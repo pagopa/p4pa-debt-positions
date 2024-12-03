@@ -10,7 +10,7 @@ plugins {
 
 group = "it.gov.pagopa.payhub"
 version = "0.0.1"
-description = "template-payments-java-repository"
+description = "p4pa-debt-positions"
 
 java {
 	toolchain {
