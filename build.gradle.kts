@@ -92,7 +92,7 @@ configure<SourceSetContainer> {
 }
 
 springBoot {
-	mainClass.value("it.gov.pagopa.template.TemplateApplication")
+	mainClass.value("it.gov.pagopa.pu.debtpositions.DebtPositionsApplication")
 }
 
 openApiGenerate {
