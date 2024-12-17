@@ -33,6 +33,6 @@ public class DebtPosition implements Serializable {
   private boolean flagIuvVolatile;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

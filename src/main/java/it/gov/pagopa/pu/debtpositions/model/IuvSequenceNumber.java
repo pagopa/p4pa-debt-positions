@@ -22,6 +22,6 @@ public class IuvSequenceNumber {
   private Long sequenceNumber;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

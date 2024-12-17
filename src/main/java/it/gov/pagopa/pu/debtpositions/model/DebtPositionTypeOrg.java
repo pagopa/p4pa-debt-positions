@@ -42,6 +42,6 @@ public class DebtPositionTypeOrg {
   private Long amountActualizationOrgSilServiceId;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

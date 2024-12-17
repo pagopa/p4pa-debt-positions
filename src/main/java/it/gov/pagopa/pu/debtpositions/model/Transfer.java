@@ -31,6 +31,6 @@ public class Transfer {
   private Long transferIndex;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

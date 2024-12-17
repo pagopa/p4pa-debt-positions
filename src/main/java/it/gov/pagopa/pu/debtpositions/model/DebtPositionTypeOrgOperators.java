@@ -19,8 +19,8 @@ public class DebtPositionTypeOrgOperators {
   @SequenceGenerator(name = "debt_position_type_org_operators_generator", sequenceName = "debt_position_type_org_operators_seq", allocationSize = 1)
   private Long debtPositionTypeOrgOperatorId;
   private Long debtPositionTypeOrgId;
+  private Long operatorExternalUserId;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
-
+  private Long updateOperatorId;
 }

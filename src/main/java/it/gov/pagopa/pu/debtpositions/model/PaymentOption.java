@@ -30,6 +30,6 @@ public class PaymentOption {
   private PaymentOptionType paymentOptionType;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

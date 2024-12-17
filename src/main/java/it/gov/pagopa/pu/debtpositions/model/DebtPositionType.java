@@ -30,6 +30,6 @@ public class DebtPositionType {
   private boolean flagMandatoryDueDate;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }

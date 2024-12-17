@@ -37,6 +37,6 @@ public class Installment {
   private byte[] debtorFiscalCodeHash;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
-  private Long operatorExternalUserId;
+  private Long updateOperatorId;
 
 }
