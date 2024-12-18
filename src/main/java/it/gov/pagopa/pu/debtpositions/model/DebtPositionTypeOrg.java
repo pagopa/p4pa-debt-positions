@@ -35,11 +35,13 @@ public class DebtPositionTypeOrg {
   private boolean flagMandatoryDueDate;
   private boolean flagSpontaneous;
   private boolean flagNotifyIO;
+  private String ioTemplateMessage;
   private boolean flagActive;
   private boolean flagNotifyOutcomePush;
   private Long notifyOutcomePushOrgSilServiceId;
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
+  private boolean flagExternal;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private Long updateOperatorId;

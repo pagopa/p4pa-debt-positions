@@ -28,6 +28,8 @@ public class DebtPositionType {
   private String taxonomyCode;
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;
+  private boolean flagNotifyIO;
+  private String ioTemplateMessage;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private Long updateOperatorId;
