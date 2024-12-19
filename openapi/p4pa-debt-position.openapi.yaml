@@ -7,10 +7,10 @@ servers:
   - url: http://localhost:8080
     description: Generated server url
 paths:
-  /api/debt-positions:
+  /debt-positions:
     post:
       tags:
-        - debt-position-controller
+        - debt-position
       operationId: createDebtPosition
       requestBody:
         content:
@@ -75,6 +75,34 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/PaymentOptionDTO"
+    PaymentOptionDTO:
+      type: object
+      properties:
+        paymentOptionId:
+          type: integer
+          format: int64
+        totalAmountCents:
+          type: integer
+          format: int64
+        status:
+          type: string
+        multiDebtor:
+          type: boolean
+        dueDate:
+          type: string
+          format: date-time
+        description:
+          type: string
+        paymentOptionType:
+          type: string
+          enum:
+            - SINGLE_INSTALLMENT
+            - INSTALMENTS
+            - DOWN_PAYMENT
+        installments:
+          type: array
+          items:
+            $ref: "#/components/schemas/InstallmentDTO"
     InstallmentDTO:
       type: object
       properties:
@@ -82,7 +110,8 @@ components:
           type: integer
           format: int64
         paymentOptionId:
-          $ref: "#/components/schemas/PaymentOptionDTO"
+          type: integer
+          format: int64
         status:
           type: string
         iud:
@@ -116,65 +145,45 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TransferDTO"
-        receipt:
-          $ref: "#/components/schemas/ReceiptDTO"
+        receiptId:
+          type: integer
+          format: int64
         creationDate:
           type: string
           format: date-time
         updateDate:
           type: string
           format: date-time
-    PaymentOptionDTO:
+    TransferDTO:
       type: object
       properties:
-        paymentOptionId:
+        transferId:
           type: integer
           format: int64
-        totalAmountCents:
+        orgFiscalCode:
+          type: string
+        orgName:
+          type: string
+        amountCents:
           type: integer
           format: int64
-        status:
+        remittanceInformation:
           type: string
-        multiDebtor:
-          type: boolean
-        dueDate:
+        stampType:
           type: string
-          format: date-time
-        description:
+        stampHashDocument:
           type: string
-        paymentOptionType:
+        stampProvincialResidence:
           type: string
-          enum:
-            - SINGLE_INSTALLMENT
-            - INSTALMENTS
-            - DOWN_PAYMENT
-        installments:
-          type: array
-          items:
-            $ref: "#/components/schemas/InstallmentDTO"
-    PersonDTO:
-      type: object
-      properties:
-        uniqueIdentifierType:
+        iban:
           type: string
-        uniqueIdentifierCode:
+        postalIban:
           type: string
-        fullName:
+        category:
           type: string
-        address:
-          type: string
-        civic:
-          type: string
-        postalCode:
-          type: string
-        location:
-          type: string
-        province:
-          type: string
-        nation:
-          type: string
-        email:
-          type: string
+        transferIndex:
+          type: integer
+          format: int32
     ReceiptDTO:
       type: object
       properties:
@@ -241,33 +250,26 @@ components:
         updateDate:
           type: string
           format: date-time
-    TransferDTO:
+    PersonDTO:
       type: object
       properties:
-        transferId:
-          type: integer
-          format: int64
-        orgFiscalCode:
+        uniqueIdentifierType:
           type: string
-        orgName:
+        uniqueIdentifierCode:
           type: string
-        amountCents:
-          type: integer
-          format: int64
-        remittanceInformation:
+        fullName:
           type: string
-        stampType:
+        address:
           type: string
-        stampHashDocument:
+        civic:
           type: string
-        stampProvincialResidence:
+        postalCode:
           type: string
-        iban:
+        location:
           type: string
-        postalIban:
+        province:
           type: string
-        category:
+        nation:
           type: string
-        transferIndex:
-          type: integer
-          format: int32
+        email:
+          type: string
