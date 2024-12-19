@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "receipt")
@@ -37,16 +36,16 @@ public class Receipt {
   private String channelDescription;
   private String paymentMethod;
   private Long feeCents;
-  private LocalDateTime paymentDateTime;
-  private LocalDate applicationDate;
-  private LocalDate transferDate;
+  private OffsetDateTime paymentDateTime;
+  private OffsetDateTime applicationDate;
+  private OffsetDateTime transferDate;
   private byte[] receiptBytes;
   private boolean standin;
   private Character debtorEntityType;
   private Long personalDataId;
   private byte[] debtorFiscalCodeHash;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

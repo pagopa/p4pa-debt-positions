@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "debt_position_type_org")
@@ -42,8 +42,8 @@ public class DebtPositionTypeOrg {
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

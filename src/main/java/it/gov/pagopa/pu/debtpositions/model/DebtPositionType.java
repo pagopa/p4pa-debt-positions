@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "debt_position_type")
@@ -30,8 +30,8 @@ public class DebtPositionType {
   private boolean flagMandatoryDueDate;
   private boolean flagNotifyIO;
   private String ioTemplateMessage;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

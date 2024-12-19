@@ -6,8 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "debt_position")
@@ -28,11 +27,11 @@ public class DebtPosition implements Serializable {
   private Long ingestionFlowFileLineNumber;
   private Long organizationId;
   private Long debtPositionTypeOrgId;
-  private LocalDate notificationDate;
-  private LocalDate validityDate;
+  private OffsetDateTime notificationDate;
+  private OffsetDateTime validityDate;
   private boolean flagIuvVolatile;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

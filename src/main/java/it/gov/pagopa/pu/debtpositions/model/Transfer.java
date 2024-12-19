@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "transfer")
@@ -29,8 +29,8 @@ public class Transfer {
   private String postalIban;
   private String category;
   private Long transferIndex;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

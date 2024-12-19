@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "installment")
@@ -24,7 +23,7 @@ public class Installment {
   private String iud;
   private String iuv;
   private String iur;
-  private LocalDate dueDate;
+  private OffsetDateTime dueDate;
   private String paymentTypeCode;
   private Long amountCents;
   private Long notificationFeeCents;
@@ -35,8 +34,8 @@ public class Installment {
   private Long personalDataId;
   private Character debtorEntityType;
   private byte[] debtorFiscalCodeHash;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }

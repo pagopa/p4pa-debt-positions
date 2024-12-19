@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "debt_position_type_org_operators")
@@ -20,7 +20,7 @@ public class DebtPositionTypeOrgOperators {
   private Long debtPositionTypeOrgOperatorId;
   private Long debtPositionTypeOrgId;
   private Long operatorExternalUserId;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 }

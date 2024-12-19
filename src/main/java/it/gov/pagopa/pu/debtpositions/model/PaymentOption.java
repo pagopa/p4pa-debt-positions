@@ -6,8 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "payment_option")
@@ -24,12 +23,12 @@ public class PaymentOption {
   private Long totalAmountCents;
   private String status;
   private boolean multiDebtor;
-  private LocalDate dueDate;
+  private OffsetDateTime dueDate;
   private String description;
   @Enumerated(EnumType.STRING)
   private PaymentOptionType paymentOptionType;
-  private LocalDateTime creationDate;
-  private LocalDateTime updateDate;
+  private OffsetDateTime creationDate;
+  private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
 }
