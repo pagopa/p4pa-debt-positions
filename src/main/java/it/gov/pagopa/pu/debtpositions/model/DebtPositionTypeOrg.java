@@ -26,7 +26,7 @@ public class DebtPositionTypeOrg {
   private String iban;
   private String postalIban;
   private String postalAccountCode;
-  private String holderPostalCC;
+  private String holderPostalCc;
   private String orgSector;
   private String xsdDefinitionRef;
   private Long amountCents;
@@ -34,7 +34,7 @@ public class DebtPositionTypeOrg {
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;
   private boolean flagSpontaneous;
-  private boolean flagNotifyIO;
+  private boolean flagNotifyIo;
   private String ioTemplateMessage;
   private boolean flagActive;
   private boolean flagNotifyOutcomePush;

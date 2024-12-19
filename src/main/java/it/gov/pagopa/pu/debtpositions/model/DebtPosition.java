@@ -20,7 +20,7 @@ public class DebtPosition implements Serializable {
   @SequenceGenerator(name = "debt_position_generator", sequenceName = "debt_position_seq", allocationSize = 1)
   private Long debtPositionId;
   private String iupdOrg;
-  private String iupdPagoPa;
+  private String iupdPagopa;
   private String description;
   private String status;
   private Long ingestionFlowFileId;

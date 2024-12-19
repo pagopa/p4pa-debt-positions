@@ -28,7 +28,7 @@ public class DebtPositionType {
   private String taxonomyCode;
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;
-  private boolean flagNotifyIO;
+  private boolean flagNotifyIo;
   private String ioTemplateMessage;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
