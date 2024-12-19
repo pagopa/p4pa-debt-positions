@@ -3,6 +3,11 @@ spring:
       name: ${artifactId}
       version: ${version}
     jmx.enabled: true
+    datasource:
+      url: \${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}}
+      username: \${DEBT_POSITIONS_DB_USER}
+      password: \${DEBT_POSITIONS_DB_PASSWORD}
+      driverClassName: org.postgresql.Driver
 management:
     endpoint:
       health:
@@ -15,4 +20,3 @@ management:
         exposure.include: "*"
       web:
         exposure.include: info, health
-app:

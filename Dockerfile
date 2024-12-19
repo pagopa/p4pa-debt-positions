@@ -101,8 +101,6 @@ RUN mkdir -p src/main/java && \
 
 USER ${APP_USER}
 
-RUN gradle openApiGenerate dependencies --no-daemon
-
 #
 # 🏗️ Build Stage
 #
