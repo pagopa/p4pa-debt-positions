@@ -12,7 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaRepositories(
   basePackages = {"it.gov.pagopa.pu.debtpositions.citizen"}
 )
-public class CitizenDataSourceConfiguration {
+public class CitizenDataSourceConfig {
   @Bean
   @ConfigurationProperties("spring.datasource.citizen")
   public DataSourceProperties citizenDataSourceProperties() {
