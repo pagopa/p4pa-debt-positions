@@ -3,6 +3,14 @@ spring:
       name: ${artifactId}
       version: ${version}
     jmx.enabled: true
+    datasource:
+      citizen:
+        jdbc-url: "\${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:${CITIZENDB_PORT:5432}/citizen}"
+        username: "\${CITIZENDB_USER}"
+        password: "\${CITIZENDB_PASSWORD}"
+        driverClassName: "org.postgresql.Driver"
+        minimumIdle: "\${CITIZENDB_MINIDLE:5}"
+        maximumPoolSize: "\${CITIZENDB_MAXPOOLSIZE:10}"
 management:
     endpoint:
       health:

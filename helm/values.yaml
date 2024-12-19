@@ -65,6 +65,10 @@ microservice-chart:
   envSecret:
     APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-connection-string
 
+    CITIZENDB_HOST: db-host
+    CITIZENDB_USER: db-mypay-login-username
+    CITIZENDB_PASSWORD: db-mypay-login-password
+
   # nodeSelector: {}
 
   # tolerations: []
