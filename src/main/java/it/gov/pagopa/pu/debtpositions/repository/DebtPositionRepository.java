@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(collectionResourceRel = "debt_position", path = "debt-positions")
+@RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition,Long> {
 
     @EntityGraph(value = "completeDebtPosition")
