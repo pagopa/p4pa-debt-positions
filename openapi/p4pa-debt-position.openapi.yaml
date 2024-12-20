@@ -32,6 +32,9 @@ paths:
 components:
   schemas:
     DebtPositionDTO:
+      required:
+        - debtPositionTypeOrgId
+        - organizationId
       type: object
       properties:
         debtPositionId:
@@ -76,6 +79,9 @@ components:
           items:
             $ref: "#/components/schemas/PaymentOptionDTO"
     PaymentOptionDTO:
+      required:
+        - installments
+        - totalAmountCents
       type: object
       properties:
         paymentOptionId:
@@ -104,6 +110,11 @@ components:
           items:
             $ref: "#/components/schemas/InstallmentDTO"
     InstallmentDTO:
+      required:
+        - amountCents
+        - debtor
+        - remittanceInformation
+        - transfers
       type: object
       properties:
         installmentId:
@@ -145,9 +156,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TransferDTO"
-        receiptId:
-          type: integer
-          format: int64
         creationDate:
           type: string
           format: date-time
@@ -155,6 +163,12 @@ components:
           type: string
           format: date-time
     TransferDTO:
+      required:
+        - amountCents
+        - category
+        - orgFiscalCode
+        - orgName
+        - remittanceInformation
       type: object
       properties:
         transferId:
@@ -188,6 +202,9 @@ components:
       type: object
       properties:
         receiptId:
+          type: integer
+          format: int64
+        installmentId:
           type: integer
           format: int64
         paymentReceiptId:
@@ -251,6 +268,11 @@ components:
           type: string
           format: date-time
     PersonDTO:
+      required:
+        - email
+        - fullName
+        - uniqueIdentifierCode
+        - uniqueIdentifierType
       type: object
       properties:
         uniqueIdentifierType:
