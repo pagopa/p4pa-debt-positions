@@ -9,5 +9,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface DebtPositionRepository extends JpaRepository<DebtPosition,Long> {
 
     @EntityGraph(value = "completeDebtPosition")
-    DebtPosition findOneWithAllDataById(Long debtPositionId);
+    DebtPosition findOneWithAllDataByDebtPositionId(Long debtPositionId);
 }

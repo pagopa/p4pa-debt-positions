@@ -10,9 +10,9 @@ import java.time.OffsetDateTime;
 import java.util.List;
 
 @NamedEntityGraph(
-        name = "debt-position-entity-graph",
+        name = "completeDebtPosition",
         attributeNodes = {
-                @NamedAttributeNode("paymentOptions")
+                @NamedAttributeNode(value = "paymentOptions", subgraph = "subgraph.payment-option")
         },
         subgraphs = {
                 @NamedSubgraph(name = "subgraph.payment-option",
