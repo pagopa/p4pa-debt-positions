@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -12,7 +13,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class Receipt {
+public class ReceiptNoPII implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receipt_generator")
@@ -39,7 +40,6 @@ public class Receipt {
   private OffsetDateTime paymentDateTime;
   private OffsetDateTime applicationDate;
   private OffsetDateTime transferDate;
-  private byte[] receiptBytes;
   private boolean standin;
   private Character debtorEntityType;
   private Long personalDataId;

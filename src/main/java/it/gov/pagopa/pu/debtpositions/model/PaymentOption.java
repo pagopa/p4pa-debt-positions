@@ -6,14 +6,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "payment_option")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class PaymentOption {
+public class PaymentOption implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_option_generator")
@@ -31,4 +33,6 @@ public class PaymentOption {
   private OffsetDateTime updateDate;
   private Long updateOperatorId;
 
+  @OneToMany
+  private List<InstallmentNoPII> installments;
 }
