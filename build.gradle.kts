@@ -6,6 +6,7 @@ plugins {
 	id("org.sonarqube") version "5.1.0.4882"
 	id("com.github.ben-manes.versions") version "0.51.0"
 	id("org.openapi.generator") version "7.9.0"
+  id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 }
 
 group = "it.gov.pagopa.payhub"
@@ -31,21 +32,21 @@ repositories {
 val springDocOpenApiVersion = "2.6.0"
 val openApiToolsVersion = "0.2.6"
 val micrometerVersion = "1.4.0"
-val hikariCPVersion = "6.2.1"
+val postgresJdbcVersion = "42.7.4"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
+  implementation("org.springframework.boot:spring-boot-starter-data-rest")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
-  implementation("com.zaxxer:HikariCP:$hikariCPVersion")
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
 
-  // PostgreSQL
-  runtimeOnly("org.postgresql:postgresql")
+  //postgres jdbc
+  implementation("org.postgresql:postgresql:$postgresJdbcVersion")
 
 	compileOnly("org.projectlombok:lombok")
 	annotationProcessor("org.projectlombok:lombok")
@@ -87,14 +88,20 @@ configurations {
 	}
 }
 
+openApi {
+  apiDocsUrl.set("http://localhost:8080/v3/api-docs")
+  outputDir.set(file("$projectDir/openapi"))
+  outputFileName.set("generated.openapi.json")
+}
+
 tasks.compileJava {
-	dependsOn("openApiGenerate")
+  dependsOn("openApiGenerate")
 }
 
 configure<SourceSetContainer> {
-	named("main") {
-		java.srcDir("$projectDir/build/generated/src/main/java")
-	}
+  named("main") {
+    java.srcDir("$projectDir/build/generated/src/main/java")
+  }
 }
 
 springBoot {
@@ -103,7 +110,7 @@ springBoot {
 
 openApiGenerate {
   generatorName.set("spring")
-  inputSpec.set("$rootDir/openapi/template-payments-java-repository.openapi.yaml")
+  inputSpec.set("$rootDir/openapi/p4pa-debt-position.openapi.yaml")
   outputDir.set("$projectDir/build/generated")
   apiPackage.set("it.gov.pagopa.template.controller.generated")
   modelPackage.set("it.gov.pagopa.template.model.generated")
@@ -114,7 +121,7 @@ openApiGenerate {
     "interfaceOnly" to "true",
     "useTags" to "true",
     "generateConstructorWithAllArgs" to "false",
-    "generatedConstructorWithRequiredArgs" to "false",
-    "additionalModelTypeAnnotations" to "@lombok.Data @lombok.Builder @lombok.AllArgsConstructor @lombok.RequiredArgsConstructor"
+    "generatedConstructorWithRequiredArgs" to "true",
+    "additionalModelTypeAnnotations" to "@lombok.Data @lombok.Builder @lombok.AllArgsConstructor"
   ))
 }

@@ -64,6 +64,9 @@ microservice-chart:
 
   envSecret:
     APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-connection-string
+    DEBT_POSITIONS_DB_HOST: db-host
+    DEBT_POSITIONS_DB_USER: db-piattaforma-unitaria-login-username
+    DEBT_POSITIONS_DB_PASSWORD: db-piattaforma-unitaria-login-password
 
     CITIZENDB_HOST: db-host
     CITIZENDB_USER: db-mypay-login-username
