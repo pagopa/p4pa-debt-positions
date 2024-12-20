@@ -97,7 +97,7 @@ springBoot {
 
 openApiGenerate {
   generatorName.set("spring")
-  inputSpec.set("$rootDir/openapi/template-payments-java-repository.openapi.yaml")
+  inputSpec.set("$rootDir/openapi/p4pa-debt-position.openapi.yaml")
   outputDir.set("$projectDir/build/generated")
   apiPackage.set("it.gov.pagopa.template.controller.generated")
   modelPackage.set("it.gov.pagopa.template.model.generated")
