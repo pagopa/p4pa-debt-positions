@@ -23,6 +23,6 @@ public class IuvSequenceNumber implements Serializable {
   private Long sequenceNumber;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
 }

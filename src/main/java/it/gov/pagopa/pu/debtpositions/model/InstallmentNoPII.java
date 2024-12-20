@@ -22,9 +22,11 @@ public class InstallmentNoPII implements Serializable {
   private Long installmentId;
   private Long paymentOptionId;
   private String status;
+  private String iupdPagopa;
   private String iud;
   private String iuv;
   private String iur;
+  private String iuf;
   private OffsetDateTime dueDate;
   private String paymentTypeCode;
   private Long amountCents;
@@ -38,7 +40,7 @@ public class InstallmentNoPII implements Serializable {
   private byte[] debtorFiscalCodeHash;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
   @OneToMany
   private List<Transfer> transfers;

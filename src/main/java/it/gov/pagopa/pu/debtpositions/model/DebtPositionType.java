@@ -33,6 +33,6 @@ public class DebtPositionType implements Serializable {
   private String ioTemplateMessage;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
 }

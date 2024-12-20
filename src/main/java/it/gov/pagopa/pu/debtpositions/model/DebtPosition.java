@@ -33,7 +33,6 @@ public class DebtPosition implements Serializable {
     @SequenceGenerator(name = "debt_position_generator", sequenceName = "debt_position_seq", allocationSize = 1)
     private Long debtPositionId;
     private String iupdOrg;
-    private String iupdPagopa;
     private String description;
     private String status;
     private Long ingestionFlowFileId;
@@ -45,7 +44,7 @@ public class DebtPosition implements Serializable {
     private boolean flagIuvVolatile;
     private OffsetDateTime creationDate;
     private OffsetDateTime updateDate;
-    private Long updateOperatorId;
+    private Long updateOperatorExternalId;
 
     @OneToMany
     private List<PaymentOption> paymentOptions;

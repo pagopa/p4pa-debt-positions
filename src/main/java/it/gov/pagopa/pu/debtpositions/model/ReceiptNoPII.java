@@ -46,6 +46,6 @@ public class ReceiptNoPII implements Serializable {
   private byte[] debtorFiscalCodeHash;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
 }
