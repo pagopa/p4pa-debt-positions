@@ -8,6 +8,9 @@ spring:
       username: \${DEBT_POSITIONS_DB_USER}
       password: \${DEBT_POSITIONS_DB_PASSWORD}
       driverClassName: org.postgresql.Driver
+    data:
+      rest:
+        basePath: crud
 management:
     endpoint:
       health:
