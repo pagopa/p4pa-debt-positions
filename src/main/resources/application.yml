@@ -8,6 +8,11 @@ spring:
       username: \${DEBT_POSITIONS_DB_USER}
       password: \${DEBT_POSITIONS_DB_PASSWORD}
       driverClassName: org.postgresql.Driver
+      citizen:
+        jdbc-url: \${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:${CITIZENDB_PORT:5432}/citizen}
+        username: \${CITIZENDB_USER}
+        password: \${CITIZENDB_PASSWORD}
+        driverClassName: org.postgresql.Driver
     data:
       rest:
         basePath: crud
