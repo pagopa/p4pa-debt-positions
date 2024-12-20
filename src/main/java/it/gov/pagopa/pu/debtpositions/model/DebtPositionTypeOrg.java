@@ -45,6 +45,6 @@ public class DebtPositionTypeOrg implements Serializable {
   private boolean flagExternal;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
 }

@@ -31,7 +31,7 @@ public class PaymentOption implements Serializable {
   private PaymentOptionType paymentOptionType;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
   @OneToMany
   private List<InstallmentNoPII> installments;
