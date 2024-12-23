@@ -4,10 +4,11 @@ spring:
       version: ${version}
     jmx.enabled: true
     datasource:
-      url: \${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}
-      username: \${DEBT_POSITIONS_DB_USER}
-      password: \${DEBT_POSITIONS_DB_PASSWORD}
-      driverClassName: org.postgresql.Driver
+      debt-position:
+        jdbc-url: \${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}
+        username: \${DEBT_POSITIONS_DB_USER}
+        password: \${DEBT_POSITIONS_DB_PASSWORD}
+        driverClassName: org.postgresql.Driver
       citizen:
         jdbc-url: \${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:${CITIZENDB_PORT:5432}/citizen}
         username: \${CITIZENDB_USER}
