@@ -68,6 +68,10 @@ microservice-chart:
     DEBT_POSITIONS_DB_USER: db-piattaforma-unitaria-login-username
     DEBT_POSITIONS_DB_PASSWORD: db-piattaforma-unitaria-login-password
 
+    CITIZENDB_HOST: db-host
+    CITIZENDB_USER: db-mypay-login-username
+    CITIZENDB_PASSWORD: db-mypay-login-password
+
   # nodeSelector: {}
 
   # tolerations: []
