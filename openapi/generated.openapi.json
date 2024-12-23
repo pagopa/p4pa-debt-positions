@@ -3139,6 +3139,81 @@
           }
         }
       },
+      "EntityModelDebtPositionTypeOrgOperators": {
+        "type": "object",
+        "properties": {
+          "debtPositionTypeOrgOperatorId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "debtPositionTypeOrgId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "operatorExternalUserId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updateOperatorExternalId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PageMetadata": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalElements": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "PagedModelEntityModelDebtPositionTypeOrgOperators": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "debtPositionTypeOrgOperatorses": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
       "EntityModelDebtPositionType": {
         "type": "object",
         "properties": {
@@ -3191,33 +3266,12 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
           "_links": {
             "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "PageMetadata": {
-        "type": "object",
-        "properties": {
-          "size": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalElements": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalPages": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "number": {
-            "type": "integer",
-            "format": "int64"
           }
         }
       },
@@ -3243,116 +3297,92 @@
           }
         }
       },
-      "EntityModelDebtPositionTypeOrgOperators": {
+      "EntityModelReceiptNoPII": {
         "type": "object",
         "properties": {
-          "debtPositionTypeOrgOperatorId": {
+          "receiptId": {
             "type": "integer",
             "format": "int64"
           },
-          "debtPositionTypeOrgId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "operatorExternalUserId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "creationDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateOperatorId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "PagedModelEntityModelDebtPositionTypeOrgOperators": {
-        "type": "object",
-        "properties": {
-          "_embedded": {
-            "type": "object",
-            "properties": {
-              "debtPositionTypeOrgOperatorses": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
-                }
-              }
-            }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          },
-          "page": {
-            "$ref": "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "EntityModelInstallmentNoPII": {
-        "type": "object",
-        "properties": {
           "installmentId": {
             "type": "integer",
             "format": "int64"
           },
-          "paymentOptionId": {
+          "paymentReceiptId": {
             "type": "integer",
             "format": "int64"
           },
-          "status": {
+          "noticeNumber": {
             "type": "string"
           },
-          "iud": {
+          "orgFiscalCode": {
             "type": "string"
           },
-          "iuv": {
+          "outcome": {
             "type": "string"
           },
-          "iur": {
+          "creditorReferenceId": {
             "type": "string"
           },
-          "dueDate": {
+          "paymentAmountCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "description": {
+            "type": "string"
+          },
+          "companyName": {
+            "type": "string"
+          },
+          "officeName": {
+            "type": "string"
+          },
+          "idPsp": {
+            "type": "string"
+          },
+          "pspFiscalCode": {
+            "type": "string"
+          },
+          "pspPartitaIva": {
+            "type": "string"
+          },
+          "pspCompanyName": {
+            "type": "string"
+          },
+          "idChannel": {
+            "type": "string"
+          },
+          "channelDescription": {
+            "type": "string"
+          },
+          "paymentMethod": {
+            "type": "string"
+          },
+          "feeCents": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "paymentDateTime": {
             "type": "string",
             "format": "date-time"
           },
-          "paymentTypeCode": {
-            "type": "string"
+          "applicationDate": {
+            "type": "string",
+            "format": "date-time"
           },
-          "amountCents": {
-            "type": "integer",
-            "format": "int64"
+          "transferDate": {
+            "type": "string",
+            "format": "date-time"
           },
-          "notificationFeeCents": {
-            "type": "integer",
-            "format": "int64"
+          "standin": {
+            "type": "boolean"
           },
-          "remittanceInformation": {
-            "type": "string"
-          },
-          "humanFriendlyRemittanceInformation": {
-            "type": "string"
-          },
-          "balance": {
-            "type": "string"
-          },
-          "legacyPaymentMetadata": {
+          "debtorEntityType": {
             "type": "string"
           },
           "personalDataId": {
             "type": "integer",
             "format": "int64"
-          },
-          "debtorEntityType": {
-            "type": "string"
           },
           "debtorFiscalCodeHash": {
             "type": "string",
@@ -3366,7 +3396,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -3375,16 +3405,16 @@
           }
         }
       },
-      "PagedModelEntityModelInstallmentNoPII": {
+      "PagedModelEntityModelReceiptNoPII": {
         "type": "object",
         "properties": {
           "_embedded": {
             "type": "object",
             "properties": {
-              "installmentNoPIIs": {
+              "receiptNoPIIs": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref": "#/components/schemas/EntityModelReceiptNoPII"
                 }
               }
             }
@@ -3408,138 +3438,6 @@
           },
           "stampProvincialResidence": {
             "type": "string"
-          }
-        }
-      },
-      "CollectionModelTransfer": {
-        "type": "object",
-        "properties": {
-          "_embedded": {
-            "type": "object",
-            "properties": {
-              "transfers": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/TransferResponse"
-                }
-              }
-            }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "CollectionModelObject": {
-        "type": "object",
-        "properties": {
-          "_embedded": {
-            "type": "object",
-            "properties": {
-              "objects": {
-                "type": "array",
-                "items": {
-                  "type": "object"
-                }
-              }
-            }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "EntityModelPaymentOption": {
-        "type": "object",
-        "properties": {
-          "paymentOptionId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "debtPositionId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "totalAmountCents": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "status": {
-            "type": "string"
-          },
-          "multiDebtor": {
-            "type": "boolean"
-          },
-          "dueDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "description": {
-            "type": "string"
-          },
-          "paymentOptionType": {
-            "type": "string",
-            "enum": [
-              "SINGLE_INSTALLMENT",
-              "INSTALMENTS",
-              "DOWN_PAYMENT"
-            ]
-          },
-          "creationDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateDate": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "updateOperatorId": {
-            "type": "integer",
-            "format": "int64"
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          }
-        }
-      },
-      "PagedModelEntityModelPaymentOption": {
-        "type": "object",
-        "properties": {
-          "_embedded": {
-            "type": "object",
-            "properties": {
-              "paymentOptions": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/EntityModelPaymentOption"
-                }
-              }
-            }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
-          },
-          "page": {
-            "$ref": "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "CollectionModelInstallmentNoPII": {
-        "type": "object",
-        "properties": {
-          "_embedded": {
-            "type": "object",
-            "properties": {
-              "installmentNoPIIs": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/InstallmentNoPIIResponse"
-                }
-              }
-            }
-          },
-          "_links": {
-            "$ref": "#/components/schemas/Links"
           }
         }
       },
@@ -3591,7 +3489,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -3630,9 +3528,6 @@
             "format": "int64"
           },
           "iupdOrg": {
-            "type": "string"
-          },
-          "iupdPagopa": {
             "type": "string"
           },
           "description": {
@@ -3676,7 +3571,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -3704,6 +3599,25 @@
           },
           "page": {
             "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelObject": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "objects": {
+                "type": "array",
+                "items": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
           }
         }
       },
@@ -3818,7 +3732,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -3849,92 +3763,162 @@
           }
         }
       },
-      "EntityModelReceiptNoPII": {
+      "EntityModelPaymentOption": {
         "type": "object",
         "properties": {
-          "receiptId": {
+          "paymentOptionId": {
             "type": "integer",
             "format": "int64"
           },
-          "installmentId": {
+          "debtPositionId": {
             "type": "integer",
             "format": "int64"
           },
-          "paymentReceiptId": {
+          "totalAmountCents": {
             "type": "integer",
             "format": "int64"
           },
-          "noticeNumber": {
+          "status": {
             "type": "string"
           },
-          "orgFiscalCode": {
-            "type": "string"
+          "multiDebtor": {
+            "type": "boolean"
           },
-          "outcome": {
-            "type": "string"
-          },
-          "creditorReferenceId": {
-            "type": "string"
-          },
-          "paymentAmountCents": {
-            "type": "integer",
-            "format": "int64"
+          "dueDate": {
+            "type": "string",
+            "format": "date-time"
           },
           "description": {
             "type": "string"
           },
-          "companyName": {
-            "type": "string"
+          "paymentOptionType": {
+            "type": "string",
+            "enum": [
+              "SINGLE_INSTALLMENT",
+              "INSTALMENTS",
+              "DOWN_PAYMENT"
+            ]
           },
-          "officeName": {
-            "type": "string"
+          "creationDate": {
+            "type": "string",
+            "format": "date-time"
           },
-          "idPsp": {
-            "type": "string"
+          "updateDate": {
+            "type": "string",
+            "format": "date-time"
           },
-          "pspFiscalCode": {
-            "type": "string"
-          },
-          "pspPartitaIva": {
-            "type": "string"
-          },
-          "pspCompanyName": {
-            "type": "string"
-          },
-          "idChannel": {
-            "type": "string"
-          },
-          "channelDescription": {
-            "type": "string"
-          },
-          "paymentMethod": {
-            "type": "string"
-          },
-          "feeCents": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
-          "paymentDateTime": {
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelEntityModelPaymentOption": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "paymentOptions": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/EntityModelPaymentOption"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelInstallmentNoPII": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "installmentNoPIIs": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InstallmentNoPIIResponse"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
+          }
+        }
+      },
+      "EntityModelInstallmentNoPII": {
+        "type": "object",
+        "properties": {
+          "installmentId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "paymentOptionId": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string"
+          },
+          "iupdPagopa": {
+            "type": "string"
+          },
+          "iud": {
+            "type": "string"
+          },
+          "iuv": {
+            "type": "string"
+          },
+          "iur": {
+            "type": "string"
+          },
+          "iuf": {
+            "type": "string"
+          },
+          "dueDate": {
             "type": "string",
             "format": "date-time"
           },
-          "applicationDate": {
-            "type": "string",
-            "format": "date-time"
+          "paymentTypeCode": {
+            "type": "string"
           },
-          "transferDate": {
-            "type": "string",
-            "format": "date-time"
+          "amountCents": {
+            "type": "integer",
+            "format": "int64"
           },
-          "standin": {
-            "type": "boolean"
+          "notificationFeeCents": {
+            "type": "integer",
+            "format": "int64"
           },
-          "debtorEntityType": {
+          "remittanceInformation": {
+            "type": "string"
+          },
+          "humanFriendlyRemittanceInformation": {
+            "type": "string"
+          },
+          "balance": {
+            "type": "string"
+          },
+          "legacyPaymentMetadata": {
             "type": "string"
           },
           "personalDataId": {
             "type": "integer",
             "format": "int64"
+          },
+          "debtorEntityType": {
+            "type": "string"
           },
           "debtorFiscalCodeHash": {
             "type": "string",
@@ -3948,7 +3932,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -3957,16 +3941,16 @@
           }
         }
       },
-      "PagedModelEntityModelReceiptNoPII": {
+      "PagedModelEntityModelInstallmentNoPII": {
         "type": "object",
         "properties": {
           "_embedded": {
             "type": "object",
             "properties": {
-              "receiptNoPIIs": {
+              "installmentNoPIIs": {
                 "type": "array",
                 "items": {
-                  "$ref": "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref": "#/components/schemas/EntityModelInstallmentNoPII"
                 }
               }
             }
@@ -3976,6 +3960,25 @@
           },
           "page": {
             "$ref": "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelTransfer": {
+        "type": "object",
+        "properties": {
+          "_embedded": {
+            "type": "object",
+            "properties": {
+              "transfers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "_links": {
+            "$ref": "#/components/schemas/Links"
           }
         }
       },
@@ -4002,7 +4005,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4100,7 +4103,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4158,7 +4161,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4172,9 +4175,6 @@
             "format": "int64"
           },
           "iupdOrg": {
-            "type": "string"
-          },
-          "iupdPagopa": {
             "type": "string"
           },
           "description": {
@@ -4218,7 +4218,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -4244,6 +4244,9 @@
           "status": {
             "type": "string"
           },
+          "iupdPagopa": {
+            "type": "string"
+          },
           "iud": {
             "type": "string"
           },
@@ -4251,6 +4254,9 @@
             "type": "string"
           },
           "iur": {
+            "type": "string"
+          },
+          "iuf": {
             "type": "string"
           },
           "dueDate": {
@@ -4299,7 +4305,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -4355,7 +4361,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           },
@@ -4415,7 +4421,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4435,6 +4441,9 @@
           "status": {
             "type": "string"
           },
+          "iupdPagopa": {
+            "type": "string"
+          },
           "iud": {
             "type": "string"
           },
@@ -4442,6 +4451,9 @@
             "type": "string"
           },
           "iur": {
+            "type": "string"
+          },
+          "iuf": {
             "type": "string"
           },
           "dueDate": {
@@ -4490,7 +4502,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4540,7 +4552,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4594,7 +4606,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }
@@ -4699,7 +4711,7 @@
             "type": "string",
             "format": "date-time"
           },
-          "updateOperatorId": {
+          "updateOperatorExternalId": {
             "type": "integer",
             "format": "int64"
           }

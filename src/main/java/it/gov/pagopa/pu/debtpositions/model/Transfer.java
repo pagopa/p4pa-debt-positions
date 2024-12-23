@@ -32,6 +32,6 @@ public class Transfer implements Serializable {
   private Long transferIndex;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
-  private Long updateOperatorId;
+  private Long updateOperatorExternalId;
 
 }
