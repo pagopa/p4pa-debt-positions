@@ -46,7 +46,7 @@ class OpenApiGeneratorTest {
     ).andExpect(status().isOk()).andReturn();
 
     String openApi = result.getResponse().getContentAsString();
-    Assertions.assertTrue(openApi.startsWith("{\"openapi\":\"3.0."));
+    Assertions.assertTrue(openApi.startsWith("{\n  \"openapi\" : \"3.0."));
 
     Files.writeString(Path.of("openapi/generated.openapi.json"), openApi, StandardOpenOption.TRUNCATE_EXISTING);
 
