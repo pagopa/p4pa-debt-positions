@@ -1,9 +1,5 @@
 package it.gov.pagopa.pu.debtpositions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,16 +48,10 @@ class OpenApiGeneratorTest {
     String openApi = result.getResponse().getContentAsString();
     Assertions.assertTrue(openApi.startsWith("{\"openapi\":\"3.0."));
 
-    Files.writeString(Path.of("openapi/generated.openapi.json"), prettyPrint(openApi), StandardOpenOption.TRUNCATE_EXISTING);
+    Files.writeString(Path.of("openapi/generated.openapi.json"), openApi, StandardOpenOption.TRUNCATE_EXISTING);
 
     String gitStatus = execCmd("git", "status");
     Assertions.assertFalse(gitStatus.contains("openapi/generated.openapi.json"), "Generated OpenApi not committed");
-  }
-
-  public String prettyPrint(String json) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-    JsonNode jsonObject = mapper.readTree(json);
-    return mapper.writeValueAsString(jsonObject);
   }
 
   public static String execCmd(String... cmd) throws java.io.IOException {
