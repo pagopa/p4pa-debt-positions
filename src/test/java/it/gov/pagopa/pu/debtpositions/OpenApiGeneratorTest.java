@@ -1,9 +1,6 @@
 package it.gov.pagopa.pu.debtpositions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
+import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +43,6 @@ class OpenApiGeneratorTest {
 
   @Test
   void generateAndVerifyCommit() throws Exception {
-
     MvcResult result = mockMvc.perform(
       get("/v3/api-docs")
         .contentType(MediaType.APPLICATION_JSON)
@@ -64,7 +60,7 @@ class OpenApiGeneratorTest {
       try {
         content().json(storedOpenApi, JsonCompareMode.STRICT).match(result);
         toStore=false;
-      } catch (Exception e){
+      } catch (JSONException e){
         //Do Nothing
       }
     }
@@ -74,13 +70,6 @@ class OpenApiGeneratorTest {
 
     String gitStatus = execCmd("git", "status");
     Assertions.assertFalse(gitStatus.contains("openapi/generated.openapi.json"), "Generated OpenApi not committed");
-  }
-
-  public String prettyPrint(String json) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper()
-      .enable(SerializationFeature.INDENT_OUTPUT);
-    JsonNode jsonObject = mapper.readTree(json);
-    return mapper.writeValueAsString(jsonObject);
   }
 
   public static String execCmd(String... cmd) throws java.io.IOException {
