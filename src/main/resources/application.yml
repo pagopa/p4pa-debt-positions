@@ -29,3 +29,6 @@ management:
         exposure.include: "*"
       web:
         exposure.include: info, health
+
+springdoc:
+  writer-with-default-pretty-printer: true
