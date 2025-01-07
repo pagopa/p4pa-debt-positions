@@ -197,7 +197,7 @@ components:
           type: string
         transferIndex:
           type: integer
-          format: int32
+          format: int64
     ReceiptDTO:
       type: object
       properties:
