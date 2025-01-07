@@ -6,7 +6,6 @@ plugins {
 	id("org.sonarqube") version "6.0.1.5171"
 	id("com.github.ben-manes.versions") version "0.51.0"
 	id("org.openapi.generator") version "7.10.0"
-  id("org.springdoc.openapi-gradle-plugin") version "1.9.0"
 }
 
 group = "it.gov.pagopa.payhub"
@@ -55,6 +54,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito:mockito-core")
 	testImplementation ("org.projectlombok:lombok")
+  testImplementation("com.h2database:h2")
 }
 
 tasks.withType<Test> {
@@ -86,12 +86,6 @@ configurations {
 	compileClasspath {
 		resolutionStrategy.activateDependencyLocking()
 	}
-}
-
-openApi {
-  apiDocsUrl.set("http://localhost:8080/v3/api-docs")
-  outputDir.set(file("$projectDir/openapi"))
-  outputFileName.set("generated.openapi.json")
 }
 
 tasks.compileJava {
