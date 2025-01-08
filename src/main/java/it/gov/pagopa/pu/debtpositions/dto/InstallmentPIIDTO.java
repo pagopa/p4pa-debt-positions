@@ -11,15 +11,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InstallmentPIIDTO {
 
-    private String uniqueIdentifierType;
-    private String uniqueIdentifierCode;
-    private String fullName;
-    private String address;
-    private String civic;
-    private String postalCode;
-    private String location;
-    private String province;
-    private String nation;
-    private String email;
+    private Person debtor;
 
 }

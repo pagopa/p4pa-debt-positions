@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Person {
 
-    private String uniqueIdentifierType;
-    private String uniqueIdentifierCode;
+    private String entityType;
+    private String fiscalCode;
     private String fullName;
     private String address;
     private String civic;

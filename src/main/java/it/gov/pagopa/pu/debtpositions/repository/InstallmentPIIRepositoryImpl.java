@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
-import it.gov.pagopa.pu.debtpositions.citizen.Constants;
+import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
@@ -25,7 +25,7 @@ public class InstallmentPIIRepositoryImpl implements InstallmentPIIRepository {
     @Override
     public long save(Installment installment) {
         Pair<InstallmentNoPII, InstallmentPIIDTO> p = installmentPIIMapper.map(installment);
-        long personalDataId = personalDataService.insert(p.getSecond(), Constants.PERSONAL_DATA_TYPE.INSTALLMENT);
+        long personalDataId = personalDataService.insert(p.getSecond(), PersonalDataType.INSTALLMENT);
         p.getFirst().setPersonalDataId(personalDataId);
         installment.setNoPII(p.getFirst());
         long newId = installmentNoPIIRepository.save(p.getFirst()).getInstallmentId();

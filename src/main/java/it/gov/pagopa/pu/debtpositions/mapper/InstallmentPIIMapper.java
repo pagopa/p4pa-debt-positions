@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.Person;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -36,8 +35,8 @@ public class InstallmentPIIMapper {
         installmentNoPII.setHumanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation());
         installmentNoPII.setBalance(installment.getBalance());
         installmentNoPII.setLegacyPaymentMetadata(installment.getLegacyPaymentMetadata());
-        installmentNoPII.setDebtorEntityType(installment.getDebtor().getUniqueIdentifierType().charAt(0));
-        installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getUniqueIdentifierCode()));
+        installmentNoPII.setDebtorEntityType(installment.getDebtor().getEntityType().charAt(0));
+        installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getFiscalCode()));
         installmentNoPII.setCreationDate(installment.getCreationDate());
         installmentNoPII.setUpdateDate(installment.getUpdateDate());
         installmentNoPII.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
@@ -46,24 +45,9 @@ public class InstallmentPIIMapper {
             installmentNoPII.setPersonalDataId(installment.getNoPII().getPersonalDataId());
         }
 
-        Person debtor = installment.getDebtor();
-        InstallmentPIIDTO installmentPIIDTO = getInstallmentPIIDTO(debtor);
+        InstallmentPIIDTO installmentPIIDTO = InstallmentPIIDTO.builder()
+                .debtor(installment.getDebtor()).build();
 
         return Pair.of(installmentNoPII, installmentPIIDTO);
-    }
-
-    private static InstallmentPIIDTO getInstallmentPIIDTO(Person debtor) {
-        InstallmentPIIDTO installmentPIIDTO = new InstallmentPIIDTO();
-        installmentPIIDTO.setUniqueIdentifierType(debtor.getUniqueIdentifierType());
-        installmentPIIDTO.setUniqueIdentifierCode(debtor.getUniqueIdentifierCode());
-        installmentPIIDTO.setFullName(debtor.getFullName());
-        installmentPIIDTO.setAddress(debtor.getAddress());
-        installmentPIIDTO.setCivic(debtor.getCivic());
-        installmentPIIDTO.setPostalCode(debtor.getPostalCode());
-        installmentPIIDTO.setLocation(debtor.getLocation());
-        installmentPIIDTO.setProvince(debtor.getProvince());
-        installmentPIIDTO.setNation(debtor.getNation());
-        installmentPIIDTO.setEmail(debtor.getEmail());
-        return installmentPIIDTO;
     }
 }

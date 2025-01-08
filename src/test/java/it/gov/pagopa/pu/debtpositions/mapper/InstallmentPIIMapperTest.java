@@ -42,7 +42,7 @@ class InstallmentPIIMapperTest {
 
     Installment installment = buildInstallment();
     byte[] expectedHashedCF = {};
-    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getUniqueIdentifierCode())).thenReturn(expectedHashedCF);
+    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
 
     Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
 
@@ -60,7 +60,7 @@ class InstallmentPIIMapperTest {
     Installment installment = buildInstallment();
     installment.setNoPII(installmentNoPIIExpected);
     byte[] expectedHashedCF = {};
-    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getUniqueIdentifierCode())).thenReturn(expectedHashedCF);
+    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
 
     Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
 

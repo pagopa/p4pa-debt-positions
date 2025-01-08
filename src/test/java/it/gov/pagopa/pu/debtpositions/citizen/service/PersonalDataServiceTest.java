@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.citizen.service;
 
-import it.gov.pagopa.pu.debtpositions.citizen.Constants;
+import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
@@ -57,7 +57,7 @@ class PersonalDataServiceTest {
     Mockito.when(repositoryMock.save(personalDataInput)).thenReturn(personalDataOutput);
 
     // When
-    long insert = service.insert(pii, Constants.PERSONAL_DATA_TYPE.INSTALLMENT);
+    long insert = service.insert(pii, PersonalDataType.INSTALLMENT);
 
     // Then
     Assertions.assertEquals(piiId, insert);

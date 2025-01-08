@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
-import it.gov.pagopa.pu.debtpositions.citizen.Constants;
+import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
@@ -43,7 +43,7 @@ class InstallmentPIIRepositoryImplTest {
     Mockito.when(mapperMock.map(installment)).thenReturn(p);
 
     long piiId = -1L;
-    Mockito.when(personalDataServiceMock.insert(p.getSecond(), Constants.PERSONAL_DATA_TYPE.INSTALLMENT)).thenReturn(piiId);
+    Mockito.when(personalDataServiceMock.insert(p.getSecond(), PersonalDataType.INSTALLMENT)).thenReturn(piiId);
 
     long insertedId = -2L;
     Mockito.when(installmentNoPIIRepository.save(p.getFirst())).thenReturn(installmentNoPII);

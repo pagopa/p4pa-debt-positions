@@ -68,16 +68,7 @@ public class InstallmentFaker {
 
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
-      .uniqueIdentifierType("F")
-      .uniqueIdentifierCode("uniqueIdentifierCode")
-      .fullName("fullName")
-      .address("address")
-      .civic("civic")
-      .postalCode("postalCode")
-      .location("location")
-      .province("province")
-      .nation("nation")
-      .email("email@test.it")
+      .debtor(buildPerson())
       .build();
   }
 

@@ -6,8 +6,8 @@ public class PersonFaker {
 
   public static Person buildPerson(){
     return Person.builder()
-      .uniqueIdentifierType("F")
-      .uniqueIdentifierCode("uniqueIdentifierCode")
+      .entityType("F")
+      .fiscalCode("uniqueIdentifierCode")
       .fullName("fullName")
       .address("address")
       .civic("civic")

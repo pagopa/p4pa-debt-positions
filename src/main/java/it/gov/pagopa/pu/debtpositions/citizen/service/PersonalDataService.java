@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.citizen.service;
 
-
-import it.gov.pagopa.pu.debtpositions.citizen.Constants;
+import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
 import lombok.extern.slf4j.Slf4j;
@@ -19,7 +18,7 @@ public class PersonalDataService {
         this.dataCipherService = dataCipherService;
     }
 
-    public long insert(Object pii, Constants.PERSONAL_DATA_TYPE type) {
+    public long insert(Object pii, PersonalDataType type) {
         return repository.save(PersonalData.builder()
                 .type(type.name())
                 .data(dataCipherService.encryptObj(pii))
