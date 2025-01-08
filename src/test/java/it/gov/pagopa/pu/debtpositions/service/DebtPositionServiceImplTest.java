@@ -26,7 +26,7 @@ class DebtPositionServiceImplTest {
   private DebtPositionServiceImpl debtPositionService;
 
   @Test
-  void givenValidDebtPositionDTOWhenSaveDebtPositionThenReturnSavedDebtPositionDTO() {
+  void givenValidDebtPositionDTO_WhenSaveDebtPosition_ThenReturnSavedDebtPositionDTO() {
     DebtPositionDTO inputDto = new DebtPositionDTO();
     inputDto.setDebtPositionId(1L);
 
@@ -53,7 +53,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenRepositoryFailsWhenSaveDebtPositionThenThrowRuntimeException() {
+  void givenRepositoryFails_WhenSaveDebtPosition_ThenThrowRuntimeException() {
     DebtPositionDTO inputDto = new DebtPositionDTO();
     DebtPosition mappedEntity = new DebtPosition();
     Mockito.when(debtPositionMapper.mapToModel(inputDto)).thenReturn(mappedEntity);
@@ -65,7 +65,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenMapperFailsWhenConvertEntityToDTOThenThrowRuntimeException() {
+  void givenMapperFails_WhenConvertEntityToDTO_ThenThrowRuntimeException() {
     DebtPositionDTO inputDto = new DebtPositionDTO();
     DebtPosition mappedEntity = new DebtPosition();
     DebtPosition savedEntity = new DebtPosition();
