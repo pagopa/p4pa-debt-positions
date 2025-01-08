@@ -56,12 +56,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionTypeOrgOperators"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionTypeOrgOperators"
                 }
               },
               "text/uri-list" : {
@@ -93,7 +93,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -120,7 +120,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -158,7 +158,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -168,7 +168,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -227,7 +227,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrgOperators"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -281,12 +281,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionTypeOrg"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionTypeOrg"
                 }
               },
               "text/uri-list" : {
@@ -318,7 +318,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -345,7 +345,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -383,7 +383,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -393,7 +393,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -452,7 +452,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionTypeOrg"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -506,12 +506,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionType"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/PagedModelDebtPositionType"
                 }
               },
               "text/uri-list" : {
@@ -543,7 +543,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/DebtPositionType"
                 }
               }
             }
@@ -570,7 +570,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/DebtPositionType"
                 }
               }
             }
@@ -608,7 +608,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/DebtPositionType"
                 }
               }
             }
@@ -618,7 +618,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/DebtPositionType"
                 }
               }
             }
@@ -677,7 +677,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPositionType"
+                  "$ref" : "#/components/schemas/DebtPositionType"
                 }
               }
             }
@@ -731,12 +731,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/PagedModelDebtPosition"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/PagedModelDebtPosition"
                 }
               },
               "text/uri-list" : {
@@ -768,7 +768,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -794,7 +794,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -824,7 +824,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -862,7 +862,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -872,7 +872,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -931,7 +931,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelDebtPosition"
+                  "$ref" : "#/components/schemas/DebtPosition"
                 }
               }
             }
@@ -1212,12 +1212,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/PagedModelInstallmentNoPII"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/PagedModelInstallmentNoPII"
                 }
               },
               "text/uri-list" : {
@@ -1249,7 +1249,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
                 }
               }
             }
@@ -1276,7 +1276,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
                 }
               }
             }
@@ -1314,7 +1314,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
                 }
               }
             }
@@ -1324,7 +1324,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
                 }
               }
             }
@@ -1383,7 +1383,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
                 }
               }
             }
@@ -1664,12 +1664,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PagedModelPaymentOption"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PagedModelPaymentOption"
                 }
               },
               "text/uri-list" : {
@@ -1701,7 +1701,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -1728,7 +1728,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -1766,7 +1766,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -1776,7 +1776,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -1835,7 +1835,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelPaymentOption"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -2358,12 +2358,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/PagedModelReceiptNoPII"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/PagedModelReceiptNoPII"
                 }
               },
               "text/uri-list" : {
@@ -2395,7 +2395,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
@@ -2422,7 +2422,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
@@ -2460,7 +2460,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
@@ -2470,7 +2470,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
@@ -2529,7 +2529,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelReceiptNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
@@ -2583,12 +2583,12 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelTransfer"
+                  "$ref" : "#/components/schemas/PagedModelTransfer"
                 }
               },
               "application/x-spring-data-compact+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/PagedModelEntityModelTransfer"
+                  "$ref" : "#/components/schemas/PagedModelTransfer"
                 }
               },
               "text/uri-list" : {
@@ -2620,7 +2620,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/Transfer"
                 }
               }
             }
@@ -2647,7 +2647,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/Transfer"
                 }
               }
             }
@@ -2685,7 +2685,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/Transfer"
                 }
               }
             }
@@ -2695,7 +2695,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/Transfer"
                 }
               }
             }
@@ -2754,7 +2754,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/Transfer"
                 }
               }
             }
@@ -2879,7 +2879,7 @@
             "type" : "integer",
             "format" : "int64"
           },
-          "description" : {
+          "paymentTypeCode" : {
             "type" : "string"
           },
           "companyName" : {
@@ -3013,45 +3013,37 @@
           }
         }
       },
-      "EntityModelTransfer" : {
+      "PaymentOption" : {
         "type" : "object",
         "properties" : {
-          "transferId" : {
+          "paymentOptionId" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "installmentId" : {
+          "debtPositionId" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "orgFiscalCode" : {
-            "type" : "string"
-          },
-          "orgName" : {
-            "type" : "string"
-          },
-          "amountCents" : {
+          "totalAmountCents" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "remittanceInformation" : {
+          "status" : {
             "type" : "string"
           },
-          "stamp" : {
-            "$ref" : "#/components/schemas/Stamp"
+          "multiDebtor" : {
+            "type" : "boolean"
           },
-          "iban" : {
+          "dueDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "description" : {
             "type" : "string"
           },
-          "postalIban" : {
-            "type" : "string"
-          },
-          "category" : {
-            "type" : "string"
-          },
-          "transferIndex" : {
-            "type" : "integer",
-            "format" : "int64"
+          "paymentOptionType" : {
+            "type" : "string",
+            "enum" : [ "SINGLE_INSTALLMENT", "INSTALMENTS", "DOWN_PAYMENT" ]
           },
           "creationDate" : {
             "type" : "string",
@@ -3070,16 +3062,16 @@
           }
         }
       },
-      "PagedModelEntityModelTransfer" : {
+      "PagedModelPaymentOption" : {
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "transfers" : {
+              "paymentOptions" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/EntityModelTransfer"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -3508,68 +3500,92 @@
           }
         }
       },
-      "EntityModelInstallmentNoPII" : {
+      "ReceiptNoPII" : {
         "type" : "object",
         "properties" : {
+          "receiptId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
           "installmentId" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "paymentOptionId" : {
+          "paymentReceiptId" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "status" : {
+          "noticeNumber" : {
             "type" : "string"
           },
-          "iupdPagopa" : {
+          "orgFiscalCode" : {
             "type" : "string"
           },
-          "iud" : {
+          "outcome" : {
             "type" : "string"
           },
-          "iuv" : {
+          "creditorReferenceId" : {
             "type" : "string"
           },
-          "iur" : {
+          "paymentAmountCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "description" : {
             "type" : "string"
           },
-          "iuf" : {
+          "companyName" : {
             "type" : "string"
           },
-          "dueDate" : {
+          "officeName" : {
+            "type" : "string"
+          },
+          "idPsp" : {
+            "type" : "string"
+          },
+          "pspFiscalCode" : {
+            "type" : "string"
+          },
+          "pspPartitaIva" : {
+            "type" : "string"
+          },
+          "pspCompanyName" : {
+            "type" : "string"
+          },
+          "idChannel" : {
+            "type" : "string"
+          },
+          "channelDescription" : {
+            "type" : "string"
+          },
+          "paymentMethod" : {
+            "type" : "string"
+          },
+          "feeCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "paymentDateTime" : {
             "type" : "string",
             "format" : "date-time"
           },
-          "paymentTypeCode" : {
-            "type" : "string"
+          "applicationDate" : {
+            "type" : "string",
+            "format" : "date-time"
           },
-          "amountCents" : {
-            "type" : "integer",
-            "format" : "int64"
+          "transferDate" : {
+            "type" : "string",
+            "format" : "date-time"
           },
-          "notificationFeeCents" : {
-            "type" : "integer",
-            "format" : "int64"
+          "standin" : {
+            "type" : "boolean"
           },
-          "remittanceInformation" : {
-            "type" : "string"
-          },
-          "humanFriendlyRemittanceInformation" : {
-            "type" : "string"
-          },
-          "balance" : {
-            "type" : "string"
-          },
-          "legacyPaymentMetadata" : {
+          "debtorEntityType" : {
             "type" : "string"
           },
           "personalDataId" : {
             "type" : "integer",
             "format" : "int64"
-          },
-          "debtorEntityType" : {
-            "type" : "string"
           },
           "debtorFiscalCodeHash" : {
             "type" : "string",
@@ -3592,16 +3608,16 @@
           }
         }
       },
-      "PagedModelEntityModelInstallmentNoPII" : {
+      "PagedModelReceiptNoPII" : {
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "installmentNoPIIs" : {
+              "receiptNoPIIs" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/EntityModelInstallmentNoPII"
+                  "$ref" : "#/components/schemas/ReceiptNoPII"
                 }
               }
             }
