@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -9,6 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class InstallmentPIIMapper {
+
+    private final DataCipherService dataCipherService;
+
+    public InstallmentPIIMapper(DataCipherService dataCipherService) {
+        this.dataCipherService = dataCipherService;
+    }
 
     public Pair<InstallmentNoPII, InstallmentPIIDTO> map(InstallmentDTO installment) {
         InstallmentNoPII installmentNoPII = new InstallmentNoPII();
@@ -30,6 +37,7 @@ public class InstallmentPIIMapper {
         installmentNoPII.setBalance(installment.getBalance());
         installmentNoPII.setLegacyPaymentMetadata(installment.getLegacyPaymentMetadata());
         installmentNoPII.setDebtorEntityType(installment.getDebtor().getUniqueIdentifierType().charAt(0));
+        installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getUniqueIdentifierCode()));
         installmentNoPII.setCreationDate(installment.getCreationDate());
         installmentNoPII.setUpdateDate(installment.getUpdateDate());
         installmentNoPII.setUpdateOperatorExternalId(1L); // TODO to check

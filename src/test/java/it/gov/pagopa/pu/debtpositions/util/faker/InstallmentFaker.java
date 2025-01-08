@@ -60,6 +60,7 @@ public class InstallmentFaker {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .debtorEntityType('F')
+      .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
       .build();
   }
