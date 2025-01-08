@@ -15,6 +15,7 @@ class PaymentOptionMapperTest {
   private final TransferMapper transferMapper = new TransferMapper();
   private final InstallmentMapper installmentMapper = new InstallmentMapper(transferMapper);
   private final PaymentOptionMapper paymentOptionMapper = new PaymentOptionMapper(installmentMapper);
+
   @Test
   void givenValidPaymentOption_WhenMapToDto_ThenReturnPaymentOptionDTO() {
     OffsetDateTime dueDate = OffsetDateTime.parse("2025-01-01T00:00:00+00:00");

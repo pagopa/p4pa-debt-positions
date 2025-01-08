@@ -4,8 +4,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
-
 @Service
 public class DebtPositionMapper {
 
@@ -32,7 +30,7 @@ public class DebtPositionMapper {
       .updateDate(debtPosition.getUpdateDate())
       .paymentOptions(debtPosition.getPaymentOptions().stream()
         .map(paymentOptionMapper::mapToDto)
-        .collect(Collectors.toList()))
+        .toList())
       .build();
   }
 
@@ -53,7 +51,7 @@ public class DebtPositionMapper {
     debtPosition.setUpdateDate(dto.getUpdateDate());
     debtPosition.setPaymentOptions(dto.getPaymentOptions().stream()
       .map(paymentOptionMapper::mapToModel)
-      .collect(Collectors.toList()));
+      .toList());
     return debtPosition;
   }
 

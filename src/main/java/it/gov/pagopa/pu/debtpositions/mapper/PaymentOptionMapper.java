@@ -5,8 +5,6 @@ import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
-
 @Service
 public class PaymentOptionMapper {
 
@@ -27,7 +25,7 @@ public class PaymentOptionMapper {
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(paymentOption.getPaymentOptionType().name()))
       .installments(paymentOption.getInstallments().stream()
         .map(installmentMapper::mapToDto)
-        .collect(Collectors.toList()))
+        .toList())
       .build();
   }
 
@@ -42,7 +40,7 @@ public class PaymentOptionMapper {
     paymentOption.setPaymentOptionType(PaymentOptionType.valueOf(dto.getPaymentOptionType().name()));
     paymentOption.setInstallments(dto.getInstallments().stream()
       .map(installmentMapper::mapToModel)
-      .collect(Collectors.toList()));
+      .toList());
     return paymentOption;
   }
 

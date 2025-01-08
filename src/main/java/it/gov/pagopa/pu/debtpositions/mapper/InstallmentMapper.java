@@ -4,8 +4,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
-import java.util.stream.Collectors;
-
 @Service
 public class InstallmentMapper {
 
@@ -31,7 +29,7 @@ public class InstallmentMapper {
       .humanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation())
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
-        .collect(Collectors.toList()))
+        .toList())
       .creationDate(installment.getCreationDate())
       .updateDate(installment.getUpdateDate())
       .build();
@@ -53,7 +51,7 @@ public class InstallmentMapper {
     installmentNoPII.setHumanFriendlyRemittanceInformation(dto.getHumanFriendlyRemittanceInformation());
     installmentNoPII.setTransfers(dto.getTransfers().stream()
       .map(transferMapper::mapToModel)
-      .collect(Collectors.toList()));
+      .toList());
     installmentNoPII.setCreationDate(dto.getCreationDate());
     installmentNoPII.setUpdateDate(dto.getUpdateDate());
     return installmentNoPII;
