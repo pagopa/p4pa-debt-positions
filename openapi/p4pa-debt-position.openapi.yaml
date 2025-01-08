@@ -125,11 +125,15 @@ components:
           format: int64
         status:
           type: string
+        iupd_pagopa:
+          type: string
         iud:
           type: string
         iuv:
           type: string
         iur:
+          type: string
+        iuf:
           type: string
         dueDate:
           type: string
