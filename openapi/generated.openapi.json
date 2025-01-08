@@ -17,7 +17,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "get-debtpositiontypeorgoperators",
-        "operationId" : "crud-get-debtpositiontypeorgoperators",
+        "operationId" : "crud-get-debtpositiontypeorgoperatorss",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -105,7 +105,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "get-debtpositiontypeorgoperators",
-        "operationId" : "crud-get-debtpositiontypeorgoperators_1",
+        "operationId" : "crud-get-debtpositiontypeorgoperators",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -242,7 +242,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "get-debtpositiontypeorg",
-        "operationId" : "crud-get-debtpositiontypeorg",
+        "operationId" : "crud-get-debtpositiontypeorgs",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -330,7 +330,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "get-debtpositiontypeorg",
-        "operationId" : "crud-get-debtpositiontypeorg_1",
+        "operationId" : "crud-get-debtpositiontypeorg",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -467,7 +467,7 @@
       "get" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "get-debtpositiontype",
-        "operationId" : "crud-get-debtpositiontype",
+        "operationId" : "crud-get-debtpositiontypes",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -555,7 +555,7 @@
       "get" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "get-debtpositiontype",
-        "operationId" : "crud-get-debtpositiontype_1",
+        "operationId" : "crud-get-debtpositiontype",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -692,7 +692,7 @@
       "get" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "get-debtposition",
-        "operationId" : "crud-get-debtposition",
+        "operationId" : "crud-get-debtpositions",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -809,7 +809,7 @@
       "get" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "get-debtposition",
-        "operationId" : "crud-get-debtposition_1",
+        "operationId" : "crud-get-debtposition",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1173,7 +1173,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "get-installmentnopii",
-        "operationId" : "crud-get-installmentnopii",
+        "operationId" : "crud-get-installmentnopiis",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1261,7 +1261,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "get-installmentnopii",
-        "operationId" : "crud-get-installmentnopii_1",
+        "operationId" : "crud-get-installmentnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1625,7 +1625,7 @@
       "get" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "get-paymentoption",
-        "operationId" : "crud-get-paymentoption",
+        "operationId" : "crud-get-paymentoptions",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1713,7 +1713,7 @@
       "get" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "get-paymentoption",
-        "operationId" : "crud-get-paymentoption_1",
+        "operationId" : "crud-get-paymentoption",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2077,7 +2077,7 @@
       "get" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "get-personaldata",
-        "operationId" : "crud-get-personaldata",
+        "operationId" : "crud-get-personaldatas",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2165,7 +2165,7 @@
       "get" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "get-personaldata",
-        "operationId" : "crud-get-personaldata_1",
+        "operationId" : "crud-get-personaldata",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2301,7 +2301,7 @@
     "/crud/profile" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "crud-profile-profile",
+        "operationId" : "crud-profile-profiles",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2572,7 +2572,7 @@
       "get" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "get-receiptnopii",
-        "operationId" : "crud-get-receiptnopii",
+        "operationId" : "crud-get-receiptnopiis",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2660,7 +2660,7 @@
       "get" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "get-receiptnopii",
-        "operationId" : "crud-get-receiptnopii_1",
+        "operationId" : "crud-get-receiptnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2797,7 +2797,7 @@
       "get" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "get-transfer",
-        "operationId" : "crud-get-transfer",
+        "operationId" : "crud-get-transfers",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2885,7 +2885,7 @@
       "get" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "get-transfer",
-        "operationId" : "crud-get-transfer_1",
+        "operationId" : "crud-get-transfer",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -3101,20 +3101,6 @@
           }
         }
       },
-      "Stamp" : {
-        "type" : "object",
-        "properties" : {
-          "stampType" : {
-            "type" : "string"
-          },
-          "stampHashDocument" : {
-            "type" : "string"
-          },
-          "stampProvincialResidence" : {
-            "type" : "string"
-          }
-        }
-      },
       "InstallmentNoPII" : {
         "type" : "object",
         "properties" : {
@@ -3196,6 +3182,20 @@
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "Stamp" : {
+        "type" : "object",
+        "properties" : {
+          "stampType" : {
+            "type" : "string"
+          },
+          "stampHashDocument" : {
+            "type" : "string"
+          },
+          "stampProvincialResidence" : {
+            "type" : "string"
           }
         }
       },

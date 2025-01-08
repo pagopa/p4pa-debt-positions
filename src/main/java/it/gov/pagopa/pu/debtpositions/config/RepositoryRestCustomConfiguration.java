@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
+import io.swagger.v3.oas.models.PathItem;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
 import org.apache.commons.lang3.StringUtils;
@@ -35,12 +36,15 @@ public class RepositoryRestCustomConfiguration {
       .filter(e -> e.getKey().startsWith("/crud/"))
       .forEach(entry -> {
         String[] paths = entry.getKey().split("/");
-        entry.getValue().readOperations().forEach(operation -> operation.setOperationId(
+        entry.getValue().readOperationsMap().forEach((httpMethod, operation) -> operation.setOperationId(
           "crud-" +
             StringUtils.firstNonEmpty(
               operation.getDescription(),
               paths[2] + "-" + paths[paths.length - 1]
-            )));
+            )
+            + (PathItem.HttpMethod.GET.equals(httpMethod) && paths.length == 3 ? "s" : "")
+        ));
       });
   }
+
 }
