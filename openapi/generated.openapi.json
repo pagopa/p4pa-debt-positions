@@ -17,7 +17,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "get-debtpositiontypeorgoperators",
-        "operationId" : "getCollectionResource-debtpositiontypeorgoperators-get",
+        "operationId" : "crud-get-debtpositiontypeorgoperators",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -76,7 +76,7 @@
       "post" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "create-debtpositiontypeorgoperators",
-        "operationId" : "postCollectionResource-debtpositiontypeorgoperators-post",
+        "operationId" : "crud-create-debtpositiontypeorgoperators",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -105,7 +105,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "get-debtpositiontypeorgoperators",
-        "operationId" : "getItemResource-debtpositiontypeorgoperators-get",
+        "operationId" : "crud-get-debtpositiontypeorgoperators_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -133,7 +133,7 @@
       "put" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "update-debtpositiontypeorgoperators",
-        "operationId" : "putItemResource-debtpositiontypeorgoperators-put",
+        "operationId" : "crud-update-debtpositiontypeorgoperators",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -181,7 +181,7 @@
       "delete" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "delete-debtpositiontypeorgoperators",
-        "operationId" : "deleteItemResource-debtpositiontypeorgoperators-delete",
+        "operationId" : "crud-delete-debtpositiontypeorgoperators",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -202,7 +202,7 @@
       "patch" : {
         "tags" : [ "debt-position-type-org-operators-entity-controller" ],
         "description" : "patch-debtpositiontypeorgoperators",
-        "operationId" : "patchItemResource-debtpositiontypeorgoperators-patch",
+        "operationId" : "crud-patch-debtpositiontypeorgoperators",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -242,7 +242,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "get-debtpositiontypeorg",
-        "operationId" : "getCollectionResource-debtpositiontypeorg-get",
+        "operationId" : "crud-get-debtpositiontypeorg",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -301,7 +301,7 @@
       "post" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "create-debtpositiontypeorg",
-        "operationId" : "postCollectionResource-debtpositiontypeorg-post",
+        "operationId" : "crud-create-debtpositiontypeorg",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -330,7 +330,7 @@
       "get" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "get-debtpositiontypeorg",
-        "operationId" : "getItemResource-debtpositiontypeorg-get",
+        "operationId" : "crud-get-debtpositiontypeorg_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -358,7 +358,7 @@
       "put" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "update-debtpositiontypeorg",
-        "operationId" : "putItemResource-debtpositiontypeorg-put",
+        "operationId" : "crud-update-debtpositiontypeorg",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -406,7 +406,7 @@
       "delete" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "delete-debtpositiontypeorg",
-        "operationId" : "deleteItemResource-debtpositiontypeorg-delete",
+        "operationId" : "crud-delete-debtpositiontypeorg",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -427,7 +427,7 @@
       "patch" : {
         "tags" : [ "debt-position-type-org-entity-controller" ],
         "description" : "patch-debtpositiontypeorg",
-        "operationId" : "patchItemResource-debtpositiontypeorg-patch",
+        "operationId" : "crud-patch-debtpositiontypeorg",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -467,7 +467,7 @@
       "get" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "get-debtpositiontype",
-        "operationId" : "getCollectionResource-debtpositiontype-get",
+        "operationId" : "crud-get-debtpositiontype",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -526,7 +526,7 @@
       "post" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "create-debtpositiontype",
-        "operationId" : "postCollectionResource-debtpositiontype-post",
+        "operationId" : "crud-create-debtpositiontype",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -555,7 +555,7 @@
       "get" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "get-debtpositiontype",
-        "operationId" : "getItemResource-debtpositiontype-get",
+        "operationId" : "crud-get-debtpositiontype_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -583,7 +583,7 @@
       "put" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "update-debtpositiontype",
-        "operationId" : "putItemResource-debtpositiontype-put",
+        "operationId" : "crud-update-debtpositiontype",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -631,7 +631,7 @@
       "delete" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "delete-debtpositiontype",
-        "operationId" : "deleteItemResource-debtpositiontype-delete",
+        "operationId" : "crud-delete-debtpositiontype",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -652,7 +652,7 @@
       "patch" : {
         "tags" : [ "debt-position-type-entity-controller" ],
         "description" : "patch-debtpositiontype",
-        "operationId" : "patchItemResource-debtpositiontype-patch",
+        "operationId" : "crud-patch-debtpositiontype",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -692,7 +692,7 @@
       "get" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "get-debtposition",
-        "operationId" : "getCollectionResource-debtposition-get",
+        "operationId" : "crud-get-debtposition",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -751,7 +751,7 @@
       "post" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "create-debtposition",
-        "operationId" : "postCollectionResource-debtposition-post",
+        "operationId" : "crud-create-debtposition",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -779,7 +779,7 @@
     "/crud/debt-positions/search/findOneWithAllDataByDebtPositionId" : {
       "get" : {
         "tags" : [ "debt-position-search-controller" ],
-        "operationId" : "executeSearch-debtposition-get",
+        "operationId" : "crud-debt-positions-findOneWithAllDataByDebtPositionId",
         "parameters" : [ {
           "name" : "debtPositionId",
           "in" : "query",
@@ -809,7 +809,7 @@
       "get" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "get-debtposition",
-        "operationId" : "getItemResource-debtposition-get",
+        "operationId" : "crud-get-debtposition_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -837,7 +837,7 @@
       "put" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "update-debtposition",
-        "operationId" : "putItemResource-debtposition-put",
+        "operationId" : "crud-update-debtposition",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -885,7 +885,7 @@
       "delete" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "delete-debtposition",
-        "operationId" : "deleteItemResource-debtposition-delete",
+        "operationId" : "crud-delete-debtposition",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -906,7 +906,7 @@
       "patch" : {
         "tags" : [ "debt-position-entity-controller" ],
         "description" : "patch-debtposition",
-        "operationId" : "patchItemResource-debtposition-patch",
+        "operationId" : "crud-patch-debtposition",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -946,7 +946,7 @@
       "get" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "get-paymentoption-by-debtposition-Id",
-        "operationId" : "followPropertyReference-debtposition-get",
+        "operationId" : "crud-get-paymentoption-by-debtposition-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -979,7 +979,7 @@
       "put" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "update-paymentoption-by-debtposition-Id",
-        "operationId" : "createPropertyReference-debtposition-put",
+        "operationId" : "crud-update-paymentoption-by-debtposition-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1037,7 +1037,7 @@
       "delete" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "delete-paymentoption-by-debtposition-Id",
-        "operationId" : "deletePropertyReference-debtposition-delete",
+        "operationId" : "crud-delete-paymentoption-by-debtposition-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1058,7 +1058,7 @@
       "patch" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "patch-paymentoption-by-debtposition-Id",
-        "operationId" : "createPropertyReference-debtposition-patch",
+        "operationId" : "crud-patch-paymentoption-by-debtposition-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1108,7 +1108,7 @@
       "get" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "get-paymentoption-by-debtposition-Id",
-        "operationId" : "followPropertyReference-debtposition-get_1",
+        "operationId" : "crud-get-paymentoption-by-debtposition-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1143,7 +1143,7 @@
       "delete" : {
         "tags" : [ "debt-position-property-reference-controller" ],
         "description" : "delete-paymentoption-by-debtposition-Id",
-        "operationId" : "deletePropertyReferenceId-debtposition-delete",
+        "operationId" : "crud-delete-paymentoption-by-debtposition-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1173,7 +1173,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "get-installmentnopii",
-        "operationId" : "getCollectionResource-installmentnopii-get",
+        "operationId" : "crud-get-installmentnopii",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1232,7 +1232,7 @@
       "post" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "create-installmentnopii",
-        "operationId" : "postCollectionResource-installmentnopii-post",
+        "operationId" : "crud-create-installmentnopii",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1261,7 +1261,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "get-installmentnopii",
-        "operationId" : "getItemResource-installmentnopii-get",
+        "operationId" : "crud-get-installmentnopii_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1289,7 +1289,7 @@
       "put" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "update-installmentnopii",
-        "operationId" : "putItemResource-installmentnopii-put",
+        "operationId" : "crud-update-installmentnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1337,7 +1337,7 @@
       "delete" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "delete-installmentnopii",
-        "operationId" : "deleteItemResource-installmentnopii-delete",
+        "operationId" : "crud-delete-installmentnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1358,7 +1358,7 @@
       "patch" : {
         "tags" : [ "installment-no-pii-entity-controller" ],
         "description" : "patch-installmentnopii",
-        "operationId" : "patchItemResource-installmentnopii-patch",
+        "operationId" : "crud-patch-installmentnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1398,7 +1398,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "get-transfer-by-installmentnopii-Id",
-        "operationId" : "followPropertyReference-installmentnopii-get",
+        "operationId" : "crud-get-transfer-by-installmentnopii-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1431,7 +1431,7 @@
       "put" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "update-transfer-by-installmentnopii-Id",
-        "operationId" : "createPropertyReference-installmentnopii-put",
+        "operationId" : "crud-update-transfer-by-installmentnopii-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1489,7 +1489,7 @@
       "delete" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "delete-transfer-by-installmentnopii-Id",
-        "operationId" : "deletePropertyReference-installmentnopii-delete",
+        "operationId" : "crud-delete-transfer-by-installmentnopii-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1510,7 +1510,7 @@
       "patch" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "patch-transfer-by-installmentnopii-Id",
-        "operationId" : "createPropertyReference-installmentnopii-patch",
+        "operationId" : "crud-patch-transfer-by-installmentnopii-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1560,7 +1560,7 @@
       "get" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "get-transfer-by-installmentnopii-Id",
-        "operationId" : "followPropertyReference-installmentnopii-get_1",
+        "operationId" : "crud-get-transfer-by-installmentnopii-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1595,7 +1595,7 @@
       "delete" : {
         "tags" : [ "installment-no-pii-property-reference-controller" ],
         "description" : "delete-transfer-by-installmentnopii-Id",
-        "operationId" : "deletePropertyReferenceId-installmentnopii-delete",
+        "operationId" : "crud-delete-transfer-by-installmentnopii-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1625,7 +1625,7 @@
       "get" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "get-paymentoption",
-        "operationId" : "getCollectionResource-paymentoption-get",
+        "operationId" : "crud-get-paymentoption",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -1684,7 +1684,7 @@
       "post" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "create-paymentoption",
-        "operationId" : "postCollectionResource-paymentoption-post",
+        "operationId" : "crud-create-paymentoption",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -1713,7 +1713,7 @@
       "get" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "get-paymentoption",
-        "operationId" : "getItemResource-paymentoption-get",
+        "operationId" : "crud-get-paymentoption_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1741,7 +1741,7 @@
       "put" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "update-paymentoption",
-        "operationId" : "putItemResource-paymentoption-put",
+        "operationId" : "crud-update-paymentoption",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1789,7 +1789,7 @@
       "delete" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "delete-paymentoption",
-        "operationId" : "deleteItemResource-paymentoption-delete",
+        "operationId" : "crud-delete-paymentoption",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1810,7 +1810,7 @@
       "patch" : {
         "tags" : [ "payment-option-entity-controller" ],
         "description" : "patch-paymentoption",
-        "operationId" : "patchItemResource-paymentoption-patch",
+        "operationId" : "crud-patch-paymentoption",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1850,7 +1850,7 @@
       "get" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "get-installmentnopii-by-paymentoption-Id",
-        "operationId" : "followPropertyReference-paymentoption-get",
+        "operationId" : "crud-get-installmentnopii-by-paymentoption-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1883,7 +1883,7 @@
       "put" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "update-installmentnopii-by-paymentoption-Id",
-        "operationId" : "createPropertyReference-paymentoption-put",
+        "operationId" : "crud-update-installmentnopii-by-paymentoption-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1941,7 +1941,7 @@
       "delete" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "delete-installmentnopii-by-paymentoption-Id",
-        "operationId" : "deletePropertyReference-paymentoption-delete",
+        "operationId" : "crud-delete-installmentnopii-by-paymentoption-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -1962,7 +1962,7 @@
       "patch" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "patch-installmentnopii-by-paymentoption-Id",
-        "operationId" : "createPropertyReference-paymentoption-patch",
+        "operationId" : "crud-patch-installmentnopii-by-paymentoption-Id",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2012,7 +2012,7 @@
       "get" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "get-installmentnopii-by-paymentoption-Id",
-        "operationId" : "followPropertyReference-paymentoption-get_1",
+        "operationId" : "crud-get-installmentnopii-by-paymentoption-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2047,7 +2047,7 @@
       "delete" : {
         "tags" : [ "payment-option-property-reference-controller" ],
         "description" : "delete-installmentnopii-by-paymentoption-Id",
-        "operationId" : "deletePropertyReferenceId-paymentoption-delete",
+        "operationId" : "crud-delete-installmentnopii-by-paymentoption-Id_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2077,7 +2077,7 @@
       "get" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "get-personaldata",
-        "operationId" : "getCollectionResource-personaldata-get",
+        "operationId" : "crud-get-personaldata",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2136,7 +2136,7 @@
       "post" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "create-personaldata",
-        "operationId" : "postCollectionResource-personaldata-post",
+        "operationId" : "crud-create-personaldata",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2165,7 +2165,7 @@
       "get" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "get-personaldata",
-        "operationId" : "getItemResource-personaldata-get",
+        "operationId" : "crud-get-personaldata_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2193,7 +2193,7 @@
       "put" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "update-personaldata",
-        "operationId" : "putItemResource-personaldata-put",
+        "operationId" : "crud-update-personaldata",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2241,7 +2241,7 @@
       "delete" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "delete-personaldata",
-        "operationId" : "deleteItemResource-personaldata-delete",
+        "operationId" : "crud-delete-personaldata",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2262,7 +2262,7 @@
       "patch" : {
         "tags" : [ "personal-data-entity-controller" ],
         "description" : "patch-personaldata",
-        "operationId" : "patchItemResource-personaldata-patch",
+        "operationId" : "crud-patch-personaldata",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2301,7 +2301,7 @@
     "/crud/profile" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "listAllFormsOfMetadata",
+        "operationId" : "crud-profile-profile",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2319,7 +2319,7 @@
     "/crud/profile/debt-position-type-org-operators" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor",
+        "operationId" : "crud-profile-debt-position-type-org-operators",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2347,7 +2347,7 @@
     "/crud/profile/debt-position-type-orgs" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_1",
+        "operationId" : "crud-profile-debt-position-type-orgs",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2375,7 +2375,7 @@
     "/crud/profile/debt-position-types" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_2",
+        "operationId" : "crud-profile-debt-position-types",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2403,7 +2403,7 @@
     "/crud/profile/debt-positions" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_3",
+        "operationId" : "crud-profile-debt-positions",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2431,7 +2431,7 @@
     "/crud/profile/installments" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_4",
+        "operationId" : "crud-profile-installments",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2459,7 +2459,7 @@
     "/crud/profile/payment-options" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_5",
+        "operationId" : "crud-profile-payment-options",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2487,7 +2487,7 @@
     "/crud/profile/personalDatas" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_6",
+        "operationId" : "crud-profile-personalDatas",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2515,7 +2515,7 @@
     "/crud/profile/receipts" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_7",
+        "operationId" : "crud-profile-receipts",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2543,7 +2543,7 @@
     "/crud/profile/transfers" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "descriptor_8",
+        "operationId" : "crud-profile-transfers",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -2572,7 +2572,7 @@
       "get" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "get-receiptnopii",
-        "operationId" : "getCollectionResource-receiptnopii-get",
+        "operationId" : "crud-get-receiptnopii",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2631,7 +2631,7 @@
       "post" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "create-receiptnopii",
-        "operationId" : "postCollectionResource-receiptnopii-post",
+        "operationId" : "crud-create-receiptnopii",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2660,7 +2660,7 @@
       "get" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "get-receiptnopii",
-        "operationId" : "getItemResource-receiptnopii-get",
+        "operationId" : "crud-get-receiptnopii_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2688,7 +2688,7 @@
       "put" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "update-receiptnopii",
-        "operationId" : "putItemResource-receiptnopii-put",
+        "operationId" : "crud-update-receiptnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2736,7 +2736,7 @@
       "delete" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "delete-receiptnopii",
-        "operationId" : "deleteItemResource-receiptnopii-delete",
+        "operationId" : "crud-delete-receiptnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2757,7 +2757,7 @@
       "patch" : {
         "tags" : [ "receipt-no-pii-entity-controller" ],
         "description" : "patch-receiptnopii",
-        "operationId" : "patchItemResource-receiptnopii-patch",
+        "operationId" : "crud-patch-receiptnopii",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2797,7 +2797,7 @@
       "get" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "get-transfer",
-        "operationId" : "getCollectionResource-transfer-get",
+        "operationId" : "crud-get-transfer",
         "parameters" : [ {
           "name" : "page",
           "in" : "query",
@@ -2856,7 +2856,7 @@
       "post" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "create-transfer",
-        "operationId" : "postCollectionResource-transfer-post",
+        "operationId" : "crud-create-transfer",
         "requestBody" : {
           "content" : {
             "application/json" : {
@@ -2885,7 +2885,7 @@
       "get" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "get-transfer",
-        "operationId" : "getItemResource-transfer-get",
+        "operationId" : "crud-get-transfer_1",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2913,7 +2913,7 @@
       "put" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "update-transfer",
-        "operationId" : "putItemResource-transfer-put",
+        "operationId" : "crud-update-transfer",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2961,7 +2961,7 @@
       "delete" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "delete-transfer",
-        "operationId" : "deleteItemResource-transfer-delete",
+        "operationId" : "crud-delete-transfer",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
@@ -2982,7 +2982,7 @@
       "patch" : {
         "tags" : [ "transfer-entity-controller" ],
         "description" : "patch-transfer",
-        "operationId" : "patchItemResource-transfer-patch",
+        "operationId" : "crud-patch-transfer",
         "parameters" : [ {
           "name" : "id",
           "in" : "path",
