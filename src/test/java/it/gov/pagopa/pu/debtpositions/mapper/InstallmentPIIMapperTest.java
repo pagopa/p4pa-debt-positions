@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,11 +40,29 @@ class InstallmentPIIMapperTest {
     InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
 
-    InstallmentDTO installmentDTO = buildInstallmentDTO();
+    Installment installment = buildInstallment();
     byte[] expectedHashedCF = {};
-    Mockito.when(dataCipherServiceMock.hash(installmentDTO.getDebtor().getUniqueIdentifierCode())).thenReturn(expectedHashedCF);
+    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getUniqueIdentifierCode())).thenReturn(expectedHashedCF);
 
-    Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installmentDTO);
+    Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
+
+    assertEquals(installmentNoPIIExpected, result.getFirst());
+    assertEquals(installmentPIIDTOExpected, result.getSecond());
+    checkNotNullFields(result.getFirst(), "transfers", "personalDataId", "debtorFiscalCodeHash");
+    checkNotNullFields(result.getSecond());
+  }
+
+  @Test
+  void testMapWithNoPIINotNull(){
+    InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
+    InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
+
+    Installment installment = buildInstallment();
+    installment.setNoPII(installmentNoPIIExpected);
+    byte[] expectedHashedCF = {};
+    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getUniqueIdentifierCode())).thenReturn(expectedHashedCF);
+
+    Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
 
     assertEquals(installmentNoPIIExpected, result.getFirst());
     assertEquals(installmentPIIDTOExpected, result.getSecond());

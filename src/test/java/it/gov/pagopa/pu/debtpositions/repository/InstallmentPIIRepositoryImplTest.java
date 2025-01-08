@@ -2,9 +2,9 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.citizen.Constants;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +36,7 @@ class InstallmentPIIRepositoryImplTest {
   @Test
   void testInsert(){
     // Given
-    InstallmentDTO installment = new InstallmentDTO();
+    Installment installment = new Installment();
     InstallmentNoPII installmentNoPII = new InstallmentNoPII();
     installmentNoPII.setInstallmentId(-2L);
     Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(installmentNoPII, new InstallmentPIIDTO());
@@ -54,6 +54,9 @@ class InstallmentPIIRepositoryImplTest {
     // Then
     Assertions.assertEquals(insertedId, insert);
     Assertions.assertEquals(insertedId, installment.getInstallmentId());
+    Assertions.assertEquals(installment.getNoPII().getInstallmentId(), installment.getInstallmentId());
     Assertions.assertEquals(piiId, p.getFirst().getPersonalDataId());
+    Assertions.assertSame(p.getFirst(), installment.getNoPII());
+
   }
 }

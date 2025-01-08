@@ -1,21 +1,21 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 
 public class InstallmentFaker {
 
   static OffsetDateTime date = OffsetDateTime.of(2025, 1, 1, 0,0,0, 0, ZoneOffset.UTC);
 
-  public static InstallmentDTO buildInstallmentDTO(){
-    return InstallmentDTO.builder()
+  public static Installment buildInstallment(){
+    return Installment.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
       .status("status")
@@ -24,8 +24,6 @@ public class InstallmentFaker {
       .iuv("iuv")
       .iur("iur")
       .iuf("iuf")
-      .creationDate(date)
-      .updateDate(date)
       .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
@@ -35,7 +33,10 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .transfers(List.of())
-      .debtor(buildPersonDTO())
+      .debtor(buildPerson())
+      .creationDate(date)
+      .updateDate(date)
+      .updateOperatorExternalId(1L)
       .build();
   }
 
@@ -49,9 +50,6 @@ public class InstallmentFaker {
       .iuv("iuv")
       .iur("iur")
       .iuf("iuf")
-      .creationDate(date)
-      .updateDate(date)
-      .updateOperatorExternalId(1L)
       .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
@@ -62,6 +60,9 @@ public class InstallmentFaker {
       .debtorEntityType('F')
       .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
+      .creationDate(date)
+      .updateDate(date)
+      .updateOperatorExternalId(1L)
       .build();
   }
 

@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface InstallmentPIIRepository {
 
-    long save(InstallmentDTO installment);
+    long save(Installment installment);
 }

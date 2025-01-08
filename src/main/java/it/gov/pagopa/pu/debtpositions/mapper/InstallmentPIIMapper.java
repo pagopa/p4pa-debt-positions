@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.Person;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ public class InstallmentPIIMapper {
         this.dataCipherService = dataCipherService;
     }
 
-    public Pair<InstallmentNoPII, InstallmentPIIDTO> map(InstallmentDTO installment) {
+    public Pair<InstallmentNoPII, InstallmentPIIDTO> map(Installment installment) {
         InstallmentNoPII installmentNoPII = new InstallmentNoPII();
 
         installmentNoPII.setInstallmentId(installment.getInstallmentId());
@@ -40,15 +40,19 @@ public class InstallmentPIIMapper {
         installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getUniqueIdentifierCode()));
         installmentNoPII.setCreationDate(installment.getCreationDate());
         installmentNoPII.setUpdateDate(installment.getUpdateDate());
-        installmentNoPII.setUpdateOperatorExternalId(1L); // TODO to check
+        installmentNoPII.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
 
-        PersonDTO debtor = installment.getDebtor();
+        if(installment.getNoPII() != null){
+            installmentNoPII.setPersonalDataId(installment.getNoPII().getPersonalDataId());
+        }
+
+        Person debtor = installment.getDebtor();
         InstallmentPIIDTO installmentPIIDTO = getInstallmentPIIDTO(debtor);
 
         return Pair.of(installmentNoPII, installmentPIIDTO);
     }
 
-    private static InstallmentPIIDTO getInstallmentPIIDTO(PersonDTO debtor) {
+    private static InstallmentPIIDTO getInstallmentPIIDTO(Person debtor) {
         InstallmentPIIDTO installmentPIIDTO = new InstallmentPIIDTO();
         installmentPIIDTO.setUniqueIdentifierType(debtor.getUniqueIdentifierType());
         installmentPIIDTO.setUniqueIdentifierCode(debtor.getUniqueIdentifierCode());
