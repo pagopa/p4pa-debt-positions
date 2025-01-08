@@ -49,7 +49,9 @@ class OpenApiGeneratorTest {
     ).andExpect(status().isOk())
       .andReturn();
 
-    String openApiResult = result.getResponse().getContentAsString();
+    String openApiResult = result.getResponse().getContentAsString()
+      .replace("\r", "");
+
     Assertions.assertTrue(openApiResult.startsWith("{\n  \"openapi\" : \"3.0."));
 
     Path openApiGeneratedPath = Path.of("openapi/generated.openapi.json");
