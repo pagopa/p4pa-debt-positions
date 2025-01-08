@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrint;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.json.JsonAssert;
 import org.springframework.test.json.JsonCompareMode;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -17,7 +18,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -50,7 +50,8 @@ class OpenApiGeneratorTest {
       .andReturn();
 
     String openApiResult = result.getResponse().getContentAsString()
-      .replace("\r", "");
+      .replace("\r", "")
+      .replace("EntityModel", "");
 
     Assertions.assertTrue(openApiResult.startsWith("{\n  \"openapi\" : \"3.0."));
 
@@ -59,7 +60,7 @@ class OpenApiGeneratorTest {
     if(Files.exists(openApiGeneratedPath)){
       String storedOpenApi = Files.readString(openApiGeneratedPath);
       try {
-        content().json(storedOpenApi, JsonCompareMode.STRICT).match(result);
+        JsonAssert.comparator(JsonCompareMode.STRICT).assertIsMatch(storedOpenApi, openApiResult);
         toStore=false;
       } catch (Throwable e){
         //Do Nothing
