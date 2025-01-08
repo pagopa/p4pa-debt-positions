@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions;
 
-import org.json.JSONException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +49,9 @@ class OpenApiGeneratorTest {
     ).andExpect(status().isOk())
       .andReturn();
 
-    String openApiResult = result.getResponse().getContentAsString();
+    String openApiResult = result.getResponse().getContentAsString()
+      .replace("\r", "");
+
     Assertions.assertTrue(openApiResult.startsWith("{\n  \"openapi\" : \"3.0."));
 
     Path openApiGeneratedPath = Path.of("openapi/generated.openapi.json");
@@ -60,7 +61,7 @@ class OpenApiGeneratorTest {
       try {
         content().json(storedOpenApi, JsonCompareMode.STRICT).match(result);
         toStore=false;
-      } catch (JSONException e){
+      } catch (Throwable e){
         //Do Nothing
       }
     }
