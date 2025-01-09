@@ -27,6 +27,7 @@ public class InstallmentPIIMapper {
         installmentNoPII.setIuv(installment.getIuv());
         installmentNoPII.setIur(installment.getIur());
         installmentNoPII.setIuf(installment.getIuf());
+        installmentNoPII.setNav(installment.getNav());
         installmentNoPII.setDueDate(installment.getDueDate());
         installmentNoPII.setPaymentTypeCode(installment.getPaymentTypeCode());
         installmentNoPII.setAmountCents(installment.getAmountCents());
