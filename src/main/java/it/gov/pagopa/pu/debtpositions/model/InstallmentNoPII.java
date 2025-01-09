@@ -29,6 +29,7 @@ public class InstallmentNoPII implements Serializable {
   private String iuv;
   private String iur;
   private String iuf;
+  private String nav;
   private OffsetDateTime dueDate;
   private String paymentTypeCode;
   private Long amountCents;
