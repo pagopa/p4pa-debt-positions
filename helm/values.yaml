@@ -64,6 +64,7 @@ microservice-chart:
 
   envSecret:
     APPLICATIONINSIGHTS_CONNECTION_STRING: appinsights-connection-string
+    JWT_TOKEN_PUBLIC_KEY: jwt-public-key
     DEBT_POSITIONS_DB_HOST: db-host
     DEBT_POSITIONS_DB_USER: db-piattaforma-unitaria-login-username
     DEBT_POSITIONS_DB_PASSWORD: db-piattaforma-unitaria-login-password
@@ -71,6 +72,9 @@ microservice-chart:
     CITIZENDB_HOST: db-host
     CITIZENDB_USER: db-mypay-login-username
     CITIZENDB_PASSWORD: db-mypay-login-password
+
+    DATA_CIPHER_ENCRYPT_PASSWORD: data-cipher-encrypt-password
+    DATA_CIPHER_HASH_PEPPER: data-cipher-hash-pepper
 
   # nodeSelector: {}
 

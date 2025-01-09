@@ -1,26 +1,22 @@
-package it.gov.pagopa.pu.debtpositions.model;
+package it.gov.pagopa.pu.debtpositions.dto;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-@Entity
-@Table(name = "installment")
-@Builder(toBuilder = true)
-@AllArgsConstructor
-@NoArgsConstructor
 @Data
-public class InstallmentNoPII implements Serializable {
+@Builder(toBuilder = true)
+@NoArgsConstructor
+@AllArgsConstructor
+public class Installment {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "installment_generator")
-  @SequenceGenerator(name = "installment_generator", sequenceName = "installment_seq", allocationSize = 1)
   private Long installmentId;
   private Long paymentOptionId;
   private String status;
@@ -37,13 +33,12 @@ public class InstallmentNoPII implements Serializable {
   private String humanFriendlyRemittanceInformation;
   private String balance;
   private String legacyPaymentMetadata;
-  private Long personalDataId;
-  private Character debtorEntityType;
-  private byte[] debtorFiscalCodeHash;
+  private Person debtor;
+  private List<Transfer> transfers;
   private OffsetDateTime creationDate;
   private OffsetDateTime updateDate;
   private Long updateOperatorExternalId;
 
-  @OneToMany
-  private List<Transfer> transfers;
+  @JsonIgnore
+  private InstallmentNoPII noPII;
 }
