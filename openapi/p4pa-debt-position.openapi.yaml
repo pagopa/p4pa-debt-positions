@@ -141,6 +141,8 @@ components:
           type: string
         iuf:
           type: string
+        nav:
+          type: string
         dueDate:
           type: string
           format: date-time
