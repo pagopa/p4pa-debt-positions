@@ -5,6 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(path = "installments")
-public interface InstallmentRepository extends JpaRepository<InstallmentNoPII,Long> {
+public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoPII, Long> {
 
 }

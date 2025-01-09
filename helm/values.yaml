@@ -73,6 +73,9 @@ microservice-chart:
     CITIZENDB_USER: db-mypay-login-username
     CITIZENDB_PASSWORD: db-mypay-login-password
 
+    DATA_CIPHER_ENCRYPT_PASSWORD: data-cipher-encrypt-password
+    DATA_CIPHER_HASH_PEPPER: data-cipher-hash-pepper
+
   # nodeSelector: {}
 
   # tolerations: []
