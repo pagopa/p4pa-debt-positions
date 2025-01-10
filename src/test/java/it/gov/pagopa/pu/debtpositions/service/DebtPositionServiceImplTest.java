@@ -11,14 +11,15 @@ import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.TransferMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.util.Repositories;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -54,8 +55,19 @@ class DebtPositionServiceImplTest {
   @Mock
   private TransferMapper transferMapper;
 
-  @InjectMocks
   private DebtPositionServiceImpl debtPositionService;
+
+  @BeforeEach
+  void setUp() {
+    Repositories repositories = new Repositories(debtPositionRepository, paymentOptionRepository, installmentRepository, transferRepository);
+    debtPositionService = new DebtPositionServiceImpl(
+      repositories,
+      debtPositionMapper,
+      paymentOptionMapper,
+      installmentMapper,
+      transferMapper
+    );
+  }
 
   @Test
   void givenValidDebtPositionDTO_WhenSaveDebtPosition_ThenSaveAllEntities() {
@@ -102,7 +114,6 @@ class DebtPositionServiceImplTest {
     Mockito.verify(installmentMapper).mapToModel(installmentDTO);
     Mockito.verify(transferMapper).mapToModel(transferDTO);
   }
-
 
   @Test
   void givenRepositoryFails_WhenSaveDebtPosition_ThenThrowRuntimeException() {

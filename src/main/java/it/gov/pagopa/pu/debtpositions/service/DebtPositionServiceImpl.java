@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.TransferMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.util.Repositories;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.*;
 import jakarta.transaction.Transactional;
@@ -23,11 +24,12 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final InstallmentMapper installmentMapper;
   private final TransferMapper transferMapper;
 
-  public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, PaymentOptionRepository paymentOptionRepository, InstallmentPIIRepository installmentRepository, TransferRepository transferRepository, DebtPositionMapper debtPositionMapper, PaymentOptionMapper paymentOptionMapper, InstallmentMapper installmentMapper, TransferMapper transferMapper) {
-    this.debtPositionRepository = debtPositionRepository;
-    this.paymentOptionRepository = paymentOptionRepository;
-    this.installmentRepository = installmentRepository;
-    this.transferRepository = transferRepository;
+  public DebtPositionServiceImpl(Repositories repositories, DebtPositionMapper debtPositionMapper, PaymentOptionMapper paymentOptionMapper,
+                                 InstallmentMapper installmentMapper, TransferMapper transferMapper) {
+    this.debtPositionRepository = repositories.debtPositionRepository();
+    this.paymentOptionRepository = repositories.paymentOptionRepository();
+    this.installmentRepository = repositories.installmentRepository();
+    this.transferRepository = repositories.transferRepository();
     this.debtPositionMapper = debtPositionMapper;
     this.paymentOptionMapper = paymentOptionMapper;
     this.installmentMapper = installmentMapper;
