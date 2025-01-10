@@ -13,27 +13,6 @@ public class DebtPositionMapper {
     this.paymentOptionMapper = paymentOptionMapper;
   }
 
-  public DebtPositionDTO mapToDto(DebtPosition debtPosition) {
-    return DebtPositionDTO.builder()
-      .debtPositionId(debtPosition.getDebtPositionId())
-      .iupdOrg(debtPosition.getIupdOrg())
-      .description(debtPosition.getDescription())
-      .status(debtPosition.getStatus())
-      .ingestionFlowFileId(debtPosition.getIngestionFlowFileId())
-      .ingestionFlowFileLineNumber(debtPosition.getIngestionFlowFileLineNumber())
-      .organizationId(debtPosition.getOrganizationId())
-      .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
-      .notificationDate(debtPosition.getNotificationDate())
-      .validityDate(debtPosition.getValidityDate())
-      .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
-      .creationDate(debtPosition.getCreationDate())
-      .updateDate(debtPosition.getUpdateDate())
-      .paymentOptions(debtPosition.getPaymentOptions().stream()
-        .map(paymentOptionMapper::mapToDto)
-        .toList())
-      .build();
-  }
-
   public DebtPosition mapToModel(DebtPositionDTO dto) {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(dto.getDebtPositionId());

@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
 import java.time.OffsetDateTime;
@@ -62,6 +63,7 @@ public class InstallmentFaker {
       .debtorEntityType('F')
       .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
+      .transfers(List.of())
       .creationDate(date)
       .updateDate(date)
       .updateOperatorExternalId(1L)
@@ -71,6 +73,31 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
+      .build();
+  }
+
+  public static InstallmentDTO buildInstallmentNoPIIDTO() {
+    return InstallmentDTO.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status("status")
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .dueDate(date)
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .transfers(List.of())
+      .creationDate(date)
+      .updateDate(date)
       .build();
   }
 

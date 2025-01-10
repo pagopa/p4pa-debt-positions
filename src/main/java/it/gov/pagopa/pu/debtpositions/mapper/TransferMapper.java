@@ -8,23 +8,6 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransferMapper {
 
-  public TransferDTO mapToDto(Transfer transfer) {
-    return TransferDTO.builder()
-      .transferId(transfer.getTransferId())
-      .orgFiscalCode(transfer.getOrgFiscalCode())
-      .orgName(transfer.getOrgName())
-      .amountCents(transfer.getAmountCents())
-      .remittanceInformation(transfer.getRemittanceInformation())
-      .stampType(transfer.getStamp().getStampType())
-      .stampHashDocument(transfer.getStamp().getStampHashDocument())
-      .stampProvincialResidence(transfer.getStamp().getStampProvincialResidence())
-      .iban(transfer.getIban())
-      .postalIban(transfer.getPostalIban())
-      .category(transfer.getCategory())
-      .transferIndex(transfer.getTransferIndex())
-      .build();
-  }
-
   public Transfer mapToModel(TransferDTO dto) {
     Transfer transfer = new Transfer();
     transfer.setTransferId(dto.getTransferId());
