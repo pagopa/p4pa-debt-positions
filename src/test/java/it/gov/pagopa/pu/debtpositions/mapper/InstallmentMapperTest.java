@@ -8,13 +8,13 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 class InstallmentMapperTest {
 
-  private final TransferMapper transferMapper = new TransferMapper();
-  private final InstallmentMapper installmentMapper = new InstallmentMapper(transferMapper);
+  private final PersonMapper personMapper = new PersonMapper();
+  private final InstallmentMapper installmentMapper = new InstallmentMapper(personMapper);
 
   @Test
   void givenValidInstallmentDTO_WhenMapToModel_ThenReturnInstallment() {
-    Installment installmentExpected = buildInstallment();
-    InstallmentDTO installmentDTO = buildInstallmentNoPIIDTO();
+    Installment installmentExpected = buildInstallmentNoUpdate();
+    InstallmentDTO installmentDTO = buildInstallmentDTO();
 
     Installment result = installmentMapper.mapToModel(installmentDTO);
 

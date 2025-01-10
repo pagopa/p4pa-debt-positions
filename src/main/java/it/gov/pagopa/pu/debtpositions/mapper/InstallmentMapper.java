@@ -7,10 +7,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class InstallmentMapper {
 
-  private final TransferMapper transferMapper;
+  private final PersonMapper personMapper;
 
-  public InstallmentMapper(TransferMapper transferMapper) {
-    this.transferMapper = transferMapper;
+  public InstallmentMapper(PersonMapper personMapper) {
+    this.personMapper = personMapper;
   }
 
   public Installment mapToModel(InstallmentDTO dto) {
@@ -32,9 +32,7 @@ public class InstallmentMapper {
     installment.setLegacyPaymentMetadata(dto.getLegacyPaymentMetadata());
     installment.setHumanFriendlyRemittanceInformation(dto.getHumanFriendlyRemittanceInformation());
     installment.setBalance(dto.getBalance());
-    installment.setTransfers(dto.getTransfers().stream()
-      .map(transferMapper::mapToModel)
-      .toList());
+    installment.setDebtor(personMapper.mapToModel(dto.getDebtor()));
     installment.setCreationDate(dto.getCreationDate());
     installment.setUpdateDate(dto.getUpdateDate());
     return installment;
