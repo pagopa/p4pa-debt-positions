@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.junit.jupiter.api.Test;
 
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -19,5 +20,6 @@ class TransferMapperTest {
     Transfer result = transferMapper.mapToModel(transferDTO);
 
     assertEquals(transferExpected, result);
+    checkNotNullFields(result, "updateOperatorExternalId", "installmentId", "creationDate", "updateDate");
   }
 }

@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.junit.jupiter.api.Test;
 
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -19,5 +20,6 @@ class PaymentOptionMapperTest {
     PaymentOption result = paymentOptionMapper.mapToModel(paymentOptionDTO);
 
     assertEquals(paymentOptionExpected, result);
+    checkNotNullFields(result, "updateOperatorExternalId", "debtPositionId", "creationDate", "updateDate", "installments");
   }
 }

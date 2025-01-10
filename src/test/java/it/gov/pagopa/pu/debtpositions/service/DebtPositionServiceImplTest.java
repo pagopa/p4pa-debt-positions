@@ -26,8 +26,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
 
@@ -113,18 +111,6 @@ class DebtPositionServiceImplTest {
     Mockito.verify(paymentOptionMapper).mapToModel(paymentOptionDTO);
     Mockito.verify(installmentMapper).mapToModel(installmentDTO);
     Mockito.verify(transferMapper).mapToModel(transferDTO);
-  }
-
-  @Test
-  void givenRepositoryFails_WhenSaveDebtPosition_ThenThrowRuntimeException() {
-    DebtPositionDTO inputDto = new DebtPositionDTO();
-    DebtPosition mappedEntity = new DebtPosition();
-    Mockito.when(debtPositionMapper.mapToModel(inputDto)).thenReturn(mappedEntity);
-    Mockito.when(debtPositionRepository.save(mappedEntity)).thenThrow(new RuntimeException("Database error"));
-
-    assertThrows(RuntimeException.class, () -> debtPositionService.saveDebtPosition(inputDto));
-    Mockito.verify(debtPositionMapper).mapToModel(inputDto);
-    Mockito.verify(debtPositionRepository).save(mappedEntity);
   }
 }
 

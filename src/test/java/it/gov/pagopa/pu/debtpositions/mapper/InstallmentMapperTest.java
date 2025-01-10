@@ -3,6 +3,8 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import org.junit.jupiter.api.Test;
+
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static org.junit.jupiter.api.Assertions.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
@@ -19,6 +21,7 @@ class InstallmentMapperTest {
     Installment result = installmentMapper.mapToModel(installmentDTO);
 
     assertEquals(installmentExpected, result);
+    checkNotNullFields(result, "transfers", "updateOperatorExternalId", "noPII");
   }
 }
 
