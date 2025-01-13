@@ -2,7 +2,11 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -11,7 +15,7 @@ import java.util.SortedSet;
 
 @Entity
 @Table(name = "installment")
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data

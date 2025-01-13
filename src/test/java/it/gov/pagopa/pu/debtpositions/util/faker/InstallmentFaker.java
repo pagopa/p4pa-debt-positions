@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -12,7 +13,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 
 public class InstallmentFaker {
 
-  static OffsetDateTime date = OffsetDateTime.of(2025, 1, 1, 0,0,0, 0, ZoneOffset.UTC);
+  static LocalDateTime date = LocalDateTime.of(2025, 1, 1, 0,0,0, 0);
+  static OffsetDateTime offsetDateTime = OffsetDateTime.of(date, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
     return Installment.builder()
@@ -25,7 +27,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(offsetDateTime)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -37,7 +39,7 @@ public class InstallmentFaker {
       .debtor(buildPerson())
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId(1L)
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 
@@ -52,7 +54,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(offsetDateTime)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -64,7 +66,7 @@ public class InstallmentFaker {
       .balance("balance")
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId(1L)
+      .updateOperatorExternalId("OPERATOREXTERNALID")
       .build();
   }
 
