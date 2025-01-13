@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
@@ -13,7 +14,8 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class ReceiptNoPII implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class ReceiptNoPII extends BaseEntity implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receipt_generator")
@@ -44,8 +46,4 @@ public class ReceiptNoPII implements Serializable {
   private Character debtorEntityType;
   private Long personalDataId;
   private byte[] debtorFiscalCodeHash;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
-
 }

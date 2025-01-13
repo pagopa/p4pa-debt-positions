@@ -3,17 +3,18 @@ package it.gov.pagopa.pu.debtpositions.model;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "debt_position_type_org")
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DebtPositionTypeOrg implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_type_org_generator")
@@ -43,8 +44,4 @@ public class DebtPositionTypeOrg implements Serializable {
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
-
 }
