@@ -35,7 +35,7 @@ public class InstallmentFaker {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
-      .transfers(List.of())
+      .transfers(List.of(buildTransfer()))
       .debtor(buildPerson())
       .creationDate(OFFSET_DATE_TIME)
       .updateDate(OFFSET_DATE_TIME)
@@ -73,6 +73,32 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
+      .build();
+  }
+
+  public static Installment buildInstallmentNoUpdate(){
+    return Installment.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status("status")
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .debtor(buildPerson())
+      .transfers(List.of())
+      .creationDate(date)
+      .updateDate(date)
       .build();
   }
 

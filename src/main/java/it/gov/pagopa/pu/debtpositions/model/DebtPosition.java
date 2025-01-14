@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.SortedSet;
 
 @NamedEntityGraph(
         name = "completeDebtPosition",
@@ -28,7 +29,8 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class DebtPosition implements Serializable {
+@EqualsAndHashCode(of = "debtPositionId", callSuper = false)
+public class DebtPosition extends BaseEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_generator")
@@ -44,10 +46,7 @@ public class DebtPosition implements Serializable {
     private OffsetDateTime notificationDate;
     private OffsetDateTime validityDate;
     private boolean flagIuvVolatile;
-    private OffsetDateTime creationDate;
-    private OffsetDateTime updateDate;
-    private Long updateOperatorExternalId;
 
-    @OneToMany
-    private List<PaymentOption> paymentOptions;
+    @OneToMany(mappedBy = "debtPositionId")
+    private SortedSet<PaymentOption> paymentOptions;
 }

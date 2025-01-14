@@ -1,13 +1,15 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.Comparator;
 
 @Entity
 @Table(name = "transfer")
@@ -15,7 +17,8 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Data
 @Builder
-public class Transfer implements Serializable {
+@EqualsAndHashCode(of = "transferId", callSuper = false)
+public class Transfer extends BaseEntity implements Serializable, Comparable<Transfer> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transfer_generator")
@@ -32,8 +35,9 @@ public class Transfer implements Serializable {
   private String postalIban;
   private String category;
   private Long transferIndex;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
 
+  @Override
+  public int compareTo(@Nonnull Transfer o) {
+    return Comparator.comparing(Transfer::getTransferId).compare(this, o);
+  }
 }

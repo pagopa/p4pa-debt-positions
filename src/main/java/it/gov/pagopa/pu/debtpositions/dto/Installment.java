@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
@@ -36,9 +37,9 @@ public class Installment {
   private String legacyPaymentMetadata;
   private Person debtor;
   private List<Transfer> transfers;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
+  private LocalDateTime creationDate;
+  private LocalDateTime updateDate;
+  private String updateOperatorExternalId;
 
   @JsonIgnore
   private InstallmentNoPII noPII;

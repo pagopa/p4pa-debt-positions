@@ -1,15 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Comparator;
+import java.util.SortedSet;
 
 @Entity
 @Table(name = "payment_option")
@@ -17,7 +20,8 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 @Builder
-public class PaymentOption implements Serializable {
+@EqualsAndHashCode(of = "paymentOptionId", callSuper = false)
+public class PaymentOption extends BaseEntity implements Serializable, Comparable<PaymentOption> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_option_generator")
@@ -31,10 +35,12 @@ public class PaymentOption implements Serializable {
   private String description;
   @Enumerated(EnumType.STRING)
   private PaymentOptionType paymentOptionType;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
 
-  @OneToMany
-  private List<InstallmentNoPII> installments;
+  @OneToMany(mappedBy = "paymentOptionId")
+  private SortedSet<InstallmentNoPII> installments;
+
+  @Override
+  public int compareTo(@Nonnull PaymentOption o) {
+    return Comparator.comparing(PaymentOption::getPaymentOptionId).compare(this, o);
+  }
 }

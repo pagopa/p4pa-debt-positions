@@ -1,22 +1,26 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.List;
+import java.util.Comparator;
+import java.util.SortedSet;
 
 @Entity
 @Table(name = "installment")
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class InstallmentNoPII implements Serializable {
+@EqualsAndHashCode(of = "installmentId", callSuper = false)
+public class InstallmentNoPII extends BaseEntity implements Serializable, Comparable<InstallmentNoPII> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "installment_generator")
@@ -41,10 +45,12 @@ public class InstallmentNoPII implements Serializable {
   private Long personalDataId;
   private Character debtorEntityType;
   private byte[] debtorFiscalCodeHash;
-  private OffsetDateTime creationDate;
-  private OffsetDateTime updateDate;
-  private Long updateOperatorExternalId;
 
-  @OneToMany
-  private List<Transfer> transfers;
+  @OneToMany(mappedBy = "installmentId")
+  private SortedSet<Transfer> transfers;
+
+  @Override
+  public int compareTo(@Nonnull InstallmentNoPII o) {
+    return Comparator.comparing(InstallmentNoPII::getInstallmentId).compare(this, o);
+  }
 }

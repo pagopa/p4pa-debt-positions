@@ -20,10 +20,10 @@ public class PersonFaker {
       .build();
   }
 
-  public static PersonDTO buildPersonDTO() {
+  public static PersonDTO buildPersonDTO(){
     return PersonDTO.builder()
-      .entityType("entityType")
-      .fiscalCode("fiscalCode")
+      .entityType("F")
+      .fiscalCode("uniqueIdentifierCode")
       .fullName("fullName")
       .address("address")
       .civic("civic")
