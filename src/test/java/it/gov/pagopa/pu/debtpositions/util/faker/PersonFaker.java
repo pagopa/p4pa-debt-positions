@@ -22,8 +22,8 @@ public class PersonFaker {
 
   public static PersonDTO buildPersonDTO(){
     return PersonDTO.builder()
-      .uniqueIdentifierType("F")
-      .uniqueIdentifierCode("uniqueIdentifierCode")
+      .entityType("F")
+      .fiscalCode("uniqueIdentifierCode")
       .fullName("fullName")
       .address("address")
       .civic("civic")

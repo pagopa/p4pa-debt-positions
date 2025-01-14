@@ -9,9 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class PaymentOptionMapper {
@@ -31,14 +29,16 @@ public class PaymentOptionMapper {
       .map(installmentMapper::mapToModel)
       .toList();
 
-    List<InstallmentNoPII> installmentNoPIIs = installments.stream()
+    SortedSet<InstallmentNoPII> installmentNoPIIs = installments.stream()
       .map(installment -> {
         Pair<InstallmentNoPII, InstallmentPIIDTO> result = installmentPIIMapper.map(installment);
         InstallmentNoPII installmentNoPII = result.getFirst();
         installmentMapping.put(installmentNoPII, installment);
         return installmentNoPII;
       })
-      .toList();
+      .collect(() -> new TreeSet<>(Comparator.comparing(InstallmentNoPII::getInstallmentId)),
+        SortedSet::add,
+        SortedSet::addAll);
 
     PaymentOption paymentOption = new PaymentOption();
     paymentOption.setPaymentOptionId(dto.getPaymentOptionId());

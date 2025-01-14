@@ -39,8 +39,8 @@ public class InstallmentMapper {
     installment.setTransfers(dto.getTransfers().stream()
       .map(transferMapper::mapToModel)
       .toList());
-    installment.setCreationDate(dto.getCreationDate());
-    installment.setUpdateDate(dto.getUpdateDate());
+    installment.setCreationDate(dto.getCreationDate().toLocalDateTime());
+    installment.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
     return installment;
   }
 

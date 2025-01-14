@@ -8,9 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class DebtPositionMapper {
@@ -34,20 +32,20 @@ public class DebtPositionMapper {
     debtPosition.setNotificationDate(dto.getNotificationDate());
     debtPosition.setValidityDate(dto.getValidityDate());
     debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
-    debtPosition.setCreationDate(dto.getCreationDate());
-    debtPosition.setUpdateDate(dto.getUpdateDate());
+    debtPosition.setCreationDate(dto.getCreationDate().toLocalDateTime());
+    debtPosition.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
 
     Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
 
-    List<PaymentOption> paymentOptions = dto.getPaymentOptions().stream()
+    SortedSet<PaymentOption> paymentOptions = dto.getPaymentOptions().stream()
       .map(paymentOptionDTO -> {
         Pair<PaymentOption, Map<InstallmentNoPII, Installment>> paymentOptionWithInstallments = paymentOptionMapper.mapToModel(paymentOptionDTO);
-
         installmentMapping.putAll(paymentOptionWithInstallments.getSecond());
-
         return paymentOptionWithInstallments.getFirst();
       })
-      .toList();
+      .collect(() -> new TreeSet<>(Comparator.comparing(PaymentOption::getPaymentOptionId)),
+        SortedSet::add,
+        SortedSet::addAll);
 
     debtPosition.setPaymentOptions(paymentOptions);
 

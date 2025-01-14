@@ -90,7 +90,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(date.atOffset(ZoneOffset.UTC))
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -116,7 +116,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(date.atOffset(ZoneOffset.UTC))
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -126,8 +126,8 @@ public class InstallmentFaker {
       .balance("balance")
       .debtor(buildPersonDTO())
       .transfers(List.of())
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(date.atOffset(ZoneOffset.UTC))
+      .updateDate(date.atOffset(ZoneOffset.UTC))
       .build();
   }
 

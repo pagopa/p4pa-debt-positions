@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TreeSet;
 
 public class PaymentOptionFaker {
 
@@ -22,7 +23,7 @@ public class PaymentOptionFaker {
     paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
-    paymentOption.setInstallments(List.of());
+    paymentOption.setInstallments(new TreeSet<>());
     return paymentOption;
   }
 

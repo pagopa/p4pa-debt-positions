@@ -19,8 +19,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
-import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -72,11 +73,11 @@ class DebtPositionServiceImplTest {
 
     DebtPosition savedDebtPosition = new DebtPosition();
     savedDebtPosition.setDebtPositionId(1L);
-    savedDebtPosition.setPaymentOptions(Collections.singletonList(paymentOption));
+    savedDebtPosition.setPaymentOptions(new TreeSet<>(List.of(paymentOption)));
 
     PaymentOption savedPaymentOption = new PaymentOption();
     savedPaymentOption.setPaymentOptionId(1L);
-    savedPaymentOption.setInstallments(Collections.singletonList(installmentNoPII));
+    savedPaymentOption.setInstallments(new TreeSet<>(List.of(installmentNoPII)));
 
     Installment savedInstallment = new Installment();
     savedInstallment.setInstallmentId(1L);

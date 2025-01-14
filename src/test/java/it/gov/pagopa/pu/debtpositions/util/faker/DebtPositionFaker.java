@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
+import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
@@ -27,9 +28,9 @@ public class DebtPositionFaker {
     debtPosition.setNotificationDate(DATE);
     debtPosition.setValidityDate(DATE);
     debtPosition.setFlagIuvVolatile(true);
-    debtPosition.setCreationDate(DATE);
-    debtPosition.setUpdateDate(DATE);
-    debtPosition.setPaymentOptions(List.of(buildPaymentOption()));
+    debtPosition.setCreationDate(DATE.toLocalDateTime());
+    debtPosition.setUpdateDate(DATE.toLocalDateTime());
+    debtPosition.setPaymentOptions(new TreeSet<>(List.of(buildPaymentOption())));
     return debtPosition;
   }
 

@@ -9,8 +9,8 @@ public class PersonMapper {
 
   public Person mapToModel(PersonDTO dto) {
     Person person = new Person();
-    person.setEntityType(dto.getUniqueIdentifierType());
-    person.setFiscalCode(dto.getUniqueIdentifierCode());
+    person.setEntityType(dto.getEntityType());
+    person.setFiscalCode(dto.getFiscalCode());
     person.setFullName(dto.getFullName());
     person.setAddress(dto.getAddress());
     person.setCivic(dto.getCivic());

@@ -49,8 +49,6 @@ components:
           format: int64
         iupdOrg:
           type: string
-        iupdPagopa:
-          type: string
         description:
           type: string
         status:
@@ -136,7 +134,7 @@ components:
           format: int64
         status:
           type: string
-        iupd_pagopa:
+        iupdPagopa:
           type: string
         iud:
           type: string
