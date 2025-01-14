@@ -11,6 +11,7 @@ public class TransferMapper {
   public Transfer mapToModel(TransferDTO dto) {
     Transfer transfer = new Transfer();
     transfer.setTransferId(dto.getTransferId());
+    transfer.setInstallmentId(dto.getInstallmentId());
     transfer.setOrgFiscalCode(dto.getOrgFiscalCode());
     transfer.setOrgName(dto.getOrgName());
     transfer.setAmountCents(dto.getAmountCents());

@@ -11,7 +11,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 class InstallmentMapperTest {
 
   private final PersonMapper personMapper = new PersonMapper();
-  private final InstallmentMapper installmentMapper = new InstallmentMapper(personMapper);
+  private final TransferMapper transferMapper = new TransferMapper();
+  private final InstallmentMapper installmentMapper = new InstallmentMapper(personMapper, transferMapper);
 
   @Test
   void givenValidInstallmentDTO_WhenMapToModel_ThenReturnInstallment() {
@@ -21,7 +22,7 @@ class InstallmentMapperTest {
     Installment result = installmentMapper.mapToModel(installmentDTO);
 
     assertEquals(installmentExpected, result);
-    checkNotNullFields(result, "transfers", "updateOperatorExternalId", "noPII");
+    checkNotNullFields(result, "updateOperatorExternalId", "noPII");
   }
 }
 

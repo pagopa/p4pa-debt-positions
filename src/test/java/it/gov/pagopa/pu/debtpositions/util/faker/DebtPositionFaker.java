@@ -5,7 +5,10 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
-import java.util.Collections;
+import java.util.List;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
 
 public class DebtPositionFaker {
 
@@ -26,7 +29,7 @@ public class DebtPositionFaker {
     debtPosition.setFlagIuvVolatile(true);
     debtPosition.setCreationDate(DATE);
     debtPosition.setUpdateDate(DATE);
-    debtPosition.setPaymentOptions(Collections.emptyList());
+    debtPosition.setPaymentOptions(List.of(buildPaymentOption()));
     return debtPosition;
   }
 
@@ -45,7 +48,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setCreationDate(DATE);
     debtPositionDTO.setUpdateDate(DATE);
-    debtPositionDTO.setPaymentOptions(Collections.emptyList());
+    debtPositionDTO.setPaymentOptions(List.of(buildPaymentOptionDTO()));
     return debtPositionDTO;
   }
 }

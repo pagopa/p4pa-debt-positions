@@ -20,6 +20,6 @@ class TransferMapperTest {
     Transfer result = transferMapper.mapToModel(transferDTO);
 
     assertEquals(transferExpected, result);
-    checkNotNullFields(result, "updateOperatorExternalId", "installmentId", "creationDate", "updateDate");
+    checkNotNullFields(result, "updateOperatorExternalId", "creationDate", "updateDate");
   }
 }

@@ -1,8 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class DebtPositionMapper {
@@ -13,7 +21,7 @@ public class DebtPositionMapper {
     this.paymentOptionMapper = paymentOptionMapper;
   }
 
-  public DebtPosition mapToModel(DebtPositionDTO dto) {
+  public Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mapToModel(DebtPositionDTO dto) {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(dto.getDebtPositionId());
     debtPosition.setIupdOrg(dto.getIupdOrg());
@@ -28,10 +36,21 @@ public class DebtPositionMapper {
     debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
     debtPosition.setCreationDate(dto.getCreationDate());
     debtPosition.setUpdateDate(dto.getUpdateDate());
-    debtPosition.setPaymentOptions(dto.getPaymentOptions().stream()
-      .map(paymentOptionMapper::mapToModel)
-      .toList());
-    return debtPosition;
-  }
 
+    Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
+
+    List<PaymentOption> paymentOptions = dto.getPaymentOptions().stream()
+      .map(paymentOptionDTO -> {
+        Pair<PaymentOption, Map<InstallmentNoPII, Installment>> paymentOptionWithInstallments = paymentOptionMapper.mapToModel(paymentOptionDTO);
+
+        installmentMapping.putAll(paymentOptionWithInstallments.getSecond());
+
+        return paymentOptionWithInstallments.getFirst();
+      })
+      .toList();
+
+    debtPosition.setPaymentOptions(paymentOptions);
+
+    return Pair.of(debtPosition, installmentMapping);
+  }
 }

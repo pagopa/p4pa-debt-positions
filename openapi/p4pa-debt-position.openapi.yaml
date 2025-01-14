@@ -93,6 +93,9 @@ components:
         paymentOptionId:
           type: integer
           format: int64
+        debtPositionId:
+          type: integer
+          format: int64
         totalAmountCents:
           type: integer
           format: int64
@@ -184,6 +187,9 @@ components:
       type: object
       properties:
         transferId:
+          type: integer
+          format: int64
+        installmentId:
           type: integer
           format: int64
         orgFiscalCode:

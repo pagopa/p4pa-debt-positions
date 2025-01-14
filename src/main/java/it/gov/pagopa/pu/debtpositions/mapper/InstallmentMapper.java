@@ -9,8 +9,11 @@ public class InstallmentMapper {
 
   private final PersonMapper personMapper;
 
-  public InstallmentMapper(PersonMapper personMapper) {
+  private final TransferMapper transferMapper;
+
+  public InstallmentMapper(PersonMapper personMapper, TransferMapper transferMapper) {
     this.personMapper = personMapper;
+    this.transferMapper = transferMapper;
   }
 
   public Installment mapToModel(InstallmentDTO dto) {
@@ -29,10 +32,13 @@ public class InstallmentMapper {
     installment.setAmountCents(dto.getAmountCents());
     installment.setNotificationFeeCents(dto.getNotificationFeeCents());
     installment.setRemittanceInformation(dto.getRemittanceInformation());
-    installment.setLegacyPaymentMetadata(dto.getLegacyPaymentMetadata());
     installment.setHumanFriendlyRemittanceInformation(dto.getHumanFriendlyRemittanceInformation());
     installment.setBalance(dto.getBalance());
+    installment.setLegacyPaymentMetadata(dto.getLegacyPaymentMetadata());
     installment.setDebtor(personMapper.mapToModel(dto.getDebtor()));
+    installment.setTransfers(dto.getTransfers().stream()
+      .map(transferMapper::mapToModel)
+      .toList());
     installment.setCreationDate(dto.getCreationDate());
     installment.setUpdateDate(dto.getUpdateDate());
     return installment;
