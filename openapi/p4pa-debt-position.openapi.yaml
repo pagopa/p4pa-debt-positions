@@ -39,8 +39,9 @@ components:
   schemas:
     DebtPositionDTO:
       required:
-        - debtPositionTypeOrgId
         - organizationId
+        - debtPositionTypeOrgId
+        - paymentOptions
       type: object
       properties:
         debtPositionId:
@@ -88,6 +89,7 @@ components:
       required:
         - installments
         - totalAmountCents
+        - paymentOptionType
       type: object
       properties:
         paymentOptionId:
@@ -289,13 +291,13 @@ components:
       required:
         - email
         - fullName
-        - uniqueIdentifierCode
-        - uniqueIdentifierType
+        - entityType
+        - fiscalCode
       type: object
       properties:
-        uniqueIdentifierType:
+        entityType:
           type: string
-        uniqueIdentifierCode:
+        fiscalCode:
           type: string
         fullName:
           type: string

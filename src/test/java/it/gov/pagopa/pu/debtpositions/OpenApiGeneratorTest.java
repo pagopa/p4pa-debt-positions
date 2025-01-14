@@ -67,7 +67,7 @@ class OpenApiGeneratorTest {
       }
     }
     if(toStore){
-      Files.writeString(openApiGeneratedPath, openApiResult, StandardOpenOption.TRUNCATE_EXISTING);
+      Files.writeString(openApiGeneratedPath, openApiResult, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     String gitStatus = execCmd("git", "status");

@@ -1,3 +1,6 @@
+server:
+  http: "\${SERVER_PORT:8080}"
+
 spring:
     application:
       name: ${artifactId}
@@ -6,6 +9,8 @@ spring:
     threads:
       virtual:
         enabled: "\${VIRTUAL_THREADS_ENABLED:true}"
+    jpa:
+      show-sql: "\${SHOW_SQL:false}"
     datasource:
       debt-position:
         jdbc-url: \${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}
@@ -22,17 +27,35 @@ spring:
         basePath: crud
 
 management:
+    endpoints:
+      jmx:
+        exposure.include: "*"
+      web:
+        exposure:
+          include: health, info, prometheus, metrics
+        base-path: /actuator
     endpoint:
       health:
         probes.enabled: true
         group:
           readiness.include: "*"
           liveness.include: livenessState,diskSpace,ping
-    endpoints:
-      jmx:
-        exposure.include: "*"
-      web:
-        exposure.include: info, health
+      prometheus:
+        enabled: true
+    metrics:
+      tags:
+        application: ${artifactId}
+      export:
+        prometheus:
+          enabled: true
+          step: 1m
+          descriptions: true
+      enable:
+        jvm: true
+        process: true
+        system: true
+        http: true
+        logback: true
 
 data-cipher:
   encrypt-psw: "\${DATA_CIPHER_ENCRYPT_PASSWORD:PWD}"
