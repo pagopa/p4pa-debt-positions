@@ -49,8 +49,6 @@ components:
           format: int64
         iupdOrg:
           type: string
-        iupdPagopa:
-          type: string
         description:
           type: string
         status:
@@ -95,6 +93,9 @@ components:
         paymentOptionId:
           type: integer
           format: int64
+        debtPositionId:
+          type: integer
+          format: int64
         totalAmountCents:
           type: integer
           format: int64
@@ -133,7 +134,7 @@ components:
           format: int64
         status:
           type: string
-        iupd_pagopa:
+        iupdPagopa:
           type: string
         iud:
           type: string
@@ -188,6 +189,9 @@ components:
         transferId:
           type: integer
           format: int64
+        installmentId:
+          type: integer
+          format: int64
         orgFiscalCode:
           type: string
         orgName:
@@ -211,7 +215,7 @@ components:
           type: string
         transferIndex:
           type: integer
-          format: int32
+          format: int64
     ReceiptDTO:
       type: object
       properties:

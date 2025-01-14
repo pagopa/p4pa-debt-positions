@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
 import java.time.LocalDateTime;
@@ -10,6 +11,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 
 public class InstallmentFaker {
 
@@ -35,7 +38,7 @@ public class InstallmentFaker {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
-      .transfers(List.of())
+      .transfers(List.of(buildTransfer()))
       .debtor(buildPerson())
       .creationDate(date)
       .updateDate(date)
@@ -73,6 +76,58 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
+      .build();
+  }
+
+  public static Installment buildInstallmentNoUpdate(){
+    return Installment.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status("status")
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .debtor(buildPerson())
+      .transfers(List.of())
+      .creationDate(date)
+      .updateDate(date)
+      .build();
+  }
+
+  public static InstallmentDTO buildInstallmentDTO() {
+    return InstallmentDTO.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status("status")
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .debtor(buildPersonDTO())
+      .transfers(List.of())
+      .creationDate(date.atOffset(ZoneOffset.UTC))
+      .updateDate(date.atOffset(ZoneOffset.UTC))
       .build();
   }
 
