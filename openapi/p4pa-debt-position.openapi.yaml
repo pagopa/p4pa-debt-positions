@@ -29,6 +29,36 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /sync/status/{debtPositionId}:
+    put:
+      tags:
+        - debt-position
+      operationId: finalizeSyncStatus
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncStatusDTO"
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionDTO'
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: []
 components:
@@ -308,4 +338,15 @@ components:
         nation:
           type: string
         email:
+          type: string
+    SyncStatusDTO:
+      type: object
+      additionalProperties:
+          $ref: "#/components/schemas/IudSyncStatusUpdateDTO"
+    IudSyncStatusUpdateDTO:
+      type: object
+      properties:
+        newStatus:
+          type: string
+        iupdPagopa:
           type: string

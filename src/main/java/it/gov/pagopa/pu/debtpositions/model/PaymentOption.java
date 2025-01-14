@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 public class PaymentOption implements Serializable {
 
   @Id

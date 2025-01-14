@@ -2,11 +2,15 @@ package it.gov.pagopa.pu.debtpositions.util;
 
 import org.junit.jupiter.api.Assertions;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class TestUtils {
+  public static final OffsetDateTime OFFSET_DATE_TIME = OffsetDateTime.of(2025, 1, 1, 0,0,0, 0, ZoneOffset.UTC);
+
   private TestUtils(){}
 
   /**

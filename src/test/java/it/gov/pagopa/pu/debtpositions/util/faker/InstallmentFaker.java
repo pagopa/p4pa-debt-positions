@@ -2,30 +2,32 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.OFFSET_DATE_TIME;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
 
 public class InstallmentFaker {
-
-  static OffsetDateTime date = OffsetDateTime.of(2025, 1, 1, 0,0,0, 0, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
     return Installment.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status("TO_SYNC")
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(OFFSET_DATE_TIME)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -35,8 +37,8 @@ public class InstallmentFaker {
       .balance("balance")
       .transfers(List.of())
       .debtor(buildPerson())
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(OFFSET_DATE_TIME)
+      .updateDate(OFFSET_DATE_TIME)
       .updateOperatorExternalId(1L)
       .build();
   }
@@ -45,14 +47,14 @@ public class InstallmentFaker {
     return InstallmentNoPII.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status("TO_SYNC")
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(OFFSET_DATE_TIME)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .notificationFeeCents(100L)
@@ -62,8 +64,8 @@ public class InstallmentFaker {
       .debtorEntityType('F')
       .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(OFFSET_DATE_TIME)
+      .updateDate(OFFSET_DATE_TIME)
       .updateOperatorExternalId(1L)
       .build();
   }
@@ -71,6 +73,34 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
+      .build();
+  }
+
+  public static InstallmentDTO buildInstallmentDTO() {
+    List<TransferDTO> transfers = new ArrayList<>();
+    transfers.add(buildTransferDTO());
+    return InstallmentDTO.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status("TO_SYNC")
+      .iud("iud")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .iupdPagopa("iupdPagopa")
+      .dueDate(OFFSET_DATE_TIME)
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .debtor(buildPersonDTO())
+      .transfers(transfers)
+      .creationDate(OFFSET_DATE_TIME)
+      .updateDate(OFFSET_DATE_TIME)
       .build();
   }
 
