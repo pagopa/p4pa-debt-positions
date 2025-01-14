@@ -10,7 +10,8 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.function.Supplier;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentOptionMapper {
@@ -18,7 +19,7 @@ public class PaymentOptionMapper {
   private final InstallmentMapper installmentMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
 
-  private static final Supplier<TreeSet<InstallmentNoPII>> TREE_SET_SUPPLIER = TreeSet::new;
+  private static final Collector<InstallmentNoPII, ?, SortedSet<InstallmentNoPII>> toTreeSet = Collectors.toCollection(TreeSet::new);
 
   public PaymentOptionMapper(InstallmentMapper installmentMapper, InstallmentPIIMapper installmentPIIMapper) {
     this.installmentMapper = installmentMapper;
@@ -39,10 +40,7 @@ public class PaymentOptionMapper {
         installmentMapping.put(installmentNoPII, installment);
         return installmentNoPII;
       })
-      .collect(
-        TREE_SET_SUPPLIER,
-        SortedSet::add,
-        SortedSet::addAll);
+      .collect(toTreeSet);
 
     PaymentOption paymentOption = new PaymentOption();
     paymentOption.setPaymentOptionId(dto.getPaymentOptionId());
