@@ -10,12 +10,15 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 @Service
 public class PaymentOptionMapper {
 
   private final InstallmentMapper installmentMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
+
+  private static final Supplier<TreeSet<InstallmentNoPII>> TREE_SET_SUPPLIER = TreeSet::new;
 
   public PaymentOptionMapper(InstallmentMapper installmentMapper, InstallmentPIIMapper installmentPIIMapper) {
     this.installmentMapper = installmentMapper;
@@ -36,7 +39,8 @@ public class PaymentOptionMapper {
         installmentMapping.put(installmentNoPII, installment);
         return installmentNoPII;
       })
-      .collect(() -> new TreeSet<>(Comparator.comparing(InstallmentNoPII::getInstallmentId)),
+      .collect(
+        TREE_SET_SUPPLIER,
         SortedSet::add,
         SortedSet::addAll);
 

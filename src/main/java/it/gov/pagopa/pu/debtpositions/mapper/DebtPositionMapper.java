@@ -9,11 +9,14 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.function.Supplier;
 
 @Service
 public class DebtPositionMapper {
 
   private final PaymentOptionMapper paymentOptionMapper;
+
+  private static final Supplier<TreeSet<PaymentOption>> TREE_SET_SUPPLIER = TreeSet::new;
 
   public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper) {
     this.paymentOptionMapper = paymentOptionMapper;
@@ -43,9 +46,11 @@ public class DebtPositionMapper {
         installmentMapping.putAll(paymentOptionWithInstallments.getSecond());
         return paymentOptionWithInstallments.getFirst();
       })
-      .collect(() -> new TreeSet<>(Comparator.comparing(PaymentOption::getPaymentOptionId)),
+      .collect(
+        TREE_SET_SUPPLIER,
         SortedSet::add,
-        SortedSet::addAll);
+        SortedSet::addAll
+      );
 
     debtPosition.setPaymentOptions(paymentOptions);
 
