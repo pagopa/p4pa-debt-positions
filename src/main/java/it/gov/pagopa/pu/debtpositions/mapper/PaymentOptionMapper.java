@@ -19,7 +19,7 @@ public class PaymentOptionMapper {
   private final InstallmentMapper installmentMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
 
-  private static final Collector<InstallmentNoPII, ?, SortedSet<InstallmentNoPII>> toTreeSet = Collectors.toCollection(TreeSet::new);
+  private static final Collector<InstallmentNoPII, ?, SortedSet<InstallmentNoPII>> toInstallmentTreeSet = Collectors.toCollection(TreeSet::new);
 
   public PaymentOptionMapper(InstallmentMapper installmentMapper, InstallmentPIIMapper installmentPIIMapper) {
     this.installmentMapper = installmentMapper;
@@ -40,7 +40,7 @@ public class PaymentOptionMapper {
         installmentMapping.put(installmentNoPII, installment);
         return installmentNoPII;
       })
-      .collect(toTreeSet);
+      .collect(toInstallmentTreeSet);
 
     PaymentOption paymentOption = new PaymentOption();
     paymentOption.setPaymentOptionId(dto.getPaymentOptionId());

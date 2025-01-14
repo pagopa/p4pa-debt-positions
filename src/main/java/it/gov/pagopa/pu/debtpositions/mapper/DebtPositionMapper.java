@@ -17,7 +17,7 @@ public class DebtPositionMapper {
 
   private final PaymentOptionMapper paymentOptionMapper;
 
-  private static final Collector<PaymentOption, ?, SortedSet<PaymentOption>> toTreeSet = Collectors.toCollection(TreeSet::new);
+  private static final Collector<PaymentOption, ?, SortedSet<PaymentOption>> toPaymentOptionTreeSet = Collectors.toCollection(TreeSet::new);
 
   public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper) {
     this.paymentOptionMapper = paymentOptionMapper;
@@ -47,7 +47,7 @@ public class DebtPositionMapper {
         installmentMapping.putAll(paymentOptionWithInstallments.getSecond());
         return paymentOptionWithInstallments.getFirst();
       })
-      .collect(toTreeSet);
+      .collect(toPaymentOptionTreeSet);
 
     debtPosition.setPaymentOptions(paymentOptions);
 
