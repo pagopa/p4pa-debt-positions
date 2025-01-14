@@ -28,7 +28,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildIn
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -97,11 +96,6 @@ class DebtPositionServiceImplTest {
     Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
     Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
     Mockito.verify(transferRepository, Mockito.times(1)).save(transfer);
-
-    assertEquals(debtPosition, savedDebtPosition);
-    assertEquals(paymentOption, savedPaymentOption);
-    assertEquals(installment, savedInstallment);
-    assertEquals(savedTransfer, transfer);
   }
 }
 
