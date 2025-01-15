@@ -8,10 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
