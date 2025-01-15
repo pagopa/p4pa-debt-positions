@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +19,7 @@ import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.enums.DebtPositionStatus.TO_SYNC;
 
+@Service
 public class DebtPositionServiceImpl implements DebtPositionService {
 
   private final DebtPositionRepository debtPositionRepository;
