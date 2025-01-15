@@ -11,7 +11,10 @@ import it.gov.pagopa.pu.debtpositions.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.enums.DebtPositionStatus.TO_SYNC;
 
@@ -63,53 +66,46 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public void finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> syncStatusDTO) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
-    debtPosition.getPaymentOptions().stream()
-      .filter(paymentOption -> {
-        boolean anyUpdated = paymentOption.getInstallments().stream()
-          .filter(installment -> TO_SYNC.name().equals(installment.getStatus()))
-          .filter(installment -> syncStatusDTO.containsKey(installment.getIud()))
-          .filter(installment -> installment.getIupdPagopa().equals(syncStatusDTO.get(installment.getIud()).getIupdPagopa()))
-          .map(installment -> {
-            IudSyncStatusUpdateDTO updateDTO = syncStatusDTO.get(installment.getIud());
-            installment.setStatus(updateDTO.getNewStatus());
-            installmentNoPIIRepository.updateStatus(
-              installment.getInstallmentId(),
-              updateDTO.getNewStatus()
-            );
-            return true;
-          })
-          .findAny()
-          .orElse(false);
+    debtPosition.getPaymentOptions().forEach(paymentOption ->
+      paymentOption.getInstallments().stream()
+        .filter(installment -> TO_SYNC.name().equals(installment.getStatus()))
+        .filter(installment -> syncStatusDTO.containsKey(installment.getIud()))
+        .filter(installment -> installment.getIupdPagopa().equals(syncStatusDTO.get(installment.getIud()).getIupdPagopa()))
+        .forEach(installment -> {
+          IudSyncStatusUpdateDTO updateDTO = syncStatusDTO.get(installment.getIud());
+          installment.setStatus(updateDTO.getNewStatus());
+          installmentNoPIIRepository.updateStatus(
+            installment.getInstallmentId(),
+            updateDTO.getNewStatus()
+          );
+        }));
 
-        if (anyUpdated) {
-          updatePaymentOptionStatus(paymentOption);
-        }
-        return anyUpdated;
-      })
-      .findAny()
-      .ifPresent(op -> updateDebtPositionStatus(debtPosition));
+    debtPosition.getPaymentOptions().forEach(this::updatePaymentOptionStatus);
+
+    updateDebtPositionStatus(debtPosition);
+  }
+
+  private <T> Optional<T> verifyStatusUniqueness(Stream<T> stream) {
+    List<T> distinctItems = stream.distinct().toList();
+    return distinctItems.size() == 1
+      ? Optional.of(distinctItems.getFirst())
+      : Optional.empty();
   }
 
   private void updatePaymentOptionStatus(PaymentOption paymentOption) {
-    paymentOption.getInstallments().stream()
-      .map(InstallmentNoPII::getStatus)
-      .distinct()
-      .reduce((first, second) -> null)
-      .ifPresent(unifiedStatus -> {
-        paymentOption.setStatus(unifiedStatus);
-        paymentOptionRepository.updateStatus(paymentOption.getPaymentOptionId(), unifiedStatus);
-      });
+    verifyStatusUniqueness(paymentOption.getInstallments().stream().map(InstallmentNoPII::getStatus))
+      .ifPresent(status -> {
+      paymentOption.setStatus(status);
+      paymentOptionRepository.updateStatus(paymentOption.getPaymentOptionId(), status);
+    });
   }
 
   private void updateDebtPositionStatus(DebtPosition debtPosition) {
-    debtPosition.getPaymentOptions().stream()
-      .map(PaymentOption::getStatus)
-      .distinct()
-      .reduce((first, second) -> null)
-      .ifPresent(unifiedStatus -> {
-        debtPosition.setStatus(unifiedStatus);
-        debtPositionRepository.updateStatus(debtPosition.getDebtPositionId(), unifiedStatus);
-      });
+    verifyStatusUniqueness(debtPosition.getPaymentOptions().stream().map(PaymentOption::getStatus))
+      .ifPresent(status -> {
+      debtPosition.setStatus(status);
+      debtPositionRepository.updateStatus(debtPosition.getDebtPositionId(), status);
+    });
   }
 }
 

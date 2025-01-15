@@ -8,8 +8,7 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.TreeSet;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 

@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IudSyncStatusUpdateDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.*;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -28,6 +28,9 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildIn
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -87,17 +90,19 @@ class DebtPositionServiceImplTest {
 
     service.saveDebtPosition(debtPositionDTO);
 
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
-    Mockito.verify(paymentOptionRepositoryMock, Mockito.times(1)).save(paymentOption);
-    Mockito.verify(installmentRepositoryMock, Mockito.times(1)).save(installment);
-    Mockito.verify(transferRepositoryMock, Mockito.times(1)).save(transfer);
+    verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
+    verify(paymentOptionRepositoryMock, Mockito.times(1)).save(paymentOption);
+    verify(installmentRepositoryMock, Mockito.times(1)).save(installment);
+    verify(transferRepositoryMock, Mockito.times(1)).save(transfer);
   }
 
   @Test
   void givenFinalizeSyncStatusThenOk(){
+    // Given
     Long id = 1L;
-    String newStatus = "newStatus";
+    String newStatus = "UNPAID";
     DebtPosition debtPosition = buildDebtPosition();
+
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
 
     Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
@@ -106,16 +111,68 @@ class DebtPositionServiceImplTest {
 
     Mockito.doNothing().when(debtPositionRepositoryMock).updateStatus(id, newStatus);
 
-
     Map<String, IudSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IudSyncStatusUpdateDTO iudSyncStatusUpdateDTO = IudSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
-      .iupdPagopa("iupdPagopa")
+      .iupdPagopa("iupdPagoPa")
       .build();
 
     syncStatusDTO.put("iud", iudSyncStatusUpdateDTO);
 
+    // When
     service.finalizeSyncStatus(id, syncStatusDTO);
+    System.out.println("debtPosition: " + debtPosition);
+
+    // Then
+    verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
+    verify(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
+    verify(paymentOptionRepositoryMock).updateStatus(id, newStatus);
+    verify(debtPositionRepositoryMock).updateStatus(id, newStatus);
+
+    assertEquals(newStatus, debtPosition.getStatus());
+    assertEquals(newStatus, debtPosition.getPaymentOptions().getFirst().getStatus());
+    assertEquals(newStatus, debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+  }
+
+  @Test
+  void givenFinalizeSyncStatusWhenDifferentStatusThenOk(){
+    // Given
+    Long id = 1L;
+    String newStatus = "UNPAID";
+    DebtPosition debtPosition = buildDebtPosition();
+    InstallmentNoPII installment = InstallmentNoPII.builder()
+      .installmentId(2L)
+      .paymentOptionId(1L)
+      .status("status")
+      .iupdPagopa("iupdPagoPa1")
+      .iud("iud1").build();
+
+    debtPosition.getPaymentOptions().getFirst().setInstallments(new TreeSet<>(List.of(buildInstallmentNoPII(), installment)));
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
+
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
+
+    Map<String, IudSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
+    IudSyncStatusUpdateDTO iudSyncStatusUpdateDTO = IudSyncStatusUpdateDTO.builder()
+      .newStatus(newStatus)
+      .iupdPagopa("iupdPagoPa")
+      .build();
+
+    syncStatusDTO.put("iud", iudSyncStatusUpdateDTO);
+
+    // When
+    service.finalizeSyncStatus(id, syncStatusDTO);
+    System.out.println("debtPosition: " + debtPosition);
+
+    // Then
+    verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
+    verify(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
+
+    assertNotEquals(newStatus, debtPosition.getStatus());
+    assertNotEquals(newStatus, debtPosition.getPaymentOptions().getFirst().getStatus());
+    assertEquals(newStatus, debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertNotEquals(newStatus, debtPosition.getPaymentOptions().getFirst().getInstallments().getLast().getStatus());
   }
 }
 
