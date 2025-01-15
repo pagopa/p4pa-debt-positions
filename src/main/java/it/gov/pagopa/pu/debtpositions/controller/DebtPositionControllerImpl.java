@@ -16,7 +16,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> requestBody) {
+  public ResponseEntity<Void> finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> requestBody) {
     return DebtPositionApi.super.finalizeSyncStatus(debtPositionId, requestBody);
   }
 }

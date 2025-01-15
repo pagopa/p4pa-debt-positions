@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IudSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -11,9 +10,6 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.*;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 
 import java.util.Map;
 
@@ -30,7 +26,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, PaymentOptionRepository paymentOptionRepository,
                                  InstallmentPIIRepository installmentRepository, TransferRepository transferRepository,
-                                 DebtPositionMapper debtPositionMapper) {
+                                 DebtPositionMapper debtPositionMapper, InstallmentNoPIIRepository installmentNoPIIRepository) {
     this.debtPositionRepository = debtPositionRepository;
     this.paymentOptionRepository = paymentOptionRepository;
     this.installmentRepository = installmentRepository;
@@ -64,7 +60,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public DebtPositionDTO finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> syncStatusDTO) {
+  public void finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> syncStatusDTO) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     debtPosition.getPaymentOptions().stream()
@@ -92,8 +88,6 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       })
       .findAny()
       .ifPresent(op -> updateDebtPositionStatus(debtPosition));
-
-    return debtPositionMapper.map(debtPosition);
   }
 
   private void updatePaymentOptionStatus(PaymentOption paymentOption) {

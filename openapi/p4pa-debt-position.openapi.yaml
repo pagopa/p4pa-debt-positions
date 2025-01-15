@@ -51,10 +51,6 @@ paths:
       responses:
         "200":
           description: Ok
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/DebtPositionDTO'
         "400":
           description: Invalid request
         "500":

@@ -8,5 +8,5 @@ import java.util.Map;
 public interface DebtPositionService {
 
   void saveDebtPosition(DebtPositionDTO debtPositionDTO);
-  DebtPositionDTO finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> syncStatusDTO);
+  void finalizeSyncStatus(Long debtPositionId, Map<String, IudSyncStatusUpdateDTO> syncStatusDTO);
 }

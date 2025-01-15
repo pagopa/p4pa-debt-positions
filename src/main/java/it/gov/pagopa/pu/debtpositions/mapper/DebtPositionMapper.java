@@ -5,11 +5,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import org.mapstruct.Mapper;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -55,10 +57,4 @@ public class DebtPositionMapper {
     return Pair.of(debtPosition, installmentMapping);
   }
 }
-
-//@Mapper(componentModel = "spring", uses = {PaymentOptionMapper.class})
-//public interface DebtPositionMapper {
-//
-//  DebtPositionDTO map(DebtPosition debtPosition);
-//}
 

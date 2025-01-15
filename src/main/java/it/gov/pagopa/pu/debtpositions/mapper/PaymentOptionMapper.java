@@ -6,7 +6,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import org.mapstruct.Mapper;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -57,8 +56,3 @@ public class PaymentOptionMapper {
     return Pair.of(paymentOption, installmentMapping);
   }
 }
-//@Mapper(componentModel = "spring", uses = {InstallmentMapper.class})
-//public interface PaymentOptionMapper {
-//
-//  PaymentOptionDTO map(PaymentOption paymentOption);
-//}
