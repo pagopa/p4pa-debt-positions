@@ -29,7 +29,7 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
-  /sync/status/{debtPositionId}:
+  /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:
         - debt-position
