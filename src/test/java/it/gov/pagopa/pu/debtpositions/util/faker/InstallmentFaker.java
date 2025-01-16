@@ -70,7 +70,7 @@ public class InstallmentFaker {
       .balance("balance")
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId("OPERATOREXTERNALID")
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 

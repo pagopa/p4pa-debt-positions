@@ -121,7 +121,6 @@ class DebtPositionServiceImplTest {
 
     // When
     service.finalizeSyncStatus(id, syncStatusDTO);
-    System.out.println("debtPosition: " + debtPosition);
 
     // Then
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
@@ -163,7 +162,6 @@ class DebtPositionServiceImplTest {
 
     // When
     service.finalizeSyncStatus(id, syncStatusDTO);
-    System.out.println("debtPosition: " + debtPosition);
 
     // Then
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);

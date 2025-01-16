@@ -10,12 +10,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoUpdate;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
-import static org.junit.jupiter.api.Assertions.*;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentMapperTest {
@@ -42,7 +43,7 @@ class InstallmentMapperTest {
 
     Installment result = installmentMapper.mapToModel(installmentDTO);
 
-    assertEquals(installmentExpected, result);
+    reflectionEqualsByName(installmentExpected, result);
     checkNotNullFields(result, "updateOperatorExternalId", "noPII");
   }
 }

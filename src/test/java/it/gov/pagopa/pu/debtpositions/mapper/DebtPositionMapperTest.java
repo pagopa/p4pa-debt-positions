@@ -17,11 +17,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.*;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionMapperTest {
@@ -51,7 +53,7 @@ class DebtPositionMapperTest {
 
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> result = debtPositionMapper.mapToModel(debtPositionDTO);
 
-    assertEquals(debtPositionExpected, result.getFirst());
+    reflectionEqualsByName(debtPositionExpected, result.getFirst());
     checkNotNullFields(result.getFirst(), "updateOperatorExternalId");
   }
 

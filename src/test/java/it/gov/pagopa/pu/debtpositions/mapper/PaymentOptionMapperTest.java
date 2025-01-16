@@ -15,10 +15,10 @@ import org.springframework.data.util.Pair;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentOptionMapperTest {
@@ -46,7 +46,7 @@ class PaymentOptionMapperTest {
 
     Pair<PaymentOption, Map<InstallmentNoPII, Installment>> result = paymentOptionMapper.mapToModel(paymentOptionDTO);
 
-    assertEquals(paymentOptionExpected, result.getFirst());
+    reflectionEqualsByName(paymentOptionExpected, result.getFirst());
     checkNotNullFields(result.getFirst(), "updateOperatorExternalId", "creationDate", "updateDate");
   }
 }
