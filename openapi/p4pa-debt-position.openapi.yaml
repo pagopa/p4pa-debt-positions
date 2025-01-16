@@ -12,6 +12,13 @@ paths:
       tags:
         - debt-position
       operationId: createDebtPosition
+      parameters:
+        - name: massive
+          in: query
+          description: Indicates if the operation is massive (true) or single (false).
+          required: false
+          schema:
+            type: boolean
       requestBody:
         content:
           application/json:
@@ -27,6 +34,8 @@ paths:
                 $ref: '#/components/schemas/DebtPositionDTO'
         "400":
           description: Invalid request
+        "409":
+          description: Debt position already exists
         "500":
           description: Internal server error
 security:
@@ -52,7 +61,7 @@ components:
         description:
           type: string
         status:
-          type: string
+          $ref: "#/components/schemas/DebtPositionStatus"
         ingestionFlowFileId:
           type: integer
           format: int64
@@ -313,3 +322,14 @@ components:
           type: string
         email:
           type: string
+    DebtPositionStatus:
+      type: string
+      enum:
+        - TO_SYNC
+        - REPORTED
+        - PAID
+        - PARTIALLY_PAID
+        - CANCELLED
+        - INVALID
+        - EXPIRED
+        - UNPAID

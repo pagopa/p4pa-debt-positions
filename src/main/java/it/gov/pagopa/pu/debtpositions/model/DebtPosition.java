@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +37,7 @@ public class DebtPosition extends BaseEntity implements Serializable {
     private Long debtPositionId;
     private String iupdOrg;
     private String description;
-    private String status;
+    private DebtPositionStatus status;
     private Long ingestionFlowFileId;
     private Long ingestionFlowFileLineNumber;
     private Long organizationId;
