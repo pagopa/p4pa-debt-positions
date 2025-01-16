@@ -13,6 +13,7 @@ import java.util.List;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
 
 public class InstallmentFaker {
 
@@ -99,7 +100,7 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .debtor(buildPerson())
-      .transfers(List.of())
+      .transfers(List.of(buildTransfer()))
       .creationDate(date)
       .updateDate(date)
       .build();
@@ -125,7 +126,7 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .debtor(buildPersonDTO())
-      .transfers(List.of())
+      .transfers(List.of(buildTransferDTO()))
       .creationDate(date.atOffset(ZoneOffset.UTC))
       .updateDate(date.atOffset(ZoneOffset.UTC))
       .build();
