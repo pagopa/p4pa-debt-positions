@@ -21,9 +21,9 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 class InstallmentMapperTest {
 
   @Mock
-  private final PersonMapper personMapperMock = new PersonMapper();
+  private PersonMapper personMapperMock;
   @Mock
-  private final TransferMapper transferMapperMock = new TransferMapper();
+  private TransferMapper transferMapperMock;
 
   private InstallmentMapper installmentMapper;
 
