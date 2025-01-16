@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DebtPositionControllerImpl implements DebtPositionApi {
   @Override
-  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO) {
-    return DebtPositionApi.super.createDebtPosition(debtPositionDTO);
+  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
+    return DebtPositionApi.super.createDebtPosition(debtPositionDTO, massive);
   }
 }

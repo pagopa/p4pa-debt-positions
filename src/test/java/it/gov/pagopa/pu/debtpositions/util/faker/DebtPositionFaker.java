@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 
 import java.time.OffsetDateTime;
@@ -20,7 +21,7 @@ public class DebtPositionFaker {
     debtPosition.setDebtPositionId(1L);
     debtPosition.setIupdOrg("IUPD_ORG");
     debtPosition.setDescription("Test Description");
-    debtPosition.setStatus("ACTIVE");
+    debtPosition.setStatus(DebtPositionStatus.PAID);
     debtPosition.setIngestionFlowFileId(1001L);
     debtPosition.setIngestionFlowFileLineNumber(10L);
     debtPosition.setOrganizationId(500L);
@@ -39,7 +40,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setDebtPositionId(1L);
     debtPositionDTO.setIupdOrg("IUPD_ORG");
     debtPositionDTO.setDescription("Test Description");
-    debtPositionDTO.setStatus("ACTIVE");
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     debtPositionDTO.setIngestionFlowFileId(1001L);
     debtPositionDTO.setIngestionFlowFileLineNumber(10L);
     debtPositionDTO.setOrganizationId(500L);
