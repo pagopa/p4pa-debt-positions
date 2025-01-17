@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.activities.activity;
 
-import it.gov.pagopa.pu.debtpositions.activities.dao.TaxonomyDao;
 import it.gov.pagopa.pu.debtpositions.activities.exception.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.activities.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.TaxonomyRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
@@ -20,10 +20,10 @@ import static it.gov.pagopa.pu.debtpositions.activities.util.Utilities.isValidPI
 @Service
 public class ValidateDebtPositionActivityImpl implements ValidateDebtPositionActivity {
 
-    private final TaxonomyDao taxonomyDao;
+    private final TaxonomyRepository taxonomyRepository;
 
-    public ValidateDebtPositionActivityImpl(TaxonomyDao taxonomyDao) {
-        this.taxonomyDao = taxonomyDao;
+    public ValidateDebtPositionActivityImpl(TaxonomyRepository taxonomyRepository) {
+        this.taxonomyRepository = taxonomyRepository;
     }
 
     public void validate(DebtPositionDTO debtPositionDTO) {
@@ -119,7 +119,7 @@ public class ValidateDebtPositionActivityImpl implements ValidateDebtPositionAct
             throw new InvalidValueException("Category of secondary beneficiary is mandatory");
         } else {
             String categoryCode = StringUtils.substringBeforeLast(category, "/") + "/";
-            Boolean categoryCodeExists = taxonomyDao.verifyCategory(categoryCode);
+            Boolean categoryCodeExists = taxonomyRepository.existsTaxonomyByTaxonomyCode(categoryCode);
             if (!Boolean.TRUE.equals(categoryCodeExists)) {
                 throw new InvalidValueException("The category code does not exist in the archive");
             }

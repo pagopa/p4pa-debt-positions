@@ -2,10 +2,10 @@ package it.gov.pagopa.pu.debtpositions.activities.activity.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.activities.activity.ValidateDebtPositionActivity;
 import it.gov.pagopa.pu.debtpositions.activities.activity.ValidateDebtPositionActivityImpl;
-import it.gov.pagopa.pu.debtpositions.activities.dao.TaxonomyDao;
 import it.gov.pagopa.pu.debtpositions.activities.exception.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.repository.TaxonomyRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,11 +25,12 @@ class ValidateDebtPositionActivityImplTest {
 
     private ValidateDebtPositionActivity activity;
 
-    @Mock private TaxonomyDao taxonomyDaoMock;
+    @Mock
+    private TaxonomyRepository taxonomyRepository;
 
     @BeforeEach
     void init() {
-        activity = new ValidateDebtPositionActivityImpl(taxonomyDaoMock);
+        activity = new ValidateDebtPositionActivityImpl(taxonomyRepository);
     }
 
     @Test
@@ -276,7 +277,7 @@ class ValidateDebtPositionActivityImplTest {
         secondTransfer.setCategory("category");
         debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().add(secondTransfer);
 
-        when(taxonomyDaoMock.verifyCategory("category/")).thenReturn(null);
+        when(taxonomyRepository.existsTaxonomyByTaxonomyCode("category/")).thenReturn(null);
 
         InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
         assertEquals("The category code does not exist in the archive", invalidValueException.getMessage());
@@ -293,7 +294,7 @@ class ValidateDebtPositionActivityImplTest {
         secondTransfer.setAmountCents(null);
         debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().add(secondTransfer);
 
-        when(taxonomyDaoMock.verifyCategory("category/")).thenReturn(Boolean.TRUE);
+        when(taxonomyRepository.existsTaxonomyByTaxonomyCode("category/")).thenReturn(Boolean.TRUE);
 
         InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
         assertEquals("The amount of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -310,7 +311,7 @@ class ValidateDebtPositionActivityImplTest {
         secondTransfer.setAmountCents(-12L);
         debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().add(secondTransfer);
 
-        when(taxonomyDaoMock.verifyCategory("category/")).thenReturn(Boolean.TRUE);
+        when(taxonomyRepository.existsTaxonomyByTaxonomyCode("category/")).thenReturn(Boolean.TRUE);
 
         InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
         assertEquals("The amount of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -327,7 +328,7 @@ class ValidateDebtPositionActivityImplTest {
         secondTransfer.setAmountCents(12L);
         debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().add(secondTransfer);
 
-        when(taxonomyDaoMock.verifyCategory("category/")).thenReturn(Boolean.TRUE);
+        when(taxonomyRepository.existsTaxonomyByTaxonomyCode("category/")).thenReturn(Boolean.TRUE);
 
         assertDoesNotThrow(() -> activity.validate(debtPositionDTO));
     }
