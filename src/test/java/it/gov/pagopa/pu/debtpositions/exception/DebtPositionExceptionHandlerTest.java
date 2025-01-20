@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import static org.mockito.Mockito.doThrow;
 
-@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@ExtendWith({SpringExtension.class})
 @WebMvcTest(value = {DebtPositionExceptionHandlerTest.TestController.class}, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 @ContextConfiguration(classes = {
   DebtPositionExceptionHandlerTest.TestController.class,

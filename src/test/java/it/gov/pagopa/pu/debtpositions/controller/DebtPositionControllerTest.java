@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.gov.pagopa.pu.debtpositions.dto.generated.IudSyncStatusUpdateDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -11,10 +13,13 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -34,23 +39,26 @@ class DebtPositionControllerTest {
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
     Long id = 1L;
-    String newStatus = "UNPAID";
+    InstallmentStatus newStatus = InstallmentStatus.TO_SYNC;
 
-    Map<String, IudSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
-    IudSyncStatusUpdateDTO iudSyncStatusUpdateDTO = IudSyncStatusUpdateDTO.builder()
+    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
+    IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
       .iupdPagopa("iupdPagoPa")
       .build();
 
-    syncStatusDTO.put("iud", iudSyncStatusUpdateDTO);
+    syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
 
-    Mockito.doNothing().when(service).finalizeSyncStatus(id, syncStatusDTO);
+    Mockito.when(service.finalizeSyncStatus(id, syncStatusDTO)).thenReturn(buildDebtPositionDTO());
 
-    mockMvc.perform(
+    MvcResult result = mockMvc.perform(
         put("/debt-positions/1/finalize-sync-status")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(syncStatusDTO)))
       .andExpect(status().isOk())
       .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 }

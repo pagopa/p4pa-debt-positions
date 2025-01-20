@@ -111,7 +111,7 @@ public class InstallmentFaker {
     return InstallmentDTO.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status(InstallmentStatus.TO_SYNC)
+      .status(InstallmentStatus.UNPAID)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")

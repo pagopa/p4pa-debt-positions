@@ -1,11 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.Set;
 
-public abstract class StatusRulesHandler<E extends Enum<E>> {
+public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   private final E syncStatus;
   private final E paidStatus;
@@ -25,63 +23,59 @@ public abstract class StatusRulesHandler<E extends Enum<E>> {
     this.invalidStatus = invalidStatus;
   }
 
-  public <T, S, C extends Enum<C>> void updateEntityStatus(T entity,
-                                                           Function<T, List<S>> childStatusExtractor,
-                                                           Function<List<S>, C> statusDeterminer,
-                                                           BiConsumer<T, C> statusUpdater,
-                                                           BiConsumer<T, C> repositoryUpdater) {
-
-    List<S> childStatuses = childStatusExtractor.apply(entity);
-    C newStatus = statusDeterminer.apply(childStatuses);
-    statusUpdater.accept(entity, newStatus);
-    repositoryUpdater.accept(entity, newStatus);
+  public void updateEntityStatus(T entity) {
+    List<E> childStatuses = getChildStatuses(entity);
+    D newStatus = calculateNewStatus(childStatuses);
+    setStatus(entity, newStatus);
+    storeStatus(entity, newStatus);
   }
 
-  public boolean isToSync(List<E> statusList) {
-    return statusList.contains(syncStatus);
+  protected abstract List<E> getChildStatuses(T entity);
+
+  protected abstract D calculateNewStatus(List<E> childStatuses);
+
+  protected abstract void setStatus(T entity, D newStatus);
+
+  protected abstract void storeStatus(T entity, D newStatus);
+
+  public boolean isToSync(List<E> childrenStatusList) {
+    return childrenStatusList.contains(syncStatus);
   }
 
-  public boolean isPartiallyPaid(List<E> statusList) {
-    return statusList.contains(paidStatus) &&
-      (statusList.contains(unpaidStatus) || statusList.contains(expiredStatus));
+  public boolean isPartiallyPaid(List<E> childrenStatusList) {
+    return childrenStatusList.contains(paidStatus) &&
+      (childrenStatusList.contains(unpaidStatus) || childrenStatusList.contains(expiredStatus));
   }
 
-  public boolean isUnpaid(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(unpaidStatus)) ||
-      (allMatchOrEmpty(statusList, status -> status.equals(cancelledStatus) || status.equals(unpaidStatus)) &&
-        statusList.contains(unpaidStatus));
+  public boolean isUnpaid(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, unpaidStatus, Set.of(cancelledStatus));
   }
 
-  public boolean isPaid(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(paidStatus)) ||
-      (allMatchOrEmpty(statusList, status -> status.equals(cancelledStatus) || status.equals(paidStatus)) &&
-        statusList.contains(paidStatus));
+  public boolean isPaid(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, paidStatus, Set.of(cancelledStatus));
   }
 
-  public boolean isReported(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(reportedStatus)) ||
-      (allMatchOrEmpty(statusList, status -> status.equals(cancelledStatus) || status.equals(reportedStatus)) &&
-        statusList.contains(reportedStatus));
+  public boolean isReported(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, reportedStatus, Set.of(cancelledStatus));
   }
 
-  public boolean isInvalid(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(invalidStatus)) ||
-      (allMatchOrEmpty(statusList, status -> status.equals(cancelledStatus) || status.equals(invalidStatus)) &&
-        statusList.contains(invalidStatus));
+  public boolean isInvalid(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, invalidStatus, Set.of(cancelledStatus));
   }
 
-  public boolean isCancelled(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(cancelledStatus));
+  public boolean isCancelled(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, cancelledStatus, Set.of());
   }
 
-  public boolean isExpired(List<E> statusList) {
-    return allMatchOrEmpty(statusList, status -> status.equals(expiredStatus));
+  public boolean isExpired(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, expiredStatus, Set.of());
   }
 
-  private boolean allMatchOrEmpty(List<E> statusList, Predicate<E> predicate) {
+  private boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {
     if (statusList.isEmpty()) {
       return false;
     }
-    return statusList.stream().allMatch(predicate);
+    return statusList.contains(requiredState) &&
+      statusList.stream().allMatch(status -> requiredState.equals(status) || allowedStatuses.contains(status));
   }
 }

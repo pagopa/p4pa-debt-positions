@@ -417,14 +417,15 @@ components:
     SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
-        $ref: "#/components/schemas/IudSyncStatusUpdateDTO"
-    IudSyncStatusUpdateDTO:
+        $ref: "#/components/schemas/IupdSyncStatusUpdateDTO"
+    IupdSyncStatusUpdateDTO:
       type: object
       properties:
         newStatus:
-          type: string
+          $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
           type: string
+
     DebtPositionErrorDTO:
       type: object
       required:

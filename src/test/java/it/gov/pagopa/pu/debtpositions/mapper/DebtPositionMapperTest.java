@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -41,6 +42,7 @@ class DebtPositionMapperTest {
   @Test
   void givenValidDebtPositionDTO_whenMapToModel_thenReturnDebtPositionAndInstallmentMap() {
     DebtPosition debtPositionExpected = buildDebtPosition();
+    debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     Map<InstallmentNoPII, Installment> installmentMap = new HashMap<>();

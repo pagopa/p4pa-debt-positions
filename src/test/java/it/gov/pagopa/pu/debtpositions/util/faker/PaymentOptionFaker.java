@@ -22,7 +22,7 @@ public class PaymentOptionFaker {
     paymentOption.setDebtPositionId(1L);
     paymentOption.setTotalAmountCents(2000L);
     paymentOption.setDueDate(DATE);
-    paymentOption.setStatus(PaymentOptionStatus.UNPAID);
+    paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
     paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);

@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -52,6 +53,28 @@ public class DebtPositionMapper {
     debtPosition.setPaymentOptions(paymentOptions);
 
     return Pair.of(debtPosition, installmentMapping);
+  }
+
+  public DebtPositionDTO mapToDto(DebtPosition debtPosition){
+    return DebtPositionDTO.builder()
+      .debtPositionId(debtPosition.getDebtPositionId())
+      .iupdOrg(debtPosition.getIupdOrg())
+      .description(debtPosition.getDescription())
+      .status(debtPosition.getStatus())
+      .ingestionFlowFileId(debtPosition.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(debtPosition.getIngestionFlowFileLineNumber())
+      .organizationId(debtPosition.getOrganizationId())
+      .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
+      .notificationDate(debtPosition.getNotificationDate())
+      .validityDate(debtPosition.getValidityDate())
+      .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
+      .creationDate(OffsetDateTime.from(debtPosition.getCreationDate()))
+      .updateDate(OffsetDateTime.from(debtPosition.getUpdateDate()))
+      .paymentOptions(
+        debtPosition.getPaymentOptions().stream()
+          .map(paymentOptionMapper::mapToDto)
+          .toList()
+      )      .build();
   }
 }
 

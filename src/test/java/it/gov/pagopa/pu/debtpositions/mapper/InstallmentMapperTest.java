@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,6 +37,7 @@ class InstallmentMapperTest {
   @Test
   void givenValidInstallmentDTO_WhenMapToModel_ThenReturnInstallment() {
     Installment installmentExpected = buildInstallmentNoUpdate();
+    installmentExpected.setStatus(InstallmentStatus.UNPAID);
     InstallmentDTO installmentDTO = buildInstallmentDTO();
 
     Mockito.when(personMapperMock.mapToModel(buildPersonDTO())).thenReturn(buildPerson());

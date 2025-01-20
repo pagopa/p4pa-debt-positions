@@ -3,22 +3,27 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.TO_SYNC;
 
-@Component
-public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentStatus>{
+public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentStatus, PaymentOption, PaymentOptionStatus> {
 
-  public PaymentOptionStatusChecker() {
+  private final PaymentOptionRepository paymentOptionRepository;
+
+  public PaymentOptionStatusChecker(PaymentOptionRepository paymentOptionRepository) {
     super(InstallmentStatus.TO_SYNC, InstallmentStatus.PAID, InstallmentStatus.UNPAID,
       InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.REPORTED, InstallmentStatus.INVALID);
+    this.paymentOptionRepository = paymentOptionRepository;
   }
 
-  public PaymentOptionStatus determinePaymentOptionStatus(List<InstallmentStatus> installmentStatusList) {
+  @Override
+  public PaymentOptionStatus calculateNewStatus(List<InstallmentStatus> installmentStatusList) {
     if (isToSync(installmentStatusList)) {
       return TO_SYNC;
     } else if (isPartiallyPaid(installmentStatusList)) {
@@ -38,5 +43,22 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
     } else {
       throw new InvalidStatusException("Unable to determine status for PaymentOption");
     }
+  }
+
+  @Override
+  protected List<InstallmentStatus> getChildStatuses(PaymentOption paymentOption) {
+    return paymentOption.getInstallments().stream()
+      .map(InstallmentNoPII::getStatus)
+      .toList();
+  }
+
+  @Override
+  protected void setStatus(PaymentOption paymentOption, PaymentOptionStatus newStatus) {
+    paymentOption.setStatus(newStatus);
+  }
+
+  @Override
+  protected void storeStatus(PaymentOption paymentOption, PaymentOptionStatus newStatus) {
+    paymentOptionRepository.updateStatus(paymentOption.getPaymentOptionId(), newStatus);
   }
 }

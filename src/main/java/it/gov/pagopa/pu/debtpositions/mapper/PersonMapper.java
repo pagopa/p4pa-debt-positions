@@ -21,5 +21,4 @@ public class PersonMapper {
     person.setEmail(dto.getEmail());
     return person;
   }
-
 }
