@@ -77,11 +77,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SyncStatusDTO"
+              $ref: "#/components/schemas/SyncStatusUpdateRequestDTO"
         required: true
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionDTO'
         "400":
           description: Invalid request
           content:
@@ -410,7 +414,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
-    SyncStatusDTO:
+    SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
         $ref: "#/components/schemas/IudSyncStatusUpdateDTO"
