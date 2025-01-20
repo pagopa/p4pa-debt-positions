@@ -22,7 +22,9 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   @SequenceGenerator(name = "receipt_generator", sequenceName = "receipt_seq", allocationSize = 1)
   private Long receiptId;
   private Long installmentId;
-  private Long paymentReceiptId;
+  private Long ingestionFlowFileId;
+  private String receiptOrigin;
+  private String paymentReceiptId;
   private String noticeNumber;
   private String orgFiscalCode;
   private String outcome;
