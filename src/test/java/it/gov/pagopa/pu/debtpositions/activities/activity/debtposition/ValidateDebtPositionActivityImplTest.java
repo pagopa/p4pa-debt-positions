@@ -8,7 +8,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TaxonomyRepository;
-import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +15,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -113,7 +116,9 @@ class ValidateDebtPositionActivityImplTest {
   void givenInstallmentWithDueDateRetroactiveThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(TestUtils.OFFSETDATETIME);
+    LocalDateTime localDateTime = LocalDateTime.of(2024, 5, 15, 10, 30, 0);
+    OffsetDateTime offsetDateTime = ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Rome")).toOffsetDateTime();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(offsetDateTime);
 
     Mockito.when(debtPositionTypeOrgRepository.findById(2L)).thenReturn(Optional.of(mockDebtPositionTypeOrg));
 

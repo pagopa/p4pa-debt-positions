@@ -44,7 +44,7 @@ public class InstallmentFaker {
       .debtor(buildPerson())
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateOperatorExternalId("OPERATOREXTERNALID")
       .build();
   }
 
@@ -101,7 +101,7 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .debtor(buildPerson())
-      .transfers(List.of())
+      .transfers(new ArrayList<>(List.of(buildTransfer())))
       .creationDate(date)
       .updateDate(date)
       .build();
