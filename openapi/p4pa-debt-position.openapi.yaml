@@ -31,7 +31,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DebtPositionDTO'
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
+  /receipts:
+    post:
+      tags:
+        - receipt
+      operationId: createReceipt
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReceiptDTO"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReceiptDTO"
         "400":
           description: Invalid request
         "409":
