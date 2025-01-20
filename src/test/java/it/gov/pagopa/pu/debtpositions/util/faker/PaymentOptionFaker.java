@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 
@@ -21,7 +22,7 @@ public class PaymentOptionFaker {
     paymentOption.setDebtPositionId(1L);
     paymentOption.setTotalAmountCents(2000L);
     paymentOption.setDueDate(DATE);
-    paymentOption.setStatus("PENDING");
+    paymentOption.setStatus(PaymentOptionStatus.UNPAID);
     paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
@@ -36,7 +37,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setDueDate(DATE);
-    paymentOptionDTO.setStatus("PENDING");
+    paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);

@@ -71,6 +71,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito:mockito-core")
 	testImplementation ("org.projectlombok:lombok")
+  testAnnotationProcessor("org.projectlombok:lombok")
   testImplementation("com.h2database:h2")
 }
 

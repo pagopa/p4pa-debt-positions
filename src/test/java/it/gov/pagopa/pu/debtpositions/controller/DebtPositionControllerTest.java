@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IudSyncStatusUpdateDTO;
-import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ class DebtPositionControllerTest {
   private ObjectMapper objectMapper;
 
   @MockitoBean
-  private DebtPositionService service;
+  private DebtPositionHierarchyStatusAlignerService service;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
@@ -47,7 +47,7 @@ class DebtPositionControllerTest {
     Mockito.doNothing().when(service).finalizeSyncStatus(id, syncStatusDTO);
 
     mockMvc.perform(
-        put("/sync/status/1")
+        put("/debt-positions/1/finalize-sync-status")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(syncStatusDTO)))
       .andExpect(status().isOk())

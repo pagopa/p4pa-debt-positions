@@ -1,11 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -38,7 +35,8 @@ public class DebtPosition extends BaseEntity implements Serializable {
     private Long debtPositionId;
     private String iupdOrg;
     private String description;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private DebtPositionStatus status;
     private Long ingestionFlowFileId;
     private Long ingestionFlowFileLineNumber;
     private Long organizationId;

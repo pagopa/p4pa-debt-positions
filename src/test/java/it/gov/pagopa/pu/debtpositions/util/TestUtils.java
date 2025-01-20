@@ -97,7 +97,7 @@ public class TestUtils {
 
             Assertions.assertTrue(result, String.format("Invalid compare between methods%n%s = %s%n%s = %s", m1, v1, m2, v2));
           } catch (NoSuchMethodException e) {
-            log.debug("Method {} is not defined in {}{}", m1, o2.getClass().getName(), e.getMessage());
+            log.warn("Method {} is not defined in {}{}", m1, o2.getClass().getName(), e.getMessage());
           } catch (IllegalAccessException |
                    InvocationTargetException e) {
             throw new IllegalStateException(String.format("[ERROR] Something gone wrong comparing %s with %s%n%s", m1, m2, e.getMessage()));
