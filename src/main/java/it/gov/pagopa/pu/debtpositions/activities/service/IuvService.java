@@ -1,7 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.activities.service;
 
 import it.gov.pagopa.pu.debtpositions.activities.exception.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepositoryImpl;
+import it.gov.pagopa.pu.debtpositions.service.IuvSequenceNumberService;
+import it.gov.pagopa.pu.debtpositions.service.IuvSequenceNumberServiceImpl;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -22,12 +23,12 @@ public class IuvService {
 
   private final String informationSystemId;
 
-  private final IuvSequenceNumberRepositoryImpl iuvSequenceNumberRepositoryImpl;
+  private final IuvSequenceNumberService iuvSequenceNumberService;
 
   public IuvService(@Value("${iuv.informationSystemId:00}") String informationSystemId,
-                    IuvSequenceNumberRepositoryImpl iuvSequenceNumberRepositoryImpl) {
+                    IuvSequenceNumberService iuvSequenceNumberService) {
     this.informationSystemId = informationSystemId;
-    this.iuvSequenceNumberRepositoryImpl = iuvSequenceNumberRepositoryImpl;
+    this.iuvSequenceNumberService = iuvSequenceNumberService;
   }
 
   /**
@@ -54,7 +55,7 @@ public class IuvService {
   }
 
   private String generatePaymentIndex(Organization org) {
-    long paymentIndex = iuvSequenceNumberRepositoryImpl.getNextIuvSequenceNumber(org.getOrganizationId());
+    long paymentIndex = iuvSequenceNumberService.getNextIuvSequenceNumber(org.getOrganizationId());
     if (paymentIndex < 1) {
       log.error("invalid payment index returned for org[{}/{}]: {}", org.getIpaCode(), org.getOrgFiscalCode(), paymentIndex);
       throw new InvalidValueException("invalid payment index");

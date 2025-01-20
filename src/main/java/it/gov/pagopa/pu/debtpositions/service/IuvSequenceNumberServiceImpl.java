@@ -1,17 +1,18 @@
-package it.gov.pagopa.pu.debtpositions.repository;
+package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
+import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
-public class IuvSequenceNumberRepositoryImpl {
+public class IuvSequenceNumberServiceImpl implements IuvSequenceNumberService {
 
   private final IuvSequenceNumberRepository iuvSequenceNumberRepository;
 
-  public IuvSequenceNumberRepositoryImpl(IuvSequenceNumberRepository iuvSequenceNumberRepository) {
+  public IuvSequenceNumberServiceImpl(IuvSequenceNumberRepository iuvSequenceNumberRepository) {
     this.iuvSequenceNumberRepository = iuvSequenceNumberRepository;
   }
 

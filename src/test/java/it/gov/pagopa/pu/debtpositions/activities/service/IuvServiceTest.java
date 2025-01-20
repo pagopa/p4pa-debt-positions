@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.activities.service;
 
 import it.gov.pagopa.pu.debtpositions.activities.exception.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepositoryImpl;
+import it.gov.pagopa.pu.debtpositions.service.IuvSequenceNumberService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class IuvServiceTest {
 
   @Mock
-  private IuvSequenceNumberRepositoryImpl iuvSequenceNumberRepositoryImpl;
+  private IuvSequenceNumberService iuvSequenceNumberService;
 
   private IuvService iuvService;
 
@@ -44,25 +44,25 @@ class IuvServiceTest {
 
   @BeforeEach
   void setUp() {
-    iuvService = new IuvService("00", iuvSequenceNumberRepositoryImpl);
+    iuvService = new IuvService("00", iuvSequenceNumberService);
   }
 
   //region test generateIuv
   @Test
   void givenValidOrgWhenGenerateIuvThenOk(){
     //Given
-    Mockito.when(iuvSequenceNumberRepositoryImpl.getNextIuvSequenceNumber(VALID_ORG.getOrganizationId())).thenReturn(VALID_PAYMENT_INDEX);
+    Mockito.when(iuvSequenceNumberService.getNextIuvSequenceNumber(VALID_ORG.getOrganizationId())).thenReturn(VALID_PAYMENT_INDEX);
     //When
     String result = iuvService.generateIuv(VALID_ORG);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(iuvSequenceNumberRepositoryImpl, Mockito.times(1)).getNextIuvSequenceNumber(VALID_ORG.getOrganizationId());
+    Mockito.verify(iuvSequenceNumberService, Mockito.times(1)).getNextIuvSequenceNumber(VALID_ORG.getOrganizationId());
   }
 
   @Test
   void givenEmptyOrgWhenGenerateIuvThenException(){
     //Given
-    Mockito.when(iuvSequenceNumberRepositoryImpl.getNextIuvSequenceNumber(INVALID_ORG.getOrganizationId())).thenReturn(INVALID_PAYMENT_INDEX);
+    Mockito.when(iuvSequenceNumberService.getNextIuvSequenceNumber(INVALID_ORG.getOrganizationId())).thenReturn(INVALID_PAYMENT_INDEX);
     //Verify
     Assertions.assertThrows(InvalidValueException.class, () -> iuvService.generateIuv(INVALID_ORG));
   }
