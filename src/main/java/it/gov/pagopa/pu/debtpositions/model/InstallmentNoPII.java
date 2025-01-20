@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -27,7 +28,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   @SequenceGenerator(name = "installment_generator", sequenceName = "installment_seq", allocationSize = 1)
   private Long installmentId;
   private Long paymentOptionId;
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private InstallmentStatus status;
   private String iupdPagopa;
   private String iud;
   private String iuv;
