@@ -313,7 +313,7 @@ components:
         ingestionFlowFileId:
           type: integer
           format: int64
-        receiptSource:
+        receiptOrigin:
           type: string
         paymentReceiptId:
           type: string
@@ -360,9 +360,6 @@ components:
         transferDate:
           type: string
           format: date-time
-        receiptBytes:
-          type: string
-          format: byte
         standin:
           type: boolean
         debtor:
