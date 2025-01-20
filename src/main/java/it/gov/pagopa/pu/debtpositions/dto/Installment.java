@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import lombok.AllArgsConstructor;
@@ -20,7 +21,7 @@ public class Installment {
 
   private Long installmentId;
   private Long paymentOptionId;
-  private String status;
+  private InstallmentStatus status;
   private String iupdPagopa;
   private String iud;
   private String iuv;

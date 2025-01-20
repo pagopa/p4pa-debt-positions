@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
 import java.time.LocalDateTime;
@@ -23,7 +24,7 @@ public class InstallmentFaker {
     return Installment.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status(InstallmentStatus.TO_SYNC)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -50,7 +51,7 @@ public class InstallmentFaker {
     return InstallmentNoPII.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status(InstallmentStatus.TO_SYNC)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -83,7 +84,7 @@ public class InstallmentFaker {
     return Installment.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status(InstallmentStatus.TO_SYNC)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -109,7 +110,7 @@ public class InstallmentFaker {
     return InstallmentDTO.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status("status")
+      .status(InstallmentStatus.TO_SYNC)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")

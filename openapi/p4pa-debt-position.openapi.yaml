@@ -12,6 +12,13 @@ paths:
       tags:
         - debt-position
       operationId: createDebtPosition
+      parameters:
+        - name: massive
+          in: query
+          description: Indicates if the operation is massive (true) or single (false).
+          required: false
+          schema:
+            type: boolean
       requestBody:
         content:
           application/json:
@@ -49,8 +56,48 @@ paths:
                 $ref: "#/components/schemas/ReceiptDTO"
         "400":
           description: Invalid request
+        "409":
+          description: Debt position already exists
         "500":
           description: Internal server error
+  /debt-positions/{debtPositionId}/finalize-sync-status:
+    put:
+      tags:
+        - debt-position
+      operationId: finalizeSyncStatus
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SyncStatusDTO"
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionDTO'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
 security:
   - BearerAuth: []
 components:
@@ -74,7 +121,7 @@ components:
         description:
           type: string
         status:
-          type: string
+          $ref: "#/components/schemas/DebtPositionStatus"
         ingestionFlowFileId:
           type: integer
           format: int64
@@ -122,7 +169,7 @@ components:
           type: integer
           format: int64
         status:
-          type: string
+          $ref: "#/components/schemas/PaymentOptionStatus"
         multiDebtor:
           type: boolean
         dueDate:
@@ -155,7 +202,7 @@ components:
           type: integer
           format: int64
         status:
-          type: string
+          $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
           type: string
         iud:
@@ -334,4 +381,60 @@ components:
         nation:
           type: string
         email:
+          type: string
+    DebtPositionStatus:
+      type: string
+      enum:
+        - TO_SYNC
+        - REPORTED
+        - PAID
+        - PARTIALLY_PAID
+        - CANCELLED
+        - INVALID
+        - EXPIRED
+        - UNPAID
+    PaymentOptionStatus:
+      type: string
+      enum:
+        - TO_SYNC
+        - REPORTED
+        - PAID
+        - PARTIALLY_PAID
+        - CANCELLED
+        - INVALID
+        - EXPIRED
+        - UNPAID
+    InstallmentStatus:
+      type: string
+      enum:
+        - TO_SYNC
+        - REPORTED
+        - PAID
+        - CANCELLED
+        - INVALID
+        - EXPIRED
+        - UNPAID
+    SyncStatusDTO:
+      type: object
+      additionalProperties:
+        $ref: "#/components/schemas/IudSyncStatusUpdateDTO"
+    IudSyncStatusUpdateDTO:
+      type: object
+      properties:
+        newStatus:
+          type: string
+        iupdPagopa:
+          type: string
+    DebtPositionErrorDTO:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            - DEBT_POSITION_IVALID_REQUEST
+            - DEBT_POSITION_GENERIC_ERROR
+        message:
           type: string
