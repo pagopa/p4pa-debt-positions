@@ -107,7 +107,9 @@ tasks.register("dependenciesBuild") {
   description = "grouping all together automatically generate code tasks"
 
   dependsOn(
-    "openApiGenerate"
+    "openApiGenerate",
+    "openApiGenerateORGANIZATION",
+    "openApiGenerateP4PAAUTH"
   )
 }
 
