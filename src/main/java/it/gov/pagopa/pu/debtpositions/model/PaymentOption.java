@@ -1,12 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
@@ -18,6 +16,7 @@ import java.util.SortedSet;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @EqualsAndHashCode(of = "paymentOptionId", callSuper = false)
 public class PaymentOption extends BaseEntity implements Serializable, Comparable<PaymentOption> {
 
@@ -27,7 +26,8 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   private Long paymentOptionId;
   private Long debtPositionId;
   private Long totalAmountCents;
-  private String status;
+  @Enumerated(EnumType.STRING)
+  private PaymentOptionStatus status;
   private boolean multiDebtor;
   private OffsetDateTime dueDate;
   private String description;

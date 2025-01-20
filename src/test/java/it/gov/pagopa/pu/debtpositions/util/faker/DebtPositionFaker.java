@@ -23,7 +23,7 @@ public class DebtPositionFaker {
     debtPosition.setDebtPositionTypeOrgId(2L);
     debtPosition.setIupdOrg("IUPD_ORG");
     debtPosition.setDescription("Test Description");
-    debtPosition.setStatus(DebtPositionStatus.PAID);
+    debtPosition.setStatus(DebtPositionStatus.TO_SYNC);
     debtPosition.setIngestionFlowFileId(1001L);
     debtPosition.setIngestionFlowFileLineNumber(10L);
     debtPosition.setOrganizationId(500L);
@@ -42,7 +42,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setDebtPositionTypeOrgId(2L);
     debtPositionDTO.setIupdOrg("IUPD_ORG");
     debtPositionDTO.setDescription("Test Description");
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
     debtPositionDTO.setIngestionFlowFileId(1001L);
     debtPositionDTO.setIngestionFlowFileLineNumber(10L);
     debtPositionDTO.setOrganizationId(500L);
