@@ -63,9 +63,6 @@ public class ValidateDebtPositionActivityImpl implements ValidateDebtPositionAct
     if (debtPositionTypeOrgDTO.isFlagMandatoryDueDate() && installmentDTO.getDueDate() == null) {
       throw new InvalidValueException("The due date is mandatory");
     }
-    if (installmentDTO.getAmountCents() == null) {
-      throw new InvalidValueException("Amount is mandatory");
-    }
     if (installmentDTO.getAmountCents() < 0) {
       throw new InvalidValueException("Amount is not valid");
     }
@@ -111,7 +108,7 @@ public class ValidateDebtPositionActivityImpl implements ValidateDebtPositionAct
       }
       checkTaxonomyCategory(transferSecondaryBeneficiary.getCategory());
 
-      if (transferSecondaryBeneficiary.getAmountCents() == null || transferSecondaryBeneficiary.getAmountCents() < 0) {
+      if (transferSecondaryBeneficiary.getAmountCents() < 0) {
         throw new InvalidValueException("The amount of secondary beneficiary is not valid");
       }
     }

@@ -139,18 +139,6 @@ class ValidateDebtPositionActivityImplTest {
   }
 
   @Test
-  void givenInstallmentWithAmountNullThenThrowValidationException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setAmountCents(null);
-
-    Mockito.when(debtPositionTypeOrgRepository.findById(2L)).thenReturn(Optional.of(mockDebtPositionTypeOrg));
-
-    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
-    assertEquals("Amount is mandatory", invalidValueException.getMessage());
-  }
-
-  @Test
   void givenInstallmentWithAmountInvalidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
@@ -363,27 +351,6 @@ class ValidateDebtPositionActivityImplTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
     assertEquals("The category code does not exist in the archive", invalidValueException.getMessage());
-  }
-
-  @Test
-  void givenSecondTransferAmountNullThenThrowValidationException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
-    TransferDTO secondTransfer = buildTransferDTO();
-    secondTransfer.setAmountCents(null);
-    List<TransferDTO> transfers = List.of(secondTransfer, secondTransfer);
-    debtPositionDTO.getPaymentOptions()
-      .getFirst()
-      .getInstallments()
-      .getFirst()
-      .setTransfers(new ArrayList<>(transfers));
-
-    Mockito.when(debtPositionTypeOrgRepository.findById(2L)).thenReturn(Optional.of(mockDebtPositionTypeOrg));
-
-    when(taxonomyRepository.existsTaxonomyByTaxonomyCode("category/")).thenReturn(Boolean.TRUE);
-
-    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> activity.validate(debtPositionDTO));
-    assertEquals("The amount of secondary beneficiary is not valid", invalidValueException.getMessage());
   }
 
   @Test
