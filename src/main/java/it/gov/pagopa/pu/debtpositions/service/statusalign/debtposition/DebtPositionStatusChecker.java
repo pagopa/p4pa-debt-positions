@@ -4,13 +4,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.*;
 
-@Service
+@Component
 public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionStatus> {
 
   public DebtPositionStatusChecker() {
