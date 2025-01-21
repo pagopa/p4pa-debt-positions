@@ -37,7 +37,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setDueDate(DATE);
-    paymentOptionDTO.setStatus(PaymentOptionStatus.TO_SYNC);
+    paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);

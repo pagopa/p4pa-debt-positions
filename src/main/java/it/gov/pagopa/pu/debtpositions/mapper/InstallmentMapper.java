@@ -2,7 +2,10 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
 public class InstallmentMapper {
@@ -43,5 +46,33 @@ public class InstallmentMapper {
     installment.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
     return installment;
   }
+
+  public InstallmentDTO mapToDto(InstallmentNoPII installment) {
+    return InstallmentDTO.builder()
+      .installmentId(installment.getInstallmentId())
+      .paymentOptionId(installment.getPaymentOptionId())
+      .status(installment.getStatus())
+      .iupdPagopa(installment.getIupdPagopa())
+      .iud(installment.getIud())
+      .iuv(installment.getIuv())
+      .iur(installment.getIur())
+      .iuf(installment.getIuf())
+      .nav(installment.getNav())
+      .dueDate(installment.getDueDate())
+      .paymentTypeCode(installment.getPaymentTypeCode())
+      .amountCents(installment.getAmountCents())
+      .notificationFeeCents(installment.getNotificationFeeCents())
+      .remittanceInformation(installment.getRemittanceInformation())
+      .humanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation())
+      .balance(installment.getBalance())
+      .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
+      .transfers(installment.getTransfers().stream()
+        .map(transferMapper::mapToDto)
+        .toList())
+      .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
+      .build();
+  }
+
 
 }

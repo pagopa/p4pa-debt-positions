@@ -2,9 +2,13 @@ package it.gov.pagopa.pu.debtpositions.util;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 public class Utilities {
-    private Utilities(){}
+
+  private Utilities() {}
     public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     public static final int IBAN_LENGTH = 27;
 
@@ -13,6 +17,11 @@ public class Utilities {
         return matcher.matches();
     }
 
+  public static OffsetDateTime localDatetimeToOffsetDateTime(LocalDateTime localDateTime){
+    return localDateTime != null
+      ? localDateTime.atOffset(ZoneOffset.UTC)
+      : null;
+  }
     public static boolean isValidIban(String iban) {
         return iban != null && iban.length() == IBAN_LENGTH;
     }

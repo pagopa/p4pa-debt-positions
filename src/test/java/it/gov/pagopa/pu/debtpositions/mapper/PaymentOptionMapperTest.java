@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,6 +39,7 @@ class PaymentOptionMapperTest {
   @Test
   void givenValidPaymentOptionDTO_WhenMapToModel_ThenReturnPaymentOptionAndInstallmentMap() {
     PaymentOption paymentOptionExpected = buildPaymentOption();
+    paymentOptionExpected.setStatus(PaymentOptionStatus.UNPAID);
     PaymentOptionDTO paymentOptionDTO = buildPaymentOptionDTO();
 
     Mockito.when(installmentMapperMock.mapToModel(buildInstallmentDTO())).thenReturn(buildInstallment());
@@ -48,5 +50,19 @@ class PaymentOptionMapperTest {
 
     reflectionEqualsByName(paymentOptionExpected, result.getFirst());
     checkNotNullFields(result.getFirst(), "updateOperatorExternalId", "creationDate", "updateDate");
+  }
+
+  @Test
+  void givenMapToDtoThenOk(){
+    PaymentOptionDTO paymentOptionExpected = buildPaymentOptionDTO();
+    paymentOptionExpected.setStatus(PaymentOptionStatus.TO_SYNC);
+
+    Mockito.when(installmentMapperMock.mapToDto(buildInstallmentNoPII())).thenReturn(buildInstallmentDTO());
+
+    PaymentOptionDTO result = paymentOptionMapper.mapToDto(buildPaymentOption());
+    System.out.println("result: "+result);
+
+    reflectionEqualsByName(paymentOptionExpected, result);
+    checkNotNullFields(result);
   }
 }

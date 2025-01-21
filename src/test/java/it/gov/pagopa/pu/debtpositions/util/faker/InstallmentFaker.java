@@ -45,7 +45,7 @@ public class InstallmentFaker {
       .debtor(buildPerson())
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId("OPERATOREXTERNALID")
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 
@@ -72,7 +72,7 @@ public class InstallmentFaker {
       .balance("balance")
       .creationDate(date)
       .updateDate(date)
-      .updateOperatorExternalId("OPERATOREXTERNALID")
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 
@@ -112,7 +112,7 @@ public class InstallmentFaker {
     return InstallmentDTO.builder()
       .installmentId(1L)
       .paymentOptionId(1L)
-      .status(InstallmentStatus.TO_SYNC)
+      .status(InstallmentStatus.UNPAID)
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
