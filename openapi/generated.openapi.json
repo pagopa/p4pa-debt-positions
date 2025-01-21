@@ -3075,6 +3075,9 @@
           "noticeNumber" : {
             "type" : "string"
           },
+          "paymentNote" : {
+            "type" : "string"
+          },
           "orgFiscalCode" : {
             "type" : "string"
           },
@@ -3248,6 +3251,20 @@
           }
         }
       },
+      "Stamp" : {
+        "type" : "object",
+        "properties" : {
+          "stampType" : {
+            "type" : "string"
+          },
+          "stampHashDocument" : {
+            "type" : "string"
+          },
+          "stampProvincialResidence" : {
+            "type" : "string"
+          }
+        }
+      },
       "PaymentOption" : {
         "type" : "object",
         "properties" : {
@@ -3319,17 +3336,22 @@
           }
         }
       },
-      "Stamp" : {
+      "CollectionModelInstallmentNoPII" : {
         "type" : "object",
         "properties" : {
-          "stampType" : {
-            "type" : "string"
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "installmentNoPIIs" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/InstallmentNoPIIResponse"
+                }
+              }
+            }
           },
-          "stampHashDocument" : {
-            "type" : "string"
-          },
-          "stampProvincialResidence" : {
-            "type" : "string"
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
           }
         }
       },
@@ -3343,25 +3365,6 @@
                 "type" : "array",
                 "items" : {
                   "type" : "object"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "CollectionModelInstallmentNoPII" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "installmentNoPIIs" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/InstallmentNoPIIResponse"
                 }
               }
             }
@@ -4539,6 +4542,9 @@
           "noticeNumber" : {
             "type" : "string"
           },
+          "paymentNote" : {
+            "type" : "string"
+          },
           "orgFiscalCode" : {
             "type" : "string"
           },
@@ -4907,7 +4913,7 @@
         }
       },
       "ReceiptDTO" : {
-        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptSource" ],
+        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
@@ -4922,13 +4928,16 @@
             "type" : "integer",
             "format" : "int64"
           },
-          "receiptSource" : {
+          "receiptOrigin" : {
             "type" : "string"
           },
           "paymentReceiptId" : {
             "type" : "string"
           },
           "noticeNumber" : {
+            "type" : "string"
+          },
+          "paymentNote" : {
             "type" : "string"
           },
           "orgFiscalCode" : {
@@ -4989,10 +4998,6 @@
           "transferDate" : {
             "type" : "string",
             "format" : "date-time"
-          },
-          "receiptBytes" : {
-            "type" : "string",
-            "format" : "byte"
           },
           "standin" : {
             "type" : "boolean"

@@ -26,6 +26,7 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   private String receiptOrigin;
   private String paymentReceiptId;
   private String noticeNumber;
+  private String paymentNote;
   private String orgFiscalCode;
   private String outcome;
   private String creditorReferenceId;

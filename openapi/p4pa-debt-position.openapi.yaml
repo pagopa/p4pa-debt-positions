@@ -319,6 +319,8 @@ components:
           type: string
         noticeNumber:
           type: string
+        paymentNote:
+          type: string
         orgFiscalCode:
           type: string
         outcome:
