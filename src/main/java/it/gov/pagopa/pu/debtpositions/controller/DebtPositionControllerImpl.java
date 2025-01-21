@@ -22,9 +22,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     return DebtPositionApi.super.createDebtPosition(debtPositionDTO, massive);
-  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
-    return DebtPositionApi.super.createDebtPosition(debtPositionDTO, massive);
   }
+
 
   @Override
   public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, Map<String, IupdSyncStatusUpdateDTO> requestBody) {
@@ -32,3 +31,4 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 }
+
