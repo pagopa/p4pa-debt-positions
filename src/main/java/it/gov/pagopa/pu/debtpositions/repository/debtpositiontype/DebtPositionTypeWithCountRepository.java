@@ -8,8 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(path = "debt-position-types-collection")
-public interface DebtPositionTypeCollectionRepository extends JpaRepository<DebtPositionTypeWithCount,Long> {
+@RepositoryRestResource(path = "debt-position-types-with-count")
+public interface DebtPositionTypeWithCountRepository extends JpaRepository<DebtPositionTypeWithCount,Long> {
   @Query(value = "SELECT t.debt_position_type_id, t.code, t.description, t.update_date, "
     + "( SELECT COUNT(org.organization_id) "
     + "FROM debt_position_type_org org "
