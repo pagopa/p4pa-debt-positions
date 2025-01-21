@@ -13,6 +13,9 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   private final E reportedStatus;
   private final E invalidStatus;
 
+  private final Set<E> allowedCancelledStatuses;
+  private final Set<E> emptyAllowedStatuses;
+
   protected StatusRulesHandler(E syncStatus, E paidStatus, E unpaidStatus, E expiredStatus, E cancelledStatus, E reportedStatus, E invalidStatus) {
     this.syncStatus = syncStatus;
     this.paidStatus = paidStatus;
@@ -21,6 +24,9 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
     this.invalidStatus = invalidStatus;
+
+    this.allowedCancelledStatuses = Set.of(cancelledStatus);
+    this.emptyAllowedStatuses = Set.of();
   }
 
   public void updateEntityStatus(T entity) {
@@ -48,27 +54,27 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   }
 
   public boolean isUnpaid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, unpaidStatus, Set.of(cancelledStatus));
+    return allMatch(childrenStatusList, unpaidStatus, allowedCancelledStatuses);
   }
 
   public boolean isPaid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, paidStatus, Set.of(cancelledStatus));
+    return allMatch(childrenStatusList, paidStatus, allowedCancelledStatuses);
   }
 
   public boolean isReported(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, reportedStatus, Set.of(cancelledStatus));
+    return allMatch(childrenStatusList, reportedStatus, allowedCancelledStatuses);
   }
 
   public boolean isInvalid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, invalidStatus, Set.of(cancelledStatus));
+    return allMatch(childrenStatusList, invalidStatus, allowedCancelledStatuses);
   }
 
   public boolean isCancelled(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, cancelledStatus, Set.of());
+    return allMatch(childrenStatusList, cancelledStatus, emptyAllowedStatuses);
   }
 
   public boolean isExpired(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, expiredStatus, Set.of());
+    return allMatch(childrenStatusList, expiredStatus, emptyAllowedStatuses);
   }
 
   private boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {

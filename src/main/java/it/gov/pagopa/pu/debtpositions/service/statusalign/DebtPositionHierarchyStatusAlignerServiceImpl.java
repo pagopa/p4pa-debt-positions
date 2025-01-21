@@ -46,15 +46,15 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       paymentOption.getInstallments().stream()
         .filter(installment -> {
           boolean isToSync = TO_SYNC.equals(installment.getStatus());
-          boolean hasIud = syncStatusDTO.containsKey(installment.getIud());
+          boolean iud2Update = syncStatusDTO.containsKey(installment.getIud());
 
-          if (!hasIud) {
-            log.error("Installment with IUD [{}] is not present in the syncStatusDTO map", installment.getIud());
-          } else if (!isToSync) {
-            log.error("Installment with IUD [{}] does not have TO_SYNC status", installment.getIud());
+          if (!iud2Update  && isToSync) {
+            log.error("Installment with IUD [{}] is TO_SYNC but not present in the syncStatusDTO map", installment.getIud());
+          } else if (iud2Update  && !isToSync) {
+            log.error("Installment with IUD [{}] is present in the input map but does not have TO_SYNC status", installment.getIud());
           }
 
-          return isToSync && hasIud;
+          return isToSync && iud2Update ;
         })
         .forEach(installment -> {
           IupdSyncStatusUpdateDTO updateDTO = syncStatusDTO.get(installment.getIud());

@@ -6,10 +6,11 @@ import java.time.ZoneOffset;
 
 public class Utilities {
 
-  private Utilities() {
-  }
+  private Utilities() {}
 
-  public static OffsetDateTime localDatetimeToOffsetDateTime(LocalDateTime localDateTime) {
-    return localDateTime.atOffset(ZoneOffset.UTC);
+  public static OffsetDateTime localDatetimeToOffsetDateTime(LocalDateTime localDateTime){
+    return localDateTime != null
+      ? localDateTime.atOffset(ZoneOffset.UTC)
+      : null;
   }
 }
