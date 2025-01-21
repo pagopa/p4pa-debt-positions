@@ -53,10 +53,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     return childrenStatusList.contains(syncStatus);
   }
 
-  public boolean isPartiallyPaid(List<E> childrenStatusList) {
-    return childrenStatusList.contains(paidStatus) &&
-      (childrenStatusList.contains(unpaidStatus) || childrenStatusList.contains(expiredStatus));
-  }
+  protected abstract boolean isPartiallyPaid(List<E> childrenStatusList);
 
   public boolean isUnpaid(List<E> childrenStatusList) {
     return allMatch(childrenStatusList, unpaidStatus, allowedCancelledStatuses);
