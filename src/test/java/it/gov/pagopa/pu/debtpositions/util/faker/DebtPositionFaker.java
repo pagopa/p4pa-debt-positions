@@ -40,7 +40,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setDebtPositionId(1L);
     debtPositionDTO.setIupdOrg("IUPD_ORG");
     debtPositionDTO.setDescription("Test Description");
-    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
     debtPositionDTO.setIngestionFlowFileId(1001L);
     debtPositionDTO.setIngestionFlowFileLineNumber(10L);
     debtPositionDTO.setOrganizationId(500L);

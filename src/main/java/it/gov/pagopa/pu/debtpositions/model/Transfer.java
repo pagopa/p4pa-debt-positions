@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -15,6 +16,7 @@ import java.util.Comparator;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Builder
 @EqualsAndHashCode(of = "transferId", callSuper = false)
 public class Transfer extends BaseEntity implements Serializable, Comparable<Transfer> {
 

@@ -12,6 +12,8 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 @Service
 public class DebtPositionMapper {
 
@@ -53,4 +55,27 @@ public class DebtPositionMapper {
 
     return Pair.of(debtPosition, installmentMapping);
   }
+
+  public DebtPositionDTO mapToDto(DebtPosition debtPosition){
+    return DebtPositionDTO.builder()
+      .debtPositionId(debtPosition.getDebtPositionId())
+      .iupdOrg(debtPosition.getIupdOrg())
+      .description(debtPosition.getDescription())
+      .status(debtPosition.getStatus())
+      .ingestionFlowFileId(debtPosition.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(debtPosition.getIngestionFlowFileLineNumber())
+      .organizationId(debtPosition.getOrganizationId())
+      .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
+      .notificationDate(debtPosition.getNotificationDate())
+      .validityDate(debtPosition.getValidityDate())
+      .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
+      .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
+      .paymentOptions(
+        debtPosition.getPaymentOptions().stream()
+          .map(paymentOptionMapper::mapToDto)
+          .toList()
+      )      .build();
+  }
 }
+

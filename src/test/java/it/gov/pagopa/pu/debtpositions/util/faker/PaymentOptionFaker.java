@@ -10,6 +10,8 @@ import java.time.ZoneOffset;
 import java.util.List;
 import java.util.TreeSet;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
+
 public class PaymentOptionFaker {
 
   private static final OffsetDateTime DATE = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
@@ -24,9 +26,10 @@ public class PaymentOptionFaker {
     paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
-    paymentOption.setInstallments(new TreeSet<>());
+    paymentOption.setInstallments(new TreeSet<>(List.of(buildInstallmentNoPII())));
     return paymentOption;
   }
+
 
   public static PaymentOptionDTO buildPaymentOptionDTO() {
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
@@ -34,11 +37,11 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setDueDate(DATE);
-    paymentOptionDTO.setStatus(PaymentOptionStatus.TO_SYNC);
+    paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
-    paymentOptionDTO.setInstallments(List.of());
+    paymentOptionDTO.setInstallments(List.of(buildInstallmentDTO()));
     return paymentOptionDTO;
   }
 }
