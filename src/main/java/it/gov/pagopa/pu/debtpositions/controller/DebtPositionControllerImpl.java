@@ -22,6 +22,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     return DebtPositionApi.super.createDebtPosition(debtPositionDTO, massive);
+  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
+    return DebtPositionApi.super.createDebtPosition(debtPositionDTO, massive);
   }
 
   @Override
