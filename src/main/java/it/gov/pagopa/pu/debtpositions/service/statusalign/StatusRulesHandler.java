@@ -1,8 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.util.List;
 import java.util.Set;
 
+@Slf4j
 public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   private final E syncStatus;
@@ -31,8 +34,10 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   public void updateEntityStatus(T entity) {
     List<E> childStatuses = getChildStatuses(entity);
+    log.info("Calculating new Status for {}", entity.getClass());
     D newStatus = calculateNewStatus(childStatuses);
     setStatus(entity, newStatus);
+    log.info("Updating entity {} with status {}", entity.getClass(), newStatus);
     storeStatus(entity, newStatus);
   }
 

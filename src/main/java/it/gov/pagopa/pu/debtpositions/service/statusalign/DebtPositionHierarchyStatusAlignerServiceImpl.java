@@ -49,7 +49,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           boolean iud2Update = syncStatusDTO.containsKey(installment.getIud());
 
           if (!iud2Update  && isToSync) {
-            log.error("Installment with IUD [{}] is TO_SYNC but not present in the syncStatusDTO map", installment.getIud());
+            log.error("Installment with IUD [{}] is TO_SYNC but not present in the input map", installment.getIud());
           } else if (iud2Update  && !isToSync) {
             log.error("Installment with IUD [{}] is present in the input map but does not have TO_SYNC status", installment.getIud());
           }
@@ -61,6 +61,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
           InstallmentStatus newStatus = updateDTO.getNewStatus();
           installment.setStatus(newStatus);
+          log.info("Updating status {} and iupdPagopa {} for installment with id {}", newStatus, updateDTO.getIupdPagopa(), installment.getInstallmentId());
           installmentNoPIIRepository.updateStatusAndIupdPagopa(
             installment.getInstallmentId(),
             updateDTO.getIupdPagopa(),
