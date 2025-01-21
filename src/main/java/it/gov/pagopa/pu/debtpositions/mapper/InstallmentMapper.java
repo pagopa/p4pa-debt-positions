@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
 public class InstallmentMapper {
@@ -69,8 +69,8 @@ public class InstallmentMapper {
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
         .toList())
-      .creationDate(OffsetDateTime.from(installment.getCreationDate()))
-      .updateDate(OffsetDateTime.from(installment.getUpdateDate()))
+      .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();
   }
 

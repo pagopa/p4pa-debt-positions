@@ -59,4 +59,16 @@ class DebtPositionMapperTest {
     checkNotNullFields(result.getFirst(), "updateOperatorExternalId");
   }
 
+  @Test
+  void givenMapToDtoThenOk(){
+    DebtPositionDTO debtPositionExpected = buildDebtPositionDTO();
+    debtPositionExpected.setStatus(DebtPositionStatus.TO_SYNC);
+
+    Mockito.when(paymentOptionMapperMock.mapToDto(buildPaymentOption())).thenReturn(buildPaymentOptionDTO());
+
+    DebtPositionDTO result = debtPositionMapper.mapToDto(buildDebtPosition());
+
+    checkNotNullFields(result);
+    reflectionEqualsByName(debtPositionExpected, result);
+  }
 }

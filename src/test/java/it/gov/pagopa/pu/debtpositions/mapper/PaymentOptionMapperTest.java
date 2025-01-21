@@ -51,4 +51,18 @@ class PaymentOptionMapperTest {
     reflectionEqualsByName(paymentOptionExpected, result.getFirst());
     checkNotNullFields(result.getFirst(), "updateOperatorExternalId", "creationDate", "updateDate");
   }
+
+  @Test
+  void givenMapToDtoThenOk(){
+    PaymentOptionDTO paymentOptionExpected = buildPaymentOptionDTO();
+    paymentOptionExpected.setStatus(PaymentOptionStatus.TO_SYNC);
+
+    Mockito.when(installmentMapperMock.mapToDto(buildInstallmentNoPII())).thenReturn(buildInstallmentDTO());
+
+    PaymentOptionDTO result = paymentOptionMapper.mapToDto(buildPaymentOption());
+    System.out.println("result: "+result);
+
+    reflectionEqualsByName(paymentOptionExpected, result);
+    checkNotNullFields(result);
+  }
 }

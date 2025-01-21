@@ -8,10 +8,11 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
 public class DebtPositionMapper {
@@ -68,8 +69,8 @@ public class DebtPositionMapper {
       .notificationDate(debtPosition.getNotificationDate())
       .validityDate(debtPosition.getValidityDate())
       .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
-      .creationDate(OffsetDateTime.from(debtPosition.getCreationDate()))
-      .updateDate(OffsetDateTime.from(debtPosition.getUpdateDate()))
+      .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
       .paymentOptions(
         debtPosition.getPaymentOptions().stream()
           .map(paymentOptionMapper::mapToDto)
