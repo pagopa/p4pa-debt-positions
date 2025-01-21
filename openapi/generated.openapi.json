@@ -558,7 +558,7 @@
         }
       }
     },
-    "/crud/debt-position-types-collection" : {
+    "/crud/debt-position-types-with-count" : {
       "get" : {
         "tags" : [ "debt-position-type-with-count-entity-controller" ],
         "description" : "get-debtpositiontypewithcount",
@@ -646,10 +646,10 @@
         }
       }
     },
-    "/crud/debt-position-types-collection/search/findByBrokerId" : {
+    "/crud/debt-position-types-with-count/search/findByBrokerId" : {
       "get" : {
         "tags" : [ "debt-position-type-with-count-search-controller" ],
-        "operationId" : "crud-debt-position-types-collection-findByBrokerId",
+        "operationId" : "crud-debt-position-types-with-count-findByBrokerId",
         "parameters" : [ {
           "name" : "brokerId",
           "in" : "query",
@@ -706,7 +706,7 @@
         }
       }
     },
-    "/crud/debt-position-types-collection/{id}" : {
+    "/crud/debt-position-types-with-count/{id}" : {
       "get" : {
         "tags" : [ "debt-position-type-with-count-entity-controller" ],
         "description" : "get-debtpositiontypewithcount",
@@ -2467,10 +2467,10 @@
         }
       }
     },
-    "/crud/profile/debt-position-types-collection" : {
+    "/crud/profile/debt-position-types-with-count" : {
       "get" : {
         "tags" : [ "profile-controller" ],
-        "operationId" : "crud-profile-debt-position-types-collection",
+        "operationId" : "crud-profile-debt-position-types-with-count",
         "responses" : {
           "200" : {
             "description" : "OK",
@@ -3801,25 +3801,6 @@
           }
         }
       },
-      "CollectionModelObject" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "objects" : {
-                "type" : "array",
-                "items" : {
-                  "type" : "object"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
       "CollectionModelTransfer" : {
         "type" : "object",
         "properties" : {
@@ -3830,6 +3811,25 @@
                 "type" : "array",
                 "items" : {
                   "$ref" : "#/components/schemas/TransferResponse"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelObject" : {
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "objects" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object"
                 }
               }
             }
