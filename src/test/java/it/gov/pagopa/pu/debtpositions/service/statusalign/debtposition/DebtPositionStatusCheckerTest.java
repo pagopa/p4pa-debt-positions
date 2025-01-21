@@ -64,6 +64,16 @@ class DebtPositionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is PARTIALLY_PAID when there is at least one PARTIALLY_PAID paymentOption.
+   */
+  @Test
+  void testDeterminePaymentOptionStatus_PartiallyPaid3() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.PARTIALLY_PAID, result);
+  }
+
+  /**
    * Test if the status is UNPAID when all paymentOptions are UNPAID.
    */
   @Test

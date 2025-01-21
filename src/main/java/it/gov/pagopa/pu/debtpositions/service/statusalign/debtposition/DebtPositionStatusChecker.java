@@ -25,7 +25,8 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   public DebtPositionStatus calculateNewStatus(List<PaymentOptionStatus> paymentOptionStatusList) {
     if (isToSync(paymentOptionStatusList)){
       return DebtPositionStatus.TO_SYNC;
-    } else if (isPartiallyPaid(paymentOptionStatusList)){
+    } else if (isPartiallyPaid(paymentOptionStatusList)||
+      paymentOptionStatusList.contains(PARTIALLY_PAID)){
       return DebtPositionStatus.PARTIALLY_PAID;
     } else if (isUnpaid(paymentOptionStatusList)){
       return DebtPositionStatus.UNPAID;
