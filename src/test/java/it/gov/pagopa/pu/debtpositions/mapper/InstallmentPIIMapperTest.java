@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -46,8 +47,8 @@ class InstallmentPIIMapperTest {
 
     Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
 
-    assertEquals(installmentNoPIIExpected, result.getFirst());
-    assertEquals(installmentPIIDTOExpected, result.getSecond());
+    reflectionEqualsByName(installmentNoPIIExpected, result.getFirst());
+    reflectionEqualsByName(installmentPIIDTOExpected, result.getSecond());
     checkNotNullFields(result.getFirst(), "transfers", "personalDataId", "debtorFiscalCodeHash");
     checkNotNullFields(result.getSecond());
   }

@@ -77,7 +77,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/SyncStatusDTO"
+              $ref: "#/components/schemas/SyncStatusUpdateRequestDTO"
         required: true
       responses:
         "200":
@@ -393,6 +393,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
+        - DRAFT
     PaymentOptionStatus:
       type: string
       enum:
@@ -404,6 +405,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
+        - DRAFT
     InstallmentStatus:
       type: string
       enum:
@@ -414,17 +416,19 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
-    SyncStatusDTO:
+        - DRAFT
+    SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
-        $ref: "#/components/schemas/IudSyncStatusUpdateDTO"
-    IudSyncStatusUpdateDTO:
+        $ref: "#/components/schemas/IupdSyncStatusUpdateDTO"
+    IupdSyncStatusUpdateDTO:
       type: object
       properties:
         newStatus:
-          type: string
+          $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
           type: string
+
     DebtPositionErrorDTO:
       type: object
       required:

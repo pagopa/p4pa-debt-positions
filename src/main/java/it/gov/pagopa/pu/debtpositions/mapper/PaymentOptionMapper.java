@@ -55,4 +55,23 @@ public class PaymentOptionMapper {
 
     return Pair.of(paymentOption, installmentMapping);
   }
+
+  public PaymentOptionDTO mapToDto(PaymentOption paymentOption) {
+    return PaymentOptionDTO.builder()
+      .paymentOptionId(paymentOption.getPaymentOptionId())
+      .debtPositionId(paymentOption.getDebtPositionId())
+      .totalAmountCents(paymentOption.getTotalAmountCents())
+      .status(paymentOption.getStatus())
+      .multiDebtor(paymentOption.isMultiDebtor())
+      .dueDate(paymentOption.getDueDate())
+      .description(paymentOption.getDescription())
+      .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(paymentOption.getPaymentOptionType().name()))
+      .installments(
+        paymentOption.getInstallments().stream()
+          .map(installmentMapper::mapToDto)
+          .toList()
+      )
+      .build();
+  }
+
 }
