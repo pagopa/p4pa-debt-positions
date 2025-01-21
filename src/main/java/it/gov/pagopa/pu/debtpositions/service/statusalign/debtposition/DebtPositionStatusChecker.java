@@ -25,8 +25,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   public DebtPositionStatus calculateNewStatus(List<PaymentOptionStatus> paymentOptionStatusList) {
     if (isToSync(paymentOptionStatusList)){
       return DebtPositionStatus.TO_SYNC;
-    } else if (isPartiallyPaid(paymentOptionStatusList)||
-      paymentOptionStatusList.contains(PARTIALLY_PAID)){
+    } else if (isPartiallyPaid(paymentOptionStatusList)){
       return DebtPositionStatus.PARTIALLY_PAID;
     } else if (isUnpaid(paymentOptionStatusList)){
       return DebtPositionStatus.UNPAID;
@@ -44,6 +43,12 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
       throw new InvalidStatusException("Unable to determine status for DebtPosition");
     }
   }
+
+  @Override
+  public boolean isPartiallyPaid(List<PaymentOptionStatus> childrenStatusList) {
+    return childrenStatusList.contains(PARTIALLY_PAID) || super.isPartiallyPaid(childrenStatusList);
+  }
+
 
   @Override
   protected List<PaymentOptionStatus> getChildStatuses(DebtPosition debtPosition) {
