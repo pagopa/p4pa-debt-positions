@@ -287,6 +287,22 @@ components:
           format: int64
     ReceiptDTO:
       type: object
+      required:
+        - receiptSource
+        - paymentReceiptId
+        - noticeNumber
+        - orgFiscalCode
+        - outcome
+        - creditorReferenceId
+        - paymentAmountCents
+        - description
+        - companyName
+        - idPsp
+        - pspCompanyName
+        - idChannel
+        - channelDescription
+        - debtor
+        - payer
       properties:
         receiptId:
           type: integer
@@ -294,9 +310,16 @@ components:
         installmentId:
           type: integer
           format: int64
+        ingestionFlowFileId:
+          type: integer
+          format: int64
+        receiptOrigin:
+          type: string
         paymentReceiptId:
           type: string
         noticeNumber:
+          type: string
+        paymentNote:
           type: string
         orgFiscalCode:
           type: string
@@ -339,9 +362,6 @@ components:
         transferDate:
           type: string
           format: date-time
-        receiptBytes:
-          type: string
-          format: byte
         standin:
           type: boolean
         debtor:
