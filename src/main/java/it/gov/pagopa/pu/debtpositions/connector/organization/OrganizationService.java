@@ -6,8 +6,8 @@ import java.util.Optional;
 
 public interface OrganizationService {
 
-  Optional<Organization> getOrganizationByFiscalCode(String orgFiscalCode);
+  Optional<Organization> getOrganizationByFiscalCode(String orgFiscalCode, String accessToken);
 
-  Optional<Organization> getOrganizationByIpaCode(String ipaCode);
+  Optional<Organization> getOrganizationByIpaCode(String ipaCode, String accessToken);
 
 }

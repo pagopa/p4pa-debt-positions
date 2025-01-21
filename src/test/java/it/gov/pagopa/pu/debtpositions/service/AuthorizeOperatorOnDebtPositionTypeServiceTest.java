@@ -43,10 +43,10 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
     debtPositionTypeOrgDTO.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgDTO.setOrganizationId(orgId);
 
-    when(debtPositionTypeOrgOperatorsRepositoryMock.findDebtPositionTypeOrgOperatorsByOperatorExternalUserId(username))
+    when(debtPositionTypeOrgOperatorsRepositoryMock.findByOperatorExternalUserId(username))
       .thenReturn(buildDebtPositionTypeOrgOperators());
 
-    when(debtPositionTypeOrgRepositoryMock.findDebtPositionTypeOrgByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgId))
+    when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgId))
       .thenReturn(Optional.of(debtPositionTypeOrgDTO));
 
     DebtPositionTypeOrg result = authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, username);
@@ -63,10 +63,10 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrgDTO = new DebtPositionTypeOrg();
     debtPositionTypeOrgDTO.setDebtPositionTypeOrgId(1L);
 
-    when(debtPositionTypeOrgOperatorsRepositoryMock.findDebtPositionTypeOrgOperatorsByOperatorExternalUserId(username))
+    when(debtPositionTypeOrgOperatorsRepositoryMock.findByOperatorExternalUserId(username))
       .thenReturn(buildDebtPositionTypeOrgOperators());
 
-    when(debtPositionTypeOrgRepositoryMock.findDebtPositionTypeOrgByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgId))
+    when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgId))
       .thenReturn(Optional.empty());
 
     assertThrows(OperatorNotAuthorizedException.class, () ->

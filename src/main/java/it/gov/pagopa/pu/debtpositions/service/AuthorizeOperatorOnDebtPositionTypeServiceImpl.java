@@ -5,12 +5,10 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Lazy
 @Service
 public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements AuthorizeOperatorOnDebtPositionTypeService {
 
@@ -23,14 +21,14 @@ public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements Authorize
         this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     }
 
-    public DebtPositionTypeOrg authorize(Long orgId, Long debtPositionTypeOrgId, String username){
+    public DebtPositionTypeOrg authorize(Long orgId, Long debtPositionTypeOrgId, String operatorExternalUserId){
         DebtPositionTypeOrgOperators debtPositionTypeOrgOperators =
-                debtPositionTypeOrgOperatorsRepository.findDebtPositionTypeOrgOperatorsByOperatorExternalUserId(username);
+                debtPositionTypeOrgOperatorsRepository.findByOperatorExternalUserId(operatorExternalUserId);
 
         Optional<DebtPositionTypeOrg> debtPositionTypeOrg =
-                debtPositionTypeOrgRepository.findDebtPositionTypeOrgByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgOperators.getDebtPositionTypeOrgId());
+                debtPositionTypeOrgRepository.findByOrganizationIdAndDebtPositionTypeOrgId(orgId, debtPositionTypeOrgOperators.getDebtPositionTypeOrgId());
 
         return debtPositionTypeOrg
-                .orElseThrow(() -> new OperatorNotAuthorizedException("The operator " + username + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId + " related to organization " + orgId));
+                .orElseThrow(() -> new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId + " related to organization " + orgId));
     }
 }

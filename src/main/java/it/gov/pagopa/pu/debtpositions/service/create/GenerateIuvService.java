@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
 /**
  * Service class responsible for generating a valid and unique IUV for a given organization.
@@ -11,5 +11,5 @@ public interface GenerateIuvService {
    * @param orgFiscalCode the fiscal code of the organization for which the IUV is requested
    * @return the IUV generated
    */
-  String generateIuv(String orgFiscalCode);
+  String generateIuv(String orgFiscalCode, String accessToken);
 }

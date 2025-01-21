@@ -1,9 +1,8 @@
-package it.gov.pagopa.pu.debtpositions.connector.auth.config;
+package it.gov.pagopa.pu.debtpositions.connector.taxonomy.config;
 
-import it.gov.pagopa.pu.auth.dto.generated.AccessToken;
-import it.gov.pagopa.pu.auth.dto.generated.UserInfo;
-import it.gov.pagopa.pu.auth.generated.ApiClient;
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
+import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
+import it.gov.pagopa.pu.organization.generated.ApiClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,11 +14,11 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @ExtendWith(MockitoExtension.class)
-class AuthApisHolderTest extends BaseApiHolderTest {
+class TaxonomyApisHolderTest extends BaseApiHolderTest {
     @Mock
     private RestTemplateBuilder restTemplateBuilderMock;
 
-    private AuthApisHolder authApisHolder;
+    private TaxonomyApisHolder taxonomyApisHolder;
 
     @BeforeEach
     void setUp() {
@@ -28,7 +27,7 @@ class AuthApisHolderTest extends BaseApiHolderTest {
         ApiClient apiClient = new ApiClient(restTemplateMock);
         String baseUrl = "http://example.com";
         apiClient.setBasePath(baseUrl);
-        authApisHolder = new AuthApisHolder(baseUrl, restTemplateBuilderMock);
+        taxonomyApisHolder = new TaxonomyApisHolder(baseUrl, restTemplateBuilderMock);
     }
 
     @AfterEach
@@ -40,21 +39,12 @@ class AuthApisHolderTest extends BaseApiHolderTest {
     }
 
     @Test
-    void whenGetAuthzApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    void whenGetTaxonomyCodeDtoSearchControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
         assertAuthenticationShouldBeSetInThreadSafeMode(
-                accessToken -> authApisHolder.getAuthzApi(accessToken)
-                        .getUserInfoFromMappedExternaUserId("externalUserId"),
-                UserInfo.class,
-                authApisHolder::unload);
-    }
-
-    @Test
-    void whenGetAuthnApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
-        assertAuthenticationShouldBeSetInThreadSafeMode(
-                accessToken -> authApisHolder.getAuthnApi(accessToken)
-                        .postToken("clientId", "grantType", "scope", "subjectToken", "subjectIssuer", "subjectTokenType", "clientSecret"),
-                AccessToken.class,
-                authApisHolder::unload);
+                accessToken -> taxonomyApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken)
+                        .crudTaxonomiesFindByTaxonomyCode("TAXONOMYCODE"),
+                Taxonomy.class,
+                taxonomyApisHolder::unload);
     }
 
 }

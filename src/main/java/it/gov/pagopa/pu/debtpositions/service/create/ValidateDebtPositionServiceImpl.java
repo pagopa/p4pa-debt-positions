@@ -1,35 +1,35 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
+import it.gov.pagopa.pu.debtpositions.connector.taxonomy.TaxonomyService;
 import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import it.gov.pagopa.pu.debtpositions.repository.TaxonomyRepository;
+import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidIban;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
 
-@Lazy
 @Service
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
-  private final TaxonomyRepository taxonomyRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final TaxonomyService taxonomyService;
 
-  public ValidateDebtPositionServiceImpl(TaxonomyRepository taxonomyRepository, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
-    this.taxonomyRepository = taxonomyRepository;
+  public ValidateDebtPositionServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, TaxonomyService taxonomyService) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.taxonomyService = taxonomyService;
   }
 
-  public void validate(DebtPositionDTO debtPositionDTO) {
+  public void validate(DebtPositionDTO debtPositionDTO, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
     if (debtPositionTypeOrg == null ||
       debtPositionTypeOrg.getCode() == null ||
@@ -48,7 +48,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
         validateInstallment(installmentDTO, debtPositionTypeOrg);
         validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-        validateTransfers(installmentDTO.getTransfers());
+        validateTransfers(installmentDTO.getTransfers(), accessToken);
       }
     }
   }
@@ -89,7 +89,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateTransfers(List<TransferDTO> transferDTOList) {
+  private void validateTransfers(List<TransferDTO> transferDTOList, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
       throw new InvalidValueException("At least one transfer is mandatory for installment");
     }
@@ -106,7 +106,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (!isValidIban(transferSecondaryBeneficiary.getIban())) {
         throw new InvalidValueException("Iban of secondary beneficiary is not valid");
       }
-      checkTaxonomyCategory(transferSecondaryBeneficiary.getCategory());
+      checkTaxonomyCategory(transferSecondaryBeneficiary.getCategory(), accessToken);
 
       if (transferSecondaryBeneficiary.getAmountCents() < 0) {
         throw new InvalidValueException("The amount of secondary beneficiary is not valid");
@@ -114,13 +114,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void checkTaxonomyCategory(String category) {
+  private void checkTaxonomyCategory(String category, String accessToken) {
     if (StringUtils.isBlank(category)) {
       throw new InvalidValueException("Category of secondary beneficiary is mandatory");
     } else {
       String categoryCode = StringUtils.substringBeforeLast(category, "/") + "/";
-      Boolean categoryCodeExists = taxonomyRepository.existsTaxonomyByTaxonomyCode(categoryCode);
-      if (!Boolean.TRUE.equals(categoryCodeExists)) {
+      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(categoryCode, accessToken);
+      if (taxonomy.isEmpty()) {
         throw new InvalidValueException("The category code does not exist in the archive");
       }
     }

@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvServiceImpl;
+import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,32 +38,34 @@ class GenerateIuvServiceTest {
 
   private static final String INVALID_ORG_FISCAL_CODE = "INVALID_FISCAL_CODE";
 
+  private final String accessToken = "ACCESSTOKEN";
+
   @Test
-  void givenValidOrgWhenGenerateIuvThenOk(){
+  void givenValidOrgWhenGenerateIuvThenOk() {
     //Given
-    Mockito.when(organizationService.getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE)).thenReturn(Optional.of(VALID_ORG));
+    Mockito.when(organizationService.getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.of(VALID_ORG));
     Mockito.when(iuvService.generateIuv(VALID_ORG)).thenReturn(VALID_IUV);
     //When
-    String result = generateIuvService.generateIuv(VALID_ORG_FISCAL_CODE);
+    String result = generateIuvService.generateIuv(VALID_ORG_FISCAL_CODE, accessToken);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE);
-    Mockito.verify(iuvService,Mockito.times(1)).generateIuv(VALID_ORG);
+    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE, accessToken);
+    Mockito.verify(iuvService, Mockito.times(1)).generateIuv(VALID_ORG);
   }
 
   @Test
-  void givenEmptyOrgWhenGenerateIuvThenException(){
+  void givenEmptyOrgWhenGenerateIuvThenException() {
     //Verify
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(""));
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv("", accessToken));
     Assertions.assertEquals("invalid orgFiscalCode", exception.getMessage());
   }
 
   @Test
-  void givenInvalidOrgWhenGenerateIuvThenException(){
+  void givenInvalidOrgWhenGenerateIuvThenException() {
     //Given
-    Mockito.when(organizationService.getOrganizationByFiscalCode(INVALID_ORG_FISCAL_CODE)).thenReturn(Optional.empty());
+    Mockito.when(organizationService.getOrganizationByFiscalCode(INVALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.empty());
     //Verify
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(INVALID_ORG_FISCAL_CODE));
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(INVALID_ORG_FISCAL_CODE, accessToken));
     Assertions.assertEquals("invalid organization", exception.getMessage());
   }
 }

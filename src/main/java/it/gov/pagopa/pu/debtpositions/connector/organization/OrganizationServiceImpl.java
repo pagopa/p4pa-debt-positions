@@ -1,36 +1,31 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization;
 
-import it.gov.pagopa.pu.debtpositions.connector.auth.AuthnService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-@Lazy
 @Service
 public class OrganizationServiceImpl implements OrganizationService {
 
-    private final AuthnService authnService;
     private final OrganizationSearchClient organizationSearchClient;
 
-    public OrganizationServiceImpl(AuthnService authnService, OrganizationSearchClient organizationSearchClient) {
-        this.authnService = authnService;
+    public OrganizationServiceImpl(OrganizationSearchClient organizationSearchClient) {
         this.organizationSearchClient = organizationSearchClient;
     }
 
     @Override
-    public Optional<Organization> getOrganizationByFiscalCode(String orgFiscalCode) {
+    public Optional<Organization> getOrganizationByFiscalCode(String orgFiscalCode, String accessToken) {
         return Optional.ofNullable(
-                organizationSearchClient.findByOrgFiscalCode(orgFiscalCode, authnService.getAccessToken())
+                organizationSearchClient.findByOrgFiscalCode(orgFiscalCode, accessToken)
         );
     }
 
     @Override
-    public Optional<Organization> getOrganizationByIpaCode(String ipaCode) {
+    public Optional<Organization> getOrganizationByIpaCode(String ipaCode, String accessToken) {
         return Optional.ofNullable(
-                organizationSearchClient.findByIpaCode(ipaCode, authnService.getAccessToken())
+                organizationSearchClient.findByIpaCode(ipaCode, accessToken)
         );
     }
 }

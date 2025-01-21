@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
@@ -14,5 +14,5 @@ public interface ValidateDebtPositionService {
      * @param debtPositionRequestDTO representing the new debt position to be validated
      * @throws InvalidValueException if a value does not comply with business rules
      */
-    void validate(DebtPositionDTO debtPositionRequestDTO);
+    void validate(DebtPositionDTO debtPositionRequestDTO, String accessToken);
 }

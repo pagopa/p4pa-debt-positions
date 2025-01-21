@@ -1,17 +1,15 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 /**
  * Service class exposing methods related to IUV handling.
  */
-@Lazy
 @Service
 @Slf4j
 public class IuvService {
@@ -23,7 +21,7 @@ public class IuvService {
 
   private final IuvSequenceNumberService iuvSequenceNumberService;
 
-  public IuvService(@Value("${iuv.informationSystemId:00}") String informationSystemId,
+  public IuvService(@Value("${iuv.informationSystemId}") String informationSystemId,
                     IuvSequenceNumberService iuvSequenceNumberService) {
     this.informationSystemId = informationSystemId;
     this.iuvSequenceNumberService = iuvSequenceNumberService;

@@ -22,10 +22,10 @@ public interface AuthorizeOperatorOnDebtPositionTypeService {
      *
      * @param orgId the identifier of the organization
      * @param debtPositionTypeOrgId the identifier of the specific debt position type to verify for authorization
-     * @param username the username of the operator
+     * @param operatorExternalUserId the username of the operator
      * @return the {@link DebtPositionTypeOrg} representing the authorized debt position type
      * @throws OperatorNotAuthorizedException if the operator is not authorized to manage the specified installment type
      */
 
-    DebtPositionTypeOrg authorize(Long orgId, Long debtPositionTypeOrgId, String username);
+    DebtPositionTypeOrg authorize(Long orgId, Long debtPositionTypeOrgId, String operatorExternalUserId);
 }

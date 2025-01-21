@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
 import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
@@ -20,7 +20,7 @@ public class IuvSequenceNumberServiceImpl implements IuvSequenceNumberService {
   public long getNextIuvSequenceNumber(Long organizationId) {
     long nextSequenceNumber;
 
-    Optional<IuvSequenceNumber> currentEntity = iuvSequenceNumberRepository.findIuvSequenceNumberByOrganizationId(organizationId);
+    Optional<IuvSequenceNumber> currentEntity = iuvSequenceNumberRepository.findByOrganizationId(organizationId);
 
     if (currentEntity.isEmpty()) {
       nextSequenceNumber = 1;

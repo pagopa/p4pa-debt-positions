@@ -9,5 +9,5 @@ import java.util.Optional;
 @RepositoryRestResource(path = "debt-position-type-orgs")
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg,Long> {
 
-  Optional<DebtPositionTypeOrg> findDebtPositionTypeOrgByOrganizationIdAndDebtPositionTypeOrgId(Long organizationId, Long debtPositionTypeOrgId);
+  Optional<DebtPositionTypeOrg> findByOrganizationIdAndDebtPositionTypeOrgId(Long organizationId, Long debtPositionTypeOrgId);
 }

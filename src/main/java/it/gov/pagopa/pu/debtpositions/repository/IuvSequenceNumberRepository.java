@@ -9,5 +9,5 @@ import java.util.Optional;
 @RepositoryRestResource(exported = false)
 public interface IuvSequenceNumberRepository extends JpaRepository<IuvSequenceNumber,Long> {
 
-  Optional<IuvSequenceNumber> findIuvSequenceNumberByOrganizationId(Long organizationId);
+  Optional<IuvSequenceNumber> findByOrganizationId(Long organizationId);
 }

@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization;
 
-import it.gov.pagopa.pu.debtpositions.connector.auth.AuthnService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
@@ -18,8 +17,6 @@ import java.util.Optional;
 class OrganizationServiceTest {
 
     @Mock
-    private AuthnService authnServiceMock;
-    @Mock
     private OrganizationSearchClient organizationSearchClientMock;
 
     private OrganizationService organizationService;
@@ -29,18 +26,13 @@ class OrganizationServiceTest {
     @BeforeEach
     void init(){
         organizationService = new OrganizationServiceImpl(
-                authnServiceMock,
                 organizationSearchClientMock
         );
-
-        Mockito.when(authnServiceMock.getAccessToken())
-                .thenReturn(accessToken);
     }
 
     @AfterEach
     void verifyNoMoreInteractions(){
         Mockito.verifyNoMoreInteractions(
-                authnServiceMock,
                 organizationSearchClientMock
         );
     }
@@ -54,7 +46,7 @@ class OrganizationServiceTest {
                 .thenReturn(null);
 
         // When
-        Optional<Organization> result = organizationService.getOrganizationByFiscalCode(orgFiscalCode);
+        Optional<Organization> result = organizationService.getOrganizationByFiscalCode(orgFiscalCode, accessToken);
 
         // Then
         Assertions.assertTrue(result.isEmpty());
@@ -69,7 +61,7 @@ class OrganizationServiceTest {
                 .thenReturn(expectedResult);
 
         // When
-        Optional<Organization> result = organizationService.getOrganizationByFiscalCode(orgFiscalCode);
+        Optional<Organization> result = organizationService.getOrganizationByFiscalCode(orgFiscalCode, accessToken);
 
         // Then
         Assertions.assertTrue(result.isPresent());
@@ -86,7 +78,7 @@ class OrganizationServiceTest {
                 .thenReturn(null);
 
         // When
-        Optional<Organization> result = organizationService.getOrganizationByIpaCode(orgIpaCode);
+        Optional<Organization> result = organizationService.getOrganizationByIpaCode(orgIpaCode, accessToken);
 
         // Then
         Assertions.assertTrue(result.isEmpty());
@@ -101,7 +93,7 @@ class OrganizationServiceTest {
                 .thenReturn(expectedResult);
 
         // When
-        Optional<Organization> result = organizationService.getOrganizationByIpaCode(orgIpaCode);
+        Optional<Organization> result = organizationService.getOrganizationByIpaCode(orgIpaCode, accessToken);
 
         // Then
         Assertions.assertTrue(result.isPresent());
