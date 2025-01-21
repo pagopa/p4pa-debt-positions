@@ -61,4 +61,10 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   protected void storeStatus(PaymentOption paymentOption, PaymentOptionStatus newStatus) {
     paymentOptionRepository.updateStatus(paymentOption.getPaymentOptionId(), newStatus);
   }
+
+  @Override
+  protected boolean isPartiallyPaid(List<InstallmentStatus> childrenStatusList) {
+    return childrenStatusList.contains(InstallmentStatus.PAID) &&
+      (childrenStatusList.contains(InstallmentStatus.UNPAID) || childrenStatusList.contains(InstallmentStatus.EXPIRED));
+  }
 }

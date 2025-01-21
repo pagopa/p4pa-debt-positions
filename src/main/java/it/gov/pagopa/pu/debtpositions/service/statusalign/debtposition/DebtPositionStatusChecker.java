@@ -45,6 +45,12 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   }
 
   @Override
+  public boolean isPartiallyPaid(List<PaymentOptionStatus> childrenStatusList) {
+    return childrenStatusList.contains(PARTIALLY_PAID);
+  }
+
+
+  @Override
   protected List<PaymentOptionStatus> getChildStatuses(DebtPosition debtPosition) {
     return debtPosition.getPaymentOptions().stream()
       .map(PaymentOption::getStatus)
