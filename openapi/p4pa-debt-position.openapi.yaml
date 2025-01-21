@@ -393,6 +393,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
+        - DRAFT
     PaymentOptionStatus:
       type: string
       enum:
@@ -404,6 +405,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
+        - DRAFT
     InstallmentStatus:
       type: string
       enum:
@@ -414,6 +416,7 @@ components:
         - INVALID
         - EXPIRED
         - UNPAID
+        - DRAFT
     SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
