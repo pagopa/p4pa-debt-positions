@@ -78,7 +78,7 @@ jwt:
 
 rest:
   organization:
-    base-url: "\${REST_ORGANIZATION_BASE_URL:http://p4pa-organization-microservice-chart:8080}"
+    base-url: "\${ORGANIZATION_BASE_URL:http://p4pa-organization-microservice-chart:8080}"
 
 iuv:
   informationSystemId: 00
