@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
@@ -18,7 +19,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTrans
 
 public class InstallmentFaker {
 
-  static LocalDateTime date = LocalDateTime.of(2025, 1, 1, 0,0,0, 0);
+  static LocalDateTime date = LocalDateTime.now().plusDays(2);
   static OffsetDateTime offsetDateTime = OffsetDateTime.of(date, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
@@ -40,7 +41,7 @@ public class InstallmentFaker {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
-      .transfers(List.of(buildTransfer()))
+      .transfers(new ArrayList<>(List.of(buildTransfer())))
       .debtor(buildPerson())
       .creationDate(date)
       .updateDate(date)
@@ -101,7 +102,7 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .debtor(buildPerson())
-      .transfers(List.of(buildTransfer()))
+      .transfers(new ArrayList<>(List.of(buildTransfer())))
       .creationDate(date)
       .updateDate(date)
       .build();
@@ -127,7 +128,7 @@ public class InstallmentFaker {
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
       .balance("balance")
       .debtor(buildPersonDTO())
-      .transfers(List.of(buildTransferDTO()))
+      .transfers(new ArrayList<>(List.of(buildTransferDTO())))
       .creationDate(date.atOffset(ZoneOffset.UTC))
       .updateDate(date.atOffset(ZoneOffset.UTC))
       .build();

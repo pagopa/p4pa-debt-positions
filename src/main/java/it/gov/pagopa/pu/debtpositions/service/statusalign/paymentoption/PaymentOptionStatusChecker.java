@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
@@ -41,7 +41,7 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
     } else if (isExpired(installmentStatusList)) {
       return PaymentOptionStatus.EXPIRED;
     } else {
-      throw new InvalidStatusException("Unable to determine status for PaymentOption");
+      throw new InvalidValueException("Unable to determine status for PaymentOption");
     }
   }
 

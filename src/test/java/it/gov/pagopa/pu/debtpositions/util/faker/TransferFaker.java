@@ -10,14 +10,14 @@ public class TransferFaker {
     Transfer transfer = new Transfer();
     transfer.setTransferId(1L);
     transfer.setInstallmentId(1L);
-    transfer.setOrgFiscalCode("ABC123");
+    transfer.setOrgFiscalCode("12345678903");
     transfer.setOrgName("Organization Name");
     transfer.setAmountCents(1000L);
     transfer.setRemittanceInformation("Payment Info");
     transfer.setIban("IT60X0542811101000000123456");
     transfer.setPostalIban("123456");
-    transfer.setCategory("Category");
-    transfer.setTransferIndex(1L);
+    transfer.setCategory("category");
+    transfer.setTransferIndex(2L);
     transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
     return transfer;
   }
@@ -26,14 +26,14 @@ public class TransferFaker {
     return TransferDTO.builder()
       .transferId(1L)
       .installmentId(1L)
-      .orgFiscalCode("ABC123")
+      .orgFiscalCode("12345678903")
       .orgName("Organization Name")
       .amountCents(1000L)
       .remittanceInformation("Payment Info")
       .iban("IT60X0542811101000000123456")
       .postalIban("123456")
-      .category("Category")
-      .transferIndex(1L)
+      .category("category")
+      .transferIndex(2L)
       .stampType("TYPE")
       .stampHashDocument("HASH")
       .stampProvincialResidence("PR")

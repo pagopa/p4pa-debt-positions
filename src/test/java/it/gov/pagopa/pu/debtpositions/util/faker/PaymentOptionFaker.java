@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -26,10 +27,9 @@ public class PaymentOptionFaker {
     paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
-    paymentOption.setInstallments(new TreeSet<>(List.of(buildInstallmentNoPII())));
+    paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildInstallmentNoPII()))));
     return paymentOption;
   }
-
 
   public static PaymentOptionDTO buildPaymentOptionDTO() {
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
@@ -41,7 +41,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
-    paymentOptionDTO.setInstallments(List.of(buildInstallmentDTO()));
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
     return paymentOptionDTO;
   }
 }

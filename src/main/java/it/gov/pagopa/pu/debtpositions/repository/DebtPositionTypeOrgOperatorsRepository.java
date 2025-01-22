@@ -7,4 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(path = "debt-position-type-org-operators")
 public interface DebtPositionTypeOrgOperatorsRepository extends JpaRepository<DebtPositionTypeOrgOperators,Long>{
 
+  DebtPositionTypeOrgOperators findByOperatorExternalUserId(String operatorExternalUserId);
 }

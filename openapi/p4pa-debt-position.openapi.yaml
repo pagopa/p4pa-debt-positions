@@ -34,6 +34,16 @@ paths:
                 $ref: "#/components/schemas/DebtPositionDTO"
         "400":
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
   /receipts:
@@ -448,7 +458,6 @@ components:
           $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
           type: string
-
     DebtPositionErrorDTO:
       type: object
       required:
@@ -458,7 +467,8 @@ components:
         code:
           type: string
           enum:
-            - DEBT_POSITION_IVALID_REQUEST
+            - DEBT_POSITION_BAD_REQUEST
+            - DEBT_POSITION_FORBIDDEN
             - DEBT_POSITION_GENERIC_ERROR
         message:
           type: string

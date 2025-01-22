@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
@@ -19,38 +20,38 @@ public class DebtPositionFaker {
   public static DebtPosition buildDebtPosition() {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(1L);
+    debtPosition.setDebtPositionTypeOrgId(2L);
     debtPosition.setIupdOrg("IUPD_ORG");
     debtPosition.setDescription("Test Description");
     debtPosition.setStatus(DebtPositionStatus.TO_SYNC);
     debtPosition.setIngestionFlowFileId(1001L);
     debtPosition.setIngestionFlowFileLineNumber(10L);
     debtPosition.setOrganizationId(500L);
-    debtPosition.setDebtPositionTypeOrgId(200L);
     debtPosition.setNotificationDate(DATE);
     debtPosition.setValidityDate(DATE);
     debtPosition.setFlagIuvVolatile(true);
     debtPosition.setCreationDate(DATE.toLocalDateTime());
     debtPosition.setUpdateDate(DATE.toLocalDateTime());
-    debtPosition.setPaymentOptions(new TreeSet<>(List.of(buildPaymentOption())));
+    debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildPaymentOption()))));
     return debtPosition;
   }
 
   public static DebtPositionDTO buildDebtPositionDTO() {
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
     debtPositionDTO.setDebtPositionId(1L);
+    debtPositionDTO.setDebtPositionTypeOrgId(2L);
     debtPositionDTO.setIupdOrg("IUPD_ORG");
     debtPositionDTO.setDescription("Test Description");
     debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
     debtPositionDTO.setIngestionFlowFileId(1001L);
     debtPositionDTO.setIngestionFlowFileLineNumber(10L);
     debtPositionDTO.setOrganizationId(500L);
-    debtPositionDTO.setDebtPositionTypeOrgId(200L);
     debtPositionDTO.setNotificationDate(DATE);
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setCreationDate(DATE);
     debtPositionDTO.setUpdateDate(DATE);
-    debtPositionDTO.setPaymentOptions(List.of(buildPaymentOptionDTO()));
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
     return debtPositionDTO;
   }
 }
