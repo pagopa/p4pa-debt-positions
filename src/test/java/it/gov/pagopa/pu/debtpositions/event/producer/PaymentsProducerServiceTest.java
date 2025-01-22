@@ -15,9 +15,6 @@ import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.messaging.Message;
 
-import java.util.function.Supplier;
-
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -29,12 +26,9 @@ class PaymentsProducerServiceTest {
 
     private PaymentsProducerService paymentsProducerService;
 
-    private PaymentsProducerService.PaymentsProducerConfig config;
-
     @BeforeEach
     public void setUp() {
         paymentsProducerService = new PaymentsProducerService(streamBridge);
-        config = new PaymentsProducerService.PaymentsProducerConfig();
     }
 
     @Test
@@ -57,11 +51,5 @@ class PaymentsProducerServiceTest {
                     Assertions.assertSame(debtPosition.getOrganizationId(), m.getHeaders().get(KafkaHeaders.KEY));
                     return true;
                 }));
-    }
-
-    @Test
-    void whenConfigPaymentsProducerThenOk() {
-        Supplier<Message<Object>> supplier = config.paymentsProducer();
-        assertNotNull(supplier);
     }
 }

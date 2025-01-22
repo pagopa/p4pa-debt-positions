@@ -37,6 +37,7 @@ spring:
                 brokers: \${KAFKA_BINDER_BROKER:}
                 configuration:
                   sasl.jaas.config: \${KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG:}
+                  key.serializer: org.apache.kafka.common.serialization.StringSerializer
         bindings:
           paymentsProducer-out-0:
             binder: kafka-payments-producer
