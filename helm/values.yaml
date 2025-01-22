@@ -54,6 +54,12 @@ microservice-chart:
       - name: appinsights-config
         key: applicationinsights.json
 
+  externalConfigMapValues:
+    eventhub-config:
+      KAFKA_CONFIG_SECURITY_PROTOCOL: p4pa-payhub-security-protocol
+      KAFKA_CONFIG_SASL_MECHANISM: p4pa-payhub-sasl-mechanism
+      KAFKA_TOPIC_PAYMENTS: p4pa-payhub-payments-topic
+
   envConfig:
     APPLICATIONINSIGHTS_ROLE_NAME: "p4pa-debt-positions"
     APPLICATIONINSIGHTS_INSTRUMENTATION_LOGGING_LEVEL: "OFF"
@@ -77,6 +83,8 @@ microservice-chart:
 
     DATA_CIPHER_ENCRYPT_PASSWORD: data-cipher-encrypt-password
     DATA_CIPHER_HASH_PEPPER: data-cipher-hash-pepper
+
+    KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG: p4pa-payhub-payments-evh-producer-jaas-config
 
   # nodeSelector: {}
 
