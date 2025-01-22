@@ -10,7 +10,6 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Component;
 
 @Component
-@SuppressWarnings("squid:java:S125") // suppressing commented code warning
 public class PaymentsProducerService {
 
     @Value("${spring.cloud.stream.bindings.paymentsProducer-out-0.binder}")
