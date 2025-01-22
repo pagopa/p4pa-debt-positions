@@ -30,6 +30,12 @@ repositories {
 	mavenCentral()
 }
 
+dependencyManagement {
+  imports {
+    mavenBom("org.springframework.cloud:spring-cloud-dependencies:2024.0.0")
+  }
+}
+
 val springDocOpenApiVersion = "2.7.0"
 val openApiToolsVersion = "0.2.6"
 val micrometerVersion = "1.4.1"
@@ -44,6 +50,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-data-rest")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
   implementation("io.micrometer:micrometer-registry-prometheus")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
