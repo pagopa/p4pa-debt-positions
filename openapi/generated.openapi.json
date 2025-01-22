@@ -3040,7 +3040,7 @@
           "in" : "query",
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int32"
           }
         } ],
         "responses" : {
@@ -3475,20 +3475,6 @@
           }
         }
       },
-      "Stamp" : {
-        "type" : "object",
-        "properties" : {
-          "stampType" : {
-            "type" : "string"
-          },
-          "stampHashDocument" : {
-            "type" : "string"
-          },
-          "stampProvincialResidence" : {
-            "type" : "string"
-          }
-        }
-      },
       "InstallmentNoPII" : {
         "type" : "object",
         "properties" : {
@@ -3616,6 +3602,20 @@
           },
           "page" : {
             "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "Stamp" : {
+        "type" : "object",
+        "properties" : {
+          "stampType" : {
+            "type" : "string"
+          },
+          "stampHashDocument" : {
+            "type" : "string"
+          },
+          "stampProvincialResidence" : {
+            "type" : "string"
           }
         }
       },
