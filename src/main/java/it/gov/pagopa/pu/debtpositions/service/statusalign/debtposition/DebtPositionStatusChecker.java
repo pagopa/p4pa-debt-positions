@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -40,7 +40,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
     } else if (isExpired(paymentOptionStatusList)){
       return DebtPositionStatus.EXPIRED;
     } else {
-      throw new InvalidStatusException("Unable to determine status for DebtPosition");
+      throw new InvalidValueException("Unable to determine status for DebtPosition");
     }
   }
 

@@ -37,13 +37,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateErrorDTO"
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
         "403":
           description: Forbidden
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CreateErrorDTO"
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
   /receipts:
@@ -467,20 +467,8 @@ components:
         code:
           type: string
           enum:
-            - DEBT_POSITION_IVALID_REQUEST
+            - DEBT_POSITION_BAD_REQUEST
+            - DEBT_POSITION_FORBIDDEN
             - DEBT_POSITION_GENERIC_ERROR
-        message:
-          type: string
-    CreateErrorDTO:
-      type: object
-      required:
-        - code
-        - message
-      properties:
-        code:
-          type: string
-          enum:
-            - WORKFLOW_BAD_REQUEST
-            - WORKFLOW_FORBIDDEN
         message:
           type: string

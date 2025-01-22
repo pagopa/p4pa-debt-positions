@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.OperatorNotAuthorizedException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;

@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.exception;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,8 +45,8 @@ public class DebtPositionExceptionHandlerTest {
   }
 
   @Test
-  void handleInvalidStatusExceptionError() throws Exception {
-    doThrow(new InvalidStatusException("Error")).when(testControllerSpy).testEndpoint(DATA);
+  void handleInvalidValueExceptionError() throws Exception {
+    doThrow(new InvalidValueException("Error")).when(testControllerSpy).testEndpoint(DATA);
 
     mockMvc.perform(MockMvcRequestBuilders.get("/test")
         .param(DATA, DATA)

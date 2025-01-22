@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -169,7 +169,7 @@ class DebtPositionStatusCheckerTest {
   @Test
   void testCalculateNewStatus_InvalidStatus() {
     List<PaymentOptionStatus> paymentOptionStatusList = List.of();
-    Exception exception = assertThrows(InvalidStatusException.class, () -> checker.calculateNewStatus(paymentOptionStatusList));
+    Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(paymentOptionStatusList));
     assertEquals("Unable to determine status for DebtPosition", exception.getMessage());
   }
 

@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.exception.OperatorNotAuthorizedException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 
 /**
  * Service class responsible for verifying authorization on the DebtPositionType entity.

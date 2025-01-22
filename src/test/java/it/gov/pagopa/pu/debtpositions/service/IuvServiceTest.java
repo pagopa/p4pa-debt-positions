@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvSequenceNumberService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;

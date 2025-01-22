@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.exception;
+package it.gov.pagopa.pu.debtpositions.exception.custom;
 
 
 public class OperatorNotAuthorizedException extends RuntimeException {
