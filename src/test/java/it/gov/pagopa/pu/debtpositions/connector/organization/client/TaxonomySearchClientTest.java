@@ -1,6 +1,6 @@
-package it.gov.pagopa.pu.debtpositions.connector.taxonomy.client;
+package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
-import it.gov.pagopa.pu.debtpositions.connector.taxonomy.config.TaxonomyApisHolder;
+import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.client.generated.TaxonomySearchControllerApi;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import org.junit.jupiter.api.AfterEach;
@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 @ExtendWith(MockitoExtension.class)
 class TaxonomySearchClientTest {
     @Mock
-    private TaxonomyApisHolder taxonomyApisHolderMock;
+    private OrganizationApisHolder organizationApisHolder;
     @Mock
     private TaxonomySearchControllerApi taxonomySearchControllerApi;
 
@@ -23,13 +23,13 @@ class TaxonomySearchClientTest {
 
     @BeforeEach
     void setUp() {
-        taxonomySearchClient = new TaxonomySearchClient(taxonomyApisHolderMock);
+        taxonomySearchClient = new TaxonomySearchClient(organizationApisHolder);
     }
 
     @AfterEach
     void verifyNoMoreInteractions(){
         Mockito.verifyNoMoreInteractions(
-          taxonomyApisHolderMock
+          organizationApisHolder
         );
     }
 
@@ -40,7 +40,7 @@ class TaxonomySearchClientTest {
         String taxonomyCode = "TAXONOMYCODE";
         Taxonomy expectedResult = new Taxonomy();
 
-        Mockito.when(taxonomyApisHolderMock.getTaxonomyCodeDtoSearchControllerApi(accessToken))
+        Mockito.when(organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken))
                 .thenReturn(taxonomySearchControllerApi);
         Mockito.when(taxonomySearchControllerApi.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
                 .thenReturn(expectedResult);

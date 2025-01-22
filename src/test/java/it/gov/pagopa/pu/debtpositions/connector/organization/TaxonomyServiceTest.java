@@ -1,6 +1,6 @@
-package it.gov.pagopa.pu.debtpositions.connector.taxonomy;
+package it.gov.pagopa.pu.debtpositions.connector.organization;
 
-import it.gov.pagopa.pu.debtpositions.connector.taxonomy.client.TaxonomySearchClient;
+import it.gov.pagopa.pu.debtpositions.connector.organization.client.TaxonomySearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;

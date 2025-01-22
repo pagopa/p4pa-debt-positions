@@ -77,6 +77,9 @@ jwt:
                 -----END PUBLIC KEY-----}"
 
 rest:
+  default-timeout:
+    connect-millis: "\${DEFAULT_REST_CONNECT_TIMEOUT_MILLIS:60000}"
+    read-millis: "\${DEFAULT_REST_READ_TIMEOUT_MILLIS:60000}"
   organization:
     base-url: "\${ORGANIZATION_BASE_URL:http://p4pa-organization-microservice-chart:8080}"
 

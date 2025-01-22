@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.connector.taxonomy.TaxonomyService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.TaxonomyService;
 import it.gov.pagopa.pu.debtpositions.exception.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;

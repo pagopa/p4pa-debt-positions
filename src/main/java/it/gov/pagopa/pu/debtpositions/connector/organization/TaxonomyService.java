@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.connector.taxonomy;
+package it.gov.pagopa.pu.debtpositions.connector.organization;
 
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import java.util.Optional;
