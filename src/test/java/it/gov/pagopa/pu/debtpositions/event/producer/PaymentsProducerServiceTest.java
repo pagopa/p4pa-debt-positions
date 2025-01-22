@@ -48,7 +48,7 @@ class PaymentsProducerServiceTest {
                     PaymentEventDTO payload = (PaymentEventDTO) m.getPayload();
                     Assertions.assertSame(debtPosition, payload.getPayload());
                     Assertions.assertSame(eventType, payload.getEventType());
-                    Assertions.assertSame(debtPosition.getOrganizationId(), m.getHeaders().get(KafkaHeaders.KEY));
+                    Assertions.assertEquals(String.valueOf(debtPosition.getOrganizationId()), m.getHeaders().get(KafkaHeaders.KEY));
                     return true;
                 }));
     }
