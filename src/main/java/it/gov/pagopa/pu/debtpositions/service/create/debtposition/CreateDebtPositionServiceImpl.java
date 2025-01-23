@@ -12,7 +12,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,7 +37,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   }
 
   @Override
-  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
+  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean generateIuv) {
     log.info("START Create DebtPosition...");
     String accessToken = SecurityUtils.getAccessToken();
 
@@ -46,25 +45,27 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     validateInstallments(debtPositionDTO, accessToken);
 
     DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO).getFirst();
+
     long countDuplicates = installmentPIIRepository.countExistingDebtPosition(debtPosition);
     if (countDuplicates > 0) {
       log.error("Duplicate record found for DebtPosition with id {}", debtPositionDTO.getDebtPositionId());
       throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
     }
 
+    if (Boolean.TRUE.equals(generateIuv)) {
+      debtPositionDTO.getPaymentOptions().stream()
+        .flatMap(po -> po.getInstallments().stream())
+        .forEach(installment -> {
+          String orgFiscalCode = installment.getDebtor().getFiscalCode();
+          String generatedIuv = generateIuvService.generateIuv(orgFiscalCode, accessToken);
+          installment.iuv(generatedIuv);
+        });
+    }
+
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    //IS PAGOPA PAYMENT
-    debtPositionDTO.getPaymentOptions().stream()
-      .flatMap(po -> po.getInstallments().stream())
-      .forEach(installment -> {
-        String orgFiscalCode = installment.getDebtor().getFiscalCode();
-          String generatedIuv = generateIuvService.generateIuv(orgFiscalCode, accessToken);
-          //SAVE IUV
-      });
-
     log.info("END Create DebtPosition...");
-    return null;
+    return savedDebtPosition;
   }
 
   private void verifyAuthorization(DebtPositionDTO debtPositionDTO) {

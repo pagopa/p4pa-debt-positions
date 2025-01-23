@@ -10,8 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
@@ -52,6 +51,25 @@ public class DebtPositionFaker {
     debtPositionDTO.setCreationDate(DATE);
     debtPositionDTO.setUpdateDate(DATE);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
+    return debtPositionDTO;
+  }
+
+  public static DebtPositionDTO buildGeneratedIuvDebtPositionDTO() {
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
+    debtPositionDTO.setDebtPositionId(1L);
+    debtPositionDTO.setDebtPositionTypeOrgId(2L);
+    debtPositionDTO.setIupdOrg("IUPD_ORG");
+    debtPositionDTO.setDescription("Test Description");
+    debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
+    debtPositionDTO.setIngestionFlowFileId(1001L);
+    debtPositionDTO.setIngestionFlowFileLineNumber(10L);
+    debtPositionDTO.setOrganizationId(500L);
+    debtPositionDTO.setNotificationDate(DATE);
+    debtPositionDTO.setValidityDate(DATE);
+    debtPositionDTO.setFlagIuvVolatile(true);
+    debtPositionDTO.setCreationDate(DATE);
+    debtPositionDTO.setUpdateDate(DATE);
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));
     return debtPositionDTO;
   }
 }

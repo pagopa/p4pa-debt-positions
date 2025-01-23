@@ -1,8 +1,7 @@
-package it.gov.pagopa.pu.debtpositions.service;
+package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
 import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
-import it.gov.pagopa.pu.debtpositions.service.create.IuvSequenceNumberServiceImpl;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

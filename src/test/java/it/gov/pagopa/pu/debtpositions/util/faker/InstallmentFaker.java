@@ -134,4 +134,30 @@ public class InstallmentFaker {
       .build();
   }
 
+  public static InstallmentDTO buildGeneratedIuvInstallmentDTO() {
+    return InstallmentDTO.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status(InstallmentStatus.UNPAID)
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("generatedIuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .debtor(buildPersonDTO())
+      .transfers(new ArrayList<>(List.of(buildTransferDTO())))
+      .creationDate(date.atOffset(ZoneOffset.UTC))
+      .updateDate(date.atOffset(ZoneOffset.UTC))
+      .build();
+  }
+
 }

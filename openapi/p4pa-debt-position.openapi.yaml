@@ -19,6 +19,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: generateIuv
+          in: query
+          description: Indicates if IUV should be generated or not.
+          required: false
+          schema:
+            type: boolean
       requestBody:
         content:
           application/json:
