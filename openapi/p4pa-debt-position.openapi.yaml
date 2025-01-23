@@ -19,7 +19,7 @@ paths:
           required: false
           schema:
             type: boolean
-        - name: generateIuv
+        - name: pagopaPayment
           in: query
           description: Indicates if IUV should be generated or not.
           required: false

@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
@@ -21,23 +21,25 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
   private final DebtPositionMapper debtPositionMapper;
   private final ValidateDebtPositionService validateDebtPositionService;
-  private final InstallmentPIIRepository installmentPIIRepository;
   private final DebtPositionService debtPositionService;
   private final GenerateIuvService generateIuvService;
+  private final InstallmentNoPIIRepository installmentNoPIIRepository;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                       DebtPositionMapper debtPositionMapper, ValidateDebtPositionService validateDebtPositionService,
-                                       InstallmentPIIRepository installmentPIIRepository, DebtPositionService debtPositionService, GenerateIuvService generateIuvService) {
+                                       DebtPositionMapper debtPositionMapper,
+                                       ValidateDebtPositionService validateDebtPositionService,
+                                       DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
+                                       InstallmentNoPIIRepository installmentNoPIIRepository) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.debtPositionMapper = debtPositionMapper;
     this.validateDebtPositionService = validateDebtPositionService;
-    this.installmentPIIRepository = installmentPIIRepository;
     this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
+    this.installmentNoPIIRepository = installmentNoPIIRepository;
   }
 
   @Override
-  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean generateIuv) {
+  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment) {
     log.info("START Create DebtPosition...");
     String accessToken = SecurityUtils.getAccessToken();
 
@@ -46,13 +48,17 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO).getFirst();
 
-    long countDuplicates = installmentPIIRepository.countExistingDebtPosition(debtPosition);
-    if (countDuplicates > 0) {
-      log.error("Duplicate record found for DebtPosition with id {}", debtPositionDTO.getDebtPositionId());
-      throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
-    }
+    debtPosition.getPaymentOptions().stream()
+      .flatMap(po -> po.getInstallments().stream())
+      .forEach(installmentNoPII -> {
+        long countDuplicates = installmentNoPIIRepository.countExistingDebtPosition(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav());
+        if (countDuplicates > 0) {
+          log.error("Duplicate record found for Installment with id {}", installmentNoPII.getInstallmentId());
+          throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
+        }
+      });
 
-    if (Boolean.TRUE.equals(generateIuv)) {
+    if (Boolean.TRUE.equals(pagopaPayment)) {
       debtPositionDTO.getPaymentOptions().stream()
         .flatMap(po -> po.getInstallments().stream())
         .forEach(installment -> {

@@ -23,8 +23,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean generateIuv) {
-    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, generateIuv);
+  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment) {
+    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, pagopaPayment);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 

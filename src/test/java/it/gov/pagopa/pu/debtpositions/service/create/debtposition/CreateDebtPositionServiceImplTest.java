@@ -7,7 +7,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
@@ -40,7 +40,7 @@ class CreateDebtPositionServiceImplTest {
   @Mock
   private ValidateDebtPositionService validateDebtPositionService;
   @Mock
-  private InstallmentPIIRepository installmentPIIRepository;
+  private InstallmentNoPIIRepository installmentNoPIIRepository;
   @Mock
   private DebtPositionService debtPositionService;
   @Mock
@@ -54,7 +54,7 @@ class CreateDebtPositionServiceImplTest {
   @BeforeEach
   void setUp() {
     createDebtPositionService = new CreateDebtPositionServiceImpl(authorizeOperatorOnDebtPositionTypeService, debtPositionMapper,
-      validateDebtPositionService, installmentPIIRepository, debtPositionService, generateIuvService);
+      validateDebtPositionService, debtPositionService, generateIuvService, installmentNoPIIRepository);
   }
 
   @Test
@@ -72,7 +72,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionService).validate(debtPositionDTO, null);
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(installmentPIIRepository.countExistingDebtPosition(debtPosition)).thenReturn(0L);
+    Mockito.when(installmentNoPIIRepository.countExistingDebtPosition(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(debtPositionService.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, false);
@@ -96,7 +96,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionService).validate(debtPositionDTO, null);
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(installmentPIIRepository.countExistingDebtPosition(debtPosition)).thenReturn(2L);
+    Mockito.when(installmentNoPIIRepository.countExistingDebtPosition(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(2L);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, false, false)
@@ -120,7 +120,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionService).validate(debtPositionDTO, null);
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(installmentPIIRepository.countExistingDebtPosition(debtPosition)).thenReturn(0L);
+    Mockito.when(installmentNoPIIRepository.countExistingDebtPosition(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(generateIuvService.generateIuv(orgFiscalCode, null)).thenReturn("generatedIuv");
     Mockito.when(debtPositionService.saveDebtPosition(debtPositionDTO)).thenReturn(buildGeneratedIuvDebtPositionDTO());
 
