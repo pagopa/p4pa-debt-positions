@@ -25,6 +25,44 @@ spring:
     data:
       rest:
         basePath: crud
+    cloud:
+      function:
+        definition: paymentsProducer
+      stream:
+        binders:
+          kafka-payments-producer:
+            type: kafka
+            environment:
+              spring.cloud.stream.kafka.binder:
+                brokers: \${KAFKA_BINDER_BROKER:}
+                configuration:
+                  sasl.jaas.config: \${KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG:}
+                  key.serializer: org.apache.kafka.common.serialization.StringSerializer
+        bindings:
+          paymentsProducer-out-0:
+            binder: kafka-payments-producer
+            content-type: \${KAFKA_CONTENT_TYPE:application/json}
+            destination: \${KAFKA_TOPIC_PAYMENTS:}
+        kafka:
+          binder:
+            auto-create-topics: false
+            configuration:
+              heartbeat.interval.ms: \${KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS:3000}
+              session.timeout.ms: \${KAFKA_CONFIG_SESSION_TIMEOUT_MS:30000}
+              request.timeout.ms: \${KAFKA_CONFIG_REQUEST_TIMEOUT_MS:60000}
+              metadata.max.age.ms: \${KAFKA_CONFIG_METADATA_MAX_AGE:180000}
+              sasl.mechanism: \${KAFKA_CONFIG_SASL_MECHANISM:}
+              security.protocol: \${KAFKA_CONFIG_SECURITY_PROTOCOL:}
+              max.request.size: \${KAFKA_CONFIG_MAX_REQUEST_SIZE:1000000}
+          binders:
+            paymentsProducer-out-0:
+              producer:
+                configuration:
+                  client.id: debt-positions
+                  connections.max.idle.ms: \${KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME:180000}
+                  retry.backoff.ms: \${KAFKA_PAYMENTS_PRODUCER_RETRY_MS:\${KAFKA_RETRY_MS:10000}}
+                  linger.ms: \${KAFKA_PAYMENTS_PRODUCER_LINGER_MS:\${KAFKA_LINGER_MS:2}}
+                  batch.size: \${KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE:\${KAFKA_BATCH_SIZE:16384}}
 
 management:
     endpoints:

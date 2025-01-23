@@ -18,5 +18,5 @@ public interface TransferRepository extends JpaRepository<Transfer,Long> {
     "i.iuv = :iuv AND " +
     "i.iur = :iur AND " +
     "t.transferIndex = :transferIndex")
-  Optional<Transfer> findBySemanticKey(Long orgId, String iuv, String iur, Long transferIndex);
+  Optional<Transfer> findBySemanticKey(Long orgId, String iuv, String iur, int transferIndex);
 }
