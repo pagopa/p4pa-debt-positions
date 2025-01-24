@@ -43,7 +43,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    log.info("END Create DebtPosition...");
+    log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
   }
 
