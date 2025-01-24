@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.model.debtpositiontype;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import it.gov.pagopa.pu.debtpositions.config.json.LocalDateTimeToOffsetDateTimeSerializer;
 import jakarta.persistence.Entity;
@@ -32,6 +31,5 @@ public class DebtPositionTypeWithCount implements Serializable {
     + "FROM debt_position_type_org org "
     + "WHERE debt_position_type_id = org.debt_position_type_id)")
   private Integer activeOrganizations;
-  @JsonIgnore
   private Long brokerId;
 }
