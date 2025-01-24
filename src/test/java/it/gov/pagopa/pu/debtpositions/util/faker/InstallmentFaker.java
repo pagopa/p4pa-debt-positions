@@ -144,7 +144,7 @@ public class InstallmentFaker {
       .iuv("generatedIuv")
       .iur("iur")
       .iuf("iuf")
-      .nav("nav")
+      .nav("generatedNav")
       .dueDate(date.atOffset(ZoneOffset.UTC))
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)

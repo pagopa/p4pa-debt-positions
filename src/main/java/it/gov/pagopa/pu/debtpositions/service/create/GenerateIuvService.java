@@ -11,5 +11,7 @@ public interface GenerateIuvService {
    * @param orgId the fiscal code of the organization for which the IUV is requested
    * @return the IUV generated
    */
-  String generateIuv(String orgId, String accessToken);
+  String generateIuv(Long orgId, String accessToken);
+
+  String iuv2Nav(String iuv);
 }

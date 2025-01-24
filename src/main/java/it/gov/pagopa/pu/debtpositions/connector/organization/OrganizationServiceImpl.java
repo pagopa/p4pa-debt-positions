@@ -30,7 +30,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
-  public Optional<Organization> getOrganizationById(String orgId, String accessToken) {
+  public Optional<Organization> getOrganizationById(Long orgId, String accessToken) {
     return Optional.ofNullable(
       organizationSearchClient.findByOrganizationId(orgId, accessToken)
     );

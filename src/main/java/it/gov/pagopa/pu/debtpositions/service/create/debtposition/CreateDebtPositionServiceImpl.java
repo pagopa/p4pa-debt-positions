@@ -39,16 +39,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
-
-    if (Boolean.TRUE.equals(pagopaPayment)) {
-      debtPositionDTO.getPaymentOptions().stream()
-        .flatMap(po -> po.getInstallments().stream())
-        .forEach(installment -> {
-          Long orgId = debtPositionDTO.getOrganizationId();
-          String generatedIuv = generateIuvService.generateIuv(String.valueOf(orgId), accessToken);
-          installment.setIuv(generatedIuv);
-        });
-    }
+    generateIuv(debtPositionDTO, pagopaPayment, accessToken);
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
 
@@ -62,9 +53,23 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       .forEach(installmentNoPII -> {
         long countDuplicates = installmentNoPIIRepository.countExistingInstallments(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav());
         if (countDuplicates > 0) {
-          log.error("Duplicate record found for Installment with id {}", installmentNoPII.getInstallmentId());
+          log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav(), debtPositionDTO.getOrganizationId());
           throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
         }
       });
+  }
+
+  private void generateIuv(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
+    if (Boolean.TRUE.equals(pagopaPayment)) {
+      debtPositionDTO.getPaymentOptions().stream()
+        .flatMap(po -> po.getInstallments().stream())
+        .forEach(installment -> {
+          Long orgId = debtPositionDTO.getOrganizationId();
+          String generatedIuv = generateIuvService.generateIuv(orgId, accessToken);
+          String nav = generateIuvService.iuv2Nav(generatedIuv);
+          installment.setIuv(generatedIuv);
+          installment.setNav(nav);
+        });
+    }
   }
 }

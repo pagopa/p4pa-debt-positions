@@ -78,7 +78,7 @@ class OrganizationSearchClientTest {
   void whenFindByIdThenInvokeWithAccessToken() {
     // Given
     String accessToken = "ACCESSTOKEN";
-    String orgId = "ORGID";
+    String orgId = "1";
     Organization expectedResult = new Organization();
 
     Mockito.when(organizationApisHolderMock.getOrganizationEntityControllerApi(accessToken))
@@ -87,7 +87,7 @@ class OrganizationSearchClientTest {
       .thenReturn(expectedResult);
 
     // When
-    Organization result = organizationSearchClient.findByOrganizationId(orgId, accessToken);
+    Organization result = organizationSearchClient.findByOrganizationId(Long.valueOf(orgId), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);

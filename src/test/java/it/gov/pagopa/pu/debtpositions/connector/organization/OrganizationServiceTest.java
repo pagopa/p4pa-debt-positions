@@ -104,7 +104,7 @@ class OrganizationServiceTest {
   @Test
   void givenNotExistentOrgIdWhenGetOrganizationByIdThenEmpty(){
     // Given
-    String orgId = "ORGID";
+    Long orgId = 1L;
     Mockito.when(organizationSearchClientMock.findByOrganizationId(orgId, accessToken))
       .thenReturn(null);
 
@@ -118,13 +118,13 @@ class OrganizationServiceTest {
   @Test
   void givenExistentOrgIdWhenGetOrganizationByIdThenEmpty(){
     // Given
-    String orgIpaCode = "ORGID";
+    Long orgId = 1L;
     Organization expectedResult = new Organization();
-    Mockito.when(organizationSearchClientMock.findByOrganizationId(orgIpaCode, accessToken))
+    Mockito.when(organizationSearchClientMock.findByOrganizationId(orgId, accessToken))
       .thenReturn(expectedResult);
 
     // When
-    Optional<Organization> result = organizationService.getOrganizationById(orgIpaCode, accessToken);
+    Optional<Organization> result = organizationService.getOrganizationById(orgId, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());

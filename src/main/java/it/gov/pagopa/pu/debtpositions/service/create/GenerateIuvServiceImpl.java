@@ -21,12 +21,17 @@ public class GenerateIuvServiceImpl implements GenerateIuvService {
 
 
   @Override
-  public String generateIuv(String orgId, String accessToken) {
+  public String generateIuv(Long orgId, String accessToken) {
     Organization org = organizationService.getOrganizationById(orgId, accessToken)
       .orElseThrow(() -> new InvalidValueException("invalid organization"));
 
     String iuv = iuvService.generateIuv(org);
     log.debug("generated new IUV[{}] for organization[{}/{}]", iuv, org.getIpaCode(), org.getOrgFiscalCode());
     return iuv;
+  }
+
+  @Override
+  public String iuv2Nav(String iuv) {
+    return iuvService.iuv2Nav(iuv);
   }
 }

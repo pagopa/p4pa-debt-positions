@@ -34,29 +34,41 @@ class GenerateIuvServiceTest {
     .build();
   private static final String VALID_IUV = "12345678901234567";
 
-  private static final String INVALID_ORG_FISCAL_CODE = "INVALID_FISCAL_CODE";
-
   private final String accessToken = "ACCESSTOKEN";
 
   @Test
   void givenValidOrgWhenGenerateIuvThenOk() {
     //Given
-    Mockito.when(organizationService.getOrganizationById(VALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.of(VALID_ORG));
+    Long orgId = 1L;
+    Mockito.when(organizationService.getOrganizationById(orgId, accessToken)).thenReturn(Optional.of(VALID_ORG));
     Mockito.when(iuvService.generateIuv(VALID_ORG)).thenReturn(VALID_IUV);
     //When
-    String result = generateIuvService.generateIuv(VALID_ORG_FISCAL_CODE, accessToken);
+    String result = generateIuvService.generateIuv(orgId, accessToken);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationById(VALID_ORG_FISCAL_CODE, accessToken);
+    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationById(orgId, accessToken);
     Mockito.verify(iuvService, Mockito.times(1)).generateIuv(VALID_ORG);
   }
 
   @Test
   void givenInvalidOrgWhenGenerateIuvThenException() {
     //Given
-    Mockito.when(organizationService.getOrganizationById(INVALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.empty());
+    Mockito.when(organizationService.getOrganizationById(-1L, accessToken)).thenReturn(Optional.empty());
     //Verify
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(INVALID_ORG_FISCAL_CODE, accessToken));
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(-1L, accessToken));
     Assertions.assertEquals("invalid organization", exception.getMessage());
+  }
+
+  @Test
+  void givenValidIuvWhenGenerateNavThenOk() {
+    //Given
+    String iuv = "generatedIuv";
+    String nav = "3generatedIuv";
+    Mockito.when(iuvService.iuv2Nav(iuv)).thenReturn(nav);
+    //When
+    String result = generateIuvService.iuv2Nav(iuv);
+    //Verify
+    Assertions.assertEquals(nav, result);
+    Mockito.verify(iuvService, Mockito.times(1)).iuv2Nav(iuv);
   }
 }
