@@ -33,7 +33,8 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
   @Override
   public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment, String accessToken, String operatorExternalUserId) {
-    log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}, ingestionFlowFileId {}", debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg(), debtPositionDTO.getIngestionFlowFileId());
+    log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}, ingestionFlowFileId {}, rowNumber {}", debtPositionDTO.getOrganizationId(),
+      debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg(), debtPositionDTO.getIngestionFlowFileId(), debtPositionDTO.getIngestionFlowFileLineNumber());
 
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);

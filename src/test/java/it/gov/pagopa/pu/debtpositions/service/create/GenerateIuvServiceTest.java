@@ -41,27 +41,20 @@ class GenerateIuvServiceTest {
   @Test
   void givenValidOrgWhenGenerateIuvThenOk() {
     //Given
-    Mockito.when(organizationService.getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.of(VALID_ORG));
+    Mockito.when(organizationService.getOrganizationById(VALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.of(VALID_ORG));
     Mockito.when(iuvService.generateIuv(VALID_ORG)).thenReturn(VALID_IUV);
     //When
     String result = generateIuvService.generateIuv(VALID_ORG_FISCAL_CODE, accessToken);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationByFiscalCode(VALID_ORG_FISCAL_CODE, accessToken);
+    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationById(VALID_ORG_FISCAL_CODE, accessToken);
     Mockito.verify(iuvService, Mockito.times(1)).generateIuv(VALID_ORG);
-  }
-
-  @Test
-  void givenEmptyOrgWhenGenerateIuvThenException() {
-    //Verify
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv("", accessToken));
-    Assertions.assertEquals("invalid orgFiscalCode", exception.getMessage());
   }
 
   @Test
   void givenInvalidOrgWhenGenerateIuvThenException() {
     //Given
-    Mockito.when(organizationService.getOrganizationByFiscalCode(INVALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.empty());
+    Mockito.when(organizationService.getOrganizationById(INVALID_ORG_FISCAL_CODE, accessToken)).thenReturn(Optional.empty());
     //Verify
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(INVALID_ORG_FISCAL_CODE, accessToken));
     Assertions.assertEquals("invalid organization", exception.getMessage());

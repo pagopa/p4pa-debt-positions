@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
+import it.gov.pagopa.pu.organization.client.generated.OrganizationEntityControllerApi;
 import it.gov.pagopa.pu.organization.client.generated.OrganizationSearchControllerApi;
 import it.gov.pagopa.pu.organization.client.generated.TaxonomySearchControllerApi;
 import it.gov.pagopa.pu.organization.generated.ApiClient;
@@ -14,6 +15,8 @@ import org.springframework.web.client.RestTemplate;
 public class OrganizationApisHolder {
 
   private final OrganizationSearchControllerApi organizationSearchControllerApi;
+
+  private final OrganizationEntityControllerApi organizationEntityControllerApi;
 
   private final TaxonomySearchControllerApi taxonomySearchControllerApi;
 
@@ -30,6 +33,7 @@ public class OrganizationApisHolder {
 
     this.organizationSearchControllerApi = new OrganizationSearchControllerApi(apiClient);
     this.taxonomySearchControllerApi = new TaxonomySearchControllerApi(apiClient);
+    this.organizationEntityControllerApi = new OrganizationEntityControllerApi(apiClient);
   }
 
   @PreDestroy
@@ -46,6 +50,10 @@ public class OrganizationApisHolder {
 
   public TaxonomySearchControllerApi getTaxonomyCodeDtoSearchControllerApi(String accessToken) {
     return getApi(accessToken, taxonomySearchControllerApi);
+  }
+
+  public OrganizationEntityControllerApi getOrganizationEntityControllerApi(String accessToken) {
+    return getApi(accessToken, organizationEntityControllerApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {

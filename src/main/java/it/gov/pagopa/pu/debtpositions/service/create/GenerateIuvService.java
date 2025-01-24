@@ -8,8 +8,8 @@ public interface GenerateIuvService {
 
   /**
    * Generate a valid and unique IUV given the fiscal code of the organization.
-   * @param orgFiscalCode the fiscal code of the organization for which the IUV is requested
+   * @param orgId the fiscal code of the organization for which the IUV is requested
    * @return the IUV generated
    */
-  String generateIuv(String orgFiscalCode, String accessToken);
+  String generateIuv(String orgId, String accessToken);
 }
