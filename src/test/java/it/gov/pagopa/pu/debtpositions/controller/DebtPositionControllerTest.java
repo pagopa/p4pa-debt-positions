@@ -73,7 +73,7 @@ class DebtPositionControllerTest {
     Boolean massive = false;
     Boolean pagopaPayment = true;
 
-    Mockito.when(createDebtPositionService.createDebtPosition(inputDTO, massive, pagopaPayment))
+    Mockito.when(createDebtPositionService.createDebtPosition(inputDTO, massive, pagopaPayment, null, null))
       .thenReturn(buildDebtPositionDTO());
 
     MvcResult result = mockMvc.perform(

@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -24,7 +25,9 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment) {
-    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, pagopaPayment);
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, pagopaPayment, accessToken, operatorExternalUserId);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 

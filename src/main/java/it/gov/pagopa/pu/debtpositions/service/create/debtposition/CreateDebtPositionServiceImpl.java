@@ -2,15 +2,11 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -19,19 +15,16 @@ import org.springframework.stereotype.Service;
 public class CreateDebtPositionServiceImpl implements CreateDebtPositionService {
 
   private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
-  private final DebtPositionMapper debtPositionMapper;
   private final ValidateDebtPositionService validateDebtPositionService;
   private final DebtPositionService debtPositionService;
   private final GenerateIuvService generateIuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                       DebtPositionMapper debtPositionMapper,
                                        ValidateDebtPositionService validateDebtPositionService,
                                        DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
                                        InstallmentNoPIIRepository installmentNoPIIRepository) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
-    this.debtPositionMapper = debtPositionMapper;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
@@ -39,32 +32,20 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   }
 
   @Override
-  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment) {
-    log.info("START Create DebtPosition...");
-    String accessToken = SecurityUtils.getAccessToken();
+  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment, String accessToken, String operatorExternalUserId) {
+    log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}, ingestionFlowFileId {}", debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg(), debtPositionDTO.getIngestionFlowFileId());
 
-    verifyAuthorization(debtPositionDTO);
-    validateInstallments(debtPositionDTO, accessToken);
-
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO).getFirst();
-
-    debtPosition.getPaymentOptions().stream()
-      .flatMap(po -> po.getInstallments().stream())
-      .forEach(installmentNoPII -> {
-        long countDuplicates = installmentNoPIIRepository.countExistingDebtPosition(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav());
-        if (countDuplicates > 0) {
-          log.error("Duplicate record found for Installment with id {}", installmentNoPII.getInstallmentId());
-          throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
-        }
-      });
+    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+    validateDebtPositionService.validate(debtPositionDTO, accessToken);
+    verifyInstallmentUniqueness(debtPositionDTO);
 
     if (Boolean.TRUE.equals(pagopaPayment)) {
       debtPositionDTO.getPaymentOptions().stream()
         .flatMap(po -> po.getInstallments().stream())
         .forEach(installment -> {
-          String orgFiscalCode = installment.getDebtor().getFiscalCode();
-          String generatedIuv = generateIuvService.generateIuv(orgFiscalCode, accessToken);
-          installment.iuv(generatedIuv);
+          Long orgId = debtPositionDTO.getOrganizationId();
+          String generatedIuv = generateIuvService.generateIuv(String.valueOf(orgId), accessToken);
+          installment.setIuv(generatedIuv);
         });
     }
 
@@ -74,20 +55,15 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     return savedDebtPosition;
   }
 
-  private void verifyAuthorization(DebtPositionDTO debtPositionDTO) {
-    log.info("START Verify Authorization...");
-
-    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
-
-    log.info("END Verify Authorization, found DebtPositionTypeOrg id: {}", debtPositionTypeOrg.getDebtPositionTypeOrgId());
-  }
-
-  private void validateInstallments(DebtPositionDTO debtPositionDTO, String accessToken) {
-    log.info("START Validating installments...");
-
-    validateDebtPositionService.validate(debtPositionDTO, accessToken);
-
-    log.info("END validating installments");
+  private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO) {
+    debtPositionDTO.getPaymentOptions().stream()
+      .flatMap(po -> po.getInstallments().stream())
+      .forEach(installmentNoPII -> {
+        long countDuplicates = installmentNoPIIRepository.countExistingInstallments(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav());
+        if (countDuplicates > 0) {
+          log.error("Duplicate record found for Installment with id {}", installmentNoPII.getInstallmentId());
+          throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
+        }
+      });
   }
 }

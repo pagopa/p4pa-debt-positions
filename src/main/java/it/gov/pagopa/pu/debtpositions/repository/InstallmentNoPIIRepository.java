@@ -20,7 +20,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   void updateStatusAndIupdPagopa(@Param("installmentId") Long installmentId, @Param("iupdPagopa") String iupdPagopa, @Param("status") InstallmentStatus status);
 
   @Query("""
-    SELECT COUNT(dp)
+    SELECT COUNT(i)
     FROM DebtPosition dp
     JOIN dp.paymentOptions po
     JOIN po.installments i
@@ -28,5 +28,5 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
       AND i.status <> 'CANCELLED'
       AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
     """)
-  long countExistingDebtPosition(@Param("orgId") Long orgId, @Param("iud") String iud, @Param("iuv") String iuv, @Param("nav") String nav);
+  long countExistingInstallments(@Param("orgId") Long orgId, @Param("iud") String iud, @Param("iuv") String iuv, @Param("nav") String nav);
 }
