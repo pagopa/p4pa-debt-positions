@@ -23,11 +23,18 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Query("UPDATE DebtPosition d SET d.status = :status WHERE d.debtPositionId = :debtPositionId")
   void updateStatus(@Param("debtPositionId") Long debtPositionId, @Param("status") DebtPositionStatus status);
 
-  @Query(value = "SELECT d FROM DebtPosition d " +
-    "JOIN d.paymentOptions p " +
-    "JOIN p.installments i " +
-    "JOIN i.transfers t " +
-    "WHERE t.transferId = :transferId")
+  @Query("""
+   SELECT d
+   FROM DebtPosition d
+   WHERE EXISTS (
+      SELECT 1
+      FROM PaymentOption p
+         JOIN p.installments i
+         JOIN i.transfers t
+      WHERE p.debtPositionId = d.debtPositionId AND t.transferId = :transferId
+      )
+   """)
+  @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByTransferId(@Param("transferId") Long transferId);
 
 }

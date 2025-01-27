@@ -1,10 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.exception;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionErrorDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
@@ -35,9 +32,14 @@ public class DebtPositionExceptionHandler {
     return handleWorkflowErrorException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
   }
 
-  @ExceptionHandler({InvalidInstallmentStatusException.class})
+  @ExceptionHandler({InvalidStatusTransitionException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidInstallmentStatus(RuntimeException ex, HttpServletRequest request){
     return handleWorkflowErrorException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
+  }
+
+  @ExceptionHandler({DebtPositionNotFoundException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleDebtPositionNotFound(RuntimeException ex, HttpServletRequest request){
+    return handleWorkflowErrorException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
   }
 
   static ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(RuntimeException ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
