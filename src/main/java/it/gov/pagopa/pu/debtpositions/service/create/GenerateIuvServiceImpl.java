@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.connector.organization.OrganizationService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,15 +21,17 @@ public class GenerateIuvServiceImpl implements GenerateIuvService {
 
 
   @Override
-  public String generateIuv(String orgFiscalCode, String accessToken) {
-    if(StringUtils.isBlank(orgFiscalCode)){
-      throw new InvalidValueException("invalid orgFiscalCode");
-    }
-    Organization org = organizationService.getOrganizationByFiscalCode(orgFiscalCode, accessToken)
+  public String generateIuv(Long orgId, String accessToken) {
+    Organization org = organizationService.getOrganizationById(orgId, accessToken)
       .orElseThrow(() -> new InvalidValueException("invalid organization"));
 
     String iuv = iuvService.generateIuv(org);
     log.debug("generated new IUV[{}] for organization[{}/{}]", iuv, org.getIpaCode(), org.getOrgFiscalCode());
     return iuv;
+  }
+
+  @Override
+  public String iuv2Nav(String iuv) {
+    return iuvService.iuv2Nav(iuv);
   }
 }

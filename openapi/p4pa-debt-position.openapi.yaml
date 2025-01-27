@@ -19,6 +19,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: pagopaPayment
+          in: query
+          description: Indicates if IUV should be generated or not.
+          required: false
+          schema:
+            type: boolean
       requestBody:
         content:
           application/json:
@@ -40,6 +46,12 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "409":
+          description: Conflict
           content:
             application/json:
               schema:
@@ -523,6 +535,7 @@ components:
           type: string
           enum:
             - DEBT_POSITION_BAD_REQUEST
+            - DEBT_POSITION_CONFLICT
             - DEBT_POSITION_FORBIDDEN
             - DEBT_POSITION_GENERIC_ERROR
         message:

@@ -4,5 +4,5 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 
 public interface InstallmentPIIRepository {
 
-    long save(Installment installment);
+  long save(Installment installment);
 }
