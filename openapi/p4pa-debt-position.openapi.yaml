@@ -164,6 +164,8 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/DebtPositionStatus"
+        debtPositionOrigin:
+          $ref: "#/components/schemas/DebtPositionOrigin"
         ingestionFlowFileId:
           type: integer
           format: int64
@@ -245,6 +247,8 @@ components:
           format: int64
         status:
           $ref: "#/components/schemas/InstallmentStatus"
+        syncStatus:
+          $ref: "#/components/schemas/InstallmentSyncStatus"
         iupdPagopa:
           type: string
         iud:
@@ -456,6 +460,15 @@ components:
         - EXPIRED
         - UNPAID
         - DRAFT
+    DebtPositionOrigin:
+      type: string
+      enum:
+        - ORDINARY
+        - SPONTANEOUS
+        - SECONDARY_ORG
+        - RECEIPT_FILE
+        - RECEIPT_PAGOPA
+        - REPORTING_PAGOPA
     PaymentOptionStatus:
       type: string
       enum:
@@ -489,6 +502,16 @@ components:
         newStatus:
           $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
+          type: string
+    InstallmentSyncStatus:
+      required:
+        - syncStatusFrom
+        - syncStatusTo
+      type: object
+      properties:
+        syncStatusFrom:
+          type: string
+        syncStatusTo:
           type: string
     DebtPositionErrorDTO:
       type: object
