@@ -42,7 +42,6 @@ val micrometerVersion = "1.4.1"
 val postgresJdbcVersion = "42.7.4"
 val bouncycastleVersion = "1.79"
 val mapStructVersion = "1.6.3"
-val podamVersion = "8.0.2.RELEASE"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
@@ -83,7 +82,6 @@ dependencies {
 	testImplementation ("org.projectlombok:lombok")
   testAnnotationProcessor("org.projectlombok:lombok")
   testImplementation("com.h2database:h2")
-  testImplementation("uk.co.jemos.podam:podam:$podamVersion")
 }
 
 tasks.withType<Test> {
