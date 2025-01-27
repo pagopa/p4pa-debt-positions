@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.DebtPositionNotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -134,7 +134,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(null);
 
-    assertThrows(DebtPositionNotFoundException.class, () -> service.finalizeSyncStatus(id, syncStatusDTO),
+    assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(id, syncStatusDTO),
       "Debt position related to the id requested does not found");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, InstallmentStatus.REPORTED);
@@ -148,7 +148,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(null);
 
-    assertThrows(DebtPositionNotFoundException.class, () -> service.notifyReportedTransferId(transferId),
+    assertThrows(NotFoundException.class, () -> service.notifyReportedTransferId(transferId),
       "Debt position related to the transfer requested does not found");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);

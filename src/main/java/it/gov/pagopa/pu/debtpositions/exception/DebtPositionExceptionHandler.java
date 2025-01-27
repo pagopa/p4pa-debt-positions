@@ -46,11 +46,6 @@ public class DebtPositionExceptionHandler {
     return handleWorkflowErrorException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 
-  @ExceptionHandler({DebtPositionNotFoundException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleDebtPositionNotFound(RuntimeException ex, HttpServletRequest request){
-    return handleWorkflowErrorException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
-  }
-
   static ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(RuntimeException ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
     String message = logException(ex, request, httpStatus);
 

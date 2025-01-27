@@ -117,16 +117,4 @@ public class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
   }
 
-  @Test
-  void handleDebtPositionNotFoundExceptionError() throws Exception {
-    doThrow(new DebtPositionNotFoundException("Error")).when(testControllerSpy).testEndpoint(DATA);
-
-    mockMvc.perform(MockMvcRequestBuilders.get("/test")
-        .param(DATA, DATA)
-        .contentType(MediaType.APPLICATION_JSON)
-        .accept(MediaType.APPLICATION_JSON))
-      .andExpect(MockMvcResultMatchers.status().isNotFound())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_NOT_FOUND"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
-  }
 }

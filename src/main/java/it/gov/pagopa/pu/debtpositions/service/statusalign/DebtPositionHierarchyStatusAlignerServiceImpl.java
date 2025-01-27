@@ -3,8 +3,8 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.DebtPositionNotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -45,7 +45,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new DebtPositionNotFoundException("Debt position related to the id requested does not found");
+      throw new NotFoundException("Debt position related to the id requested does not found");
     }
 
     debtPosition.getPaymentOptions().forEach(paymentOption ->
@@ -84,7 +84,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
-      throw new DebtPositionNotFoundException("Debt position related to the transfer requested does not found");
+      throw new NotFoundException("Debt position related to the transfer requested does not found");
     }
 
     debtPosition.getPaymentOptions().stream()
