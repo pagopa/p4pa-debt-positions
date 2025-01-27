@@ -3,6 +3,12 @@ package it.gov.pagopa.pu.debtpositions.util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
+import uk.co.jemos.podam.api.AttributeMetadata;
+import uk.co.jemos.podam.api.DataProviderStrategy;
+import uk.co.jemos.podam.api.PodamFactory;
+import uk.co.jemos.podam.api.PodamFactoryImpl;
+import uk.co.jemos.podam.common.ManufacturingContext;
+import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -116,6 +122,17 @@ public class TestUtils {
       e.printStackTrace();
       throw new RuntimeException(e);
     }
+  }
+
+  public static PodamFactory getPodamFactory() {
+    PodamFactoryImpl podamFactory = new PodamFactoryImpl();
+    podamFactory.getStrategy().addOrReplaceTypeManufacturer(SortedSet.class, new AbstractTypeManufacturer<>(){
+      @Override
+      public SortedSet<?> getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, ManufacturingContext manufacturingCtx) {
+        return new TreeSet<>();
+      }
+    });
+    return podamFactory;
   }
 
 }

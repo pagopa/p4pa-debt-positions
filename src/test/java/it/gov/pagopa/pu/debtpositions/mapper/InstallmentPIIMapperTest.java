@@ -1,9 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -26,15 +29,22 @@ class InstallmentPIIMapperTest {
   @Mock
   private DataCipherService dataCipherServiceMock;
 
+  @Mock
+  private PersonalDataService personalDataServiceMock;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
   @BeforeEach
   void init(){
-    mapper = new InstallmentPIIMapper(dataCipherServiceMock);
+    mapper = new InstallmentPIIMapper(dataCipherServiceMock,personalDataServiceMock);
   }
 
   @AfterEach
   void verifyNotMoreInvocation() {
     Mockito.verifyNoMoreInteractions(dataCipherServiceMock);
   }
+
+  //region map(it.gov.pagopa.pu.debtpositions.dto.Installment)
 
   @Test
   void testMap(){
@@ -70,5 +80,23 @@ class InstallmentPIIMapperTest {
     checkNotNullFields(result.getFirst(), "transfers", "personalDataId", "debtorFiscalCodeHash");
     checkNotNullFields(result.getSecond());
   }
+
+  //endregion
+
+  //region map(it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII)
+  @Test
+  void testMapInstallmentNoPII(){
+    //given
+    InstallmentNoPII installmentNoPII = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    InstallmentPIIDTO installmentPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
+
+    //when
+    Installment result = mapper.map(installmentNoPII);
+    //then
+    TestUtils.checkNotNullFields(result,"noPII");
+    Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
+  }
+  //endregion
 
 }
