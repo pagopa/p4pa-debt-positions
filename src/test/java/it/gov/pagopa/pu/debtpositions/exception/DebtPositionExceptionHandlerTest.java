@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
@@ -85,6 +86,19 @@ public class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.status().isConflict())
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
+
+  }
+
+  @Test
+  void handleNotFoundException() throws Exception {
+    doThrow(new NotFoundException("NOT_FOUND_MESSAGE")).when(testControllerSpy).testEndpoint(DATA);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/test")
+        .param(DATA, DATA)
+        .contentType(MediaType.APPLICATION_JSON)
+        .accept(MediaType.APPLICATION_JSON))
+      .andExpect(MockMvcResultMatchers.status().isNotFound())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("resource not found: NOT_FOUND_MESSAGE"));
 
   }
 }
