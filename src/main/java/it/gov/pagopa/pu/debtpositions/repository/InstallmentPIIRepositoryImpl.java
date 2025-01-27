@@ -9,6 +9,8 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class InstallmentPIIRepositoryImpl implements InstallmentPIIRepository {
 
@@ -33,4 +35,10 @@ public class InstallmentPIIRepositoryImpl implements InstallmentPIIRepository {
         installment.getNoPII().setInstallmentId(newId);
         return newId;
     }
+
+  @Override
+  public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav) {
+    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav)
+      .stream().map(installmentPIIMapper::map).toList();
+  }
 }
