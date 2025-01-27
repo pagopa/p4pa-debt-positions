@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionErrorDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +33,11 @@ public class DebtPositionExceptionHandler {
   @ExceptionHandler({ConflictErrorException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
     return handleWorkflowErrorException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
+  }
+
+  @ExceptionHandler({NotFoundException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleNotFoundError(RuntimeException ex, HttpServletRequest request){
+    return handleWorkflowErrorException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
   }
 
   static ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(RuntimeException ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
