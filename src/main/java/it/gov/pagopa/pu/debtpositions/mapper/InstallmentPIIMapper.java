@@ -82,6 +82,7 @@ public class InstallmentPIIMapper {
       .updateOperatorExternalId(installmentNoPII.getUpdateOperatorExternalId())
       .debtor(pii.getDebtor())
       .transfers(List.copyOf(installmentNoPII.getTransfers()))
+      .noPII(installmentNoPII)
       .build();
   }
 }
