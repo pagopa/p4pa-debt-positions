@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import it.gov.pagopa.pu.organization.generated.ApiClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -46,5 +47,23 @@ class OrganizationApisHolderTest extends BaseApiHolderTest {
                 Organization.class,
                 organizationApisHolder::unload);
     }
+
+  @Test
+  void whenGetTaxonomyCodeDtoSearchControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken)
+        .crudTaxonomiesFindByTaxonomyCode("TAXONOMYCODE"),
+      Taxonomy.class,
+      organizationApisHolder::unload);
+  }
+
+  @Test
+  void whenGetOrganizationEntityControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> organizationApisHolder.getOrganizationEntityControllerApi(accessToken)
+        .crudGetOrganization("ORGID"),
+      Organization.class,
+      organizationApisHolder::unload);
+  }
 
 }
