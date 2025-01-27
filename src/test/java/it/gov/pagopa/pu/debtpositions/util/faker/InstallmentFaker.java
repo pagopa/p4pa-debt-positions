@@ -145,6 +145,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.UNPAID)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("generatedIuv")
