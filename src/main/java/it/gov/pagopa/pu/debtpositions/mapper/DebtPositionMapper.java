@@ -38,6 +38,7 @@ public class DebtPositionMapper {
     debtPosition.setNotificationDate(dto.getNotificationDate());
     debtPosition.setValidityDate(dto.getValidityDate());
     debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
+    debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
     debtPosition.setCreationDate(dto.getCreationDate().toLocalDateTime());
     debtPosition.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
 
@@ -69,6 +70,7 @@ public class DebtPositionMapper {
       .notificationDate(debtPosition.getNotificationDate())
       .validityDate(debtPosition.getValidityDate())
       .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
+      .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
       .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
       .paymentOptions(
