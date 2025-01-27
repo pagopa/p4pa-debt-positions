@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.List;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentPIIRepositoryImplTest {
@@ -27,6 +31,8 @@ class InstallmentPIIRepositoryImplTest {
   private InstallmentPIIMapper mapperMock;
 
   private InstallmentPIIRepository installmentPIIRepository;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void init() {
@@ -59,4 +65,21 @@ class InstallmentPIIRepositoryImplTest {
     Assertions.assertSame(p.getFirst(), installment.getNoPII());
 
   }
+
+  @Test
+  void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk() {
+    // Given
+    List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV")).thenReturn(installmentDTOList);
+    installmentDTOList.forEach(installmentNoPII -> Mockito.when(mapperMock.map(installmentNoPII)).thenReturn(Installment.builder().build()));
+
+    // When
+    List<Installment> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV");
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(installmentDTOList.size(), result.size());
+    installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
+  }
+
 }

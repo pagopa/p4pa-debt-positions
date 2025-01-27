@@ -66,5 +66,17 @@ class InstallmentMapperTest {
     reflectionEqualsByName(installmentExpected, result, "debtor");
     checkNotNullFields(result, "debtor");
   }
+
+  @Test
+  void givenMapInstallmentToDtoThenOk(){
+    Installment installmentExpected = buildInstallment();
+
+    Mockito.when(transferMapperMock.mapToDto(buildTransfer())).thenReturn(buildTransferDTO());
+
+    InstallmentDTO result = installmentMapper.mapToDto(installmentExpected);
+
+    reflectionEqualsByName(installmentExpected, result, "debtor");  //TODO P4ADEV-2028
+    checkNotNullFields(result, "debtor");  //TODO P4ADEV-2028
+  }
 }
 
