@@ -91,7 +91,7 @@ class PersonalDataServiceTest {
   @Test
   void givenNotFoundPersonalDataIdWhenGetThenException(){
     //given
-    Mockito.when(repositoryMock.findById(1L)).thenReturn(null);
+    Mockito.when(repositoryMock.findById(1L)).thenReturn(Optional.empty());
     //when
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.get(1L, InstallmentPIIDTO.class));
     //then
