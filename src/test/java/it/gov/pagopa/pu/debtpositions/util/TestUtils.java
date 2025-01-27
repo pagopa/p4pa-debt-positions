@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Assertions;
 import uk.co.jemos.podam.api.AttributeMetadata;
@@ -10,11 +11,13 @@ import uk.co.jemos.podam.api.PodamFactoryImpl;
 import uk.co.jemos.podam.common.ManufacturingContext;
 import uk.co.jemos.podam.typeManufacturers.AbstractTypeManufacturer;
 
-import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.math.BigInteger;
 import java.time.OffsetDateTime;
 import java.time.chrono.ChronoZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
 
 @Slf4j
@@ -65,7 +68,7 @@ public class TestUtils {
             if (v1 != null) {
               if (v1.equals(v2)) {
                 //Do Nothing
-              } else if (v1 instanceof Comparable && v2 instanceof Comparable && ((Comparable) v1).compareTo(v2) == 0) {
+              } else if (v1 instanceof Comparable v1Comparable && v2 instanceof Comparable v2Comparable && compareEquals(v1Comparable, v2Comparable)) {
                 //Do Nothing
               } else if (OffsetDateTime.class.isAssignableFrom(v1.getClass()) && OffsetDateTime.class.isAssignableFrom(v2.getClass())) {
                 result = ((OffsetDateTime) v1).isEqual((OffsetDateTime) v2);
@@ -87,6 +90,16 @@ public class TestUtils {
               } else if (String.class.isAssignableFrom(v2.getClass()) && Enum.class.isAssignableFrom(v1.getClass())) {
                 v1 = ReflectionUtils.enum2String((Enum<?>) v1);
                 result = v2.equals(v1);
+              } else if (v1 instanceof Collection<?> collV1 && v2 instanceof Collection<?> collV2 && collV1.size() == collV2.size()) {
+                Iterator<?> it1 = collV1.iterator();
+                Iterator<?> it2 = collV2.iterator();
+                while (it1.hasNext() && it2.hasNext()) {
+                  checked.addAll(reflectionEqualsByName(it1.next(), it2.next()));
+                }
+              } else if (v1.getClass().isArray() && v2.getClass().isArray() && Array.getLength(v1) == Array.getLength(v2)) {
+                for (int i = 0; i < Array.getLength(v1); i++) {
+                  checked.addAll(reflectionEqualsByName(Array.get(v1, i), Array.get(v2, i)));
+                }
               } else {
                 boolean equals = v1.toString().equals(v2.toString());
                 if (Enum.class.isAssignableFrom(v2.getClass()) && Enum.class.isAssignableFrom(v1.getClass())) {
@@ -94,7 +107,9 @@ public class TestUtils {
                 } else if (String.class.isAssignableFrom(v1.getClass()) || String.class.isAssignableFrom(v2.getClass())) {
                   result = equals;
                 } else {
-                  checked.addAll(reflectionEqualsByName(v1, v2));
+                  List<Method> addedMethods = reflectionEqualsByName(v1, v2);
+                  Assertions.assertFalse(addedMethods.isEmpty(), String.format("Invalid compare between methods%n%s = %s%n%s = %s", m1, v1, m2, v2));
+                  checked.addAll(addedMethods);
                 }
               }
 
@@ -104,14 +119,30 @@ public class TestUtils {
             Assertions.assertTrue(result, String.format("Invalid compare between methods%n%s = %s%n%s = %s", m1, v1, m2, v2));
           } catch (NoSuchMethodException e) {
             log.warn("Method {} is not defined in {}{}", m1, o2.getClass().getName(), e.getMessage());
-          } catch (IllegalAccessException |
-                   InvocationTargetException e) {
-            throw new IllegalStateException(String.format("[ERROR] Something gone wrong comparing %s with %s%n%s", m1, m2, e.getMessage()));
+          } catch (Exception e) {
+            throw new IllegalStateException(String.format("[ERROR] Something gone wrong comparing %s with %s%n%s", m1, m2, e.getMessage()), e);
           }
         }
       }
     }
     return checked;
+  }
+
+  private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnnnnn");
+  private static <T> boolean compareEquals(Comparable<T> v1, T v2) {
+    try {
+      //specific equality tests for TemporalAccessor classes
+      if(v1 instanceof TemporalAccessor v1Time && v2 instanceof TemporalAccessor v2Time){
+        //ignore timezone (for localDate/Time objects)
+        return StringUtils.equals(formatter.format(v1Time), formatter.format(v2Time));
+      } else {
+        //generic fallback
+        return v1.compareTo(v2)==0;
+      }
+    } catch (ClassCastException cce) {
+      log.warn("cannot compare {} with {}", ClassUtils.getName(v1), ClassUtils.getName(v2));
+      return false;
+    }
   }
 
   private static boolean hasStandardEquals(Class<?> clazz) {
