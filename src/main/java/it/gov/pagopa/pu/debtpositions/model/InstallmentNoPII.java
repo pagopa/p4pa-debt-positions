@@ -47,6 +47,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private Long personalDataId;
   private Character debtorEntityType;
   private byte[] debtorFiscalCodeHash;
+  private String syncStatusFrom;
+  private String syncStatusTo;
 
   @OneToMany(mappedBy = "installmentId")
   private SortedSet<Transfer> transfers;

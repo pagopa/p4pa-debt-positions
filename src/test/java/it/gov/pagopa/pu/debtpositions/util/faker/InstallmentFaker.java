@@ -12,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
@@ -27,6 +28,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -54,6 +56,8 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatusFrom("syncStatusFrom")
+      .syncStatusTo("syncStatusTo")
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -87,6 +91,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -113,6 +118,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.UNPAID)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -139,6 +145,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.UNPAID)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("generatedIuv")

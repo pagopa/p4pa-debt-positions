@@ -28,7 +28,8 @@ public class InstallmentPIIMapper {
     installmentNoPII.setInstallmentId(installment.getInstallmentId());
     installmentNoPII.setPaymentOptionId(installment.getPaymentOptionId());
     installmentNoPII.setStatus(installment.getStatus());
-    installmentNoPII.setIupdPagopa(installment.getIupdPagopa());
+    installmentNoPII.setSyncStatusFrom(installment.getSyncStatus().getSyncStatusFrom());
+    installmentNoPII.setSyncStatusTo(installment.getSyncStatus().getSyncStatusTo());installmentNoPII.setIupdPagopa(installment.getIupdPagopa());
     installmentNoPII.setIud(installment.getIud());
     installmentNoPII.setIuv(installment.getIuv());
     installmentNoPII.setIur(installment.getIur());
