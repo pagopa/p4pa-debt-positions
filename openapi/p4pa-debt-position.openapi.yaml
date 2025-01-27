@@ -19,6 +19,12 @@ paths:
           required: false
           schema:
             type: boolean
+        - name: pagopaPayment
+          in: query
+          description: Indicates if IUV should be generated or not.
+          required: false
+          schema:
+            type: boolean
       requestBody:
         content:
           application/json:
@@ -40,6 +46,12 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "403":
           description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "409":
+          description: Conflict
           content:
             application/json:
               schema:
@@ -164,6 +176,8 @@ components:
           type: string
         status:
           $ref: "#/components/schemas/DebtPositionStatus"
+        debtPositionOrigin:
+          $ref: "#/components/schemas/DebtPositionOrigin"
         ingestionFlowFileId:
           type: integer
           format: int64
@@ -245,6 +259,8 @@ components:
           format: int64
         status:
           $ref: "#/components/schemas/InstallmentStatus"
+        syncStatus:
+          $ref: "#/components/schemas/InstallmentSyncStatus"
         iupdPagopa:
           type: string
         iud:
@@ -456,6 +472,15 @@ components:
         - EXPIRED
         - UNPAID
         - DRAFT
+    DebtPositionOrigin:
+      type: string
+      enum:
+        - ORDINARY
+        - SPONTANEOUS
+        - SECONDARY_ORG
+        - RECEIPT_FILE
+        - RECEIPT_PAGOPA
+        - REPORTING_PAGOPA
     PaymentOptionStatus:
       type: string
       enum:
@@ -490,6 +515,16 @@ components:
           $ref: "#/components/schemas/InstallmentStatus"
         iupdPagopa:
           type: string
+    InstallmentSyncStatus:
+      required:
+        - syncStatusFrom
+        - syncStatusTo
+      type: object
+      properties:
+        syncStatusFrom:
+          type: string
+        syncStatusTo:
+          type: string
     DebtPositionErrorDTO:
       type: object
       required:
@@ -500,6 +535,7 @@ components:
           type: string
           enum:
             - DEBT_POSITION_BAD_REQUEST
+            - DEBT_POSITION_CONFLICT
             - DEBT_POSITION_FORBIDDEN
             - DEBT_POSITION_GENERIC_ERROR
         message:

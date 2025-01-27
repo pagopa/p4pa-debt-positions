@@ -12,6 +12,7 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
@@ -27,6 +28,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -54,6 +56,8 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatusFrom("syncStatusFrom")
+      .syncStatusTo("syncStatusTo")
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -87,6 +91,7 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
@@ -113,12 +118,40 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.UNPAID)
+      .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
+      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .notificationFeeCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
+      .balance("balance")
+      .debtor(buildPersonDTO())
+      .transfers(new ArrayList<>(List.of(buildTransferDTO())))
+      .creationDate(date.atOffset(ZoneOffset.UTC))
+      .updateDate(date.atOffset(ZoneOffset.UTC))
+      .build();
+  }
+
+  public static InstallmentDTO buildGeneratedIuvInstallmentDTO() {
+    return InstallmentDTO.builder()
+      .installmentId(1L)
+      .paymentOptionId(1L)
+      .status(InstallmentStatus.UNPAID)
+      .syncStatus(buildInstallmentSyncStatus())
+      .iupdPagopa("iupdPagoPa")
+      .iud("iud")
+      .iuv("generatedIuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("generatedNav")
       .dueDate(date.atOffset(ZoneOffset.UTC))
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)

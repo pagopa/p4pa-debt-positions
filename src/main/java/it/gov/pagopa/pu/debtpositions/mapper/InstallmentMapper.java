@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,7 @@ public class InstallmentMapper {
     installment.setInstallmentId(dto.getInstallmentId());
     installment.setPaymentOptionId(dto.getPaymentOptionId());
     installment.setStatus(dto.getStatus());
+    installment.setSyncStatus(dto.getSyncStatus());
     installment.setIupdPagopa(dto.getIupdPagopa());
     installment.setIud(dto.getIud());
     installment.setIuv(dto.getIuv());
@@ -52,6 +54,7 @@ public class InstallmentMapper {
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
       .status(installment.getStatus())
+      .syncStatus(InstallmentSyncStatus.builder().syncStatusFrom(installment.getSyncStatusFrom()).syncStatusTo(installment.getSyncStatusTo()).build())
       .iupdPagopa(installment.getIupdPagopa())
       .iud(installment.getIud())
       .iuv(installment.getIuv())
