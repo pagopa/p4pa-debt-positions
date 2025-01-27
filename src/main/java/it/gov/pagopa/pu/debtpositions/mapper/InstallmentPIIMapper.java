@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -65,6 +66,10 @@ public class InstallmentPIIMapper {
       .installmentId(installmentNoPII.getInstallmentId())
       .paymentOptionId(installmentNoPII.getPaymentOptionId())
       .status(installmentNoPII.getStatus())
+      .syncStatus(InstallmentSyncStatus.builder()
+        .syncStatusFrom(installmentNoPII.getSyncStatusFrom())
+        .syncStatusTo(installmentNoPII.getSyncStatusTo())
+        .build())
       .iupdPagopa(installmentNoPII.getIupdPagopa())
       .iud(installmentNoPII.getIud())
       .iuv(installmentNoPII.getIuv())

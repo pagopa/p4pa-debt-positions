@@ -82,6 +82,7 @@ public class InstallmentMapper {
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
       .status(installment.getStatus())
+      .syncStatus(installment.getSyncStatus())
       .iupdPagopa(installment.getIupdPagopa())
       .iud(installment.getIud())
       .iuv(installment.getIuv())
