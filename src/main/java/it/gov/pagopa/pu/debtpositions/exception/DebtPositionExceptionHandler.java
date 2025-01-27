@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionErrorDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,6 +33,11 @@ public class DebtPositionExceptionHandler {
   @ExceptionHandler({ConflictErrorException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
     return handleWorkflowErrorException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
+  }
+
+  @ExceptionHandler({InvalidInstallmentStatusException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleInvalidInstallmentStatus(RuntimeException ex, HttpServletRequest request){
+    return handleWorkflowErrorException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 
   static ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(RuntimeException ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {

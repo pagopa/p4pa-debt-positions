@@ -19,6 +19,12 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Query("UPDATE InstallmentNoPII i SET i.status = :status, i.iupdPagopa = :iupdPagopa WHERE i.installmentId = :installmentId")
   void updateStatusAndIupdPagopa(@Param("installmentId") Long installmentId, @Param("iupdPagopa") String iupdPagopa, @Param("status") InstallmentStatus status);
 
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
+  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
+
   @Query("""
     SELECT COUNT(i)
     FROM DebtPosition dp

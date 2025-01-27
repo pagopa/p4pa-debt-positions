@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -48,13 +49,13 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           boolean isToSync = TO_SYNC.equals(installment.getStatus());
           boolean iud2Update = syncStatusDTO.containsKey(installment.getIud());
 
-          if (!iud2Update  && isToSync) {
+          if (!iud2Update && isToSync) {
             log.error("Installment with IUD [{}] is TO_SYNC but not present in the input map", installment.getIud());
-          } else if (iud2Update  && !isToSync) {
+          } else if (iud2Update && !isToSync) {
             log.error("Installment with IUD [{}] is present in the input map but does not have TO_SYNC status", installment.getIud());
           }
 
-          return isToSync && iud2Update ;
+          return isToSync && iud2Update;
         })
         .forEach(installment -> {
           IupdSyncStatusUpdateDTO updateDTO = syncStatusDTO.get(installment.getIud());
@@ -66,6 +67,34 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
             installment.getInstallmentId(),
             updateDTO.getIupdPagopa(),
             newStatus
+          );
+        })
+    );
+
+    debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
+    debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
+
+    return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  @Override
+  public DebtPositionDTO notifyReportedTransferId(Long transferId) {
+    DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
+
+    debtPosition.getPaymentOptions().forEach(paymentOption ->
+      paymentOption.getInstallments().stream()
+        .filter(installment -> {
+          boolean isToBeReported = installment.getTransfers().stream().anyMatch(transfer -> transfer.getTransferId().equals(transferId));
+          if (isToBeReported && !installment.getStatus().equals(InstallmentStatus.PAID)) {
+            throw new InvalidInstallmentStatusException("The installment is not in the paid status to be set in reported status");
+          }
+          return isToBeReported;
+        })
+        .forEach(installment -> {
+          InstallmentStatus newStatus = InstallmentStatus.REPORTED;
+          installment.setStatus(newStatus);
+          log.info("Updating status {} for installment with id {}", newStatus, installment.getInstallmentId());
+          installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus
           );
         })
     );
