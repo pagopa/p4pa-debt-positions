@@ -91,14 +91,15 @@ public class DebtPositionExceptionHandlerTest {
 
   @Test
   void handleNotFoundException() throws Exception {
-    doThrow(new NotFoundException("NOT_FOUND_MESSAGE")).when(testControllerSpy).testEndpoint(DATA);
+    doThrow(new NotFoundException("Error")).when(testControllerSpy).testEndpoint(DATA);
 
     mockMvc.perform(MockMvcRequestBuilders.get("/test")
         .param(DATA, DATA)
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.status().isNotFound())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("resource not found: NOT_FOUND_MESSAGE"));
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_NOT_FOUND"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
 
   }
 }

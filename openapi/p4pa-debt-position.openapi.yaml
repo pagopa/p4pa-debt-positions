@@ -547,5 +547,6 @@ components:
             - DEBT_POSITION_CONFLICT
             - DEBT_POSITION_FORBIDDEN
             - DEBT_POSITION_GENERIC_ERROR
+            - DEBT_POSITION_NOT_FOUND
         message:
           type: string

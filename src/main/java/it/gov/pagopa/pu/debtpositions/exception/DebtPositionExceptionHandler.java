@@ -7,13 +7,11 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.api.ErrorMessage;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 
@@ -37,18 +35,9 @@ public class DebtPositionExceptionHandler {
     return handleWorkflowErrorException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
   }
 
-  @ExceptionHandler(NotFoundException.class)
-  @ResponseStatus(value = HttpStatus.NOT_FOUND)
-  public ErrorMessage resourceNotFoundException(NotFoundException ex, HttpServletRequest request) {
-    if (log.isInfoEnabled()) {
-      String logMessage = "A ResourceNotFoundException occurred handling request %s - HttpStatus %s - %s"
-        .formatted(getRequestDetails(request), HttpStatus.NOT_FOUND.value(), ex.getMessage());
-      if (log.isDebugEnabled())
-        log.debug(logMessage, ex);
-      else
-        log.info(logMessage);
-    }
-    return new ErrorMessage("resource not found: %s".formatted(ex.getMessage()));
+  @ExceptionHandler({NotFoundException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleNotFoundError(RuntimeException ex, HttpServletRequest request){
+    return handleWorkflowErrorException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
   }
 
   static ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(RuntimeException ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
