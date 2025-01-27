@@ -9,6 +9,7 @@ import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class InstallmentPIIMapper {
@@ -81,7 +82,7 @@ public class InstallmentPIIMapper {
       .updateDate(installmentNoPII.getUpdateDate())
       .updateOperatorExternalId(installmentNoPII.getUpdateOperatorExternalId())
       .debtor(pii.getDebtor())
-      .transfers(List.copyOf(installmentNoPII.getTransfers()))
+      .transfers(Optional.ofNullable(installmentNoPII.getTransfers()).map(List::copyOf).orElse(List.of()))
       .noPII(installmentNoPII)
       .build();
   }

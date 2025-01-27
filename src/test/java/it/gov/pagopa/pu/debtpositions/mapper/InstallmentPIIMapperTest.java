@@ -32,8 +32,6 @@ class InstallmentPIIMapperTest {
   @Mock
   private PersonalDataService personalDataServiceMock;
 
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
-
   @BeforeEach
   void init(){
     mapper = new InstallmentPIIMapper(dataCipherServiceMock,personalDataServiceMock);
@@ -87,8 +85,8 @@ class InstallmentPIIMapperTest {
   @Test
   void testMapInstallmentNoPII(){
     //given
-    InstallmentNoPII installmentNoPII = podamFactory.manufacturePojo(InstallmentNoPII.class);
-    InstallmentPIIDTO installmentPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
     Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
 
     //when
