@@ -24,9 +24,9 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   void updateStatus(@Param("debtPositionId") Long debtPositionId, @Param("status") DebtPositionStatus status);
 
   @Query(value = "SELECT d FROM DebtPosition d " +
-    "JOIN FETCH d.paymentOptions p " +
-    "JOIN FETCH p.installments i " +
-    "JOIN FETCH i.transfers t " +
+    "JOIN d.paymentOptions p " +
+    "JOIN p.installments i " +
+    "JOIN i.transfers t " +
     "WHERE t.transferId = :transferId")
   DebtPosition findByTransferId(@Param("transferId") Long transferId);
 
