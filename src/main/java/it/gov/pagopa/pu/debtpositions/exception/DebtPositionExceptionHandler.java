@@ -42,7 +42,7 @@ public class DebtPositionExceptionHandler {
   }
 
   @ExceptionHandler({InvalidStatusTransitionException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleInvalidInstallmentStatus(RuntimeException ex, HttpServletRequest request){
+  public ResponseEntity<DebtPositionErrorDTO> handleInvalidStatusTransitionException(RuntimeException ex, HttpServletRequest request){
     return handleWorkflowErrorException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 

@@ -45,7 +45,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new NotFoundException("Debt position related to the id requested does not found");
+      throw new NotFoundException("Debt position related to the id " + debtPositionId + " does not found");
     }
 
     debtPosition.getPaymentOptions().forEach(paymentOption ->
@@ -76,7 +76,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         })
     );
 
-    return updateAllStatus(debtPosition);
+    return alignHierarchyStatus(debtPosition);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
-      throw new NotFoundException("Debt position related to the transfer requested does not found");
+      throw new NotFoundException("Debt position related to the transfer with id " + transferId + " does not found");
     }
 
     debtPosition.getPaymentOptions().stream()
@@ -96,19 +96,19 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           case InstallmentStatus.REPORTED -> false;
           case InstallmentStatus.PAID -> true;
           default ->
-            throw new InvalidStatusTransitionException("The installment is not in the paid status to be set in reported status");
+            throw new InvalidStatusTransitionException("The installment with id " + i.getInstallmentId() + " is not in the paid status to be set in reported status");
         })
       .ifPresent(installment -> {
         InstallmentStatus newStatus = InstallmentStatus.REPORTED;
         installment.setStatus(newStatus);
-        log.info("Updating status {} for installment with id {}", newStatus, installment.getInstallmentId());
+        log.info("Updating status {} for installment with id {} after report notification on transfer {}", newStatus, installment.getInstallmentId(), transferId);
         installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
       });
 
-    return updateAllStatus(debtPosition);
+    return alignHierarchyStatus(debtPosition);
   }
 
-  private DebtPositionDTO updateAllStatus(DebtPosition debtPosition) {
+  private DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition) {
     debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
     debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
 

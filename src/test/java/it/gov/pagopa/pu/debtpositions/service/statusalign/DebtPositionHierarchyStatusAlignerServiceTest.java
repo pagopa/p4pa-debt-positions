@@ -135,7 +135,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(null);
 
     assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(id, syncStatusDTO),
-      "Debt position related to the id requested does not found");
+      "Debt position related to the id 1 does not found");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, InstallmentStatus.REPORTED);
     verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
@@ -149,7 +149,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(null);
 
     assertThrows(NotFoundException.class, () -> service.notifyReportedTransferId(transferId),
-      "Debt position related to the transfer requested does not found");
+      "Debt position related to the transfer with id 1 does not found");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
     verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
@@ -165,7 +165,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(debtPosition);
 
     assertThrows(InvalidStatusTransitionException.class, () -> service.notifyReportedTransferId(transferId),
-      "The installment is not in the paid status to be set in reported status");
+      "The installment with id 1 is not in the paid status to be set in reported status");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
     verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
