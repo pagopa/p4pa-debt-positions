@@ -29,8 +29,7 @@ public class InstallmentPIIMapper {
     installmentNoPII.setInstallmentId(installment.getInstallmentId());
     installmentNoPII.setPaymentOptionId(installment.getPaymentOptionId());
     installmentNoPII.setStatus(installment.getStatus());
-    installmentNoPII.setSyncStatusFrom(installment.getSyncStatus().getSyncStatusFrom());
-    installmentNoPII.setSyncStatusTo(installment.getSyncStatus().getSyncStatusTo());installmentNoPII.setIupdPagopa(installment.getIupdPagopa());
+    installmentNoPII.setIupdPagopa(installment.getIupdPagopa());
     installmentNoPII.setIud(installment.getIud());
     installmentNoPII.setIuv(installment.getIuv());
     installmentNoPII.setIur(installment.getIur());
@@ -54,6 +53,12 @@ public class InstallmentPIIMapper {
       installmentNoPII.setPersonalDataId(installment.getNoPII().getPersonalDataId());
     }
 
+    if(installment.getSyncStatus() != null){
+      installmentNoPII.setSyncStatus(InstallmentSyncStatus.builder()
+        .syncStatusFrom(installment.getSyncStatus().getSyncStatusFrom())
+        .syncStatusTo(installment.getSyncStatus().getSyncStatusTo()).build());
+    }
+
     InstallmentPIIDTO installmentPIIDTO = InstallmentPIIDTO.builder()
       .debtor(installment.getDebtor()).build();
 
@@ -62,14 +67,10 @@ public class InstallmentPIIMapper {
 
   public Installment map(InstallmentNoPII installmentNoPII) {
     InstallmentPIIDTO pii = personalDataService.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
-    return Installment.builder()
+    Installment installment = Installment.builder()
       .installmentId(installmentNoPII.getInstallmentId())
       .paymentOptionId(installmentNoPII.getPaymentOptionId())
       .status(installmentNoPII.getStatus())
-      .syncStatus(InstallmentSyncStatus.builder()
-        .syncStatusFrom(installmentNoPII.getSyncStatusFrom())
-        .syncStatusTo(installmentNoPII.getSyncStatusTo())
-        .build())
       .iupdPagopa(installmentNoPII.getIupdPagopa())
       .iud(installmentNoPII.getIud())
       .iuv(installmentNoPII.getIuv())
@@ -91,5 +92,13 @@ public class InstallmentPIIMapper {
       .transfers(Optional.ofNullable(installmentNoPII.getTransfers()).map(List::copyOf).orElse(List.of()))
       .noPII(installmentNoPII)
       .build();
+
+    if(installmentNoPII.getSyncStatus() != null) {
+      installment.setSyncStatus(InstallmentSyncStatus.builder()
+        .syncStatusFrom(installmentNoPII.getSyncStatus().getSyncStatusFrom())
+        .syncStatusTo(installmentNoPII.getSyncStatus().getSyncStatusTo())
+        .build());
+    }
+    return installment;
   }
 }

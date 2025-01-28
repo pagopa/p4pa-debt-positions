@@ -50,11 +50,10 @@ public class InstallmentMapper {
   }
 
   public InstallmentDTO mapToDto(InstallmentNoPII installment) {
-    return InstallmentDTO.builder()
+    InstallmentDTO installmentDTO = InstallmentDTO.builder()
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
       .status(installment.getStatus())
-      .syncStatus(InstallmentSyncStatus.builder().syncStatusFrom(installment.getSyncStatusFrom()).syncStatusTo(installment.getSyncStatusTo()).build())
       .iupdPagopa(installment.getIupdPagopa())
       .iud(installment.getIud())
       .iuv(installment.getIuv())
@@ -75,9 +74,18 @@ public class InstallmentMapper {
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();
+
+    if(installment.getSyncStatus() != null) {
+      InstallmentSyncStatus installmentSyncStatus = InstallmentSyncStatus.builder()
+        .syncStatusFrom(installment.getSyncStatus().getSyncStatusFrom())
+        .syncStatusTo(installment.getSyncStatus().getSyncStatusTo()).build();
+      installmentDTO.setSyncStatus(installmentSyncStatus);
+    }
+
+    return installmentDTO;
   }
 
-  public InstallmentDTO mapToDto(Installment installment){
+  public InstallmentDTO mapToDto(Installment installment) {
     return InstallmentDTO.builder()
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())

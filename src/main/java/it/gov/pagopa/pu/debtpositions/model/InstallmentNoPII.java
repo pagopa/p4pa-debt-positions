@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -47,8 +48,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private Long personalDataId;
   private Character debtorEntityType;
   private byte[] debtorFiscalCodeHash;
-  private String syncStatusFrom;
-  private String syncStatusTo;
+  @Embedded
+  private InstallmentSyncStatus syncStatus;
 
   @OneToMany(mappedBy = "installmentId")
   private SortedSet<Transfer> transfers;
