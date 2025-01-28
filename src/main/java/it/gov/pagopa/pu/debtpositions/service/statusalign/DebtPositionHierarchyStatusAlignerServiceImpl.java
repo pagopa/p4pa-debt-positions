@@ -96,7 +96,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           case InstallmentStatus.REPORTED -> false;
           case InstallmentStatus.PAID -> true;
           default ->
-            throw new InvalidStatusTransitionException("The installment with id " + i.getInstallmentId() + " is not in the paid status to be set in reported status");
+            throw new InvalidStatusTransitionException("The installment with id " + i.getInstallmentId() + " is in " + i.getStatus() + " status and cannot be set to reported status");
         })
       .ifPresent(installment -> {
         InstallmentStatus newStatus = InstallmentStatus.REPORTED;

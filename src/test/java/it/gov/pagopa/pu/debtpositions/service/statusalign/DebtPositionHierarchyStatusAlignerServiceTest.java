@@ -165,7 +165,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(debtPosition);
 
     assertThrows(InvalidStatusTransitionException.class, () -> service.notifyReportedTransferId(transferId),
-      "The installment with id 1 is not in the paid status to be set in reported status");
+      "The installment with id 1 is in TO_SYNC status and cannot be set to reported status");
 
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
     verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
