@@ -4,8 +4,8 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;

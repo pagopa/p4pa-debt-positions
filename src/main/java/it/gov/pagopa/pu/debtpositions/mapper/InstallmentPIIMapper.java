@@ -54,7 +54,7 @@ public class InstallmentPIIMapper {
     }
 
     if(installment.getSyncStatus() != null){
-      installmentNoPII.setSyncStatus(InstallmentSyncStatus.builder()
+      installmentNoPII.setSyncStatus(it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus.builder()
         .syncStatusFrom(installment.getSyncStatus().getSyncStatusFrom())
         .syncStatusTo(installment.getSyncStatus().getSyncStatusTo()).build());
     }

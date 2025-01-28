@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
