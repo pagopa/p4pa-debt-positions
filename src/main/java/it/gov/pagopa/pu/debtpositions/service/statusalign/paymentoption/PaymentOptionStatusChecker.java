@@ -18,7 +18,7 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
 
   public PaymentOptionStatusChecker(PaymentOptionRepository paymentOptionRepository) {
     super(InstallmentStatus.TO_SYNC, InstallmentStatus.PAID, InstallmentStatus.UNPAID,
-      InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.REPORTED, InstallmentStatus.INVALID);
+      InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.REPORTED);
     this.paymentOptionRepository = paymentOptionRepository;
   }
 
@@ -66,5 +66,10 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   protected boolean isPartiallyPaid(List<InstallmentStatus> childrenStatusList) {
     return childrenStatusList.contains(InstallmentStatus.PAID) &&
       (childrenStatusList.contains(InstallmentStatus.UNPAID) || childrenStatusList.contains(InstallmentStatus.EXPIRED));
+  }
+
+  private boolean isInvalid(List<InstallmentStatus> childrenStatusList) {
+    return childrenStatusList.contains(InstallmentStatus.INVALID) &&
+      childrenStatusList.stream().allMatch(status -> InstallmentStatus.INVALID.equals(status) || InstallmentStatus.CANCELLED.equals(status));
   }
 }
