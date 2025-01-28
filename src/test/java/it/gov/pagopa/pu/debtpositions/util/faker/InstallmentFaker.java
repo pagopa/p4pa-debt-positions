@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -56,8 +57,9 @@ public class InstallmentFaker {
       .installmentId(1L)
       .paymentOptionId(1L)
       .status(InstallmentStatus.TO_SYNC)
-      .syncStatusFrom("syncStatusFrom")
-      .syncStatusTo("syncStatusTo")
+      .syncStatus(InstallmentSyncStatus.builder()
+        .syncStatusFrom(InstallmentStatus.DRAFT)
+        .syncStatusTo(InstallmentStatus.UNPAID).build())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
       .iuv("iuv")

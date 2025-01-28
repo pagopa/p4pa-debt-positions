@@ -566,9 +566,9 @@ components:
       type: object
       properties:
         syncStatusFrom:
-          type: string
+          $ref: "#/components/schemas/InstallmentStatus"
         syncStatusTo:
-          type: string
+          $ref: "#/components/schemas/InstallmentStatus"
     DebtPositionErrorDTO:
       type: object
       required:

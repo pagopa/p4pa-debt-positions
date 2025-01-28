@@ -14,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -33,8 +32,8 @@ class InstallmentPIIMapperTest {
   private PersonalDataService personalDataServiceMock;
 
   @BeforeEach
-  void init(){
-    mapper = new InstallmentPIIMapper(dataCipherServiceMock,personalDataServiceMock);
+  void init() {
+    mapper = new InstallmentPIIMapper(dataCipherServiceMock, personalDataServiceMock);
   }
 
   @AfterEach
@@ -45,7 +44,7 @@ class InstallmentPIIMapperTest {
   //region map(it.gov.pagopa.pu.debtpositions.dto.Installment)
 
   @Test
-  void testMap(){
+  void testMap() {
     InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
 
@@ -62,7 +61,7 @@ class InstallmentPIIMapperTest {
   }
 
   @Test
-  void testMapWithNoPIINotNull(){
+  void testMapWithNoPIINotNull() {
     InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
 
@@ -83,7 +82,7 @@ class InstallmentPIIMapperTest {
 
   //region map(it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII)
   @Test
-  void testMapInstallmentNoPII(){
+  void testMapInstallmentNoPII() {
     //given
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
@@ -93,8 +92,43 @@ class InstallmentPIIMapperTest {
     Installment result = mapper.map(installmentNoPII);
     //then
     TestUtils.checkNotNullFields(result);
+    TestUtils.checkNotNullFields(result.getSyncStatus());
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
   }
   //endregion
 
+  @Test
+  void testMapInstallmentWithNullSyncStatus() {
+    InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
+    InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
+    installmentNoPIIExpected.setSyncStatus(null);
+
+    Installment installment = buildInstallment();
+    installment.setSyncStatus(null);
+    byte[] expectedHashedCF = {};
+    Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
+
+    Pair<InstallmentNoPII, InstallmentPIIDTO> result = mapper.map(installment);
+
+    reflectionEqualsByName(installmentNoPIIExpected, result.getFirst());
+    reflectionEqualsByName(installmentPIIDTOExpected, result.getSecond());
+    checkNotNullFields(result.getFirst(), "transfers", "personalDataId",
+      "debtorFiscalCodeHash", "syncStatus");
+    checkNotNullFields(result.getSecond());
+  }
+
+  @Test
+  void testMapInstallmentNoPIIWithNullSyncStatus() {
+    //given
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.setSyncStatus(null);
+    InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
+    Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
+
+    //when
+    Installment result = mapper.map(installmentNoPII);
+    //then
+    TestUtils.checkNotNullFields(result, "syncStatus");
+    Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
+  }
 }
