@@ -11,6 +11,5 @@ class PaymentOptionTypeEnumTest {
     for (PaymentOptionType value : PaymentOptionType.values()) {
       Assertions.assertDoesNotThrow(() -> PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(value.name()));
     }
-
   }
 }

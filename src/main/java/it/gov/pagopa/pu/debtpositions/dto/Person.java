@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
+import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Person {
 
-    private String entityType;
+    private PersonEntityType entityType;
     private String fiscalCode;
     private String fullName;
     private String address;
