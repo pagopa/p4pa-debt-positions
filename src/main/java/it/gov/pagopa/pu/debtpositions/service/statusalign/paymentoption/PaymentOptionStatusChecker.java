@@ -68,7 +68,7 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
       (childrenStatusList.contains(InstallmentStatus.UNPAID) || childrenStatusList.contains(InstallmentStatus.EXPIRED));
   }
 
-  public boolean isInvalid(List<InstallmentStatus> childrenStatusList) {
+  private boolean isInvalid(List<InstallmentStatus> childrenStatusList) {
     return childrenStatusList.contains(InstallmentStatus.INVALID) &&
       childrenStatusList.stream().allMatch(status -> InstallmentStatus.INVALID.equals(status) || InstallmentStatus.CANCELLED.equals(status));
   }
