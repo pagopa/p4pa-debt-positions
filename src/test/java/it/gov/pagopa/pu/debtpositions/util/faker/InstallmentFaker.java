@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
@@ -73,7 +74,7 @@ public class InstallmentFaker {
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
-      .debtorEntityType('F')
+      .debtorEntityType(PersonEntityType.F)
       .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
       .creationDate(date)

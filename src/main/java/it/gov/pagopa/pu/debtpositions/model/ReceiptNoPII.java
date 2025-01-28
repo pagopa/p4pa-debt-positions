@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -46,7 +47,8 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   private OffsetDateTime applicationDate;
   private OffsetDateTime transferDate;
   private boolean standin;
-  private Character debtorEntityType;
+  @Enumerated(EnumType.STRING)
+  private PersonEntityType debtorEntityType;
   private Long personalDataId;
   private byte[] debtorFiscalCodeHash;
 }

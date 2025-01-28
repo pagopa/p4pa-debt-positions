@@ -43,7 +43,7 @@ public class InstallmentPIIMapper {
     installmentNoPII.setHumanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation());
     installmentNoPII.setBalance(installment.getBalance());
     installmentNoPII.setLegacyPaymentMetadata(installment.getLegacyPaymentMetadata());
-    installmentNoPII.setDebtorEntityType(installment.getDebtor().getEntityType().charAt(0));
+    installmentNoPII.setDebtorEntityType(installment.getDebtor().getEntityType());
     installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getFiscalCode()));
     installmentNoPII.setCreationDate(installment.getCreationDate());
     installmentNoPII.setUpdateDate(installment.getUpdateDate());
