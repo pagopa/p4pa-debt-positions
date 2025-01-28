@@ -25,22 +25,26 @@ public class TransferMapper {
   }
 
   public TransferDTO mapToDto(Transfer transfer) {
-    return TransferDTO.builder()
+    TransferDTO transferDTO = TransferDTO.builder()
       .transferId(transfer.getTransferId())
       .installmentId(transfer.getInstallmentId())
       .orgFiscalCode(transfer.getOrgFiscalCode())
       .orgName(transfer.getOrgName())
       .amountCents(transfer.getAmountCents())
       .remittanceInformation(transfer.getRemittanceInformation())
-      .stampType(transfer.getStamp().getStampType())
-      .stampHashDocument(transfer.getStamp().getStampHashDocument())
-      .stampProvincialResidence(transfer.getStamp().getStampProvincialResidence())
       .iban(transfer.getIban())
       .postalIban(transfer.getPostalIban())
       .category(transfer.getCategory())
       .transferIndex(transfer.getTransferIndex())
       .build();
-  }
 
+    if( transfer.getStamp() != null) {
+      transferDTO.setStampType(transfer.getStamp().getStampType());
+      transferDTO.setStampHashDocument(transfer.getStamp().getStampHashDocument());
+      transferDTO.setStampProvincialResidence(transfer.getStamp().getStampProvincialResidence());
+    }
+
+    return transferDTO;
+  }
 
 }

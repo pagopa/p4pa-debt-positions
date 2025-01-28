@@ -146,6 +146,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
         '500':
           description: Server Error
           content:
@@ -174,6 +180,12 @@ paths:
                 $ref: '#/components/schemas/DebtPositionDTO'
         "400":
           description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
           content:
             application/json:
               schema:
@@ -269,7 +281,7 @@ components:
           type: string
           enum:
             - SINGLE_INSTALLMENT
-            - INSTALMENTS
+            - INSTALLMENTS
             - DOWN_PAYMENT
         installments:
           type: array
