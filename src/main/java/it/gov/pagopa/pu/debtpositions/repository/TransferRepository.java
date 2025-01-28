@@ -1,11 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.Optional;
+import java.util.Set;
 
 @RepositoryRestResource(path = "transfers")
 public interface TransferRepository extends JpaRepository<Transfer,Long> {
@@ -17,6 +19,8 @@ public interface TransferRepository extends JpaRepository<Transfer,Long> {
     "WHERE d.organizationId = :orgId AND " +
     "i.iuv = :iuv AND " +
     "i.iur = :iur AND " +
-    "t.transferIndex = :transferIndex")
-  Optional<Transfer> findBySemanticKey(Long orgId, String iuv, String iur, int transferIndex);
+    "t.transferIndex = :transferIndex AND" +
+    "(:installmentStatusSet IS null OR i.status in :installmentStatusSet)")
+  Optional<Transfer> findBySemanticKey(Long orgId, String iuv, String iur,
+                                       int transferIndex, Set<InstallmentStatus> installmentStatusSet);
 }
