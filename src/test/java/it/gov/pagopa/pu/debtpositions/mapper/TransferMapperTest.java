@@ -18,14 +18,14 @@ class TransferMapperTest {
   private TransferMapper transferMapper;
 
   @BeforeEach
-  void setUp(){
+  void setUp() {
     transferMapper = new TransferMapper();
   }
 
   @Test
   void givenValidTransferDTO_WhenMapToModel_ThenReturnTransfer() {
     TransferDTO transferDTO = buildTransferDTO();
-    Transfer transferExpected =  buildTransfer();
+    Transfer transferExpected = buildTransfer();
 
     Transfer result = transferMapper.mapToModel(transferDTO);
 
@@ -34,7 +34,7 @@ class TransferMapperTest {
   }
 
   @Test
-  void givenMapToDtoThenOk(){
+  void givenMapToDtoThenOk() {
     TransferDTO transferExpected = buildTransferDTO();
 
     TransferDTO result = transferMapper.mapToDto(buildTransfer());
@@ -42,5 +42,26 @@ class TransferMapperTest {
     reflectionEqualsByName(transferExpected, result);
     checkNotNullFields(result, "updateOperatorExternalId", "creationDate", "updateDate");
 
+  }
+
+  @Test
+  void givenMapToDtoWithNullStampThenOk() {
+    TransferDTO transferExpected = buildTransferDTO();
+    transferExpected.setStampType(null);
+    transferExpected.setStampHashDocument(null);
+    transferExpected.setStampProvincialResidence(null);
+
+    Transfer transfer = buildTransfer();
+    transfer.setStamp(null);
+
+    TransferDTO result = transferMapper.mapToDto(transfer);
+
+    reflectionEqualsByName(transferExpected, result);
+    checkNotNullFields(result, "updateOperatorExternalId",
+      "creationDate",
+      "updateDate",
+      "stampProvincialResidence",
+      "stampHashDocument",
+      "stampType");
   }
 }
