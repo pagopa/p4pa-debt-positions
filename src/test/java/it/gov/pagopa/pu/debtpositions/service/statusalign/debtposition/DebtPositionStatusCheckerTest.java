@@ -114,26 +114,6 @@ class DebtPositionStatusCheckerTest {
   }
 
   /**
-   * Test if the status is INVALID when all paymentOptions are INVALID.
-   */
-  @Test
-  void testCalculateNewStatus_Invalid() {
-    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.INVALID, PaymentOptionStatus.INVALID);
-    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
-    assertEquals(DebtPositionStatus.INVALID, result);
-  }
-
-  /**
-   * Test if the status is INVALID when all paymentOptions are CANCELLED, with at least one INVALID.
-   */
-  @Test
-  void testDeterminePaymentOptionStatus_Invalid2() {
-    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.INVALID, PaymentOptionStatus.CANCELLED);
-    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
-    assertEquals(DebtPositionStatus.INVALID, result);
-  }
-
-  /**
    * Test if the status is CANCELLED when all paymentOptions are CANCELLED.
    */
   @Test

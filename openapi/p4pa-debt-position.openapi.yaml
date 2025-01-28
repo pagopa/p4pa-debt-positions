@@ -515,7 +515,6 @@ components:
         - PAID
         - PARTIALLY_PAID
         - CANCELLED
-        - INVALID
         - EXPIRED
         - UNPAID
         - DRAFT
