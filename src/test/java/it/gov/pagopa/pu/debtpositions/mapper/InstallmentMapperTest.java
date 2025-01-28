@@ -65,6 +65,7 @@ class InstallmentMapperTest {
 
     reflectionEqualsByName(installmentExpected, result, "debtor");
     checkNotNullFields(result, "debtor");
+    checkNotNullFields(result.getSyncStatus());
   }
 
   @Test

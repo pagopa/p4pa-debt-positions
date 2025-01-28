@@ -92,6 +92,7 @@ class InstallmentPIIMapperTest {
     Installment result = mapper.map(installmentNoPII);
     //then
     TestUtils.checkNotNullFields(result);
+    TestUtils.checkNotNullFields(result.getSyncStatus());
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
   }
   //endregion
