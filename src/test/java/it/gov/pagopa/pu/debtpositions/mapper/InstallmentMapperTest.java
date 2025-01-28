@@ -68,6 +68,23 @@ class InstallmentMapperTest {
   }
 
   @Test
+  void givenMapToDtoWithNullSyncStatus(){
+    InstallmentDTO installmentExpected = buildInstallmentDTO();
+    installmentExpected.setStatus(InstallmentStatus.TO_SYNC);
+    installmentExpected.setSyncStatus(null);
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.setTransfers(new TreeSet<>(List.of(buildTransfer())));
+    installmentNoPII.setSyncStatus(null);
+
+    Mockito.when(transferMapperMock.mapToDto(buildTransfer())).thenReturn(buildTransferDTO());
+
+    InstallmentDTO result = installmentMapper.mapToDto(installmentNoPII);
+
+    reflectionEqualsByName(installmentExpected, result, "debtor");
+    checkNotNullFields(result, "debtor", "syncStatus");
+  }
+
+  @Test
   void givenMapInstallmentToDtoThenOk(){
     Installment installmentExpected = buildInstallment();
 
