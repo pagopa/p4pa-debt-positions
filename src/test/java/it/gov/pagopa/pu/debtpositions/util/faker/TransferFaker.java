@@ -17,7 +17,7 @@ public class TransferFaker {
     transfer.setIban("IT60X0542811101000000123456");
     transfer.setPostalIban("123456");
     transfer.setCategory("category");
-    transfer.setTransferIndex(2L);
+    transfer.setTransferIndex(2);
     transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
     return transfer;
   }
@@ -33,7 +33,7 @@ public class TransferFaker {
       .iban("IT60X0542811101000000123456")
       .postalIban("123456")
       .category("category")
-      .transferIndex(2L)
+      .transferIndex(2)
       .stampType("TYPE")
       .stampHashDocument("HASH")
       .stampProvincialResidence("PR")
