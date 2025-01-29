@@ -34,7 +34,7 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
   private String iban;
   private String postalIban;
   private String category;
-  private Long transferIndex;
+  private Integer transferIndex;
 
   @Override
   public int compareTo(@Nonnull Transfer o) {
