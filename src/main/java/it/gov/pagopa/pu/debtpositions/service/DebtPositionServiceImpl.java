@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -10,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -49,6 +51,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       savedPaymentOption.getInstallments().forEach(installmentNoPII -> {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+        if (StringUtils.isBlank(mappedInstallment.getIud())) {
+          mappedInstallment.setIud(Utilities.getRandomIUD());
+        }
         long idInstallment = installmentRepository.save(mappedInstallment);
 
         mappedInstallment.getTransfers().forEach(transfer -> {
