@@ -16,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
@@ -106,15 +107,16 @@ class DebtPositionServiceImplTest {
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(savedInstallment.getInstallmentId());
     Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
 
-    Mockito.mockStatic(Utilities.class);
-    Mockito.when(Utilities.getRandomIUD()).thenReturn(generatedIUD);
+    try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
+      mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
 
-    debtPositionService.saveDebtPosition(debtPositionDTO);
+      debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
-    Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
-    Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
-    Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
+      Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
+      Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
+      Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
+      Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
+    }
   }
 }
 
