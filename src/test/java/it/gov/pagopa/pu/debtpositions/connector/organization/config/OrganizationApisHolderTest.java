@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import it.gov.pagopa.pu.organization.generated.ApiClient;
@@ -63,6 +64,15 @@ class OrganizationApisHolderTest extends BaseApiHolderTest {
       accessToken -> organizationApisHolder.getOrganizationEntityControllerApi(accessToken)
         .crudGetOrganization("ORGID"),
       Organization.class,
+      organizationApisHolder::unload);
+  }
+
+  @Test
+  void whenGetBrokerSearchControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> organizationApisHolder.getBrokerSearchControllerApi(accessToken)
+        .crudBrokersFindByBrokeredOrganizationId("ORGID"),
+      Broker.class,
       organizationApisHolder::unload);
   }
 

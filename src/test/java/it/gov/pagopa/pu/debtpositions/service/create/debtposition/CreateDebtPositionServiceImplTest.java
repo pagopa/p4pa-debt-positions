@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTyp
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,6 +38,8 @@ class CreateDebtPositionServiceImplTest {
   private DebtPositionService debtPositionService;
   @Mock
   private GenerateIuvService generateIuvService;
+  @Mock
+  private DebtPositionSyncService debtPositionSyncService;
 
   private CreateDebtPositionService createDebtPositionService;
 
@@ -46,7 +49,7 @@ class CreateDebtPositionServiceImplTest {
   @BeforeEach
   void setUp() {
     createDebtPositionService = new CreateDebtPositionServiceImpl(authorizeOperatorOnDebtPositionTypeService,
-      validateDebtPositionService, debtPositionService, generateIuvService, installmentNoPIIRepository);
+      validateDebtPositionService, debtPositionService, generateIuvService, debtPositionSyncService, installmentNoPIIRepository);
   }
 
   @Test
