@@ -26,8 +26,6 @@ spring:
       rest:
         basePath: crud
     cloud:
-      function:
-        definition: paymentsProducer
       stream:
         binders:
           kafka-payments-producer:
