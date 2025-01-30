@@ -60,21 +60,22 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(buildDebtPositionDTO());
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().syncStatus(null);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
-    IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
+    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = Map.of("iud", IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
       .iupdPagopa(iupdPagoPa)
-      .build();
+      .build());
 
-    syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
 
     assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     assertEquals(PaymentOptionStatus.UNPAID, result.getPaymentOptions().getFirst().getStatus());
     assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    reflectionEqualsByName(buildDebtPositionDTO(), result);
+    assertNull(result.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
+    reflectionEqualsByName(debtPositionDTO, result);
   }
 
   @Test
