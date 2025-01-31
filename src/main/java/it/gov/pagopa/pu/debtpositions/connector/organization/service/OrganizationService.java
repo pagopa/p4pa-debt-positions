@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.connector.organization;
+package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 

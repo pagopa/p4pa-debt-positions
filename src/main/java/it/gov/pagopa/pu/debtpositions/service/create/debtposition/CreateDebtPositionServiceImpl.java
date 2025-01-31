@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -81,7 +82,8 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
     if (Boolean.TRUE.equals(pagopaPayment) && (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))) {
-      debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken);
+      WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken);
+      log.info("Workflow created with id {}", workflow.getWorkflowId());
     }
   }
 }

@@ -57,33 +57,25 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
-
+  implementation("org.mapstruct:mapstruct:$mapStructVersion")
   //security
   implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
-
-
   //postgres jdbc
   implementation("org.postgresql:postgresql:$postgresJdbcVersion")
 
 	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
-
-  /**
-   * Mapstruct
-   * https://mapstruct.org/
-   * mapstruct dependencies must always be placed after the lombok dependency
-   * or the generated mappers will return an empty object
-   **/
-  implementation("org.mapstruct:mapstruct:$mapStructVersion")
-  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 
 	//	Testing
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito:mockito-core")
 	testImplementation ("org.projectlombok:lombok")
-  testAnnotationProcessor("org.projectlombok:lombok")
   testImplementation("com.h2database:h2")
   testImplementation("uk.co.jemos.podam:podam:$podamVersion")
+
+  testAnnotationProcessor("org.projectlombok:lombok")
+
+  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
+  annotationProcessor("org.projectlombok:lombok")
 }
 
 tasks.withType<Test> {
@@ -128,7 +120,8 @@ tasks.register("dependenciesBuild") {
   dependsOn(
     "openApiGenerate",
     "openApiGenerateORGANIZATION",
-    "openApiGenerateP4PAAUTH"
+    "openApiGenerateP4PAAUTH",
+    "openApiGenerateWORKFLOWHUB"
   )
 }
 
@@ -197,6 +190,33 @@ tasks.register<GenerateTask>("openApiGenerateP4PAAUTH") {
   invokerPackage.set("it.gov.pagopa.pu.auth.generated")
   apiPackage.set("it.gov.pagopa.pu.auth.controller.generated")
   modelPackage.set("it.gov.pagopa.pu.auth.dto.generated")
+  configOptions.set(mapOf(
+    "swaggerAnnotations" to "false",
+    "openApiNullable" to "false",
+    "dateLibrary" to "java8",
+    "serializableModel" to "true",
+    "useSpringBoot3" to "true",
+    "useJakartaEe" to "true",
+    "serializationLibrary" to "jackson",
+    "generateSupportingFiles" to "true",
+    "generateConstructorWithAllArgs" to "false",
+    "generatedConstructorWithRequiredArgs" to "true",
+    "additionalModelTypeAnnotations" to "@lombok.Data @lombok.Builder @lombok.AllArgsConstructor"
+  )
+  )
+  library.set("resttemplate")
+}
+
+tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
+  group = "AutomaticallyGeneratedCode"
+  description = "openapi"
+
+  generatorName.set("java")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-workflow-hub/refs/heads/develop/openapi/p4pa-workflow-hub.openapi.yaml")
+  outputDir.set("$projectDir/build/generated")
+  invokerPackage.set("it.gov.pagopa.pu.workflowhub.generated")
+  apiPackage.set("it.gov.pagopa.pu.workflowhub.controller.generated")
+  modelPackage.set("it.gov.pagopa.pu.workflowhub.dto.generated")
   configOptions.set(mapOf(
     "swaggerAnnotations" to "false",
     "openApiNullable" to "false",
