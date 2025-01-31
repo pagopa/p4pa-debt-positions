@@ -21,9 +21,9 @@ on:
         required: false
         default: 'true'
       argocd_target_branch:
-          description: 'argocd target branch name'
-          required: false
-          default: 'main'
+        description: 'argocd target branch name'
+        required: false
+        default: 'main'
       postman_branch:
         description: postman branch name'
         required: false
@@ -32,10 +32,6 @@ on:
 env:
   # branch choosed by workflow_dispatch or by push event
   CURRENT_BRANCH: ${{ github.event.inputs.branch || github.ref_name }}
-
-permissions:
-  packages: write
-  contents: read
 
 jobs:
   checkout:
@@ -83,10 +79,10 @@ jobs:
           azure_devops_pat: ${{ secrets.AZURE_DEVOPS_TOKEN }}
           azure_template_parameters: |
             {
-              "APPS_TOP": "[p4pa-workflow-hub]",
+              "APPS_TOP": "[p4pa-debt-positions]",
               "ARGOCD_TARGET_BRANCH": "${{ github.event.inputs.argocd_target_branch }}",
               "POSTMAN_BRANCH": "${{ github.event.inputs.postman_branch }}",
-              "TRIGGER_MESSAGE": "p4pa-workflow-hub"
+              "TRIGGER_MESSAGE": "p4pa-debt-positions"
             }
 
 
