@@ -23,6 +23,7 @@ public class PaymentsProducerService {
 
     /*
     Producer not connected on startup, but just on-demand
+    To connect on startup uncomment these lines and configure bean name (spring.cloud.function.definition)
     @Configuration
     static class PaymentsProducerConfig {
         @Bean

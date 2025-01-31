@@ -67,6 +67,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
           InstallmentStatus newStatus = updateDTO.getNewStatus();
           installment.setStatus(newStatus);
+          installment.setSyncStatus(null);
           log.info("Updating status {} and iupdPagopa {} for installment with id {}", newStatus, updateDTO.getIupdPagopa(), installment.getInstallmentId());
           installmentNoPIIRepository.updateStatusAndIupdPagopa(
             installment.getInstallmentId(),
