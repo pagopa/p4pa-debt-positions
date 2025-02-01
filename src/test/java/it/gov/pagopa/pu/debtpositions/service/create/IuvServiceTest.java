@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,12 +22,11 @@ class IuvServiceTest {
   private static final String VALID_ORG_FISCAL_CODE = "VALID_FISCAL_CODE";
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
   private static final String VALID_APPLICATION_CODE = "01";
-  private static final Organization VALID_ORG = Organization.builder()
+  private static final Organization VALID_ORG = OrganizationFaker.buildOrganization()
     .organizationId(1L)
     .orgFiscalCode(VALID_ORG_FISCAL_CODE)
     .ipaCode(VALID_ORG_IPA_CODE)
-    .segregationCode(VALID_APPLICATION_CODE)
-    .build();
+    .segregationCode(VALID_APPLICATION_CODE);
   private static final long VALID_PAYMENT_INDEX = 42L;
   private static final String VALID_IUV = "01000000000004285";
   private static final String WRONG_CHECK_IUV = "01000000000004286";
@@ -35,11 +35,10 @@ class IuvServiceTest {
   private static final String INVALID_ORG_FISCAL_CODE = "INVALID_FISCAL_CODE";
   private static final String INVALID_ORG_IPA_CODE = "INVALID_IPA_CODE";
   private static final long INVALID_PAYMENT_INDEX = 0L;
-  private static final Organization INVALID_ORG = Organization.builder()
+  private static final Organization INVALID_ORG = OrganizationFaker.buildOrganization()
     .organizationId(99L)
     .orgFiscalCode(INVALID_ORG_FISCAL_CODE)
-    .ipaCode(INVALID_ORG_IPA_CODE)
-    .build();
+    .ipaCode(INVALID_ORG_IPA_CODE);
 
   @BeforeEach
   void setUp() {
