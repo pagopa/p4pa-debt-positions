@@ -20,7 +20,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_type_org_generator")
   @SequenceGenerator(name = "debt_position_type_org_generator", sequenceName = "debt_position_type_org_seq", allocationSize = 1)
-  @NotNull
   private Long debtPositionTypeOrgId;
   @NotNull
   private Long debtPositionTypeId;

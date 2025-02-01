@@ -28,7 +28,6 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "installment_generator")
   @SequenceGenerator(name = "installment_generator", sequenceName = "installment_seq", allocationSize = 1)
-  @NotNull
   private Long installmentId;
   @NotNull
   private Long paymentOptionId;

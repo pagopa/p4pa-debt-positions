@@ -24,7 +24,6 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transfer_generator")
   @SequenceGenerator(name = "transfer_generator", sequenceName = "transfer_seq", allocationSize = 1)
-  @NotNull
   private Long transferId;
   @NotNull
   private Long installmentId;

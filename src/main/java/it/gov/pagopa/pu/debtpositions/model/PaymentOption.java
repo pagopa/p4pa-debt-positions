@@ -24,7 +24,6 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_option_generator")
   @SequenceGenerator(name = "payment_option_generator", sequenceName = "payment_option_seq", allocationSize = 1)
-  @NotNull
   private Long paymentOptionId;
   @NotNull
   private Long debtPositionId;
