@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,12 +20,18 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_type_org_generator")
   @SequenceGenerator(name = "debt_position_type_org_generator", sequenceName = "debt_position_type_org_seq", allocationSize = 1)
+  @NotNull
   private Long debtPositionTypeOrgId;
+  @NotNull
   private Long debtPositionTypeId;
+  @NotNull
   private Long organizationId;
   private String balance;
+  @NotNull
   private String code;
+  @NotNull
   private String description;
+  @NotNull
   private String iban;
   private String postalIban;
   private String postalAccountCode;
