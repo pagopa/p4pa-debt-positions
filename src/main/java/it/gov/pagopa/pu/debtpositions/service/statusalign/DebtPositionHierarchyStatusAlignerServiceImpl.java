@@ -15,6 +15,8 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+import java.util.List;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.TO_SYNC;
@@ -105,6 +107,30 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         log.info("Updating status {} for installment with id {} after report notification on transfer {}", newStatus, installment.getInstallmentId(), transferId);
         installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
       });
+
+    return alignHierarchyStatus(debtPosition);
+  }
+
+  @Override
+  public DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId) {
+    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+
+    if (debtPosition == null) {
+      throw new NotFoundException("Debt position related to the id " + debtPositionId + " does not found");
+    }
+
+    debtPosition.getPaymentOptions().forEach(paymentOption ->
+      paymentOption.getInstallments().stream()
+        .filter(installment -> !List.of(InstallmentStatus.CANCELLED, InstallmentStatus.INVALID).contains(installment.getStatus()))
+        .forEach(installment -> {
+            if (installment.getDueDate().isBefore(OffsetDateTime.now())) {
+              InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
+              installment.setStatus(newStatus);
+              log.info("Updating status {} for installment with id {} after checking the due date", newStatus, installment.getInstallmentId());
+              installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
+            }
+          }
+        ));
 
     return alignHierarchyStatus(debtPosition);
   }

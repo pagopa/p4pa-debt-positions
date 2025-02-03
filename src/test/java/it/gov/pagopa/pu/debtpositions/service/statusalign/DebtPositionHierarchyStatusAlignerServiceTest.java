@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -225,4 +227,89 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
     verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
+
+  @Test
+  void givenCheckAndUpdateInstallmentExpirationWhenDebtPositionNotFoundThenThrowsException() {
+    Long debtPositionId = 1L;
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
+
+    assertThrows(NotFoundException.class, () -> service.checkAndUpdateInstallmentExpiration(debtPositionId),
+      "Debt position related to the id 1 does not found");
+
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
+    verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
+    verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
+  }
+
+  @Test
+  void givenCheckAndUpdateInstallmentExpirationWhenInstallmentIsInvalidThenOk() {
+    Long debtPositionId = 1L;
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.INVALID);
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.INVALID);
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+
+    assertEquals(InstallmentStatus.INVALID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
+    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
+    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
+  }
+
+  @Test
+  void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsBeforeNowThenOk() {
+    Long debtPositionId = 1L;
+    OffsetDateTime dueDate = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+
+    assertEquals(InstallmentStatus.EXPIRED, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    verify(installmentNoPIIRepositoryMock, times(1)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
+    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
+    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
+  }
+
+  @Test
+  void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsAfterNowThenOk() {
+    Long debtPositionId = 1L;
+    OffsetDateTime dueDate = OffsetDateTime.now().plusDays(2);
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+
+    assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
+    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
+    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
+  }
+
 }
