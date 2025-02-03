@@ -88,4 +88,20 @@ class DebtPositionControllerTest {
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
+
+  @Test
+  void whenCheckAndUpdateInstallmentExpirationThenOk() throws Exception {
+    Long id = 1L;
+
+    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id)).thenReturn(buildDebtPositionDTO());
+
+    MvcResult result = mockMvc.perform(
+        put("/debt-positions/1/check-installment-expiration")
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
 }

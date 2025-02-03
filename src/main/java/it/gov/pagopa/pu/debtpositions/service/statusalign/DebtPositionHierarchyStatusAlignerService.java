@@ -10,4 +10,6 @@ public interface DebtPositionHierarchyStatusAlignerService {
   DebtPositionDTO finalizeSyncStatus(Long debtPositionId, Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO);
 
   DebtPositionDTO notifyReportedTransferId(Long transferId);
+
+  DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId);
 }
