@@ -74,7 +74,7 @@ class CreateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenDebtPositionOrdSilWhenCreateThenOk() {
+  void givenDebtPositionOrdinarySilWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
 
@@ -96,7 +96,7 @@ class CreateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenDebtPositionSpontWhenCreateThenOk() {
+  void givenDebtPositionSpontaneousWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
 
@@ -110,6 +110,27 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(installmentNoPIIRepository.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(debtPositionService.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, true, null, null);
+
+    assertEquals(debtPositionDTO, result);
+    reflectionEqualsByName(debtPositionDTO, result);
+  }
+
+  @Test
+  void givenDebtPositionOtherOriginWhenCreateThenOk() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
+
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    Mockito.when(authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionService).validate(debtPositionDTO, null);
+    Mockito.when(installmentNoPIIRepository.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
+    Mockito.when(debtPositionService.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, true, null, null);
 
