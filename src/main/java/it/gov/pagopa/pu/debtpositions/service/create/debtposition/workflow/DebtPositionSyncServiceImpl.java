@@ -42,7 +42,6 @@ public class DebtPositionSyncServiceImpl implements DebtPositionSyncService {
           workflowService.alignDpSyncAcaGpdPreload(debtPositionRequest, accessToken);
         case ASYNC_GPD ->
           workflowService.alignDpGPD(debtPositionRequest, accessToken);
-        case null -> null;
       };
     }
     return workflowCreatedDTO;

@@ -522,6 +522,7 @@ components:
       type: string
       enum:
         - ORDINARY
+        - ORDINARY_SIL
         - SPONTANEOUS
         - SECONDARY_ORG
         - RECEIPT_FILE

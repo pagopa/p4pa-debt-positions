@@ -23,6 +23,8 @@ class IuvServiceTest {
   private static final String VALID_APPLICATION_CODE = "01";
   private static final Organization VALID_ORG = Organization.builder()
     .organizationId(1L)
+    .orgName("ORG_NAME")
+    .status(Organization.StatusEnum.ACTIVE)
     .orgFiscalCode(VALID_ORG_FISCAL_CODE)
     .ipaCode(VALID_ORG_IPA_CODE)
     .segregationCode(VALID_APPLICATION_CODE)
@@ -37,6 +39,8 @@ class IuvServiceTest {
   private static final long INVALID_PAYMENT_INDEX = 0L;
   private static final Organization INVALID_ORG = Organization.builder()
     .organizationId(99L)
+    .orgName("INVALID_ORG_NAME")
+    .status(Organization.StatusEnum.DRAFT)
     .orgFiscalCode(INVALID_ORG_FISCAL_CODE)
     .ipaCode(INVALID_ORG_IPA_CODE)
     .build();

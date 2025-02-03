@@ -29,6 +29,8 @@ class GenerateIuvServiceTest {
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
   private static final Organization VALID_ORG = Organization.builder()
     .organizationId(1L)
+    .orgName("ORG_NAME")
+    .status(Organization.StatusEnum.ACTIVE)
     .orgFiscalCode(VALID_ORG_FISCAL_CODE)
     .ipaCode(VALID_ORG_IPA_CODE)
     .build();

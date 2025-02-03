@@ -81,7 +81,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   }
 
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
-    if (Boolean.TRUE.equals(pagopaPayment) && (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))) {
+    if (Boolean.TRUE.equals(pagopaPayment) && (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY_SIL) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))) {
       WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken);
       log.info("Workflow created with id {}", workflow.getWorkflowId());
     }
