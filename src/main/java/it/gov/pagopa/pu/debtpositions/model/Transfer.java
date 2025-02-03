@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,16 +25,22 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "transfer_generator")
   @SequenceGenerator(name = "transfer_generator", sequenceName = "transfer_seq", allocationSize = 1)
   private Long transferId;
+  @NotNull
   private Long installmentId;
+  @NotNull
   private String orgFiscalCode;
   private String orgName;
+  @NotNull
   private Long amountCents;
+  @NotNull
   private String remittanceInformation;
   @Embedded
   private Stamp stamp;
   private String iban;
   private String postalIban;
+  @NotNull
   private String category;
+  @NotNull
   private Integer transferIndex;
 
   @Override

@@ -11,6 +11,8 @@ spring:
         enabled: "\${VIRTUAL_THREADS_ENABLED:true}"
     jpa:
       show-sql: "\${SHOW_SQL:false}"
+      hibernate:
+        ddl-auto: none
     datasource:
       debt-position:
         jdbc-url: "\${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}"
