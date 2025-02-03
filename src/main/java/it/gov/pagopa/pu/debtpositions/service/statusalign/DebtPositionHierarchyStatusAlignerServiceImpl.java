@@ -123,7 +123,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       paymentOption.getInstallments().stream()
         .filter(installment -> !List.of(InstallmentStatus.CANCELLED, InstallmentStatus.INVALID).contains(installment.getStatus()))
         .forEach(installment -> {
-            if (installment.getDueDate().isBefore(OffsetDateTime.now())) {
+            if (installment.getDueDate() != null && installment.getDueDate().isBefore(OffsetDateTime.now())) {
               InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
               installment.setStatus(newStatus);
               log.info("Updating status {} for installment with id {} after checking the due date", newStatus, installment.getInstallmentId());
