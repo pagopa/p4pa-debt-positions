@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
-import java.util.List;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.TO_SYNC;
@@ -121,7 +120,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
     debtPosition.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().stream()
-        .filter(installment -> !List.of(InstallmentStatus.CANCELLED, InstallmentStatus.INVALID).contains(installment.getStatus()))
+        .filter(installment -> installment.getStatus().equals(InstallmentStatus.UNPAID))
         .forEach(installment -> {
             if (installment.getDueDate() != null && installment.getDueDate().isBefore(OffsetDateTime.now())) {
               InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
