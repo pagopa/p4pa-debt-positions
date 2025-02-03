@@ -125,7 +125,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
             if (installment.getDueDate() != null && installment.getDueDate().isBefore(OffsetDateTime.now())) {
               InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
               installment.setStatus(newStatus);
-              log.info("Updating status {} for installment with id {} after checking the due date", newStatus, installment.getInstallmentId());
+              log.info("Updating status {} for installment with id {} related to debt position {} after checking the due date", newStatus, installment.getInstallmentId(), debtPositionId);
               installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
             }
           }
