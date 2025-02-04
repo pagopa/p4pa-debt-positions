@@ -37,5 +37,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(debtPositionId, requestBody);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
+
+  @Override
+  public ResponseEntity<DebtPositionDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId) {
+    DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId);
+    return new ResponseEntity<>(body, HttpStatus.OK);
+  }
 }
 
