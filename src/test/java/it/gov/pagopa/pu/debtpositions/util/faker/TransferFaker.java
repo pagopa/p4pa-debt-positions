@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
-import it.gov.pagopa.pu.workflowhub.dto.generated.TransferRequestDTO;
 
 public class TransferFaker {
 
@@ -25,24 +24,6 @@ public class TransferFaker {
 
   public static TransferDTO buildTransferDTO() {
     return TransferDTO.builder()
-      .transferId(1L)
-      .installmentId(1L)
-      .orgFiscalCode("12345678903")
-      .orgName("Organization Name")
-      .amountCents(1000L)
-      .remittanceInformation("Payment Info")
-      .iban("IT60X0542811101000000123456")
-      .postalIban("123456")
-      .category("category")
-      .transferIndex(2)
-      .stampType("TYPE")
-      .stampHashDocument("HASH")
-      .stampProvincialResidence("PR")
-      .build();
-  }
-
-  public static TransferRequestDTO buildTransferRequestDTO(){
-    return TransferRequestDTO.builder()
       .transferId(1L)
       .installmentId(1L)
       .orgFiscalCode("12345678903")

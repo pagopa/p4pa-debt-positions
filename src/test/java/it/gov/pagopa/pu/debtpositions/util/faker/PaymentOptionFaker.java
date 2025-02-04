@@ -4,8 +4,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentOptionRequestDTO;
-import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentOptionRequestStatus;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -59,19 +57,5 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));
     return paymentOptionDTO;
-  }
-
-  public static PaymentOptionRequestDTO buildPaymentOptionRequestDTO() {
-    return PaymentOptionRequestDTO.builder()
-      .paymentOptionId(1L)
-      .debtPositionId(1L)
-      .totalAmountCents(2000L)
-      .status(PaymentOptionRequestStatus.UNPAID)
-      .multiDebtor(true)
-      .dueDate(DATE)
-      .description("Payment description")
-      .paymentOptionType(PaymentOptionRequestDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
-      .installments(List.of(buildInstallmentRequestDTO()))
-      .build();
   }
 }

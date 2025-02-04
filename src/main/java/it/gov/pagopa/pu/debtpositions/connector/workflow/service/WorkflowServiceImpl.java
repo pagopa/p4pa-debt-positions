@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowApiClient;
-import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.springframework.stereotype.Service;
 
@@ -14,27 +14,27 @@ public class WorkflowServiceImpl implements WorkflowService {
   }
 
   @Override
-  public WorkflowCreatedDTO handleDpSync(DebtPositionRequestDTO debtPositionRequestDTO, String accessToken) {
-    return this.workflowApiClient.handleDpSync(debtPositionRequestDTO, accessToken);
+  public WorkflowCreatedDTO handleDpSync(DebtPositionDTO debtPositionDTO, String accessToken) {
+    return this.workflowApiClient.handleDpSync(debtPositionDTO, accessToken);
   }
 
   @Override
-  public WorkflowCreatedDTO alignDpSyncAca(DebtPositionRequestDTO debtPositionRequestDTO, String accessToken) {
-    return this.workflowApiClient.alignDpSyncAca(debtPositionRequestDTO, accessToken);
+  public WorkflowCreatedDTO alignDpSyncAca(DebtPositionDTO debtPositionDTO, String accessToken) {
+    return this.workflowApiClient.alignDpSyncAca(debtPositionDTO, accessToken);
   }
 
   @Override
-  public WorkflowCreatedDTO alignDpSyncGpdPreload(DebtPositionRequestDTO debtPositionRequestDTO, String accessToken) {
-    return this.workflowApiClient.alignDpSyncGpdPreload(debtPositionRequestDTO, accessToken);
+  public WorkflowCreatedDTO alignDpSyncGpdPreload(DebtPositionDTO debtPositionDTO, String accessToken) {
+    return this.workflowApiClient.alignDpSyncGpdPreload(debtPositionDTO, accessToken);
   }
 
   @Override
-  public WorkflowCreatedDTO alignDpSyncAcaGpdPreload(DebtPositionRequestDTO debtPositionRequestDTO, String accessToken) {
-    return this.workflowApiClient.alignDpSyncAcaGpdPreload(debtPositionRequestDTO, accessToken);
+  public WorkflowCreatedDTO alignDpSyncAcaGpdPreload(DebtPositionDTO debtPositionDTO, String accessToken) {
+    return this.workflowApiClient.alignDpSyncAcaGpdPreload(debtPositionDTO, accessToken);
   }
 
   @Override
-  public WorkflowCreatedDTO alignDpGPD(DebtPositionRequestDTO debtPositionRequestDTO, String accessToken) {
-    return this.workflowApiClient.alignDpGPD(debtPositionRequestDTO, accessToken);
+  public WorkflowCreatedDTO alignDpGPD(DebtPositionDTO debtPositionDTO, String accessToken) {
+    return this.workflowApiClient.alignDpGPD(debtPositionDTO, accessToken);
   }
 }

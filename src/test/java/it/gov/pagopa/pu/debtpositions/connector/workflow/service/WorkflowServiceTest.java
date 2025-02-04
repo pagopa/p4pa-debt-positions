@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowApiClient;
-import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -40,11 +40,11 @@ class WorkflowServiceTest {
   void givenValidDebtPositionRequestDTOWhenHandleDpSyncThenEmpty() {
     // Given
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.handleDpSync(new DebtPositionRequestDTO(), accessToken))
+    Mockito.when(workflowApiClientMock.handleDpSync(new DebtPositionDTO(), accessToken))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.handleDpSync(new DebtPositionRequestDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.handleDpSync(new DebtPositionDTO(), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -54,11 +54,11 @@ class WorkflowServiceTest {
   void givenValidDebtPositionRequestDTOWhenAlignDpSyncAcaThenEmpty(){
     // Given
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncAca(new DebtPositionRequestDTO(), accessToken))
+    Mockito.when(workflowApiClientMock.alignDpSyncAca(new DebtPositionDTO(), accessToken))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncAca(new DebtPositionRequestDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.alignDpSyncAca(new DebtPositionDTO(), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -68,11 +68,11 @@ class WorkflowServiceTest {
   void givenValidDebtPositionRequestDTOWhenAlignDpSyncGpdPreloadThenEmpty(){
     // Given
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncGpdPreload(new DebtPositionRequestDTO(), accessToken))
+    Mockito.when(workflowApiClientMock.alignDpSyncGpdPreload(new DebtPositionDTO(), accessToken))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncGpdPreload(new DebtPositionRequestDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.alignDpSyncGpdPreload(new DebtPositionDTO(), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -82,11 +82,11 @@ class WorkflowServiceTest {
   void givenValidDebtPositionRequestDTOWhenAlignDpSyncAcaGpdPreloadThenEmpty(){
     // Given
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncAcaGpdPreload(new DebtPositionRequestDTO(), accessToken))
+    Mockito.when(workflowApiClientMock.alignDpSyncAcaGpdPreload(new DebtPositionDTO(), accessToken))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncAcaGpdPreload(new DebtPositionRequestDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.alignDpSyncAcaGpdPreload(new DebtPositionDTO(), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -96,11 +96,11 @@ class WorkflowServiceTest {
   void givenValidDebtPositionRequestDTOWhenAlignDpGPDThenEmpty(){
     // Given
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpGPD(new DebtPositionRequestDTO(), accessToken))
+    Mockito.when(workflowApiClientMock.alignDpGPD(new DebtPositionDTO(), accessToken))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.alignDpGPD(new DebtPositionRequestDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.alignDpGPD(new DebtPositionDTO(), accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);

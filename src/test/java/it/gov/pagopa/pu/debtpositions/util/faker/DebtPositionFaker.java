@@ -4,9 +4,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionOriginRequest;
-import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionRequestDTO;
-import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionRequestStatus;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -78,25 +75,5 @@ public class DebtPositionFaker {
     debtPositionDTO.setUpdateDate(DATE);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));
     return debtPositionDTO;
-  }
-
-  public static DebtPositionRequestDTO buildDebtPositionRequestDTO() {
-    return DebtPositionRequestDTO.builder()
-      .debtPositionId(1L)
-      .debtPositionTypeOrgId(2L)
-      .iupdOrg("IUPD_ORG")
-      .description("Test Description")
-      .status(DebtPositionRequestStatus.UNPAID)
-      .debtPositionOrigin(DebtPositionOriginRequest.ORDINARY)
-      .ingestionFlowFileId(1001L)
-      .ingestionFlowFileLineNumber(10L)
-      .organizationId(500L)
-      .notificationDate(DATE)
-      .validityDate(DATE)
-      .flagIuvVolatile(true)
-      .creationDate(DATE)
-      .updateDate(DATE)
-      .paymentOptions(List.of(buildPaymentOptionRequestDTO()))
-      .build();
   }
 }

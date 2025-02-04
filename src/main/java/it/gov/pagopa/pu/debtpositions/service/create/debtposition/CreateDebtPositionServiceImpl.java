@@ -13,6 +13,8 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Set;
+
 @Service
 @Slf4j
 public class CreateDebtPositionServiceImpl implements CreateDebtPositionService {
@@ -23,6 +25,12 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final GenerateIuvService generateIuvService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
+
+  private static final Set<DebtPositionOrigin> DEBT_POSITION_ORIGIN_TO_SYNC = Set.of(
+    DebtPositionOrigin.ORDINARY,
+    DebtPositionOrigin.ORDINARY_SIL,
+    DebtPositionOrigin.SPONTANEOUS
+  );
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
@@ -81,7 +89,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   }
 
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
-    if (Boolean.TRUE.equals(pagopaPayment) && (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY_SIL) || debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))) {
+    if (Boolean.TRUE.equals(pagopaPayment) && DEBT_POSITION_ORIGIN_TO_SYNC.contains(debtPositionDTO.getDebtPositionOrigin())) {
       WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken);
       log.info("Workflow created with id {}", workflow.getWorkflowId());
     }

@@ -7,10 +7,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
-import it.gov.pagopa.pu.workflowhub.dto.generated.InstallmentRequestDTO;
-import it.gov.pagopa.pu.workflowhub.dto.generated.InstallmentRequestStatus;
-import it.gov.pagopa.pu.workflowhub.dto.generated.InstallmentSyncStatusRequest;
-import it.gov.pagopa.pu.workflowhub.dto.generated.TransferRequestDTO;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -167,35 +163,6 @@ public class InstallmentFaker {
       .balance("balance")
       .debtor(buildPersonDTO())
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(date.atOffset(ZoneOffset.UTC))
-      .updateDate(date.atOffset(ZoneOffset.UTC))
-      .build();
-  }
-
-  public static InstallmentRequestDTO buildInstallmentRequestDTO() {
-    List<TransferRequestDTO> transfers = new ArrayList<>();
-    transfers.add(buildTransferRequestDTO());
-    return InstallmentRequestDTO.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
-      .status(InstallmentRequestStatus.UNPAID)
-      .syncStatus(InstallmentSyncStatusRequest.builder().syncStatusFrom(InstallmentRequestStatus.DRAFT).syncStatusTo(InstallmentRequestStatus.UNPAID).build())
-      .iupdPagopa("iupdPagoPa")
-      .iud("iud")
-      .iuv("iuv")
-      .iur("iur")
-      .iuf("iuf")
-      .nav("nav")
-      .dueDate(date.atOffset(ZoneOffset.UTC))
-      .paymentTypeCode("paymentTypeCode")
-      .amountCents(100L)
-      .notificationFeeCents(100L)
-      .remittanceInformation("remittanceInformation")
-      .legacyPaymentMetadata("legacyPaymentMetadata")
-      .humanFriendlyRemittanceInformation("humanFriendlyRemittanceInformation")
-      .balance("balance")
-      .debtor(buildPersonRequestDTO())
-      .transfers(transfers)
       .creationDate(date.atOffset(ZoneOffset.UTC))
       .updateDate(date.atOffset(ZoneOffset.UTC))
       .build();
