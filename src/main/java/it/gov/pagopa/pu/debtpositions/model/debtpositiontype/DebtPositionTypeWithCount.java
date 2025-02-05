@@ -1,17 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.model.debtpositiontype;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import it.gov.pagopa.pu.debtpositions.config.json.LocalDateTimeToOffsetDateTimeSerializer;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import java.io.Serializable;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Formula;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "debt_position_type")
@@ -25,7 +24,6 @@ public class DebtPositionTypeWithCount implements Serializable {
   private Long debtPositionTypeId;
   private String code;
   private String description;
-  @JsonSerialize(using = LocalDateTimeToOffsetDateTimeSerializer.class)
   private LocalDateTime updateDate;
   @Formula("(SELECT COUNT(*) "
     + "FROM debt_position_type_org org "

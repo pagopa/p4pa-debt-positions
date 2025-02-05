@@ -1,11 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 public class Utilities {
 
@@ -20,7 +20,7 @@ public class Utilities {
 
   public static OffsetDateTime localDatetimeToOffsetDateTime(LocalDateTime localDateTime){
     return localDateTime != null
-      ? localDateTime.atOffset(ZoneOffset.UTC)
+      ? localDateTime.atOffset(ZoneId.systemDefault().getRules().getOffset(localDateTime))
       : null;
   }
     public static boolean isValidIban(String iban) {

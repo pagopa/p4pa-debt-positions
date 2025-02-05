@@ -4,9 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,10 +19,9 @@ class UtilitiesTest {
 
   @Test
   void testLocalDatetimeToOffsetDateTime() {
-    LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 1, 0, 0);
-    OffsetDateTime expectedOffsetDateTime = localDateTime.atOffset(ZoneOffset.UTC);
+    OffsetDateTime expectedOffsetDateTime = OffsetDateTime.now();
 
-    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(localDateTime);
+    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(expectedOffsetDateTime.toLocalDateTime());
 
     assertEquals(expectedOffsetDateTime, result);
     }
@@ -38,9 +35,7 @@ class UtilitiesTest {
 
   @Test
   void testLocalDatetimeToOffsetDateTimeWithNull() {
-    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(null);
-
-    assertNull(result, "The result should be null for a null input.");
+    assertNull(Utilities.localDatetimeToOffsetDateTime(null), "The result should be null for a null input.");
   }
 
   @Test
