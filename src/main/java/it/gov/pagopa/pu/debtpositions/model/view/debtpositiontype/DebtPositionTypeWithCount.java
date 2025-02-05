@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.model.debtpositiontype;
+package it.gov.pagopa.pu.debtpositions.model.view.debtpositiontype;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import it.gov.pagopa.pu.debtpositions.config.json.LocalDateTimeToOffsetDateTimeSerializer;
