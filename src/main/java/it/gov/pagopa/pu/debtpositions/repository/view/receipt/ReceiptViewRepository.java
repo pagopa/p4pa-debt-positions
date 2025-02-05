@@ -11,7 +11,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.time.OffsetDateTime;
 
-@RepositoryRestResource(path = "receipts-custom")
+@RepositoryRestResource(path = "receipts-view")
 public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
 
   @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
