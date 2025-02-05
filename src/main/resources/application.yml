@@ -133,4 +133,4 @@ rest:
     base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}"
 
 iuv:
-  informationSystemId: 00
+  informationSystemId: "00"
