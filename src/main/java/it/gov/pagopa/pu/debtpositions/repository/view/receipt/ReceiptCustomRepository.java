@@ -14,6 +14,7 @@ import java.time.OffsetDateTime;
 @RepositoryRestResource(path = "receipts-custom")
 public interface ReceiptCustomRepository extends Repository<ReceiptCustom, Long> {
 
+  @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
   @Query(value = "SELECT new ReceiptCustom(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dp.description as description) "
     + "FROM ReceiptCustom r "
     + "JOIN InstallmentNoPII i ON r.installmentId = i.installmentId "
