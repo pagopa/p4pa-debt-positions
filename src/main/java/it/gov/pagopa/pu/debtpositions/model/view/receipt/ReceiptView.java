@@ -17,7 +17,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ReceiptCustom implements Serializable {
+public class ReceiptView implements Serializable {
 
   @Id
   private Long receiptId;

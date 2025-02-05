@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptCustom;
+import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -12,11 +12,11 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import java.time.OffsetDateTime;
 
 @RepositoryRestResource(path = "receipts-custom")
-public interface ReceiptCustomRepository extends Repository<ReceiptCustom, Long> {
+public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
 
   @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
-  @Query(value = "SELECT new ReceiptCustom(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dp.description as description) "
-    + "FROM ReceiptCustom r "
+  @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dp.description as description) "
+    + "FROM ReceiptView r "
     + "JOIN InstallmentNoPII i ON r.installmentId = i.installmentId "
     + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
     + "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId "
@@ -32,7 +32,7 @@ public interface ReceiptCustomRepository extends Repository<ReceiptCustom, Long>
     + "AND ((cast(:fromDate as date) IS NULL AND cast(:toDate as date) IS NULL) "
     + "OR (cast(:fromDate as date) IS NOT NULL AND cast(:toDate as date) IS NOT NULL "
     + "AND r.paymentDateTime BETWEEN :fromDate AND :toDate))")
-  Page<ReceiptCustom> findReceiptsByFilters(
+  Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("receiptOrigin") String receiptOrigin,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
