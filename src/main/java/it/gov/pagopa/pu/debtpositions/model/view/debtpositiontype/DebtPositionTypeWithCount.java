@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.model.debtpositiontype;
+package it.gov.pagopa.pu.debtpositions.model.view.debtpositiontype;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
