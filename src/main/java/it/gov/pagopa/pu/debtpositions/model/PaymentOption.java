@@ -45,6 +45,9 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
 
   @Override
   public int compareTo(@Nonnull PaymentOption o) {
-    return Comparator.comparing(PaymentOption::getPaymentOptionId).compare(this, o);
+    return Comparator
+      .comparing(PaymentOption::getPaymentOptionId, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
+
 }
