@@ -25,6 +25,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final GenerateIuvService generateIuvService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final DebtPositionProcessorService debtPositionProcessorService;
 
   private static final Set<DebtPositionOrigin> DEBT_POSITION_ORIGIN_TO_SYNC = Set.of(
     DebtPositionOrigin.ORDINARY,
@@ -36,13 +37,14 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
                                        ValidateDebtPositionService validateDebtPositionService,
                                        DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
                                        DebtPositionSyncService debtPositionSyncService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository) {
+                                       InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
+    this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
   @Override
@@ -54,8 +56,9 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
     generateIuv(debtPositionDTO, pagopaPayment, accessToken);
+    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
+    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
     invokeWorkflow(savedDebtPosition, pagopaPayment, accessToken);
 
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
