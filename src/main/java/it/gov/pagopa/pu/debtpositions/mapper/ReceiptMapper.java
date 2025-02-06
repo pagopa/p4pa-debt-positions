@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
-import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.stereotype.Service;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
@@ -49,40 +48,6 @@ public class ReceiptMapper {
       .creationDate(dto.getCreationDate().toLocalDateTime())
       .updateDate(dto.getUpdateDate().toLocalDateTime())
       .build();
-  }
-
-  public ReceiptDTO mapToDto(ReceiptNoPII receipt) {
-    ReceiptDTO receiptDTO = new ReceiptDTO();
-    receiptDTO.setReceiptId(receipt.getReceiptId());
-    receiptDTO.setInstallmentId(receipt.getInstallmentId());
-    receiptDTO.setIngestionFlowFileId(receipt.getIngestionFlowFileId());
-    receiptDTO.setReceiptOrigin(receipt.getReceiptOrigin());
-    receiptDTO.setPaymentReceiptId(receipt.getPaymentReceiptId());
-    receiptDTO.setNoticeNumber(receipt.getNoticeNumber());
-    receiptDTO.setPaymentNote(receipt.getPaymentNote());
-    receiptDTO.setOrgFiscalCode(receipt.getOrgFiscalCode());
-    receiptDTO.setOutcome(receipt.getOutcome());
-    receiptDTO.setCreditorReferenceId(receipt.getCreditorReferenceId());
-    receiptDTO.setPaymentAmountCents(receipt.getPaymentAmountCents());
-    receiptDTO.setDescription(receipt.getDescription());
-    receiptDTO.setCompanyName(receipt.getCompanyName());
-    receiptDTO.setOfficeName(receipt.getOfficeName());
-    receiptDTO.setIdPsp(receipt.getIdPsp());
-    receiptDTO.setPspFiscalCode(receipt.getPspFiscalCode());
-    receiptDTO.setPspPartitaIva(receipt.getPspPartitaIva());
-    receiptDTO.setPspCompanyName(receipt.getPspCompanyName());
-    receiptDTO.setIdChannel(receipt.getIdChannel());
-    receiptDTO.setChannelDescription(receipt.getChannelDescription());
-    receiptDTO.setPaymentMethod(receipt.getPaymentMethod());
-    receiptDTO.setFeeCents(receipt.getFeeCents());
-    receiptDTO.setPaymentDateTime(receipt.getPaymentDateTime());
-    receiptDTO.setApplicationDate(receipt.getApplicationDate());
-    receiptDTO.setTransferDate(receipt.getTransferDate());
-    receiptDTO.setStandin(receipt.isStandin());
-    receiptDTO.setCreationDate(localDatetimeToOffsetDateTime(receipt.getCreationDate()));
-    receiptDTO.setUpdateDate(localDatetimeToOffsetDateTime(receipt.getUpdateDate()));
-
-    return receiptDTO;
   }
 
   public ReceiptDTO mapToDto(Receipt receipt) {

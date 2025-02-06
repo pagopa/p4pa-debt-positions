@@ -28,7 +28,7 @@ public class ReceiptPIIRepositoryImpl implements ReceiptPIIRepository {
     long personalDataId = personalDataService.insert(p.getSecond(), PersonalDataType.RECEIPT);
     p.getFirst().setPersonalDataId(personalDataId);
     receipt.setNoPII(p.getFirst());
-    long newId = receiptNoPIIRepository.save(p.getFirst()).getInstallmentId();
+    long newId = receiptNoPIIRepository.save(p.getFirst()).getReceiptId();
     receipt.setReceiptId(newId);
     receipt.getNoPII().setReceiptId(newId);
     return newId;
