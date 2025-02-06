@@ -4,13 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class UtilitiesTest {
 
@@ -23,10 +19,9 @@ class UtilitiesTest {
 
   @Test
   void testLocalDatetimeToOffsetDateTime() {
-    LocalDateTime localDateTime = LocalDateTime.of(2025, 1, 1, 0, 0);
-    OffsetDateTime expectedOffsetDateTime = localDateTime.atOffset(ZoneOffset.UTC);
+    OffsetDateTime expectedOffsetDateTime = OffsetDateTime.now();
 
-    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(localDateTime);
+    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(expectedOffsetDateTime.toLocalDateTime());
 
     assertEquals(expectedOffsetDateTime, result);
     }
@@ -40,8 +35,20 @@ class UtilitiesTest {
 
   @Test
   void testLocalDatetimeToOffsetDateTimeWithNull() {
-    OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(null);
+    assertNull(Utilities.localDatetimeToOffsetDateTime(null), "The result should be null for a null input.");
+  }
 
-    assertNull(result, "The result should be null for a null input.");
+  @Test
+  void testGetRandomIUD() {
+    String iud = Utilities.getRandomIUD();
+
+    assertTrue(iud.startsWith("000"));
+  }
+
+  @Test
+  void testGetRandomicUUID() {
+    String uuid = Utilities.getRandomicUUID();
+
+    assertEquals(32, uuid.length());
   }
 }

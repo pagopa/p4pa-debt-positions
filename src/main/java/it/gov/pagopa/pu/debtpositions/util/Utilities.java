@@ -1,10 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.ZoneId;
+import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Utilities {
 
@@ -19,7 +20,7 @@ public class Utilities {
 
   public static OffsetDateTime localDatetimeToOffsetDateTime(LocalDateTime localDateTime){
     return localDateTime != null
-      ? localDateTime.atOffset(ZoneOffset.UTC)
+      ? localDateTime.atOffset(ZoneId.systemDefault().getRules().getOffset(localDateTime))
       : null;
   }
     public static boolean isValidIban(String iban) {
@@ -50,8 +51,11 @@ public class Utilities {
         return (10 - s % 10) % 10 == pi.charAt(10) - '0';
     }
 
-    /** It will remove and replace file extension */
-    public static String replaceFileExtension(String fileName, String newExtension){
-        return fileName.substring(0, fileName.lastIndexOf(".")) + newExtension;
-    }
+  public static String getRandomIUD() {
+    return "000" + getRandomicUUID();
+  }
+
+  public static String getRandomicUUID() {
+    return UUID.randomUUID().toString().replace("-", "");
+  }
 }

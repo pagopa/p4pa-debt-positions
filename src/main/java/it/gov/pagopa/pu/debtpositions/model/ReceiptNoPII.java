@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,22 +25,35 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   private Long receiptId;
   private Long installmentId;
   private Long ingestionFlowFileId;
+  @NotNull
   private String receiptOrigin;
+  @NotNull
   private String paymentReceiptId;
+  @NotNull
   private String noticeNumber;
   private String paymentNote;
+  @NotNull
   private String orgFiscalCode;
+  @NotNull
   private String outcome;
+  @NotNull
   private String creditorReferenceId;
+  @NotNull
   private Long paymentAmountCents;
+  @NotNull
   private String description;
+  @NotNull
   private String companyName;
   private String officeName;
+  @NotNull
   private String idPsp;
   private String pspFiscalCode;
   private String pspPartitaIva;
+  @NotNull
   private String pspCompanyName;
+  @NotNull
   private String idChannel;
+  @NotNull
   private String channelDescription;
   private String paymentMethod;
   private Long feeCents;
@@ -48,7 +62,10 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   private OffsetDateTime transferDate;
   private boolean standin;
   @Enumerated(EnumType.STRING)
+  @NotNull
   private PersonEntityType debtorEntityType;
+  @NotNull
   private Long personalDataId;
+  @NotNull
   private byte[] debtorFiscalCodeHash;
 }

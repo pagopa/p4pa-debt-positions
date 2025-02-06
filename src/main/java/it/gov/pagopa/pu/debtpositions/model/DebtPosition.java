@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
@@ -34,15 +35,20 @@ public class DebtPosition extends BaseEntity implements Serializable {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_generator")
   @SequenceGenerator(name = "debt_position_generator", sequenceName = "debt_position_seq", allocationSize = 1)
   private Long debtPositionId;
+  @NotNull
   private String iupdOrg;
   private String description;
   @Enumerated(EnumType.STRING)
+  @NotNull
   private DebtPositionStatus status;
   @Enumerated(EnumType.STRING)
+  @NotNull
   private DebtPositionOrigin debtPositionOrigin;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;
+  @NotNull
   private Long organizationId;
+  @NotNull
   private Long debtPositionTypeOrgId;
   private OffsetDateTime notificationDate;
   private OffsetDateTime validityDate;

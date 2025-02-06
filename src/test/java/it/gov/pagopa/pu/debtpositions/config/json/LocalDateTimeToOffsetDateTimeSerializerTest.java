@@ -1,8 +1,7 @@
-package it.gov.pagopa.pu.debtpositions.config;
+package it.gov.pagopa.pu.debtpositions.config.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import it.gov.pagopa.pu.debtpositions.config.json.LocalDateTimeToOffsetDateTimeSerializer;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

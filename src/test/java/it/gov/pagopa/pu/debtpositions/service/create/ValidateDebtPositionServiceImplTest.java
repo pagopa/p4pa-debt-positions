@@ -243,7 +243,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO secondTransfer = buildTransferDTO();
-    secondTransfer.setTransferIndex(1L);
+    secondTransfer.setTransferIndex(1);
     List<TransferDTO> transfers = List.of(secondTransfer, secondTransfer);
     debtPositionDTO.getPaymentOptions()
       .getFirst()
