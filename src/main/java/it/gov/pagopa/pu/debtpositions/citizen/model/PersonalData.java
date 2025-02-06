@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.citizen.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,6 +13,8 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PersonalData {
   @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personal_data_generator")
+  @SequenceGenerator(name = "personal_data_generator", sequenceName = "personal_data_seq", allocationSize = 1)
   private Long id;
   private String type;
   private byte[] data;
