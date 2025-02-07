@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class PersonalData {
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "personal_data_generator")
-  @SequenceGenerator(name = "personal_data_generator", sequenceName = "personal_data_seq", allocationSize = 1)
+  @SequenceGenerator(name = "personal_data_generator", sequenceName = "personal_data_id_seq", allocationSize = 1)
   private Long id;
   private String type;
   private byte[] data;
