@@ -22,4 +22,19 @@ public class PersonMapper {
     person.setEmail(dto.getEmail());
     return person;
   }
+
+  public PersonDTO mapToDto(Person person) {
+    return PersonDTO.builder()
+      .entityType(PersonDTO.EntityTypeEnum.fromValue(person.getEntityType().name()))
+      .fiscalCode(person.getFiscalCode())
+      .fullName(person.getFullName())
+      .address(person.getAddress())
+      .civic(person.getCivic())
+      .postalCode(person.getPostalCode())
+      .location(person.getLocation())
+      .province(person.getProvince())
+      .nation(person.getNation())
+      .email(person.getEmail())
+      .build();
+  }
 }

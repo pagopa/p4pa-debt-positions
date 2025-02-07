@@ -143,19 +143,18 @@ openApiGenerate {
   outputDir.set("$projectDir/build/generated")
   apiPackage.set("it.gov.pagopa.pu.debtpositions.controller.generated")
   modelPackage.set("it.gov.pagopa.pu.debtpositions.dto.generated")
-  configOptions.set(
-    mapOf(
-      "dateLibrary" to "java8",
-      "requestMappingMode" to "api_interface",
-      "useSpringBoot3" to "true",
-      "interfaceOnly" to "true",
-      "useTags" to "true",
-      "useBeanValidation" to "true",
-      "generateConstructorWithAllArgs" to "true",
-      "generatedConstructorWithRequiredArgs" to "true",
-      "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
-    )
-  )
+  openapiNormalizer.set(mapOf("REF_AS_PARENT_IN_ALLOF" to "true"))
+  configOptions.set(mapOf(
+    "dateLibrary" to "java8",
+    "requestMappingMode" to "api_interface",
+    "useSpringBoot3" to "true",
+    "interfaceOnly" to "true",
+    "useTags" to "true",
+    "useBeanValidation" to "true",
+    "generateConstructorWithAllArgs" to "true",
+    "generatedConstructorWithRequiredArgs" to "true",
+    "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
+  ))
 }
 
 var targetEnv = when (grgit.branch.current().name) {
