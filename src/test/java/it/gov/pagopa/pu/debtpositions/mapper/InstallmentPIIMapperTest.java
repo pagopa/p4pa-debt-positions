@@ -56,7 +56,7 @@ class InstallmentPIIMapperTest {
 
     reflectionEqualsByName(installmentNoPIIExpected, result.getFirst());
     reflectionEqualsByName(installmentPIIDTOExpected, result.getSecond());
-    checkNotNullFields(result.getFirst(), "transfers", "personalDataId", "debtorFiscalCodeHash");
+    checkNotNullFields(result.getFirst(), "personalDataId", "debtorFiscalCodeHash");
     checkNotNullFields(result.getSecond());
   }
 
@@ -112,7 +112,7 @@ class InstallmentPIIMapperTest {
 
     reflectionEqualsByName(installmentNoPIIExpected, result.getFirst());
     reflectionEqualsByName(installmentPIIDTOExpected, result.getSecond());
-    checkNotNullFields(result.getFirst(), "transfers", "personalDataId",
+    checkNotNullFields(result.getFirst(), "personalDataId",
       "debtorFiscalCodeHash", "syncStatus");
     checkNotNullFields(result.getSecond());
   }
