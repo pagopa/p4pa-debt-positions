@@ -9,8 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class InstallmentPIIMapper {
@@ -48,6 +47,7 @@ public class InstallmentPIIMapper {
     installmentNoPII.setCreationDate(installment.getCreationDate());
     installmentNoPII.setUpdateDate(installment.getUpdateDate());
     installmentNoPII.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
+    installmentNoPII.setTransfers(new TreeSet<>(installment.getTransfers()));
 
     if (installment.getNoPII() != null) {
       installmentNoPII.setPersonalDataId(installment.getNoPII().getPersonalDataId());

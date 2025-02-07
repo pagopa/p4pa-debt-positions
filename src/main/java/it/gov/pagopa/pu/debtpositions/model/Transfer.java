@@ -45,6 +45,9 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
 
   @Override
   public int compareTo(@Nonnull Transfer o) {
-    return Comparator.comparing(Transfer::getTransferId).compare(this, o);
+    return Comparator
+      .comparing(Transfer::getTransferId, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
+
 }

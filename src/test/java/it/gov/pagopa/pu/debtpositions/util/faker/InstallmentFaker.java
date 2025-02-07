@@ -13,12 +13,11 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPersonDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.*;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 
 public class InstallmentFaker {
 
@@ -80,6 +79,7 @@ public class InstallmentFaker {
       .creationDate(date)
       .updateDate(date)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
   }
 

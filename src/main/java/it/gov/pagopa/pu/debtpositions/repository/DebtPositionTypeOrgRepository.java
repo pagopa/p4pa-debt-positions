@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg,Long> {
 
   Optional<DebtPositionTypeOrg> findByOrganizationIdAndDebtPositionTypeOrgId(Long organizationId, Long debtPositionTypeOrgId);
+
+  Optional<DebtPositionTypeOrg> findByOrganizationIdAndCode(Long organizationId, String code);
 }

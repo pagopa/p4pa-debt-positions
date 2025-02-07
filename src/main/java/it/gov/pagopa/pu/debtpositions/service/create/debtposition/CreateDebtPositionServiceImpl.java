@@ -7,6 +7,9 @@ import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTyp
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,19 +21,25 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final ValidateDebtPositionService validateDebtPositionService;
   private final DebtPositionService debtPositionService;
   private final GenerateIuvService generateIuvService;
+  private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final DebtPositionProcessorService debtPositionProcessorService;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
                                        DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository) {
+                                       DebtPositionSyncService debtPositionSyncService,
+                                       InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
+    this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
+    this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
+  @Transactional
   @Override
   public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}, ingestionFlowFileId {}, rowNumber {}", debtPositionDTO.getOrganizationId(),
@@ -40,8 +49,10 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
     generateIuv(debtPositionDTO, pagopaPayment, accessToken);
+    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
+    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
+    invokeWorkflow(savedDebtPosition, pagopaPayment, accessToken, massive);
 
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
@@ -70,6 +81,15 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
           installment.setIuv(generatedIuv);
           installment.setNav(nav);
         });
+    }
+  }
+
+  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken, Boolean massive) {
+    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, pagopaPayment, massive);
+    if (workflow != null) {
+      log.info("Workflow created with id {}", workflow.getWorkflowId());
+    } else {
+      log.info("Workflow creation was not executed for debtPositionId {}, origin {}, pagopaPayment {}, massive {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), pagopaPayment, massive);
     }
   }
 }

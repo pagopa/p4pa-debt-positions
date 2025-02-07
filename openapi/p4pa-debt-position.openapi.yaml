@@ -608,6 +608,7 @@ components:
       type: string
       enum:
         - ORDINARY
+        - ORDINARY_SIL
         - SPONTANEOUS
         - SECONDARY_ORG
         - RECEIPT_FILE
@@ -673,3 +674,68 @@ components:
             - DEBT_POSITION_NOT_FOUND
         message:
           type: string
+    DebtPositionTypeOrgDTO:
+      required:
+        - debtPositionTypeId
+        - organizationId
+        - code
+        - description
+        - iban
+      type: object
+      properties:
+        debtPositionTypeOrgId:
+          type: integer
+          format: int64
+        debtPositionTypeId:
+          type: integer
+          format: int64
+        organizationId:
+          type: integer
+          format: int64
+        balance:
+          type: string
+        code:
+          type: string
+        description:
+          type: string
+        iban:
+          type: string
+        postalIban:
+          type: string
+        postalAccountCode:
+          type: string
+        holderPostalCc:
+          type: string
+        orgSector:
+          type: string
+        xsdDefinitionRef:
+          type: string
+        amountCents:
+          type: integer
+          format: int64
+        externalPaymentUrl:
+          type: string
+        flagAnonymousFiscalCode:
+          type: boolean
+        flagMandatoryDueDate:
+          type: boolean
+        flagSpontaneous:
+          type: boolean
+        flagNotifyIo:
+          type: boolean
+        ioTemplateMessage:
+          type: string
+        flagActive:
+          type: boolean
+        flagNotifyOutcomePush:
+          type: boolean
+        notifyOutcomePushOrgSilServiceId:
+          type: integer
+          format: int64
+        flagAmountActualization:
+          type: boolean
+        amountActualizationOrgSilServiceId:
+          type: integer
+          format: int64
+        flagExternal:
+          type: boolean
