@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -12,8 +11,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtP
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -26,12 +23,6 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
-
-  private static final Set<DebtPositionOrigin> DEBT_POSITION_ORIGIN_TO_SYNC = Set.of(
-    DebtPositionOrigin.ORDINARY,
-    DebtPositionOrigin.ORDINARY_SIL,
-    DebtPositionOrigin.SPONTANEOUS
-  );
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
@@ -59,7 +50,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
-    invokeWorkflow(savedDebtPosition, pagopaPayment, accessToken);
+    invokeWorkflow(savedDebtPosition, pagopaPayment, accessToken, massive);
 
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
@@ -91,10 +82,12 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     }
   }
 
-  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
-    if (Boolean.TRUE.equals(pagopaPayment) && DEBT_POSITION_ORIGIN_TO_SYNC.contains(debtPositionDTO.getDebtPositionOrigin())) {
-      WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken);
+  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken, Boolean massive) {
+    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, pagopaPayment, massive);
+    if (workflow != null) {
       log.info("Workflow created with id {}", workflow.getWorkflowId());
+    } else {
+      log.warn("Workflow creation failed for Debt Position id {}, origin {} and pagopaPayment {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), pagopaPayment);
     }
   }
 }
