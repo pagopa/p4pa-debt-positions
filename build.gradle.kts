@@ -242,9 +242,9 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
       "useJakartaEe" to "true",
       "serializationLibrary" to "jackson",
       "generateSupportingFiles" to "true",
-      "generateConstructorWithAllArgs" to "false",
+      "generateConstructorWithAllArgs" to "true",
       "generatedConstructorWithRequiredArgs" to "true",
-      "additionalModelTypeAnnotations" to "@lombok.Data @lombok.Builder @lombok.AllArgsConstructor"
+      "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
     )
   )
   library.set("resttemplate")

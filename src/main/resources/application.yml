@@ -130,7 +130,7 @@ rest:
   organization:
     base-url: "\${ORGANIZATION_BASE_URL:http://localhost:8081}"
   workflow-hub:
-    base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}"
+    base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}/workflowhub"
 
 iuv:
   informationSystemId: "00"
