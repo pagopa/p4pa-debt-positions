@@ -32,4 +32,15 @@ class PersonMapperTest {
     reflectionEqualsByName(personExpected, result);
     checkNotNullFields(result);
   }
+
+  @Test
+  void givenValidPerson_WhenMapToDto_ThenReturnPersonDTO() {
+    Person person = buildPerson();
+    PersonDTO personDTOExpected = buildPersonDTO();
+
+    PersonDTO result = personMapper.mapToDto(person);
+
+    reflectionEqualsByName(personDTOExpected, result);
+    checkNotNullFields(result);
+  }
 }
