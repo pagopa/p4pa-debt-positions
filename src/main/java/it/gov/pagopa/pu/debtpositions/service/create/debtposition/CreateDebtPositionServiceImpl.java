@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
+  @Transactional
   @Override
   public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}, ingestionFlowFileId {}, rowNumber {}", debtPositionDTO.getOrganizationId(),
@@ -87,7 +89,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     if (workflow != null) {
       log.info("Workflow created with id {}", workflow.getWorkflowId());
     } else {
-      log.warn("Workflow creation failed for Debt Position id {}, origin {} and pagopaPayment {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), pagopaPayment);
+      log.info("Workflow creation was not executed for debtPositionId {}, origin {}, pagopaPayment {}, massive {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), pagopaPayment, massive);
     }
   }
 }
