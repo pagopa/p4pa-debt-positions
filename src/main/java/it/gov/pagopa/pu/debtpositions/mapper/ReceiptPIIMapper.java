@@ -53,6 +53,9 @@ public class ReceiptPIIMapper {
     receiptNoPII.setUpdateOperatorExternalId(receipt.getUpdateOperatorExternalId());
     receiptNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(receipt.getDebtor().getFiscalCode()));
     receiptNoPII.setDebtorEntityType(receipt.getDebtor().getEntityType());
+    if (receipt.getNoPII() != null) {
+      receiptNoPII.setPersonalDataId(receipt.getNoPII().getPersonalDataId());
+    }
 
     ReceiptPIIDTO receiptPIIDTO = ReceiptPIIDTO.builder()
       .debtor(receipt.getDebtor())
