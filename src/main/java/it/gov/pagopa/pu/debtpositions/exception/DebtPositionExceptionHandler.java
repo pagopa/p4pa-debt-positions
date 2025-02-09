@@ -9,6 +9,8 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
@@ -39,14 +41,14 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CodeEnum.FORBIDDEN);
   }
 
-  @ExceptionHandler({ConflictErrorException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
-  }
-
-  @ExceptionHandler({NotFoundException.class})
+  @ExceptionHandler({NotFoundException.class, ResourceNotFoundException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleNotFoundError(RuntimeException ex, HttpServletRequest request){
     return handleException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
+  }
+
+  @ExceptionHandler({ConflictErrorException.class, DataIntegrityViolationException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
+    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
   }
 
   @ExceptionHandler({InvalidStatusTransitionException.class})
