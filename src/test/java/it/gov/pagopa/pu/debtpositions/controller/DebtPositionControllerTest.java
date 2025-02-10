@@ -71,15 +71,13 @@ class DebtPositionControllerTest {
   void whenCreateDebtPositionThenOk() throws Exception {
     DebtPositionDTO inputDTO = buildDebtPositionDTO();
     Boolean massive = false;
-    Boolean pagopaPayment = true;
 
-    Mockito.when(createDebtPositionService.createDebtPosition(inputDTO, massive, pagopaPayment, null, null))
+    Mockito.when(createDebtPositionService.createDebtPosition(inputDTO, massive, null, null))
       .thenReturn(buildDebtPositionDTO());
 
     MvcResult result = mockMvc.perform(
         post("/debt-positions")
           .param("massive", String.valueOf(massive))
-          .param("pagopaPayment", String.valueOf(pagopaPayment))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(inputDTO)))
       .andExpect(status().isOk())

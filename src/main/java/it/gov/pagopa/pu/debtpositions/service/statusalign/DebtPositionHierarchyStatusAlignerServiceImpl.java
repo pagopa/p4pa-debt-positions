@@ -46,7 +46,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new NotFoundException("Debt position related to the id " + debtPositionId + " does not found");
+      throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
     }
 
     debtPosition.getPaymentOptions().forEach(paymentOption ->
@@ -86,7 +86,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
-      throw new NotFoundException("Debt position related to the transfer with id " + transferId + " does not found");
+      throw new NotFoundException(String.format("Debt position related to the transfer with id %s was not found", transferId));
     }
 
     debtPosition.getPaymentOptions().stream()
@@ -115,7 +115,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new NotFoundException("Debt position related to the id " + debtPositionId + " does not found");
+      throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
     }
 
     debtPosition.getPaymentOptions().forEach(paymentOption ->
