@@ -146,7 +146,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   private void updateInstallmentFields(InstallmentNoPII installment, InstallmentStatus status, Broker broker, Long receiptId) {
     if (receiptId != null) {
-      //installment.setReceiptId(receiptId);  //TODO task P4PADEV-2070
+      installment.setReceiptId(receiptId);
     }
     switch (broker.getPagoPaInteractionModel()) {
       case SYNC -> installment.setStatus(status);
@@ -165,7 +165,7 @@ public class ReceiptServiceImpl implements ReceiptService {
   }
 
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken) {
-    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, true, false);
+    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, false);
     if (workflow != null) {
       log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
     } else {
