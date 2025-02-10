@@ -31,6 +31,7 @@ class ReceiptServiceImplTest {
   @Test
   void givenValidOrganizationAndNavWhGetReceiptsByOrganizationIdAndNavThenOk() {
     //given
+    String accessToken = "ACCESS_TOKEN";
     ReceiptWithAdditionalNodeDataDTO receipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Receipt receiptModel = podamFactory.manufacturePojo(Receipt.class);
     long receiptId = receiptModel.getReceiptId();
@@ -40,7 +41,7 @@ class ReceiptServiceImplTest {
     Mockito.when(receiptPIIRepositoryMock.save(receiptModel)).thenReturn(receiptId);
 
     //when
-    ReceiptDTO response = receiptService.createReceipt(receipt);
+    ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
 
     //verify
     Assertions.assertNotNull(response);

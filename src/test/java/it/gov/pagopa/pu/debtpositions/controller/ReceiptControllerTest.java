@@ -41,7 +41,7 @@ class ReceiptControllerTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())))).thenReturn(expectedResponse);
+    Mockito.when(receiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())), Mockito.any())).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.post("/receipts")
@@ -55,6 +55,7 @@ class ReceiptControllerTest {
     TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate");
 
     Mockito.verify(receiptServiceMock, Mockito.times(1)).createReceipt(
-      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())));
+      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
+      Mockito.any());
   }
 }
