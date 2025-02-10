@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
@@ -178,7 +180,7 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenPersonWithAnonimousCFButNotAnonymousFlagThenThrowValidationException() {
+  void givenPersonWithAnonymousCFButNotAnonymousFlagThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     mockDebtPositionTypeOrg.setFlagAnonymousFiscalCode(false);
@@ -193,6 +195,8 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonWithNullFullNameThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.REPORTING_PAGOPA);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setFullName(null);
 
@@ -205,6 +209,8 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonWithNullEmailThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
 
@@ -217,6 +223,8 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonWithInvalidEmailThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail("test&it");
 
@@ -229,6 +237,8 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenNoTransfersThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SECONDARY_ORG);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(null);
 
@@ -241,6 +251,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenTransfersMismatchThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setTransferIndex(1);
@@ -260,6 +271,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenSecondTransferPIVANullThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setOrgFiscalCode(null);
@@ -279,6 +291,8 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenSecondTransferPIVANotValidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
+    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setOrgFiscalCode("00000000001");
@@ -379,6 +393,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenSecondTransferThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     DebtPositionTypeOrg mockDebtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO secondTransfer = buildTransferDTO();
     List<TransferDTO> transfers = List.of(secondTransfer, secondTransfer);
@@ -403,6 +418,50 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionTypeOrgRepository.findById(2L)).thenReturn(Optional.of(mockDebtPositionTypeOrg));
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken));
+  }
+
+  @Test
+  void testValidateWhenDPOriginOrdinaryAndStatusPaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.ORDINARY, DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+  }
+
+  @Test
+  void testValidateWhenDPOriginOrdinarySilAndStatusPaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.ORDINARY_SIL,DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+  }
+
+  @Test
+  void testValidateWhenDPOriginSpontaneousAndStatusUnpaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS, DebtPositionStatus.PAID, "A Debt Position with origin SPONTANEOUS can only be created in UNPAID state");
+  }
+
+  @Test
+  void testValidateWhenDPOriginSecondaryOrgAndStatusUnpaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.SECONDARY_ORG, DebtPositionStatus.UNPAID, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+  }
+
+  @Test
+  void testValidateWhenDPReceiptPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_PAGOPA, DebtPositionStatus.UNPAID, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+  }
+
+  @Test
+  void testValidateWhenDPReceiptFileAndStatusUnpaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_FILE, DebtPositionStatus.UNPAID, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+  }
+
+  @Test
+  void testValidateWhenDPReportingPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
+    testValidateDPOrigin(DebtPositionOrigin.REPORTING_PAGOPA, DebtPositionStatus.UNPAID, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+  }
+
+  private void testValidateDPOrigin(DebtPositionOrigin origin, DebtPositionStatus status, String errorMessage) {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(origin);
+    debtPositionDTO.setStatus(status);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken));
+    assertEquals(errorMessage, invalidValueException.getMessage());
   }
 }
 
