@@ -37,6 +37,7 @@ public class DebtPositionMapper {
     debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
     debtPosition.setMultiDebtor(dto.getMultiDebtor());
+    debtPosition.setFlagPagoPaPayment(dto.getFlagPagoPaPayment());
     debtPosition.setCreationDate(dto.getCreationDate().toLocalDateTime());
     debtPosition.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
 
@@ -67,6 +68,7 @@ public class DebtPositionMapper {
       .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
       .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
       .multiDebtor(debtPosition.isMultiDebtor())
+      .flagPagoPaPayment(debtPosition.isFlagPagoPaPayment())
       .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
       .paymentOptions(

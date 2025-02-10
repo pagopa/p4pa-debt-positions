@@ -29,6 +29,7 @@ public class DebtPositionFaker {
     debtPosition.setValidityDate(DATE);
     debtPosition.setFlagIuvVolatile(true);
     debtPosition.setMultiDebtor(false);
+    debtPosition.setFlagPagoPaPayment(false);
     debtPosition.setCreationDate(DATE.toLocalDateTime());
     debtPosition.setUpdateDate(DATE.toLocalDateTime());
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildPaymentOption()))));
@@ -47,6 +48,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
+    debtPositionDTO.setFlagPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATE);
     debtPositionDTO.setUpdateDate(DATE);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
@@ -65,6 +67,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
+    debtPositionDTO.setFlagPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATE);
     debtPositionDTO.setUpdateDate(DATE);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));

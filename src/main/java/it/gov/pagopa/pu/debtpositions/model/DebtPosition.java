@@ -51,6 +51,7 @@ public class DebtPosition extends BaseEntity implements Serializable {
   private OffsetDateTime validityDate;
   private boolean flagIuvVolatile;
   private boolean multiDebtor;
+  private boolean flagPagoPaPayment;
 
   @OneToMany(mappedBy = "debtPositionId")
   private SortedSet<PaymentOption> paymentOptions;
