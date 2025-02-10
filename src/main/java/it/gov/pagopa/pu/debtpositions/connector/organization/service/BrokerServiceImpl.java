@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerEntityClient;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -10,9 +12,11 @@ import java.util.Optional;
 public class BrokerServiceImpl implements BrokerService {
 
   private final BrokerSearchClient brokerSearchClient;
+  private final BrokerEntityClient brokerEntityClient;
 
-  public BrokerServiceImpl(BrokerSearchClient brokerSearchClient) {
+  public BrokerServiceImpl(BrokerSearchClient brokerSearchClient, BrokerEntityClient brokerEntityClient) {
     this.brokerSearchClient = brokerSearchClient;
+    this.brokerEntityClient = brokerEntityClient;
   }
 
   @Override
@@ -20,5 +24,11 @@ public class BrokerServiceImpl implements BrokerService {
     return Optional.ofNullable(
       brokerSearchClient.findByOrganizationId(organizationId, accessToken)
     );
+  }
+
+  @Override
+  @Cacheable
+  public Broker findById(Long brokerId, String accessToken) {
+    return brokerEntityClient.findById(brokerId, accessToken);
   }
 }
