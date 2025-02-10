@@ -35,15 +35,17 @@ public class InstallmentMapper {
     installment.setDueDate(dto.getDueDate());
     installment.setPaymentTypeCode(dto.getPaymentTypeCode());
     installment.setAmountCents(dto.getAmountCents());
-    installment.setNotificationFeeCents(dto.getNotificationFeeCents());
     installment.setRemittanceInformation(dto.getRemittanceInformation());
-    installment.setHumanFriendlyRemittanceInformation(dto.getHumanFriendlyRemittanceInformation());
     installment.setBalance(dto.getBalance());
     installment.setLegacyPaymentMetadata(dto.getLegacyPaymentMetadata());
     installment.setDebtor(personMapper.mapToModel(dto.getDebtor()));
     installment.setTransfers(dto.getTransfers().stream()
       .map(transferMapper::mapToModel)
       .toList());
+    installment.setNotificationDate(dto.getNotificationDate());
+    installment.setIngestionFlowFileId(dto.getIngestionFlowFileId());
+    installment.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
+    installment.setReceiptId(dto.getReceiptId());
     installment.setCreationDate(dto.getCreationDate().toLocalDateTime());
     installment.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
     return installment;
@@ -63,14 +65,16 @@ public class InstallmentMapper {
       .dueDate(installment.getDueDate())
       .paymentTypeCode(installment.getPaymentTypeCode())
       .amountCents(installment.getAmountCents())
-      .notificationFeeCents(installment.getNotificationFeeCents())
       .remittanceInformation(installment.getRemittanceInformation())
-      .humanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation())
       .balance(installment.getBalance())
       .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
         .toList())
+      .notificationDate(installment.getNotificationDate())
+      .ingestionFlowFileId(installment.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
+      .receiptId(installment.getReceiptId())
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();
@@ -100,15 +104,17 @@ public class InstallmentMapper {
       .dueDate(installment.getDueDate())
       .paymentTypeCode(installment.getPaymentTypeCode())
       .amountCents(installment.getAmountCents())
-      .notificationFeeCents(installment.getNotificationFeeCents())
       .remittanceInformation(installment.getRemittanceInformation())
-      .humanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation())
       .balance(installment.getBalance())
       .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
       .debtor(null) //TODO P4ADEV-2028
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
         .toList())
+      .notificationDate(installment.getNotificationDate())
+      .ingestionFlowFileId(installment.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
+      .receiptId(installment.getReceiptId())
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();

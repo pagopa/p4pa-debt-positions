@@ -23,7 +23,6 @@ public class ReceiptPIIMapper {
     ReceiptNoPII receiptNoPII = new ReceiptNoPII();
 
     receiptNoPII.setReceiptId(receipt.getReceiptId());
-    receiptNoPII.setInstallmentId(receipt.getInstallmentId());
     receiptNoPII.setIngestionFlowFileId(receipt.getIngestionFlowFileId());
     receiptNoPII.setReceiptOrigin(receipt.getReceiptOrigin());
     receiptNoPII.setPaymentReceiptId(receipt.getPaymentReceiptId());
@@ -69,7 +68,6 @@ public class ReceiptPIIMapper {
     ReceiptPIIDTO pii = personalDataService.get(receiptNoPII.getPersonalDataId(), ReceiptPIIDTO.class);
     return Receipt.builder()
       .receiptId(receiptNoPII.getReceiptId())
-      .installmentId(receiptNoPII.getInstallmentId())
       .ingestionFlowFileId(receiptNoPII.getIngestionFlowFileId())
       .receiptOrigin(receiptNoPII.getReceiptOrigin())
       .paymentReceiptId(receiptNoPII.getPaymentReceiptId())

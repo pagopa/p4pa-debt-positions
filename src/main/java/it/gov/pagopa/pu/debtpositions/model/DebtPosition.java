@@ -44,15 +44,14 @@ public class DebtPosition extends BaseEntity implements Serializable {
   @Enumerated(EnumType.STRING)
   @NotNull
   private DebtPositionOrigin debtPositionOrigin;
-  private Long ingestionFlowFileId;
-  private Long ingestionFlowFileLineNumber;
   @NotNull
   private Long organizationId;
   @NotNull
   private Long debtPositionTypeOrgId;
-  private OffsetDateTime notificationDate;
   private OffsetDateTime validityDate;
   private boolean flagIuvVolatile;
+  private boolean multiDebtor;
+  private boolean flagPagoPaPayment;
 
   @OneToMany(mappedBy = "debtPositionId")
   private SortedSet<PaymentOption> paymentOptions;

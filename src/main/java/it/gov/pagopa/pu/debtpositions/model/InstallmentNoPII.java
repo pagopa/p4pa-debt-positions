@@ -46,10 +46,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private String paymentTypeCode;
   @NotNull
   private Long amountCents;
-  private Long notificationFeeCents;
   @NotNull
   private String remittanceInformation;
-  private String humanFriendlyRemittanceInformation;
   private String balance;
   @NotNull
   private String legacyPaymentMetadata;
@@ -62,6 +60,10 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private byte[] debtorFiscalCodeHash;
   @Embedded
   private InstallmentSyncStatus syncStatus;
+  private OffsetDateTime notificationDate;
+  private Long ingestionFlowFileId;
+  private Long ingestionFlowFileLineNumber;
+  private Long receiptId;
 
   @OneToMany(mappedBy = "installmentId")
   private SortedSet<Transfer> transfers;
