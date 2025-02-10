@@ -37,6 +37,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenDebtPositionWhenInvokeWorkflowSYNCThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.SYNC);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
@@ -45,7 +46,7 @@ class DebtPositionSyncServiceImplTest {
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
     Mockito.when(workflowService.handleDpSync(debtPositionDTO, null)).thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null,false);
 
     assertEquals(expectedResult, result);
   }
@@ -53,6 +54,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenDebtPositionWhenInvokeWorkflowSYNC_ACAThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.SYNC_ACA);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
@@ -61,7 +63,7 @@ class DebtPositionSyncServiceImplTest {
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
     Mockito.when(workflowService.alignDpSyncAca(debtPositionDTO, null)).thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertEquals(expectedResult, result);
   }
@@ -69,6 +71,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenDebtPositionWhenInvokeWorkflowSYNC_GPDPRELOADThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.SYNC_GPDPRELOAD);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
@@ -77,7 +80,7 @@ class DebtPositionSyncServiceImplTest {
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
     Mockito.when(workflowService.alignDpSyncGpdPreload(debtPositionDTO, null)).thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertEquals(expectedResult, result);
   }
@@ -85,6 +88,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenDebtPositionWhenInvokeWorkflowSYNC_ACA_GPDPRELOADThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.SYNC_ACA_GPDPRELOAD);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
@@ -93,7 +97,7 @@ class DebtPositionSyncServiceImplTest {
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
     Mockito.when(workflowService.alignDpSyncAcaGpdPreload(debtPositionDTO, null)).thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertEquals(expectedResult, result);
   }
@@ -101,12 +105,13 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenMassiveTrueWhenInvokeWorkflowSYNC_ACA_GPDPRELOADThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.SYNC_ACA_GPDPRELOAD);
 
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, true);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true);
 
     assertNull(result);
   }
@@ -114,6 +119,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenDebtPositionWhenInvokeWorkflowASYNC_GPDThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.ASYNC_GPD);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
@@ -122,7 +128,7 @@ class DebtPositionSyncServiceImplTest {
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
     Mockito.when(workflowService.alignDpGPD(debtPositionDTO, null)).thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertEquals(expectedResult, result);
   }
@@ -130,12 +136,13 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenMassiveTrueWhenInvokeWorkflowASYNC_GPDThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     Broker broker = new Broker();
     broker.setPagoPaInteractionModel(Broker.PagoPaInteractionModelEnum.ASYNC_GPD);
 
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(broker));
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, true);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true);
 
     assertNull(result);
   }
@@ -143,10 +150,11 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenInvalidbrokerWhenInvokeWorkflowASYNC_GPDThenNull() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
 
     Mockito.when(brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.empty());
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertNull(result);
   }
@@ -154,9 +162,10 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenOriginDifferentWhenInvokeWorkflowASYNC_GPDThenNull() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, true, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertNull(result);
   }
@@ -165,7 +174,7 @@ class DebtPositionSyncServiceImplTest {
   void givenPagoPaPaymentFalseWhenInvokeWorkflowASYNC_GPDThenNull() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false, false);
+    WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
 
     assertNull(result);
   }

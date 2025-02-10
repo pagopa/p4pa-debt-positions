@@ -24,10 +24,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment) {
+  public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, pagopaPayment, accessToken, operatorExternalUserId);
+    DebtPositionDTO body = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 
