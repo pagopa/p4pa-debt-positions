@@ -31,14 +31,13 @@ public class DebtPositionMapper {
     debtPosition.setIupdOrg(dto.getIupdOrg());
     debtPosition.setDescription(dto.getDescription());
     debtPosition.setStatus(dto.getStatus());
-    debtPosition.setIngestionFlowFileId(dto.getIngestionFlowFileId());
-    debtPosition.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
     debtPosition.setOrganizationId(dto.getOrganizationId());
     debtPosition.setDebtPositionTypeOrgId(dto.getDebtPositionTypeOrgId());
-    debtPosition.setNotificationDate(dto.getNotificationDate());
     debtPosition.setValidityDate(dto.getValidityDate());
     debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
+    debtPosition.setMultiDebtor(dto.getMultiDebtor());
+    debtPosition.setFlagPagoPaPayment(dto.getFlagPagoPaPayment());
     debtPosition.setCreationDate(dto.getCreationDate().toLocalDateTime());
     debtPosition.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
 
@@ -63,14 +62,13 @@ public class DebtPositionMapper {
       .iupdOrg(debtPosition.getIupdOrg())
       .description(debtPosition.getDescription())
       .status(debtPosition.getStatus())
-      .ingestionFlowFileId(debtPosition.getIngestionFlowFileId())
-      .ingestionFlowFileLineNumber(debtPosition.getIngestionFlowFileLineNumber())
       .organizationId(debtPosition.getOrganizationId())
       .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
-      .notificationDate(debtPosition.getNotificationDate())
       .validityDate(debtPosition.getValidityDate())
       .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
       .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
+      .multiDebtor(debtPosition.isMultiDebtor())
+      .flagPagoPaPayment(debtPosition.isFlagPagoPaPayment())
       .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
       .paymentOptions(

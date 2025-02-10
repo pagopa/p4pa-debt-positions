@@ -33,13 +33,15 @@ public class Installment {
   private OffsetDateTime dueDate;
   private String paymentTypeCode;
   private Long amountCents;
-  private Long notificationFeeCents;
   private String remittanceInformation;
-  private String humanFriendlyRemittanceInformation;
   private String balance;
   private String legacyPaymentMetadata;
   private Person debtor;
   private List<Transfer> transfers;
+  private OffsetDateTime notificationDate;
+  private Long ingestionFlowFileId;
+  private Long ingestionFlowFileLineNumber;
+  private Long receiptId;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private String updateOperatorExternalId;

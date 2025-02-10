@@ -32,7 +32,6 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   @Enumerated(EnumType.STRING)
   @NotNull
   private PaymentOptionStatus status;
-  private boolean multiDebtor;
   private OffsetDateTime dueDate;
   @NotNull
   private String description;

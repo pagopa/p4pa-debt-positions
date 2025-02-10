@@ -37,13 +37,15 @@ public class InstallmentPIIMapper {
     installmentNoPII.setDueDate(installment.getDueDate());
     installmentNoPII.setPaymentTypeCode(installment.getPaymentTypeCode());
     installmentNoPII.setAmountCents(installment.getAmountCents());
-    installmentNoPII.setNotificationFeeCents(installment.getNotificationFeeCents());
     installmentNoPII.setRemittanceInformation(installment.getRemittanceInformation());
-    installmentNoPII.setHumanFriendlyRemittanceInformation(installment.getHumanFriendlyRemittanceInformation());
     installmentNoPII.setBalance(installment.getBalance());
     installmentNoPII.setLegacyPaymentMetadata(installment.getLegacyPaymentMetadata());
     installmentNoPII.setDebtorEntityType(installment.getDebtor().getEntityType());
     installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getFiscalCode()));
+    installmentNoPII.setNotificationDate(installment.getNotificationDate());
+    installmentNoPII.setIngestionFlowFileId(installment.getIngestionFlowFileId());
+    installmentNoPII.setIngestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber());
+    installmentNoPII.setReceiptId(installment.getReceiptId());
     installmentNoPII.setCreationDate(installment.getCreationDate());
     installmentNoPII.setUpdateDate(installment.getUpdateDate());
     installmentNoPII.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
@@ -80,11 +82,13 @@ public class InstallmentPIIMapper {
       .dueDate(installmentNoPII.getDueDate())
       .paymentTypeCode(installmentNoPII.getPaymentTypeCode())
       .amountCents(installmentNoPII.getAmountCents())
-      .notificationFeeCents(installmentNoPII.getNotificationFeeCents())
       .remittanceInformation(installmentNoPII.getRemittanceInformation())
-      .humanFriendlyRemittanceInformation(installmentNoPII.getHumanFriendlyRemittanceInformation())
       .balance(installmentNoPII.getBalance())
       .legacyPaymentMetadata(installmentNoPII.getLegacyPaymentMetadata())
+      .notificationDate(installmentNoPII.getNotificationDate())
+      .ingestionFlowFileId(installmentNoPII.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(installmentNoPII.getIngestionFlowFileLineNumber())
+      .receiptId(installmentNoPII.getReceiptId())
       .creationDate(installmentNoPII.getCreationDate())
       .updateDate(installmentNoPII.getUpdateDate())
       .updateOperatorExternalId(installmentNoPII.getUpdateOperatorExternalId())

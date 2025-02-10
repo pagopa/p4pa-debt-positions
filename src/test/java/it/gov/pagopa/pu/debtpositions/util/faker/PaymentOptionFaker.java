@@ -24,7 +24,6 @@ public class PaymentOptionFaker {
     paymentOption.setTotalAmountCents(2000L);
     paymentOption.setDueDate(DATE);
     paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
-    paymentOption.setMultiDebtor(true);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
     paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildInstallmentNoPII()))));
@@ -38,7 +37,6 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setDueDate(DATE);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
-    paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
@@ -52,7 +50,6 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setDueDate(DATE);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
-    paymentOptionDTO.setMultiDebtor(true);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));

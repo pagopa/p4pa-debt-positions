@@ -23,7 +23,6 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receipt_generator")
   @SequenceGenerator(name = "receipt_generator", sequenceName = "receipt_seq", allocationSize = 1)
   private Long receiptId;
-  private Long installmentId;
   private Long ingestionFlowFileId;
   @NotNull
   private String receiptOrigin;

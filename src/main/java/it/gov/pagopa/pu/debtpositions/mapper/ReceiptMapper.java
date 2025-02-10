@@ -18,7 +18,6 @@ public class ReceiptMapper {
   public Receipt mapToModel(ReceiptDTO dto) {
     return Receipt.builder()
       .receiptId(dto.getReceiptId())
-      .installmentId(dto.getInstallmentId())
       .ingestionFlowFileId(dto.getIngestionFlowFileId())
       .receiptOrigin(dto.getReceiptOrigin())
       .paymentReceiptId(dto.getPaymentReceiptId())
@@ -53,7 +52,6 @@ public class ReceiptMapper {
   public ReceiptDTO mapToDto(Receipt receipt) {
     return ReceiptDTO.builder()
       .receiptId(receipt.getReceiptId())
-      .installmentId(receipt.getInstallmentId())
       .ingestionFlowFileId(receipt.getIngestionFlowFileId())
       .receiptOrigin(receipt.getReceiptOrigin())
       .paymentReceiptId(receipt.getPaymentReceiptId())
