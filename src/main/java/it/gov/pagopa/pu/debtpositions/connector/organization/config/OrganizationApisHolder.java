@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
+import it.gov.pagopa.pu.organization.client.generated.BrokerSearchControllerApi;
 import it.gov.pagopa.pu.organization.client.generated.*;
 import it.gov.pagopa.pu.organization.generated.ApiClient;
 import it.gov.pagopa.pu.organization.generated.BaseApi;
@@ -20,6 +21,8 @@ public class OrganizationApisHolder {
 
   private final BrokerEntityControllerApi brokerEntityControllerApi;
 
+  private final BrokerSearchControllerApi brokerSearchControllerApi;
+
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
   public OrganizationApisHolder(
@@ -34,6 +37,7 @@ public class OrganizationApisHolder {
     this.taxonomySearchControllerApi = new TaxonomySearchControllerApi(apiClient);
     this.organizationEntityControllerApi = new OrganizationEntityControllerApi(apiClient);
     this.brokerEntityControllerApi = new BrokerEntityControllerApi(apiClient);
+    this.brokerSearchControllerApi = new BrokerSearchControllerApi(apiClient);
   }
 
   @PreDestroy
@@ -58,6 +62,10 @@ public class OrganizationApisHolder {
 
   public BrokerEntityControllerApi getBrokerEntityControllerApi(String accessToken) {
     return getApi(accessToken, brokerEntityControllerApi);
+  }
+
+  public BrokerSearchControllerApi getBrokerSearchControllerApi(String accessToken) {
+    return getApi(accessToken, brokerSearchControllerApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {

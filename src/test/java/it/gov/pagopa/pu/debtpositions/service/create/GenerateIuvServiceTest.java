@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -30,6 +30,8 @@ class GenerateIuvServiceTest {
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
   private static final Organization VALID_ORG = OrganizationFaker.buildOrganization()
     .organizationId(1L)
+    .orgName("ORG_NAME")
+    .status(Organization.StatusEnum.ACTIVE)
     .orgFiscalCode(VALID_ORG_FISCAL_CODE)
     .ipaCode(VALID_ORG_IPA_CODE);
   private static final String VALID_IUV = "12345678901234567";

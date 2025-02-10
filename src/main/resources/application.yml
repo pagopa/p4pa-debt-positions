@@ -128,7 +128,9 @@ rest:
     connect-millis: "\${DEFAULT_REST_CONNECT_TIMEOUT_MILLIS:60000}"
     read-millis: "\${DEFAULT_REST_READ_TIMEOUT_MILLIS:60000}"
   organization:
-    base-url: "\${ORGANIZATION_BASE_URL:http://p4pa-organization-microservice-chart:8080}"
+    base-url: "\${ORGANIZATION_BASE_URL:http://localhost:8081}"
+  workflow-hub:
+    base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}/workflowhub"
 
 iuv:
-  informationSystemId: 00
+  informationSystemId: "00"

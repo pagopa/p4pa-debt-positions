@@ -68,6 +68,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
 
   @Override
   public int compareTo(@Nonnull InstallmentNoPII o) {
-    return Comparator.comparing(InstallmentNoPII::getInstallmentId).compare(this, o);
+    return Comparator
+      .comparing(InstallmentNoPII::getInstallmentId, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
 }

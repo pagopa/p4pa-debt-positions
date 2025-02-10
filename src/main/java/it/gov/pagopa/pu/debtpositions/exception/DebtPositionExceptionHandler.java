@@ -9,15 +9,19 @@ import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.ErrorResponse;
+import org.springframework.web.ErrorResponseException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.util.stream.Collectors;
 
@@ -37,14 +41,14 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CodeEnum.FORBIDDEN);
   }
 
-  @ExceptionHandler({ConflictErrorException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
-  }
-
-  @ExceptionHandler({NotFoundException.class})
+  @ExceptionHandler({NotFoundException.class, ResourceNotFoundException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleNotFoundError(RuntimeException ex, HttpServletRequest request){
     return handleException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.NOT_FOUND);
+  }
+
+  @ExceptionHandler({ConflictErrorException.class, DataIntegrityViolationException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
+    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.CONFLICT);
   }
 
   @ExceptionHandler({InvalidStatusTransitionException.class})
@@ -53,18 +57,20 @@ public class DebtPositionExceptionHandler {
   }
 
 
-  @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class, MethodArgumentNotValidException.class})
+  @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class, MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleViolationException(Exception ex, HttpServletRequest request) {
     return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 
-  @ExceptionHandler({ServletException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleServletException(ServletException ex, HttpServletRequest request) {
+  @ExceptionHandler({ServletException.class, ErrorResponseException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleServletException(Exception ex, HttpServletRequest request) {
     HttpStatusCode httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
     DebtPositionErrorDTO.CodeEnum errorCode = DebtPositionErrorDTO.CodeEnum.GENERIC_ERROR;
     if (ex instanceof ErrorResponse errorResponse) {
       httpStatus = errorResponse.getStatusCode();
-      if (httpStatus.is4xxClientError()) {
+      if(httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND)) {
+        errorCode = DebtPositionErrorDTO.CodeEnum.NOT_FOUND;
+      } else if (httpStatus.is4xxClientError()) {
         errorCode = DebtPositionErrorDTO.CodeEnum.BAD_REQUEST;
       }
     }
@@ -92,6 +98,9 @@ public class DebtPositionExceptionHandler {
       getRequestDetails(request),
       httpStatus.value(),
       ex.getMessage());
+    if(log.isDebugEnabled() && ex.getCause()!=null){
+      log.debug("CausedBy: ", ex.getCause());
+    }
   }
 
   private static String buildReturnedMessage(Exception ex) {
