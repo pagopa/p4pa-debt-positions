@@ -63,7 +63,8 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       });
     });
 
-    return debtPositionMapper.mapToDto(savedDebtPosition);
+    DebtPosition refreshedDebtPosition = debtPositionRepository.getReferenceById(savedDebtPosition.getDebtPositionId());
+    return debtPositionMapper.mapToDto(refreshedDebtPosition);
   }
 }
 

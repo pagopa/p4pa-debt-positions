@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -29,12 +31,14 @@ class InstallmentMapperTest {
   private PersonMapper personMapperMock;
   @Mock
   private TransferMapper transferMapperMock;
+  @Mock
+  private PersonalDataService personalDataServiceMock;
 
   private InstallmentMapper installmentMapper;
 
   @BeforeEach
   void setUp(){
-    installmentMapper = new InstallmentMapper(personMapperMock, transferMapperMock);
+    installmentMapper = new InstallmentMapper(personMapperMock, transferMapperMock, personalDataServiceMock);
   }
 
   @Test
@@ -89,12 +93,14 @@ class InstallmentMapperTest {
   void givenMapInstallmentToDtoThenOk(){
     Installment installmentExpected = buildInstallment();
 
+    Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(buildInstallmentPIIDTO());
+    Mockito.when(personMapperMock.mapToDto(buildPerson())).thenReturn(buildPersonDTO());
     Mockito.when(transferMapperMock.mapToDto(buildTransfer())).thenReturn(buildTransferDTO());
 
     InstallmentDTO result = installmentMapper.mapToDto(installmentExpected);
 
-    reflectionEqualsByName(installmentExpected, result, "debtor");  //TODO P4ADEV-2028
-    checkNotNullFields(result, "debtor");  //TODO P4ADEV-2028
+    reflectionEqualsByName(installmentExpected, result);
+    checkNotNullFields(result);
   }
 }
 
