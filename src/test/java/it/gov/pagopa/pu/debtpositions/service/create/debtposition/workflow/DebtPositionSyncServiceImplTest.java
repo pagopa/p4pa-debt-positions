@@ -162,6 +162,7 @@ class DebtPositionSyncServiceImplTest {
   @Test
   void givenOriginDifferentWhenInvokeWorkflowASYNC_GPDThenNull() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
 
     WorkflowCreatedDTO result = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false);
