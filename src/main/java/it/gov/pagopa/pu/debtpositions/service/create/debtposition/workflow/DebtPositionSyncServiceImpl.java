@@ -29,8 +29,8 @@ public class DebtPositionSyncServiceImpl implements DebtPositionSyncService {
   }
 
   @Override
-  public WorkflowCreatedDTO invokeWorkFlow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean pagopaPayment, Boolean massive) {
-    if (Boolean.TRUE.equals(pagopaPayment) && DEBT_POSITION_ORIGIN_TO_SYNC.contains(debtPositionDTO.getDebtPositionOrigin())) {
+  public WorkflowCreatedDTO invokeWorkFlow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment()) && DEBT_POSITION_ORIGIN_TO_SYNC.contains(debtPositionDTO.getDebtPositionOrigin())) {
       Optional<Broker> optBroker = brokerService.getBrokerByOrganizationId(debtPositionDTO.getOrganizationId(), accessToken);
       WorkflowCreatedDTO workflowCreatedDTO = null;
 
