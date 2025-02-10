@@ -17,7 +17,6 @@ import java.time.OffsetDateTime;
 public class Receipt {
 
   private Long receiptId;
-  private Long installmentId;
   private Long ingestionFlowFileId;
   private String receiptOrigin;
   private String paymentReceiptId;

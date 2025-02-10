@@ -260,25 +260,18 @@ components:
           $ref: "#/components/schemas/DebtPositionStatus"
         debtPositionOrigin:
           $ref: "#/components/schemas/DebtPositionOrigin"
-        ingestionFlowFileId:
-          type: integer
-          format: int64
-        ingestionFlowFileLineNumber:
-          type: integer
-          format: int64
         organizationId:
           type: integer
           format: int64
         debtPositionTypeOrgId:
           type: integer
           format: int64
-        notificationDate:
-          type: string
-          format: date-time
         validityDate:
           type: string
           format: date-time
         flagIuvVolatile:
+          type: boolean
+        multiDebtor:
           type: boolean
         creationDate:
           type: string
@@ -308,8 +301,6 @@ components:
           format: int64
         status:
           $ref: "#/components/schemas/PaymentOptionStatus"
-        multiDebtor:
-          type: boolean
         dueDate:
           type: string
           format: date-time
@@ -363,12 +354,7 @@ components:
         amountCents:
           type: integer
           format: int64
-        notificationFeeCents:
-          type: integer
-          format: int64
         remittanceInformation:
-          type: string
-        humanFriendlyRemittanceInformation:
           type: string
         balance:
           type: string
@@ -380,6 +366,18 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TransferDTO"
+        notificationDate:
+          type: string
+          format: date-time
+        ingestionFlowFileId:
+          type: integer
+          format: int64
+        ingestionFlowFileLineNumber:
+          type: integer
+          format: int64
+        receiptId:
+          type: integer
+          format: int64
         creationDate:
           type: string
           format: date-time
@@ -445,9 +443,6 @@ components:
         - payer
       properties:
         receiptId:
-          type: integer
-          format: int64
-        installmentId:
           type: integer
           format: int64
         ingestionFlowFileId:
