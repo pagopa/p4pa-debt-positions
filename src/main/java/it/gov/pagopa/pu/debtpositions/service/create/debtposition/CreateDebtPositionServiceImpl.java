@@ -55,23 +55,28 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     generateIuv(debtPositionDTO, accessToken);
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+    if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
       updateDebtPositionStatusToSync(debtPositionUpdated);
-
-      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      invokeWorkflow(debtPositionUpdated, accessToken, massive);
-
-      log.info("Sending creation message to queue for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      paymentsProducerService.notifyPaymentsEvent(debtPositionUpdated, PaymentEventType.DP_CREATED);
-
-    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
       updateDebtPositionStatusToDraft(debtPositionUpdated);
     }
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
 
+    invokeWorkflowIfStatusToSync(savedDebtPosition, accessToken, massive);
+
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
+  }
+
+  private void invokeWorkflowIfStatusToSync(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.TO_SYNC)) {
+      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
+      invokeWorkflow(debtPositionDTO, accessToken, massive);
+
+      log.info("Sending creation message to queue for debt position with id {}", debtPositionDTO.getDebtPositionId());
+      paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.DP_CREATED);
+    }
   }
 
   private void updateDebtPositionStatusToSync(DebtPositionDTO debtPositionDTO) {

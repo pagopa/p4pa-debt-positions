@@ -190,9 +190,14 @@ class CreateDebtPositionServiceImplTest {
 
     DebtPositionDTO debtPositionIuvDTO = buildGeneratedIuvDebtPositionDTO();
     debtPositionIuvDTO.setFlagPagoPaPayment(true);
+    debtPositionIuvDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    debtPositionIuvDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.TO_SYNC);
+    debtPositionIuvDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
+    debtPositionIuvDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
 
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setFlagPagoPaPayment(true);
+    debtPosition.setStatus(DebtPositionStatus.TO_SYNC);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
@@ -203,7 +208,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(generateIuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionIuvDTO);
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionIuvDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
@@ -211,7 +216,7 @@ class CreateDebtPositionServiceImplTest {
       .flatMap(po -> po.getInstallments().stream())
       .forEach(inst -> assertEquals("generatedIuv", inst.getIuv()));
     reflectionEqualsByName(debtPositionIuvDTO, result);
-    verify(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.DP_CREATED);
+    verify(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionIuvDTO, PaymentEventType.DP_CREATED);
   }
 
   @Test
