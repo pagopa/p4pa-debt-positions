@@ -147,6 +147,7 @@ class CreateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
 
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
@@ -163,6 +164,9 @@ class CreateDebtPositionServiceImplTest {
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
+    assertEquals(DebtPositionStatus.PAID, result.getStatus());
+    assertEquals(PaymentOptionStatus.PAID, result.getPaymentOptions().getFirst().getStatus());
+    assertEquals(InstallmentStatus.PAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
   }
 
   @Test

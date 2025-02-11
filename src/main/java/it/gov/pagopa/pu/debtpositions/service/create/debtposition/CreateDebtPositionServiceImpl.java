@@ -59,6 +59,8 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       updateDebtPositionStatusToSync(debtPositionUpdated);
     } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
       updateDebtPositionStatusToDraft(debtPositionUpdated);
+    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
+      updateDebtPositionStatusToPaid(debtPositionUpdated);
     }
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
@@ -96,6 +98,15 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       paymentOption.setStatus(PaymentOptionStatus.DRAFT);
       paymentOption.getInstallments().forEach(installment ->
         installment.setStatus(InstallmentStatus.DRAFT));
+    });
+  }
+
+  private void updateDebtPositionStatusToPaid(DebtPositionDTO debtPositionDTO) {
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
+      paymentOption.setStatus(PaymentOptionStatus.PAID);
+      paymentOption.getInstallments().forEach(installment ->
+        installment.setStatus(InstallmentStatus.PAID));
     });
   }
 
