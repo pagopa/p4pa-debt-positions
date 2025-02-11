@@ -50,6 +50,7 @@ public class PaymentOptionMapper {
     paymentOption.setDueDate(dto.getDueDate());
     paymentOption.setDescription(dto.getDescription());
     paymentOption.setPaymentOptionType(PaymentOptionType.valueOf(dto.getPaymentOptionType().name()));
+    paymentOption.setPaymentOptionIndex(dto.getPaymentOptionIndex());
     paymentOption.setInstallments(installmentNoPIIs);
 
     return Pair.of(paymentOption, installmentMapping);
@@ -64,6 +65,7 @@ public class PaymentOptionMapper {
       .dueDate(paymentOption.getDueDate())
       .description(paymentOption.getDescription())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(paymentOption.getPaymentOptionType().name()))
+      .paymentOptionIndex(paymentOption.getPaymentOptionIndex())
       .installments(
         paymentOption.getInstallments().stream()
           .map(installmentMapper::mapToDto)
