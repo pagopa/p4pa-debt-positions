@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
+import it.gov.pagopa.pu.debtpositions.event.producer.enums.PaymentEventType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -24,12 +26,13 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
+  private final PaymentsProducerService paymentsProducerService;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
                                        DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
                                        DebtPositionSyncService debtPositionSyncService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService) {
+                                       InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService, PaymentsProducerService paymentsProducerService) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
@@ -37,6 +40,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
+    this.paymentsProducerService = paymentsProducerService;
   }
 
   @Transactional
@@ -51,11 +55,42 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     generateIuv(debtPositionDTO, pagopaPayment, accessToken);
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
-    invokeWorkflow(savedDebtPosition, pagopaPayment, accessToken, massive);
+    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+      updateDebtPositionStatusToSync(debtPositionUpdated);
 
+      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
+      invokeWorkflow(debtPositionUpdated, pagopaPayment, accessToken, massive);
+
+      log.info("Sending creation message to queue for debt position with id {}", debtPositionDTO.getDebtPositionId());
+      paymentsProducerService.notifyPaymentsEvent(debtPositionUpdated, PaymentEventType.DP_CREATED);
+
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+      updateDebtPositionStatusToDraft(debtPositionUpdated);
+    }
+
+    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
+  }
+
+  private void updateDebtPositionStatusToSync(DebtPositionDTO debtPositionDTO) {
+    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
+      paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
+      paymentOption.getInstallments().forEach(installment -> {
+        installment.setStatus(InstallmentStatus.TO_SYNC);
+        installment.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
+      });
+    });
+  }
+
+  private void updateDebtPositionStatusToDraft(DebtPositionDTO debtPositionDTO) {
+    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
+    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
+      paymentOption.setStatus(PaymentOptionStatus.DRAFT);
+      paymentOption.getInstallments().forEach(installment ->
+        installment.setStatus(InstallmentStatus.DRAFT));
+    });
   }
 
   private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO) {
