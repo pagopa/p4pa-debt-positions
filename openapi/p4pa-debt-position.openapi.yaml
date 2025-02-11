@@ -308,6 +308,9 @@ components:
             - SINGLE_INSTALLMENT
             - INSTALLMENTS
             - DOWN_PAYMENT
+        paymentOptionIndex:
+          type: integer
+          format: int32
         installments:
           type: array
           items:

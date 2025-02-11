@@ -26,6 +26,7 @@ public class PaymentOptionFaker {
     paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
+    paymentOption.setPaymentOptionIndex(1);
     paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildInstallmentNoPII()))));
     return paymentOption;
   }
@@ -39,6 +40,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
     return paymentOptionDTO;
   }
@@ -52,6 +54,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));
     return paymentOptionDTO;
   }
