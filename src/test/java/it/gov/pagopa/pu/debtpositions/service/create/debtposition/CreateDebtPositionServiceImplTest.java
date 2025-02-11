@@ -74,10 +74,9 @@ class CreateDebtPositionServiceImplTest {
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, true, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, true, null, null);
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
     assertEquals(debtPositionDTO, result);
@@ -104,7 +103,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, true, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
@@ -134,13 +133,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, true, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
-    Mockito.when(authorizeOperatorOnDebtPositionTypeService.authorize(orgId, debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
-    Mockito.doNothing().when(validateDebtPositionService).validate(debtPositionDTO, null);
-    Mockito.when(installmentNoPIIRepository.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
-    Mockito.when(debtPositionProcessorService.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionService.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncService.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
@@ -209,7 +202,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(generateIuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(buildGeneratedIuvDebtPositionDTO());
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, true, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, null, false)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
 
     DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
@@ -236,12 +229,12 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
     assertEquals(DebtPositionStatus.DRAFT, result.getStatus());
     assertEquals(PaymentOptionStatus.DRAFT, result.getPaymentOptions().getFirst().getStatus());
     assertEquals(InstallmentStatus.DRAFT, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(debtPositionSyncServiceMock, times(0)).invokeWorkFlow(debtPositionDTO, null, true, false);
+    verify(debtPositionSyncServiceMock, times(0)).invokeWorkFlow(debtPositionDTO, null, false);
     verify(paymentsProducerServiceMock, times(0)).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.DP_CREATED);
   }
 }

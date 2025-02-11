@@ -59,7 +59,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       updateDebtPositionStatusToSync(debtPositionUpdated);
 
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      invokeWorkflow(debtPositionUpdated, pagopaPayment, accessToken, massive);
+      invokeWorkflow(debtPositionUpdated, accessToken, massive);
 
       log.info("Sending creation message to queue for debt position with id {}", debtPositionDTO.getDebtPositionId());
       paymentsProducerService.notifyPaymentsEvent(debtPositionUpdated, PaymentEventType.DP_CREATED);
