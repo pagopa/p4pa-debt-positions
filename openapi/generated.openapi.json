@@ -3867,7 +3867,8 @@
             "format" : "int64"
           },
           "receiptOrigin" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "RECEIPT_PAGOPA", "RECEIPT_FILE" ]
           },
           "paymentReceiptId" : {
             "type" : "string"
@@ -3994,7 +3995,7 @@
         }
       },
       "PaymentOption" : {
-        "required" : [ "debtPositionId", "description", "paymentOptionType", "status", "totalAmountCents" ],
+        "required" : [ "debtPositionId", "description", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -4034,6 +4035,10 @@
           "paymentOptionType" : {
             "type" : "string",
             "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT" ]
+          },
+          "paymentOptionIndex" : {
+            "type" : "integer",
+            "format" : "int32"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
@@ -5004,7 +5009,7 @@
         }
       },
       "PaymentOptionRequestBody" : {
-        "required" : [ "debtPositionId", "description", "paymentOptionType", "status", "totalAmountCents" ],
+        "required" : [ "debtPositionId", "description", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -5044,6 +5049,10 @@
           "paymentOptionType" : {
             "type" : "string",
             "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT" ]
+          },
+          "paymentOptionIndex" : {
+            "type" : "integer",
+            "format" : "int32"
           },
           "installments" : {
             "type" : "array",
@@ -5206,7 +5215,7 @@
         }
       },
       "PaymentOptionResponse" : {
-        "required" : [ "debtPositionId", "description", "paymentOptionType", "status", "totalAmountCents" ],
+        "required" : [ "debtPositionId", "description", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -5246,6 +5255,10 @@
           "paymentOptionType" : {
             "type" : "string",
             "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT" ]
+          },
+          "paymentOptionIndex" : {
+            "type" : "integer",
+            "format" : "int32"
           }
         }
       },
@@ -5327,7 +5340,8 @@
             "format" : "int64"
           },
           "receiptOrigin" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "RECEIPT_PAGOPA", "RECEIPT_FILE" ]
           },
           "paymentReceiptId" : {
             "type" : "string"
@@ -5596,6 +5610,10 @@
             "type" : "string",
             "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT" ]
           },
+          "paymentOptionIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
           "installments" : {
             "type" : "array",
             "items" : {
@@ -5716,7 +5734,7 @@
         }
       },
       "ReceiptDTO" : {
-        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName" ],
+        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
@@ -5728,7 +5746,8 @@
             "format" : "int64"
           },
           "receiptOrigin" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "RECEIPT_PAGOPA", "RECEIPT_FILE" ]
           },
           "paymentReceiptId" : {
             "type" : "string"
@@ -5857,7 +5876,7 @@
         }
       },
       "ReceiptWithAdditionalNodeDataDTO" : {
-        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "transfers" ],
+        "required" : [ "channelDescription", "companyName", "creditorReferenceId", "debtor", "description", "idChannel", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "payer", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin", "transfers" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
@@ -5869,7 +5888,8 @@
             "format" : "int64"
           },
           "receiptOrigin" : {
-            "type" : "string"
+            "type" : "string",
+            "enum" : [ "RECEIPT_PAGOPA", "RECEIPT_FILE" ]
           },
           "paymentReceiptId" : {
             "type" : "string"
