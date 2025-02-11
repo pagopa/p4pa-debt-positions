@@ -425,7 +425,7 @@ components:
     ReceiptDTO:
       type: object
       required:
-        - receiptSource
+        - receiptOrigin
         - paymentReceiptId
         - noticeNumber
         - orgFiscalCode
@@ -448,7 +448,7 @@ components:
           type: integer
           format: int64
         receiptOrigin:
-          type: string
+          $ref: "#/components/schemas/ReceiptOrigin"
         paymentReceiptId:
           type: string
         noticeNumber:
@@ -631,6 +631,11 @@ components:
         - EXPIRED
         - UNPAID
         - DRAFT
+    ReceiptOrigin:
+      type: string
+      enum:
+        - RECEIPT_PAGOPA
+        - RECEIPT_FILE
     SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
