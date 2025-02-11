@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -13,7 +12,6 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +23,6 @@ import org.springframework.data.util.Pair;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
@@ -109,7 +106,6 @@ class DebtPositionServiceImplTest {
     Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(savedInstallment.getInstallmentId());
     Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
-    Mockito.when(debtPositionRepository.findById(1L)).thenReturn(Optional.of(debtPosition));
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
@@ -120,63 +116,6 @@ class DebtPositionServiceImplTest {
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
       Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
-    }
-  }
-
-  @Test
-  void givenValidDebtPositionDTO_WhenSaveDebtPosition_ThenNotFoundException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-
-    DebtPosition debtPosition = buildDebtPosition();
-    PaymentOption paymentOption = buildPaymentOption();
-
-    InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
-    Installment installmentNoIud = buildInstallment();
-    installmentNoIud.setIud("");
-
-    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
-    Installment installment = buildInstallment();
-    installment.setInstallmentId(10L);
-    installmentNoPII.setInstallmentId(10L);
-
-    Map<InstallmentNoPII, Installment> installmentMap = Map.of(
-      installmentNoPIINoIud, installmentNoIud,
-      installmentNoPII, installment
-    );
-
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
-
-    DebtPosition savedDebtPosition = new DebtPosition();
-    savedDebtPosition.setDebtPositionId(1L);
-    savedDebtPosition.setPaymentOptions(new TreeSet<>(List.of(paymentOption)));
-
-    PaymentOption savedPaymentOption = new PaymentOption();
-    savedPaymentOption.setPaymentOptionId(1L);
-    savedPaymentOption.setInstallments(new TreeSet<>(List.of(installmentNoPIINoIud, installmentNoPII)));
-
-    Installment savedInstallment = new Installment();
-    savedInstallment.setInstallmentId(1L);
-
-    Transfer savedTransfer = new Transfer();
-    savedTransfer.setTransferId(1L);
-
-    String generatedIUD = "RANDOM_IUD_12345";
-
-    Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
-    Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(savedInstallment.getInstallmentId());
-    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
-    Mockito.when(debtPositionRepository.findById(1L)).thenThrow(new NotFoundException("DebtPosition not found with ID: 999"));
-
-    try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
-      mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
-
-      NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () ->
-        debtPositionService.saveDebtPosition(debtPositionDTO)
-      );
-
-      Assertions.assertEquals("DebtPosition not found with ID: 999", notFoundException.getMessage());
     }
   }
 }

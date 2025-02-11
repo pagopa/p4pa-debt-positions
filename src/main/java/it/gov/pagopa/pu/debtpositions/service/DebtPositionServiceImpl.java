@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service;
 import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -53,7 +52,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
         if (StringUtils.isBlank(mappedInstallment.getIud())) {
-          mappedInstallment.setIud(Utilities.getRandomIUD());
+          String iud = Utilities.getRandomIUD();
+          mappedInstallment.setIud(iud);
+          installmentNoPII.setIud(iud);
         }
         long idInstallment = installmentRepository.save(mappedInstallment);
 
@@ -64,9 +65,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       });
     });
 
-    DebtPosition refreshedDebtPosition = debtPositionRepository.findById(savedDebtPosition.getDebtPositionId())
-      .orElseThrow(() -> new NotFoundException("DebtPosition not found with ID: " + savedDebtPosition.getDebtPositionId()));
-    return debtPositionMapper.mapToDto(refreshedDebtPosition);
+    return debtPositionMapper.mapToDto(savedDebtPosition);
   }
 }
 
