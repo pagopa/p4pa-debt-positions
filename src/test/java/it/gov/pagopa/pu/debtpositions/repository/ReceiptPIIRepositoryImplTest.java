@@ -4,9 +4,13 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.mapper.ReceiptMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,6 +31,8 @@ class ReceiptPIIRepositoryImplTest {
   private PersonalDataService personalDataServiceMock;
   @Mock
   private ReceiptPIIMapper receiptPIIMapperMock;
+  @Mock
+  private ReceiptMapper receiptMapperMock;
 
   private ReceiptPIIRepository receiptPIIRepository;
 
@@ -34,7 +40,8 @@ class ReceiptPIIRepositoryImplTest {
 
   @BeforeEach
   void init() {
-    receiptPIIRepository = new ReceiptPIIRepositoryImpl(receiptPIIMapperMock, personalDataServiceMock, receiptNoPIIRepositoryMock);
+    receiptPIIRepository = new ReceiptPIIRepositoryImpl(receiptPIIMapperMock, personalDataServiceMock, receiptNoPIIRepositoryMock,
+      receiptMapperMock);
   }
 
   @Test
@@ -63,4 +70,43 @@ class ReceiptPIIRepositoryImplTest {
     Mockito.verify(receiptNoPIIRepositoryMock, Mockito.times(1)).save(pair.getFirst());
   }
 
+  @Test
+  void givenExistingReceiptWhenFindReceiptThenOk() {
+    // Given
+    Long receiptId = 1L;
+    String orgFiscalCode = "orgFiscalCode";
+    ReceiptNoPII receiptNoPII = podamFactory.manufacturePojo(ReceiptNoPII.class);
+    Receipt receipt = podamFactory.manufacturePojo(Receipt.class);
+    ReceiptDTO receiptDto = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptNoPIIRepositoryMock.findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode)).thenReturn(
+      Optional.of(receiptNoPII));
+    Mockito.when(receiptPIIMapperMock.map(receiptNoPII)).thenReturn(receipt);
+    Mockito.when(receiptMapperMock.mapToDto(receipt)).thenReturn(receiptDto);
+
+    // When
+    ReceiptDTO result = receiptPIIRepository.getReceiptDetail(receiptId,orgFiscalCode);
+
+    // Then
+    Assertions.assertEquals(receiptDto, result);
+    Mockito.verify(receiptNoPIIRepositoryMock).findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode);
+    Mockito.verify(receiptPIIMapperMock).map(receiptNoPII);
+    Mockito.verify(receiptMapperMock).mapToDto(receipt);
+  }
+
+  @Test
+  void givenNonExistingReceiptWhenFindReceiptThenNotFoundException() {
+    // Given
+    Long receiptId = 1L;
+    String orgFiscalCode = "orgFiscalCode";
+
+    Mockito.when(receiptNoPIIRepositoryMock.findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode)).thenReturn(
+      Optional.empty());
+
+    // When
+    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.getReceiptDetail(receiptId,orgFiscalCode));
+
+    Mockito.verify(receiptNoPIIRepositoryMock).findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode);
+    Mockito.verifyNoInteractions(receiptPIIMapperMock, receiptMapperMock);
+  }
 }

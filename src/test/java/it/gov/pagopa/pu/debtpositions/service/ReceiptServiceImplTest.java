@@ -50,4 +50,23 @@ class ReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
   }
+
+  @Test
+  void whenGetReceiptDetailThenOk() {
+    //given
+    Long receiptId = 1L;
+    String orgFiscalCode = "orgFiscalCode";
+    ReceiptDTO receipt = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptPIIRepositoryMock.getReceiptDetail(receiptId,orgFiscalCode)).thenReturn(receipt);
+
+    //when
+    ReceiptDTO response = receiptService.getReceiptDetail(receiptId,orgFiscalCode);
+
+    //verify
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(receipt, response);
+
+    Mockito.verify(receiptPIIRepositoryMock).getReceiptDetail(receiptId,orgFiscalCode);
+  }
 }

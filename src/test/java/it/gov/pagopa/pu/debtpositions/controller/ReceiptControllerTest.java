@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
@@ -17,8 +19,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.co.jemos.podam.api.PodamFactory;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReceiptControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -56,5 +56,26 @@ class ReceiptControllerTest {
 
     Mockito.verify(receiptServiceMock, Mockito.times(1)).createReceipt(
       Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())));
+  }
+
+  @Test
+  void whenGetReceiptDetailThenOk() throws Exception {
+    //given
+    Long receiptId = 1L;
+    String orgFiscalCode = "orgFiscalCode";
+    ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId,orgFiscalCode)).thenReturn(expectedResponse);
+
+    MvcResult result = mockMvc.perform(
+        MockMvcRequestBuilders.get("/receipts/"+receiptId)
+          .param("orgFiscalCode",orgFiscalCode))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
+    TestUtils.reflectionEqualsByName(expectedResponse,response);
+
+    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId,orgFiscalCode);
   }
 }
