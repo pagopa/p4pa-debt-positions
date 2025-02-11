@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptOrigin;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -34,7 +35,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND r.paymentDateTime BETWEEN :fromDate AND :toDate))")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Parameter(required = true) @Param("receiptOrigin") String receiptOrigin,
+    @Parameter(required = true) @Param("receiptOrigin") ReceiptOrigin receiptOrigin,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @Param("iuv") String iuv,
     @Param("iur") String iur,

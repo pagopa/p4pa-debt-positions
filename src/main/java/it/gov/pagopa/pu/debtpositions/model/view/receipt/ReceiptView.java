@@ -1,8 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model.view.receipt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptOrigin;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,7 +23,8 @@ public class ReceiptView implements Serializable {
   private Long paymentAmountCents;
   private OffsetDateTime paymentDateTime;
   private Long installmentId;
-  private String receiptOrigin;
+  @Enumerated(EnumType.STRING)
+  private ReceiptOrigin receiptOrigin;
   private String iuv;
   private String description;
 

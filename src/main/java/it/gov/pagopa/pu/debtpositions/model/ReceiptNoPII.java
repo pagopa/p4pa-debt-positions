@@ -25,6 +25,7 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   @SequenceGenerator(name = "receipt_generator", sequenceName = "receipt_seq", allocationSize = 1)
   private Long receiptId;
   private Long ingestionFlowFileId;
+  @Enumerated(EnumType.STRING)
   @NotNull
   private ReceiptOrigin receiptOrigin;
   @NotNull
