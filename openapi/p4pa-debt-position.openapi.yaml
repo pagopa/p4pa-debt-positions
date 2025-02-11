@@ -791,6 +791,9 @@ components:
     InstallmentSynchronizeDTO:
       required:
         - action
+        - ingestionFileId
+        - ingestionFlowFileLineNumber
+        - organizationId
         - iupd
         - description
         - paymentOptionIndex
@@ -812,7 +815,7 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
-        orgId:
+        organizationId:
           type: integer
           format: int64
         action:
