@@ -192,6 +192,7 @@ class CreateDebtPositionServiceImplTest {
     debtPositionIuvDTO.setFlagPagoPaPayment(true);
 
     DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.setFlagPagoPaPayment(true);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
@@ -210,6 +211,8 @@ class CreateDebtPositionServiceImplTest {
       .flatMap(po -> po.getInstallments().stream())
       .forEach(inst -> assertEquals("generatedIuv", inst.getIuv()));
     reflectionEqualsByName(debtPositionIuvDTO, result);
+    System.out.println("debtPositionIuvDTO: "+debtPositionIuvDTO);
+    System.out.println("result: "+result);
     verify(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.DP_CREATED);
   }
 
