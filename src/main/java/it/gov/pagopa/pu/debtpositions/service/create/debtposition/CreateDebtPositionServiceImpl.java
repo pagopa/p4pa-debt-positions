@@ -45,14 +45,14 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
   @Transactional
   @Override
-  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, Boolean pagopaPayment, String accessToken, String operatorExternalUserId) {
+  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
-    generateIuv(debtPositionDTO, pagopaPayment, accessToken);
+    generateIuv(debtPositionDTO, accessToken);
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
     if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
@@ -69,6 +69,8 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     }
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
+    invokeWorkflow(savedDebtPosition, accessToken, massive);
+
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
   }
@@ -105,8 +107,8 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       });
   }
 
-  private void generateIuv(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken) {
-    if (Boolean.TRUE.equals(pagopaPayment)) {
+  private void generateIuv(DebtPositionDTO debtPositionDTO, String accessToken) {
+    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
       debtPositionDTO.getPaymentOptions().stream()
         .flatMap(po -> po.getInstallments().stream())
         .forEach(installment -> {
@@ -119,12 +121,12 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     }
   }
 
-  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, Boolean pagopaPayment, String accessToken, Boolean massive) {
-    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, pagopaPayment, massive);
+  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, massive);
     if (workflow != null) {
       log.info("Workflow created with id {}", workflow.getWorkflowId());
     } else {
-      log.info("Workflow creation was not executed for debtPositionId {}, origin {}, pagopaPayment {}, massive {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), pagopaPayment, massive);
+      log.info("Workflow creation was not executed for debtPositionId {}, origin {}, massive {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), massive);
     }
   }
 }
