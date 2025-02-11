@@ -51,6 +51,7 @@ public class InstallmentFaker {
       .creationDate(date)
       .updateDate(date)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .noPII(buildInstallmentNoPII())
       .build();
   }
 
@@ -71,6 +72,7 @@ public class InstallmentFaker {
       .dueDate(offsetDateTime)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
+      .personalDataId(123L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .debtorEntityType(PersonEntityType.F)
