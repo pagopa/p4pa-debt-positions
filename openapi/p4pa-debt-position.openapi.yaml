@@ -877,7 +877,7 @@ components:
           type: string
         legacyPaymentMetadata:
           type: string
-        flagGenerateIuv:
+        flagPagoPaPayment:
           type: boolean
         balance:
           type: string
