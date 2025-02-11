@@ -812,6 +812,9 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
+        orgId:
+          type: integer
+          format: int64
         action:
           type: string
           enum:
