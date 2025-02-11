@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -15,9 +17,12 @@ public class InstallmentMapper {
 
   private final TransferMapper transferMapper;
 
-  public InstallmentMapper(PersonMapper personMapper, TransferMapper transferMapper) {
+  private final PersonalDataService personalDataService;
+
+  public InstallmentMapper(PersonMapper personMapper, TransferMapper transferMapper, PersonalDataService personalDataService) {
     this.personMapper = personMapper;
     this.transferMapper = transferMapper;
+    this.personalDataService = personalDataService;
   }
 
   public Installment mapToModel(InstallmentDTO dto) {
@@ -90,6 +95,9 @@ public class InstallmentMapper {
   }
 
   public InstallmentDTO mapToDto(Installment installment) {
+    InstallmentNoPII installmentNoPII = installment.getNoPII();
+    InstallmentPIIDTO pii = personalDataService.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
+
     return InstallmentDTO.builder()
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
@@ -107,7 +115,7 @@ public class InstallmentMapper {
       .remittanceInformation(installment.getRemittanceInformation())
       .balance(installment.getBalance())
       .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
-      .debtor(null) //TODO P4ADEV-2028
+      .debtor(personMapper.mapToDto(pii.getDebtor()))
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
         .toList())

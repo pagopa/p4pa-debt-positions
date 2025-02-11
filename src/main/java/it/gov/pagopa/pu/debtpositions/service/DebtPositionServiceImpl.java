@@ -52,7 +52,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
         if (StringUtils.isBlank(mappedInstallment.getIud())) {
-          mappedInstallment.setIud(Utilities.getRandomIUD());
+          String iud = Utilities.getRandomIUD();
+          mappedInstallment.setIud(iud);
+          installmentNoPII.setIud(iud);
         }
         long idInstallment = installmentRepository.save(mappedInstallment);
 
