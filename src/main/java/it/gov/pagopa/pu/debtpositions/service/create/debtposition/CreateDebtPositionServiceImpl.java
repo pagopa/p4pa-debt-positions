@@ -56,11 +56,11 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
     if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
-      updateDebtPositionStatusToSync(debtPositionUpdated);
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
     } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
-      updateDebtPositionStatusToDraft(debtPositionUpdated);
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
     } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
-      updateDebtPositionStatusToPaid(debtPositionUpdated);
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
@@ -81,32 +81,16 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     }
   }
 
-  private void updateDebtPositionStatusToSync(DebtPositionDTO debtPositionDTO) {
-    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+  private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,
+                                        InstallmentStatus installmentStatus) {
+    debtPositionDTO.setStatus(debtPositionStatus);
     debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
-      paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
+      paymentOption.setStatus(paymentStatus);
       paymentOption.getInstallments().forEach(installment -> {
-        installment.setStatus(InstallmentStatus.TO_SYNC);
-        installment.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
-      });
-    });
-  }
-
-  private void updateDebtPositionStatusToDraft(DebtPositionDTO debtPositionDTO) {
-    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
-    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
-      paymentOption.setStatus(PaymentOptionStatus.DRAFT);
-      paymentOption.getInstallments().forEach(installment ->
-        installment.setStatus(InstallmentStatus.DRAFT));
-    });
-  }
-
-  private void updateDebtPositionStatusToPaid(DebtPositionDTO debtPositionDTO) {
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
-    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
-      paymentOption.setStatus(PaymentOptionStatus.PAID);
-      paymentOption.getInstallments().forEach(installment ->
-        installment.setStatus(InstallmentStatus.PAID));
+        installment.setStatus(installmentStatus);
+        if(debtPositionStatus.equals(DebtPositionStatus.TO_SYNC)) {
+          installment.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
+        }});
     });
   }
 
