@@ -791,7 +791,7 @@ components:
     InstallmentSynchronizeDTO:
       required:
         - action
-        - ingestionFileId
+        - ingestionFlowFileId
         - ingestionFlowFileLineNumber
         - organizationId
         - iupd
@@ -809,7 +809,7 @@ components:
         - flagGenerateIuv
       type: object
       properties:
-        ingestionFileId:
+        ingestionFlowFileId:
           type: integer
           format: int64
         ingestionFlowFileLineNumber:
