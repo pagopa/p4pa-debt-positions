@@ -11,7 +11,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long> {
 
   @RestResource(exported = false)
-  @Query(" select i" +
+  @Query(" select r" +
     "  from ReceiptNoPII r" +
     " where r.paymentReceiptId = :paymentReceiptId")
   ReceiptNoPII getByPaymentReceiptId(@Param("paymentReceiptId") String paymentReceiptId);
