@@ -38,6 +38,8 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   @Enumerated(EnumType.STRING)
   @NotNull
   private PaymentOptionType paymentOptionType;
+  @NotNull
+  private Integer paymentOptionIndex;
 
   @OneToMany(mappedBy = "paymentOptionId")
   private SortedSet<InstallmentNoPII> installments;

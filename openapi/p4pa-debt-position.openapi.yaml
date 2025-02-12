@@ -241,6 +241,7 @@ components:
         - organizationId
         - debtPositionTypeOrgId
         - paymentOptions
+        - flagPagoPaPayment
       type: object
       properties:
         debtPositionId:
@@ -308,6 +309,9 @@ components:
             - SINGLE_INSTALLMENT
             - INSTALLMENTS
             - DOWN_PAYMENT
+        paymentOptionIndex:
+          type: integer
+          format: int32
         installments:
           type: array
           items:
