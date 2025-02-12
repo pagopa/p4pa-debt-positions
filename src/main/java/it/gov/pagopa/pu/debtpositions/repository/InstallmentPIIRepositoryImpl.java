@@ -14,27 +14,27 @@ import java.util.List;
 @Service
 public class InstallmentPIIRepositoryImpl implements InstallmentPIIRepository {
 
-    private final InstallmentPIIMapper installmentPIIMapper;
-    private final PersonalDataService personalDataService;
-    private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final InstallmentPIIMapper installmentPIIMapper;
+  private final PersonalDataService personalDataService;
+  private final InstallmentNoPIIRepository installmentNoPIIRepository;
 
-    public InstallmentPIIRepositoryImpl(InstallmentPIIMapper installmentPIIMapper, PersonalDataService personalDataService, InstallmentNoPIIRepository installmentNoPIIRepository) {
-        this.installmentPIIMapper = installmentPIIMapper;
-        this.personalDataService = personalDataService;
-        this.installmentNoPIIRepository = installmentNoPIIRepository;
-    }
+  public InstallmentPIIRepositoryImpl(InstallmentPIIMapper installmentPIIMapper, PersonalDataService personalDataService, InstallmentNoPIIRepository installmentNoPIIRepository) {
+    this.installmentPIIMapper = installmentPIIMapper;
+    this.personalDataService = personalDataService;
+    this.installmentNoPIIRepository = installmentNoPIIRepository;
+  }
 
-    @Override
-    public long save(Installment installment) {
-        Pair<InstallmentNoPII, InstallmentPIIDTO> p = installmentPIIMapper.map(installment);
-        long personalDataId = personalDataService.insert(p.getSecond(), PersonalDataType.INSTALLMENT);
-        p.getFirst().setPersonalDataId(personalDataId);
-        installment.setNoPII(p.getFirst());
-        long newId = installmentNoPIIRepository.save(p.getFirst()).getInstallmentId();
-        installment.setInstallmentId(newId);
-        installment.getNoPII().setInstallmentId(newId);
-        return newId;
-    }
+  @Override
+  public InstallmentNoPII save(Installment installment) {
+    Pair<InstallmentNoPII, InstallmentPIIDTO> p = installmentPIIMapper.map(installment);
+    long personalDataId = personalDataService.insert(p.getSecond(), PersonalDataType.INSTALLMENT);
+    p.getFirst().setPersonalDataId(personalDataId);
+    installment.setNoPII(p.getFirst());
+    InstallmentNoPII newInstallment = installmentNoPIIRepository.save(p.getFirst());
+    installment.setInstallmentId(newInstallment.getInstallmentId());
+    installment.getNoPII().setInstallmentId(newInstallment.getInstallmentId());
+    return newInstallment;
+  }
 
   @Override
   public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav) {

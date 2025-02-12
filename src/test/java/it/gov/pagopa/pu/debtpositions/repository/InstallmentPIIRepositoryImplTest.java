@@ -55,10 +55,10 @@ class InstallmentPIIRepositoryImplTest {
     Mockito.when(installmentNoPIIRepository.save(p.getFirst())).thenReturn(installmentNoPII);
 
     // When
-    long insert = installmentPIIRepository.save(installment);
+    InstallmentNoPII insert = installmentPIIRepository.save(installment);
 
     // Then
-    Assertions.assertEquals(insertedId, insert);
+    Assertions.assertEquals(insertedId, insert.getInstallmentId());
     Assertions.assertEquals(insertedId, installment.getInstallmentId());
     Assertions.assertEquals(installment.getNoPII().getInstallmentId(), installment.getInstallmentId());
     Assertions.assertEquals(piiId, p.getFirst().getPersonalDataId());

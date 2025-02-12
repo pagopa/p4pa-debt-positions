@@ -56,10 +56,10 @@ public class DebtPositionServiceImpl implements DebtPositionService {
           mappedInstallment.setIud(iud);
           installmentNoPII.setIud(iud);
         }
-        long idInstallment = installmentRepository.save(mappedInstallment);
+        InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment);
 
         mappedInstallment.getTransfers().forEach(transfer -> {
-          transfer.setInstallmentId(idInstallment);
+          transfer.setInstallmentId(savedInstallment.getInstallmentId());
           transferRepository.save(transfer);
         });
       });
