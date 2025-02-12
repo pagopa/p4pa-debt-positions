@@ -4,9 +4,12 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,4 +66,38 @@ class ReceiptPIIRepositoryImplTest {
     Mockito.verify(receiptNoPIIRepositoryMock, Mockito.times(1)).save(pair.getFirst());
   }
 
+  @Test
+  void givenExistingReceiptWhenFindReceiptThenOk() {
+    // Given
+    Long receiptId = 1L;
+    ReceiptNoPII receiptNoPII = podamFactory.manufacturePojo(ReceiptNoPII.class);
+    ReceiptDTO receiptDto = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptNoPIIRepositoryMock.findById(receiptId)).thenReturn(
+      Optional.of(receiptNoPII));
+    Mockito.when(receiptPIIMapperMock.mapToReceiptDTO(receiptNoPII)).thenReturn(receiptDto);
+
+    // When
+    ReceiptDTO result = receiptPIIRepository.getReceiptDetail(receiptId);
+
+    // Then
+    Assertions.assertEquals(receiptDto, result);
+    Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
+    Mockito.verify(receiptPIIMapperMock).mapToReceiptDTO(receiptNoPII);
+  }
+
+  @Test
+  void givenNonExistingReceiptWhenFindReceiptThenNotFoundException() {
+    // Given
+    Long receiptId = 1L;
+
+    Mockito.when(receiptNoPIIRepositoryMock.findById(receiptId)).thenReturn(
+      Optional.empty());
+
+    // When
+    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.getReceiptDetail(receiptId));
+
+    Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
+    Mockito.verifyNoInteractions(receiptPIIMapperMock);
+  }
 }

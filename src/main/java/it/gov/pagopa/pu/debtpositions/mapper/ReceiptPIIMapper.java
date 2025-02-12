@@ -1,9 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -13,10 +16,13 @@ public class ReceiptPIIMapper {
 
   private final DataCipherService dataCipherService;
   private final PersonalDataService personalDataService;
+  private final PersonMapper personMapper;
 
-  public ReceiptPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService) {
+  public ReceiptPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService,
+    PersonMapper personMapper) {
     this.dataCipherService = dataCipherService;
     this.personalDataService = personalDataService;
+    this.personMapper = personMapper;
   }
 
   public Pair<ReceiptNoPII, ReceiptPIIDTO> map(Receipt receipt) {
@@ -98,6 +104,41 @@ public class ReceiptPIIMapper {
       .debtor(pii.getDebtor())
       .payer(pii.getPayer())
       .noPII(receiptNoPII)
+      .build();
+  }
+
+  public ReceiptDTO mapToReceiptDTO(ReceiptNoPII receiptNoPII) {
+    ReceiptPIIDTO pii = personalDataService.get(receiptNoPII.getPersonalDataId(), ReceiptPIIDTO.class);
+    return ReceiptDTO.builder()
+      .receiptId(receiptNoPII.getReceiptId())
+      .ingestionFlowFileId(receiptNoPII.getIngestionFlowFileId())
+      .receiptOrigin(receiptNoPII.getReceiptOrigin())
+      .paymentReceiptId(receiptNoPII.getPaymentReceiptId())
+      .noticeNumber(receiptNoPII.getNoticeNumber())
+      .paymentNote(receiptNoPII.getPaymentNote())
+      .orgFiscalCode(receiptNoPII.getOrgFiscalCode())
+      .outcome(receiptNoPII.getOutcome())
+      .creditorReferenceId(receiptNoPII.getCreditorReferenceId())
+      .paymentAmountCents(receiptNoPII.getPaymentAmountCents())
+      .description(receiptNoPII.getDescription())
+      .companyName(receiptNoPII.getCompanyName())
+      .officeName(receiptNoPII.getOfficeName())
+      .idPsp(receiptNoPII.getIdPsp())
+      .pspFiscalCode(receiptNoPII.getPspFiscalCode())
+      .pspPartitaIva(receiptNoPII.getPspPartitaIva())
+      .pspCompanyName(receiptNoPII.getPspCompanyName())
+      .idChannel(receiptNoPII.getIdChannel())
+      .channelDescription(receiptNoPII.getChannelDescription())
+      .paymentMethod(receiptNoPII.getPaymentMethod())
+      .feeCents(receiptNoPII.getFeeCents())
+      .paymentDateTime(receiptNoPII.getPaymentDateTime())
+      .applicationDate(receiptNoPII.getApplicationDate())
+      .transferDate(receiptNoPII.getTransferDate())
+      .standin(receiptNoPII.isStandin())
+      .debtor(personMapper.mapToDto(pii.getDebtor()))
+      .payer(personMapper.mapToDto(pii.getPayer()))
+      .creationDate(localDatetimeToOffsetDateTime(receiptNoPII.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(receiptNoPII.getUpdateDate()))
       .build();
   }
 }
