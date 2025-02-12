@@ -441,6 +441,7 @@ components:
         - orgFiscalCode
         - orgName
         - remittanceInformation
+        - transferIndex
       type: object
       properties:
         transferId:
