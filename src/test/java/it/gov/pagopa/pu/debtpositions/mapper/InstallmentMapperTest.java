@@ -63,12 +63,14 @@ class InstallmentMapperTest {
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
     installmentNoPII.setTransfers(new TreeSet<>(List.of(buildTransfer())));
 
+    Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(buildInstallmentPIIDTO());
+    Mockito.when(personMapperMock.mapToDto(buildPerson())).thenReturn(buildPersonDTO());
     Mockito.when(transferMapperMock.mapToDto(buildTransfer())).thenReturn(buildTransferDTO());
 
     InstallmentDTO result = installmentMapper.mapToDto(installmentNoPII);
 
-    reflectionEqualsByName(installmentExpected, result, "debtor");
-    checkNotNullFields(result, "debtor");
+    reflectionEqualsByName(installmentExpected, result);
+    checkNotNullFields(result);
     checkNotNullFields(result.getSyncStatus());
   }
 
@@ -81,12 +83,14 @@ class InstallmentMapperTest {
     installmentNoPII.setTransfers(new TreeSet<>(List.of(buildTransfer())));
     installmentNoPII.setSyncStatus(null);
 
+    Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(buildInstallmentPIIDTO());
+    Mockito.when(personMapperMock.mapToDto(buildPerson())).thenReturn(buildPersonDTO());
     Mockito.when(transferMapperMock.mapToDto(buildTransfer())).thenReturn(buildTransferDTO());
 
     InstallmentDTO result = installmentMapper.mapToDto(installmentNoPII);
 
-    reflectionEqualsByName(installmentExpected, result, "debtor");
-    checkNotNullFields(result, "debtor", "syncStatus");
+    reflectionEqualsByName(installmentExpected, result);
+    checkNotNullFields(result, "syncStatus");
   }
 
   @Test

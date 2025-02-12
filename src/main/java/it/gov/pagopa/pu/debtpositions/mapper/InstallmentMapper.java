@@ -57,6 +57,7 @@ public class InstallmentMapper {
   }
 
   public InstallmentDTO mapToDto(InstallmentNoPII installment) {
+    InstallmentPIIDTO pii = personalDataService.get(installment.getPersonalDataId(), InstallmentPIIDTO.class);
     InstallmentDTO installmentDTO = InstallmentDTO.builder()
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
@@ -73,6 +74,7 @@ public class InstallmentMapper {
       .remittanceInformation(installment.getRemittanceInformation())
       .balance(installment.getBalance())
       .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
+      .debtor(personMapper.mapToDto(pii.getDebtor()))
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
         .toList())
