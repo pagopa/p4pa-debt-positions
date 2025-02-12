@@ -3,10 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptMapper;
@@ -191,6 +188,7 @@ class ReceiptServiceImplTest {
     if (updateDate != null)
       installment.setUpdateDate(updateDate);
     DebtPositionDTO debtPositionDTO = podamFactory.manufacturePojo(DebtPositionDTO.class);
+    debtPositionDTO.setStatus(DebtPositionStatus.fromValue(status.getValue()));
     WorkflowCreatedDTO workflowCreatedDTO = invokeWorkflowOk ? podamFactory.manufacturePojo(WorkflowCreatedDTO.class) : null;
     List<InstallmentNoPII> installments = new ArrayList<>();
     installments.add(installment);
