@@ -18,10 +18,11 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,6 +70,12 @@ class ReceiptServiceImplTest {
   @BeforeEach
   void setup(TestInfo info) {
     accessToken = "ACCESS_TOKEN";
+    if (info.getTags().contains("createReceipt")) {
+      setupCreateReceipt(info);
+    }
+  }
+
+  private void setupCreateReceipt(TestInfo info) {
     receipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptModel = podamFactory.manufacturePojo(Receipt.class);
     receiptId = receiptModel.getReceiptId();
@@ -92,6 +99,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   @Tag("alreadyHandled")
   void givenReceiptAlreadyHandledWhenCreateReceiptThenOk() {
     //given
@@ -113,6 +121,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndUnpaidInstallmentWhenCreateReceiptThenOk() {
     List<InstallmentNoPII> additionalInstallments = new ArrayList<>();
     //add multiple to sync installments
@@ -129,6 +138,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndInSyncInstallmentWhenCreateReceiptThenOk() {
     handleValidReceiptImpl(InstallmentStatus.TO_SYNC,
       InstallmentSyncStatus.builder().syncStatusFrom(InstallmentStatus.EXPIRED).syncStatusTo(InstallmentStatus.UNPAID).build(),
@@ -136,6 +146,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndInSyncInstallmentAndInvokeWorkflowKoWhenCreateReceiptThenOk() {
     handleValidReceiptImpl(InstallmentStatus.TO_SYNC,
       InstallmentSyncStatus.builder().syncStatusFrom(InstallmentStatus.EXPIRED).syncStatusTo(InstallmentStatus.UNPAID).build(),
@@ -143,6 +154,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndExpiredInstallmentsWhenCreateReceiptThenOk() {
     List<InstallmentNoPII> additionalInstallments = new ArrayList<>();
     //add multiple to sync installments
@@ -199,7 +211,7 @@ class ReceiptServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), receipt.getNoticeNumber())).thenReturn(installments);
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installment.getInstallmentId())).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.invokeWorkFlow(debtPositionDTO, accessToken, false)).thenReturn(workflowCreatedDTO);
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
 
     //when
     ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
@@ -216,15 +228,17 @@ class ReceiptServiceImplTest {
     Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(organization.getOrganizationId(), receipt.getNoticeNumber());
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(installment.getInstallmentId());
     Mockito.verify(debtPositionMapperMock, Mockito.times(1)).mapToDto(debtPosition);
-    Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).invokeWorkFlow(debtPositionDTO, accessToken, false);
+    Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndDraftInstallmentWhenCreateReceiptThenOk() {
     handleNotValidInstallmentReceiptImpl(null);
   }
 
   @Test
+  @Tag("createReceipt")
   void givenValidReceiptAndDraftAndToSyncInstallmentWhenCreateReceiptThenOk() {
     List<InstallmentNoPII> additionalInstallments = new ArrayList<>();
     //add multiple to sync installments
@@ -277,6 +291,7 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   void givenNotFoundOrganizationWhenCreateReceiptThenOk() {
     //give
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.empty());
@@ -294,12 +309,14 @@ class ReceiptServiceImplTest {
   }
 
   @Test
+  @Tag("createReceipt")
   @Tag("exception")
   void givenMultipleUnpaidInstallmentsWhenCreateReceiptThenException() {
     handleMultipleIncoherentInstallmentImpl(InstallmentStatus.UNPAID, null);
   }
 
   @Test
+  @Tag("createReceipt")
   @Tag("exception")
   void givenMultipleToSyncInstallmentsWhenCreateReceiptThenException() {
     handleMultipleIncoherentInstallmentImpl(InstallmentStatus.TO_SYNC,
@@ -357,5 +374,22 @@ class ReceiptServiceImplTest {
         ;
     }
     return newSet;
+  }
+
+  @Test
+  void whenGetReceiptDetailThenOk() {
+    //given
+    ReceiptDTO expectedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptPIIRepositoryMock.getReceiptDetail(receiptId)).thenReturn(expectedReceipt);
+
+    //when
+    ReceiptDTO response = receiptService.getReceiptDetail(receiptId);
+
+    //verify
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(expectedReceipt, response);
+
+    Mockito.verify(receiptPIIRepositoryMock).getReceiptDetail(receiptId);
   }
 }

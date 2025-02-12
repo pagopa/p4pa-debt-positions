@@ -4,6 +4,8 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.data.util.Pair;
@@ -32,5 +34,14 @@ public class ReceiptPIIRepositoryImpl implements ReceiptPIIRepository {
     receipt.setReceiptId(newId);
     receipt.getNoPII().setReceiptId(newId);
     return newId;
+  }
+
+  @Override
+  public ReceiptDTO getReceiptDetail(Long receiptId) {
+    ReceiptNoPII receiptNoPII = receiptNoPIIRepository.findById(receiptId)
+      .orElseThrow(() -> new NotFoundException(
+        "ReceiptNoPII having receiptId %d not found".formatted(
+          receiptId)));
+    return receiptPIIMapper.mapToReceiptDTO(receiptNoPII);
   }
 }

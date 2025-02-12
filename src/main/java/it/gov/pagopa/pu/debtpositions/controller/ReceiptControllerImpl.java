@@ -24,4 +24,9 @@ public class ReceiptControllerImpl implements ReceiptApi {
     ReceiptDTO body = receiptService.createReceipt(receiptDTO, accessToken);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
+
+  @Override
+  public ResponseEntity<ReceiptDTO> getReceiptDetail(Long receiptId) {
+    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId));
+  }
 }
