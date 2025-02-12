@@ -104,7 +104,7 @@ class DebtPositionServiceImplTest {
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
     Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
     Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
-    Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(savedInstallment.getInstallmentId());
+    Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installmentNoPII);
     Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
