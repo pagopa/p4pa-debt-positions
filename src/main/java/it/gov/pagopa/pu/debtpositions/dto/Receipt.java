@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptOrigin;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class Receipt {
 
   private Long receiptId;
   private Long ingestionFlowFileId;
-  private ReceiptOrigin receiptOrigin;
+  private ReceiptOriginType receiptOrigin;
   private String paymentReceiptId;
   private String noticeNumber;
   private String paymentNote;
