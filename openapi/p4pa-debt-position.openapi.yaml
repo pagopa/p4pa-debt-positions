@@ -121,11 +121,6 @@ paths:
             type: integer
             format: int64
           description: The ID of the receipt
-        - name: orgFiscalCode
-          in: query
-          required: true
-          schema:
-            type: string
       responses:
         "200":
           description: Ok

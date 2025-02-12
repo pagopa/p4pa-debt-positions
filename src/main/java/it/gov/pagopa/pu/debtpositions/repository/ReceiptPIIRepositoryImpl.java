@@ -37,11 +37,11 @@ public class ReceiptPIIRepositoryImpl implements ReceiptPIIRepository {
   }
 
   @Override
-  public ReceiptDTO getReceiptDetail(Long receiptId, String orgFiscalCode) {
-    ReceiptNoPII receiptNoPII = receiptNoPIIRepository.findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode)
+  public ReceiptDTO getReceiptDetail(Long receiptId) {
+    ReceiptNoPII receiptNoPII = receiptNoPIIRepository.findById(receiptId)
       .orElseThrow(() -> new NotFoundException(
-        "ReceiptNoPII having receiptId %d and orgFiscalCode %s not found".formatted(
-          receiptId, orgFiscalCode)));
+        "ReceiptNoPII having receiptId %d not found".formatted(
+          receiptId)));
     return receiptPIIMapper.mapToReceiptDTO(receiptNoPII);
   }
 }

@@ -70,20 +70,19 @@ class ReceiptPIIRepositoryImplTest {
   void givenExistingReceiptWhenFindReceiptThenOk() {
     // Given
     Long receiptId = 1L;
-    String orgFiscalCode = "orgFiscalCode";
     ReceiptNoPII receiptNoPII = podamFactory.manufacturePojo(ReceiptNoPII.class);
     ReceiptDTO receiptDto = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptNoPIIRepositoryMock.findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode)).thenReturn(
+    Mockito.when(receiptNoPIIRepositoryMock.findById(receiptId)).thenReturn(
       Optional.of(receiptNoPII));
     Mockito.when(receiptPIIMapperMock.mapToReceiptDTO(receiptNoPII)).thenReturn(receiptDto);
 
     // When
-    ReceiptDTO result = receiptPIIRepository.getReceiptDetail(receiptId,orgFiscalCode);
+    ReceiptDTO result = receiptPIIRepository.getReceiptDetail(receiptId);
 
     // Then
     Assertions.assertEquals(receiptDto, result);
-    Mockito.verify(receiptNoPIIRepositoryMock).findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode);
+    Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
     Mockito.verify(receiptPIIMapperMock).mapToReceiptDTO(receiptNoPII);
   }
 
@@ -91,15 +90,14 @@ class ReceiptPIIRepositoryImplTest {
   void givenNonExistingReceiptWhenFindReceiptThenNotFoundException() {
     // Given
     Long receiptId = 1L;
-    String orgFiscalCode = "orgFiscalCode";
 
-    Mockito.when(receiptNoPIIRepositoryMock.findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode)).thenReturn(
+    Mockito.when(receiptNoPIIRepositoryMock.findById(receiptId)).thenReturn(
       Optional.empty());
 
     // When
-    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.getReceiptDetail(receiptId,orgFiscalCode));
+    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.getReceiptDetail(receiptId));
 
-    Mockito.verify(receiptNoPIIRepositoryMock).findByReceiptIdAndOrgFiscalCode(receiptId,orgFiscalCode);
+    Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
     Mockito.verifyNoInteractions(receiptPIIMapperMock);
   }
 }

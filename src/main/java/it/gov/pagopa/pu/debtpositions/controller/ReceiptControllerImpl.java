@@ -24,7 +24,7 @@ public class ReceiptControllerImpl implements ReceiptApi {
   }
 
   @Override
-  public ResponseEntity<ReceiptDTO> getReceiptDetail(Long receiptId, String orgFiscalCode) {
-    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId, orgFiscalCode));
+  public ResponseEntity<ReceiptDTO> getReceiptDetail(Long receiptId) {
+    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId));
   }
 }

@@ -62,20 +62,18 @@ class ReceiptControllerTest {
   void whenGetReceiptDetailThenOk() throws Exception {
     //given
     Long receiptId = 1L;
-    String orgFiscalCode = "orgFiscalCode";
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId,orgFiscalCode)).thenReturn(expectedResponse);
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/receipts/"+receiptId)
-          .param("orgFiscalCode",orgFiscalCode))
+        MockMvcRequestBuilders.get("/receipts/"+receiptId))
       .andExpect(status().isOk())
       .andReturn();
 
     ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId,orgFiscalCode);
+    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId);
   }
 }
