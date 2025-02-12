@@ -73,7 +73,6 @@ class BrokerServiceTest {
     // Given
     Long brokerId = 1L;
     Broker expectedResult = new Broker();
-    String accessToken = "ACCESS_TOKEN";
     Mockito.when(brokerEntityClientMock.findById(brokerId, accessToken))
       .thenReturn(expectedResult);
 
