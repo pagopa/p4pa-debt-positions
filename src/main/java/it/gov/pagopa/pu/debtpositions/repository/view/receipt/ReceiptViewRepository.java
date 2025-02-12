@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 import io.swagger.v3.oas.annotations.Parameter;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptView;
+import java.time.OffsetDateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -10,15 +11,13 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-import java.time.OffsetDateTime;
-
 @RepositoryRestResource(path = "receipts-view")
 public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
 
   @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
   @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dp.description as description) "
     + "FROM ReceiptView r "
-    + "JOIN InstallmentNoPII i ON r.installmentId = i.installmentId "
+    + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
     + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
     + "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId "
     + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
