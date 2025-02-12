@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.event.producer;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.dto.PaymentEventDTO;
-import it.gov.pagopa.pu.debtpositions.event.producer.enums.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
