@@ -241,6 +241,7 @@ components:
         - organizationId
         - debtPositionTypeOrgId
         - paymentOptions
+        - flagPagoPaPayment
       type: object
       properties:
         debtPositionId:
