@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptOrigin;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,7 +26,7 @@ public class ReceiptNoPII extends BaseEntity implements Serializable {
   private Long receiptId;
   private Long ingestionFlowFileId;
   @NotNull
-  private ReceiptOrigin receiptOrigin;
+  private ReceiptOriginType receiptOrigin;
   @NotNull
   private String paymentReceiptId;
   @NotNull

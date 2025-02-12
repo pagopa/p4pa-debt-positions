@@ -190,6 +190,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/installment-synchronize:
+    put:
+      tags:
+        - debt-position
+      operationId: installmentSynchronize
+      parameters:
+        - name: massive
+          in: query
+          description: Indicates if the operation is massive (true) or single (false).
+          required: false
+          schema:
+            type: boolean
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/InstallmentSynchronizeDTO"
+        required: true
+      responses:
+        "201":
+          description: Ok
+          headers:
+            workflow-id:
+              schema:
+                type: string
+              description: The workflow id created.
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /transfers/{transferId}/reported:
     put:
       tags:
@@ -449,7 +499,7 @@ components:
           type: integer
           format: int64
         receiptOrigin:
-          $ref: "#/components/schemas/ReceiptOrigin"
+          type: ReceiptOrigin
         paymentReceiptId:
           type: string
         noticeNumber:
@@ -632,11 +682,6 @@ components:
         - EXPIRED
         - UNPAID
         - DRAFT
-    ReceiptOrigin:
-      type: string
-      enum:
-        - RECEIPT_PAGOPA
-        - RECEIPT_FILE
     SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:
@@ -739,3 +784,129 @@ components:
           format: int64
         flagExternal:
           type: boolean
+    InstallmentSynchronizeDTO:
+      required:
+        - action
+        - ingestionFlowFileId
+        - ingestionFlowFileLineNumber
+        - organizationId
+        - iupd
+        - description
+        - paymentOptionIndex
+        - paymentOptionType
+        - iud
+        - entityType
+        - fiscalCode
+        - fullName
+        - amount
+        - debtPositionTypeCode
+        - remittanceInformation
+        - legacyPaymentMetadata
+        - flagGenerateIuv
+      type: object
+      properties:
+        ingestionFlowFileId:
+          type: integer
+          format: int64
+        ingestionFlowFileLineNumber:
+          type: integer
+          format: int64
+        organizationId:
+          type: integer
+          format: int64
+        action:
+          type: string
+          enum:
+            - I
+            - M
+            - A
+        draft:
+          type: boolean
+        iupdOrg:
+          type: string
+        description:
+          type: string
+        validityDate:
+          type: string
+          format: date-time
+        multiDebtor:
+          type: boolean
+        notificationDate:
+          type: string
+          format: date-time
+        paymentOptionIndex:
+          type: integer
+          format: int64
+        paymentOptionType:
+          type: string
+        iud:
+          type: string
+        iuv:
+          type: string
+        entityType:
+          type: string
+          enum:
+            - F
+            - G
+        fiscalCode:
+          type: string
+        fullName:
+          type: string
+        address:
+          type: string
+        civic:
+          type: string
+        postalCode:
+          type: string
+        location:
+          type: string
+        province:
+          type: string
+        nation:
+          type: string
+        email:
+          type: string
+        dueDate:
+          type: string
+          format: date-time
+        amount:
+          type: number
+        debtPositionTypeCode:
+          type: string
+        paymentTypeCode:
+          type: string
+        remittanceInformation:
+          type: string
+        legacyPaymentMetadata:
+          type: string
+        flagPagoPaPayment:
+          type: boolean
+        balance:
+          type: string
+        flagMultibeneficiary:
+          type: boolean
+        numberBeneficiary:
+          type: integer
+          format: int64
+        transfersList:
+          type: array
+          items:
+            $ref: "#/components/schemas/TransferSynchronizeDTO"
+    TransferSynchronizeDTO:
+      type: object
+      properties:
+        orgFiscalCode:
+          type: string
+        orgName:
+          type: string
+        amount:
+          type: number
+        remittanceInformation:
+          type: string
+        iban:
+          type: string
+        category:
+          type: string
+        transferIndex:
+          type: integer
+          format: int32

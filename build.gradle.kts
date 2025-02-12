@@ -144,6 +144,9 @@ openApiGenerate {
   apiPackage.set("it.gov.pagopa.pu.debtpositions.controller.generated")
   modelPackage.set("it.gov.pagopa.pu.debtpositions.dto.generated")
   openapiNormalizer.set(mapOf("REF_AS_PARENT_IN_ALLOF" to "true"))
+  typeMappings.set(mapOf(
+    "ReceiptOrigin" to "it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType"
+  ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",
     "requestMappingMode" to "api_interface",
