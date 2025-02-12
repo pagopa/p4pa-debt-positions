@@ -448,10 +448,7 @@ components:
           type: integer
           format: int64
         receiptOrigin:
-          type: string
-          enum:
-            - RECEIPT_PAGOPA
-            - RECEIPT_FILE
+          $ref: "#/components/schemas/ReceiptOrigin"
         paymentReceiptId:
           type: string
         noticeNumber:
@@ -634,6 +631,11 @@ components:
         - EXPIRED
         - UNPAID
         - DRAFT
+    ReceiptOrigin:
+      type: string
+      enum:
+        - RECEIPT_PAGOPA
+        - RECEIPT_FILE
     SyncStatusUpdateRequestDTO:
       type: object
       additionalProperties:

@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model.view.receipt;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -25,7 +25,7 @@ public class ReceiptView implements Serializable {
   private Long paymentAmountCents;
   private OffsetDateTime paymentDateTime;
   private Long installmentId;
-  private ReceiptDTO.ReceiptOriginEnum receiptOrigin;
+  private ReceiptOriginType receiptOrigin;
   private String iuv;
   private String description;
 
