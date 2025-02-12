@@ -11,8 +11,10 @@ import it.gov.pagopa.pu.debtpositions.mapper.ReceiptMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
+import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
@@ -25,6 +27,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Slf4j
@@ -34,6 +37,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   private static final Set<InstallmentStatus> NOT_PAID = Set.of(InstallmentStatus.DRAFT, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED);
 
+  private final ReceiptNoPIIRepository receiptNoPIIRepository;
   private final ReceiptPIIRepository receiptPIIRepository;
   private final ReceiptMapper receiptMapper;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
@@ -43,10 +47,11 @@ public class ReceiptServiceImpl implements ReceiptService {
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionMapper debtPositionMapper;
 
-  public ReceiptServiceImpl(ReceiptPIIRepository receiptPIIRepository, ReceiptMapper receiptMapper,
+  public ReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, ReceiptMapper receiptMapper,
                             InstallmentNoPIIRepository installmentNoPIIRepository, OrganizationService organizationService,
                             DebtPositionRepository debtPositionRepository, BrokerService brokerService,
                             DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper) {
+    this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
     this.receiptMapper = receiptMapper;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
@@ -60,45 +65,84 @@ public class ReceiptServiceImpl implements ReceiptService {
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+
+    //check if the same receipt is already present on DB.
+    // in this case just ignore it since it simply means that the same receipt has been broadcasted
+    // to multiple organizations managed by PU
+    ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
+    if(receiptInDb != null) {
+      log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
+      receiptDTO.setReceiptId(receiptInDb.getReceiptId());
+      return receiptDTO;
+    }
+
     //persist receipt
     Receipt receipt = receiptMapper.mapToModel(receiptDTO);
     long newId = receiptPIIRepository.save(receipt);
     receiptDTO.setReceiptId(newId);
 
     //check if organization who handle the notice is managed by PU
+    AtomicBoolean primaryOrgFound = new AtomicBoolean(false);
     Optional<Organization> primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken);
 
     if (primaryOrg.isPresent()) {
       Broker primaryBroker = brokerService.findById(primaryOrg.get().getBrokerId(), accessToken);
-      // check installment by orgId/noticeNumber
-      // filter out installments with status PAID and REPORTED
-      List<InstallmentNoPII> installmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.get().getOrganizationId(), receiptDTO.getNoticeNumber())
-        .stream().filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
-          && !anInstallment.getStatus().equals(InstallmentStatus.PAID)).toList();
+      // check installments by orgId/noticeNumber
+      List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.get().getOrganizationId(), receiptDTO.getNoticeNumber());
 
-      /*
-       * Apply this rules to find if a valid installment is associated to the receipt:
-       * 1. >1 installments with status UNPAID -> throw exception
-       * 2. 1 installment with status UNPAID -> use it
-       * 3. >1 installment with status TO_SYNC and sync_status_to UNPAID -> throw exception
-       * 4. 1 installment with status TO_SYNC and sync_status_to UNPAID -> use it
-       * 5. >=1 installments with status EXPIRED -> use the most recent
-       * 6. (default) -> not found (nothing to do)
-       */
-      checkInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.UNPAID, null)
-        .or(() -> checkInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID))
-        .or(() -> checkInstallment(installmentList, CHECK_MODE.MOST_RECENT, InstallmentStatus.EXPIRED, null))
-        .ifPresent(installment -> {
-          DebtPosition debtPosition = updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
-          // start debt position workflow
-          DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
-          invokeWorkflow(debtPositionDTO, accessToken);
-        });
+      //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer
+      if(!fullInstallmentList.isEmpty()) {
+
+        // filter out installments with status PAID and REPORTED
+        List<InstallmentNoPII> installmentList = fullInstallmentList.stream()
+          .filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
+            && !anInstallment.getStatus().equals(InstallmentStatus.PAID)).toList();
+
+        /*
+         * Apply these rules to find if a valid installment (i.e. not discarded by status PAID or REPORTED) is associated to the receipt:
+         * 1. >1 installments with status UNPAID -> throw exception
+         * 2. 1 installment with status UNPAID -> use it
+         * 3. >1 installment with status TO_SYNC and sync_status_to UNPAID -> throw exception
+         * 4. 1 installment with status TO_SYNC and sync_status_to UNPAID -> use it
+         * 5. >=1 installments with status EXPIRED -> use the most recent
+         * 6. (default) -> not found (nothing to do)
+         */
+        checkInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.UNPAID, null)
+          .or(() -> checkInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID))
+          .or(() -> checkInstallment(installmentList, CHECK_MODE.MOST_RECENT, InstallmentStatus.EXPIRED, null))
+          .ifPresentOrElse(installment -> {
+            primaryOrgFound.set(true);
+            //case an installment is found
+            DebtPosition debtPosition = updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
+            // start debt position workflow
+            DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
+            invokeWorkflow(debtPositionDTO, accessToken);
+          }, () -> {
+            //case no valid installment found to associate to receipt, but no exception found (for instance: all installment in status paid/reported)
+            //in this case, just log the event
+            List<String> installmentWithStatusList = fullInstallmentList.stream().map(i -> i.getInstallmentId() + "/" +
+              (i.getStatus().equals(InstallmentStatus.TO_SYNC) ? (i.getSyncStatus().getSyncStatusFrom() + "->" + i.getSyncStatus().getSyncStatusTo()) : i.getSyncStatus())).toList();
+            log.info("No valid installment found to associate to receipt [{}]; list of installment/status [{}]", receiptDTO.getReceiptId(), installmentWithStatusList);
+          });
+      }
     }
 
-    // for every organization having a non-primary transfer, check if it managed by PU
-    // if so, create a "technical" installment (and debt position) for it, in status PAID
-    // TODO task P4ADEV-2027
+    // for every organization handled by PU and mentioned in the receipt
+    receiptDTO.getTransfers().stream()
+      //get the fiscal code of the organization
+      .map(ReceiptTransferDTO::getFiscalCodePA)
+      .distinct()
+      //exclude primary org in case it has a valid debt position associated to it
+      .filter(fiscalCode -> !primaryOrgFound.get() || !fiscalCode.equals(receiptDTO.getOrgFiscalCode()))
+      //check if the organization is managed by PU
+      .map(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken))
+      .filter(Optional::isPresent)
+      .map(Optional::get)
+      //create a "technical" debt position, in status PAID
+      .forEach(organization ->
+        //TODO tast P4ADEV-2027
+        log.info("TODO P4ADEV-2027 create technical debt position for org[{}] nav[{}]", organization.getOrganizationId(), receiptDTO.getNoticeNumber())
+      );
 
     return receiptDTO;
   }
@@ -126,7 +170,7 @@ public class ReceiptServiceImpl implements ReceiptService {
       if (paymentOption.getPaymentOptionId().equals(installment.getPaymentOptionId())) {
         // current payment option: find this installment
         InstallmentNoPII primaryInstallment = paymentOption.getInstallments().stream()
-          .filter(anInstallment -> !anInstallment.getInstallmentId().equals(installment.getInstallmentId()))
+          .filter(anInstallment -> anInstallment.getInstallmentId().equals(installment.getInstallmentId()))
           .findFirst().orElseThrow(() -> new NotFoundException("installment not found " + installment.getInstallmentId()));
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", primaryInstallment.getInstallmentId(), receiptDTO.getReceiptId());
@@ -156,8 +200,9 @@ public class ReceiptServiceImpl implements ReceiptService {
   }
 
   private void updateSyncStatus(InstallmentNoPII installment, InstallmentStatus to) {
+    InstallmentStatus from = installment.getStatus().equals(InstallmentStatus.TO_SYNC) ? installment.getSyncStatus().getSyncStatusFrom() : installment.getStatus();
     installment.setSyncStatus(InstallmentSyncStatus.builder()
-      .syncStatusFrom(installment.getStatus())
+      .syncStatusFrom(from)
       .syncStatusTo(to)
       .build()
     );
