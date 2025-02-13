@@ -6,6 +6,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Test;
@@ -32,6 +33,9 @@ class ReceiptControllerTest {
 
   @MockitoBean
   private CreateReceiptService createReceiptServiceMock;
+
+  @MockitoBean
+  private ReceiptService receiptServiceMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
@@ -65,7 +69,7 @@ class ReceiptControllerTest {
     Long receiptId = 1L;
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(createReceiptServiceMock.getReceiptDetail(receiptId)).thenReturn(expectedResponse);
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/receipts/"+receiptId))
@@ -75,6 +79,6 @@ class ReceiptControllerTest {
     ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(createReceiptServiceMock).getReceiptDetail(receiptId);
+    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId);
   }
 }
