@@ -28,7 +28,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 @Slf4j
@@ -83,7 +82,7 @@ public class ReceiptServiceImpl implements ReceiptService {
     receiptDTO.setReceiptId(newId);
 
     //check if organization who handle the notice is managed by PU
-    AtomicBoolean primaryOrgFound = new AtomicBoolean(false);
+    boolean[] primaryOrgFound = new boolean[]{false};
     Optional<Organization> primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken);
 
     if (primaryOrg.isPresent()) {
@@ -112,7 +111,7 @@ public class ReceiptServiceImpl implements ReceiptService {
           .or(() -> checkInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID))
           .or(() -> checkInstallment(installmentList, CHECK_MODE.MOST_RECENT, InstallmentStatus.EXPIRED, null))
           .ifPresentOrElse(installment -> {
-            primaryOrgFound.set(true);
+            primaryOrgFound[0]=true;
             //case an installment is found
             DebtPosition debtPosition = updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
             // start debt position workflow
@@ -134,7 +133,7 @@ public class ReceiptServiceImpl implements ReceiptService {
       .map(ReceiptTransferDTO::getFiscalCodePA)
       .distinct()
       //exclude primary org in case it has a valid debt position associated to it
-      .filter(fiscalCode -> !primaryOrgFound.get() || !fiscalCode.equals(receiptDTO.getOrgFiscalCode()))
+      .filter(fiscalCode -> !primaryOrgFound[0] || !fiscalCode.equals(receiptDTO.getOrgFiscalCode()))
       //check if the organization is managed by PU
       .map(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken))
       .filter(Optional::isPresent)
