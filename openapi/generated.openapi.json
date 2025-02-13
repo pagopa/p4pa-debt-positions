@@ -2739,14 +2739,14 @@
             "format" : "int64"
           }
         }, {
-          "name" : "fromDate",
+          "name" : "paymentDateTimeFrom",
           "in" : "query",
           "schema" : {
             "type" : "string",
             "format" : "date-time"
           }
         }, {
-          "name" : "toDate",
+          "name" : "paymentDateTimeTo",
           "in" : "query",
           "schema" : {
             "type" : "string",
@@ -3844,6 +3844,34 @@
           }
         }
       },
+      "InstallmentSyncStatus" : {
+        "required" : [ "syncStatusFrom", "syncStatusTo" ],
+        "type" : "object",
+        "properties" : {
+          "syncStatusFrom" : {
+            "type" : "string",
+            "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "DRAFT" ]
+          },
+          "syncStatusTo" : {
+            "type" : "string",
+            "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "DRAFT" ]
+          }
+        }
+      },
+      "Stamp" : {
+        "type" : "object",
+        "properties" : {
+          "stampType" : {
+            "type" : "string"
+          },
+          "stampHashDocument" : {
+            "type" : "string"
+          },
+          "stampProvincialResidence" : {
+            "type" : "string"
+          }
+        }
+      },
       "InstallmentNoPII" : {
         "required" : [ "amountCents", "debtorEntityType", "debtorFiscalCodeHash", "iud", "legacyPaymentMetadata", "paymentOptionId", "paymentTypeCode", "personalDataId", "remittanceInformation", "status" ],
         "type" : "object",
@@ -3945,34 +3973,6 @@
           }
         }
       },
-      "InstallmentSyncStatus" : {
-        "required" : [ "syncStatusFrom", "syncStatusTo" ],
-        "type" : "object",
-        "properties" : {
-          "syncStatusFrom" : {
-            "type" : "string",
-            "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "DRAFT" ]
-          },
-          "syncStatusTo" : {
-            "type" : "string",
-            "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "DRAFT" ]
-          }
-        }
-      },
-      "Stamp" : {
-        "type" : "object",
-        "properties" : {
-          "stampType" : {
-            "type" : "string"
-          },
-          "stampHashDocument" : {
-            "type" : "string"
-          },
-          "stampProvincialResidence" : {
-            "type" : "string"
-          }
-        }
-      },
       "PageMetadata" : {
         "type" : "object",
         "properties" : {
@@ -4016,25 +4016,6 @@
           }
         }
       },
-      "CollectionModelTransfer" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "transfers" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/TransferResponse"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
       "CollectionModelObject" : {
         "type" : "object",
         "properties" : {
@@ -4045,6 +4026,25 @@
                 "type" : "array",
                 "items" : {
                   "type" : "object"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelTransfer" : {
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "transfers" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/TransferResponse"
                 }
               }
             }

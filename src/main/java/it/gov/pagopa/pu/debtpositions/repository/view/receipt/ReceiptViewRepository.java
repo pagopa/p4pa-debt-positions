@@ -29,9 +29,8 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND (:iur IS NULL OR i.iur = :iur) "
     + "AND (:iud IS NULL OR i.iud = :iud) "
     + "AND (:debtPositionTypeOrgId IS NULL OR dp.debtPositionTypeOrgId = :debtPositionTypeOrgId) "
-    + "AND ((cast(:fromDate as date) IS NULL AND cast(:toDate as date) IS NULL) "
-    + "OR (cast(:fromDate as date) IS NOT NULL AND cast(:toDate as date) IS NOT NULL "
-    + "AND r.paymentDateTime BETWEEN :fromDate AND :toDate))")
+    + "AND (cast(:paymentDateTimeFrom as date) IS NULL OR r.paymentDateTime >= :paymentDateTimeFrom) "
+    + "AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo) ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("receiptOrigin") ReceiptOriginType receiptOrigin,
@@ -40,8 +39,8 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     @Param("iur") String iur,
     @Param("iud") String iud,
     @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
-    @Param("fromDate") OffsetDateTime fromDate,
-    @Param("toDate") OffsetDateTime toDate,
+    @Param("paymentDateTimeFrom") OffsetDateTime fromDate,
+    @Param("paymentDateTimeTo") OffsetDateTime toDate,
     Pageable pageable);
 
 }
