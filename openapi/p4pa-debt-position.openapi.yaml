@@ -829,7 +829,6 @@ components:
         - ingestionFlowFileId
         - ingestionFlowFileLineNumber
         - organizationId
-        - iupd
         - description
         - paymentOptionIndex
         - paymentOptionType
@@ -875,8 +874,10 @@ components:
           format: date-time
         paymentOptionIndex:
           type: integer
-          format: int64
+          format: int32
         paymentOptionType:
+          type: string
+        paymentOptionDescription:
           type: string
         iud:
           type: string
@@ -926,7 +927,7 @@ components:
           type: boolean
         numberBeneficiary:
           type: integer
-          format: int64
+          format: int32
         transfersList:
           type: array
           items:

@@ -7,4 +7,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(path = "debt-position-types")
 public interface DebtPositionTypeRepository extends JpaRepository<DebtPositionType,Long> {
 
+  DebtPositionType findByDebtPositionTypeId(Long debtPositionTypeId);
 }

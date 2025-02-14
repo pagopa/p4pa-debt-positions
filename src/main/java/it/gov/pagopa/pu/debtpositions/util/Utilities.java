@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -57,5 +58,11 @@ public class Utilities {
 
   public static String getRandomicUUID() {
     return UUID.randomUUID().toString().replace("-", "");
+  }
+
+  private static final BigDecimal BIG_DECIMAL_100 = new BigDecimal(100);
+
+  public static Long amountToCents(BigDecimal amount){
+    return amount != null ? amount.multiply(BIG_DECIMAL_100).longValueExact() : null;
   }
 }

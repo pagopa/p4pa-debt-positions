@@ -10,6 +10,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.util.Optional;
+
 @RepositoryRestResource(path = "payment-options")
 public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Long> {
 
@@ -19,4 +21,9 @@ public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Lon
   @Query("UPDATE PaymentOption p SET p.status = :status WHERE p.paymentOptionId = :paymentOptionId")
   void updateStatus(@Param("paymentOptionId") Long paymentOptionId, @Param("status") PaymentOptionStatus status);
 
+  @Query(value = "SELECT po from PaymentOption po " +
+    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
+    "WHERE dp.iupdOrg = :iupdOrg AND " +
+    "po.paymentOptionIndex = :paymentOptionIndex")
+  Optional<PaymentOption> getByPaymentOptionIndexAndIupdOrg(Integer paymentOptionIndex, String iupdOrg);
 }

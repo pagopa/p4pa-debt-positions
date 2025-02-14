@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
@@ -10,6 +11,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+
+import java.util.Optional;
 
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
@@ -37,4 +40,5 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByTransferId(@Param("transferId") Long transferId);
 
+  Optional<DebtPosition> findByIupdOrgAndDebtPositionOrigin(String iupdOrg, DebtPositionOrigin debtPositionOrigin);
 }
