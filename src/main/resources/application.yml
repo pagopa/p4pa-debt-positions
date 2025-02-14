@@ -129,8 +129,14 @@ rest:
     read-millis: "\${DEFAULT_REST_READ_TIMEOUT_MILLIS:60000}"
   organization:
     base-url: "\${ORGANIZATION_BASE_URL:http://localhost:8081}"
+    max-attempts: "\${ORGANIZATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${ORGANIZATION_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${ORGANIZATION_PRINT_BODY_WHEN_ERROR:true}"
   workflow-hub:
     base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}/workflowhub"
+    max-attempts: "\${WORKFLOW_HUB_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${WORKFLOW_HUB_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${WORKFLOW_HUB_PRINT_BODY_WHEN_ERROR:true}"
 
 iuv:
   informationSystemId: "00"
