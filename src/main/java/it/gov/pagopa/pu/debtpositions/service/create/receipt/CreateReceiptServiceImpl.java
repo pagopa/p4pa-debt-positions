@@ -87,9 +87,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       //exclude primary org in case it has a valid debt position associated to it
       .filter(fiscalCode -> !primaryOrgFound[0] || !fiscalCode.equals(receiptDTO.getOrgFiscalCode()))
       //check if the organization is managed by PU
-      .map(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken))
-      .filter(Optional::isPresent)
-      .map(Optional::get)
+      .flatMap(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken).stream())
       //create a "technical" debt position, in status PAID
       .forEach(organization ->
         //TODO tast P4ADEV-2027
