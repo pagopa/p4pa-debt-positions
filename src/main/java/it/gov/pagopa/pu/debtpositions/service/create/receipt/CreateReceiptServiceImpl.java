@@ -56,15 +56,10 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.info("createReceipt paymentReceiptId[{}} org/nav[{}/{}]", receiptDTO.getPaymentReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber());
 
-    //check if the same receipt is already present on DB.
-    // in this case just ignore it since it simply means that the same receipt has been broadcast
-    // to multiple organizations managed by PU
-    ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
-    if (receiptInDb != null) {
-      log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
-      receiptDTO.setReceiptId(receiptInDb.getReceiptId());
-      return receiptDTO;
-    }
+    //check if the same receipt is already present on DB
+    Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
+    if (receiptInDb.isPresent())
+      return receiptInDb.get();
 
     //persist receipt
     saveReceipt(receiptDTO);
@@ -102,6 +97,19 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       );
 
     return receiptDTO;
+  }
+
+  // check if the same receipt is already present on DB.
+  // in this case just ignore it since it simply means that the same receipt has been broadcast
+  // to multiple organizations managed by PU
+  private Optional<ReceiptDTO> checkIfAlreadyStored(ReceiptDTO receiptDTO) {
+    ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
+    if (receiptInDb != null) {
+      log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
+      receiptDTO.setReceiptId(receiptInDb.getReceiptId());
+      return Optional.of(receiptDTO);
+    }
+    return Optional.empty();
   }
 
   private void saveReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
