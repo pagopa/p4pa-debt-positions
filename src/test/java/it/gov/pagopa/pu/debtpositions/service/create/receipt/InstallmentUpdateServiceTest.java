@@ -24,13 +24,13 @@ import java.util.TreeSet;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
-class InstallmentUpdateServiceImplTest {
+class InstallmentUpdateServiceTest {
 
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
 
   @InjectMocks
-  private InstallmentUpdateServiceImpl installmentUpdateService;
+  private InstallmentUpdateService installmentUpdateService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
@@ -52,7 +52,7 @@ class InstallmentUpdateServiceImplTest {
   @Test
   void givenNotFoundFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
 
@@ -67,7 +67,7 @@ class InstallmentUpdateServiceImplTest {
   @Test
   void givenNotFoundFoundInstallmentWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
@@ -95,23 +95,23 @@ class InstallmentUpdateServiceImplTest {
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     broker.setPagoPaInteractionModel(pagoPaInteractionModelEnum);
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
     List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
 
     paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.PAID),
       targetInstallment
     )));
     paymentOptionList.get(1).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.DRAFT),
-      PrimaryOrgInstallmentServiceImplTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
-      PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.REPORTED)
+      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.DRAFT),
+      PrimaryOrgInstallmentServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
+      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.REPORTED)
     )));
     paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceImplTest.getInstallment(InstallmentStatus.PAID),
-      PrimaryOrgInstallmentServiceImplTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
+      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     )));
 
     //align entities id
@@ -141,7 +141,7 @@ class InstallmentUpdateServiceImplTest {
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUpdateServiceImpl.NOT_PAID.contains(anInstallment.getStatus())) {
+          if (InstallmentUpdateService.NOT_PAID.contains(anInstallment.getStatus())) {
             verifyInstallmentStatus(anInstallment, broker, InstallmentStatus.INVALID,
               "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
                 idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(),anInstallment.getStatus()));

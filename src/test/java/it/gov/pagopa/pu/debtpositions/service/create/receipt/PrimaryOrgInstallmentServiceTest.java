@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class PrimaryOrgInstallmentServiceImplTest {
+class PrimaryOrgInstallmentServiceTest {
 
   private enum ExptectedOutcome { FOUND, EMPTY, EXCEPTION }
 
@@ -29,7 +29,7 @@ class PrimaryOrgInstallmentServiceImplTest {
   private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
 
   @InjectMocks
-  private PrimaryOrgInstallmentServiceImpl primaryOrgInstallmentService;
+  private PrimaryOrgInstallmentService primaryOrgInstallmentService;
 
   private static final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
