@@ -67,10 +67,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     }
 
     //persist receipt
-    Receipt receipt = receiptMapper.mapToModel(receiptDTO);
-    long newId = receiptPIIRepository.save(receipt);
-    receiptDTO.setReceiptId(newId);
-    log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), newId);
+    saveReceipt(receiptDTO);
 
     //check if organization who handle the notice is managed by PU
     boolean[] primaryOrgFound = new boolean[]{false};
@@ -105,6 +102,13 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       );
 
     return receiptDTO;
+  }
+
+  private void saveReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    Receipt receipt = receiptMapper.mapToModel(receiptDTO);
+    long newId = receiptPIIRepository.save(receipt);
+    receiptDTO.setReceiptId(newId);
+    log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), newId);
   }
 
 
