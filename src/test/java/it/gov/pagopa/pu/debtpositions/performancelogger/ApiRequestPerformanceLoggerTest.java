@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.performancelogger;
 
-import it.gov.pagopa.payhub.auth.performancelogger.PerformanceLoggerTest;
-import it.gov.pagopa.payhub.auth.utils.MemoryAppender;
+import it.gov.pagopa.pu.debtpositions.util.MemoryAppender;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.ServletRequest;
