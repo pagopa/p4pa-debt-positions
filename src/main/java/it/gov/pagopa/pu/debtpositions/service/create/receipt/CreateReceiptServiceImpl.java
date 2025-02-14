@@ -34,12 +34,13 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private final DebtPositionMapper debtPositionMapper;
   private final PrimaryOrgInstallmentService primaryOrgInstallmentService;
   private final InstallmentUpdateService installmentUpdateService;
+  private final CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService;
 
   public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository,
                                   ReceiptMapper receiptMapper, OrganizationService organizationService,
                                   BrokerService brokerService, DebtPositionSyncService debtPositionSyncService,
                                   DebtPositionMapper debtPositionMapper, PrimaryOrgInstallmentService primaryOrgInstallmentService,
-                                  InstallmentUpdateService installmentUpdateService) {
+                                  InstallmentUpdateService installmentUpdateService, CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
     this.receiptMapper = receiptMapper;
@@ -49,6 +50,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     this.debtPositionMapper = debtPositionMapper;
     this.primaryOrgInstallmentService = primaryOrgInstallmentService;
     this.installmentUpdateService = installmentUpdateService;
+    this.createPaidTechnicalDebtPositionsService = createPaidTechnicalDebtPositionsService;
   }
 
   @Override
@@ -80,19 +82,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
         }));
 
     //for every organization handled by PU and mentioned in the receipt
-    receiptDTO.getTransfers().stream()
-      //get the fiscal code of the organization
-      .map(ReceiptTransferDTO::getFiscalCodePA)
-      .distinct()
-      //exclude primary org in case it has a valid debt position associated to it
-      .filter(fiscalCode -> !primaryOrgFound[0] || !fiscalCode.equals(receiptDTO.getOrgFiscalCode()))
-      //check if the organization is managed by PU
-      .flatMap(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken).stream())
-      //create a "technical" debt position, in status PAID
-      .forEach(organization ->
-        //TODO tast P4ADEV-2027
-        log.info("TODO P4ADEV-2027 create technical debt position for org[{}] nav[{}]", organization.getOrganizationId(), receiptDTO.getNoticeNumber())
-      );
+    createPaidTechnicalDebtPositionsService.createPaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound[0], accessToken);
 
     return receiptDTO;
   }

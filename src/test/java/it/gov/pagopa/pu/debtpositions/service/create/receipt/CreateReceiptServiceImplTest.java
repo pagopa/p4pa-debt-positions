@@ -51,6 +51,8 @@ class CreateReceiptServiceImplTest {
   private PrimaryOrgInstallmentService primaryOrgInstallmentServiceMock;
   @Mock
   private InstallmentUpdateService installmentUpdateServiceMock;
+  @Mock
+  private CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsServiceMock;
 
   @InjectMocks
   private CreateReceiptServiceImpl receiptService;
@@ -76,15 +78,6 @@ class CreateReceiptServiceImplTest {
       Mockito.when(receiptMapperMock.mapToModel(receipt)).thenReturn(receiptModel);
       Mockito.when(receiptPIIRepositoryMock.save(receiptModel)).thenReturn(receiptId);
       Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receipt.getPaymentReceiptId())).thenReturn(null);
-
-      if (!info.getTags().contains("exception")) {
-        receipt.getTransfers().stream()
-          .filter(transfer -> !receipt.getOrgFiscalCode().equals(transfer.getFiscalCodePA()))
-          .forEach(transfer -> {
-            Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(transfer.getFiscalCodePA(), accessToken))
-              .thenReturn(Optional.of(podamFactory.manufacturePojo(Organization.class)));
-          });
-      }
     }
   }
 
@@ -138,6 +131,7 @@ class CreateReceiptServiceImplTest {
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, broker, receipt)).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
 
     //when
     ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
@@ -155,6 +149,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, broker, receipt);
     Mockito.verify(debtPositionMapperMock, Mockito.times(1)).mapToDto(debtPosition);
     Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
   }
 
   @Test
@@ -165,6 +160,7 @@ class CreateReceiptServiceImplTest {
 
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.of(organization));
     Mockito.when(primaryOrgInstallmentServiceMock.findPrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Optional.empty());
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     //when
     ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
@@ -178,6 +174,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
     Mockito.verify(primaryOrgInstallmentServiceMock, Mockito.times(1)).findPrimaryOrgInstallment(organization, receipt.getNoticeNumber());
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
     Mockito.verifyNoInteractions(brokerServiceMock,installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
   }
 
@@ -188,6 +185,7 @@ class CreateReceiptServiceImplTest {
     organization.setOrgFiscalCode(receipt.getOrgFiscalCode());
 
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.empty());
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     //when
     ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
@@ -200,6 +198,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
     Mockito.verifyNoInteractions(primaryOrgInstallmentServiceMock, brokerServiceMock,installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
   }
 
