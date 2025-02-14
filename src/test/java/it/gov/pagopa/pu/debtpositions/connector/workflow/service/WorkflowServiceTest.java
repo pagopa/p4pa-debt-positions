@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowApiClient;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -20,8 +21,6 @@ class WorkflowServiceTest {
 
   private WorkflowService workflowService;
 
-  private final String accessToken = "ACCESSTOKEN";
-
   @BeforeEach
   void init() {
     workflowService = new WorkflowServiceImpl(
@@ -37,72 +36,22 @@ class WorkflowServiceTest {
   }
 
   @Test
-  void givenValidDebtPositionRequestDTOWhenHandleDpSyncThenEmpty() {
+  void whenSyncDebtPositionThenOk() {
     // Given
+    String accessToken = "ACCESSTOKEN";
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
+    Boolean massive = true;
+    PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.handleDpSync(new DebtPositionDTO(), accessToken))
+
+    Mockito.when(workflowApiClientMock.syncDebtPosition(Mockito.same(debtPositionDTO), Mockito.same(massive), Mockito.same(paymentEventType), Mockito.same(accessToken)))
       .thenReturn(expectedResult);
 
     // When
-    WorkflowCreatedDTO result = workflowService.handleDpSync(new DebtPositionDTO(), accessToken);
+    WorkflowCreatedDTO result = workflowService.syncDebtPosition(debtPositionDTO, massive, paymentEventType, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
   }
 
-  @Test
-  void givenValidDebtPositionRequestDTOWhenAlignDpSyncAcaThenEmpty(){
-    // Given
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncAca(new DebtPositionDTO(), accessToken))
-      .thenReturn(expectedResult);
-
-    // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncAca(new DebtPositionDTO(), accessToken);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-  }
-
-  @Test
-  void givenValidDebtPositionRequestDTOWhenAlignDpSyncGpdPreloadThenEmpty(){
-    // Given
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncGpdPreload(new DebtPositionDTO(), accessToken))
-      .thenReturn(expectedResult);
-
-    // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncGpdPreload(new DebtPositionDTO(), accessToken);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-  }
-
-  @Test
-  void givenValidDebtPositionRequestDTOWhenAlignDpSyncAcaGpdPreloadThenEmpty(){
-    // Given
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpSyncAcaGpdPreload(new DebtPositionDTO(), accessToken))
-      .thenReturn(expectedResult);
-
-    // When
-    WorkflowCreatedDTO result = workflowService.alignDpSyncAcaGpdPreload(new DebtPositionDTO(), accessToken);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-  }
-
-  @Test
-  void givenValidDebtPositionRequestDTOWhenAlignDpGPDThenEmpty(){
-    // Given
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
-    Mockito.when(workflowApiClientMock.alignDpGPD(new DebtPositionDTO(), accessToken))
-      .thenReturn(expectedResult);
-
-    // When
-    WorkflowCreatedDTO result = workflowService.alignDpGPD(new DebtPositionDTO(), accessToken);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-  }
 }

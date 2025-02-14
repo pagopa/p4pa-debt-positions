@@ -1,16 +1,14 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
-import it.gov.pagopa.pu.debtpositions.event.producer.enums.PaymentEventType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.workflow.DebtPositionSyncService;
-import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,13 +24,14 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
-  private final PaymentsProducerService paymentsProducerService;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
-                                       DebtPositionService debtPositionService, GenerateIuvService generateIuvService,
+                                       DebtPositionService debtPositionService,
+                                       GenerateIuvService generateIuvService,
                                        DebtPositionSyncService debtPositionSyncService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService, PaymentsProducerService paymentsProducerService) {
+                                       InstallmentNoPIIRepository installmentNoPIIRepository,
+                                       DebtPositionProcessorService debtPositionProcessorService) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
@@ -40,7 +39,6 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
-    this.paymentsProducerService = paymentsProducerService;
   }
 
   @Transactional
@@ -65,19 +63,16 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated);
 
-    invokeWorkflowIfStatusToSync(savedDebtPosition, accessToken, massive);
+    invokeWorkflow(savedDebtPosition, accessToken, massive);
 
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return savedDebtPosition;
   }
 
-  private void invokeWorkflowIfStatusToSync(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
-    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.TO_SYNC)) {
+  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+    if(!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      invokeWorkflow(debtPositionDTO, accessToken, massive);
-
-      log.info("Sending creation message to queue for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.DP_CREATED);
+      debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken);
     }
   }
 
@@ -88,9 +83,10 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       paymentOption.setStatus(paymentStatus);
       paymentOption.getInstallments().forEach(installment -> {
         installment.setStatus(installmentStatus);
-        if(debtPositionStatus.equals(DebtPositionStatus.TO_SYNC)) {
+        if (debtPositionStatus.equals(DebtPositionStatus.TO_SYNC)) {
           installment.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
-        }});
+        }
+      });
     });
   }
 
@@ -120,12 +116,4 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     }
   }
 
-  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
-    WorkflowCreatedDTO workflow = debtPositionSyncService.invokeWorkFlow(debtPositionDTO, accessToken, massive);
-    if (workflow != null) {
-      log.info("Workflow created with id {}", workflow.getWorkflowId());
-    } else {
-      log.info("Workflow creation was not executed for debtPositionId {}, origin {}, massive {}: received null response", debtPositionDTO.getDebtPositionId(), debtPositionDTO.getDebtPositionOrigin(), massive);
-    }
-  }
 }
