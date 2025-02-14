@@ -7,9 +7,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 @RepositoryRestResource(path = "receipts-detail-view")
 public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDetailNoPIIView, Long> {
+  @RestResource(exported = false)
   @Query(value = "SELECT new ReceiptDetailNoPIIView("
       + "r.receiptId as receiptId, "
       + "i.iuv as iuv, "
