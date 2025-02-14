@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.ReceiptApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import org.springframework.http.HttpStatus;
@@ -24,7 +25,7 @@ public class ReceiptControllerImpl implements ReceiptApi {
   }
 
   @Override
-  public ResponseEntity<ReceiptDTO> getReceiptDetail(Long receiptId) {
-    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId));
+  public ResponseEntity<ReceiptDetailDTO> getReceiptDetail(Long receiptId, String operatorExternalUserId) {
+    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId, operatorExternalUserId));
   }
 }
