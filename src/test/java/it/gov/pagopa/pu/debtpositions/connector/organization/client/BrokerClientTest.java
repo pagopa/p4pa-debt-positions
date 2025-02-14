@@ -13,17 +13,17 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class BrokerEntityClientTest {
+class BrokerClientTest {
   @Mock
   private OrganizationApisHolder organizationApisHolderMock;
   @Mock
   private BrokerEntityControllerApi brokerEntityControllerApiMock;
 
-  private BrokerEntityClient brokerEntityClient;
+  private BrokerClient brokerClient;
 
   @BeforeEach
   void setUp() {
-    brokerEntityClient = new BrokerEntityClient(organizationApisHolderMock);
+    brokerClient = new BrokerClient(organizationApisHolderMock);
   }
 
   @AfterEach
@@ -46,7 +46,7 @@ class BrokerEntityClientTest {
       .thenReturn(expectedResult);
 
     // When
-    Broker result = brokerEntityClient.findById(brokerId, accessToken);
+    Broker result = brokerClient.findById(brokerId, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);

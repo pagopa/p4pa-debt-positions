@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerEntityClient;
+import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerClient;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import org.junit.jupiter.api.AfterEach;
@@ -21,7 +21,7 @@ class BrokerServiceTest {
   private BrokerSearchClient brokerSearchClientMock;
 
   @Mock
-  private BrokerEntityClient brokerEntityClientMock;
+  private BrokerClient brokerClientMock;
 
   private BrokerService brokerService;
 
@@ -29,13 +29,13 @@ class BrokerServiceTest {
 
   @BeforeEach
   void init() {
-    brokerService = new BrokerServiceImpl(brokerSearchClientMock, brokerEntityClientMock);
+    brokerService = new BrokerServiceImpl(brokerSearchClientMock, brokerClientMock);
   }
 
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(brokerSearchClientMock);
-    Mockito.verifyNoMoreInteractions(brokerEntityClientMock);
+    Mockito.verifyNoMoreInteractions(brokerClientMock);
   }
 
   @Test
@@ -73,7 +73,7 @@ class BrokerServiceTest {
     // Given
     Long brokerId = 1L;
     Broker expectedResult = new Broker();
-    Mockito.when(brokerEntityClientMock.findById(brokerId, accessToken))
+    Mockito.when(brokerClientMock.findById(brokerId, accessToken))
       .thenReturn(expectedResult);
 
     // When

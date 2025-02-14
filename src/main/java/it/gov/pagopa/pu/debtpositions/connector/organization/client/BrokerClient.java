@@ -5,11 +5,11 @@ import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import org.springframework.stereotype.Service;
 
 @Service
-public class BrokerEntityClient {
+public class BrokerClient {
 
   private final OrganizationApisHolder organizationApisHolder;
 
-  public BrokerEntityClient(OrganizationApisHolder organizationApisHolder) {
+  public BrokerClient(OrganizationApisHolder organizationApisHolder) {
     this.organizationApisHolder = organizationApisHolder;
   }
 
