@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
-import it.gov.pagopa.pu.organization.generated.ApiClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,10 +25,10 @@ class OrganizationApisHolderTest extends BaseApiHolderTest {
     void setUp() {
         Mockito.when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
         Mockito.when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        ApiClient apiClient = new ApiClient(restTemplateMock);
-        String baseUrl = "http://example.com";
-        apiClient.setBasePath(baseUrl);
-        organizationApisHolder = new OrganizationApisHolder(baseUrl, restTemplateBuilderMock);
+        OrganizationClientConfig clientConfig = OrganizationClientConfig.builder()
+          .baseUrl("http://example.com")
+          .build();
+        organizationApisHolder = new OrganizationApisHolder(clientConfig, restTemplateBuilderMock);
     }
 
     @AfterEach
