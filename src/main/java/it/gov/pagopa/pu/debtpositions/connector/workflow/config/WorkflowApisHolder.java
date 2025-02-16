@@ -17,7 +17,7 @@ public class WorkflowApisHolder {
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
   public WorkflowApisHolder(
-    WorkflowClientConfig clientConfig,
+    WorkflowApiClientConfig clientConfig,
     RestTemplateBuilder restTemplateBuilder
   ) {
     RestTemplate restTemplate = restTemplateBuilder.build();

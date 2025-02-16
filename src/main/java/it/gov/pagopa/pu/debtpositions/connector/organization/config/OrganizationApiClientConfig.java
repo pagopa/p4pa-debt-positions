@@ -1,14 +1,14 @@
-package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
+package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
-import it.gov.pagopa.pu.debtpositions.connector.config.ClientConfig;
+import it.gov.pagopa.pu.debtpositions.config.ApiClientConfig;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ConfigurationProperties(prefix = "rest.workflow-hub")
+@ConfigurationProperties(prefix = "rest.organization")
 @SuperBuilder
 @NoArgsConstructor
-public class WorkflowClientConfig extends ClientConfig {
+public class OrganizationApiClientConfig extends ApiClientConfig {
 }

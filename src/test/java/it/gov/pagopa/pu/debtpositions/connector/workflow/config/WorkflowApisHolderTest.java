@@ -24,7 +24,7 @@ class WorkflowApisHolderTest extends BaseApiHolderTest {
     void setUp() {
         Mockito.when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
         Mockito.when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        WorkflowClientConfig clientConfig = WorkflowClientConfig.builder()
+        WorkflowApiClientConfig clientConfig = WorkflowApiClientConfig.builder()
           .baseUrl("http://example.com")
           .build();
         workflowApisHolder = new WorkflowApisHolder(clientConfig, restTemplateBuilderMock);
