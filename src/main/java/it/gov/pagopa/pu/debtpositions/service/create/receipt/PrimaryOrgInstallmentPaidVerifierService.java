@@ -34,7 +34,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    * - the valid installment associated to the receipt, if found
    * - a boolean indicating if the primary org has a valid installment associated to the receipt
    */
-  public Pair<Optional<InstallmentNoPII>,Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber){
+  public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber) {
     // check installments by orgId/noticeNumber
     List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, ORDINARY_DEBT_POSITION_ORIGINS);
 
@@ -43,30 +43,17 @@ public class PrimaryOrgInstallmentPaidVerifierService {
     //(see CreatePaidTechnicalDebtPositionsService class)
     if (!fullInstallmentList.isEmpty()) {
 
-      // filter out installments with status PAID and REPORTED
-      List<InstallmentNoPII> installmentList = fullInstallmentList.stream()
-        .filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
-          && !anInstallment.getStatus().equals(InstallmentStatus.PAID)).toList();
+      //filter out installments with status PAID and REPORTED
+      List<InstallmentNoPII> installmentList = filterAlreadyProcessed(fullInstallmentList);
 
-      /*
-       * Apply these rules to find if a valid installment (i.e. not discarded by status PAID or REPORTED) is associated to the receipt:
-       * 1. >1 installments with status UNPAID -> throw exception
-       * 2. 1 installment with status UNPAID -> use it
-       * 3. >1 installment with status TO_SYNC and sync_status_to UNPAID -> throw exception
-       * 4. 1 installment with status TO_SYNC and sync_status_to UNPAID -> use it
-       * 5. >=1 installments with status EXPIRED -> use the most recent (i.e. with the most recent due date)
-       * 6. (default) -> not found (nothing to do)
-       */
-      Optional<InstallmentNoPII> primaryOrgInstallment = checkValidInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.UNPAID, null)
-        .or(() -> checkValidInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID))
-        .or(() -> checkValidInstallment(installmentList, CHECK_MODE.MOST_RECENT, InstallmentStatus.EXPIRED, null));
-
-      if(primaryOrgInstallment.isEmpty()){
-        //case no valid installment found to associate to receipt, but no exception found (for instance: all installment in status paid/reported)
-        //in this case, just log the event
+      //validate related installments
+      Optional<InstallmentNoPII> primaryOrgInstallment = validateRelatedInstallments(installmentList);
+      if (primaryOrgInstallment.isEmpty() && log.isInfoEnabled()) {
+        //log the event in case no valid installment found to associate to receipt
+        //but no exception thrown (for instance: all installments in status paid/reported)
         List<String> installmentWithStatusList = fullInstallmentList.stream().map(i -> i.getInstallmentId() + "/" +
           (i.getStatus().equals(InstallmentStatus.TO_SYNC) ? (i.getSyncStatus().getSyncStatusFrom() + "->" + i.getSyncStatus().getSyncStatusTo()) : i.getSyncStatus())).toList();
-        PrimaryOrgInstallmentPaidVerifierService.log.info("No valid installment found to associate to receipt [{}/{}]; list of installment/status [{}]", primaryOrg.getOrgFiscalCode() ,noticeNumber, installmentWithStatusList);
+        log.info("No valid installment found to associate to receipt [{}/{}]; list of installment/status [{}]", primaryOrg.getOrgFiscalCode(), noticeNumber, installmentWithStatusList);
       }
 
       return Pair.of(primaryOrgInstallment, true);
@@ -87,6 +74,27 @@ public class PrimaryOrgInstallmentPaidVerifierService {
             + (syncStatusTo != null ? " and syncStatusTo " + syncStatusTo : ""));
         }
       });
+  }
+
+  private List<InstallmentNoPII> filterAlreadyProcessed(List<InstallmentNoPII> fullInstallmentList) {
+    return fullInstallmentList.stream()
+      .filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
+        && !anInstallment.getStatus().equals(InstallmentStatus.PAID)).toList();
+  }
+
+  /**
+   * Apply these rules to find if a valid installment (i.e. not discarded by status PAID or REPORTED) is associated to the receipt:
+   * 1. >1 installments with status UNPAID -> throw exception
+   * 2. 1 installment with status UNPAID -> use it
+   * 3. >1 installment with status TO_SYNC and sync_status_to UNPAID -> throw exception
+   * 4. 1 installment with status TO_SYNC and sync_status_to UNPAID -> use it
+   * 5. >=1 installments with status EXPIRED -> use the most recent (i.e. with the most recent due date)
+   * 6. (default) -> not found (nothing to do)
+   */
+  private Optional<InstallmentNoPII> validateRelatedInstallments(List<InstallmentNoPII> installmentList) {
+    return checkValidInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.UNPAID, null)
+      .or(() -> checkValidInstallment(installmentList, CHECK_MODE.EXACTLY_ONE, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID))
+      .or(() -> checkValidInstallment(installmentList, CHECK_MODE.MOST_RECENT, InstallmentStatus.EXPIRED, null));
   }
 
 }
