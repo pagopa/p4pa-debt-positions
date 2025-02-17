@@ -121,13 +121,18 @@ paths:
             type: integer
             format: int64
           description: The ID of the receipt
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ReceiptDTO"
+                $ref: "#/components/schemas/ReceiptDetailDTO"
         "400":
           description: Invalid request
           content:
@@ -598,6 +603,42 @@ components:
         updateDate:
           type: string
           format: date-time
+    ReceiptDetailDTO:
+      type: object
+      required:
+        - receiptId
+        - paymentAmountCents
+        - remittanceInformation
+        - debtPositionDescription
+        - debtor
+        - pspCompanyName
+        - iud
+      properties:
+        receiptId:
+          type: integer
+          format: int64
+        iuv:
+          type: string
+        paymentAmountCents:
+          type: integer
+          format: int64
+        remittanceInformation:
+          type: string
+        debtPositionDescription:
+          type: string
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
+        payer:
+          $ref: "#/components/schemas/PersonDTO"
+        paymentDateTime:
+          type: string
+          format: date-time
+        pspCompanyName:
+          type: string
+        iud:
+          type: string
+        iur:
+          type: string
     ReceiptTransferDTO:
       required:
         - idTransfer

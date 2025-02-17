@@ -11,25 +11,29 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
 class TaxonomySearchClientTest {
+
     @Mock
-    private OrganizationApisHolder organizationApisHolder;
+    private OrganizationApisHolder organizationApisHolderMock;
     @Mock
-    private TaxonomySearchControllerApi taxonomySearchControllerApi;
+    private TaxonomySearchControllerApi taxonomySearchControllerApiMock;
 
     private TaxonomySearchClient taxonomySearchClient;
 
     @BeforeEach
     void setUp() {
-        taxonomySearchClient = new TaxonomySearchClient(organizationApisHolder);
+        taxonomySearchClient = new TaxonomySearchClient(organizationApisHolderMock);
     }
 
     @AfterEach
     void verifyNoMoreInteractions(){
         Mockito.verifyNoMoreInteractions(
-          organizationApisHolder
+          organizationApisHolderMock,
+          taxonomySearchControllerApiMock
         );
     }
 
@@ -40,9 +44,9 @@ class TaxonomySearchClientTest {
         String taxonomyCode = "TAXONOMYCODE";
         Taxonomy expectedResult = new Taxonomy();
 
-        Mockito.when(organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken))
-                .thenReturn(taxonomySearchControllerApi);
-        Mockito.when(taxonomySearchControllerApi.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
+        Mockito.when(organizationApisHolderMock.getTaxonomyCodeDtoSearchControllerApi(accessToken))
+                .thenReturn(taxonomySearchControllerApiMock);
+        Mockito.when(taxonomySearchControllerApiMock.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
                 .thenReturn(expectedResult);
 
         // When
@@ -51,4 +55,22 @@ class TaxonomySearchClientTest {
         // Then
         Assertions.assertSame(expectedResult, result);
     }
+
+  @Test
+  void givenNotExistentTaxonomyCodeWhenFindByTaxonomyCodeThenNull(){
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    String taxonomyCode = "TAXONOMYCODE";
+
+    Mockito.when(organizationApisHolderMock.getTaxonomyCodeDtoSearchControllerApi(accessToken))
+      .thenReturn(taxonomySearchControllerApiMock);
+    Mockito.when(taxonomySearchControllerApiMock.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
+      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+
+    // When
+    Taxonomy result = taxonomySearchClient.findByTaxonomyCode(taxonomyCode, accessToken);
+
+    // Then
+    Assertions.assertNull(result);
+  }
 }

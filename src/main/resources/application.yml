@@ -2,99 +2,99 @@ server:
   http: "\${SERVER_PORT:8080}"
 
 spring:
-    application:
-      name: ${artifactId}
-      version: ${version}
-    jmx.enabled: true
-    threads:
-      virtual:
-        enabled: "\${VIRTUAL_THREADS_ENABLED:true}"
-    jpa:
-      show-sql: "\${SHOW_SQL:false}"
-      hibernate:
-        ddl-auto: none
-    datasource:
-      debt-position:
-        jdbc-url: "\${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}"
-        username: "\${DEBT_POSITIONS_DB_USER}"
-        password: "\${DEBT_POSITIONS_DB_PASSWORD}"
-        driverClassName: org.postgresql.Driver
-      citizen:
-        jdbc-url: "\${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:\${CITIZENDB_PORT:5432}/citizen}"
-        username: "\${CITIZENDB_USER}"
-        password: "\${CITIZENDB_PASSWORD}"
-        driverClassName: org.postgresql.Driver
-    data:
-      rest:
-        basePath: crud
-    cloud:
-      stream:
+  application:
+    name: ${artifactId}
+    version: ${version}
+  jmx.enabled: true
+  threads:
+    virtual:
+      enabled: "\${VIRTUAL_THREADS_ENABLED:true}"
+  jpa:
+    show-sql: "\${SHOW_SQL:false}"
+    hibernate:
+      ddl-auto: none
+  datasource:
+    debt-position:
+      jdbc-url: "\${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}"
+      username: "\${DEBT_POSITIONS_DB_USER}"
+      password: "\${DEBT_POSITIONS_DB_PASSWORD}"
+      driverClassName: org.postgresql.Driver
+    citizen:
+      jdbc-url: "\${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:\${CITIZENDB_PORT:5432}/citizen}"
+      username: "\${CITIZENDB_USER}"
+      password: "\${CITIZENDB_PASSWORD}"
+      driverClassName: org.postgresql.Driver
+  data:
+    rest:
+      basePath: crud
+  cloud:
+    stream:
+      binders:
+        kafka-payments-producer:
+          type: kafka
+          environment:
+            spring.cloud.stream.kafka.binder:
+              brokers: "\${KAFKA_BINDER_BROKER:}"
+              configuration:
+                sasl.jaas.config: "\${KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG:}"
+                key.serializer: org.apache.kafka.common.serialization.StringSerializer
+      bindings:
+        paymentsProducer-out-0:
+          binder: kafka-payments-producer
+          content-type: "\${KAFKA_CONTENT_TYPE:application/json}"
+          destination: "\${KAFKA_TOPIC_PAYMENTS:}"
+      kafka:
+        binder:
+          auto-create-topics: false
+          configuration:
+            heartbeat.interval.ms: "\${KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS:3000}"
+            session.timeout.ms: "\${KAFKA_CONFIG_SESSION_TIMEOUT_MS:30000}"
+            request.timeout.ms: "\${KAFKA_CONFIG_REQUEST_TIMEOUT_MS:60000}"
+            metadata.max.age.ms: "\${KAFKA_CONFIG_METADATA_MAX_AGE:180000}"
+            sasl.mechanism: "\${KAFKA_CONFIG_SASL_MECHANISM:}"
+            security.protocol: "\${KAFKA_CONFIG_SECURITY_PROTOCOL:}"
+            max.request.size: "\${KAFKA_CONFIG_MAX_REQUEST_SIZE:1000000}"
         binders:
-          kafka-payments-producer:
-            type: kafka
-            environment:
-              spring.cloud.stream.kafka.binder:
-                brokers: "\${KAFKA_BINDER_BROKER:}"
-                configuration:
-                  sasl.jaas.config: "\${KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG:}"
-                  key.serializer: org.apache.kafka.common.serialization.StringSerializer
-        bindings:
           paymentsProducer-out-0:
-            binder: kafka-payments-producer
-            content-type: "\${KAFKA_CONTENT_TYPE:application/json}"
-            destination: "\${KAFKA_TOPIC_PAYMENTS:}"
-        kafka:
-          binder:
-            auto-create-topics: false
-            configuration:
-              heartbeat.interval.ms: "\${KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS:3000}"
-              session.timeout.ms: "\${KAFKA_CONFIG_SESSION_TIMEOUT_MS:30000}"
-              request.timeout.ms: "\${KAFKA_CONFIG_REQUEST_TIMEOUT_MS:60000}"
-              metadata.max.age.ms: "\${KAFKA_CONFIG_METADATA_MAX_AGE:180000}"
-              sasl.mechanism: "\${KAFKA_CONFIG_SASL_MECHANISM:}"
-              security.protocol: "\${KAFKA_CONFIG_SECURITY_PROTOCOL:}"
-              max.request.size: "\${KAFKA_CONFIG_MAX_REQUEST_SIZE:1000000}"
-          binders:
-            paymentsProducer-out-0:
-              producer:
-                configuration:
-                  client.id: debt-positions
-                  connections.max.idle.ms: "\${KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME:180000}"
-                  retry.backoff.ms: "\${KAFKA_PAYMENTS_PRODUCER_RETRY_MS:\${KAFKA_RETRY_MS:10000}}"
-                  linger.ms: "\${KAFKA_PAYMENTS_PRODUCER_LINGER_MS:\${KAFKA_LINGER_MS:2}}"
-                  batch.size: "\${KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE:\${KAFKA_BATCH_SIZE:16384}}"
+            producer:
+              configuration:
+                client.id: debt-positions
+                connections.max.idle.ms: "\${KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME:180000}"
+                retry.backoff.ms: "\${KAFKA_PAYMENTS_PRODUCER_RETRY_MS:\${KAFKA_RETRY_MS:10000}}"
+                linger.ms: "\${KAFKA_PAYMENTS_PRODUCER_LINGER_MS:\${KAFKA_LINGER_MS:2}}"
+                batch.size: "\${KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE:\${KAFKA_BATCH_SIZE:16384}}"
 
 management:
-    endpoints:
-      jmx:
-        exposure.include: "*"
-      web:
-        exposure:
-          include: health, info, prometheus, metrics
-        base-path: /actuator
-    endpoint:
-      health:
-        probes.enabled: true
-        logging.slow-indicator-threshold: "\${HEALTH_ACTUATOR_LOGGER_TIMEOUT_DURATION:PT1S}"
-        group:
-          readiness.include: "*"
-          liveness.include: livenessState,diskSpace,ping
+  endpoints:
+    jmx:
+      exposure.include: "*"
+    web:
+      exposure:
+        include: health, info, prometheus, metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      probes.enabled: true
+      logging.slow-indicator-threshold: "\${HEALTH_ACTUATOR_LOGGER_TIMEOUT_DURATION:PT1S}"
+      group:
+        readiness.include: "*"
+        liveness.include: livenessState,diskSpace,ping
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${artifactId}
+    export:
       prometheus:
         enabled: true
-    metrics:
-      tags:
-        application: ${artifactId}
-      export:
-        prometheus:
-          enabled: true
-          step: 1m
-          descriptions: true
-      enable:
-        jvm: true
-        process: true
-        system: true
-        http: true
-        logback: true
+        step: 1m
+        descriptions: true
+    enable:
+      jvm: true
+      process: true
+      system: true
+      http: true
+      logback: true
 
 logging:
   level:
@@ -103,6 +103,11 @@ logging:
     org.springframework: "\${LOG_LEVEL_SPRING:INFO}"
     org.springframework.boot.availability: "\${LOG_LEVEL_SPRING_BOOT_AVAILABILITY:DEBUG}"
     org.springframework.kafka: "\${LOG_LEVEL_SPRING_KAFKA:INFO}"
+    it.gov.pagopa.pu.debtpositions.exception.DebtPositionExceptionHandler: "\${LOGGING_LEVEL_API_REQUEST_EXCEPTION:INFO}"
+    org.springdoc.core.utils.SpringDocAnnotationsUtils: "\${LOG_LEVEL_SPRING_DOC:ERROR}"
+    PERFORMANCE_LOG: "\${LOG_LEVEL_PERFORMANCE_LOG:INFO}"
+    PERFORMANCE_LOG.API_REQUEST: "\${LOG_LEVEL_PERFORMANCE_LOG_API_REQUEST:\${logging.level.PERFORMANCE_LOG}}"
+    PERFORMANCE_LOG.REST_INVOKE: "\${LOG_LEVEL_PERFORMANCE_LOG_REST_INVOKE:\${logging.level.PERFORMANCE_LOG}}"
 
 data-cipher:
   encrypt-psw: "\${DATA_CIPHER_ENCRYPT_PASSWORD:PWD}"
@@ -129,8 +134,14 @@ rest:
     read-millis: "\${DEFAULT_REST_READ_TIMEOUT_MILLIS:60000}"
   organization:
     base-url: "\${ORGANIZATION_BASE_URL:http://localhost:8081}"
+    max-attempts: "\${ORGANIZATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${ORGANIZATION_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${ORGANIZATION_PRINT_BODY_WHEN_ERROR:true}"
   workflow-hub:
     base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}/workflowhub"
+    max-attempts: "\${WORKFLOW_HUB_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${WORKFLOW_HUB_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${WORKFLOW_HUB_PRINT_BODY_WHEN_ERROR:true}"
 
 iuv:
   informationSystemId: "00"
