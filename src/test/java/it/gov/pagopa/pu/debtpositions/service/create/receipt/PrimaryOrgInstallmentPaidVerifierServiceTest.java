@@ -40,7 +40,8 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     String noticeNumber = "noticeNumber";
 
-    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber)).thenReturn(List.of());
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
+      PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of());
 
     //when
     Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
@@ -49,7 +50,8 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     Assertions.assertNotNull(primaryOrgInstallment);
     Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
     Assertions.assertEquals(false, primaryOrgInstallment.getRight());
-    Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber);
+    Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
+      organization.getOrganizationId(), noticeNumber, PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS);
   }
 
   @Test
@@ -157,7 +159,8 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
       installments.addAll(additionalInstallments);
 
 
-    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber)).thenReturn(installments);
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
+      PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(installments);
 
     //when
     if(expectedOutcome == ExptectedOutcome.EXCEPTION){
@@ -175,6 +178,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     }
 
     //verify
-    Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber);
+    Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
+      organization.getOrganizationId(), noticeNumber, PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS);
   }
 }

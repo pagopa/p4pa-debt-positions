@@ -82,6 +82,8 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
             Broker primaryBroker = brokerService.findById(primaryOrg.getBrokerId(), accessToken);
             //update installment status
             DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
+            //persist updated debt position
+          //TODO
             //start debt position workflow
             DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
             invokeWorkflow(debtPositionDTO, accessToken);
