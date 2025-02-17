@@ -26,7 +26,7 @@ public class InstallmentUpdateService {
     this.debtPositionRepository = debtPositionRepository;
   }
 
-  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, Broker broker, ReceiptDTO receiptDTO) {
+  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptDTO receiptDTO) {
     //retrieve debt position
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
     if(debtPosition == null) {
@@ -44,13 +44,13 @@ public class InstallmentUpdateService {
             // set status of the found installment to PAID and link it to the receipt
             log.info("Installment [{}] found for receipt [{}]", primaryInstallment.getInstallmentId(), receiptDTO.getReceiptId());
             primaryInstallmentFound[0] = true;
-            updateInstallmentFields(primaryInstallment, InstallmentStatus.PAID, broker, receiptDTO.getReceiptId());
+            updateInstallmentFields(primaryInstallment, InstallmentStatus.PAID, receiptDTO.getReceiptId());
           });
       } else {
         // change status of every other installment of different payment options of this debt position to INVALID
         paymentOption.getInstallments().forEach(anInstallment -> {
           if (NOT_PAID.contains(anInstallment.getStatus())) {
-            updateInstallmentFields(anInstallment, InstallmentStatus.INVALID, broker, null);
+            updateInstallmentFields(anInstallment, InstallmentStatus.INVALID, null);
           }
         });
       }
@@ -62,16 +62,11 @@ public class InstallmentUpdateService {
     return debtPosition;
   }
 
-  private void updateInstallmentFields(InstallmentNoPII installment, InstallmentStatus status, Broker broker, Long receiptId) {
+  private void updateInstallmentFields(InstallmentNoPII installment, InstallmentStatus status, Long receiptId) {
     if (receiptId != null) {
       installment.setReceiptId(receiptId);
     }
-    switch (broker.getPagoPaInteractionModel()) {
-      case SYNC -> installment.setStatus(status);
-      case SYNC_ACA, SYNC_GPDPRELOAD, SYNC_ACA_GPDPRELOAD, ASYNC_GPD ->
-        updateSyncStatus(installment, status);
-      default -> throw new IllegalArgumentException("Invalid PagoPaInteractionModel: " + broker.getPagoPaInteractionModel());
-    }
+    updateSyncStatus(installment, status);
   }
 
   private void updateSyncStatus(InstallmentNoPII installment, InstallmentStatus to) {

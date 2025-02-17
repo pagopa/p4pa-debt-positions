@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -10,7 +9,6 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
-import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -26,16 +24,14 @@ public class UpdatePaidDebtPositionService {
   private final OrganizationService organizationService;
   private final PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService;
   private final InstallmentUpdateService installmentUpdateService;
-  private final BrokerService brokerService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionRepository debtPositionRepository;
 
-  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, BrokerService brokerService, DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper, DebtPositionRepository debtPositionRepository) {
+  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper, DebtPositionRepository debtPositionRepository) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
-    this.brokerService = brokerService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionRepository = debtPositionRepository;
@@ -47,9 +43,8 @@ public class UpdatePaidDebtPositionService {
         Pair<Optional<InstallmentNoPII>,Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
         installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> {
           log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
-          Broker primaryBroker = brokerService.findById(primaryOrg.getBrokerId(), accessToken);
           //update installment status
-          DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
+          DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
           //persist updated debt position
           DebtPosition persistedDebtPosition = debtPositionRepository.save(debtPosition);
           log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
