@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,17 +14,22 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class PrimaryOrgInstallmentService {
+public class PrimaryOrgInstallmentPaidVerifierService {
 
   private enum CHECK_MODE {EXACTLY_ONE, MOST_RECENT}
 
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
 
-  public PrimaryOrgInstallmentService(InstallmentNoPIIRepository installmentNoPIIRepository) {
+  public PrimaryOrgInstallmentPaidVerifierService(InstallmentNoPIIRepository installmentNoPIIRepository) {
     this.installmentNoPIIRepository = installmentNoPIIRepository;
   }
 
-  public Optional<InstallmentNoPII> findPrimaryOrgInstallment(Organization primaryOrg, String noticeNumber){
+  /*
+   * Return a pair of:
+   * - the valid installment associated to the receipt, if found
+   * - a boolean indicating if the primary org has a valid installment associated to the receipt
+   */
+  public Pair<Optional<InstallmentNoPII>,Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber){
     // check installments by orgId/noticeNumber
     List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber);
 
@@ -53,12 +59,12 @@ public class PrimaryOrgInstallmentService {
         //in this case, just log the event
         List<String> installmentWithStatusList = fullInstallmentList.stream().map(i -> i.getInstallmentId() + "/" +
           (i.getStatus().equals(InstallmentStatus.TO_SYNC) ? (i.getSyncStatus().getSyncStatusFrom() + "->" + i.getSyncStatus().getSyncStatusTo()) : i.getSyncStatus())).toList();
-        PrimaryOrgInstallmentService.log.info("No valid installment found to associate to receipt [{}/{}]; list of installment/status [{}]", primaryOrg.getOrgFiscalCode() ,noticeNumber, installmentWithStatusList);
+        PrimaryOrgInstallmentPaidVerifierService.log.info("No valid installment found to associate to receipt [{}/{}]; list of installment/status [{}]", primaryOrg.getOrgFiscalCode() ,noticeNumber, installmentWithStatusList);
       }
 
-      return primaryOrgInstallment;
+      return Pair.of(primaryOrgInstallment, true);
     } else {
-      return Optional.empty();
+      return Pair.of(Optional.empty(), false);
     }
   }
 

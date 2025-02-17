@@ -20,6 +20,7 @@ import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,7 +49,7 @@ class CreateReceiptServiceImplTest {
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
-  private PrimaryOrgInstallmentService primaryOrgInstallmentServiceMock;
+  private PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierServiceMock;
   @Mock
   private InstallmentUpdateService installmentUpdateServiceMock;
   @Mock
@@ -99,7 +100,7 @@ class CreateReceiptServiceImplTest {
     TestUtils.reflectionEqualsByName(receipt, response, "receiptId");
 
     Mockito.verifyNoInteractions(receiptPIIRepositoryMock, receiptMapperMock, organizationServiceMock, brokerServiceMock,
-      debtPositionMapperMock, debtPositionSyncServiceMock, primaryOrgInstallmentServiceMock, installmentUpdateServiceMock);
+      debtPositionMapperMock, debtPositionSyncServiceMock, primaryOrgInstallmentPaidVerifierServiceMock, installmentUpdateServiceMock);
   }
 
   @Test
@@ -126,7 +127,7 @@ class CreateReceiptServiceImplTest {
     WorkflowCreatedDTO workflowCreatedDTO = workflowInvokeOk ? podamFactory.manufacturePojo(WorkflowCreatedDTO.class) : null;
 
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.of(organization));
-    Mockito.when(primaryOrgInstallmentServiceMock.findPrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Optional.of(installment));
+    Mockito.when(primaryOrgInstallmentPaidVerifierServiceMock.findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Pair.of(Optional.of(installment), true));
     Mockito.when(brokerServiceMock.findById(broker.getBrokerId(), accessToken)).thenReturn(broker);
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, broker, receipt)).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
@@ -144,7 +145,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
-    Mockito.verify(primaryOrgInstallmentServiceMock, Mockito.times(1)).findPrimaryOrgInstallment(organization, receipt.getNoticeNumber());
+    Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
     Mockito.verify(brokerServiceMock, Mockito.times(1)).findById(broker.getBrokerId(), accessToken);
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, broker, receipt);
     Mockito.verify(debtPositionMapperMock, Mockito.times(1)).mapToDto(debtPosition);
@@ -159,7 +160,7 @@ class CreateReceiptServiceImplTest {
     organization.setOrgFiscalCode(receipt.getOrgFiscalCode());
 
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.of(organization));
-    Mockito.when(primaryOrgInstallmentServiceMock.findPrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Optional.empty());
+    Mockito.when(primaryOrgInstallmentPaidVerifierServiceMock.findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Pair.of(Optional.empty(),false));
     Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     //when
@@ -173,7 +174,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
-    Mockito.verify(primaryOrgInstallmentServiceMock, Mockito.times(1)).findPrimaryOrgInstallment(organization, receipt.getNoticeNumber());
+    Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
     Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
     Mockito.verifyNoInteractions(brokerServiceMock,installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
   }
@@ -199,7 +200,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
     Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
-    Mockito.verifyNoInteractions(primaryOrgInstallmentServiceMock, brokerServiceMock,installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
+    Mockito.verifyNoInteractions(primaryOrgInstallmentPaidVerifierServiceMock, brokerServiceMock,installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
   }
 
 }

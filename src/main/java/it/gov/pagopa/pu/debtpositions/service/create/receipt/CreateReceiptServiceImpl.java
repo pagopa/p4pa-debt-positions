@@ -3,10 +3,14 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
@@ -16,6 +20,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -32,14 +37,14 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private final BrokerService brokerService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionMapper debtPositionMapper;
-  private final PrimaryOrgInstallmentService primaryOrgInstallmentService;
+  private final PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService;
   private final InstallmentUpdateService installmentUpdateService;
   private final CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService;
 
   public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository,
                                   ReceiptMapper receiptMapper, OrganizationService organizationService,
                                   BrokerService brokerService, DebtPositionSyncService debtPositionSyncService,
-                                  DebtPositionMapper debtPositionMapper, PrimaryOrgInstallmentService primaryOrgInstallmentService,
+                                  DebtPositionMapper debtPositionMapper, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService,
                                   InstallmentUpdateService installmentUpdateService, CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
@@ -48,7 +53,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     this.brokerService = brokerService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionMapper = debtPositionMapper;
-    this.primaryOrgInstallmentService = primaryOrgInstallmentService;
+    this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
     this.createPaidTechnicalDebtPositionsService = createPaidTechnicalDebtPositionsService;
   }
@@ -69,17 +74,19 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     //check if organization who handle the notice is managed by PU
     boolean[] primaryOrgFound = new boolean[]{false};
     organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken)
-      .ifPresent(primaryOrg -> primaryOrgInstallmentService.findPrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber())
-        .ifPresent(installment -> {
-          log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
-          Broker primaryBroker = brokerService.findById(primaryOrg.getBrokerId(), accessToken);
-          primaryOrgFound[0] = true;
-          //update installment status
-          DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
-          //start debt position workflow
-          DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
-          invokeWorkflow(debtPositionDTO, accessToken);
-        }));
+      .ifPresent(primaryOrg -> {
+        Pair<Optional<InstallmentNoPII>,Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
+        primaryOrgFound[0] = installmentAndPrimaryOrgFound.getRight();
+        installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> {
+            log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
+            Broker primaryBroker = brokerService.findById(primaryOrg.getBrokerId(), accessToken);
+            //update installment status
+            DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
+            //start debt position workflow
+            DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
+            invokeWorkflow(debtPositionDTO, accessToken);
+          });
+      });
 
     //for every organization handled by PU and mentioned in the receipt
     createPaidTechnicalDebtPositionsService.createPaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound[0], accessToken);

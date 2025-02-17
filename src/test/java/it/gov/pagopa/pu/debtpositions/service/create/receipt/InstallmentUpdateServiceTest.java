@@ -52,7 +52,7 @@ class InstallmentUpdateServiceTest {
   @Test
   void givenNotFoundFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
 
@@ -67,7 +67,7 @@ class InstallmentUpdateServiceTest {
   @Test
   void givenNotFoundFoundInstallmentWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
@@ -95,23 +95,23 @@ class InstallmentUpdateServiceTest {
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     Broker broker = podamFactory.manufacturePojo(Broker.class);
     broker.setPagoPaInteractionModel(pagoPaInteractionModelEnum);
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.UNPAID);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
     List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
 
     paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
       targetInstallment
     )));
     paymentOptionList.get(1).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.DRAFT),
-      PrimaryOrgInstallmentServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
-      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.REPORTED)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.DRAFT),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.REPORTED)
     )));
     paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentServiceTest.getInstallment(InstallmentStatus.PAID),
-      PrimaryOrgInstallmentServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     )));
 
     //align entities id

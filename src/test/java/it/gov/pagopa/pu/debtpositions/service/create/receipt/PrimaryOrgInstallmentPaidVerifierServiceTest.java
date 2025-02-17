@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,20 +22,20 @@ import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
-class PrimaryOrgInstallmentServiceTest {
+class PrimaryOrgInstallmentPaidVerifierServiceTest {
 
-  private enum ExptectedOutcome { FOUND, EMPTY, EXCEPTION }
+  private enum ExptectedOutcome { FOUND_VALID, FOUND_INVALID, EXCEPTION }
 
   @Mock
   private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
 
   @InjectMocks
-  private PrimaryOrgInstallmentService primaryOrgInstallmentService;
+  private PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService;
 
   private static final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @Test
-  void givenEmptyInstallmentListWhenFindPrimaryOrgInstallmentThenOk() {
+  void givenEmptyInstallmentListWhenFindAndValidatePrimaryOrgInstallmentThenOk() {
     // given
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     String noticeNumber = "noticeNumber";
@@ -42,21 +43,23 @@ class PrimaryOrgInstallmentServiceTest {
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber)).thenReturn(List.of());
 
     //when
-    Optional<InstallmentNoPII> primaryOrgInstallment = primaryOrgInstallmentService.findPrimaryOrgInstallment(organization, noticeNumber);
+    Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
 
     //verify
-    Assertions.assertEquals(Optional.empty(), primaryOrgInstallment);
+    Assertions.assertNotNull(primaryOrgInstallment);
+    Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
+    Assertions.assertEquals(false, primaryOrgInstallment.getRight());
     Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber);
   }
 
   @Test
-  void givenSingleUnpaidWhenFindPrimaryOrgInstallmentThenFound() {
+  void givenSingleUnpaidWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
     InstallmentNoPII targetInstallment = getInstallment(InstallmentStatus.UNPAID);
-    handleTest(targetInstallment, null, ExptectedOutcome.FOUND);
+    handleTest(targetInstallment, null, ExptectedOutcome.FOUND_VALID);
   }
 
   @Test
-  void givenMultipleUnpaidWhenFindPrimaryOrgInstallmentThenException() {
+  void givenMultipleUnpaidWhenFindAndValidatePrimaryOrgInstallmentThenException() {
     InstallmentNoPII targetInstallment = getInstallment(InstallmentStatus.UNPAID);
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallment(InstallmentStatus.UNPAID),
@@ -67,13 +70,13 @@ class PrimaryOrgInstallmentServiceTest {
   }
 
   @Test
-  void givenSingleSyncToUnpaidWhenFindPrimaryOrgInstallmentThenFound() {
+  void givenSingleSyncToUnpaidWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
     InstallmentNoPII targetInstallment = getInstallmentToSync(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID);
-    handleTest(targetInstallment, null, ExptectedOutcome.FOUND);
+    handleTest(targetInstallment, null, ExptectedOutcome.FOUND_VALID);
   }
 
   @Test
-  void givenMultipleSyncToUnpaidWhenFindPrimaryOrgInstallmentThenException() {
+  void givenMultipleSyncToUnpaidWhenFindAndValidatePrimaryOrgInstallmentThenException() {
     InstallmentNoPII targetInstallment = getInstallmentToSync(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID);
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
@@ -84,32 +87,32 @@ class PrimaryOrgInstallmentServiceTest {
   }
 
   @Test
-  void givenSingleExpiredWhenFindPrimaryOrgInstallmentThenFound() {
+  void givenSingleExpiredWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
     InstallmentNoPII targetInstallment = getInstallmentExpired(OffsetDateTime.now().minusDays(3));
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     );
-    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND);
+    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_VALID);
   }
 
   @Test
-  void givenMultipleExpiredWhenFindPrimaryOrgInstallmentThenFound() {
+  void givenMultipleExpiredWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
     InstallmentNoPII targetInstallment = getInstallmentExpired(OffsetDateTime.now().minusDays(3));
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID),
       getInstallmentExpired(OffsetDateTime.now().minusDays(4))
     );
-    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND);
+    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_VALID);
   }
 
   @Test
-  void givenFallbackCaseWhenFindPrimaryOrgInstallmentThenNotFound() {
+  void givenFallbackCaseWhenFindAndValidatePrimaryOrgInstallmentThenNotFound() {
     InstallmentNoPII targetInstallment = getInstallment(InstallmentStatus.PAID);
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallment(InstallmentStatus.DRAFT),
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     );
-    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.EMPTY);
+    handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_INVALID);
   }
 
   static InstallmentNoPII getInstallment(InstallmentStatus status) {
@@ -158,14 +161,16 @@ class PrimaryOrgInstallmentServiceTest {
 
     //when
     if(expectedOutcome == ExptectedOutcome.EXCEPTION){
-      Assertions.assertThrows(InvalidInstallmentStatusException.class, () -> primaryOrgInstallmentService.findPrimaryOrgInstallment(organization, noticeNumber));
+      Assertions.assertThrows(InvalidInstallmentStatusException.class, () -> primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber));
     } else {
-      Optional<InstallmentNoPII> primaryOrgInstallment = primaryOrgInstallmentService.findPrimaryOrgInstallment(organization, noticeNumber);
+      Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
+      Assertions.assertNotNull(primaryOrgInstallment);
+      Assertions.assertEquals(true, primaryOrgInstallment.getRight());
       //verify
-      if(expectedOutcome == ExptectedOutcome.FOUND){
-        Assertions.assertEquals(Optional.of(targetInstallment), primaryOrgInstallment);
+      if(expectedOutcome == ExptectedOutcome.FOUND_VALID){
+        Assertions.assertEquals(Optional.of(targetInstallment), primaryOrgInstallment.getLeft());
       } else {
-        Assertions.assertEquals(Optional.empty(), primaryOrgInstallment);
+        Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
       }
     }
 
