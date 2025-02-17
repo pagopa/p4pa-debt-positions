@@ -40,6 +40,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
 
 
     //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer
+    //(see CreatePaidTechnicalDebtPositionsService class)
     if (!fullInstallmentList.isEmpty()) {
 
       // filter out installments with status PAID and REPORTED
