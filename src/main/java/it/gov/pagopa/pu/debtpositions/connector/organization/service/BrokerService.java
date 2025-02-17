@@ -6,5 +6,5 @@ import java.util.Optional;
 
 public interface BrokerService {
 
-  Optional<Broker> getBrokerByOrganizationId(Long organizationId, String accessToken);
+  Optional<Broker> getBrokerByBrokeredOrganizationId(Long organizationId, String accessToken);
 }

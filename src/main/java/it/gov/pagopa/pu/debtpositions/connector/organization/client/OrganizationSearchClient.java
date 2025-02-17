@@ -2,8 +2,11 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+@Slf4j
 @Service
 public class OrganizationSearchClient {
 
@@ -14,18 +17,33 @@ public class OrganizationSearchClient {
   }
 
   public Organization findByIpaCode(String ipaCode, String accessToken) {
-    return organizationApisHolder.getOrganizationSearchControllerApi(accessToken)
-      .crudOrganizationsFindByIpaCode(ipaCode);
+    try{
+      return organizationApisHolder.getOrganizationSearchControllerApi(accessToken)
+        .crudOrganizationsFindByIpaCode(ipaCode);
+    } catch (HttpClientErrorException.NotFound e){
+      log.info("Cannot find organization having ipaCode {}", ipaCode);
+      return null;
+    }
   }
 
   public Organization findByOrgFiscalCode(String orgFiscalCode, String accessToken) {
-    return organizationApisHolder.getOrganizationSearchControllerApi(accessToken)
-      .crudOrganizationsFindByOrgFiscalCode(orgFiscalCode);
+    try{
+      return organizationApisHolder.getOrganizationSearchControllerApi(accessToken)
+        .crudOrganizationsFindByOrgFiscalCode(orgFiscalCode);
+    } catch (HttpClientErrorException.NotFound e){
+      log.info("Cannot find organization having fiscalCode {}", orgFiscalCode);
+      return null;
+    }
   }
 
-  public Organization findByOrganizationId(Long orgId, String accessToken) {
-    return organizationApisHolder.getOrganizationEntityControllerApi(accessToken)
-      .crudGetOrganization(String.valueOf(orgId));
+  public Organization findByOrganizationId(Long organizationId, String accessToken) {
+    try{
+      return organizationApisHolder.getOrganizationEntityControllerApi(accessToken)
+        .crudGetOrganization(String.valueOf(organizationId));
+    } catch (HttpClientErrorException.NotFound e){
+      log.info("Cannot find organization having organizationId {}", organizationId);
+      return null;
+    }
   }
 
 }

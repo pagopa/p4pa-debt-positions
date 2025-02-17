@@ -2,8 +2,11 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+@Slf4j
 @Service
 public class TaxonomySearchClient {
 
@@ -14,7 +17,12 @@ public class TaxonomySearchClient {
   }
 
   public Taxonomy findByTaxonomyCode(String taxonomyCode, String accessToken) {
-    return organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken)
-      .crudTaxonomiesFindByTaxonomyCode(taxonomyCode);
+    try{
+      return organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken)
+        .crudTaxonomiesFindByTaxonomyCode(taxonomyCode);
+    } catch (HttpClientErrorException.NotFound e){
+      log.info("Cannot find Taxonomy having taxonomyCode {}", taxonomyCode);
+      return null;
+    }
   }
 }
