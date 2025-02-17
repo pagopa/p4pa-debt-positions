@@ -4,10 +4,10 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -34,13 +34,13 @@ class UpdatePaidDebtPositionServiceTest {
   @Mock
   private DebtPositionSyncService debtPositionSyncServiceMock;
   @Mock
-  private DebtPositionMapper debtPositionMapperMock;
-  @Mock
   private PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierServiceMock;
   @Mock
   private InstallmentUpdateService installmentUpdateServiceMock;
   @Mock
-  private DebtPositionRepository debtPositionRepositoryMock;
+  private DebtPositionService debtPositionServiceMock;
+  @Mock
+  private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerServiceMock;
 
   @InjectMocks
   private UpdatePaidDebtPositionService updatePaidDebtPositionService;
@@ -80,8 +80,8 @@ class UpdatePaidDebtPositionServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receipt.getOrgFiscalCode(), accessToken)).thenReturn(Optional.of(organization));
     Mockito.when(primaryOrgInstallmentPaidVerifierServiceMock.findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Pair.of(Optional.of(installment), true));
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, receipt)).thenReturn(debtPosition);
-    Mockito.when(debtPositionRepositoryMock.save(debtPosition)).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
 
     //when
@@ -93,8 +93,8 @@ class UpdatePaidDebtPositionServiceTest {
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
     Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, receipt);
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
-    Mockito.verify(debtPositionMapperMock, Mockito.times(1)).mapToDto(debtPosition);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
     Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
   }
 
@@ -115,7 +115,7 @@ class UpdatePaidDebtPositionServiceTest {
 
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
     Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
-    Mockito.verifyNoInteractions(installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
+    Mockito.verifyNoInteractions(installmentUpdateServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionServiceMock, debtPositionSyncServiceMock);
   }
 
   @Test
@@ -133,7 +133,7 @@ class UpdatePaidDebtPositionServiceTest {
     Assertions.assertFalse(response);
 
     Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(organization.getOrgFiscalCode(), accessToken);
-    Mockito.verifyNoInteractions(primaryOrgInstallmentPaidVerifierServiceMock, installmentUpdateServiceMock, debtPositionMapperMock, debtPositionSyncServiceMock);
+    Mockito.verifyNoInteractions(primaryOrgInstallmentPaidVerifierServiceMock, installmentUpdateServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionServiceMock, debtPositionSyncServiceMock);
   }
 
 }

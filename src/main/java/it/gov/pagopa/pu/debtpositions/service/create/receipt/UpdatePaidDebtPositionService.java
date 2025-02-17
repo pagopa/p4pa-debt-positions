@@ -4,10 +4,10 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -25,16 +25,16 @@ public class UpdatePaidDebtPositionService {
   private final PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService;
   private final InstallmentUpdateService installmentUpdateService;
   private final DebtPositionSyncService debtPositionSyncService;
-  private final DebtPositionMapper debtPositionMapper;
-  private final DebtPositionRepository debtPositionRepository;
+  private final DebtPositionService debtPositionService;
+  private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
 
-  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper, DebtPositionRepository debtPositionRepository) {
+  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, DebtPositionSyncService debtPositionSyncService, DebtPositionService debtPositionService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
     this.debtPositionSyncService = debtPositionSyncService;
-    this.debtPositionMapper = debtPositionMapper;
-    this.debtPositionRepository = debtPositionRepository;
+    this.debtPositionService = debtPositionService;
+    this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
   }
 
   boolean handleReceiptReceived(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
@@ -63,12 +63,13 @@ public class UpdatePaidDebtPositionService {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
     DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
+    //align debt position status
+    DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
-    DebtPosition persistedDebtPosition = debtPositionRepository.save(debtPosition);
+    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO);
     log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
     //start debt position workflow
-    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
-    invokeWorkflow(debtPositionDTO, accessToken);
+    invokeWorkflow(persistedDebtPosition, accessToken);
   }
 
 }
