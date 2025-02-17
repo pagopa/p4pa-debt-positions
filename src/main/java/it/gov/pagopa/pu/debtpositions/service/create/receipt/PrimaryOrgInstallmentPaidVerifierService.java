@@ -29,7 +29,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
     this.installmentNoPIIRepository = installmentNoPIIRepository;
   }
 
-  /*
+  /**
    * Return a pair of:
    * - the valid installment associated to the receipt, if found
    * - a boolean indicating if the primary org has a valid installment associated to the receipt
