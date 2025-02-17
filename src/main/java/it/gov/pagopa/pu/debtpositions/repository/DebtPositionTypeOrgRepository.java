@@ -25,4 +25,12 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgs(@Parameter(required = true) @Param("organizationId") Long organizationId,
                                                      @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
+  @Query(value = "SELECT dpto "
+    + "FROM DebtPositionTypeOrg dpto "
+    + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
+    + "WHERE dptoo.debtPositionTypeOrgId = :debtPositionTypeOrgId "
+    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId")
+  Optional<DebtPositionTypeOrg> findByDebtPositionTypeOrgIdAndOperatorExternalUserId(
+    @Parameter(required = true) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 }

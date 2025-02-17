@@ -47,7 +47,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
-    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getOrganizationId(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
     generateIuv(debtPositionDTO, accessToken);
@@ -65,7 +65,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     invokeWorkflow(savedDebtPosition, accessToken, massive);
 
-    log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
+    log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
     return savedDebtPosition;
   }
 
