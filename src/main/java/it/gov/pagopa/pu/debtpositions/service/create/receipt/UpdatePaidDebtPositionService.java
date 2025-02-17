@@ -37,21 +37,11 @@ public class UpdatePaidDebtPositionService {
     this.debtPositionRepository = debtPositionRepository;
   }
 
-  boolean handleReceiptReceived(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken){
+  boolean handleReceiptReceived(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     return organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken)
       .map(primaryOrg -> {
-        Pair<Optional<InstallmentNoPII>,Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
-        installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> {
-          log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
-          //update installment status
-          DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
-          //persist updated debt position
-          DebtPosition persistedDebtPosition = debtPositionRepository.save(debtPosition);
-          log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
-          //start debt position workflow
-          DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
-          invokeWorkflow(debtPositionDTO, accessToken);
-        });
+        Pair<Optional<InstallmentNoPII>, Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
+        installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> setInstallmentAsPaid(installment, receiptDTO, accessToken));
         return installmentAndPrimaryOrgFound.getRight();
       })
       .orElse(false);
@@ -68,4 +58,17 @@ public class UpdatePaidDebtPositionService {
       }
     }
   }
+
+  private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+    log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
+    //update installment status
+    DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
+    //persist updated debt position
+    DebtPosition persistedDebtPosition = debtPositionRepository.save(debtPosition);
+    log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
+    //start debt position workflow
+    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
+    invokeWorkflow(debtPositionDTO, accessToken);
+  }
+
 }
