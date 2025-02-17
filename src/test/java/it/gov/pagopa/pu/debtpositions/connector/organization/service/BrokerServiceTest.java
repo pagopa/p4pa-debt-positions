@@ -42,11 +42,11 @@ class BrokerServiceTest {
   void givenNotExistentOrgIdWhenGetOrganizationByIdThenEmpty() {
     // Given
     Long orgId = 1L;
-    Mockito.when(brokerSearchClientMock.findByOrganizationId(orgId, accessToken))
+    Mockito.when(brokerSearchClientMock.findByBrokeredOrganizationId(orgId, accessToken))
       .thenReturn(null);
 
     // When
-    Optional<Broker> result = brokerService.getBrokerByOrganizationId(orgId, accessToken);
+    Optional<Broker> result = brokerService.getBrokerByBrokeredOrganizationId(orgId, accessToken);
 
     // Then
     Assertions.assertTrue(result.isEmpty());
@@ -57,11 +57,11 @@ class BrokerServiceTest {
     // Given
     Long orgId = 1L;
     Broker expectedResult = new Broker();
-    Mockito.when(brokerSearchClientMock.findByOrganizationId(orgId, accessToken))
+    Mockito.when(brokerSearchClientMock.findByBrokeredOrganizationId(orgId, accessToken))
       .thenReturn(expectedResult);
 
     // When
-    Optional<Broker> result = brokerService.getBrokerByOrganizationId(orgId, accessToken);
+    Optional<Broker> result = brokerService.getBrokerByBrokeredOrganizationId(orgId, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());

@@ -2,8 +2,11 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
 
+@Slf4j
 @Service
 public class BrokerSearchClient {
 
@@ -13,9 +16,14 @@ public class BrokerSearchClient {
     this.organizationApisHolder = organizationApisHolder;
   }
 
-  public Broker findByOrganizationId(Long orgId, String accessToken) {
-    return organizationApisHolder.getBrokerSearchControllerApi(accessToken)
-      .crudBrokersFindByBrokeredOrganizationId(String.valueOf(orgId));
+  public Broker findByBrokeredOrganizationId(Long organizationId, String accessToken) {
+    try {
+      return organizationApisHolder.getBrokerSearchControllerApi(accessToken)
+        .crudBrokersFindByBrokeredOrganizationId(String.valueOf(organizationId));
+    } catch (HttpClientErrorException.NotFound e){
+      log.info("Cannot find Broker associated to organizationId {}", organizationId);
+      return null;
+    }
   }
 
 }

@@ -1,23 +1,21 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
-import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
-import lombok.extern.slf4j.Slf4j;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-@Slf4j
 public class ReceiptServiceImpl implements ReceiptService {
 
-  private final ReceiptPIIRepository receiptPIIRepository;
+  private final ReceiptDetailPIIViewRepository receiptDetailPIIViewRepository;
 
-  public ReceiptServiceImpl(ReceiptPIIRepository receiptPIIRepository) {
-    this.receiptPIIRepository = receiptPIIRepository;
+  public ReceiptServiceImpl(ReceiptDetailPIIViewRepository receiptDetailPIIViewRepository) {
+    this.receiptDetailPIIViewRepository = receiptDetailPIIViewRepository;
   }
 
   @Override
-  public ReceiptDTO getReceiptDetail(Long receiptId) {
-    return receiptPIIRepository.getReceiptDetail(receiptId);
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId) {
+    return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId);
   }
 
 }

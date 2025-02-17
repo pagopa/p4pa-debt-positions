@@ -109,10 +109,13 @@
 									"\r",
 									"    pm.expect(jsonResponse).have.property(\"organizationId\")\r",
 									"    pm.expect(jsonResponse).have.property(\"orgFiscalCode\")\r",
+									"    pm.expect(jsonResponse).have.property(\"orgName\")\r",
 									"});\r",
 									"\r",
 									"let jsonResponse = pm.response.json();\r",
 									"pm.collectionVariables.set(\"organizationId\", jsonResponse.organizationId);\r",
+									"pm.collectionVariables.set(\"orgFiscalCode\", jsonResponse.orgFiscalCode);\r",
+									"pm.collectionVariables.set(\"orgName\", jsonResponse.orgName);\r",
 									""
 								],
 								"type": "text/javascript",
@@ -134,7 +137,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{codIpaEnte}}",
+							"raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{ipaCode}}",
 							"host": [
 								"{{organizationBaseUrl}}"
 							],
@@ -147,7 +150,7 @@
 							"query": [
 								{
 									"key": "ipaCode",
-									"value": "{{codIpaEnte}}"
+									"value": "{{ipaCode}}"
 								}
 							]
 						}
@@ -271,7 +274,8 @@
 									"\r",
 									"pm.collectionVariables.set(\"randomNumber\", randomNumber);\r",
 									"pm.collectionVariables.set(\"fiscalCode\", `AAAAAA69A45A602A`);\r",
-									"pm.collectionVariables.set(\"debtPositionId\", `${randomNumber}`);"
+									"pm.collectionVariables.set(\"debtPositionId\", `${randomNumber}`);\r",
+									"pm.collectionVariables.set(\"currentDate\", new Date());"
 								],
 								"type": "text/javascript",
 								"packages": {}
@@ -293,7 +297,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n  \"iupdOrg\": \"iupdOrg\",\r\n  \"description\": \"description\",\r\n  \"status\": \"UNPAID\",\r\n  \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n  \"ingestionFlowFileId\": 1,\r\n  \"ingestionFlowFileLineNumber\": 1,\r\n  \"organizationId\": {{organizationId}},\r\n  \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n  \"notificationDate\": \"2024-05-15T10:30:00+02:00\",\r\n  \"validityDate\": \"2024-05-15T10:30:00+02:00\",\r\n  \"flagIuvVolatile\": false,\r\n  \"multiDebtor\": false,\r\n  \"creationDate\": \"2024-05-15T10:30:00+02:00\",\r\n  \"updateDate\": \"2024-05-15T10:30:00+02:00\",\r\n  \"flagPagoPaPayment\": true,\r\n  \"paymentOptions\": [\r\n    {\r\n      \"totalAmountCents\": 1,\r\n      \"status\": \"TO_SYNC\",\r\n      \"multiDebtor\": false,\r\n      \"dueDate\": \"2026-05-15T10:30:00+02:00\",\r\n      \"description\": \"description\",\r\n      \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n      \"paymentOptionIndex\": 1,\r\n      \"installments\": [\r\n        {\r\n          \"status\": \"TO_SYNC\",\r\n          \"syncStatus\": {\r\n            \"syncStatusFrom\": \"TO_SYNC\",\r\n            \"syncStatusTo\": \"TO_SYNC\"\r\n          },\r\n          \"iupdPagopa\": \"iupdPagopa\",\r\n          \"iud\": \"\",\r\n          \"iuv\": \"\",\r\n          \"iur\": \"iur\",\r\n          \"iuf\": \"iuf\",\r\n          \"nav\": \"\",\r\n          \"dueDate\": \"2026-05-15T10:30:00+02:00\",\r\n          \"paymentTypeCode\": \"paymentTypeCode\",\r\n          \"amountCents\": 10000,\r\n          \"notificationFeeCents\": 100,\r\n          \"remittanceInformation\": \"remittanceInformation\",\r\n          \"humanFriendlyRemittanceInformation\": \"humanFriendlyRemittanceInformation\",\r\n          \"balance\": \"balance\",\r\n          \"legacyPaymentMetadata\": \"legacyPaymentMetadata\",\r\n          \"debtor\": {\r\n            \"entityType\": \"F\",\r\n            \"fiscalCode\": \"{{fiscalCode}}\",\r\n            \"fullName\": \"fullName\",\r\n            \"address\": \"address\",\r\n            \"civic\": \"civic\",\r\n            \"postalCode\": \"postalCode\",\r\n            \"location\": \"location\",\r\n            \"province\": \"province\",\r\n            \"nation\": \"nation\",\r\n            \"email\": \"email@test.it\"\r\n          },\r\n          \"transfers\": [\r\n            {\r\n              \"orgFiscalCode\": \"99999999912\",\r\n              \"orgName\": \"test_ente_50\",\r\n              \"amountCents\": 100,\r\n              \"remittanceInformation\": \"remittanceInformation\",\r\n              \"stampType\": \"stampType\",\r\n              \"stampHashDocument\": \"stampHashDocument\",\r\n              \"stampProvincialResidence\": \"stampProvincialResidence\",\r\n              \"iban\": \"iban\",\r\n              \"postalIban\": \"postalIban\",\r\n              \"category\": \"category\",\r\n              \"transferIndex\": 1\r\n            }\r\n          ],\r\n          \"creationDate\": \"2024-05-15T10:30:00+02:00\",\r\n          \"updateDate\": \"2024-05-15T10:30:00+02:00\"\r\n        }\r\n      ]\r\n    }\r\n  ]\r\n}",
+							"raw": "{\r\n    \"iupdOrg\": \"iupdOrg\",\r\n    \"description\": \"description\",\r\n    \"status\": \"UNPAID\",\r\n    \"organizationId\": {{organizationId}},\r\n    \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n    \"validityDate\": \"{{currentDate}}\",\r\n    \"flagIuvVolatile\": false,\r\n    \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n    \"multiDebtor\": false,\r\n    \"flagPagoPaPayment\": true,\r\n    \"creationDate\": \"{{currentDate}}\",\r\n    \"updateDate\": \"{{currentDate}}\",\r\n    \"paymentOptions\": [\r\n        {\r\n            \"totalAmountCents\": {{amountCents}},\r\n            \"status\": \"TO_SYNC\",\r\n            \"dueDate\": \"2025-02-18T10:30:00+02:00\",\r\n            \"description\": \"description\",\r\n            \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n            \"paymentOptionIndex\": 1,\r\n            \"creationDate\": \"{{currentDate}}\",\r\n            \"updateDate\": \"{{currentDate}}\",\r\n            \"installments\": [\r\n                {\r\n                    \"status\": \"TO_SYNC\",\r\n                    \"iupdPagopa\": \"iupdPagopa\",\r\n                    \"iur\": \"iur\",\r\n                    \"iuf\": \"iuf\",\r\n                    \"dueDate\": \"2025-02-18T10:30:00+02:00\",\r\n                    \"paymentTypeCode\": \"paymentTypeCode\",\r\n                    \"amountCents\": {{amountCents}},\r\n                    \"remittanceInformation\": \"remittanceInformation\",\r\n                    \"balance\": \"balance\",\r\n                    \"legacyPaymentMetadata\": \"legacyPaymentMetadata\",\r\n                    \"debtor\": {\r\n                        \"entityType\": \"F\",\r\n                        \"fiscalCode\": \"PSTRRT80M20B157M\",\r\n                        \"fullName\": \"fullName\",\r\n                        \"address\": \"address\",\r\n                        \"civic\": \"civic\",\r\n                        \"postalCode\": \"postalCode\",\r\n                        \"location\": \"location\",\r\n                        \"province\": \"province\",\r\n                        \"nation\": \"nation\",\r\n                        \"email\": \"email@test.it\"\r\n                    },\r\n                    \"syncStatus\": {\r\n                        \"syncStatusFrom\": \"TO_SYNC\",\r\n                        \"syncStatusTo\": \"TO_SYNC\"\r\n                    },\r\n                    \"notificationDate\": \"2024-02-17T10:30:00+02:00\",\r\n                    \"ingestionFlowFileId\": 1,\r\n                    \"ingestionFlowFileLineNumber\": 1,\r\n                    \"creationDate\": \"{{currentDate}}\",\r\n                    \"updateDate\": \"{{currentDate}}\",\r\n                    \"transfers\": [\r\n                        {\r\n                            \"orgFiscalCode\": \"{{orgFiscalCode}}\",\r\n                            \"orgName\": \"{{orgName}}\",\r\n                            \"amountCents\": {{amountCents}},\r\n                            \"remittanceInformation\": \"remittanceInformation\",\r\n                            \"stampType\": \"stampType\",\r\n                            \"stampHashDocument\": \"stampHashDocument\",\r\n                            \"stampProvincialResidence\": \"stampProvincialResidence\",\r\n                            \"iban\": \"IT60X0542811101000000123456\",\r\n                            \"postalIban\": \"IT45Z0760105138274512345678\",\r\n                            \"category\": \"category\",\r\n                            \"transferIndex\": 1\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -433,6 +437,31 @@
 		{
 			"key": "debtPositionTypeOrgCode",
 			"value": "CODE001",
+			"type": "string"
+		},
+		{
+			"key": "orgFiscalCode",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "amountCents",
+			"value": "10000",
+			"type": "string"
+		},
+		{
+			"key": "orgName",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "currentDate",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "ipaCode",
+			"value": "ELOC_A",
 			"type": "string"
 		}
 	]

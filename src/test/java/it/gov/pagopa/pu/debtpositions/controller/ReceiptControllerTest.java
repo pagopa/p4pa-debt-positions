@@ -5,6 +5,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
@@ -67,18 +68,20 @@ class ReceiptControllerTest {
   void whenGetReceiptDetailThenOk() throws Exception {
     //given
     Long receiptId = 1L;
-    ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
+    String operatorExternalUserId = "operatorExternalUserId";
+    ReceiptDetailDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId)).thenReturn(expectedResponse);
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/receipts/"+receiptId))
+        MockMvcRequestBuilders.get("/receipts/"+receiptId)
+          .param("operatorExternalUserId",operatorExternalUserId))
       .andExpect(status().isOk())
       .andReturn();
 
-    ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
+    ReceiptDetailDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId);
+    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId);
   }
 }

@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
+import it.gov.pagopa.pu.debtpositions.config.RestTemplateConfig;
 import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.workflowhub.generated.ApiClient;
 import it.gov.pagopa.pu.workflowhub.generated.BaseApi;
 import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -17,13 +17,18 @@ public class WorkflowApisHolder {
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
   public WorkflowApisHolder(
-    @Value("${rest.workflow-hub.base-url}") String baseUrl,
-
-    RestTemplateBuilder restTemplateBuilder) {
+    WorkflowApiClientConfig clientConfig,
+    RestTemplateBuilder restTemplateBuilder
+  ) {
     RestTemplate restTemplate = restTemplateBuilder.build();
     ApiClient apiClient = new ApiClient(restTemplate);
-    apiClient.setBasePath(baseUrl);
+    apiClient.setBasePath(clientConfig.getBaseUrl());
     apiClient.setBearerToken(bearerTokenHolder::get);
+    apiClient.setMaxAttemptsForRetry(Math.max(1, clientConfig.getMaxAttempts()));
+    apiClient.setWaitTimeMillis(clientConfig.getWaitTimeMillis());
+    if (clientConfig.isPrintBodyWhenError()) {
+      restTemplate.setErrorHandler(RestTemplateConfig.bodyPrinterWhenError("WORKFLOW-HUB"));
+    }
 
     this.debtPositionApi = new DebtPositionApi(apiClient);
   }

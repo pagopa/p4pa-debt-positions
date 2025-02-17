@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
-import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 class ReceiptServiceImplTest {
 
   @Mock
-  private ReceiptPIIRepository receiptPIIRepositoryMock;
+  private ReceiptDetailPIIViewRepository receiptDetailPIIViewRepositoryMock;
 
   @InjectMocks
   private ReceiptServiceImpl receiptService;
@@ -27,17 +27,18 @@ class ReceiptServiceImplTest {
   void whenGetReceiptDetailThenOk() {
     //given
     Long receiptId = 1L;
-    ReceiptDTO expectedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
+    String operatorExternalUserId = "operatorExternalUserId";
+    ReceiptDetailDTO receipt = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptPIIRepositoryMock.getReceiptDetail(receiptId)).thenReturn(expectedReceipt);
+    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId,operatorExternalUserId)).thenReturn(receipt);
 
     //when
-    ReceiptDTO response = receiptService.getReceiptDetail(receiptId);
+    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId,operatorExternalUserId);
 
     //verify
     Assertions.assertNotNull(response);
-    Assertions.assertEquals(expectedReceipt, response);
+    Assertions.assertEquals(receipt, response);
 
-    Mockito.verify(receiptPIIRepositoryMock).getReceiptDetail(receiptId);
+    Mockito.verify(receiptDetailPIIViewRepositoryMock).getReceiptDetail(receiptId,operatorExternalUserId);
   }
 }

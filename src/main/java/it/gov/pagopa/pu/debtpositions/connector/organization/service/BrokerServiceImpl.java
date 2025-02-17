@@ -19,9 +19,9 @@ public class BrokerServiceImpl implements BrokerService {
   }
 
   @Override
-  public Optional<Broker> getBrokerByOrganizationId(Long organizationId, String accessToken) {
+  public Optional<Broker> getBrokerByBrokeredOrganizationId(Long organizationId, String accessToken) {
     return Optional.ofNullable(
-      brokerSearchClient.findByOrganizationId(organizationId, accessToken)
+      brokerSearchClient.findByBrokeredOrganizationId(organizationId, accessToken)
     );
   }
 
