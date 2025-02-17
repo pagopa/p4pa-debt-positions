@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
@@ -42,6 +43,8 @@ class UpdatePaidDebtPositionServiceTest {
   private PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierServiceMock;
   @Mock
   private InstallmentUpdateService installmentUpdateServiceMock;
+  @Mock
+  private DebtPositionRepository debtPositionRepositoryMock;
 
   @InjectMocks
   private UpdatePaidDebtPositionService updatePaidDebtPositionService;
@@ -84,6 +87,7 @@ class UpdatePaidDebtPositionServiceTest {
     Mockito.when(primaryOrgInstallmentPaidVerifierServiceMock.findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber())).thenReturn(Pair.of(Optional.of(installment), true));
     Mockito.when(brokerServiceMock.findById(broker.getBrokerId(), accessToken)).thenReturn(broker);
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, broker, receipt)).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.save(debtPosition)).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
 
@@ -97,6 +101,7 @@ class UpdatePaidDebtPositionServiceTest {
     Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
     Mockito.verify(brokerServiceMock, Mockito.times(1)).findById(broker.getBrokerId(), accessToken);
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, broker, receipt);
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
     Mockito.verify(debtPositionMapperMock, Mockito.times(1)).mapToDto(debtPosition);
     Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
   }

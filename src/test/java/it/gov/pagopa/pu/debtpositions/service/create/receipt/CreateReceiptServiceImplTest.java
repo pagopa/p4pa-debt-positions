@@ -94,7 +94,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(updatePaidDebtPositionServiceMock, Mockito.times(1)).handleReceiptReceived(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, primaryOrgFound, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
   }
 
 }

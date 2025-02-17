@@ -46,7 +46,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     //persist receipt
     saveReceipt(receiptDTO);
 
-    //check if organization who handle the notice is managed by PU and update the installment status
+    //check if organization who handles the notice is managed by PU and update the installment status
     boolean primaryOrgFound = updateInstallmentStatusOfDebtPosition.handleReceiptReceived(receiptDTO, accessToken);
 
     //for every organization handled by PU and mentioned in the receipt

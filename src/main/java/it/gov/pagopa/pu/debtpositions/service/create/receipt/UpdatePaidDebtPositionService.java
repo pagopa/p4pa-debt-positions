@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -28,14 +29,16 @@ public class UpdatePaidDebtPositionService {
   private final BrokerService brokerService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionMapper debtPositionMapper;
+  private final DebtPositionRepository debtPositionRepository;
 
-  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, BrokerService brokerService, DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper) {
+  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, BrokerService brokerService, DebtPositionSyncService debtPositionSyncService, DebtPositionMapper debtPositionMapper, DebtPositionRepository debtPositionRepository) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
     this.brokerService = brokerService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionMapper = debtPositionMapper;
+    this.debtPositionRepository = debtPositionRepository;
   }
 
   boolean handleReceiptReceived(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken){
@@ -48,7 +51,8 @@ public class UpdatePaidDebtPositionService {
           //update installment status
           DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, primaryBroker, receiptDTO);
           //persist updated debt position
-          //TODO
+          DebtPosition persistedDebtPosition = debtPositionRepository.save(debtPosition);
+          log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
           //start debt position workflow
           DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
           invokeWorkflow(debtPositionDTO, accessToken);
