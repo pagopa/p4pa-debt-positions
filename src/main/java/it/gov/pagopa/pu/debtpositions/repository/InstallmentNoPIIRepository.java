@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import jakarta.transaction.Transactional;
@@ -46,6 +47,8 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "  join DebtPosition dp" +
           "    on po.debtPositionId = dp.debtPositionId" +
           " where dp.organizationId = :organizationId" +
+          "   and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))" +
           "   and i.nav = :nav")
-  List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav);
+  List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
+                                                   @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 }

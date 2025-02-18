@@ -38,7 +38,7 @@ public class InstallmentPIIRepositoryImpl implements InstallmentPIIRepository {
 
   @Override
   public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav) {
-    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav)
+    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, null)
       .stream().map(installmentPIIMapper::map).toList();
   }
 }

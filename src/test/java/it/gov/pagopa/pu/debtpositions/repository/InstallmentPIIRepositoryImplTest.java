@@ -70,7 +70,7 @@ class InstallmentPIIRepositoryImplTest {
   void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk() {
     // Given
     List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
-    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV")).thenReturn(installmentDTOList);
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV",null)).thenReturn(installmentDTOList);
     installmentDTOList.forEach(installmentNoPII -> Mockito.when(mapperMock.map(installmentNoPII)).thenReturn(Installment.builder().build()));
 
     // When

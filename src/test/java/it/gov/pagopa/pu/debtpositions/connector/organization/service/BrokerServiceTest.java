@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerClient;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import org.junit.jupiter.api.AfterEach;
@@ -19,18 +20,22 @@ class BrokerServiceTest {
   @Mock
   private BrokerSearchClient brokerSearchClientMock;
 
+  @Mock
+  private BrokerClient brokerClientMock;
+
   private BrokerService brokerService;
 
   private final String accessToken = "ACCESSTOKEN";
 
   @BeforeEach
   void init() {
-    brokerService = new BrokerServiceImpl(brokerSearchClientMock);
+    brokerService = new BrokerServiceImpl(brokerSearchClientMock, brokerClientMock);
   }
 
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(brokerSearchClientMock);
+    Mockito.verifyNoMoreInteractions(brokerClientMock);
   }
 
   @Test
@@ -61,5 +66,21 @@ class BrokerServiceTest {
     // Then
     Assertions.assertTrue(result.isPresent());
     Assertions.assertSame(expectedResult, result.get());
+  }
+
+  @Test
+  void givenValidBrokerIdWhenFindByIdThenOk() {
+    // Given
+    Long brokerId = 1L;
+    Broker expectedResult = new Broker();
+    Mockito.when(brokerClientMock.findById(brokerId, accessToken))
+      .thenReturn(expectedResult);
+
+    // When
+    Broker result = brokerService.findById(brokerId, accessToken);
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(expectedResult, result);
   }
 }

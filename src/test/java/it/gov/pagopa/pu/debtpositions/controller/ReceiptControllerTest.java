@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -32,6 +33,9 @@ class ReceiptControllerTest {
   private ObjectMapper objectMapper;
 
   @MockitoBean
+  private CreateReceiptService createReceiptServiceMock;
+
+  @MockitoBean
   private ReceiptService receiptServiceMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
@@ -42,7 +46,7 @@ class ReceiptControllerTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())))).thenReturn(expectedResponse);
+    Mockito.when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())), Mockito.any())).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.post("/receipts")
@@ -55,8 +59,9 @@ class ReceiptControllerTest {
     });
     TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate");
 
-    Mockito.verify(receiptServiceMock, Mockito.times(1)).createReceipt(
-      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())));
+    Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
+      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
+      Mockito.any());
   }
 
   @Test
