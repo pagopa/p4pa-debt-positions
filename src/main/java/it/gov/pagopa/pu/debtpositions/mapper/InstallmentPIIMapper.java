@@ -6,13 +6,14 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.TreeSet;
 
 @Service
-public class InstallmentPIIMapper {
+public class InstallmentPIIMapper extends BasePIIMapper<Installment, InstallmentNoPII, InstallmentPIIDTO> {
 
   private final DataCipherService dataCipherService;
   private final PersonalDataService personalDataService;
@@ -22,85 +23,87 @@ public class InstallmentPIIMapper {
     this.personalDataService = personalDataService;
   }
 
-  public Pair<InstallmentNoPII, InstallmentPIIDTO> map(Installment installment) {
-    InstallmentNoPII installmentNoPII = new InstallmentNoPII();
+  @Override
+  protected InstallmentNoPII extractNoPiiEntity(Installment fullDTO) {
+    InstallmentNoPII noPII = new InstallmentNoPII();
 
-    installmentNoPII.setInstallmentId(installment.getInstallmentId());
-    installmentNoPII.setPaymentOptionId(installment.getPaymentOptionId());
-    installmentNoPII.setStatus(installment.getStatus());
-    installmentNoPII.setIupdPagopa(installment.getIupdPagopa());
-    installmentNoPII.setIud(installment.getIud());
-    installmentNoPII.setIuv(installment.getIuv());
-    installmentNoPII.setIur(installment.getIur());
-    installmentNoPII.setIuf(installment.getIuf());
-    installmentNoPII.setNav(installment.getNav());
-    installmentNoPII.setDueDate(installment.getDueDate());
-    installmentNoPII.setPaymentTypeCode(installment.getPaymentTypeCode());
-    installmentNoPII.setAmountCents(installment.getAmountCents());
-    installmentNoPII.setRemittanceInformation(installment.getRemittanceInformation());
-    installmentNoPII.setBalance(installment.getBalance());
-    installmentNoPII.setLegacyPaymentMetadata(installment.getLegacyPaymentMetadata());
-    installmentNoPII.setDebtorEntityType(installment.getDebtor().getEntityType());
-    installmentNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(installment.getDebtor().getFiscalCode()));
-    installmentNoPII.setNotificationDate(installment.getNotificationDate());
-    installmentNoPII.setIngestionFlowFileId(installment.getIngestionFlowFileId());
-    installmentNoPII.setIngestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber());
-    installmentNoPII.setReceiptId(installment.getReceiptId());
-    installmentNoPII.setCreationDate(installment.getCreationDate());
-    installmentNoPII.setUpdateDate(installment.getUpdateDate());
-    installmentNoPII.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
-    installmentNoPII.setTransfers(new TreeSet<>(installment.getTransfers()));
+    noPII.setInstallmentId(fullDTO.getInstallmentId());
+    noPII.setPaymentOptionId(fullDTO.getPaymentOptionId());
+    noPII.setStatus(fullDTO.getStatus());
+    noPII.setIupdPagopa(fullDTO.getIupdPagopa());
+    noPII.setIud(fullDTO.getIud());
+    noPII.setIuv(fullDTO.getIuv());
+    noPII.setIur(fullDTO.getIur());
+    noPII.setIuf(fullDTO.getIuf());
+    noPII.setNav(fullDTO.getNav());
+    noPII.setDueDate(fullDTO.getDueDate());
+    noPII.setPaymentTypeCode(fullDTO.getPaymentTypeCode());
+    noPII.setAmountCents(fullDTO.getAmountCents());
+    noPII.setRemittanceInformation(fullDTO.getRemittanceInformation());
+    noPII.setBalance(fullDTO.getBalance());
+    noPII.setLegacyPaymentMetadata(fullDTO.getLegacyPaymentMetadata());
+    noPII.setDebtorEntityType(fullDTO.getDebtor().getEntityType());
+    noPII.setDebtorFiscalCodeHash(dataCipherService.hash(fullDTO.getDebtor().getFiscalCode()));
+    noPII.setNotificationDate(fullDTO.getNotificationDate());
+    noPII.setIngestionFlowFileId(fullDTO.getIngestionFlowFileId());
+    noPII.setIngestionFlowFileLineNumber(fullDTO.getIngestionFlowFileLineNumber());
+    noPII.setReceiptId(fullDTO.getReceiptId());
+    noPII.setCreationDate(fullDTO.getCreationDate());
+    noPII.setUpdateDate(fullDTO.getUpdateDate());
+    noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
+    noPII.setTransfers(new TreeSet<>(fullDTO.getTransfers()));
 
-    if (installment.getNoPII() != null) {
-      installmentNoPII.setPersonalDataId(installment.getNoPII().getPersonalDataId());
+    if(fullDTO.getSyncStatus() != null){
+      noPII.setSyncStatus(it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus.builder()
+        .syncStatusFrom(fullDTO.getSyncStatus().getSyncStatusFrom())
+        .syncStatusTo(fullDTO.getSyncStatus().getSyncStatusTo()).build());
     }
 
-    if(installment.getSyncStatus() != null){
-      installmentNoPII.setSyncStatus(it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus.builder()
-        .syncStatusFrom(installment.getSyncStatus().getSyncStatusFrom())
-        .syncStatusTo(installment.getSyncStatus().getSyncStatusTo()).build());
-    }
-
-    InstallmentPIIDTO installmentPIIDTO = InstallmentPIIDTO.builder()
-      .debtor(installment.getDebtor()).build();
-
-    return Pair.of(installmentNoPII, installmentPIIDTO);
+    return noPII;
   }
 
-  public Installment map(InstallmentNoPII installmentNoPII) {
-    InstallmentPIIDTO pii = personalDataService.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
+  @Override
+  protected InstallmentPIIDTO extractPiiDto(Installment fullDTO) {
+    return InstallmentPIIDTO.builder()
+      .debtor(fullDTO.getDebtor())
+      .build();
+  }
+
+  @Override
+  public Installment map(InstallmentNoPII noPii) {
+    InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
     Installment installment = Installment.builder()
-      .installmentId(installmentNoPII.getInstallmentId())
-      .paymentOptionId(installmentNoPII.getPaymentOptionId())
-      .status(installmentNoPII.getStatus())
-      .iupdPagopa(installmentNoPII.getIupdPagopa())
-      .iud(installmentNoPII.getIud())
-      .iuv(installmentNoPII.getIuv())
-      .iur(installmentNoPII.getIur())
-      .iuf(installmentNoPII.getIuf())
-      .nav(installmentNoPII.getNav())
-      .dueDate(installmentNoPII.getDueDate())
-      .paymentTypeCode(installmentNoPII.getPaymentTypeCode())
-      .amountCents(installmentNoPII.getAmountCents())
-      .remittanceInformation(installmentNoPII.getRemittanceInformation())
-      .balance(installmentNoPII.getBalance())
-      .legacyPaymentMetadata(installmentNoPII.getLegacyPaymentMetadata())
-      .notificationDate(installmentNoPII.getNotificationDate())
-      .ingestionFlowFileId(installmentNoPII.getIngestionFlowFileId())
-      .ingestionFlowFileLineNumber(installmentNoPII.getIngestionFlowFileLineNumber())
-      .receiptId(installmentNoPII.getReceiptId())
-      .creationDate(installmentNoPII.getCreationDate())
-      .updateDate(installmentNoPII.getUpdateDate())
-      .updateOperatorExternalId(installmentNoPII.getUpdateOperatorExternalId())
+      .installmentId(noPii.getInstallmentId())
+      .paymentOptionId(noPii.getPaymentOptionId())
+      .status(noPii.getStatus())
+      .iupdPagopa(noPii.getIupdPagopa())
+      .iud(noPii.getIud())
+      .iuv(noPii.getIuv())
+      .iur(noPii.getIur())
+      .iuf(noPii.getIuf())
+      .nav(noPii.getNav())
+      .dueDate(noPii.getDueDate())
+      .paymentTypeCode(noPii.getPaymentTypeCode())
+      .amountCents(noPii.getAmountCents())
+      .remittanceInformation(noPii.getRemittanceInformation())
+      .balance(noPii.getBalance())
+      .legacyPaymentMetadata(noPii.getLegacyPaymentMetadata())
+      .notificationDate(noPii.getNotificationDate())
+      .ingestionFlowFileId(noPii.getIngestionFlowFileId())
+      .ingestionFlowFileLineNumber(noPii.getIngestionFlowFileLineNumber())
+      .receiptId(noPii.getReceiptId())
+      .creationDate(noPii.getCreationDate())
+      .updateDate(noPii.getUpdateDate())
+      .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
       .debtor(pii.getDebtor())
-      .transfers(Optional.ofNullable(installmentNoPII.getTransfers()).map(List::copyOf).orElse(List.of()))
-      .noPII(installmentNoPII)
+      .transfers(Optional.ofNullable(noPii.getTransfers()).map(List::copyOf).orElse(List.of()))
+      .noPII(noPii)
       .build();
 
-    if(installmentNoPII.getSyncStatus() != null) {
+    if(noPii.getSyncStatus() != null) {
       installment.setSyncStatus(InstallmentSyncStatus.builder()
-        .syncStatusFrom(installmentNoPII.getSyncStatus().getSyncStatusFrom())
-        .syncStatusTo(installmentNoPII.getSyncStatus().getSyncStatusTo())
+        .syncStatusFrom(noPii.getSyncStatus().getSyncStatusFrom())
+        .syncStatusTo(noPii.getSyncStatus().getSyncStatusTo())
         .build());
     }
     return installment;

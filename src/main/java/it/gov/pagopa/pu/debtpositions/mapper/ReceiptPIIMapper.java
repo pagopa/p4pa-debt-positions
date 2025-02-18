@@ -1,18 +1,17 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
-
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 @Service
-public class ReceiptPIIMapper {
+public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, ReceiptPIIDTO> {
 
   private final DataCipherService dataCipherService;
   private final PersonalDataService personalDataService;
@@ -25,120 +24,124 @@ public class ReceiptPIIMapper {
     this.personMapper = personMapper;
   }
 
-  public Pair<ReceiptNoPII, ReceiptPIIDTO> map(Receipt receipt) {
+  @Override
+  protected ReceiptNoPII extractNoPiiEntity(Receipt fullDTO) {
     ReceiptNoPII receiptNoPII = new ReceiptNoPII();
 
-    receiptNoPII.setReceiptId(receipt.getReceiptId());
-    receiptNoPII.setIngestionFlowFileId(receipt.getIngestionFlowFileId());
-    receiptNoPII.setReceiptOrigin(receipt.getReceiptOrigin());
-    receiptNoPII.setPaymentReceiptId(receipt.getPaymentReceiptId());
-    receiptNoPII.setNoticeNumber(receipt.getNoticeNumber());
-    receiptNoPII.setPaymentNote(receipt.getPaymentNote());
-    receiptNoPII.setOrgFiscalCode(receipt.getOrgFiscalCode());
-    receiptNoPII.setOutcome(receipt.getOutcome());
-    receiptNoPII.setCreditorReferenceId(receipt.getCreditorReferenceId());
-    receiptNoPII.setPaymentAmountCents(receipt.getPaymentAmountCents());
-    receiptNoPII.setDescription(receipt.getDescription());
-    receiptNoPII.setCompanyName(receipt.getCompanyName());
-    receiptNoPII.setOfficeName(receipt.getOfficeName());
-    receiptNoPII.setIdPsp(receipt.getIdPsp());
-    receiptNoPII.setPspFiscalCode(receipt.getPspFiscalCode());
-    receiptNoPII.setPspPartitaIva(receipt.getPspPartitaIva());
-    receiptNoPII.setPspCompanyName(receipt.getPspCompanyName());
-    receiptNoPII.setIdChannel(receipt.getIdChannel());
-    receiptNoPII.setChannelDescription(receipt.getChannelDescription());
-    receiptNoPII.setPaymentMethod(receipt.getPaymentMethod());
-    receiptNoPII.setFeeCents(receipt.getFeeCents());
-    receiptNoPII.setPaymentDateTime(receipt.getPaymentDateTime());
-    receiptNoPII.setApplicationDate(receipt.getApplicationDate());
-    receiptNoPII.setTransferDate(receipt.getTransferDate());
-    receiptNoPII.setStandin(receipt.isStandin());
-    receiptNoPII.setCreationDate(receipt.getCreationDate());
-    receiptNoPII.setUpdateDate(receipt.getUpdateDate());
-    receiptNoPII.setUpdateOperatorExternalId(receipt.getUpdateOperatorExternalId());
-    receiptNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(receipt.getDebtor().getFiscalCode()));
-    receiptNoPII.setDebtorEntityType(receipt.getDebtor().getEntityType());
-    if (receipt.getNoPII() != null) {
-      receiptNoPII.setPersonalDataId(receipt.getNoPII().getPersonalDataId());
-    }
+    receiptNoPII.setReceiptId(fullDTO.getReceiptId());
+    receiptNoPII.setIngestionFlowFileId(fullDTO.getIngestionFlowFileId());
+    receiptNoPII.setReceiptOrigin(fullDTO.getReceiptOrigin());
+    receiptNoPII.setPaymentReceiptId(fullDTO.getPaymentReceiptId());
+    receiptNoPII.setNoticeNumber(fullDTO.getNoticeNumber());
+    receiptNoPII.setPaymentNote(fullDTO.getPaymentNote());
+    receiptNoPII.setOrgFiscalCode(fullDTO.getOrgFiscalCode());
+    receiptNoPII.setOutcome(fullDTO.getOutcome());
+    receiptNoPII.setCreditorReferenceId(fullDTO.getCreditorReferenceId());
+    receiptNoPII.setPaymentAmountCents(fullDTO.getPaymentAmountCents());
+    receiptNoPII.setDescription(fullDTO.getDescription());
+    receiptNoPII.setCompanyName(fullDTO.getCompanyName());
+    receiptNoPII.setOfficeName(fullDTO.getOfficeName());
+    receiptNoPII.setIdPsp(fullDTO.getIdPsp());
+    receiptNoPII.setPspFiscalCode(fullDTO.getPspFiscalCode());
+    receiptNoPII.setPspPartitaIva(fullDTO.getPspPartitaIva());
+    receiptNoPII.setPspCompanyName(fullDTO.getPspCompanyName());
+    receiptNoPII.setIdChannel(fullDTO.getIdChannel());
+    receiptNoPII.setChannelDescription(fullDTO.getChannelDescription());
+    receiptNoPII.setPaymentMethod(fullDTO.getPaymentMethod());
+    receiptNoPII.setFeeCents(fullDTO.getFeeCents());
+    receiptNoPII.setPaymentDateTime(fullDTO.getPaymentDateTime());
+    receiptNoPII.setApplicationDate(fullDTO.getApplicationDate());
+    receiptNoPII.setTransferDate(fullDTO.getTransferDate());
+    receiptNoPII.setStandin(fullDTO.isStandin());
+    receiptNoPII.setCreationDate(fullDTO.getCreationDate());
+    receiptNoPII.setUpdateDate(fullDTO.getUpdateDate());
+    receiptNoPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
+    receiptNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(fullDTO.getDebtor().getFiscalCode()));
+    receiptNoPII.setDebtorEntityType(fullDTO.getDebtor().getEntityType());
 
-    ReceiptPIIDTO receiptPIIDTO = ReceiptPIIDTO.builder()
-      .debtor(receipt.getDebtor())
-      .payer(receipt.getPayer())
-      .build();
-
-    return Pair.of(receiptNoPII, receiptPIIDTO);
+    return receiptNoPII;
   }
 
-  public Receipt map(ReceiptNoPII receiptNoPII) {
-    ReceiptPIIDTO pii = personalDataService.get(receiptNoPII.getPersonalDataId(), ReceiptPIIDTO.class);
+  @Override
+  protected ReceiptPIIDTO extractPiiDto(Receipt fullDTO) {
+    return ReceiptPIIDTO.builder()
+      .debtor(fullDTO.getDebtor())
+      .payer(fullDTO.getPayer())
+      .build();
+  }
+
+  @Override
+  public Receipt map(ReceiptNoPII noPii) {
+    ReceiptPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), ReceiptPIIDTO.class);
     return Receipt.builder()
-      .receiptId(receiptNoPII.getReceiptId())
-      .ingestionFlowFileId(receiptNoPII.getIngestionFlowFileId())
-      .receiptOrigin(receiptNoPII.getReceiptOrigin())
-      .paymentReceiptId(receiptNoPII.getPaymentReceiptId())
-      .noticeNumber(receiptNoPII.getNoticeNumber())
-      .paymentNote(receiptNoPII.getPaymentNote())
-      .orgFiscalCode(receiptNoPII.getOrgFiscalCode())
-      .outcome(receiptNoPII.getOutcome())
-      .creditorReferenceId(receiptNoPII.getCreditorReferenceId())
-      .paymentAmountCents(receiptNoPII.getPaymentAmountCents())
-      .description(receiptNoPII.getDescription())
-      .companyName(receiptNoPII.getCompanyName())
-      .officeName(receiptNoPII.getOfficeName())
-      .idPsp(receiptNoPII.getIdPsp())
-      .pspFiscalCode(receiptNoPII.getPspFiscalCode())
-      .pspPartitaIva(receiptNoPII.getPspPartitaIva())
-      .pspCompanyName(receiptNoPII.getPspCompanyName())
-      .idChannel(receiptNoPII.getIdChannel())
-      .channelDescription(receiptNoPII.getChannelDescription())
-      .paymentMethod(receiptNoPII.getPaymentMethod())
-      .feeCents(receiptNoPII.getFeeCents())
-      .paymentDateTime(receiptNoPII.getPaymentDateTime())
-      .applicationDate(receiptNoPII.getApplicationDate())
-      .transferDate(receiptNoPII.getTransferDate())
-      .standin(receiptNoPII.isStandin())
-      .creationDate(receiptNoPII.getCreationDate())
-      .updateDate(receiptNoPII.getUpdateDate())
-      .updateOperatorExternalId(receiptNoPII.getUpdateOperatorExternalId())
+      .receiptId(noPii.getReceiptId())
+      .ingestionFlowFileId(noPii.getIngestionFlowFileId())
+      .receiptOrigin(noPii.getReceiptOrigin())
+      .paymentReceiptId(noPii.getPaymentReceiptId())
+      .noticeNumber(noPii.getNoticeNumber())
+      .paymentNote(noPii.getPaymentNote())
+      .orgFiscalCode(noPii.getOrgFiscalCode())
+      .outcome(noPii.getOutcome())
+      .creditorReferenceId(noPii.getCreditorReferenceId())
+      .paymentAmountCents(noPii.getPaymentAmountCents())
+      .description(noPii.getDescription())
+      .companyName(noPii.getCompanyName())
+      .officeName(noPii.getOfficeName())
+      .idPsp(noPii.getIdPsp())
+      .pspFiscalCode(noPii.getPspFiscalCode())
+      .pspPartitaIva(noPii.getPspPartitaIva())
+      .pspCompanyName(noPii.getPspCompanyName())
+      .idChannel(noPii.getIdChannel())
+      .channelDescription(noPii.getChannelDescription())
+      .paymentMethod(noPii.getPaymentMethod())
+      .feeCents(noPii.getFeeCents())
+      .paymentDateTime(noPii.getPaymentDateTime())
+      .applicationDate(noPii.getApplicationDate())
+      .transferDate(noPii.getTransferDate())
+      .standin(noPii.isStandin())
+      .creationDate(noPii.getCreationDate())
+      .updateDate(noPii.getUpdateDate())
+      .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
       .debtor(pii.getDebtor())
       .payer(pii.getPayer())
-      .noPII(receiptNoPII)
+      .noPII(noPii)
       .build();
   }
 
   public ReceiptDTO mapToReceiptDTO(ReceiptNoPII receiptNoPII) {
-    ReceiptPIIDTO pii = personalDataService.get(receiptNoPII.getPersonalDataId(), ReceiptPIIDTO.class);
+    return mapToReceiptDTO(map(receiptNoPII));
+  }
+  public ReceiptDTO mapToReceiptDTO(Receipt receipt) {
     return ReceiptDTO.builder()
-      .receiptId(receiptNoPII.getReceiptId())
-      .ingestionFlowFileId(receiptNoPII.getIngestionFlowFileId())
-      .receiptOrigin(receiptNoPII.getReceiptOrigin())
-      .paymentReceiptId(receiptNoPII.getPaymentReceiptId())
-      .noticeNumber(receiptNoPII.getNoticeNumber())
-      .paymentNote(receiptNoPII.getPaymentNote())
-      .orgFiscalCode(receiptNoPII.getOrgFiscalCode())
-      .outcome(receiptNoPII.getOutcome())
-      .creditorReferenceId(receiptNoPII.getCreditorReferenceId())
-      .paymentAmountCents(receiptNoPII.getPaymentAmountCents())
-      .description(receiptNoPII.getDescription())
-      .companyName(receiptNoPII.getCompanyName())
-      .officeName(receiptNoPII.getOfficeName())
-      .idPsp(receiptNoPII.getIdPsp())
-      .pspFiscalCode(receiptNoPII.getPspFiscalCode())
-      .pspPartitaIva(receiptNoPII.getPspPartitaIva())
-      .pspCompanyName(receiptNoPII.getPspCompanyName())
-      .idChannel(receiptNoPII.getIdChannel())
-      .channelDescription(receiptNoPII.getChannelDescription())
-      .paymentMethod(receiptNoPII.getPaymentMethod())
-      .feeCents(receiptNoPII.getFeeCents())
-      .paymentDateTime(receiptNoPII.getPaymentDateTime())
-      .applicationDate(receiptNoPII.getApplicationDate())
-      .transferDate(receiptNoPII.getTransferDate())
-      .standin(receiptNoPII.isStandin())
-      .debtor(personMapper.mapToDto(pii.getDebtor()))
-      .payer(personMapper.mapToDto(pii.getPayer()))
-      .creationDate(localDatetimeToOffsetDateTime(receiptNoPII.getCreationDate()))
-      .updateDate(localDatetimeToOffsetDateTime(receiptNoPII.getUpdateDate()))
+      .receiptId(receipt.getReceiptId())
+      .ingestionFlowFileId(receipt.getIngestionFlowFileId())
+      .receiptOrigin(receipt.getReceiptOrigin())
+      .paymentReceiptId(receipt.getPaymentReceiptId())
+      .noticeNumber(receipt.getNoticeNumber())
+      .paymentNote(receipt.getPaymentNote())
+      .orgFiscalCode(receipt.getOrgFiscalCode())
+      .outcome(receipt.getOutcome())
+      .creditorReferenceId(receipt.getCreditorReferenceId())
+      .paymentAmountCents(receipt.getPaymentAmountCents())
+      .description(receipt.getDescription())
+      .companyName(receipt.getCompanyName())
+      .officeName(receipt.getOfficeName())
+      .idPsp(receipt.getIdPsp())
+      .pspFiscalCode(receipt.getPspFiscalCode())
+      .pspPartitaIva(receipt.getPspPartitaIva())
+      .pspCompanyName(receipt.getPspCompanyName())
+      .idChannel(receipt.getIdChannel())
+      .channelDescription(receipt.getChannelDescription())
+      .paymentMethod(receipt.getPaymentMethod())
+      .feeCents(receipt.getFeeCents())
+      .paymentDateTime(receipt.getPaymentDateTime())
+      .applicationDate(receipt.getApplicationDate())
+      .transferDate(receipt.getTransferDate())
+      .standin(receipt.isStandin())
+      .debtor(personMapper.mapToDto(receipt.getDebtor()))
+      .payer(personMapper.mapToDto(receipt.getPayer()))
+      .creationDate(localDatetimeToOffsetDateTime(receipt.getCreationDate()))
+      .updateDate(localDatetimeToOffsetDateTime(receipt.getUpdateDate()))
       .build();
   }
 }
