@@ -611,6 +611,7 @@ components:
         - remittanceInformation
         - debtPositionDescription
         - debtor
+        - payer
         - pspCompanyName
         - iud
       properties:
