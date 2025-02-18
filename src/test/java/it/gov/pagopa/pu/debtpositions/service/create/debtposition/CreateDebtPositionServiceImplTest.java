@@ -224,7 +224,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
-    Mockito.when(generateIuvServiceMock.generateIuv(organization, null)).thenReturn("generatedIuv");
+    Mockito.when(generateIuvServiceMock.generateIuv(organization)).thenReturn("generatedIuv");
     Mockito.when(generateIuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization.getOrgFiscalCode())).thenReturn(debtPositionIuvDTO);

@@ -13,7 +13,7 @@ public interface GenerateIuvService {
    * @param org the organization for which the IUV is requested
    * @return the IUV generated
    */
-  String generateIuv(Organization org, String accessToken);
+  String generateIuv(Organization org);
 
   String iuv2Nav(String iuv);
 }

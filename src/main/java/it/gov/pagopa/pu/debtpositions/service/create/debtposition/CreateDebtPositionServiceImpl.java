@@ -57,7 +57,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
-    generateIuv(debtPositionDTO, accessToken, org);
+    generateIuv(debtPositionDTO, org);
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
     if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
@@ -109,12 +109,12 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       });
   }
 
-  private void generateIuv(DebtPositionDTO debtPositionDTO, String accessToken, Organization org) {
+  private void generateIuv(DebtPositionDTO debtPositionDTO, Organization org) {
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
       debtPositionDTO.getPaymentOptions().stream()
         .flatMap(po -> po.getInstallments().stream())
         .forEach(installment -> {
-          String generatedIuv = generateIuvService.generateIuv(org, accessToken);
+          String generatedIuv = generateIuvService.generateIuv(org);
           String nav = generateIuvService.iuv2Nav(generatedIuv);
           installment.setIuv(generatedIuv);
           installment.setNav(nav);

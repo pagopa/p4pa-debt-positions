@@ -34,8 +34,7 @@ class GenerateIuvServiceTest {
     //Given
     Mockito.when(iuvService.generateIuv(VALID_ORG)).thenReturn(VALID_IUV);
     //When
-    String accessToken = "ACCESSTOKEN";
-    String result = generateIuvService.generateIuv(VALID_ORG, accessToken);
+    String result = generateIuvService.generateIuv(VALID_ORG);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
     Mockito.verify(iuvService, Mockito.times(1)).generateIuv(VALID_ORG);

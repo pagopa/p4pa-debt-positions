@@ -16,7 +16,7 @@ public class GenerateIuvServiceImpl implements GenerateIuvService {
 
 
   @Override
-  public String generateIuv(Organization org, String accessToken) {
+  public String generateIuv(Organization org) {
     String iuv = iuvService.generateIuv(org);
     log.debug("generated new IUV[{}] for organization[{}/{}]", iuv, org.getIpaCode(), org.getOrgFiscalCode());
     return iuv;
