@@ -5,6 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 
 public interface ReceiptPIIRepository {
 
-  long save(Receipt receipt);
+  Receipt save(Receipt receipt);
   ReceiptDTO getReceiptDetail(Long receiptId);
 }

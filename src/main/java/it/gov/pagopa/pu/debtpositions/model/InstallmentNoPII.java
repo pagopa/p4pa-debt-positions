@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import jakarta.annotation.Nonnull;
@@ -23,7 +24,7 @@ import java.util.SortedSet;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(of = "installmentId", callSuper = false)
-public class InstallmentNoPII extends BaseEntity implements Serializable, Comparable<InstallmentNoPII> {
+public class InstallmentNoPII extends BaseEntity implements Serializable, Comparable<InstallmentNoPII>, NoPIIEntity<InstallmentPIIDTO> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "installment_generator")

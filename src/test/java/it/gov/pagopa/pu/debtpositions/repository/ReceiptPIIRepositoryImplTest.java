@@ -46,21 +46,22 @@ class ReceiptPIIRepositoryImplTest {
     Receipt receipt = podamFactory.manufacturePojo(Receipt.class);
     receipt.setReceiptId(null);
     receipt.setNoPII(null);
-    ReceiptNoPII returned = podamFactory.manufacturePojo(ReceiptNoPII.class);
+    ReceiptNoPII savedNoPii = podamFactory.manufacturePojo(ReceiptNoPII.class);
     Pair<ReceiptNoPII, ReceiptPIIDTO> pair = podamFactory.manufacturePojo(Pair.class, ReceiptNoPII.class, ReceiptPIIDTO.class);
+    pair.getFirst().setPersonalDataId(null);
     Mockito.when(receiptPIIMapperMock.map(receipt)).thenReturn(pair);
     long piiId = -1L;
     Mockito.when(personalDataServiceMock.insert(pair.getSecond(), PersonalDataType.RECEIPT)).thenReturn(piiId);
-    Mockito.when(receiptNoPIIRepositoryMock.save(pair.getFirst())).thenReturn(returned);
+    Mockito.when(receiptNoPIIRepositoryMock.save(pair.getFirst())).thenReturn(savedNoPii);
 
     // When
-    long result = receiptPIIRepository.save(receipt);
+    Receipt result = receiptPIIRepository.save(receipt);
 
     // Then
-    Assertions.assertEquals(returned.getReceiptId(), result);
-    Assertions.assertEquals(returned.getReceiptId(), receipt.getReceiptId());
+    Assertions.assertSame(receipt, result);
+    Assertions.assertEquals(savedNoPii.getReceiptId(), receipt.getReceiptId());
     TestUtils.reflectionEqualsByName(pair.getFirst(), receipt.getNoPII(), "receiptId");
-    Assertions.assertEquals(returned.getReceiptId(), receipt.getNoPII().getReceiptId());
+    Assertions.assertEquals(savedNoPii.getReceiptId(), receipt.getNoPII().getReceiptId());
     Mockito.verify(receiptPIIMapperMock, Mockito.times(1)).map(receipt);
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).insert(pair.getSecond(), PersonalDataType.RECEIPT);
     Mockito.verify(receiptNoPIIRepositoryMock, Mockito.times(1)).save(pair.getFirst());

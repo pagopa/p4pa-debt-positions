@@ -9,8 +9,6 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentPIIDTO {
-
+public class InstallmentPIIDTO implements PIIDTO {
     private Person debtor;
-
 }
