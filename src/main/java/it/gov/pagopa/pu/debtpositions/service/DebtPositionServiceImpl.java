@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import io.micrometer.common.util.StringUtils;
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -12,15 +11,12 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Map;
-import java.util.Optional;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -30,28 +26,24 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final InstallmentPIIRepository installmentRepository;
   private final TransferRepository transferRepository;
   private final DebtPositionMapper debtPositionMapper;
-  private final OrganizationService organizationService;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, PaymentOptionRepository paymentOptionRepository,
                                  InstallmentPIIRepository installmentRepository, TransferRepository transferRepository,
-                                 DebtPositionMapper debtPositionMapper, OrganizationService organizationService) {
+                                 DebtPositionMapper debtPositionMapper) {
     this.debtPositionRepository = debtPositionRepository;
     this.paymentOptionRepository = paymentOptionRepository;
     this.installmentRepository = installmentRepository;
     this.transferRepository = transferRepository;
     this.debtPositionMapper = debtPositionMapper;
-    this.organizationService = organizationService;
   }
 
   @Transactional
   @Override
-  public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO) {
+  public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, String orgFiscalCode) {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
-      String accessToken = SecurityUtils.getAccessToken();
-      Optional<Organization> org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken);
-      org.ifPresent(organization -> mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(organization.getOrgFiscalCode())));
+      mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(orgFiscalCode));
     }
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
