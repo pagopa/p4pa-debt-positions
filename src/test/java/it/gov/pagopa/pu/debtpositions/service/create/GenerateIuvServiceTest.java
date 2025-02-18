@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
@@ -12,13 +10,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 class GenerateIuvServiceTest {
-
-  @Mock
-  private OrganizationService organizationService;
 
   @Mock
   private IuvService iuvService;
@@ -36,29 +29,15 @@ class GenerateIuvServiceTest {
     .ipaCode(VALID_ORG_IPA_CODE);
   private static final String VALID_IUV = "12345678901234567";
 
-  private final String accessToken = "ACCESSTOKEN";
-
   @Test
   void givenValidOrgWhenGenerateIuvThenOk() {
     //Given
-    Long orgId = 1L;
-    Mockito.when(organizationService.getOrganizationById(orgId, accessToken)).thenReturn(Optional.of(VALID_ORG));
     Mockito.when(iuvService.generateIuv(VALID_ORG)).thenReturn(VALID_IUV);
     //When
-    String result = generateIuvService.generateIuv(orgId, accessToken);
+    String result = generateIuvService.generateIuv(VALID_ORG);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(organizationService, Mockito.times(1)).getOrganizationById(orgId, accessToken);
     Mockito.verify(iuvService, Mockito.times(1)).generateIuv(VALID_ORG);
-  }
-
-  @Test
-  void givenInvalidOrgWhenGenerateIuvThenException() {
-    //Given
-    Mockito.when(organizationService.getOrganizationById(-1L, accessToken)).thenReturn(Optional.empty());
-    //Verify
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class, () -> generateIuvService.generateIuv(-1L, accessToken));
-    Assertions.assertEquals("invalid organization", exception.getMessage());
   }
 
   @Test
