@@ -1,8 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import org.apache.commons.lang3.StringUtils;
+
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
+import java.util.Date;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -12,6 +16,7 @@ public class Utilities {
   private Utilities() {}
     public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
     public static final int IBAN_LENGTH = 27;
+  private static final String SEP = "-";
 
     public static boolean isValidEmail(final String email) {
         Matcher matcher = EMAIL_PATTERN.matcher(email);
@@ -57,5 +62,12 @@ public class Utilities {
 
   public static String getRandomicUUID() {
     return UUID.randomUUID().toString().replace("-", "");
+  }
+
+  public static String generateRandomIupd(String orgFiscalCode) {
+    ThreadLocal<SimpleDateFormat> dateFmtUUID = ThreadLocal.withInitial(() -> new SimpleDateFormat("yyMMddHHmmssSSS"));
+    return String.format("%x", Long.valueOf(orgFiscalCode)) + SEP +
+      StringUtils.remove(StringUtils.substringBeforeLast(StringUtils.substringAfter(UUID.randomUUID().toString(), SEP), SEP), SEP) +
+      SEP + String.format("%x", Long.valueOf(dateFmtUUID.get().format(new Date())));
   }
 }
