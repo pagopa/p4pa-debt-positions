@@ -48,6 +48,7 @@ class ReceiptPIIRepositoryImplTest {
     receipt.setNoPII(null);
     ReceiptNoPII savedNoPii = podamFactory.manufacturePojo(ReceiptNoPII.class);
     Pair<ReceiptNoPII, ReceiptPIIDTO> pair = podamFactory.manufacturePojo(Pair.class, ReceiptNoPII.class, ReceiptPIIDTO.class);
+    pair.getFirst().setPersonalDataId(null);
     Mockito.when(receiptPIIMapperMock.map(receipt)).thenReturn(pair);
     long piiId = -1L;
     Mockito.when(personalDataServiceMock.insert(pair.getSecond(), PersonalDataType.RECEIPT)).thenReturn(piiId);

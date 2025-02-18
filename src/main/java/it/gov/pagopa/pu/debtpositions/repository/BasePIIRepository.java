@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.Pair;
 
 import java.io.Serializable;
+import java.util.Optional;
 
 public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends NoPIIEntity<P>, P extends PIIDTO, I extends Serializable> {
 
@@ -32,8 +33,10 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
   public F save(F fullDTO) {
     Pair<E, P> p = piiMapper.map(fullDTO);
 
-    Pair<Long, P> piiId2OldPii = retrievePII(p.getFirst());
-    boolean pii2create = piiId2OldPii==null || !p.getSecond().equals(piiId2OldPii.getSecond());
+    Pair<Long, Optional<P>> piiId2OldPii = retrievePII(p.getFirst());
+    boolean pii2create = piiId2OldPii==null ||
+      piiId2OldPii.getSecond().isEmpty() ||
+      !p.getSecond().equals(piiId2OldPii.getSecond().get());
 
     if (piiId2OldPii != null && pii2create) {
       personalDataService.delete(piiId2OldPii.getFirst());
@@ -54,7 +57,7 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
     return fullDTO;
   }
 
-  protected Pair<Long, P> retrievePII(E noPii) {
+  protected Pair<Long, Optional<P>> retrievePII(E noPii) {
     Long personalDataId = noPii.getPersonalDataId();
     I id = getId(noPii);
     if(personalDataId==null && id != null){
@@ -62,7 +65,7 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
     }
 
     if (personalDataId != null) {
-      return Pair.of(personalDataId, personalDataService.get(personalDataId, getPIITDTOClass()));
+      return Pair.of(personalDataId, Optional.ofNullable(personalDataService.get(personalDataId, getPIITDTOClass())));
     } else {
       return null;
     }
