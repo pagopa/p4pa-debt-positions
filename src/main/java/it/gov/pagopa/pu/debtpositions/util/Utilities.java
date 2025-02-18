@@ -66,8 +66,8 @@ public class Utilities {
   public static String generateRandomIupd(String orgFiscalCode) {
     return String.join("-",
       orgFiscalCode,
-      UUID.randomUUID().toString(),
-      LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMddHHmmssSSS"))
+      LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMdd")),
+      UUID.randomUUID().toString().substring(15)
     );
   }
 }

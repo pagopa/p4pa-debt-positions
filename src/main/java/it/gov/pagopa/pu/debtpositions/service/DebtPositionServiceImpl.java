@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
@@ -39,11 +40,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Transactional
   @Override
-  public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, String orgFiscalCode) {
+  public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
-      mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(orgFiscalCode));
+      mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());

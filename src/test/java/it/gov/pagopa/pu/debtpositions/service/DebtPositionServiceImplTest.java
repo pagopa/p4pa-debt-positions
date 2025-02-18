@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 
@@ -65,6 +67,7 @@ class DebtPositionServiceImplTest {
     String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
     String generatedIupd = "e04940029-18b140108de0-e39271476234";
 
+    Organization org = buildOrganization();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setIupdOrg("");
 
@@ -114,7 +117,7 @@ class DebtPositionServiceImplTest {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
       mockedStatic.when(Utilities::getRandomicUUID).thenReturn(generatedIupd);
 
-      debtPositionService.saveDebtPosition(debtPositionDTO, null);
+      debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);

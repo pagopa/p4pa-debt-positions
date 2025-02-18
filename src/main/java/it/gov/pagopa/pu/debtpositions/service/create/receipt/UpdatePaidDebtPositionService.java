@@ -67,7 +67,7 @@ public class UpdatePaidDebtPositionService {
     //align debt position status
     DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, org.getOrgFiscalCode());
+    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, org);
     log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
     //start debt position workflow
     invokeWorkflow(persistedDebtPosition, accessToken);

@@ -56,6 +56,6 @@ class UtilitiesTest {
   void testGenerateRandomIupd() {
     String uuid = Utilities.generateRandomIupd("60206350377");
 
-    assertEquals(64, uuid.length());
+    assertEquals(40, uuid.length());
   }
 }

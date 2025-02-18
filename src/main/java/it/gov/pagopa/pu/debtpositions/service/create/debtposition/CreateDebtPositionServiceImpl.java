@@ -68,7 +68,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
 
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org.getOrgFiscalCode());
+    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
 
     invokeWorkflow(savedDebtPosition, accessToken, massive);
 
