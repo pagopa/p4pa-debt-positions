@@ -873,7 +873,6 @@ components:
         - description
         - paymentOptionIndex
         - paymentOptionType
-        - iud
         - entityType
         - fiscalCode
         - fullName

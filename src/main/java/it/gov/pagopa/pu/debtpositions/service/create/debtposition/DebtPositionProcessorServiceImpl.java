@@ -8,8 +8,13 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
 
   @Override
   public DebtPositionDTO updateAmounts(DebtPositionDTO debtPositionDTO) {
-    debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
-      long totalPaymentOptionAmount = paymentOption.getInstallments().stream()
+    debtPositionDTO.getPaymentOptions().forEach(this::updatePaymentOptionAmounts);
+    return debtPositionDTO;
+  }
+
+  @Override
+  public PaymentOptionDTO updatePaymentOptionAmounts(PaymentOptionDTO paymentOptionDTO) {
+      long totalPaymentOptionAmount = paymentOptionDTO.getInstallments().stream()
         .filter(installment -> installment.getStatus() != InstallmentStatus.CANCELLED)
         .mapToLong(installment -> {
           long totalInstallmentAmount = installment.getTransfers().stream()
@@ -20,10 +25,8 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
         })
         .sum();
 
-      paymentOption.setTotalAmountCents(totalPaymentOptionAmount);
-    });
+    paymentOptionDTO.setTotalAmountCents(totalPaymentOptionAmount);
 
-    return debtPositionDTO;
+    return paymentOptionDTO;
   }
-
 }

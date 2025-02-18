@@ -13,7 +13,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import java.util.Optional;
 
 @RepositoryRestResource(path = "payment-options")
-public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Long> {
+public interface PaymentOptionRepository extends JpaRepository<PaymentOption, Long> {
 
   @RestResource(exported = false)
   @Transactional
@@ -26,4 +26,24 @@ public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Lon
     "WHERE dp.iupdOrg = :iupdOrg AND " +
     "po.paymentOptionIndex = :paymentOptionIndex")
   Optional<PaymentOption> getByPaymentOptionIndexAndIupdOrg(Integer paymentOptionIndex, String iupdOrg);
+
+  PaymentOption findByPaymentOptionId(Long paymentOptionId);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE PaymentOption p " +
+    "SET p.totalAmountCents = :totalAmountCents, p.description = :description " +
+    "WHERE p.paymentOptionId = :paymentOptionId")
+  void update(@Param("paymentOptionId") Long paymentOptionId, @Param("status") PaymentOptionStatus status,
+              @Param("totalAmountCents") Long totalAmountCents, @Param("description") String description);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE PaymentOption p " +
+    "SET p.totalAmountCents = :totalAmountCents " +
+    "WHERE p.paymentOptionId = :paymentOptionId")
+  void updateTotalAmounts(@Param("paymentOptionId") Long paymentOptionId, @Param("totalAmountCents") Long totalAmountCents);
+
 }

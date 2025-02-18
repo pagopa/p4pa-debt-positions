@@ -1,19 +1,29 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
+import io.micrometer.common.util.StringUtils;
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+
+import java.util.Objects;
 
 @Service
 @Slf4j
@@ -25,22 +35,30 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
   private final GenerateIuvService generateIuvService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final InstallmentPIIRepository installmentPIIRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
+  private final InstallmentMapper installmentMapper;
+  private final TransferRepository transferRepository;
+  private final PaymentOptionRepository paymentOptionRepository;
 
   public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                        ValidateDebtPositionService validateDebtPositionService,
                                        DebtPositionService debtPositionService,
                                        GenerateIuvService generateIuvService,
                                        DebtPositionSyncService debtPositionSyncService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository,
-                                       DebtPositionProcessorService debtPositionProcessorService) {
+                                       InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentPIIRepository installmentPIIRepository,
+                                       DebtPositionProcessorService debtPositionProcessorService, InstallmentMapper installmentMapper, TransferRepository transferRepository, PaymentOptionRepository paymentOptionRepository) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.validateDebtPositionService = validateDebtPositionService;
     this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
+    this.installmentPIIRepository = installmentPIIRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
+    this.installmentMapper = installmentMapper;
+    this.transferRepository = transferRepository;
+    this.paymentOptionRepository = paymentOptionRepository;
   }
 
   @Transactional
@@ -69,6 +87,34 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
     return Pair.of(savedDebtPosition, workflowId);
+  }
+
+  @Override
+  public Pair<DebtPositionDTO, String> createInstallment(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO) {
+    installmentDTO.setPaymentOptionId(paymentOptionDTO.getPaymentOptionId());
+    installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+    installmentDTO.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
+
+    verifyInstallmentUniqueness(debtPositionDTO);
+    generateInstallmentIuv(installmentDTO, debtPositionDTO.getOrganizationId(), accessToken);
+
+    InstallmentDTO savedInstallment = debtPositionService.saveSingleInstallment(installmentDTO);
+
+    //update stati
+
+    //update importi
+
+
+
+
+    String workflowId = invokeWorkflow(debtPositionDTO, accessToken, massive);
+
+    return Pair.of(debtPositionDTO, workflowId);
+  }
+
+  @Override
+  public Pair<DebtPositionDTO, String> createPaymentOption(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, PaymentOptionDTO paymentOptionDTO) {
+    return null;
   }
 
   private String invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
@@ -112,12 +158,16 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
         .flatMap(po -> po.getInstallments().stream())
         .forEach(installment -> {
           Long orgId = debtPositionDTO.getOrganizationId();
-          String generatedIuv = generateIuvService.generateIuv(orgId, accessToken);
-          String nav = generateIuvService.iuv2Nav(generatedIuv);
-          installment.setIuv(generatedIuv);
-          installment.setNav(nav);
+          generateInstallmentIuv(installment, orgId, accessToken);
         });
     }
+  }
+
+  private void generateInstallmentIuv(InstallmentDTO installmentDTO, Long orgId, String accessToken){
+    String generatedIuv = generateIuvService.generateIuv(orgId, accessToken);
+    String nav = generateIuvService.iuv2Nav(generatedIuv);
+    installmentDTO.setIuv(generatedIuv);
+    installmentDTO.setNav(nav);
   }
 
 }

@@ -9,11 +9,12 @@ import java.util.List;
 @Service
 public class InstallmentSynchronizeMapper {
 
-  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO) {
+  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, Long debtPositionTypeOrgId) {
     return DebtPositionDTO.builder()
       .iupdOrg(installmentSynchronizeDTO.getIupdOrg())
       .description(installmentSynchronizeDTO.getDescription())
       .debtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL)
+      .debtPositionTypeOrgId(debtPositionTypeOrgId)
       .organizationId(installmentSynchronizeDTO.getOrganizationId())
       .validityDate(installmentSynchronizeDTO.getValidityDate())
       .multiDebtor(installmentSynchronizeDTO.getMultiDebtor())
@@ -24,7 +25,6 @@ public class InstallmentSynchronizeMapper {
 
   public PaymentOptionDTO map2PaymentOptionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO){
     return PaymentOptionDTO.builder()
-      .totalAmountCents(Utilities.amountToCents(installmentSynchronizeDTO.getAmount()))
       .paymentOptionIndex(installmentSynchronizeDTO.getPaymentOptionIndex())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
       .description(installmentSynchronizeDTO.getPaymentOptionDescription())

@@ -10,9 +10,9 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @RepositoryRestResource(path = "installments")
 public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoPII, Long> {
@@ -54,8 +54,28 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Query(value = "SELECT i from InstallmentNoPII i " +
     "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
     "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
-    "WHERE dp.iupdOrg = :iupdOrg AND " +
+    "WHERE dp.organizationId = :organizationId AND " +
     "i.iud = :iud AND " +
-    "(:installmentStatusSet IS null OR i.status in :installmentStatusSet)")
-  Optional<InstallmentNoPII> getByIudAndOrganizationIdAndStatuses(String iud, String iupdOrg, Set<InstallmentStatus> installmentStatusSet);
+    "(:iuv IS NOT NULL AND i.iuv = :iuv) AND " +
+    "po.paymentOptionIndex = :paymentOptionIndex")
+  Optional<InstallmentNoPII> getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(Long organizationId, String iud, Integer paymentOptionIndex, String iuv);
+
+  @Query(value = "SELECT i from InstallmentNoPII i " +
+    "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
+    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
+    "WHERE dp.organizationId = :organizationId AND " +
+    "i.iud = :iud AND " +
+    "(:iuv IS NOT NULL AND i.iuv = :iuv)")
+  Optional<InstallmentNoPII> getByIupdOrgAndIudAndIuv(String iupdOrg, String iud, String iuv);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i " +
+    "SET i.dueDate = :dueDate, i.amountCents = :amountCents, i.remittanceInformation = remittanceInformation, " +
+    "i.balance = :balance, i.legacyPaymentMetadata = :legacyPaymentMetadata, i.notificationDate = :notificationDate" +
+    "WHERE i.installmentId = :installmentId")
+  void update(Long installmentId, OffsetDateTime dueDate, Long amountCents, String remittanceInformation,
+              String balance, String legacyPaymentMetadata, OffsetDateTime notificationDate);
+
 }
