@@ -10,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPosi
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
 import java.util.Set;
 
 @Service
@@ -60,16 +59,16 @@ public class InsertInstallmentServiceImpl {
         storedPaymentOptionDTO.getPaymentOptionId(), storedPaymentOptionDTO.getStatus()));
     }
 
-    Optional<InstallmentNoPII> storedInstallment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
+    InstallmentNoPII storedInstallment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
       debtPositionSynchronizeDTO.getOrganizationId(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv()
-    );
+    ).orElse(null);
 
-    if (storedInstallment.map(i -> !installmentStatusesValidForInsertion.contains(i.getStatus())).orElse(false)) {
+    if (storedInstallment != null && !installmentStatusesValidForInsertion.contains(storedInstallment.getStatus())) {
       throw new ConflictErrorException(String.format("The installment with id %s cannot be created because it already exists in a not modifiable status: %s",
-        storedInstallment.get().getInstallmentId(), storedInstallment.get().getStatus()));
+        storedInstallment.getInstallmentId(), storedInstallment.getStatus()));
     }
 
     InstallmentDTO installmentSyncDTO = debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
