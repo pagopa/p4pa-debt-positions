@@ -64,8 +64,6 @@ public class UpdateDebtPositionServiceImpl implements UpdateDebtPositionService 
         modifyPaymentOption(po, paymentOptionSynchronizeDTO);
       });
 
-    debtPositionProcessorService.synchronizeAmountsAndStatus(fullDebtPositionDTO, installmentDTO);
-
     WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, massive, PaymentEventType.DP_UPDATED, accessToken);
     return workflowCreatedDTO.getWorkflowId();
   }
