@@ -53,7 +53,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<Void> installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive){
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    String workflowId = debtPositionMassiveService.installmentSynchronize(installmentSynchronizeDTO, accessToken, operatorExternalUserId);
+    String workflowId = debtPositionMassiveService.installmentSynchronize(installmentSynchronizeDTO, massive, accessToken, operatorExternalUserId);
     HttpHeaders headers = new HttpHeaders();
     headers.add("workflow-id", workflowId);
     return new ResponseEntity<>(headers, HttpStatus.CREATED);

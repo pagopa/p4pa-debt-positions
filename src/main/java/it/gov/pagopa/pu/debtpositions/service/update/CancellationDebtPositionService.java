@@ -4,5 +4,5 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 
 public interface CancellationDebtPositionService {
 
-  String cancelInstallment(InstallmentDTO installmentDTO, String accessToken);
+  String cancelInstallment(InstallmentDTO installmentDTO, Boolean massive, String accessToken);
 }

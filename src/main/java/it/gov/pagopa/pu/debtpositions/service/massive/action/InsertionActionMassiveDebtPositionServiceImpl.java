@@ -32,9 +32,7 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
     }
 
     @Override
-    public String handleInsertion(DebtPositionDTO debtPositionSynchronizeDTO, DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
-        boolean massive = false; //TODO change in true when GPD massive is ready
-
+    public String handleInsertion(DebtPositionDTO debtPositionSynchronizeDTO, DebtPosition debtPosition, Boolean massive, String accessToken, String operatorExternalUserId) {
         Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
                 debtPositionSynchronizeDTO.getOrganizationId(),
                 debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),

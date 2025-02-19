@@ -8,7 +8,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.CancellationDebtPositionService;
-import it.gov.pagopa.pu.debtpositions.service.update.ModificationDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.update.UpdateDebtPositionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,29 +20,29 @@ public class UpdateActionMassiveDebtPositionServiceImpl implements UpdateActionM
 
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final InstallmentMapper installmentMapper;
-  private final ModificationDebtPositionService modificationDebtPositionService;
+  private final UpdateDebtPositionService updateDebtPositionService;
   private final CancellationDebtPositionService cancellationDebtPositionService;
 
   private static final Set<InstallmentStatus> installmentStatusesValidForUpdate =
     Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
 
-  public UpdateActionMassiveDebtPositionServiceImpl(InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, ModificationDebtPositionService modificationDebtPositionService, CancellationDebtPositionService cancellationDebtPositionService) {
+  public UpdateActionMassiveDebtPositionServiceImpl(InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, UpdateDebtPositionService updateDebtPositionService, CancellationDebtPositionService cancellationDebtPositionService) {
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.installmentMapper = installmentMapper;
-    this.modificationDebtPositionService = modificationDebtPositionService;
+    this.updateDebtPositionService = updateDebtPositionService;
     this.cancellationDebtPositionService = cancellationDebtPositionService;
   }
 
   @Override
-  public String handleModification(DebtPositionDTO debtPositionSynchronizeDTO, String accessToken) {
+  public String handleUpdate(DebtPositionDTO debtPositionSynchronizeDTO, Boolean massive, String accessToken) {
     InstallmentDTO installment = checkUpdateProcessable(debtPositionSynchronizeDTO);
-    return modificationDebtPositionService.modifyDebtPosition(debtPositionSynchronizeDTO, installment, accessToken);
+    return updateDebtPositionService.updateDebtPositionByInstallment(debtPositionSynchronizeDTO, massive, installment, accessToken);
   }
 
   @Override
-  public String handleCancellation(DebtPositionDTO debtPositionSynchronizeDTO, String accessToken) {
+  public String handleCancellation(DebtPositionDTO debtPositionSynchronizeDTO, Boolean massive, String accessToken) {
     InstallmentDTO installment = checkUpdateProcessable(debtPositionSynchronizeDTO);
-    return cancellationDebtPositionService.cancelInstallment(installment, accessToken);
+    return cancellationDebtPositionService.cancelInstallment(installment, massive, accessToken);
   }
 
   public InstallmentDTO checkUpdateProcessable(DebtPositionDTO debtPositionSynchronizeDTO) {

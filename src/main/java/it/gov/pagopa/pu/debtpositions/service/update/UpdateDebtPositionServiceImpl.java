@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class ModificationDebtPositionServiceImpl implements ModificationDebtPositionService {
+public class UpdateDebtPositionServiceImpl implements UpdateDebtPositionService {
 
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
@@ -25,7 +25,7 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
   private final DebtPositionProcessorService debtPositionProcessorService;
   private final DebtPositionSyncService debtPositionSyncService;
 
-  public ModificationDebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionRepository paymentOptionRepository, DebtPositionProcessorService debtPositionProcessorService, DebtPositionSyncService debtPositionSyncService) {
+  public UpdateDebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionRepository paymentOptionRepository, DebtPositionProcessorService debtPositionProcessorService, DebtPositionSyncService debtPositionSyncService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
@@ -35,9 +35,7 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
   }
 
   @Override
-  public String modifyDebtPosition(DebtPositionDTO debtPositionSynchronizeDTO, InstallmentDTO installmentDTO, String accessToken) {
-    boolean massive = false; //TODO change in true when GPD massive is ready
-
+  public String updateDebtPositionByInstallment(DebtPositionDTO debtPositionSynchronizeDTO, Boolean massive, InstallmentDTO installmentDTO, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installmentDTO.getInstallmentId());
     DebtPositionDTO fullDebtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
 
@@ -62,18 +60,18 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
         po.getInstallments().stream()
           .filter(installment -> installment.getInstallmentId().equals(installmentDTO.getInstallmentId()))
           .findFirst()
-          .ifPresent(installment -> updateInstallment(installment, installmentSynchronizeDTO));
-        updatePaymentOption(po, paymentOptionSynchronizeDTO);
+          .ifPresent(installment -> modifyInstallment(installment, installmentSynchronizeDTO));
+        modifyPaymentOption(po, paymentOptionSynchronizeDTO);
       });
 
     debtPositionProcessorService.synchronizeAmountsAndStatus(fullDebtPositionDTO, installmentDTO);
 
     WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, massive, PaymentEventType.DP_UPDATED, accessToken);
     return workflowCreatedDTO.getWorkflowId();
-
   }
 
-  private void updateInstallment(InstallmentDTO installmentDTO, InstallmentDTO installmentSynchronizeDTO) {
+  @Override
+  public void modifyInstallment(InstallmentDTO installmentDTO, InstallmentDTO installmentSynchronizeDTO) {
     installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
     installmentDTO.setDueDate(installmentSynchronizeDTO.getDueDate());
     installmentDTO.setAmountCents(installmentSynchronizeDTO.getAmountCents());
@@ -82,13 +80,16 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
     installmentDTO.setLegacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata());
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
 
+    // TODO set also SyncStatus
+
     installmentNoPIIRepository.update(installmentDTO.getInstallmentId(), InstallmentStatus.TO_SYNC,
       installmentSynchronizeDTO.getDueDate(), installmentSynchronizeDTO.getAmountCents(),
       installmentSynchronizeDTO.getRemittanceInformation(), installmentSynchronizeDTO.getBalance(),
       installmentSynchronizeDTO.getLegacyPaymentMetadata(), installmentSynchronizeDTO.getNotificationDate());
   }
 
-  private void updatePaymentOption(PaymentOptionDTO paymentOptionDTO, PaymentOptionDTO paymentOptionSynchronizeDTO) {
+  @Override
+  public void modifyPaymentOption(PaymentOptionDTO paymentOptionDTO, PaymentOptionDTO paymentOptionSynchronizeDTO) {
     paymentOptionDTO.setDescription(paymentOptionSynchronizeDTO.getDescription());
     paymentOptionDTO.setStatus(PaymentOptionStatus.TO_SYNC);
     debtPositionProcessorService.updatePaymentOptionAmounts(paymentOptionDTO);
@@ -98,7 +99,8 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
       paymentOptionSynchronizeDTO.getDescription());
   }
 
-  private void updateDebtPosition(DebtPositionDTO debtPositionDTO, DebtPositionDTO debtPositionSynchronizeDTO) {
+  @Override
+  public void updateDebtPosition(DebtPositionDTO debtPositionDTO, DebtPositionDTO debtPositionSynchronizeDTO) {
     debtPositionDTO.setDescription(debtPositionSynchronizeDTO.getDescription());
     debtPositionDTO.setValidityDate(debtPositionSynchronizeDTO.getValidityDate());
     debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);

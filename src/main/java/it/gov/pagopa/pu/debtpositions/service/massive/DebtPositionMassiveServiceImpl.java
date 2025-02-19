@@ -47,7 +47,7 @@ public class DebtPositionMassiveServiceImpl implements DebtPositionMassiveServic
 
 
   @Override
-  public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken, String operatorExternalUserId) {
+  public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionSynchronizeDTO = createDpFromInstallmentSynchronize(installmentSynchronizeDTO, accessToken);
 
     DebtPosition debtPosition = checkProcessableDebtPosition(debtPositionSynchronizeDTO.getIupdOrg());
@@ -56,14 +56,12 @@ public class DebtPositionMassiveServiceImpl implements DebtPositionMassiveServic
     InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
     switch (action) {
       case InstallmentSynchronizeDTO.ActionEnum.I ->
-        workflowId = insertionActionMassiveDebtPositionService.handleInsertion(debtPositionSynchronizeDTO, debtPosition, accessToken, operatorExternalUserId);
+        workflowId = insertionActionMassiveDebtPositionService.handleInsertion(debtPositionSynchronizeDTO, debtPosition, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.M ->
-        workflowId = updateActionMassiveDebtPositionService.handleModification(debtPositionSynchronizeDTO, accessToken);
+        workflowId = updateActionMassiveDebtPositionService.handleUpdate(debtPositionSynchronizeDTO, massive,  accessToken);
       case InstallmentSynchronizeDTO.ActionEnum.A ->
-        workflowId = updateActionMassiveDebtPositionService.handleCancellation(debtPositionSynchronizeDTO, accessToken);
+        workflowId = updateActionMassiveDebtPositionService.handleCancellation(debtPositionSynchronizeDTO, massive, accessToken);
     }
-
-    //dopo rischedulazione workflow scadenza
 
     return workflowId;
   }
@@ -87,7 +85,7 @@ public class DebtPositionMassiveServiceImpl implements DebtPositionMassiveServic
     TransferSynchronizeDTO firstTransfer = TransferSynchronizeDTO.builder()
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(debtPositionTypeOrg.getIban())
+      .iban(debtPositionTypeOrg.getIban().isBlank() ? organization.getIban() : debtPositionTypeOrg.getIban())
       .category(category)
       .amount(installmentSynchronizeDTO.getAmount().min(totalAmountOtherTransfers))
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
