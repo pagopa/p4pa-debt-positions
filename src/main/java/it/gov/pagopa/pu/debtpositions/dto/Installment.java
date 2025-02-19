@@ -18,7 +18,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Installment {
+public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIIDTO> {
 
   private Long installmentId;
   private Long paymentOptionId;

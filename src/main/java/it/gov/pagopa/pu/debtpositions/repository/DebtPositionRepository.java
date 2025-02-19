@@ -41,9 +41,6 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByTransferId(@Param("transferId") Long transferId);
 
-  @EntityGraph(value = "completeDebtPosition")
-  Optional<DebtPosition> findByIupdOrg(String iupdOrg);
-
   @Query("""
    SELECT d
    FROM DebtPosition d
@@ -56,6 +53,9 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
+
+  @EntityGraph(value = "completeDebtPosition")
+  Optional<DebtPosition> findByIupdOrg(String iupdOrg);
 
   @RestResource(exported = false)
   @Transactional

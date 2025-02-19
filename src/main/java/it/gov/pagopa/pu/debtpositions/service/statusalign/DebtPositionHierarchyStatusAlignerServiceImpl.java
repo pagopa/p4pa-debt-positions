@@ -134,7 +134,8 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     return alignHierarchyStatus(debtPosition);
   }
 
-  private DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition) {
+  @Override
+  public DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition) {
     debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
     debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
 

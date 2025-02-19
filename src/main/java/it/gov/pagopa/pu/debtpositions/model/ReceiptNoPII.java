@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ReceiptNoPII extends BaseEntity implements Serializable {
+public class ReceiptNoPII extends BaseEntity implements Serializable, NoPIIEntity<ReceiptPIIDTO> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "receipt_generator")

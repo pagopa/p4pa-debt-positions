@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -58,26 +59,8 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "  join DebtPosition dp" +
           "    on po.debtPositionId = dp.debtPositionId" +
           " where dp.organizationId = :organizationId" +
+          "   and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))" +
           "   and i.nav = :nav")
-  List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav);
-
-  @Query(value = "SELECT i from InstallmentNoPII i " +
-    "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
-    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
-    "WHERE dp.organizationId = :organizationId AND " +
-    "i.iud = :iud AND " +
-    "(:iuv IS NOT NULL AND i.iuv = :iuv) AND " +
-    "po.paymentOptionIndex = :paymentOptionIndex")
-  Optional<InstallmentNoPII> getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(Long organizationId, String iud, Integer paymentOptionIndex, String iuv);
-
-  @RestResource(exported = false)
-  @Transactional
-  @Modifying
-  @Query("UPDATE InstallmentNoPII i " +
-    "SET i.status = :status, i.dueDate = :dueDate, i.amountCents = :amountCents, i.remittanceInformation = remittanceInformation, " +
-    "i.balance = :balance, i.legacyPaymentMetadata = :legacyPaymentMetadata, i.notificationDate = :notificationDate" +
-    "WHERE i.installmentId = :installmentId")
-  void update(Long installmentId, InstallmentStatus status, OffsetDateTime dueDate, Long amountCents, String remittanceInformation,
-              String balance, String legacyPaymentMetadata, OffsetDateTime notificationDate);
-
+  List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
+                                                   @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 }

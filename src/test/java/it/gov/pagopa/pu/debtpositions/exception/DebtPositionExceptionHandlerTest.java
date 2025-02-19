@@ -156,6 +156,16 @@ class DebtPositionExceptionHandlerTest {
   }
 
   @Test
+  void handleInvalidInstallmentStatusExceptionError() throws Exception {
+    doThrow(new InvalidInstallmentStatusException("Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isBadRequest())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
+  }
+
+  @Test
   void handleMissingServletRequestParameterException() throws Exception {
 
     performRequest(null, MediaType.APPLICATION_JSON)
