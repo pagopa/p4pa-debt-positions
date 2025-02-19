@@ -1,14 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.service.massive;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.massive.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.*;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.service.massive.action.InsertionActionMassiveDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.massive.action.UpdateActionMassiveDebtPositionService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -18,7 +22,6 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -111,78 +114,6 @@ public class DebtPositionMassiveServiceImpl implements DebtPositionMassiveServic
     }
     return debtPosition.orElse(null);
   }
-
-
-//  private String processNewDp(DebtPositionDTO debtPositionDTO, String action, String accessToken, String operatorExternalUserId) {
-//    String workflowId = null;
-//    if (debtPositionDTO.getIupdOrg() != null) {
-//      throw new ConflictErrorException(String.format("There is another debt position with iupd %s requested but different origin", debtPositionDTO.getIupdOrg()));
-//    } else {
-//      if (IngestionFlowRowAction.I.name().equals(action)) {
-//        workflowId = createDebtPositionService.createDebtPosition(debtPositionDTO, true, accessToken, operatorExternalUserId).getRight();
-//      } else {
-//        Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByOrganizationIdAndIudAndIuv(
-//          debtPositionDTO.getOrganizationId(),
-//          debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
-//          debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv()
-//        );
-//        if (installment.isPresent() && installmentStatusesValidForModification.contains(installment.get().getStatus())) {
-//          DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.get().getInstallmentId());
-//          // update DP, PO, IN, TR
-//          // update importi/stati
-//        } else {
-//          throw new ConflictErrorException("The installment cannot be modified or cancelled because it doesn't exist or is not in an allowed status");
-//        }
-//      }
-//    }
-//    return workflowId;
-//  }
-
-  //  private String processExistingDp(DebtPositionDTO debtPositionDTO, String action, DebtPosition debtPosition) {
-//    Optional<PaymentOption> paymentOption = paymentOptionRepository.getByPaymentOptionIndexAndIupdOrg(
-//      debtPositionDTO.getPaymentOptions().getFirst().getPaymentOptionIndex(),
-//      debtPositionDTO.getIupdOrg());
-//    if (paymentOption.isEmpty()) {
-//      processNewPaymentOption(debtPosition, action);
-//    } else {
-//      if (!(Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID).contains(debtPosition.getStatus()) &&
-//        Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID).contains(paymentOption.get().getStatus()))) {
-//      }
-//      processExistingPaymentOption();
-//    }
-//    return "";
-//  }
-//
-//  private void processNewPaymentOption(DebtPosition debtPosition, String action){
-//    if (!IngestionFlowRowAction.I.name().equals(action)) {
-//      throw new ConflictErrorException("The payment option cannot be modified or cancelled because it doesn't exist");
-//    }
-//    if (!Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.DRAFT).contains(debtPosition.getStatus())) {
-//      throw new ConflictErrorException("The payment option cannot be created because the debt position is not in an allowed status");
-//    }
-//    // creo PO, IN, TR in stato UNPAID
-//  }
-//
-//  private void processExistingPaymentOption(DebtPositionDTO debtPositionDTO, String action){
-//    InstallmentDTO newInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
-//    Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByIupdOrgAndIudAndIuv(debtPositionDTO.getIupdOrg(),
-//      newInstallment.getIud(),
-//      newInstallment.getIuv());
-//
-//    if (IngestionFlowRowAction.I.name().equals(action)) {
-//      if(installment.isPresent() && !installmentStatusesValidForInsertion.contains(installment.get().getStatus())){
-//        throw new ConflictErrorException("The installment cannot be created because it already exists");
-//      }
-//      // crea IN, TR in stato UNPAID
-//    } else {
-//      if (installment.isEmpty()) {
-//        throw new ConflictErrorException("The installment cannot be modified or cancelled because it doesn't exist");
-//      }
-//      checkInstallmentIfProcessable(installment.get(), newInstallment);
-//      //aggiorna IN, ecc
-//    }
-//  }
-//
 
 }
 

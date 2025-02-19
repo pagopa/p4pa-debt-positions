@@ -44,6 +44,7 @@ public interface PaymentOptionRepository extends JpaRepository<PaymentOption, Lo
   @Query("UPDATE PaymentOption p " +
     "SET p.totalAmountCents = :totalAmountCents " +
     "WHERE p.paymentOptionId = :paymentOptionId")
-  void updateTotalAmounts(@Param("paymentOptionId") Long paymentOptionId, @Param("totalAmountCents") Long totalAmountCents);
+  void updateStatusAndTotalAmounts(@Param("paymentOptionId") Long paymentOptionId,
+                                   @Param("status") PaymentOptionStatus status, @Param("totalAmountCents") Long totalAmountCents);
 
 }

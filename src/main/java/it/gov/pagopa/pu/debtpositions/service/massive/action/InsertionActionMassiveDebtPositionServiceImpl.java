@@ -1,20 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service.massive.action;
 
-import io.micrometer.common.util.StringUtils;
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
-import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -67,8 +59,6 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
                 .findFirst()
                 .orElse(null);
 
-
-
         if (paymentOptionDTO != null) {
             if (!paymentOptionStatusesValidForInsertion.contains(paymentOptionDTO.getStatus())) {
                 throw new ConflictErrorException("The installment cannot created because the payment option is not in an allowed status");
@@ -78,7 +68,7 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
                     .getRight();
         }
 
-        return createDebtPositionService.createPaymentOption(debtPositionSynchronizeDTO, true, accessToken,
+        return createDebtPositionService.createPaymentOption(debtPositionDTO, true, accessToken,
                         debtPositionSynchronizeDTO.getPaymentOptions().getFirst())
                 .getRight();
     }

@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -26,8 +27,10 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @RestResource(exported = false)
   @Transactional
   @Modifying
-  @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
-  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
+  @Query("UPDATE InstallmentNoPII i SET i.status = :status, " +
+    "i.syncStatusFrom = :syncStatus?.syncStatusFrom, i.syncStatusTo = :syncStatus?.syncStatusTo" +
+    " WHERE i.installmentId = :installmentId")
+  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status, @Param("syncStatus") InstallmentSyncStatus syncStatus);
 
   @Query("""
     SELECT COUNT(i)
@@ -59,14 +62,6 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "(:iuv IS NOT NULL AND i.iuv = :iuv) AND " +
     "po.paymentOptionIndex = :paymentOptionIndex")
   Optional<InstallmentNoPII> getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(Long organizationId, String iud, Integer paymentOptionIndex, String iuv);
-
-  @Query(value = "SELECT i from InstallmentNoPII i " +
-    "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
-    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
-    "WHERE dp.organizationId = :organizationId AND " +
-    "i.iud = :iud AND " +
-    "(:iuv IS NOT NULL AND i.iuv = :iuv)")
-  Optional<InstallmentNoPII> getByIupdOrgAndIudAndIuv(String iupdOrg, String iud, String iuv);
 
   @RestResource(exported = false)
   @Transactional

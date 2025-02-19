@@ -4,8 +4,10 @@ import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -29,16 +31,18 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final TransferRepository transferRepository;
   private final DebtPositionMapper debtPositionMapper;
   private final InstallmentMapper installmentMapper;
+  private final PaymentOptionMapper paymentOptionMapper;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository, PaymentOptionRepository paymentOptionRepository,
                                  InstallmentPIIRepository installmentRepository, TransferRepository transferRepository,
-                                 DebtPositionMapper debtPositionMapper, InstallmentMapper installmentMapper) {
+                                 DebtPositionMapper debtPositionMapper, InstallmentMapper installmentMapper, PaymentOptionMapper paymentOptionMapper) {
     this.debtPositionRepository = debtPositionRepository;
     this.paymentOptionRepository = paymentOptionRepository;
     this.installmentRepository = installmentRepository;
     this.transferRepository = transferRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentMapper = installmentMapper;
+    this.paymentOptionMapper = paymentOptionMapper;
   }
 
   @Transactional
@@ -76,7 +80,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public InstallmentDTO saveSingleInstallment(InstallmentDTO installmentDTO){
+  public InstallmentDTO saveNewInstallment(InstallmentDTO installmentDTO) {
     Installment mappedInstallment = installmentMapper.mapToModel(installmentDTO);
 
     if (StringUtils.isBlank(mappedInstallment.getIud())) {
@@ -91,6 +95,33 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     });
 
     return installmentMapper.mapToDto(savedInstallment);
+  }
+
+  @Override
+  public PaymentOptionDTO saveNewPaymentOption(PaymentOptionDTO paymentOptionDTO) {
+    Pair<PaymentOption, Map<InstallmentNoPII, Installment>> mappedPaymentOption = paymentOptionMapper.mapToModel(paymentOptionDTO);
+    PaymentOption savedPaymentOption = paymentOptionRepository.save(mappedPaymentOption.getFirst());
+
+    savedPaymentOption.getInstallments().forEach(installmentNoPII -> {
+      Installment mappedInstallment = mappedPaymentOption.getSecond().get(installmentNoPII);
+      mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+      if (StringUtils.isBlank(mappedInstallment.getIud())) {
+        String iud = Utilities.getRandomIUD();
+        mappedInstallment.setIud(iud);
+        installmentNoPII.setIud(iud);
+      }
+      InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment);
+      installmentNoPII.setPersonalDataId(savedInstallment.getPersonalDataId());
+      installmentNoPII.setInstallmentId(savedInstallment.getInstallmentId());
+      installmentNoPII.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+
+      mappedInstallment.getTransfers().forEach(transfer -> {
+        transfer.setInstallmentId(savedInstallment.getInstallmentId());
+        transferRepository.save(transfer);
+      });
+    });
+
+    return paymentOptionMapper.mapToDto(savedPaymentOption);
   }
 }
 

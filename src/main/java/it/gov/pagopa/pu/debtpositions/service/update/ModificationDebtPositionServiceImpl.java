@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class ModificationDebtPositionServiceImpl implements ModificationDebtPositionService {
 
-
   @Override
   public String modifyDebtPosition(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
     return "";
