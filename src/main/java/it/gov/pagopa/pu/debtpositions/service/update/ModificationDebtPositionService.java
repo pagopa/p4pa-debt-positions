@@ -5,5 +5,5 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 
 public interface ModificationDebtPositionService {
 
-  String modifyDebtPosition(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO);
+  String modifyDebtPosition(DebtPositionDTO debtPositionSynchronizeDTO, InstallmentDTO installmentDTO, String accessToken);
 }

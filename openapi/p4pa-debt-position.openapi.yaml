@@ -880,7 +880,7 @@ components:
         - debtPositionTypeCode
         - remittanceInformation
         - legacyPaymentMetadata
-        - flagGenerateIuv
+        - flagPagoPaPayment
       type: object
       properties:
         ingestionFlowFileId:

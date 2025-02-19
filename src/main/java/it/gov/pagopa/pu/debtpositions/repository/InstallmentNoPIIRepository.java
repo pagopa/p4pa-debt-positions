@@ -27,10 +27,17 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @RestResource(exported = false)
   @Transactional
   @Modifying
+  @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
+  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
+
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.status = :status, " +
     "i.syncStatusFrom = :syncStatus?.syncStatusFrom, i.syncStatusTo = :syncStatus?.syncStatusTo" +
     " WHERE i.installmentId = :installmentId")
-  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status, @Param("syncStatus") InstallmentSyncStatus syncStatus);
+  void updateStatusAndSyncStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status, @Param("syncStatus") InstallmentSyncStatus syncStatus);
 
   @Query("""
     SELECT COUNT(i)
@@ -67,10 +74,10 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Transactional
   @Modifying
   @Query("UPDATE InstallmentNoPII i " +
-    "SET i.dueDate = :dueDate, i.amountCents = :amountCents, i.remittanceInformation = remittanceInformation, " +
+    "SET i.status = :status, i.dueDate = :dueDate, i.amountCents = :amountCents, i.remittanceInformation = remittanceInformation, " +
     "i.balance = :balance, i.legacyPaymentMetadata = :legacyPaymentMetadata, i.notificationDate = :notificationDate" +
     "WHERE i.installmentId = :installmentId")
-  void update(Long installmentId, OffsetDateTime dueDate, Long amountCents, String remittanceInformation,
+  void update(Long installmentId, InstallmentStatus status, OffsetDateTime dueDate, Long amountCents, String remittanceInformation,
               String balance, String legacyPaymentMetadata, OffsetDateTime notificationDate);
 
 }

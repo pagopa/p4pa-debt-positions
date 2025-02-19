@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import org.springframework.stereotype.Service;
 
@@ -8,9 +9,11 @@ import org.springframework.stereotype.Service;
 public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorService {
 
   private final PaymentOptionRepository paymentOptionRepository;
+  private final DebtPositionRepository debtPositionRepository;
 
-  public DebtPositionProcessorServiceImpl(PaymentOptionRepository paymentOptionRepository) {
+  public DebtPositionProcessorServiceImpl(PaymentOptionRepository paymentOptionRepository, DebtPositionRepository debtPositionRepository) {
     this.paymentOptionRepository = paymentOptionRepository;
+    this.debtPositionRepository = debtPositionRepository;
   }
 
   @Override
@@ -49,6 +52,8 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
         });
 
       debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+      debtPositionRepository.updateStatus(debtPositionDTO.getDebtPositionId(),
+        debtPositionDTO.getStatus());
     }
   }
 }

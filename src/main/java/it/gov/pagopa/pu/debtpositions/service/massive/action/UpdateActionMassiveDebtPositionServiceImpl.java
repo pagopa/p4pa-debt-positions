@@ -23,7 +23,8 @@ public class UpdateActionMassiveDebtPositionServiceImpl implements UpdateActionM
   private final ModificationDebtPositionService modificationDebtPositionService;
   private final CancellationDebtPositionService cancellationDebtPositionService;
 
-  private static final Set<InstallmentStatus> installmentStatusesValidForModification = Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
+  private static final Set<InstallmentStatus> installmentStatusesValidForUpdate =
+    Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
 
   public UpdateActionMassiveDebtPositionServiceImpl(InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, ModificationDebtPositionService modificationDebtPositionService, CancellationDebtPositionService cancellationDebtPositionService) {
     this.installmentNoPIIRepository = installmentNoPIIRepository;
@@ -35,7 +36,7 @@ public class UpdateActionMassiveDebtPositionServiceImpl implements UpdateActionM
   @Override
   public String handleModification(DebtPositionDTO debtPositionSynchronizeDTO, String accessToken) {
     InstallmentDTO installment = checkUpdateProcessable(debtPositionSynchronizeDTO);
-    return modificationDebtPositionService.modifyDebtPosition(debtPositionSynchronizeDTO, installment);
+    return modificationDebtPositionService.modifyDebtPosition(debtPositionSynchronizeDTO, installment, accessToken);
   }
 
   @Override
@@ -56,7 +57,7 @@ public class UpdateActionMassiveDebtPositionServiceImpl implements UpdateActionM
       throw new ConflictErrorException("The installment cannot be modified because it doesn't exist");
     }
 
-    if (!installmentStatusesValidForModification.contains(installment.getStatus())) {
+    if (!installmentStatusesValidForUpdate.contains(installment.getStatus())) {
       throw new ConflictErrorException("The installment cannot be modified because is not in an allowed status");
     }
 
@@ -69,7 +70,7 @@ public class UpdateActionMassiveDebtPositionServiceImpl implements UpdateActionM
     if (InstallmentStatus.TO_SYNC.equals(installment.getStatus())) {
       if (!installmentDTO.getIngestionFlowFileId().equals(installment.getIngestionFlowFileId())) {
         throw new ConflictErrorException("The installment cannot be modified because there was an error in the previous synchronization");
-      } else if (installment.getSyncStatus() != null && !installmentStatusesValidForModification.contains(installment.getSyncStatus().getSyncStatusTo())) {
+      } else if (installment.getSyncStatus() != null && !installmentStatusesValidForUpdate.contains(installment.getSyncStatus().getSyncStatusTo())) {
         throw new ConflictErrorException("The installment cannot be modified because is not in an allowed status");
       }
     }

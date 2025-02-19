@@ -39,7 +39,7 @@ public class CancellationDebtPositionServiceImpl implements CancellationDebtPosi
     installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
     installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
     log.info("Updating status cancelled for installment with id {}", installmentDTO.getInstallmentId());
-    installmentNoPIIRepository.updateStatus(installmentDTO.getInstallmentId(),
+    installmentNoPIIRepository.updateStatusAndSyncStatus(installmentDTO.getInstallmentId(),
       installmentDTO.getStatus(), installmentDTO.getSyncStatus());
 
     //find the DP associated
