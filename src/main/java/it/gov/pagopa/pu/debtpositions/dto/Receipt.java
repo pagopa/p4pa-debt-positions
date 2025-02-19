@@ -15,7 +15,7 @@ import java.time.OffsetDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Receipt {
+public class Receipt implements FullPIIDTO<ReceiptNoPII, ReceiptPIIDTO> {
 
   private Long receiptId;
   private Long ingestionFlowFileId;

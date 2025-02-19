@@ -8,32 +8,43 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReceiptPIIRepositoryImpl implements ReceiptPIIRepository {
+public class ReceiptPIIRepositoryImpl extends BasePIIRepository<Receipt, ReceiptNoPII, ReceiptPIIDTO, Long> implements ReceiptPIIRepository {
 
   private final ReceiptPIIMapper receiptPIIMapper;
-  private final PersonalDataService personalDataService;
   private final ReceiptNoPIIRepository receiptNoPIIRepository;
 
   public ReceiptPIIRepositoryImpl(ReceiptPIIMapper receiptPIIMapper, PersonalDataService personalDataService, ReceiptNoPIIRepository receiptNoPIIRepository) {
+    super(receiptPIIMapper, personalDataService, receiptNoPIIRepository);
     this.receiptPIIMapper = receiptPIIMapper;
-    this.personalDataService = personalDataService;
     this.receiptNoPIIRepository = receiptNoPIIRepository;
   }
 
   @Override
-  public long save(Receipt receipt) {
-    Pair<ReceiptNoPII, ReceiptPIIDTO> p = receiptPIIMapper.map(receipt);
-    long personalDataId = personalDataService.insert(p.getSecond(), PersonalDataType.RECEIPT);
-    p.getFirst().setPersonalDataId(personalDataId);
-    receipt.setNoPII(p.getFirst());
-    long newId = receiptNoPIIRepository.save(p.getFirst()).getReceiptId();
-    receipt.setReceiptId(newId);
-    receipt.getNoPII().setReceiptId(newId);
-    return newId;
+  void setId(Receipt fullDTO, Long id) {
+    fullDTO.setReceiptId(id);
+  }
+
+  @Override
+  void setId(ReceiptNoPII noPii, Long id) {
+    noPii.setReceiptId(id);
+  }
+
+  @Override
+  Long getId(ReceiptNoPII noPii) {
+    return noPii.getReceiptId();
+  }
+
+  @Override
+  Class<ReceiptPIIDTO> getPIITDTOClass() {
+    return ReceiptPIIDTO.class;
+  }
+
+  @Override
+  PersonalDataType getPIIPersonalDataType() {
+    return PersonalDataType.RECEIPT;
   }
 
   @Override

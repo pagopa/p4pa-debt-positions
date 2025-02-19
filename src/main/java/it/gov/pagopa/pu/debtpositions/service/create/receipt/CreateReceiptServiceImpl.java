@@ -70,12 +70,9 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
   private void saveReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     Receipt receipt = receiptMapper.mapToModel(receiptDTO);
-    long newId = receiptPIIRepository.save(receipt);
+    long newId = receiptPIIRepository.save(receipt).getReceiptId();
     receiptDTO.setReceiptId(newId);
     log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), newId);
   }
-
-
-
 
 }

@@ -47,10 +47,10 @@ class CreateReceiptServiceImplTest {
     receipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptModel = podamFactory.manufacturePojo(Receipt.class);
     receiptId = receiptModel.getReceiptId();
-    receiptModel.setReceiptId(null);
+    receiptModel.setNoPII(null);
 
     if (!info.getTags().contains("alreadyHandled")) {
-      Mockito.when(receiptPIIRepositoryMock.save(receiptModel)).thenReturn(receiptId);
+      Mockito.when(receiptPIIRepositoryMock.save(receiptModel)).thenReturn(receiptModel);
       Mockito.when(receiptMapperMock.mapToModel(receipt)).thenReturn(receiptModel);
       Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receipt.getPaymentReceiptId())).thenReturn(null);
     }

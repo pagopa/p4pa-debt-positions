@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class ReceiptPIIDTO {
+public class ReceiptPIIDTO implements PIIDTO {
   private Person debtor;
   private Person payer;
 }
