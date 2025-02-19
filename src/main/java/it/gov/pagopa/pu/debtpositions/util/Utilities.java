@@ -64,10 +64,12 @@ public class Utilities {
   }
 
   public static String generateRandomIupd(String orgFiscalCode) {
+    String uuid = UUID.randomUUID().toString();
+    String lastUuidPart = uuid.substring(uuid.length() - 12);
     return String.join("-",
       orgFiscalCode,
-      LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyMMdd")),
-      UUID.randomUUID().toString().substring(15)
+      LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss")),
+      lastUuidPart
     );
   }
 }
