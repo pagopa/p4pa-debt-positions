@@ -35,8 +35,9 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
 
     Pair<Long, Optional<P>> piiId2OldPii = retrievePII(p.getFirst());
     boolean pii2create = piiId2OldPii==null ||
-      piiId2OldPii.getSecond().isEmpty() ||
-      !p.getSecond().equals(piiId2OldPii.getSecond().get());
+      piiId2OldPii.getSecond()
+        .map(o -> !o.equals(p.getSecond()))
+        .orElse(false);
 
     if (piiId2OldPii != null && pii2create) {
       personalDataService.delete(piiId2OldPii.getFirst());
