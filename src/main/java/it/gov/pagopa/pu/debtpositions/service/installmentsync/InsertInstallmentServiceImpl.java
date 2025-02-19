@@ -41,6 +41,24 @@ public class InsertInstallmentServiceImpl {
         storedDebtPosition.getDebtPositionId(), storedDebtPosition.getStatus()));
     }
 
+    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(storedDebtPosition);
+
+    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
+      .filter(po -> po.getPaymentOptionIndex().equals(debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex()))
+      .findFirst()
+      .orElse(null);
+
+    if (paymentOptionDTO == null) {
+      return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken,
+          debtPositionSynchronizeDTO.getPaymentOptions().getFirst())
+        .getRight();
+    }
+
+    if (!paymentOptionStatusesValidForInsertion.contains(paymentOptionDTO.getStatus())) {
+      throw new ConflictErrorException(String.format("The installment cannot created because the payment option with id %s is not in an allowed status %s",
+        paymentOptionDTO.getPaymentOptionId(), paymentOptionDTO.getStatus()));
+    }
+
     Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
       debtPositionSynchronizeDTO.getOrganizationId(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
@@ -53,25 +71,9 @@ public class InsertInstallmentServiceImpl {
         installment.get().getInstallmentId(), installment.get().getStatus()));
     }
 
-    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(storedDebtPosition);
-
-    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionIndex().equals(debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex()))
-      .findFirst()
-      .orElse(null);
-
-    if (paymentOptionDTO != null) {
-      if (!paymentOptionStatusesValidForInsertion.contains(paymentOptionDTO.getStatus())) {
-        throw new ConflictErrorException(String.format("The installment cannot created because the payment option with id %s is not in an allowed status %s",
-          paymentOptionDTO.getPaymentOptionId(), paymentOptionDTO.getStatus()));
-      }
-      return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, paymentOptionDTO,
-          debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst())
-        .getRight();
-    }
-
-    return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken,
-        debtPositionSynchronizeDTO.getPaymentOptions().getFirst())
+    return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, paymentOptionDTO,
+        debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst())
       .getRight();
+
   }
 }
