@@ -99,7 +99,17 @@ class PersonalDataServiceTest {
     Mockito.verify(repositoryMock, Mockito.times(1)).findById(1L);
     Mockito.verifyNoInteractions(cipherServiceMock);
   }
-
   //endregion
 
+  @Test
+  void testDelete(){
+    // Given
+    long id = 1L;
+
+    // When
+    service.delete(id);
+
+    // Then
+    Mockito.verify(repositoryMock).deleteById(id);
+  }
 }
