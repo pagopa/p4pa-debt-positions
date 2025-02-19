@@ -43,36 +43,39 @@ public class InsertInstallmentServiceImpl {
 
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(storedDebtPosition);
 
-    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
+    PaymentOptionDTO storedPaymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
       .filter(po -> po.getPaymentOptionIndex().equals(debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex()))
       .findFirst()
       .orElse(null);
 
-    if (paymentOptionDTO == null) {
-      return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken,
-          debtPositionSynchronizeDTO.getPaymentOptions().getFirst())
+    if (storedPaymentOptionDTO == null) {
+      PaymentOptionDTO paymentOptionSyncDTO = debtPositionSynchronizeDTO.getPaymentOptions().getFirst();
+      paymentOptionSyncDTO.setDebtPositionId(storedDebtPosition.getDebtPositionId());
+      return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken, paymentOptionSyncDTO)
         .getRight();
     }
 
-    if (!paymentOptionStatusesValidForInsertion.contains(paymentOptionDTO.getStatus())) {
+    if (!paymentOptionStatusesValidForInsertion.contains(storedPaymentOptionDTO.getStatus())) {
       throw new ConflictErrorException(String.format("The installment cannot created because the payment option with id %s is not in an allowed status %s",
-        paymentOptionDTO.getPaymentOptionId(), paymentOptionDTO.getStatus()));
+        storedPaymentOptionDTO.getPaymentOptionId(), storedPaymentOptionDTO.getStatus()));
     }
 
-    Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
+    Optional<InstallmentNoPII> storedInstallment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
       debtPositionSynchronizeDTO.getOrganizationId(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex(),
       debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv()
     );
 
-    if (installment.map(i -> !installmentStatusesValidForInsertion.contains(i.getStatus())).orElse(false)) {
+    if (storedInstallment.map(i -> !installmentStatusesValidForInsertion.contains(i.getStatus())).orElse(false)) {
       throw new ConflictErrorException(String.format("The installment with id %s cannot be created because it already exists in a not modifiable status: %s",
-        installment.get().getInstallmentId(), installment.get().getStatus()));
+        storedInstallment.get().getInstallmentId(), storedInstallment.get().getStatus()));
     }
 
-    return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, paymentOptionDTO,
-        debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst())
+    InstallmentDTO installmentSyncDTO = debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentSyncDTO.setPaymentOptionId(storedPaymentOptionDTO.getPaymentOptionId());
+
+    return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, installmentSyncDTO)
       .getRight();
 
   }

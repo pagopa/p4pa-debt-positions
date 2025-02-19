@@ -22,12 +22,11 @@ public interface CreateDebtPositionService {
    * @param debtPositionDTO the debt position to be updated with new installment
    * @param massive indicates that the operation is massive or single
    * @param accessToken the access token
-   * @param paymentOptionDTO the payment option associated with new installment
    * @param installmentDTO the installment to be created
    * @return the {@link DebtPositionDTO} updated with new installment and workflowId of debt position synchronization
    */
   Pair<DebtPositionDTO, String> createInstallment(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken,
-                                                  PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO);
+                                                  InstallmentDTO installmentDTO);
 
   /***
    *

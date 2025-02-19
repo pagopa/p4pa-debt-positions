@@ -80,10 +80,9 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
   @Override
   public Pair<DebtPositionDTO, String> createInstallment(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken,
-                                                         PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO) {
+                                                         InstallmentDTO installmentDTO) {
     Organization org = retrieveOrganization(debtPositionDTO.getOrganizationId(), accessToken);
 
-    installmentDTO.setPaymentOptionId(paymentOptionDTO.getPaymentOptionId());
     installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
     installmentDTO.setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
 
@@ -95,7 +94,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     InstallmentDTO savedInstallment = debtPositionService.saveNewInstallment(installmentDTO);
 
     debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionId().equals(paymentOptionDTO.getPaymentOptionId()))
+      .filter(po -> po.getPaymentOptionId().equals(savedInstallment.getPaymentOptionId()))
       .findFirst()
       .ifPresent(po -> po.getInstallments().add(savedInstallment));
 
@@ -110,7 +109,6 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
                                                            PaymentOptionDTO paymentOptionDTO) {
     Organization org = retrieveOrganization(debtPositionDTO.getOrganizationId(), accessToken);
 
-    paymentOptionDTO.setDebtPositionId(debtPositionDTO.getDebtPositionId());
     paymentOptionDTO.getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     paymentOptionDTO.getInstallments().getFirst().setSyncStatus(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID));
 
@@ -121,7 +119,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     PaymentOptionDTO savedPaymentOption = debtPositionService.saveNewPaymentOption(paymentOptionDTO);
 
-    debtPositionDTO.getPaymentOptions().add(paymentOptionDTO);
+    debtPositionDTO.getPaymentOptions().add(savedPaymentOption);
     debtPositionProcessorService.synchronizeAmountsAndStatus(debtPositionDTO, savedPaymentOption.getInstallments().getFirst());
 
     String workflowId = invokeWorkflow(debtPositionDTO, accessToken, massive);
