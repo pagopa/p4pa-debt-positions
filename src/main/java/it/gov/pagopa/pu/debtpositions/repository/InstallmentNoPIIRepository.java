@@ -12,6 +12,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(path = "installments")
 public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoPII, Long> {
@@ -51,4 +52,14 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
                                                    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+
+  @Query(value = "SELECT i from InstallmentNoPII i " +
+    "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
+    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
+    "WHERE dp.organizationId = :organizationId AND " +
+    "i.iud = :iud AND " +
+    "(:iuv IS NOT NULL AND i.iuv = :iuv) AND " +
+    "po.paymentOptionIndex = :paymentOptionIndex")
+  Optional<InstallmentNoPII> getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(Long organizationId, String iud, Integer paymentOptionIndex, String iuv);
+
 }

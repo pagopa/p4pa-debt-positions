@@ -11,6 +11,8 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.util.Optional;
+
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
 
@@ -49,5 +51,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
+
+  @EntityGraph(value = "completeDebtPosition")
+  Optional<DebtPosition> findByIupdOrg(String iupdOrg);
 
 }

@@ -3,8 +3,11 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
@@ -19,11 +22,16 @@ import java.util.stream.IntStream;
 
 class DebtPositionProcessorServiceImplTest {
 
+  @Mock
+  private DebtPositionRepository debtPositionRepositoryMock;
+  @Mock
+  private PaymentOptionRepository paymentOptionRepositoryMock;
+
   private DebtPositionProcessorServiceImpl debtPositionProcessorService;
 
   @BeforeEach
   public void setUp() {
-    debtPositionProcessorService = new DebtPositionProcessorServiceImpl();
+    debtPositionProcessorService = new DebtPositionProcessorServiceImpl(paymentOptionRepositoryMock, debtPositionRepositoryMock);
   }
 
   @Test
