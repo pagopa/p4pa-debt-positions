@@ -86,7 +86,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalId);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalId).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -116,7 +116,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -146,7 +146,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -172,7 +172,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -230,7 +230,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionIuvDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionIuvDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
 
     result.getPaymentOptions().stream()
       .flatMap(po -> po.getInstallments().stream())
@@ -256,7 +256,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
 
     assertEquals(DebtPositionStatus.DRAFT, result.getStatus());
     assertEquals(PaymentOptionStatus.DRAFT, result.getPaymentOptions().getFirst().getStatus());

@@ -85,24 +85,6 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public InstallmentDTO saveNewInstallment(InstallmentDTO installmentDTO) {
-    Installment mappedInstallment = installmentMapper.mapToModel(installmentDTO);
-
-    if (StringUtils.isBlank(mappedInstallment.getIud())) {
-      String iud = Utilities.getRandomIUD();
-      mappedInstallment.setIud(iud);
-    }
-    InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment);
-
-    mappedInstallment.getTransfers().forEach(transfer -> {
-      transfer.setInstallmentId(savedInstallment.getInstallmentId());
-      transferRepository.save(transfer);
-    });
-
-    return installmentMapper.mapToDto(savedInstallment);
-  }
-
-  @Override
   public PaymentOptionDTO saveNewPaymentOption(PaymentOptionDTO paymentOptionDTO) {
     Pair<PaymentOption, Map<InstallmentNoPII, Installment>> mappedPaymentOption = paymentOptionMapper.mapToModel(paymentOptionDTO);
     PaymentOption savedPaymentOption = paymentOptionRepository.save(mappedPaymentOption.getFirst());
@@ -115,10 +97,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
         mappedInstallment.setIud(iud);
         installmentNoPII.setIud(iud);
       }
-      InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment);
-      installmentNoPII.setPersonalDataId(savedInstallment.getPersonalDataId());
-      installmentNoPII.setInstallmentId(savedInstallment.getInstallmentId());
-      installmentNoPII.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+      Installment savedInstallment = installmentRepository.save(mappedInstallment);
 
       mappedInstallment.getTransfers().forEach(transfer -> {
         transfer.setInstallmentId(savedInstallment.getInstallmentId());
@@ -128,5 +107,25 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
     return paymentOptionMapper.mapToDto(savedPaymentOption);
   }
+
+  @Override
+  public InstallmentDTO saveNewInstallment(InstallmentDTO installmentDTO) {
+    Installment mappedInstallment = installmentMapper.mapToModel(installmentDTO);
+
+    if (StringUtils.isBlank(mappedInstallment.getIud())) {
+      String iud = Utilities.getRandomIUD();
+      mappedInstallment.setIud(iud);
+    }
+    Installment savedInstallment = installmentRepository.save(mappedInstallment);
+
+    mappedInstallment.getTransfers().forEach(transfer -> {
+      transfer.setInstallmentId(savedInstallment.getInstallmentId());
+      transferRepository.save(transfer);
+    });
+
+    return installmentMapper.mapToDto(savedInstallment);
+  }
+
+
 }
 

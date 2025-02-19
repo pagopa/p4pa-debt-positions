@@ -35,9 +35,9 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @RestResource(exported = false)
   @Transactional
   @Modifying
-  @Query("UPDATE InstallmentNoPII i SET i.status = :status, " +
-    "i.syncStatusFrom = :syncStatus?.syncStatusFrom, i.syncStatusTo = :syncStatus?.syncStatusTo" +
-    " WHERE i.installmentId = :installmentId")
+  @Query("UPDATE InstallmentNoPII i " +
+    "SET i.status = :status, i.syncStatus = i.syncStatus " +
+    "WHERE i.installmentId = :installmentId")
   void updateStatusAndSyncStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status, @Param("syncStatus") InstallmentSyncStatus syncStatus);
 
   @Query("""
@@ -63,4 +63,24 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
                                                    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+
+  @Query(value = "SELECT i from InstallmentNoPII i " +
+    "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId " +
+    "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId " +
+    "WHERE dp.organizationId = :organizationId AND " +
+    "i.iud = :iud AND " +
+    "(:iuv IS NOT NULL AND i.iuv = :iuv) AND " +
+    "po.paymentOptionIndex = :paymentOptionIndex")
+  Optional<InstallmentNoPII> getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(Long organizationId, String iud, Integer paymentOptionIndex, String iuv);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i " +
+    "SET i.status = :status, i.dueDate = :dueDate, i.amountCents = :amountCents, i.remittanceInformation = remittanceInformation, " +
+    "i.balance = :balance, i.legacyPaymentMetadata = :legacyPaymentMetadata, i.notificationDate = :notificationDate " +
+    "WHERE i.installmentId = :installmentId")
+  void update(Long installmentId, InstallmentStatus status, OffsetDateTime dueDate, Long amountCents, String remittanceInformation,
+              String balance, String legacyPaymentMetadata, OffsetDateTime notificationDate);
+
 }

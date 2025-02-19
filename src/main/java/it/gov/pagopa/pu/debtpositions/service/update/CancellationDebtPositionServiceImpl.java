@@ -35,6 +35,8 @@ public class CancellationDebtPositionServiceImpl implements CancellationDebtPosi
 
   @Override
   public String cancelInstallment(InstallmentDTO installmentDTO, String accessToken) {
+    boolean massive = false; //TODO change in true when GPD massive is ready
+
     //update installment status
     installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
     installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
@@ -48,7 +50,7 @@ public class CancellationDebtPositionServiceImpl implements CancellationDebtPosi
 
     debtPositionProcessorService.synchronizeAmountsAndStatus(fullDebtPositionDTO, installmentDTO);
 
-    WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, true, PaymentEventType.DP_UPDATED, accessToken);
+    WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, massive, PaymentEventType.DP_UPDATED, accessToken);
     return workflowCreatedDTO.getWorkflowId();
   }
 }

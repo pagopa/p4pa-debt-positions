@@ -5,7 +5,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.massive.DebtPositionMassiveService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,9 @@ class DebtPositionControllerTest {
   @MockitoBean
   private CreateDebtPositionService createDebtPositionService;
 
+  @MockitoBean
+  private DebtPositionMassiveService debtPositionMassiveService;
+
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
     Long id = 1L;
@@ -73,7 +78,7 @@ class DebtPositionControllerTest {
     Boolean massive = false;
 
     Mockito.when(createDebtPositionService.createDebtPosition(inputDTO, massive, null, null))
-      .thenReturn(buildDebtPositionDTO());
+      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
 
     MvcResult result = mockMvc.perform(
         post("/debt-positions")

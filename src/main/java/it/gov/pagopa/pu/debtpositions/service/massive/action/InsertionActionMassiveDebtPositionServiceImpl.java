@@ -33,6 +33,8 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
 
     @Override
     public String handleInsertion(DebtPositionDTO debtPositionSynchronizeDTO, DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
+        boolean massive = false; //TODO change in true when GPD massive is ready
+
         Optional<InstallmentNoPII> installment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
                 debtPositionSynchronizeDTO.getOrganizationId(),
                 debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
@@ -45,7 +47,7 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
         }
 
         if (debtPosition == null) {
-            return createDebtPositionService.createDebtPosition(debtPositionSynchronizeDTO, true, accessToken, operatorExternalUserId).getRight();
+            return createDebtPositionService.createDebtPosition(debtPositionSynchronizeDTO, massive, accessToken, operatorExternalUserId).getRight();
         }
 
         if (!debtPositionStatusesValidForInsertion.contains(debtPosition.getStatus())) {
@@ -63,12 +65,12 @@ public class InsertionActionMassiveDebtPositionServiceImpl implements InsertionA
             if (!paymentOptionStatusesValidForInsertion.contains(paymentOptionDTO.getStatus())) {
                 throw new ConflictErrorException("The installment cannot created because the payment option is not in an allowed status");
             }
-            return createDebtPositionService.createInstallment(debtPositionDTO, true, accessToken, paymentOptionDTO,
+            return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, paymentOptionDTO,
                             debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst())
                     .getRight();
         }
 
-        return createDebtPositionService.createPaymentOption(debtPositionDTO, true, accessToken,
+        return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken,
                         debtPositionSynchronizeDTO.getPaymentOptions().getFirst())
                 .getRight();
     }

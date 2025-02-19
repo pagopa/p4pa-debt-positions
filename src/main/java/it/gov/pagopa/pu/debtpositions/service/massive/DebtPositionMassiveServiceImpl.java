@@ -102,6 +102,10 @@ public class DebtPositionMassiveServiceImpl implements DebtPositionMassiveServic
 
     populateFirstTransfer(installmentSynchronizeDTO, accessToken, debtPositionTypeOrg);
 
+    if(installmentSynchronizeDTO.getBalance().isBlank()){
+      installmentSynchronizeDTO.setBalance(debtPositionTypeOrg.getBalance());
+    }
+
     return installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
   }
 

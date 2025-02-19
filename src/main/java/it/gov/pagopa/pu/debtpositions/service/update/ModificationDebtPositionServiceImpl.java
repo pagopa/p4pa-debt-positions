@@ -36,6 +36,8 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
 
   @Override
   public String modifyDebtPosition(DebtPositionDTO debtPositionSynchronizeDTO, InstallmentDTO installmentDTO, String accessToken) {
+    boolean massive = false; //TODO change in true when GPD massive is ready
+
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installmentDTO.getInstallmentId());
     DebtPositionDTO fullDebtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
 
@@ -66,7 +68,7 @@ public class ModificationDebtPositionServiceImpl implements ModificationDebtPosi
 
     debtPositionProcessorService.synchronizeAmountsAndStatus(fullDebtPositionDTO, installmentDTO);
 
-    WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, true, PaymentEventType.DP_UPDATED, accessToken);
+    WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(fullDebtPositionDTO, massive, PaymentEventType.DP_UPDATED, accessToken);
     return workflowCreatedDTO.getWorkflowId();
 
   }
