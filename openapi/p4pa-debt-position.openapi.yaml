@@ -881,7 +881,6 @@ components:
         - amount
         - debtPositionTypeCode
         - remittanceInformation
-        - legacyPaymentMetadata
         - flagGenerateIuv
       type: object
       properties:

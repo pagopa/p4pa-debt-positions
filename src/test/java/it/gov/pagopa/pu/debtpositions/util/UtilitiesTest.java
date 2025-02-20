@@ -56,7 +56,7 @@ class UtilitiesTest {
   void testGenerateRandomIupd() {
     String uuid = Utilities.generateRandomIupd("60206350377");
 
-    String regex = "^60206350377-\\d{12}-[a-f0-9]{12}$";
+    String regex = "^60206350377-\\d{12}-[a-f0-9]{10}$";
 
     assertTrue(uuid.matches(regex));
   }
