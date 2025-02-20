@@ -17,7 +17,7 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
       + "i.iuv as iuv, "
       + "r.paymentAmountCents as paymentAmountCents, "
       + "i.remittanceInformation as remittanceInformation, "
-      + "dpto.description as debtPositionDescription, "
+      + "dpto.description as debtPositionTypeOrgDescription, "
       + "i.personalDataId as debtorPersonalDataId, "
       + "r.paymentDateTime as paymentDateTime, "
       + "r.pspCompanyName as pspCompanyName, "

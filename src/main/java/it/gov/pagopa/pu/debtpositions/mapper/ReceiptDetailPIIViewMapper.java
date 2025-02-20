@@ -26,7 +26,7 @@ public class ReceiptDetailPIIViewMapper {
       .iuv(receiptDetailNoPIIView.getIuv())
       .paymentAmountCents(receiptDetailNoPIIView.getPaymentAmountCents())
       .remittanceInformation(receiptDetailNoPIIView.getRemittanceInformation())
-      .debtPositionDescription(receiptDetailNoPIIView.getDebtPositionDescription())
+      .debtPositionTypeOrgDescription(receiptDetailNoPIIView.getDebtPositionTypeOrgDescription())
       .paymentDateTime(receiptDetailNoPIIView.getPaymentDateTime())
       .pspCompanyName(receiptDetailNoPIIView.getPspCompanyName())
       .iud(receiptDetailNoPIIView.getIud())
