@@ -1,0 +1,52 @@
+package it.gov.pagopa.pu.debtpositions.repository.view.installment;
+
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentView;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
+import org.springframework.data.repository.query.Param;
+
+import java.time.OffsetDateTime;
+
+public interface InstallmentViewRepository extends Repository<InstallmentView, Long> {
+
+  // Suppressing too many parameters warning: it's allowed in query methods
+  @SuppressWarnings("squid:S107")
+  @Query("""
+    SELECT new InstallmentView(
+    i.installmentId as installmentId,
+    i.paymentOptionId as paymentOptionId,
+    i.iuv as iuv,
+    i.status as status,
+    i.dueDate as dueDate,
+    i.amountCents as amountCents,
+    i.remittanceInformation as remittanceInformation,
+    i.debtorFiscalCodeHash as debtorFiscalCodeHash,
+    dpto.description as debtPositionTypeOrgDescription
+    )
+    FROM InstallmentView i
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+    WHERE dp.organizationId = :organizationId
+    AND dptoo.operatorExternalUserId = :operatorExternalUserId
+    AND i.dueDate BETWEEN :dueDateFrom AND :dueDateTo
+    AND (:iuv IS NULL OR i.iuv = :iuv)
+    AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
+    AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
+    """)
+  Page<InstallmentView> findInstallmentsByFilters(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+    @Parameter(required = true) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
+    @Parameter(required = true) @Param("dueDateTo") OffsetDateTime dueDateTo,
+    String iuv,
+    String fiscalCode,
+    Long debtPositionTypeOrgId,
+    Pageable pageable);
+
+}
