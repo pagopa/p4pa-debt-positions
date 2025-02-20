@@ -42,8 +42,8 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
   Page<InstallmentView> findInstallmentsByFilters(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
-    @Parameter(required = true) @Param("dueDateTo") OffsetDateTime dueDateTo,
+    @Parameter(required = true, schema = @Schema(type = "string", format = "date-time")) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
+    @Parameter(required = true, schema = @Schema(type = "string", format = "date-time")) @Param("dueDateTo") OffsetDateTime dueDateTo,
     String iuv,
     String fiscalCode,
     Long debtPositionTypeOrgId,
