@@ -64,7 +64,7 @@ public class Utilities {
   }
 
   public static String generateRandomIupd(String orgFiscalCode) {
-    String lastUuidPart = UUID.randomUUID().toString().substring(24);
+    String lastUuidPart = UUID.randomUUID().toString().substring(26);
     return String.join("-",
       orgFiscalCode,
       LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss")),
