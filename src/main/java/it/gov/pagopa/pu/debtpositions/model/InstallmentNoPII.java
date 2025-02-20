@@ -50,7 +50,6 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   @NotNull
   private String remittanceInformation;
   private String balance;
-  @NotNull
   private String legacyPaymentMetadata;
   @NotNull
   private Long personalDataId;
