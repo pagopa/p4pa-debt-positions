@@ -15,6 +15,8 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class CancellationDebtPositionServiceImpl implements CancellationDebtPositionService {
@@ -32,12 +34,12 @@ public class CancellationDebtPositionServiceImpl implements CancellationDebtPosi
   }
 
   @Override
-  public String cancelInstallment(DebtPositionDTO debtPositionToSyncDTO, Long installmentId, Boolean massive, String accessToken) {
-    log.info("Updating status cancelled for installment with id {}", installmentId);
+  public String cancelInstallment(DebtPositionDTO debtPositionToSyncDTO, List<Long> installmentIds, Boolean massive, String accessToken) {
+    log.info("Updating status cancelled for installments with id {}", installmentIds);
 
     debtPositionToSyncDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> installmentDTO.getInstallmentId().equals(installmentId))
+        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
         .findFirst()
         .ifPresent(installmentDTO -> {
             installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));

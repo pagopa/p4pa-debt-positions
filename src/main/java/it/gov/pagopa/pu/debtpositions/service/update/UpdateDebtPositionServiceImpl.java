@@ -1,11 +1,15 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -20,14 +24,19 @@ public class UpdateDebtPositionServiceImpl implements UpdateDebtPositionService 
 
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionProcessorService debtPositionProcessorService;
+  private final DebtPositionService debtPositionService;
+  private final OrganizationService organizationService;
 
-  public UpdateDebtPositionServiceImpl(DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService) {
+  public UpdateDebtPositionServiceImpl(DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, DebtPositionService debtPositionService, OrganizationService organizationService) {
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionProcessorService = debtPositionProcessorService;
+    this.debtPositionService = debtPositionService;
+    this.organizationService = organizationService;
   }
 
   @Override
   public String updateDebtPosition(DebtPositionDTO debtPositionToSyncDTO, List<Long> installmentIds, Boolean massive, String accessToken) {
+    log.info("Updating data of debt position with id {}", debtPositionToSyncDTO.getDebtPositionId());
 
     debtPositionToSyncDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
@@ -41,6 +50,11 @@ public class UpdateDebtPositionServiceImpl implements UpdateDebtPositionService 
         ));
 
     debtPositionProcessorService.updateAmounts(debtPositionToSyncDTO);
+
+    Organization org = organizationService.getOrganizationById(debtPositionToSyncDTO.getOrganizationId(), accessToken)
+      .orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
+
+    debtPositionService.saveDebtPosition(debtPositionToSyncDTO, org);
 
     return invokeWorkflow(debtPositionToSyncDTO, accessToken, massive);
   }

@@ -75,7 +75,7 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
 
     String workflowId = invokeWorkflow(savedDebtPosition, accessToken, massive);
 
-    log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
+    log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
     return Pair.of(savedDebtPosition, workflowId);
   }
 
