@@ -31,14 +31,16 @@ public class InstallmentSynchronizationServiceImpl implements InstallmentSynchro
   private final DebtPositionTypeRepository debtPositionTypeRepository;
   private final OrganizationSearchClient organizationSearchClient;
   private final InsertInstallmentServiceImpl insertInstallmentService;
+  private final UpdateInstallmentServiceImpl updateInstallmentService;
 
-  public InstallmentSynchronizationServiceImpl(InstallmentSynchronizeMapper installmentSynchronizeMapper, DebtPositionRepository debtPositionRepository, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository, OrganizationSearchClient organizationSearchClient, InsertInstallmentServiceImpl insertInstallmentService) {
+  public InstallmentSynchronizationServiceImpl(InstallmentSynchronizeMapper installmentSynchronizeMapper, DebtPositionRepository debtPositionRepository, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository, OrganizationSearchClient organizationSearchClient, InsertInstallmentServiceImpl insertInstallmentService, UpdateInstallmentServiceImpl updateInstallmentService) {
     this.installmentSynchronizeMapper = installmentSynchronizeMapper;
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionTypeRepository = debtPositionTypeRepository;
     this.organizationSearchClient = organizationSearchClient;
     this.insertInstallmentService = insertInstallmentService;
+    this.updateInstallmentService = updateInstallmentService;
   }
 
   @Override
@@ -52,10 +54,10 @@ public class InstallmentSynchronizationServiceImpl implements InstallmentSynchro
     return switch (action) {
       case InstallmentSynchronizeDTO.ActionEnum.I ->
         insertInstallmentService.handleInsertion(debtPositionSynchronizeDTO, debtPosition, massive, accessToken, operatorExternalUserId);
-      case InstallmentSynchronizeDTO.ActionEnum.M -> "";
-        // add handle update
-      case InstallmentSynchronizeDTO.ActionEnum.A -> "";
-        // add handle cancellation
+      case InstallmentSynchronizeDTO.ActionEnum.M ->
+        updateInstallmentService.handleUpdate(debtPositionSynchronizeDTO, massive, accessToken);
+      case InstallmentSynchronizeDTO.ActionEnum.A ->
+        updateInstallmentService.handleCancellation(debtPositionSynchronizeDTO, massive, accessToken);
     };
 
   }

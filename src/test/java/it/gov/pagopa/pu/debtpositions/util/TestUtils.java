@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import it.gov.pagopa.pu.debtpositions.util.validator.ImmutableField;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -163,6 +164,7 @@ public class TestUtils {
         return new TreeSet<>();
       }
     });
+    podamFactory.getStrategy().addOrReplaceAttributeStrategy(ImmutableField.class, "ImmutableFieldStrategy", new ImmutableFieldStrategy());
     return podamFactory;
   }
 

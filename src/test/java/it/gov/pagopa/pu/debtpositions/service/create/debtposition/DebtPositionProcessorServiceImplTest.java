@@ -3,35 +3,26 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-class DebtPositionProcessorServiceImplTest {
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-  @Mock
-  private DebtPositionRepository debtPositionRepositoryMock;
-  @Mock
-  private PaymentOptionRepository paymentOptionRepositoryMock;
+class DebtPositionProcessorServiceImplTest {
 
   private DebtPositionProcessorServiceImpl debtPositionProcessorService;
 
   @BeforeEach
   public void setUp() {
-    debtPositionProcessorService = new DebtPositionProcessorServiceImpl(paymentOptionRepositoryMock, debtPositionRepositoryMock);
+    debtPositionProcessorService = new DebtPositionProcessorServiceImpl();
   }
 
   @Test

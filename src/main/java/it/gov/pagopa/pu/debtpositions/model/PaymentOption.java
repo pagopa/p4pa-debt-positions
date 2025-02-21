@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import it.gov.pagopa.pu.debtpositions.util.validator.ImmutableField;
+import it.gov.pagopa.pu.debtpositions.util.validator.ImmutableFieldEntityListener;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -19,13 +21,16 @@ import java.util.SortedSet;
 @Data
 @Builder
 @EqualsAndHashCode(of = "paymentOptionId", callSuper = false)
+@EntityListeners(ImmutableFieldEntityListener.class)
 public class PaymentOption extends BaseEntity implements Serializable, Comparable<PaymentOption> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_option_generator")
   @SequenceGenerator(name = "payment_option_generator", sequenceName = "payment_option_seq", allocationSize = 1)
+  @ImmutableField
   private Long paymentOptionId;
   @NotNull
+  @ImmutableField
   private Long debtPositionId;
   @NotNull
   private Long totalAmountCents;
@@ -37,8 +42,10 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   private String description;
   @Enumerated(EnumType.STRING)
   @NotNull
+  @ImmutableField
   private PaymentOptionType paymentOptionType;
   @NotNull
+  @ImmutableField
   private Integer paymentOptionIndex;
 
   @OneToMany(mappedBy = "paymentOptionId")

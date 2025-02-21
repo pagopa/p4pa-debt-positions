@@ -205,6 +205,7 @@ class CreateDebtPositionServiceImplTest {
   void givenDebtPositionWhenGenerateIuvThenAssignIuvToInstallments() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv(null);
 
     Organization organization = buildOrganization();
     DebtPositionDTO debtPositionIuvDTO = buildGeneratedIuvDebtPositionDTO();
@@ -219,6 +220,7 @@ class CreateDebtPositionServiceImplTest {
     debtPosition.setStatus(DebtPositionStatus.TO_SYNC);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.setIuv(null);
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);

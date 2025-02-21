@@ -255,7 +255,7 @@ paths:
         "201":
           description: Ok
           headers:
-            workflow-id:
+            x-workflow-id:
               schema:
                 type: string
               description: The workflow id created.

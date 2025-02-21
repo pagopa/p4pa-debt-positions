@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,6 @@ import java.util.Set;
 @Slf4j
 public class InsertInstallmentServiceImpl {
 
-  private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final CreateDebtPositionService createDebtPositionService;
   private final DebtPositionMapper debtPositionMapper;
 
@@ -24,15 +23,14 @@ public class InsertInstallmentServiceImpl {
   private static final Set<PaymentOptionStatus> paymentOptionStatusesValidForInsertion = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID);
   private static final Set<DebtPositionStatus> debtPositionStatusesValidForInsertion = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID);
 
-  public InsertInstallmentServiceImpl(InstallmentNoPIIRepository installmentNoPIIRepository, CreateDebtPositionService createDebtPositionService, DebtPositionMapper debtPositionMapper) {
-    this.installmentNoPIIRepository = installmentNoPIIRepository;
+  public InsertInstallmentServiceImpl(CreateDebtPositionService createDebtPositionService, DebtPositionMapper debtPositionMapper) {
     this.createDebtPositionService = createDebtPositionService;
     this.debtPositionMapper = debtPositionMapper;
   }
 
-  public String handleInsertion(DebtPositionDTO debtPositionSynchronizeDTO, DebtPosition storedDebtPosition, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public String handleInsertion(DebtPositionDTO debtPositionToSyncDTO, DebtPosition storedDebtPosition, Boolean massive, String accessToken, String operatorExternalUserId) {
     if (storedDebtPosition == null) {
-      return createDebtPositionService.createDebtPosition(debtPositionSynchronizeDTO, massive, accessToken, operatorExternalUserId).getRight();
+      return createDebtPositionService.createDebtPosition(debtPositionToSyncDTO, massive, accessToken, operatorExternalUserId).getRight();
     }
 
     if (!debtPositionStatusesValidForInsertion.contains(storedDebtPosition.getStatus())) {
@@ -42,40 +40,44 @@ public class InsertInstallmentServiceImpl {
 
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(storedDebtPosition);
 
-    PaymentOptionDTO storedPaymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionIndex().equals(debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex()))
+    PaymentOptionDTO paymentOptionToSyncDTO = debtPositionToSyncDTO.getPaymentOptions().getFirst();
+
+    PaymentOption storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
+      .filter(po -> po.getPaymentOptionIndex().equals(paymentOptionToSyncDTO.getPaymentOptionIndex()))
       .findFirst()
       .orElse(null);
 
-    if (storedPaymentOptionDTO == null) {
-      PaymentOptionDTO paymentOptionSyncDTO = debtPositionSynchronizeDTO.getPaymentOptions().getFirst();
-      paymentOptionSyncDTO.setDebtPositionId(storedDebtPosition.getDebtPositionId());
-      return createDebtPositionService.createPaymentOption(debtPositionDTO, massive, accessToken, paymentOptionSyncDTO)
+    if (storedPaymentOption == null) {
+      paymentOptionToSyncDTO.setDebtPositionId(storedDebtPosition.getDebtPositionId());
+      debtPositionDTO.getPaymentOptions().add(paymentOptionToSyncDTO);
+
+      return createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId)
         .getRight();
     }
 
-    if (!paymentOptionStatusesValidForInsertion.contains(storedPaymentOptionDTO.getStatus())) {
+    if (!paymentOptionStatusesValidForInsertion.contains(storedPaymentOption.getStatus())) {
       throw new ConflictErrorException(String.format("The installment cannot created because the payment option with id %s is not in an allowed status %s",
-        storedPaymentOptionDTO.getPaymentOptionId(), storedPaymentOptionDTO.getStatus()));
+        storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
     }
 
-    InstallmentNoPII storedInstallment = installmentNoPIIRepository.getByOrganizationIdAndIudAndPaymentOptionIndexAndIuv(
-      debtPositionSynchronizeDTO.getOrganizationId(),
-      debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud(),
-      debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getPaymentOptionIndex(),
-      debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv()
-    ).orElse(null);
+    InstallmentDTO installmentToSyncDTO = debtPositionToSyncDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+
+    InstallmentNoPII storedInstallment = storedPaymentOption.getInstallments().stream()
+      .filter(inst -> inst.getIud().equals(installmentToSyncDTO.getIud())).findFirst().orElse(null);
 
     if (storedInstallment != null && !installmentStatusesValidForInsertion.contains(storedInstallment.getStatus())) {
       throw new ConflictErrorException(String.format("The installment with id %s cannot be created because it already exists in a not modifiable status: %s",
         storedInstallment.getInstallmentId(), storedInstallment.getStatus()));
     }
 
-    InstallmentDTO installmentSyncDTO = debtPositionSynchronizeDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
-    installmentSyncDTO.setPaymentOptionId(storedPaymentOptionDTO.getPaymentOptionId());
+    installmentToSyncDTO.setPaymentOptionId(storedPaymentOption.getPaymentOptionId());
 
-    return createDebtPositionService.createInstallment(debtPositionDTO, massive, accessToken, installmentSyncDTO)
+    debtPositionDTO.getPaymentOptions().stream()
+      .filter(po -> po.getPaymentOptionId().equals(storedPaymentOption.getPaymentOptionId()))
+      .findFirst()
+      .ifPresent(po -> po.getInstallments().add(installmentToSyncDTO));
+
+    return createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId)
       .getRight();
-
   }
 }
