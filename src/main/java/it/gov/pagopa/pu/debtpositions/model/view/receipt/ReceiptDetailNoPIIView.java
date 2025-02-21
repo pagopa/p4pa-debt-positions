@@ -22,7 +22,7 @@ public class ReceiptDetailNoPIIView implements Serializable {
   private String iuv;
   private Long paymentAmountCents;
   private String remittanceInformation;
-  private String debtPositionDescription;
+  private String debtPositionTypeOrgDescription;
   private Long debtorPersonalDataId;
   private OffsetDateTime paymentDateTime;
   private String pspCompanyName;

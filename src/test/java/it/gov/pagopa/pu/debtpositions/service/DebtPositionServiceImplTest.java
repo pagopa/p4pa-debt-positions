@@ -1,8 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.*;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -13,6 +21,9 @@ import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,49 +33,31 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
-import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
-
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
 
   @Mock
-  private DebtPositionRepository debtPositionRepositoryMock;
+  private DebtPositionRepository debtPositionRepository;
 
   @Mock
-  private PaymentOptionRepository paymentOptionRepositoryMock;
+  private PaymentOptionRepository paymentOptionRepository;
 
   @Mock
-  private InstallmentPIIRepository installmentRepositoryMock;
+  private InstallmentPIIRepository installmentRepository;
 
   @Mock
-  private TransferRepository transferRepositoryMock;
+  private TransferRepository transferRepository;
 
   @Mock
-  private DebtPositionMapper debtPositionMapperMock;
-
-  @Mock
-  private PaymentOptionMapper paymentOptionMapperMock;
-
-  @Mock
-  private InstallmentMapper installmentMapperMock;
+  private DebtPositionMapper debtPositionMapper;
 
   private DebtPositionServiceImpl debtPositionService;
 
   @BeforeEach
   void setUp() {
     debtPositionService = new DebtPositionServiceImpl(
-      debtPositionRepositoryMock, paymentOptionRepositoryMock, installmentRepositoryMock, transferRepositoryMock,
-      debtPositionMapperMock, installmentMapperMock, paymentOptionMapperMock
+      debtPositionRepository, paymentOptionRepository, installmentRepository, transferRepository,
+      debtPositionMapper
     );
   }
 
@@ -89,6 +82,7 @@ class DebtPositionServiceImplTest {
     Installment installment = buildInstallment();
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
+    installment.setNoPII(installmentNoPII);
 
     Transfer transfer = buildTransfer();
 
@@ -113,11 +107,11 @@ class DebtPositionServiceImplTest {
     Transfer savedTransfer = new Transfer();
     savedTransfer.setTransferId(1L);
 
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepositoryMock.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepositoryMock.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
-    Mockito.when(installmentRepositoryMock.save(Mockito.any(Installment.class))).thenReturn(installment);
-    Mockito.when(transferRepositoryMock.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
+    Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
+    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
+    Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
+    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
@@ -125,10 +119,10 @@ class DebtPositionServiceImplTest {
 
       debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
-      Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
-      Mockito.verify(paymentOptionRepositoryMock, Mockito.times(1)).save(paymentOption);
-      Mockito.verify(installmentRepositoryMock, Mockito.times(1)).save(installment);
-      Mockito.verify(transferRepositoryMock, Mockito.times(2)).save(transfer);
+      Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
+      Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
+      Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
+      Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
   }
 
@@ -173,21 +167,21 @@ class DebtPositionServiceImplTest {
 
     String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
 
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepositoryMock.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepositoryMock.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
-    Mockito.when(installmentRepositoryMock.save(Mockito.any(Installment.class))).thenReturn(installment);
-    Mockito.when(transferRepositoryMock.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
+    Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
+    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
+    Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
+    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
 
       debtPositionService.saveDebtPosition(debtPositionDTO, null);
 
-      Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
-      Mockito.verify(paymentOptionRepositoryMock, Mockito.times(1)).save(paymentOption);
-      Mockito.verify(installmentRepositoryMock, Mockito.times(1)).save(installment);
-      Mockito.verify(transferRepositoryMock, Mockito.times(2)).save(transfer);
+      Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
+      Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
+      Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
+      Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
   }
 }
