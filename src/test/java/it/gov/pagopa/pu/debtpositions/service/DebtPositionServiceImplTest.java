@@ -15,10 +15,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import it.gov.pagopa.pu.debtpositions.repository.*;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.List;
@@ -49,6 +46,9 @@ class DebtPositionServiceImplTest {
   private TransferRepository transferRepository;
 
   @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+
+  @Mock
   private DebtPositionMapper debtPositionMapper;
 
   private DebtPositionServiceImpl debtPositionService;
@@ -57,7 +57,7 @@ class DebtPositionServiceImplTest {
   void setUp() {
     debtPositionService = new DebtPositionServiceImpl(
       debtPositionRepository, paymentOptionRepository, installmentRepository, transferRepository,
-      debtPositionMapper
+      debtPositionMapper, debtPositionTypeOrgRepository
     );
   }
 
