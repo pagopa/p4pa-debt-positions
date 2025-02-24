@@ -71,6 +71,14 @@ paths:
           schema:
             type: string
           description: The nav of the installments
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
       responses:
         "200":
           description: Ok
