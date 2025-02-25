@@ -92,6 +92,79 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /installments/{organizationId}/export:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsExport
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: paymentDateFrom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: paymentDateTo
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: versionTrack
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+            enum:
+              - 1.0
+              - 1.1
+              - 1.2
+              - 1.3
+        - name: debtPositionTypeOrgId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: InstallmentsPaidViewDTO
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+      x-spring-paginated: true
   /receipts:
     post:
       tags:
