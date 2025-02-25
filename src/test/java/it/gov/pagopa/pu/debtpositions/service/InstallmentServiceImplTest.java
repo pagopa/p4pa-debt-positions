@@ -1,13 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -30,13 +33,16 @@ class InstallmentServiceImplTest {
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
-  @Test
-  void givenValidOrganizationAndNavWhGetInstallmentsByOrganizationIdAndNavThenOk() {
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  @NullSource
+  void givenValidOrganizationAndNavWhGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     //given
     List<Installment> installmentList = podamFactory.manufacturePojo(List.class, Installment.class);
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
+    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV")).thenReturn(installmentList);
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentList);
     installmentList.forEach(installment -> {
       InstallmentDTO installmentDTO = podamFactory.manufacturePojo(InstallmentDTO.class);
       installmentDTOList.add(installmentDTO);
@@ -44,12 +50,12 @@ class InstallmentServiceImplTest {
     });
 
     //when
-    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndNav(1L, "NAV");
+    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
 
     //verify
     Assertions.assertNotNull(response);
     Assertions.assertIterableEquals(installmentDTOList, response);
-    Mockito.verify(installmentPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(1L, "NAV");
+    Mockito.verify(installmentPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(1L, "NAV", originList);
     installmentList.forEach(installment -> Mockito.verify(installmentMapperMock, Mockito.times(1)).mapToDto(installment));
   }
 }

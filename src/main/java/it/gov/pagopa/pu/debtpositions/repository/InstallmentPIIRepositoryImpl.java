@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
@@ -23,8 +24,8 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<Installment,
   }
 
   @Override
-  public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav) {
-    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, null)
+  public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
+    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin)
       .stream().map(installmentPIIMapper::map).toList();
   }
 

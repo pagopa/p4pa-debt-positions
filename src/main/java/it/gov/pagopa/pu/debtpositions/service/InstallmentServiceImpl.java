@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
@@ -18,8 +19,8 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav) {
-    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav).stream()
+  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
+    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
             .map(installmentMapper::mapToDto)
             .toList();
   }

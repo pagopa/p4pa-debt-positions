@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.Person;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -13,6 +14,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -200,15 +204,18 @@ class InstallmentPIIRepositoryImplTest {
 
   }
 
-  @Test
-  void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk() {
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  @NullSource
+  void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     // Given
+    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
     List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
-    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", null)).thenReturn(installmentDTOList);
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
     installmentDTOList.forEach(installmentNoPII -> Mockito.when(mapperMock.map(installmentNoPII)).thenReturn(Installment.builder().build()));
 
     // When
-    List<Installment> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV");
+    List<Installment> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList);
 
     // Then
     Assertions.assertNotNull(result);
