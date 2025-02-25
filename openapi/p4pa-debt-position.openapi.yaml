@@ -290,6 +290,12 @@ paths:
         - debt-position
       operationId: installmentSynchronize
       parameters:
+        - name: origin
+          in: query
+          description: Indicates the origin of debt position to synchronize
+          required: true
+          schema:
+            $ref: "#/components/schemas/DebtPositionOrigin"
         - name: massive
           in: query
           description: Indicates if the operation is massive (true) or single (false).
@@ -306,7 +312,7 @@ paths:
         "201":
           description: Ok
           headers:
-            workflow-id:
+            x-workflow-id:
               schema:
                 type: string
               description: The workflow id created.
@@ -921,18 +927,16 @@ components:
         - ingestionFlowFileId
         - ingestionFlowFileLineNumber
         - organizationId
-        - iupd
         - description
         - paymentOptionIndex
         - paymentOptionType
-        - iud
         - entityType
         - fiscalCode
         - fullName
         - amount
         - debtPositionTypeCode
         - remittanceInformation
-        - flagGenerateIuv
+        - flagPagoPaPayment
       type: object
       properties:
         ingestionFlowFileId:
@@ -966,8 +970,10 @@ components:
           format: date-time
         paymentOptionIndex:
           type: integer
-          format: int64
+          format: int32
         paymentOptionType:
+          type: string
+        paymentOptionDescription:
           type: string
         iud:
           type: string
@@ -1017,12 +1023,20 @@ components:
           type: boolean
         numberBeneficiary:
           type: integer
-          format: int64
+          format: int32
         transfersList:
           type: array
           items:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
     TransferSynchronizeDTO:
+      required:
+        - orgFiscalCode
+        - orgName
+        - amount
+        - remittanceInformation
+        - iban
+        - category
+        - transferIndex
       type: object
       properties:
         orgFiscalCode:
