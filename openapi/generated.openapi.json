@@ -4335,25 +4335,6 @@
           }
         }
       },
-      "CollectionModelInstallmentNoPII" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "installmentNoPIIs" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/InstallmentNoPIIResponse"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
       "CollectionModelObject" : {
         "type" : "object",
         "properties" : {
@@ -4364,6 +4345,25 @@
                 "type" : "array",
                 "items" : {
                   "type" : "object"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelInstallmentNoPII" : {
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "installmentNoPIIs" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/InstallmentNoPIIResponse"
                 }
               }
             }
@@ -6938,7 +6938,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "debtPositionTypeOrgId", "flagPagoPaPayment", "organizationId", "paymentOptions" ]
+        "required" : [ "debtPositionTypeOrgCode", "debtPositionTypeOrgDescription", "debtPositionTypeOrgId", "debtor", "flagPagoPaPayment", "organizationId", "paymentOptions" ]
       },
       "Link" : {
         "type" : "object",

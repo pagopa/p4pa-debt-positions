@@ -1066,3 +1066,7 @@ components:
               type: string
             debtPositionTypeOrgCode:
               type: string
+          required:
+            - debtPositionTypeOrgDescription
+            - debtPositionTypeOrgCode
+            - debtor
