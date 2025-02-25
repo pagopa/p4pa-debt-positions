@@ -2,24 +2,26 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.*;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,6 +70,7 @@ class DebtPositionServiceImplTest {
 
     Organization org = buildOrganization();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
     debtPositionDTO.setIupdOrg("");
 
     DebtPosition debtPosition = buildDebtPosition();
@@ -107,7 +110,9 @@ class DebtPositionServiceImplTest {
     Transfer savedTransfer = new Transfer();
     savedTransfer.setTransferId(1L);
 
+    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(buildDebtPositionTypeOrg()));
     Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
     Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
@@ -119,6 +124,8 @@ class DebtPositionServiceImplTest {
 
       debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
+      Mockito.verify(debtPositionRepository, Mockito.times(1)).findByIupdOrg(debtPositionDTO.getIupdOrg());
+      Mockito.verify(debtPositionTypeOrgRepository, Mockito.times(1)).findById(debtPositionDTO.getDebtPositionTypeOrgId());
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
@@ -129,6 +136,9 @@ class DebtPositionServiceImplTest {
   @Test
   void givenValidDebtPositionDTONoOrg_WhenSaveDebtPosition_ThenSaveAllEntities() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setIban("");
 
     DebtPosition debtPosition = buildDebtPosition();
     PaymentOption paymentOption = buildPaymentOption();
@@ -141,6 +151,7 @@ class DebtPositionServiceImplTest {
     Installment installment = buildInstallment();
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
+    installment.setBalance("");
 
     Transfer transfer = buildTransfer();
 
@@ -168,6 +179,8 @@ class DebtPositionServiceImplTest {
     String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
 
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
     Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
@@ -176,13 +189,52 @@ class DebtPositionServiceImplTest {
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
 
-      debtPositionService.saveDebtPosition(debtPositionDTO, null);
+      Organization org = buildOrganization();
+      org.setIban("IT60X0542811101000000123456");
+      debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
+      Mockito.verify(debtPositionRepository, Mockito.times(1)).findByIupdOrg(debtPositionDTO.getIupdOrg());
+      Mockito.verify(debtPositionTypeOrgRepository, Mockito.times(1)).findById(debtPositionDTO.getDebtPositionTypeOrgId());
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
       Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
+  }
+
+  @Test
+  void givenDuplicatedDebtPositionDTO_WhenSaveDebtPosition_ThenThrowException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPosition debtPosition = buildDebtPosition();
+
+    InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
+    Installment installmentNoIud = buildInstallment();
+    installmentNoIud.setIud("");
+
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    Installment installment = buildInstallment();
+    installment.setInstallmentId(10L);
+    installmentNoPII.setInstallmentId(10L);
+    installment.setBalance("");
+
+    Transfer transfer = buildTransfer();
+    transfer.setTransferIndex(1);
+
+    Map<InstallmentNoPII, Installment> installmentMap = Map.of(
+      installmentNoPIINoIud, installmentNoIud,
+      installmentNoPII, installment
+    );
+
+    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
+
+    Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionRepository.findByIupdOrg(Mockito.any(String.class))).thenReturn(buildDebtPosition());
+
+    ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
+      debtPositionService.saveDebtPosition(debtPositionDTO, null)
+    );
+    assertEquals("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.", exception.getMessage());
+
   }
 }
 

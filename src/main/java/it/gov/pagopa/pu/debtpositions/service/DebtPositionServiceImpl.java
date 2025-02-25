@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.*;
@@ -41,8 +42,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+    checkDebtPosition(debtPositionDTO, mappedDebtPosition, org);
+
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
-    setDebtPositionParams(debtPositionDTO, mappedDebtPosition, org);
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
 
@@ -53,7 +55,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       savedPaymentOption.getInstallments().forEach(installmentNoPII -> {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
-        setInstallmentParam(debtPositionTypeOrg, mappedInstallment, installmentNoPII, org);
+        checkInstallment(debtPositionTypeOrg, mappedInstallment, installmentNoPII, org);
 
         InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment).getNoPII();
         installmentNoPII.setPersonalDataId(savedInstallment.getPersonalDataId());
@@ -62,7 +64,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
         mappedInstallment.getTransfers().forEach(transfer -> {
           transfer.setInstallmentId(savedInstallment.getInstallmentId());
-          setTransferParam(debtPositionTypeOrg, transfer, org);
+          checkTransfer(debtPositionTypeOrg, transfer, org);
           transferRepository.save(transfer);
         });
       });
@@ -71,13 +73,17 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     return debtPositionMapper.mapToDto(savedDebtPosition);
   }
 
-  private void setDebtPositionParams(DebtPositionDTO debtPositionDTO, Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition, Organization org) {
+  private void checkDebtPosition(DebtPositionDTO debtPositionDTO, Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition, Organization org) {
+    DebtPosition debtPosition = debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg());
+    if (debtPosition != null) {
+      throw new ConflictErrorException("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
+    }
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
       mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
   }
 
-  private void setInstallmentParam(DebtPositionTypeOrg debtPositionTypeOrg, Installment mappedInstallment, InstallmentNoPII installmentNoPII, Organization org) {
+  private void checkInstallment(DebtPositionTypeOrg debtPositionTypeOrg, Installment mappedInstallment, InstallmentNoPII installmentNoPII, Organization org) {
     String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
     mappedInstallment.setIupdPagopa(iupdPagopa);
     installmentNoPII.setIupdPagopa(iupdPagopa);
@@ -94,7 +100,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     }
   }
 
-  private void setTransferParam(DebtPositionTypeOrg debtPositionTypeOrg, Transfer transfer, Organization org) {
+  private void checkTransfer(DebtPositionTypeOrg debtPositionTypeOrg, Transfer transfer, Organization org) {
     if (transfer.getTransferIndex() == 1) {
       transfer.setIban(StringUtils.isBlank(debtPositionTypeOrg.getIban()) ? org.getIban() : debtPositionTypeOrg.getIban());
     }

@@ -56,9 +56,10 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
       .orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
-    verifyInstallmentUniqueness(debtPositionDTO);
-    generateIuv(debtPositionDTO, org);
+
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    verifyInstallmentUniqueness(debtPositionUpdated);
+    generateIuv(debtPositionUpdated, org);
 
     if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
       updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
