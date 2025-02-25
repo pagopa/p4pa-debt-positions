@@ -82,7 +82,9 @@ class DebtPositionServiceImplTest {
     installmentNoIud.setIud("");
 
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
     Installment installment = buildInstallment();
+    installment.getTransfers().getFirst().setTransferIndex(1);
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
     installment.setNoPII(installmentNoPII);
@@ -136,7 +138,6 @@ class DebtPositionServiceImplTest {
   @Test
   void givenValidDebtPositionDTONoOrg_WhenSaveDebtPosition_ThenSaveAllEntities() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setIban("");
 
@@ -148,7 +149,9 @@ class DebtPositionServiceImplTest {
     installmentNoIud.setIud("");
 
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
     Installment installment = buildInstallment();
+    installment.getTransfers().getFirst().setTransferIndex(1);
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
     installment.setBalance("");
