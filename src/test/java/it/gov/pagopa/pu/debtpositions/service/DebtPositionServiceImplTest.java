@@ -8,8 +8,11 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildO
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 
+import it.gov.pagopa.pu.debtpositions.dto.DebtPositionWithType;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDetailDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -19,11 +22,14 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,6 +38,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import uk.co.jemos.podam.api.PodamFactory;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -52,6 +59,8 @@ class DebtPositionServiceImplTest {
   private DebtPositionMapper debtPositionMapper;
 
   private DebtPositionServiceImpl debtPositionService;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void setUp() {
@@ -183,6 +192,40 @@ class DebtPositionServiceImplTest {
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
       Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
+  }
+
+  @Test
+  void givenExistingDebtPositionDetailWhenGetDebtPositionDetailThenOk(){
+    Long debtPositionId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    DebtPositionDetailDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDetailDTO.class);
+    DebtPositionWithType debtPosition = podamFactory.manufacturePojo(DebtPositionWithType.class);
+
+    Mockito.when(debtPositionRepository.findByDebtPositionIdAndOperatorExternalUserId(debtPositionId,operatorExternalUserId)).thenReturn(
+      Optional.of(debtPosition));
+    Mockito.when(debtPositionMapper.mapToDebtPositionDetailDTO(debtPosition)).thenReturn(expectedResult);
+
+    DebtPositionDetailDTO result = debtPositionService.getDebtPositionDetail(
+      debtPositionId, operatorExternalUserId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(expectedResult,result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepository,debtPositionMapper);
+  }
+
+  @Test
+  void givenNonExistingDebtPositionDetailWhenGetDebtPositionDetailThenThrowNotFoundException(){
+    Long debtPositionId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    Mockito.when(debtPositionRepository.findByDebtPositionIdAndOperatorExternalUserId(debtPositionId,operatorExternalUserId)).thenReturn(
+      Optional.empty());
+
+    Assertions.assertThrows(NotFoundException.class, ()->debtPositionService.getDebtPositionDetail(
+      debtPositionId, operatorExternalUserId));
+
+    Mockito.verifyNoMoreInteractions(debtPositionRepository);
+    Mockito.verifyNoInteractions(debtPositionMapper);
   }
 }
 
