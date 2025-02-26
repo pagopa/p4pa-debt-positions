@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewPIIDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,9 +12,9 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentsPaidViewDTO {
+public class InstallmentsPaidView {
 
-  private List<InstallmentPaidViewDTO> content;
+  private List<InstallmentPaidViewPIIDTO> content;
 
   private Long size;
 

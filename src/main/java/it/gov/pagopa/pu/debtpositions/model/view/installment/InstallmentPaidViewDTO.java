@@ -1,33 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
-import it.gov.pagopa.pu.debtpositions.dto.PIIDTO;
-import lombok.*;
-import lombok.experimental.SuperBuilder;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewNoPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewPIIDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
-@SuperBuilder
-@AllArgsConstructor
+@Builder(toBuilder = true)
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InstallmentPaidViewDTO extends InstallmentPaidViewNoPIIDTO implements PIIDTO {
+@AllArgsConstructor
+public class InstallmentPaidViewDTO implements FullPIIDTO<InstallmentPaidViewNoPIIDTO, InstallmentPaidViewPIIDTO> {
 
-  private String anagraficaVersante;
-  private String indirizzoVersante;
-  private String civicoVersante;
-  private String capVersante;
-  private String localitaVersante;
-  private String provinciaVersante;
-  private String nazioneVersante;
-  private String emailVersante;
-
-  private String anagraficaPagatore;
-  private String indirizzoPagatore;
-  private String civicoPagatore;
-  private String capPagatore;
-  private String localitaPagatore;
-  private String provinciaPagatore;
-  private String nazionePagatore;
-  private String emailPagatore;
-
+  @JsonIgnore
+  private InstallmentPaidViewNoPIIDTO noPII;
 }

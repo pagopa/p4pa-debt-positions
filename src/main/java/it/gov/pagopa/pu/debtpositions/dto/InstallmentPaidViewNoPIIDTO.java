@@ -1,25 +1,27 @@
-package it.gov.pagopa.pu.debtpositions.model.view.installment;
+package it.gov.pagopa.pu.debtpositions.dto;
 
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOutcomeCode;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.enums.SignatureType;
 import it.gov.pagopa.pu.debtpositions.enums.UniqueIdentifierType;
+import it.gov.pagopa.pu.debtpositions.model.NoPIIEntity;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
+import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Data
-@SuperBuilder(toBuilder = true)
-@AllArgsConstructor
+@Builder(toBuilder = true)
 @NoArgsConstructor
-public class InstallmentPaidViewNoPIIDTO {
+@AllArgsConstructor
+public class InstallmentPaidViewNoPIIDTO implements Serializable, NoPIIEntity<InstallmentPaidViewPIIDTO> {
 
   private String iuf;
   private Integer numRigaFlusso;
@@ -108,5 +110,8 @@ public class InstallmentPaidViewNoPIIDTO {
   private String de_nome_pa1;
   @NotNull
   private String cod_tassonomico_dovuto_pa1;
+
+  @NotNull
+  private Long personalDataId;
 
 }
