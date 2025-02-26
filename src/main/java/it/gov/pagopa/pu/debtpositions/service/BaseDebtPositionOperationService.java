@@ -44,8 +44,8 @@ public abstract class BaseDebtPositionOperationService {
      * It will:
      * <ol>
      *    <li>Authorize the operation
-     *    <li>Update amounts
      *    <li>Call the {@link #applyOperation} method
+     *    <li>Update amounts
      *    <li>Save the DebtPositionDTO
      *    <li>Align hierarchy status
      *    <li>Invoke workflow
