@@ -1,22 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.util.Pair;
-
-import java.util.HashMap;
-import java.util.Map;
-
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
@@ -25,6 +8,22 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildIn
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
+
+import it.gov.pagopa.pu.debtpositions.dto.Installment;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.util.Pair;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionMapperTest {

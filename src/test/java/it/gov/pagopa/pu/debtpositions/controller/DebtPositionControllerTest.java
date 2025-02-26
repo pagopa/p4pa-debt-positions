@@ -1,11 +1,22 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import java.util.HashMap;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +26,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DebtPositionControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -40,6 +42,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionCreationService createDebtPositionService;
+
+  @MockitoBean
+  private DebtPositionService debtPositionService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
@@ -101,5 +106,22 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
+
+  @Test
+  void whenGetDebtPositionThenOk() throws Exception {
+    Long debtPositionId = 1L;
+
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+    Mockito.when(debtPositionService.getDebtPosition(debtPositionId)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/"+debtPositionId)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(expectedResult, resultResponse);
   }
 }

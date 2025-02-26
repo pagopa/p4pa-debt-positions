@@ -6,4 +6,5 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 public interface DebtPositionService {
 
   DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org);
+  DebtPositionDTO getDebtPosition(Long debtPositionId);
 }
