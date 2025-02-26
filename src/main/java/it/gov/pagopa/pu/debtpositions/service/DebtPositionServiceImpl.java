@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -14,10 +15,9 @@ import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
+import java.util.Map;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-
-import java.util.Map;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -74,6 +74,15 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     });
 
     return debtPositionMapper.mapToDto(savedDebtPosition);
+  }
+
+  @Override
+  public DebtPositionDTO getDebtPosition(Long debtPositionId) {
+    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    if(debtPosition==null) {
+      throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
+    }
+    return debtPositionMapper.mapToDto(debtPosition);
   }
 }
 
