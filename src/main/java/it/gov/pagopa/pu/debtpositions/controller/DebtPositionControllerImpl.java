@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import org.springframework.http.HttpStatus;
@@ -16,9 +16,9 @@ import java.util.Map;
 public class DebtPositionControllerImpl implements DebtPositionApi {
 
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
-  private final CreateDebtPositionService createDebtPositionService;
+  private final DebtPositionCreationService createDebtPositionService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, CreateDebtPositionService createDebtPositionService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService createDebtPositionService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.createDebtPositionService = createDebtPositionService;
   }

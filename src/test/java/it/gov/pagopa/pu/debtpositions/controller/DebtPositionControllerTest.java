@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,7 +39,7 @@ class DebtPositionControllerTest {
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
 
   @MockitoBean
-  private CreateDebtPositionService createDebtPositionService;
+  private DebtPositionCreationService createDebtPositionService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
