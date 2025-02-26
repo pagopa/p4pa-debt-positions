@@ -10,8 +10,8 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
   public DebtPositionDTO updateAmounts(DebtPositionDTO debtPositionDTO) {
     debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
       long totalPaymentOptionAmount = paymentOption.getInstallments().stream()
-        .filter(installment -> (installment.getStatus() != InstallmentStatus.CANCELLED ||
-          (installment.getSyncStatus() != null && InstallmentStatus.CANCELLED.equals(installment.getSyncStatus().getSyncStatusTo()))))
+        .filter(installment -> (installment.getStatus() != InstallmentStatus.CANCELLED &&
+          installment.getSyncStatus() != null && !InstallmentStatus.CANCELLED.equals(installment.getSyncStatus().getSyncStatusTo())))
         .mapToLong(installment -> {
           long totalInstallmentAmount = installment.getTransfers().stream()
             .mapToLong(TransferDTO::getAmountCents)
