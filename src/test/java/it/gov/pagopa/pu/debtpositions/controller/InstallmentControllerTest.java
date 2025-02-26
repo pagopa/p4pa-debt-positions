@@ -2,13 +2,16 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,16 +42,21 @@ class InstallmentControllerTest {
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
-  @Test
-  void whenGetInstallmentsByOrganizationIdAndNavThenOk() throws Exception {
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  @NullSource
+  void whenGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) throws Exception {
     //given
     List<InstallmentDTO> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentDTO.class);
+    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV")).thenReturn(installmentDTOList);
+    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
 
-    MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/installments/{organizationId}/{nav}",1L,"NAV")
-          .contentType(MediaType.APPLICATION_JSON_VALUE))
+    var builder = MockMvcRequestBuilders.get("/installments/{organizationId}/{nav}",1L,"NAV")
+      .contentType(MediaType.APPLICATION_JSON_VALUE);
+    if(debtPositionOrigin!=null)
+      builder = builder.queryParam("debtPositionOrigin", originList.stream().map(Enum::name).toArray(String[]::new));
+    MvcResult result = mockMvc.perform(builder)
       .andExpect(status().isOk())
       .andReturn();
 
@@ -64,7 +72,7 @@ class InstallmentControllerTest {
       Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());
       Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
     }
-    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV");
+    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
   }
 
   @Test

@@ -3,47 +3,46 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.List;
+
 @Service
 @Slf4j
-public class CreateDebtPositionServiceImpl implements CreateDebtPositionService {
+public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationService implements DebtPositionCreationService {
 
-  private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
   private final ValidateDebtPositionService validateDebtPositionService;
-  private final DebtPositionService debtPositionService;
   private final GenerateIuvService generateIuvService;
-  private final DebtPositionSyncService debtPositionSyncService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
-  private final DebtPositionProcessorService debtPositionProcessorService;
-  private final OrganizationService organizationService;
 
-  public CreateDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                       ValidateDebtPositionService validateDebtPositionService,
-                                       DebtPositionService debtPositionService,
-                                       GenerateIuvService generateIuvService,
-                                       DebtPositionSyncService debtPositionSyncService,
-                                       InstallmentNoPIIRepository installmentNoPIIRepository,
-                                       DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService) {
-    this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
+  public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
+                                         ValidateDebtPositionService validateDebtPositionService,
+                                         DebtPositionService debtPositionService,
+                                         GenerateIuvService generateIuvService,
+                                         DebtPositionSyncService debtPositionSyncService,
+                                         InstallmentNoPIIRepository installmentNoPIIRepository,
+                                         DebtPositionProcessorService debtPositionProcessorService,
+                                         OrganizationService organizationService,
+                                         DebtPositionMapper debtPositionMapper,
+                                         DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
+      debtPositionProcessorService, organizationService, debtPositionMapper, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
-    this.debtPositionService = debtPositionService;
     this.generateIuvService = generateIuvService;
-    this.debtPositionSyncService = debtPositionSyncService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
-    this.debtPositionProcessorService = debtPositionProcessorService;
-    this.organizationService = organizationService;
   }
 
   @Transactional
@@ -52,35 +51,31 @@ public class CreateDebtPositionServiceImpl implements CreateDebtPositionService 
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
-    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)
-      .orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
-    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
-    validateDebtPositionService.validate(debtPositionDTO, accessToken);
-    verifyInstallmentUniqueness(debtPositionDTO);
-    generateIuv(debtPositionDTO, org);
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
-
-    if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
-    }
-
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
-
-    invokeWorkflow(savedDebtPosition, accessToken, massive);
+    List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
+      .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
+    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate, DebtPositionOrigin.ORDINARY, massive, accessToken, operatorExternalUserId).getLeft();
 
     log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
     return savedDebtPosition;
   }
 
-  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
-    if(!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken);
+  @Override
+  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate,
+                             DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
+
+    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
+    validateDebtPositionService.validate(debtPositionDTO, accessToken);
+    verifyInstallmentUniqueness(debtPositionDTO);
+    generateIuv(debtPositionDTO, org);
+
+    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
+    return debtPositionDTO;
   }
 
   private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,
