@@ -9,7 +9,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -109,21 +108,19 @@ class DebtPositionControllerTest {
   }
 
   @Test
-  void whenGetDebtPositionDetailThenOk() throws Exception {
+  void whenGetDebtPositionThenOk() throws Exception {
     Long debtPositionId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
 
-    DebtPositionDetailDTO expectedResult = new DebtPositionDetailDTO();
-    Mockito.when(debtPositionService.getDebtPositionDetail(debtPositionId,operatorExternalUserId)).thenReturn(expectedResult);
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+    Mockito.when(debtPositionService.getDebtPosition(debtPositionId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/"+debtPositionId)
-          .param("operatorExternalUserId","operatorExternalUserId")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDetailDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDetailDTO.class);
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(expectedResult, resultResponse);
   }
 }

@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.CreateDebtPositionService;
@@ -49,10 +48,9 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<DebtPositionDetailDTO> getDebtPositionDetail(
-    Long debtPositionId,
-    String operatorExternalUserId) {
-    return ResponseEntity.ok(debtPositionService.getDebtPositionDetail(debtPositionId,operatorExternalUserId));
+  public ResponseEntity<DebtPositionDTO> getDebtPosition(
+    Long debtPositionId) {
+    return ResponseEntity.ok(debtPositionService.getDebtPosition(debtPositionId));
   }
 }
 

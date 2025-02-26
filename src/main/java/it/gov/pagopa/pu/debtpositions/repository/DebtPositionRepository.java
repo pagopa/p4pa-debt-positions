@@ -1,10 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
-import it.gov.pagopa.pu.debtpositions.dto.DebtPositionWithType;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -51,15 +49,4 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
-
-  @RestResource(exported = false)
-  @Query("""
-      SELECT new it.gov.pagopa.pu.debtpositions.dto.DebtPositionWithType(dp,dpto.description,dpto.code)
-      FROM DebtPosition dp
-        JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
-        JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
-      WHERE dp.debtPositionId = :debtPositionId
-        AND dptoo.operatorExternalUserId = :operatorExternalUserId
-    """)
-  Optional<DebtPositionWithType> findByDebtPositionIdAndOperatorExternalUserId(Long debtPositionId, String operatorExternalUserId);
 }

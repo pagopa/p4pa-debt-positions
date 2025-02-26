@@ -8,10 +8,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildO
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 
-import it.gov.pagopa.pu.debtpositions.dto.DebtPositionWithType;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -27,7 +25,6 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeSet;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -195,18 +192,16 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionDetailWhenGetDebtPositionDetailThenOk(){
+  void givenExistingDebtPositionWhenGetDebtPositionThenOk(){
     Long debtPositionId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
-    DebtPositionDetailDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDetailDTO.class);
-    DebtPositionWithType debtPosition = podamFactory.manufacturePojo(DebtPositionWithType.class);
+    DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
-    Mockito.when(debtPositionRepository.findByDebtPositionIdAndOperatorExternalUserId(debtPositionId,operatorExternalUserId)).thenReturn(
-      Optional.of(debtPosition));
-    Mockito.when(debtPositionMapper.mapToDebtPositionDetailDTO(debtPosition)).thenReturn(expectedResult);
+    Mockito.when(debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionMapper.mapToDto(debtPosition)).thenReturn(expectedResult);
 
-    DebtPositionDetailDTO result = debtPositionService.getDebtPositionDetail(
-      debtPositionId, operatorExternalUserId);
+    DebtPositionDTO result = debtPositionService.getDebtPosition(
+      debtPositionId);
 
     Assertions.assertNotNull(result);
     Assertions.assertSame(expectedResult,result);
@@ -214,15 +209,13 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenNonExistingDebtPositionDetailWhenGetDebtPositionDetailThenThrowNotFoundException(){
+  void givenNonExistingDebtPositionDetailWhenGetDebtPositionThenThrowNotFoundException(){
     Long debtPositionId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
 
-    Mockito.when(debtPositionRepository.findByDebtPositionIdAndOperatorExternalUserId(debtPositionId,operatorExternalUserId)).thenReturn(
-      Optional.empty());
+    Mockito.when(debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
 
-    Assertions.assertThrows(NotFoundException.class, ()->debtPositionService.getDebtPositionDetail(
-      debtPositionId, operatorExternalUserId));
+    Assertions.assertThrows(NotFoundException.class, ()->debtPositionService.getDebtPosition(
+      debtPositionId));
 
     Mockito.verifyNoMoreInteractions(debtPositionRepository);
     Mockito.verifyNoInteractions(debtPositionMapper);

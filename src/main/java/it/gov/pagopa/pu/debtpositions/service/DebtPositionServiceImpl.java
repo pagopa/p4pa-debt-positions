@@ -1,10 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import io.micrometer.common.util.StringUtils;
-import it.gov.pagopa.pu.debtpositions.dto.DebtPositionWithType;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -79,13 +77,12 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public DebtPositionDetailDTO getDebtPositionDetail(Long debtPositionId,
-    String operatorExternalUserId) {
-    DebtPositionWithType debtPositionWithType = debtPositionRepository.findByDebtPositionIdAndOperatorExternalUserId(debtPositionId, operatorExternalUserId)
-      .orElseThrow(() -> new NotFoundException(
-        "DebtPosition having debtPositionId %d not found".formatted(
-          debtPositionId)));
-    return debtPositionMapper.mapToDebtPositionDetailDTO(debtPositionWithType);
+  public DebtPositionDTO getDebtPosition(Long debtPositionId) {
+    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    if(debtPosition==null) {
+      throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
+    }
+    return debtPositionMapper.mapToDto(debtPosition);
   }
 }
 
