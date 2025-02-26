@@ -928,7 +928,7 @@ components:
         - entityType
         - fiscalCode
         - fullName
-        - amount
+        - amountCents
         - debtPositionTypeCode
         - remittanceInformation
         - flagPagoPaPayment
@@ -1000,8 +1000,9 @@ components:
         dueDate:
           type: string
           format: date-time
-        amount:
-          type: number
+        amountCents:
+          type: integer
+          format: int64
         debtPositionTypeCode:
           type: string
         paymentTypeCode:
@@ -1027,7 +1028,7 @@ components:
       required:
         - orgFiscalCode
         - orgName
-        - amount
+        - amountCents
         - remittanceInformation
         - iban
         - category
@@ -1038,8 +1039,9 @@ components:
           type: string
         orgName:
           type: string
-        amount:
-          type: number
+        amountCents:
+          type: integer
+          format: int64
         remittanceInformation:
           type: string
         iban:
