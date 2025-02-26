@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -64,5 +65,25 @@ class InstallmentControllerTest {
       Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
     }
     Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV");
+  }
+
+  @Test
+  void whenGetInstallmentDetailThenOk() throws Exception {
+    Long installmentId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    InstallmentDetailDTO expectedResponse = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
+
+    Mockito.when(installmentServiceMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(expectedResponse);
+
+    MvcResult result = mockMvc.perform(
+        MockMvcRequestBuilders.get("/installments/"+installmentId)
+          .param("operatorExternalUserId",operatorExternalUserId))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    InstallmentDetailDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), InstallmentDetailDTO.class);
+    TestUtils.reflectionEqualsByName(expectedResponse,response);
+
+    Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
   }
 }

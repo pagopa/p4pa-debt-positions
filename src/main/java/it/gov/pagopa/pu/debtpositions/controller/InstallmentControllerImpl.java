@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.InstallmentApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -20,4 +21,10 @@ public class InstallmentControllerImpl implements InstallmentApi {
   public ResponseEntity<List<InstallmentDTO>> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav) {
     return ResponseEntity.ok(installmentService.getInstallmentsByOrganizationIdAndNav(organizationId, nav));
   }
+
+  @Override
+  public ResponseEntity<InstallmentDetailDTO> getInstallmentDetail(Long installmentId, String operatorExternalUserId) {
+    return ResponseEntity.ok(installmentService.getInstallmentDetail(installmentId, operatorExternalUserId));
+  }
+
 }
