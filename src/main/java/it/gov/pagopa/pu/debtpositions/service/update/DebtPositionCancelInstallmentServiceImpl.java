@@ -12,6 +12,8 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
+
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -31,18 +33,18 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  public String cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public Pair<DebtPositionDTO, String> cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
     List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
     log.info("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
 
-    String workflowId = execute(debtPositionDTO, installments2operate, debtPositionOrigin, massive, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId).getRight();
+    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
 
     log.info("Cancelled installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-    return workflowId;
+    return debtPositionUpdated;
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
+  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
     log.info("Updating status cancelled for installments with ids {}", installmentIds);
 

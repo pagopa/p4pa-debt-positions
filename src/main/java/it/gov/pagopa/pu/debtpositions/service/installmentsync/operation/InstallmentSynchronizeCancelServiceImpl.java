@@ -22,7 +22,8 @@ public class InstallmentSynchronizeCancelServiceImpl {
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
   }
 
-  public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO, DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO,
+                                Boolean massive, String accessToken, String operatorExternalUserId) {
     if (debtPositionDTO == null) {
       throw new ConflictErrorException(String.format("The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
     }
@@ -37,7 +38,7 @@ public class InstallmentSynchronizeCancelServiceImpl {
 
     validateStatus(installmentDTO, installmentSynchronizeDTO);
 
-    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), debtPositionOrigin, massive, accessToken, operatorExternalUserId);
+    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), massive, accessToken, operatorExternalUserId).getRight();
   }
 
   public void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {

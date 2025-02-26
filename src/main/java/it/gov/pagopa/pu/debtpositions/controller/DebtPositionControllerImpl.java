@@ -10,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -36,7 +35,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId);
+    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, DebtPositionOrigin.ORDINARY, massive, accessToken, operatorExternalUserId);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 
@@ -63,9 +62,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
     String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, massive, origin, accessToken, operatorExternalUserId);
-    HttpHeaders headers = new HttpHeaders();
-    headers.add("x-workflow-id", workflowId);
-    return new ResponseEntity<>(headers, HttpStatus.CREATED);
+    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
   }
 }
 

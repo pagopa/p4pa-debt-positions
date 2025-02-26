@@ -48,13 +48,15 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
-  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
+    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
-    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate, DebtPositionOrigin.ORDINARY,
+
+    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate,
       massive, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId).getLeft();
 
     log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
@@ -62,9 +64,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
-                                        DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
-    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
+  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
     generateIuv(debtPositionDTO, org);

@@ -40,9 +40,9 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
       case InstallmentSynchronizeDTO.ActionEnum.I ->
         installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, debtPositionOrigin, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.M ->
-        installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, debtPositionOrigin, massive, accessToken, operatorExternalUserId);
+        installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.A ->
-        installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, debtPositionOrigin, massive, accessToken, operatorExternalUserId);
+        installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
     };
   }
 
