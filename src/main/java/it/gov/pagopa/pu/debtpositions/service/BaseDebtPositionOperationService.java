@@ -61,7 +61,9 @@ public abstract class BaseDebtPositionOperationService {
      */
 
     @Transactional
-    public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken, String operatorExternalUserId) {
+    public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
+                                                 DebtPositionOrigin debtPositionOrigin, Boolean massive, PaymentEventType eventType,
+                                                 String accessToken, String operatorExternalUserId) {
         Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
         authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
@@ -73,15 +75,15 @@ public abstract class BaseDebtPositionOperationService {
         DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
         debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
 
-        String workflowId = invokeWorkflow(savedDebtPosition, accessToken, massive);
+        String workflowId = invokeWorkflow(savedDebtPosition, eventType, accessToken, massive);
 
         return Pair.of(savedDebtPosition, workflowId);
     }
 
-    private String invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+    private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, String accessToken, Boolean massive) {
         if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
             log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-            WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken);
+            WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, eventType, accessToken);
             if (workflowCreatedDTO != null) {
                 return workflowCreatedDTO.getWorkflowId();
             }
@@ -93,11 +95,11 @@ public abstract class BaseDebtPositionOperationService {
      * It will set TO_SYNC and syncStatus to the involved installments
      *
      * @param debtPositionDTO     the debt position to operate on
-     * @param installment2operate the involved installments
+     * @param installments2operate the involved installments
      * @param debtPositionOrigin  the origin of the debt position
      * @param accessToken         the access token
      * @param org                 the organization related to debt position
      * @return the {@link DebtPositionDTO} updated
      */
-    public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate, DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org);
+    public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org);
 }

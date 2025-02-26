@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -43,6 +44,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionService debtPositionService;
+
+  @MockitoBean
+  private InstallmentSynchronizeService installmentSynchronizerService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
