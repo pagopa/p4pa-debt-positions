@@ -1024,7 +1024,7 @@ components:
         numberBeneficiary:
           type: integer
           format: int32
-        transfersList:
+        additionalTransfers:
           type: array
           items:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
