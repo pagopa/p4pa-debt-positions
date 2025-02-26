@@ -4,6 +4,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
@@ -12,13 +14,17 @@ import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.List;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
 
 @Service
 @Slf4j
@@ -27,6 +33,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final ValidateDebtPositionService validateDebtPositionService;
   private final GenerateIuvService generateIuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final DebtPositionProcessorService debtPositionProcessorService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -37,12 +45,16 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
                                          DebtPositionMapper debtPositionMapper,
-                                         DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+                                         DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository
+                                         ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionMapper, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
     this.generateIuvService = generateIuvService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
   @Transactional
@@ -61,21 +73,24 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Override
   public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate,
-                             DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
+                                        DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
 
-    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
-    validateDebtPositionService.validate(debtPositionDTO, accessToken);
-    verifyInstallmentUniqueness(debtPositionDTO);
-    generateIuv(debtPositionDTO, org);
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
+    checkDebtPosition(debtPositionDTO, org, debtPositionOrigin);
 
-    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
-      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
-    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
-      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
-    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
-      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
+    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
+    checkInstallment(debtPositionUpdated, org, debtPositionTypeOrg);
+    verifyInstallmentUniqueness(debtPositionUpdated);
+
+    if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
+    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
+    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
+      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
-    return debtPositionDTO;
+    return debtPositionUpdated;
   }
 
   private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,
@@ -104,16 +119,42 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       });
   }
 
-  private void generateIuv(DebtPositionDTO debtPositionDTO, Organization org) {
-    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
-      debtPositionDTO.getPaymentOptions().stream()
-        .flatMap(po -> po.getInstallments().stream())
-        .forEach(installment -> {
+  private void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg) {
+    debtPositionDTO.getPaymentOptions().stream()
+      .flatMap(po -> po.getInstallments().stream())
+      .forEach(installment -> {
+        String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
+        installment.setIupdPagopa(iupdPagopa);
+
+        if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
           String generatedIuv = generateIuvService.generateIuv(org);
           String nav = generateIuvService.iuv2Nav(generatedIuv);
           installment.setIuv(generatedIuv);
           installment.setNav(nav);
-        });
+        }
+
+        if (StringUtils.isBlank(installment.getIud())) {
+          String iud = Utilities.getRandomIUD();
+          installment.setIud(iud);
+        }
+
+        if (StringUtils.isBlank(installment.getBalance())) {
+          installment.setBalance(debtPositionTypeOrg.getBalance());
+        }
+
+        installment.getTransfers()
+          .forEach(transfer -> {
+            if (transfer.getTransferIndex() == 1) {
+              transfer.setIban(StringUtils.isBlank(debtPositionTypeOrg.getIban()) ? org.getIban() : debtPositionTypeOrg.getIban());
+            }
+          });
+      });
+  }
+
+  private void checkDebtPosition(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionOrigin debtPositionOrigin) {
+    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
+    if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
+      debtPositionDTO.setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
   }
 

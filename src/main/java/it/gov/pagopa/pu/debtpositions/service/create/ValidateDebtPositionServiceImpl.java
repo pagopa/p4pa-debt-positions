@@ -43,7 +43,6 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     if (debtPositionTypeOrg == null ||
-      debtPositionTypeOrg.getCode() == null ||
       StringUtils.isBlank(debtPositionTypeOrg.getCode())) {
       throw new InvalidValueException("Debt position type organization is mandatory");
     }
