@@ -52,6 +52,44 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /debt-positions/{debtPositionId}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPosition
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /installments/{organizationId}/{nav}:
     get:
       tags:
@@ -247,6 +285,12 @@ paths:
         - debt-position
       operationId: installmentSynchronize
       parameters:
+        - name: origin
+          in: query
+          description: Indicates the origin of debt position to synchronize
+          required: true
+          schema:
+            $ref: "#/components/schemas/DebtPositionOrigin"
         - name: massive
           in: query
           description: Indicates if the operation is massive (true) or single (false).
@@ -263,7 +307,7 @@ paths:
         "201":
           description: Ok
           headers:
-            workflow-id:
+            x-workflow-id:
               schema:
                 type: string
               description: The workflow id created.
@@ -878,18 +922,16 @@ components:
         - ingestionFlowFileId
         - ingestionFlowFileLineNumber
         - organizationId
-        - iupd
         - description
         - paymentOptionIndex
         - paymentOptionType
-        - iud
         - entityType
         - fiscalCode
         - fullName
         - amount
         - debtPositionTypeCode
         - remittanceInformation
-        - flagGenerateIuv
+        - flagPagoPaPayment
       type: object
       properties:
         ingestionFlowFileId:
@@ -923,8 +965,10 @@ components:
           format: date-time
         paymentOptionIndex:
           type: integer
-          format: int64
+          format: int32
         paymentOptionType:
+          type: string
+        paymentOptionDescription:
           type: string
         iud:
           type: string
@@ -974,12 +1018,20 @@ components:
           type: boolean
         numberBeneficiary:
           type: integer
-          format: int64
-        transfersList:
+          format: int32
+        additionalTransfers:
           type: array
           items:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
     TransferSynchronizeDTO:
+      required:
+        - orgFiscalCode
+        - orgName
+        - amount
+        - remittanceInformation
+        - iban
+        - category
+        - transferIndex
       type: object
       properties:
         orgFiscalCode:

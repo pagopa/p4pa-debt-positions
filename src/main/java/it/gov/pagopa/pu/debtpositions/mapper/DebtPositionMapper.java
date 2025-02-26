@@ -1,18 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Service;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Service;
 
 @Service
 public class DebtPositionMapper {

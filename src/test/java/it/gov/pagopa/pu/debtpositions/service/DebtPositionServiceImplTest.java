@@ -14,15 +14,18 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeSet;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +34,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import uk.co.jemos.podam.api.PodamFactory;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -54,6 +58,8 @@ class DebtPositionServiceImplTest {
   private DebtPositionMapper debtPositionMapper;
 
   private DebtPositionServiceImpl debtPositionService;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void setUp() {
@@ -203,6 +209,36 @@ class DebtPositionServiceImplTest {
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
       Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
+  }
+
+  @Test
+  void givenExistingDebtPositionWhenGetDebtPositionThenOk(){
+    Long debtPositionId = 1L;
+    DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+
+    Mockito.when(debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionMapper.mapToDto(debtPosition)).thenReturn(expectedResult);
+
+    DebtPositionDTO result = debtPositionService.getDebtPosition(
+      debtPositionId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(expectedResult,result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepository,debtPositionMapper);
+  }
+
+  @Test
+  void givenNonExistingDebtPositionDetailWhenGetDebtPositionThenThrowNotFoundException(){
+    Long debtPositionId = 1L;
+
+    Mockito.when(debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
+
+    Assertions.assertThrows(NotFoundException.class, ()->debtPositionService.getDebtPosition(
+      debtPositionId));
+
+    Mockito.verifyNoMoreInteractions(debtPositionRepository);
+    Mockito.verifyNoInteractions(debtPositionMapper);
   }
 
   @Test

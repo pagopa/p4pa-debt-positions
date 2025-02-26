@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -53,6 +54,21 @@ class DebtPositionProcessorServiceImplTest {
       .mapToObj(i -> buildInstallmentDTO())
       .collect(Collectors.toCollection(ArrayList::new)));
     firstInstallment.setStatus(InstallmentStatus.CANCELLED);
+
+    DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+
+    assertEquals(2000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+  }
+
+  @Test
+  void givenDebtPositionWithInstallmentWithStatusToCancelledWhenUpdateAmountsThenOk() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().addAll(IntStream.range(0, 2)
+      .mapToObj(i -> buildInstallmentDTO())
+      .collect(Collectors.toCollection(ArrayList::new)));
+    firstInstallment.setSyncStatus(InstallmentSyncStatus.builder()
+      .syncStatusFrom(InstallmentStatus.UNPAID).syncStatusTo(InstallmentStatus.CANCELLED).build());
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
