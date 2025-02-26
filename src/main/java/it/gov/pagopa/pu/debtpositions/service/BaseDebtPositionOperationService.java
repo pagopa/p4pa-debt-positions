@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -21,71 +22,82 @@ import java.util.List;
 @Slf4j
 public abstract class BaseDebtPositionOperationService {
 
-  private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
-  private final DebtPositionService debtPositionService;
-  private final DebtPositionSyncService debtPositionSyncService;
-  private final DebtPositionProcessorService debtPositionProcessorService;
-  private final OrganizationService organizationService;
-  private final DebtPositionMapper debtPositionMapper;
-  private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
+    private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
+    private final DebtPositionService debtPositionService;
+    private final DebtPositionSyncService debtPositionSyncService;
+    private final DebtPositionProcessorService debtPositionProcessorService;
+    private final OrganizationService organizationService;
+    private final DebtPositionMapper debtPositionMapper;
+    private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
 
-  protected BaseDebtPositionOperationService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                             DebtPositionService debtPositionService,
-                                             DebtPositionSyncService debtPositionSyncService,
-                                             DebtPositionProcessorService debtPositionProcessorService,
-                                             OrganizationService organizationService,
-                                             DebtPositionMapper debtPositionMapper,
-                                             DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
-    this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
-    this.debtPositionService = debtPositionService;
-    this.debtPositionSyncService = debtPositionSyncService;
-    this.debtPositionProcessorService = debtPositionProcessorService;
-    this.organizationService = organizationService;
-    this.debtPositionMapper = debtPositionMapper;
-    this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
-  }
-
-  /***
-   *
-   * @param debtPositionDTO the debt position to be created
-   * @param installments2operate the list of {@link InstallmentDTO} included in the Debt Position involved in the operation
-   * @param debtPositionOrigin the origin of debt position
-   * @param massive indicates that the operation is massive or single
-   * @param accessToken the access token
-   * @param operatorExternalUserId the operator who requested the creation
-   * @return the {@link DebtPositionDTO} created and WorkflowId of debt position synchronization
-   */
-  public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
-                                               DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken,
-                                               String operatorExternalUserId) {
-    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)
-      .orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
-    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
-
-    DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, debtPositionOrigin, accessToken, org);
-
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
-
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
-    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
-
-    String workflowId = invokeWorkflow(savedDebtPosition, accessToken, massive);
-
-    return Pair.of(savedDebtPosition, workflowId);
-  }
-
-  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
-    if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken);
-      if (workflowCreatedDTO != null) {
-        return workflowCreatedDTO.getWorkflowId();
-      }
+    protected BaseDebtPositionOperationService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionMapper debtPositionMapper, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+        this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
+        this.debtPositionService = debtPositionService;
+        this.debtPositionSyncService = debtPositionSyncService;
+        this.debtPositionProcessorService = debtPositionProcessorService;
+        this.organizationService = organizationService;
+        this.debtPositionMapper = debtPositionMapper;
+        this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     }
-    return null;
-  }
 
-  public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate,
-                                      DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org);
+    /***
+     * It will:
+     * <ol>
+     *    <li>Authorize the operation
+     *    <li>Update amounts
+     *    <li>Call the {@link #applyOperation} method
+     *    <li>Save the DebtPositionDTO
+     *    <li>Align hierarchy status
+     *    <li>Invoke workflow
+     * </ol>
+     *
+     * @param debtPositionDTO the debt position to operate on
+     * @param installments2operate the list of {@link InstallmentDTO} included in the Debt Position involved in the operation (use same objects! it will be used == operator to identify them)
+     * @param debtPositionOrigin the origin of debt position
+     * @param massive indicates that the operation is massive or single
+     * @param accessToken the access token
+     * @param operatorExternalUserId the operator who requested the creation
+     * @return the {@link DebtPositionDTO} created and WorkflowId of debt position synchronization
+     */
+
+    @Transactional
+    public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, DebtPositionOrigin debtPositionOrigin, Boolean massive, String accessToken, String operatorExternalUserId) {
+        Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
+        authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+
+        DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, debtPositionOrigin, accessToken, org);
+
+        DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
+        DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
+
+        DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
+        debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
+
+        String workflowId = invokeWorkflow(savedDebtPosition, accessToken, massive);
+
+        return Pair.of(savedDebtPosition, workflowId);
+    }
+
+    private String invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken, Boolean massive) {
+        if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
+            log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
+            WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken);
+            if (workflowCreatedDTO != null) {
+                return workflowCreatedDTO.getWorkflowId();
+            }
+        }
+        return null;
+    }
+
+    /**
+     * It will set TO_SYNC and syncStatus to the involved installments
+     *
+     * @param debtPositionDTO     the debt position to operate on
+     * @param installment2operate the involved installments
+     * @param debtPositionOrigin  the origin of the debt position
+     * @param accessToken         the access token
+     * @param org                 the organization related to debt position
+     * @return the {@link DebtPositionDTO} updated
+     */
+    public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate, DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org);
 }
