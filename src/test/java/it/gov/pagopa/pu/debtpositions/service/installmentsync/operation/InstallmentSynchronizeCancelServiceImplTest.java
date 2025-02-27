@@ -155,4 +155,31 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     assertEquals(workflowId, result);
   }
+  @Test
+  void testInstallmentSyncCancelWithInstallmentWithSyncStatusValidThenOk() {
+    boolean massive = true;
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    String workflowId = "workflowId";
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIud("iud");
+    installmentSynchronizeDTO.setPaymentOptionIndex(1);
+    installmentSynchronizeDTO.setIngestionFlowFileId(1L);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()
+            .setSyncStatus(InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.UNPAID).build());
+
+    Mockito.when(baseInstallmentSynchronizeServiceMock.findInstallment(debtPositionDTO, installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex()))
+            .thenReturn(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+
+    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
+                    List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), massive, accessToken, operatorExternalUserId))
+            .thenReturn(Pair.of(debtPositionDTO, workflowId));
+
+    String result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
+
+    assertEquals(workflowId, result);
+  }
+
 }
