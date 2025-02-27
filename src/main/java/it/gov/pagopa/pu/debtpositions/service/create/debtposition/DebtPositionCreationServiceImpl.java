@@ -123,14 +123,13 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     debtPositionDTO.getPaymentOptions().stream()
       .flatMap(po -> po.getInstallments().stream())
       .forEach(installment -> {
-        String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
-        installment.setIupdPagopa(iupdPagopa);
-
         if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
           String generatedIuv = generateIuvService.generateIuv(org);
           String nav = generateIuvService.iuv2Nav(generatedIuv);
           installment.setIuv(generatedIuv);
           installment.setNav(nav);
+          String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
+          installment.setIupdPagopa(iupdPagopa);
         }
 
         if (StringUtils.isBlank(installment.getIud())) {

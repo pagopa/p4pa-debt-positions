@@ -51,4 +51,6 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
 
   DebtPosition findByIupdOrg(String iupdOrg);
+
+  DebtPosition findTopByOrderByCreationDateDesc();
 }
