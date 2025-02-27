@@ -42,7 +42,7 @@ class CreatePaidTechnicalDebtPositionsServiceTest {
       Organization org = podamFactory.manufacturePojo(Organization.class);
       transfer.setFiscalCodePA(org.getOrgFiscalCode());
       Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(org.getOrgFiscalCode(), ACCESS_TOKEN)).thenReturn(Optional.of(org));
-      Mockito.doNothing().when(managePaidDebtPositionServiceMock).persistTechnicalDebtPositionFromReceipt(receiptDTO, org);
+      Mockito.doNothing().when(managePaidDebtPositionServiceMock).persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, org);
       return org;
     }).toList();
 
@@ -52,7 +52,7 @@ class CreatePaidTechnicalDebtPositionsServiceTest {
     //verify
     orgList.forEach(org -> {
       Mockito.verify(organizationServiceMock, Mockito.times(1)).getOrganizationByFiscalCode(org.getOrgFiscalCode(), ACCESS_TOKEN);
-      Mockito.verify(managePaidDebtPositionServiceMock, Mockito.times(1)).persistTechnicalDebtPositionFromReceipt(receiptDTO, org);
+      Mockito.verify(managePaidDebtPositionServiceMock, Mockito.times(1)).persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, org);
     });
   }
 

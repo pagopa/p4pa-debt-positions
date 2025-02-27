@@ -139,7 +139,7 @@ class ManagePaidDebtPositionServiceTest {
   }
 
   @Test
-  void givenReceiptWhenPersistTechnicalDebtPositionFromReceiptThenOk(){
+  void givenReceiptWhenPersistTechnicalDebtPositionFromReceiptAndNotifyEventThenOk(){
     //given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
@@ -151,7 +151,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.doNothing().when(paymentsProducerServiceMock).notifyPaymentsEvent(persistedDebtPositionDTO, PaymentEventType.RT_RECEIVED);
 
     //when
-    managePaidDebtPositionService.persistTechnicalDebtPositionFromReceipt(receiptDTO, organization);
+    managePaidDebtPositionService.persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, organization);
 
     //verify
     Mockito.verify(receiptWithAdditionalInfoMapperMock, Mockito.times(1)).mapToDebtPosition(receiptDTO, organization);

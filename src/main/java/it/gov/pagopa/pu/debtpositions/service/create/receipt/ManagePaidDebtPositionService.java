@@ -94,7 +94,7 @@ public class ManagePaidDebtPositionService {
     return persistedDebtPosition;
   }
 
-  void persistTechnicalDebtPositionFromReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+  void persistTechnicalDebtPositionFromReceiptAndNotifyEvent(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
     log.info("Creating technical debt position from receipt[{} - {}/{}] for organization [{}/{}]",
       receiptDTO.getReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());

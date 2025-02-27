@@ -31,6 +31,6 @@ public class CreatePaidTechnicalDebtPositionsService {
       .flatMap(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken).stream())
       //create a "technical" debt position, in status PAID
       .forEach(organization ->
-        managePaidDebtPositionService.persistTechnicalDebtPositionFromReceipt(receiptDTO, organization) );
+        managePaidDebtPositionService.persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, organization) );
   }
 }
