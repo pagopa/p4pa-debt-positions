@@ -53,8 +53,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
 
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
 
-  private final Long debtPositionTypeOrgId = 2L;
-
   @BeforeEach
   void setUp() {
     debtPositionCancelInstallmentService = new DebtPositionCancelInstallmentServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
@@ -78,12 +76,12 @@ class DebtPositionCancelInstallmentServiceImplTest {
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(2L, operatorExternalId)).thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_UPDATED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DPI_CANCELLED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
 
     org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), massive, accessToken, operatorExternalId);
 
