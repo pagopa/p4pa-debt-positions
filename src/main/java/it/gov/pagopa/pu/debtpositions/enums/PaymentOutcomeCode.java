@@ -17,4 +17,13 @@ public enum PaymentOutcomeCode {
     this.code = code;
   }
 
+  public static PaymentOutcomeCode fromValue(int value) {
+    for (PaymentOutcomeCode b : PaymentOutcomeCode.values()) {
+      if (b.code == value) {
+        return b;
+      }
+    }
+    throw new IllegalArgumentException("Unexpected value '" + value + "'");
+  }
+
 }

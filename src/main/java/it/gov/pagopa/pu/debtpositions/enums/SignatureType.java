@@ -16,4 +16,13 @@ public enum SignatureType {
     this.code = code;
   }
 
+  public static SignatureType fromValue(int value) {
+    for (SignatureType b : SignatureType.values()) {
+      if (b.code == value) {
+        return b;
+      }
+    }
+    throw new IllegalArgumentException("Unexpected value '" + value + "'");
+  }
+
 }

@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                type: InstallmentsPaidView
+                $ref: '#/components/schemas/PagedInstallmentsPaidView'
         "400":
           description: Invalid request
           content:
@@ -1124,3 +1124,29 @@ components:
         transferIndex:
           type: integer
           format: int32
+    PagedInstallmentsPaidView:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            type: 'InstallmentPaidView'
+          x-field-extra-annotation: "@lombok.Builder.Default"
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64

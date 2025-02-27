@@ -1,27 +1,25 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
-import it.gov.pagopa.pu.debtpositions.enums.PaymentOutcomeCode;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
-import it.gov.pagopa.pu.debtpositions.enums.SignatureType;
 import it.gov.pagopa.pu.debtpositions.enums.UniqueIdentifierType;
-import it.gov.pagopa.pu.debtpositions.model.NoPIIEntity;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Data
-@Builder(toBuilder = true)
+@SuperBuilder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentPaidViewNoPIIDTO implements Serializable, NoPIIEntity<InstallmentPaidViewPIIDTO> {
+@EqualsAndHashCode(callSuper = true)
+public class InstallmentPaidViewDTO  extends InstallmentPaidViewPIIDTO{
 
   private String iuf;
   private Integer numRigaFlusso;
@@ -30,11 +28,13 @@ public class InstallmentPaidViewNoPIIDTO implements Serializable, NoPIIEntity<In
   @NotNull
   private String codIuv;
   private Integer versioneOggetto;
+  @NotNull
   private String identificativoDominio;
   private String identificativoStazioneRichiedente;
   @NotNull
   private String identificativoMessaggioRicevuta;
   private OffsetDateTime dataOraMessaggioRicevuta;
+  @NotNull
   private String riferimentoMessaggioRichiesta;
   private OffsetDateTime riferimentoDataRichiesta;
   private UniqueIdentifierType tipoIdentificativoUnivoco;
@@ -61,11 +61,11 @@ public class InstallmentPaidViewNoPIIDTO implements Serializable, NoPIIEntity<In
   private String localitaBeneficiario;
   private String provinciaBeneficiario;
   private String nazioneBeneficiario;
-  @NotNull
   private PersonEntityType soggVersTipoIdentificativoUnivoco;
   private PersonEntityType soggVersCodiceIdentificativoUnivoco;
+  @NotNull
   private PersonEntityType soggPagTipoIdentificativoUnivoco;
-  private PaymentOutcomeCode codiceEsitoPagamento;
+  private Integer codiceEsitoPagamento;
   @NotNull
   private Double importoTotalePagato;
   @NotNull
@@ -96,22 +96,19 @@ public class InstallmentPaidViewNoPIIDTO implements Serializable, NoPIIEntity<In
 
   @Min(1)
   @Max(15)
-  private SignatureType tipoFirma;
+  private Integer tipoFirma;
 
   private String rt;
   @NotNull
   private Integer indiceDatiSingoloPagamento;
-  @NotNull
   private Double numRtDatiPagDatiSingPagCommissioniApplicatePsp;
   private String codRtDatiPagDatiSingPagAllegatoRicevutaTipo;
   private String blbRtDatiPagDatiSingPagAllegatoRicevutaTest;
   private String bilancio;
+  @NotNull
   private String cod_fiscale_pa1;
   private String de_nome_pa1;
   @NotNull
   private String cod_tassonomico_dovuto_pa1;
-
-  @NotNull
-  private Long personalDataId;
 
 }
