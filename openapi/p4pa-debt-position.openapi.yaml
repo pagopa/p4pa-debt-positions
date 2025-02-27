@@ -1010,6 +1010,13 @@ components:
           format: int64
         flagExternal:
           type: boolean
+        serviceId:
+          type: integer
+          format: int64
+        subject:
+          type: string
+        markdown:
+          type: string
     InstallmentSynchronizeDTO:
       required:
         - action

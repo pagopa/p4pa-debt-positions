@@ -50,4 +50,7 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
+  private Long serviceId;
+  private String subject;
+  private String markdown;
 }
