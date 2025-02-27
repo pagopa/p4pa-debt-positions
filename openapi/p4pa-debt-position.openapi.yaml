@@ -197,6 +197,48 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /installments/{installmentId}:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentDetail
+      parameters:
+        - name: installmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/InstallmentDetailDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:
@@ -656,6 +698,58 @@ components:
         updateDate:
           type: string
           format: date-time
+    InstallmentDetailDTO:
+      type: object
+      required:
+        - installmentId
+        - status
+        - iuv
+        - amountCents
+        - dueDate
+        - debtor
+        - debtPositionTypeOrgDescription
+        - debtPositionDescription
+        - debtPositionId
+      properties:
+        installmentId:
+          type: integer
+          format: int64
+        receiptId:
+          type: integer
+          format: int64
+        paymentOptionId:
+          type: integer
+          format: int64
+        status:
+          $ref: "#/components/schemas/InstallmentStatus"
+        iuv:
+          type: string
+        amountCents:
+          type: integer
+          format: int64
+        dueDate:
+          type: string
+          format: date-time
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
+        debtPositionTypeOrgDescription:
+          type: string
+        debtPositionDescription:
+          type: string
+        debtPositionId:
+          type: integer
+          format: int64
+        paymentDateTime:
+          type: string
+          format: date-time
+        payer:
+          $ref: "#/components/schemas/PersonDTO"
+        pspCompanyName:
+          type: string
+        iud:
+          type: string
+        iur:
+          type: string
     ReceiptDetailDTO:
       type: object
       required:

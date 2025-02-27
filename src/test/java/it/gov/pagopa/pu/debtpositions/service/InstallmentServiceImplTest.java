@@ -3,10 +3,13 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
@@ -27,6 +30,8 @@ class InstallmentServiceImplTest {
   private InstallmentPIIRepository installmentPIIRepositoryMock;
   @Mock
   private InstallmentMapper installmentMapperMock;
+  @Mock
+  private InstallmentDetailPIIViewRepository installmentDetailPIIViewRepositoryMock;
 
   @InjectMocks
   private InstallmentServiceImpl installmentService;
@@ -57,5 +62,21 @@ class InstallmentServiceImplTest {
     Assertions.assertIterableEquals(installmentDTOList, response);
     Mockito.verify(installmentPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(1L, "NAV", originList);
     installmentList.forEach(installment -> Mockito.verify(installmentMapperMock, Mockito.times(1)).mapToDto(installment));
+  }
+
+  @Test
+  void whenGetInstallmentDetailThenOk() {
+    Long installmentId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    InstallmentDetailDTO installment = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
+
+    Mockito.when(installmentDetailPIIViewRepositoryMock.getInstallmentDetail(installmentId,operatorExternalUserId)).thenReturn(installment);
+
+    InstallmentDetailDTO response = installmentService.getInstallmentDetail(installmentId,operatorExternalUserId);
+
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(installment, response);
+
+    Mockito.verify(installmentDetailPIIViewRepositoryMock).getInstallmentDetail(installmentId,operatorExternalUserId);
   }
 }
