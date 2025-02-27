@@ -41,18 +41,16 @@ public class InstallmentSynchronizeCancelServiceImpl {
     return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), massive, accessToken, operatorExternalUserId).getRight();
   }
 
-  public void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
+  private void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     if (InstallmentStatus.TO_SYNC.equals(installmentDTO.getStatus())) {
       if (!installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId())) {
-        throw new ConflictErrorException("The installment cannot be cancelled because there was an error in the previous synchronization");
+        throw new ConflictErrorException(String.format("The installment with %s cannot be cancelled because there was an error in the previous synchronization",installmentSynchronizeDTO.getIud()));
       } else if (installmentDTO.getSyncStatus() != null && !installmentStatusesValidForCancel.contains(installmentDTO.getSyncStatus().getSyncStatusTo())) {
         throw new ConflictErrorException(String.format("The installment with %s cannot be cancelled because is not in an allowed status to: %s",
           installmentSynchronizeDTO.getIud(), installmentDTO.getSyncStatus().getSyncStatusTo()));
       }
-    }
-
-    if (!installmentStatusesValidForCancel.contains(installmentDTO.getStatus())) {
-      throw new ConflictErrorException(String.format("The installment with %s cannot be cancelled because is not in an allowed status: %s",
+    } else if (!installmentStatusesValidForCancel.contains(installmentDTO.getStatus())) {
+      throw new ConflictErrorException(String.format("The installment with iud %s cannot be cancelled because is not in an allowed status: %s",
         installmentSynchronizeDTO.getIud(), installmentDTO.getStatus()));
     }
   }
