@@ -8,8 +8,6 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelServiceImpl;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertServiceImpl;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +30,6 @@ class InstallmentSynchronizeServiceImplTest {
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
-  private InstallmentSynchronizeInsertServiceImpl installmentSynchronizeInsertServiceMock;
-  @Mock
-  private InstallmentSynchronizeUpdateServiceImpl installmentSynchronizeUpdateServiceMock;
-  @Mock
   private InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelServiceMock;
 
   private InstallmentSynchronizeService installmentSynchronizeService;
@@ -43,8 +37,7 @@ class InstallmentSynchronizeServiceImplTest {
   @BeforeEach
   void setUp() {
     installmentSynchronizeService = new InstallmentSynchronizeServiceImpl(debtPositionRepositoryMock,
-      debtPositionMapperMock, installmentSynchronizeInsertServiceMock,
-      installmentSynchronizeUpdateServiceMock, installmentSynchronizeCancelServiceMock);
+      debtPositionMapperMock, installmentSynchronizeCancelServiceMock);
   }
 
   @Test
@@ -106,49 +99,4 @@ class InstallmentSynchronizeServiceImplTest {
     assertNull(result);
   }
 
-  @Test
-  void testInstallmentSynchronizeInsertActionThenOk(){
-    String accessToken = "accessToken";
-    String operatorExternalUserId = "operatorExternalUserId";
-    boolean massive = false;
-    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.I);
-
-    DebtPosition debtPosition = buildDebtPosition();
-    debtPosition.setDebtPositionOrigin(debtPositionOrigin);
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-
-    Mockito.when(debtPositionRepositoryMock.findByIupdOrg(installmentSynchronizeDTO.getIupdOrg())).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(installmentSynchronizeInsertServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, debtPositionOrigin,
-      massive, accessToken, operatorExternalUserId)).thenReturn("workflowId");
-
-    String result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, massive, debtPositionOrigin, accessToken, operatorExternalUserId);
-
-    assertEquals("workflowId", result);
-  }
-
-  @Test
-  void testInstallmentSynchronizeUpdateActionThenOk(){
-    String accessToken = "accessToken";
-    String operatorExternalUserId = "operatorExternalUserId";
-    boolean massive = false;
-    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.M);
-
-    DebtPosition debtPosition = buildDebtPosition();
-    debtPosition.setDebtPositionOrigin(debtPositionOrigin);
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-
-    Mockito.when(debtPositionRepositoryMock.findByIupdOrg(installmentSynchronizeDTO.getIupdOrg())).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(installmentSynchronizeUpdateServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
-      massive, accessToken, operatorExternalUserId)).thenReturn("workflowId");
-
-    String result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, massive, debtPositionOrigin, accessToken, operatorExternalUserId);
-
-    assertEquals("workflowId", result);
-  }
 }
