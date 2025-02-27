@@ -34,19 +34,24 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   public Pair<DebtPositionDTO, String> cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
-    List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
-    log.info("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
+    if(log.isDebugEnabled()) {
+      List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
+      log.debug("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
+    }
 
-    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
+    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DPI_CANCELLED, accessToken, operatorExternalUserId);
 
-    log.info("Cancelled installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
+    log.debug("Cancelled installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
     return debtPositionUpdated;
   }
 
   @Override
   public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
-    log.info("Updating status cancelled for installments with ids {}", installmentIds);
+
+    if(log.isDebugEnabled()){
+      log.debug("Updating status cancelled for installments with ids {}", installmentIds);
+    }
 
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()

@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.BaseInstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,27 +16,23 @@ import java.util.Set;
 public class InstallmentSynchronizeCancelServiceImpl {
 
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
+  private final BaseInstallmentSynchronizeService baseInstallmentSynchronizeService;
 
   private static final Set<InstallmentStatus> installmentStatusesValidForCancel =
     Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
 
-  public InstallmentSynchronizeCancelServiceImpl(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
+  public InstallmentSynchronizeCancelServiceImpl(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, BaseInstallmentSynchronizeService baseInstallmentSynchronizeService) {
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
+    this.baseInstallmentSynchronizeService = baseInstallmentSynchronizeService;
   }
 
   public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO,
                                 Boolean massive, String accessToken, String operatorExternalUserId) {
     if (debtPositionDTO == null) {
-      throw new ConflictErrorException(String.format("The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
+      throw new NotFoundException(String.format("The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
     }
 
-    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionIndex().equals(installmentSynchronizeDTO.getPaymentOptionIndex()))
-      .flatMap(po -> po.getInstallments().stream())
-      .filter(inst -> inst.getIud().equals(installmentSynchronizeDTO.getIud()))
-      .findFirst()
-      .orElseThrow(() -> new ConflictErrorException(String.format("The installment with iud %s in payment option with index %s not found",
-        installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex())));
+    InstallmentDTO installmentDTO = baseInstallmentSynchronizeService.findInstallment(debtPositionDTO, installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex());
 
     validateStatus(installmentDTO, installmentSynchronizeDTO);
 
