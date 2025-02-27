@@ -43,7 +43,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class CreateDebtPositionServiceImplTest {
+class DebtPositionCreationServiceImplTest {
 
   @Mock
   private AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeServiceMock;
@@ -232,6 +232,10 @@ class CreateDebtPositionServiceImplTest {
   void givenDebtPositionWhenGenerateIuvThenAssignIuvAndIupdToInstallments() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIud("");
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setBalance("");
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setIupdOrg("");
 
     Organization organization = buildOrganization();
     DebtPositionDTO debtPositionIuvDTO = buildGeneratedIuvDebtPositionDTO();
@@ -254,7 +258,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(generateIuvServiceMock.generateIuv(organization)).thenReturn("generatedIuv");
     Mockito.when(generateIuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
-    Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), "generatedIuv", "generatedNav")).thenReturn(0L);
+    Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), "randomIUD", "generatedIuv", "generatedNav")).thenReturn(0L);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPositionIuvDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionIuvDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionIuvDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
@@ -262,6 +266,8 @@ class CreateDebtPositionServiceImplTest {
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomicUUID).thenReturn("randomUUID");
+      mockedStatic.when(Utilities::getRandomIUD).thenReturn("randomIUD");
+      mockedStatic.when(() -> Utilities.generateRandomIupd(organization.getOrgFiscalCode())).thenReturn("randomIUPD");
 
       DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
 
