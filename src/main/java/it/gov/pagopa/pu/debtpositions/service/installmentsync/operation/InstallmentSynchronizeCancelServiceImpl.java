@@ -13,17 +13,15 @@ import java.util.Set;
 
 @Service
 @Slf4j
-public class InstallmentSynchronizeCancelServiceImpl {
+public class InstallmentSynchronizeCancelServiceImpl extends BaseInstallmentSynchronizeService {
 
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
-  private final BaseInstallmentSynchronizeService baseInstallmentSynchronizeService;
 
   private static final Set<InstallmentStatus> installmentStatusesValidForCancel =
     Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
 
-  public InstallmentSynchronizeCancelServiceImpl(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, BaseInstallmentSynchronizeService baseInstallmentSynchronizeService) {
+  public InstallmentSynchronizeCancelServiceImpl(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
-    this.baseInstallmentSynchronizeService = baseInstallmentSynchronizeService;
   }
 
   public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO,
@@ -32,7 +30,7 @@ public class InstallmentSynchronizeCancelServiceImpl {
       throw new NotFoundException(String.format("The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
     }
 
-    InstallmentDTO installmentDTO = baseInstallmentSynchronizeService.findInstallment(debtPositionDTO, installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex());
+    InstallmentDTO installmentDTO = findInstallment(debtPositionDTO, installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex());
 
     validateStatus(installmentDTO, installmentSynchronizeDTO);
 

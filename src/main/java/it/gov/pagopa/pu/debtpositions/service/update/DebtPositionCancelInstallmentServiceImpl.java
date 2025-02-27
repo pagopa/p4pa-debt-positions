@@ -17,6 +17,8 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -34,8 +36,8 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   public Pair<DebtPositionDTO, String> cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
-    if(log.isDebugEnabled()) {
-      List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
+    if (log.isDebugEnabled()) {
+      Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
       log.debug("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
     }
 
@@ -47,21 +49,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
-    List<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).toList();
+    Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
+    log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 
-    if(log.isDebugEnabled()){
-      log.debug("Updating status cancelled for installments with ids {}", installmentIds);
-    }
-
-    debtPositionDTO.getPaymentOptions()
-      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .findFirst()
-        .ifPresent(installmentDTO -> {
-            installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
-            installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
-          }
-        ));
+    setSyncStatus(debtPositionDTO, installmentIds, InstallmentStatus.CANCELLED);
 
     return debtPositionDTO;
   }
