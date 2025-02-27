@@ -129,7 +129,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null);
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -161,7 +161,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null);
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -189,7 +189,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null);
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -213,7 +213,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(2L);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
-      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+      createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null)
     );
     assertEquals("Duplicate records found: the provided data conflicts with existing records.", exception.getMessage());
   }
@@ -249,7 +249,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null);
 
     result.getPaymentOptions().stream()
       .flatMap(po -> po.getInstallments().stream())
@@ -277,7 +277,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, Map.of(installmentNoPII, buildInstallment())));
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatus(debtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null);
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null);
 
     assertEquals(DebtPositionStatus.DRAFT, result.getStatus());
     assertEquals(PaymentOptionStatus.DRAFT, result.getPaymentOptions().getFirst().getStatus());
@@ -292,7 +292,7 @@ class CreateDebtPositionServiceImplTest {
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.empty());
 
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+      createDebtPositionService.createDebtPosition(debtPositionDTO,false, null, null)
     );
     assertEquals("Provided organization id not found on db.", exception.getMessage());
   }

@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -53,17 +54,16 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
-    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate, DebtPositionOrigin.ORDINARY, massive, accessToken, operatorExternalUserId).getLeft();
+
+    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate,
+      massive, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId).getLeft();
 
     log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
     return savedDebtPosition;
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installment2operate,
-                             DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
-
-    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
+  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     validateDebtPositionService.validate(debtPositionDTO, accessToken);
     verifyInstallmentUniqueness(debtPositionDTO);
     generateIuv(debtPositionDTO, org);
