@@ -1,9 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +22,7 @@ public class InstallmentDetailNoPIIView implements Serializable {
   private Long installmentId;
   private Long receiptId;
   private Long paymentOptionId;
+  @Enumerated(EnumType.STRING)
   private InstallmentStatus status;
   private String iuv;
   private Long amountCents;
