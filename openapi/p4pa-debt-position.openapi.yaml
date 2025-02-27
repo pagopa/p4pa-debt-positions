@@ -909,7 +909,6 @@ components:
                 type: string
     PersonDTO:
       required:
-        - email
         - fullName
         - entityType
         - fiscalCode

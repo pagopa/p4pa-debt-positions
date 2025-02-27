@@ -1,21 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.debtpositions.model.*;
+import it.gov.pagopa.pu.debtpositions.repository.*;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
+
 import java.util.Map;
+
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -43,10 +38,6 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
-    if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
-      mappedDebtPosition.getFirst().setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
-    }
-
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
 
     savedDebtPosition.getPaymentOptions().forEach(paymentOption -> {
@@ -56,11 +47,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       savedPaymentOption.getInstallments().forEach(installmentNoPII -> {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
-        if (StringUtils.isBlank(mappedInstallment.getIud())) {
-          String iud = Utilities.getRandomIUD();
-          mappedInstallment.setIud(iud);
-          installmentNoPII.setIud(iud);
-        }
+
         InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment).getNoPII();
         installmentNoPII.setPersonalDataId(savedInstallment.getPersonalDataId());
         installmentNoPII.setInstallmentId(savedInstallment.getInstallmentId());
@@ -79,7 +66,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public DebtPositionDTO getDebtPosition(Long debtPositionId) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
-    if(debtPosition==null) {
+    if (debtPosition == null) {
       throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
     }
     return debtPositionMapper.mapToDto(debtPosition);
