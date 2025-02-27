@@ -4,6 +4,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
+import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -20,7 +22,7 @@ import java.util.Optional;
 
 @Service
 @Slf4j
-public class UpdatePaidDebtPositionService {
+public class ManagePaidDebtPositionService {
 
   private final OrganizationService organizationService;
   private final PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService;
@@ -28,17 +30,28 @@ public class UpdatePaidDebtPositionService {
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionService debtPositionService;
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
+  private final PaymentsProducerService paymentsProducerService;
+  private final ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
 
-  public UpdatePaidDebtPositionService(OrganizationService organizationService, PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService, InstallmentUpdateService installmentUpdateService, DebtPositionSyncService debtPositionSyncService, DebtPositionService debtPositionService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+  public ManagePaidDebtPositionService(OrganizationService organizationService,
+                                       PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService,
+                                       InstallmentUpdateService installmentUpdateService,
+                                       DebtPositionSyncService debtPositionSyncService,
+                                       DebtPositionService debtPositionService,
+                                       DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+                                       PaymentsProducerService paymentsProducerService,
+                                       ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionService = debtPositionService;
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
+    this.paymentsProducerService = paymentsProducerService;
+    this.receiptWithAdditionalInfoMapper = receiptWithAdditionalInfoMapper;
   }
 
-  boolean handleReceiptReceived(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+  boolean handleReceiptReceivedPrimaryOrg(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     return organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken)
       .map(primaryOrg -> {
         Pair<Optional<InstallmentNoPII>, Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
@@ -60,17 +73,34 @@ public class UpdatePaidDebtPositionService {
     }
   }
 
-  private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken, Organization org) {
+  private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken, Organization organization) {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
     DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
     //align debt position status
     DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, org);
-    log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
+    DebtPositionDTO persistedDebtPosition = persistDebtPositionAndNotifyEvent(debtPositionDTO, organization);
     //start debt position workflow
     invokeWorkflow(persistedDebtPosition, accessToken);
+  }
+
+  private DebtPositionDTO persistDebtPositionAndNotifyEvent(DebtPositionDTO debtPositionDTO, Organization organization) {
+    //persist updated debt position
+    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, organization);
+    log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
+    //notify payment event
+    paymentsProducerService.notifyPaymentsEvent(persistedDebtPosition, PaymentEventType.RT_RECEIVED);
+    return persistedDebtPosition;
+  }
+
+  void persistTechnicalDebtPositionFromReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+    log.info("Creating technical debt position from receipt[{} - {}/{}] for organization [{}/{}]",
+      receiptDTO.getReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
+      organization.getOrganizationId(), organization.getOrgFiscalCode());
+    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
+    DebtPositionDTO createdDebtPositionDTO = persistDebtPositionAndNotifyEvent(debtPositionDTO, organization);
+    log.info("Technical debt position created with id [{}]", createdDebtPositionDTO.getDebtPositionId());
   }
 
 }
