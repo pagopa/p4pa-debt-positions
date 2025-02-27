@@ -1,11 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -21,8 +20,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DebtPositionControllerImpl.class)
@@ -43,6 +45,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionService debtPositionService;
+
+  @MockitoBean
+  private InstallmentSynchronizeService installmentSynchronizerService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
@@ -121,5 +126,25 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void whenInstallmentSynchronizeThenOk() throws Exception {
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    Boolean massive = true;
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+
+    Mockito.when(installmentSynchronizerService.installmentSynchronize(any(), any(), any(),any(), any()))
+      .thenReturn("workflowId");
+
+    mockMvc.perform(
+        put("/debt-positions/installment-synchronize")
+          .param("massive", String.valueOf(massive))
+          .param("origin", String.valueOf(debtPositionOrigin))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
+      .andExpect(status().isCreated())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andReturn();
   }
 }

@@ -425,6 +425,7 @@ components:
   schemas:
     DebtPositionDTO:
       required:
+        - debtPositionOrigin
         - organizationId
         - debtPositionTypeOrgId
         - paymentOptions
