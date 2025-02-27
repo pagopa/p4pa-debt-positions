@@ -76,10 +76,10 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Override
   public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
-                                        DebtPositionOrigin debtPositionOrigin, String accessToken, Organization org) {
+                                        String accessToken, Organization org) {
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
-    checkDebtPosition(debtPositionDTO, org, debtPositionOrigin);
+    checkDebtPosition(debtPositionDTO, org);
 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
     validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
@@ -153,8 +153,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       });
   }
 
-  private void checkDebtPosition(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionOrigin debtPositionOrigin) {
-    debtPositionDTO.setDebtPositionOrigin(debtPositionOrigin);
+  private void checkDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
       debtPositionDTO.setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
