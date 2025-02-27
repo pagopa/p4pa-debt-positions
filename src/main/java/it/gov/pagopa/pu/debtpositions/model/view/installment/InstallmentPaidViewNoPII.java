@@ -28,55 +28,44 @@ public class InstallmentPaidViewNoPII implements Serializable {
   private Long installmentId;
   private String iuf;
   @NotNull
-  private String codIud;
+  private String iud;
   @NotNull
-  private String codIuv;
+  private String noticeNumber;
   @NotNull
-  private String identificativoDominio;
+  private String orgFiscalCode;
   @NotNull
-  private String identificativoMessaggioRicevuta;
-  private OffsetDateTime dataOraMessaggioRicevuta;
+  private String paymentReceiptId;
+  private OffsetDateTime paymentDateTime;
   @NotNull
-  private String riferimentoMessaggioRichiesta;
-  private OffsetDateTime riferimentoDataRichiesta;
+  private String idPsp;
   @NotNull
-  private String codiceIdentificativoUnivoco;
+  private String pspCompanyName;
   @NotNull
-  private String denominazioneAttestante;
+  private PersonEntityType debtorEntityType;
   @NotNull
-  private PersonEntityType soggPagTipoIdentificativoUnivoco;
+  private Long paymentAmountCents;
   @NotNull
-  private Long importoTotalePagato;
+  private String creditorReferenceId;
   @NotNull
-  private String identificativoUnivocoVersamento;
-  @NotNull
-  private String codiceContestoPagamento;
-  @NotNull
-  private Long singoloImportoPagato;
-  private OffsetDateTime dataEsitoSingoloPagamento;
-  @NotNull
-  private String identificativoUnivocoRiscoss;
+  private Long amountCents;
   @Min(1)
   @Max(140)
   @NotNull
-  private String causaleVersamento;
+  private String remittanceInformation;
   @Min(5)
   @Max(140)
   @NotNull
-  private String datiSpecificiRiscossione;
+  private String category;
   @NotBlank
   @Min(1)
   @Max(1024)
-  private String tipoDovuto;
+  private String code;
   @NotNull
-  private Integer indiceDatiSingoloPagamento;
-  private Long numRtDatiPagDatiSingPagCommissioniApplicatePsp;
-  private String bilancio;
+  private Integer transferIndex;
+  private Long feeCents;
+  private String balance;
   @NotNull
-  private String cod_fiscale_pa1;
-  private String de_nome_pa1;
-  @NotNull
-  private String cod_tassonomico_dovuto_pa1;
+  private String companyName;
   @NotNull
   private Long personalDataId;
 }
