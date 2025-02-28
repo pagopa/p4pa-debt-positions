@@ -59,7 +59,7 @@ public class DebtPositionFaker {
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
     debtPositionDTO.setDebtPositionId(1L);
     debtPositionDTO.setDebtPositionTypeOrgId(2L);
-    debtPositionDTO.setIupdOrg("IUPD_ORG");
+    debtPositionDTO.setIupdOrg("randomIUPD");
     debtPositionDTO.setDescription("Test Description");
     debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);

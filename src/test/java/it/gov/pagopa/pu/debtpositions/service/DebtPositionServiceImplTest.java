@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
@@ -12,20 +13,16 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import it.gov.pagopa.pu.debtpositions.model.*;
+import it.gov.pagopa.pu.debtpositions.repository.*;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+
 import java.util.List;
 import java.util.Map;
 import java.util.TreeSet;
+
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,10 +71,9 @@ class DebtPositionServiceImplTest {
 
     Organization org = buildOrganization();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setIupdOrg("");
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
 
     DebtPosition debtPosition = buildDebtPosition();
-    debtPosition.setIupdOrg(generatedIupd);
     PaymentOption paymentOption = buildPaymentOption();
 
     InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
@@ -85,7 +81,9 @@ class DebtPositionServiceImplTest {
     installmentNoIud.setIud("");
 
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
     Installment installment = buildInstallment();
+    installment.getTransfers().getFirst().setTransferIndex(1);
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
     installment.setNoPII(installmentNoPII);
@@ -135,6 +133,8 @@ class DebtPositionServiceImplTest {
   @Test
   void givenValidDebtPositionDTONoOrg_WhenSaveDebtPosition_ThenSaveAllEntities() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setIban("");
 
     DebtPosition debtPosition = buildDebtPosition();
     PaymentOption paymentOption = buildPaymentOption();
@@ -144,9 +144,12 @@ class DebtPositionServiceImplTest {
     installmentNoIud.setIud("");
 
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
     Installment installment = buildInstallment();
+    installment.getTransfers().getFirst().setTransferIndex(1);
     installment.setInstallmentId(10L);
     installmentNoPII.setInstallmentId(10L);
+    installment.setBalance("");
 
     Transfer transfer = buildTransfer();
 
@@ -182,7 +185,9 @@ class DebtPositionServiceImplTest {
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
 
-      debtPositionService.saveDebtPosition(debtPositionDTO, null);
+      Organization org = buildOrganization();
+      org.setIban("IT60X0542811101000000123456");
+      debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
@@ -192,7 +197,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionWhenGetDebtPositionThenOk(){
+  void givenExistingDebtPositionWhenGetDebtPositionThenOk() {
     Long debtPositionId = 1L;
     DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
@@ -204,17 +209,17 @@ class DebtPositionServiceImplTest {
       debtPositionId);
 
     Assertions.assertNotNull(result);
-    Assertions.assertSame(expectedResult,result);
-    Mockito.verifyNoMoreInteractions(debtPositionRepository,debtPositionMapper);
+    Assertions.assertSame(expectedResult, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepository, debtPositionMapper);
   }
 
   @Test
-  void givenNonExistingDebtPositionDetailWhenGetDebtPositionThenThrowNotFoundException(){
+  void givenNonExistingDebtPositionDetailWhenGetDebtPositionThenThrowNotFoundException() {
     Long debtPositionId = 1L;
 
     Mockito.when(debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
 
-    Assertions.assertThrows(NotFoundException.class, ()->debtPositionService.getDebtPosition(
+    Assertions.assertThrows(NotFoundException.class, () -> debtPositionService.getDebtPosition(
       debtPositionId));
 
     Mockito.verifyNoMoreInteractions(debtPositionRepository);
