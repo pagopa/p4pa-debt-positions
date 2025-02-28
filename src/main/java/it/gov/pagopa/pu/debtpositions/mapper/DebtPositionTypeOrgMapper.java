@@ -4,13 +4,10 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-
 @Service
 public class DebtPositionTypeOrgMapper {
 
   public DebtPositionTypeOrg mapFromDebtPositionType(DebtPositionType debtPositionType, Long organizationId) {
-    LocalDateTime now = LocalDateTime.now();
     return DebtPositionTypeOrg.builder()
       .debtPositionTypeId(debtPositionType.getDebtPositionTypeId())
       .organizationId(organizationId)
@@ -35,8 +32,11 @@ public class DebtPositionTypeOrgMapper {
       .flagAmountActualization(false)
       .amountActualizationOrgSilServiceId(null)
       .flagExternal(false)
-      .creationDate(now)
-      .updateDate(now)
+      .serviceId(null)
+      .subject(null)
+      .markdown(null)
+      .creationDate(null)
+      .updateDate(null)
       .updateOperatorExternalId(null)
       .build();
   }
