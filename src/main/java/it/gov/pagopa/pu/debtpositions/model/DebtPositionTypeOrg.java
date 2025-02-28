@@ -43,6 +43,8 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private boolean flagMandatoryDueDate;
   private boolean flagSpontaneous;
   private boolean flagNotifyIo;
+  private String serviceId;
+  private String ioTemplateSubject;
   private String ioTemplateMessage;
   private boolean flagActive;
   private boolean flagNotifyOutcomePush;
@@ -50,7 +52,4 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
-  private String serviceId;
-  private String subject;
-  private String markdown;
 }
