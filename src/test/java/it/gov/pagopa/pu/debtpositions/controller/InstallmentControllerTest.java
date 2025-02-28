@@ -61,13 +61,14 @@ class InstallmentControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<InstallmentDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<List<InstallmentDTO>>(){});
+    List<InstallmentDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+    });
     for(int idx = 0; idx < installmentDTOList.size(); idx++) {
       InstallmentDTO resultElem = resultResponse.get(idx);
       InstallmentDTO expectedElem = installmentDTOList.get(idx);
       Assertions.assertTrue(EqualsBuilder.reflectionEquals(expectedElem, resultElem, false, null, true,
         "transfers", "notificationDate","dueDate", "creationDate", "updateDate"), "Error on element " + idx);
-      Assertions.assertEquals(expectedElem.getDueDate().toInstant(), resultElem.getDueDate().toInstant());
+      Assertions.assertEquals(expectedElem.getDueDate(), resultElem.getDueDate());
       Assertions.assertEquals(expectedElem.getNotificationDate().toInstant(), resultElem.getNotificationDate().toInstant());
       Assertions.assertEquals(expectedElem.getCreationDate().toInstant(), resultElem.getCreationDate().toInstant());
       Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());

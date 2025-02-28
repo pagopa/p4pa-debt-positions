@@ -11,9 +11,12 @@ import org.springframework.stereotype.Service;
 public class CreatePaidTechnicalDebtPositionsService {
 
   private final OrganizationService organizationService;
+  private final ManagePaidDebtPositionService managePaidDebtPositionService;
 
-  public CreatePaidTechnicalDebtPositionsService(OrganizationService organizationService) {
+  public CreatePaidTechnicalDebtPositionsService(OrganizationService organizationService,
+                                                 ManagePaidDebtPositionService managePaidDebtPositionService) {
     this.organizationService = organizationService;
+    this.managePaidDebtPositionService = managePaidDebtPositionService;
   }
 
   void createPaidTechnicalDebtPositionsFromReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, boolean includePrimaryOrg, String accessToken) {
@@ -28,9 +31,6 @@ public class CreatePaidTechnicalDebtPositionsService {
       .flatMap(fiscalCode -> organizationService.getOrganizationByFiscalCode(fiscalCode, accessToken).stream())
       //create a "technical" debt position, in status PAID
       .forEach(organization ->
-        //TODO task P4ADEV-2027
-        log.info("TODO P4ADEV-2027 create technical debt position for org[{}/{}] nav[{}]", organization.getOrganizationId(),
-          organization.getOrgFiscalCode(), receiptDTO.getNoticeNumber())
-      );
+        managePaidDebtPositionService.persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, organization) );
   }
 }

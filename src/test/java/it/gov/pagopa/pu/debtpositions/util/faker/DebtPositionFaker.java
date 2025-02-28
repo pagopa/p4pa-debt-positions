@@ -5,6 +5,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -15,7 +17,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
-  private static final OffsetDateTime DATE = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+  private static final LocalDate DATE = LocalDate.of(2025, 1, 1);
+  private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static DebtPosition buildDebtPosition() {
     DebtPosition debtPosition = new DebtPosition();
@@ -30,8 +33,8 @@ public class DebtPositionFaker {
     debtPosition.setFlagIuvVolatile(true);
     debtPosition.setMultiDebtor(false);
     debtPosition.setFlagPagoPaPayment(false);
-    debtPosition.setCreationDate(DATE.toLocalDateTime());
-    debtPosition.setUpdateDate(DATE.toLocalDateTime());
+    debtPosition.setCreationDate(DATETIME.toLocalDateTime());
+    debtPosition.setUpdateDate(DATETIME.toLocalDateTime());
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildPaymentOption()))));
     return debtPosition;
   }
@@ -49,8 +52,8 @@ public class DebtPositionFaker {
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
     debtPositionDTO.setFlagPagoPaPayment(false);
-    debtPositionDTO.setCreationDate(DATE);
-    debtPositionDTO.setUpdateDate(DATE);
+    debtPositionDTO.setCreationDate(DATETIME);
+    debtPositionDTO.setUpdateDate(DATETIME);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
     return debtPositionDTO;
   }
@@ -68,8 +71,8 @@ public class DebtPositionFaker {
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
     debtPositionDTO.setFlagPagoPaPayment(false);
-    debtPositionDTO.setCreationDate(DATE);
-    debtPositionDTO.setUpdateDate(DATE);
+    debtPositionDTO.setCreationDate(DATETIME);
+    debtPositionDTO.setUpdateDate(DATETIME);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));
     return debtPositionDTO;
   }

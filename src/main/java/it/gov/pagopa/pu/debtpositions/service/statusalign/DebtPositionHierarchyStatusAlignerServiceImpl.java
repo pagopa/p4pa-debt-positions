@@ -15,7 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.TO_SYNC;
@@ -122,7 +122,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       paymentOption.getInstallments().stream()
         .filter(installment -> installment.getStatus().equals(InstallmentStatus.UNPAID))
         .forEach(installment -> {
-            if (installment.getDueDate() != null && installment.getDueDate().isBefore(OffsetDateTime.now())) {
+            if (installment.getDueDate() != null && installment.getDueDate().isBefore(LocalDate.now())) {
               InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
               installment.setStatus(newStatus);
               log.info("Updating status {} for installment with id {} related to debt position {} after checking the due date", newStatus, installment.getInstallmentId(), debtPositionId);
