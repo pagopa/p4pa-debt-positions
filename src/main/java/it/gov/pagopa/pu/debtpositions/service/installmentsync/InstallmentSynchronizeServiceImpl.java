@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelServiceImpl;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -18,28 +19,31 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
   private final InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelService;
+  private final InstallmentSynchronizeUpdateServiceImpl installmentSynchronizeUpdateService;
 
-  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelService) {
+  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelService, InstallmentSynchronizeUpdateServiceImpl installmentSynchronizeUpdateService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentSynchronizeCancelService = installmentSynchronizeCancelService;
+    this.installmentSynchronizeUpdateService = installmentSynchronizeUpdateService;
   }
 
   @Override
   public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
-    DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), debtPositionOrigin);
+    DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
     InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
     return switch (action) {
       case InstallmentSynchronizeDTO.ActionEnum.I -> "TODO insert";
-      case InstallmentSynchronizeDTO.ActionEnum.M -> "TODO update";
+      case InstallmentSynchronizeDTO.ActionEnum.M ->
+        installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.A ->
         installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
     };
   }
 
-  private DebtPositionDTO retrieveAndVerifyOrigin(String iupdOrg, DebtPositionOrigin debtPositionOrigin) {
-    DebtPosition debtPosition = debtPositionRepository.findByIupdOrg(iupdOrg);
+  private DebtPositionDTO retrieveAndVerifyOrigin(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
+    DebtPosition debtPosition = debtPositionRepository.findByIupdOrgAndOrganizationId(iupdOrg, orgId);
 
     if (debtPosition == null){
       return null;

@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.UUID;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -70,5 +70,12 @@ public class Utilities {
       LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss")),
       lastUuidPart
     );
+  }
+
+  public static void checkImmutableField(String fieldName, Object original, Object updated, Set<String> modifiedFields){
+    boolean multiDebtorUpdated = !Objects.equals(original, updated);
+    if(multiDebtorUpdated){
+      modifiedFields.add(fieldName);
+    }
   }
 }
