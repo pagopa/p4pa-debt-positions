@@ -95,7 +95,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.verify(primaryOrgInstallmentPaidVerifierServiceMock, Mockito.times(1)).findAndValidatePrimaryOrgInstallment(organization, receipt.getNoticeNumber());
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, receipt);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatusAndRemap(debtPosition);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, organization);
+    Mockito.verify(debtPositionServiceMock).saveDebtPositionAndRemap(debtPositionDTO, organization);
     Mockito.verify(paymentsProducerServiceMock, Mockito.times(1)).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED);
     Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
   }
