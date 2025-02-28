@@ -10,6 +10,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -30,7 +31,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private String iur;
   private String iuf;
   private String nav;
-  private OffsetDateTime dueDate;
+  private LocalDate dueDate;
   private String paymentTypeCode;
   private Long amountCents;
   private String remittanceInformation;

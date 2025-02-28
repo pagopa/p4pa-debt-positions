@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -26,7 +27,7 @@ public class InstallmentDetailNoPIIView implements Serializable {
   private InstallmentStatus status;
   private String iuv;
   private Long amountCents;
-  private OffsetDateTime dueDate;
+  private LocalDate dueDate;
   private Long personalDataId;
   private String debtPositionTypeOrgDescription;
   private String debtPositionDescription;

@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -21,8 +22,9 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 
 public class InstallmentFaker {
 
-  static LocalDateTime date = LocalDateTime.now().plusDays(2);
-  static OffsetDateTime offsetDateTime = OffsetDateTime.of(date, ZoneOffset.UTC);
+  static LocalDate date = LocalDate.now();
+  static LocalDateTime dateTime = LocalDateTime.now().plusDays(2);
+  static OffsetDateTime offsetDateTime = OffsetDateTime.of(dateTime, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
     return Installment.builder()
@@ -36,7 +38,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(offsetDateTime)
+      .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -48,8 +50,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(dateTime)
+      .updateDate(dateTime)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .noPII(buildInstallmentNoPII())
       .build();
@@ -69,7 +71,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(offsetDateTime)
+      .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .personalDataId(123L)
@@ -82,8 +84,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(dateTime)
+      .updateDate(dateTime)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
@@ -107,7 +109,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -119,8 +121,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(date)
-      .updateDate(date)
+      .creationDate(dateTime)
+      .updateDate(dateTime)
       .build();
   }
 
@@ -136,7 +138,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -148,8 +150,8 @@ public class InstallmentFaker {
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(date.atOffset(ZoneOffset.UTC))
-      .updateDate(date.atOffset(ZoneOffset.UTC))
+      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
+      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
       .build();
   }
 
@@ -165,7 +167,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("generatedNav")
-      .dueDate(date.atOffset(ZoneOffset.UTC))
+      .dueDate(date)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -177,8 +179,8 @@ public class InstallmentFaker {
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(date.atOffset(ZoneOffset.UTC))
-      .updateDate(date.atOffset(ZoneOffset.UTC))
+      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
+      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
       .build();
   }
 

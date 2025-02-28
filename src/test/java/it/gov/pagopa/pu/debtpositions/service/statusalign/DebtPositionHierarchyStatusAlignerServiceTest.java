@@ -16,8 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.LocalDate;
 import java.util.*;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -267,7 +266,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsBeforeNowThenOk() {
     Long debtPositionId = 1L;
-    OffsetDateTime dueDate = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+    LocalDate dueDate = LocalDate.of(2025, 1, 1);
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
@@ -291,7 +290,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsAfterNowThenOk() {
     Long debtPositionId = 1L;
-    OffsetDateTime dueDate = OffsetDateTime.now().plusDays(2);
+    LocalDate dueDate = LocalDate.now().plusDays(2);
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);

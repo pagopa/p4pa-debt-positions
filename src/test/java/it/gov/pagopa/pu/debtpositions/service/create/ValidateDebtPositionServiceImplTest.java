@@ -1,12 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
@@ -17,10 +17,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,9 +118,8 @@ class ValidateDebtPositionServiceImplTest {
   void givenInstallmentWithDueDateRetroactiveThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    LocalDateTime localDateTime = LocalDateTime.of(2024, 5, 15, 10, 30, 0);
-    OffsetDateTime offsetDateTime = ZonedDateTime.of(localDateTime, ZoneId.of("Europe/Rome")).toOffsetDateTime();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(offsetDateTime);
+    LocalDate localDate = LocalDate.of(2024, 5, 15);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(localDate);
 
     Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
 
