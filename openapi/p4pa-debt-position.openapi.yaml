@@ -520,7 +520,7 @@ components:
           format: int64
         validityDate:
           type: string
-          format: date-time
+          format: date
         flagIuvVolatile:
           type: boolean
         multiDebtor:
@@ -557,7 +557,7 @@ components:
           $ref: "#/components/schemas/PaymentOptionStatus"
         dueDate:
           type: string
-          format: date-time
+          format: date
         description:
           type: string
         paymentOptionType:
@@ -605,7 +605,7 @@ components:
           type: string
         dueDate:
           type: string
-          format: date-time
+          format: date
         paymentTypeCode:
           type: string
         amountCents:
@@ -798,7 +798,7 @@ components:
           format: int64
         dueDate:
           type: string
-          format: date-time
+          format: date
         debtor:
           $ref: "#/components/schemas/PersonDTO"
         debtPositionTypeOrgDescription:
@@ -1126,7 +1126,7 @@ components:
           type: string
         validityDate:
           type: string
-          format: date-time
+          format: date
         multiDebtor:
           type: boolean
         notificationDate:
@@ -1168,7 +1168,7 @@ components:
           type: string
         dueDate:
           type: string
-          format: date-time
+          format: date
         amountCents:
           type: integer
           format: int64

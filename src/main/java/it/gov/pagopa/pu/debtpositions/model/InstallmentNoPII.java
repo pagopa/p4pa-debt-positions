@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.SortedSet;
@@ -42,7 +43,7 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private String iur;
   private String iuf;
   private String nav;
-  private OffsetDateTime dueDate;
+  private LocalDate dueDate;
   @NotNull
   private String paymentTypeCode;
   @NotNull
