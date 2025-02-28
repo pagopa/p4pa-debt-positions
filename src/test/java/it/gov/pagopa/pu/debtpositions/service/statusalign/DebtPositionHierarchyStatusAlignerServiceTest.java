@@ -9,6 +9,8 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,7 +49,25 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
   @BeforeEach
   void setUp() {
-    service = new DebtPositionHierarchyStatusAlignerServiceImpl(debtPositionRepositoryMock, installmentNoPIIRepositoryMock, paymentOptionInnerStatusAlignerServiceMock, debtPositionInnerStatusAlignerServiceMock, debtPositionMapperMock);
+    service = Mockito.spy(
+      new DebtPositionHierarchyStatusAlignerServiceImpl(
+        debtPositionRepositoryMock,
+        installmentNoPIIRepositoryMock,
+        paymentOptionInnerStatusAlignerServiceMock,
+        debtPositionInnerStatusAlignerServiceMock,
+        debtPositionMapperMock)
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(
+      debtPositionRepositoryMock,
+      installmentNoPIIRepositoryMock,
+      paymentOptionInnerStatusAlignerServiceMock,
+      debtPositionInnerStatusAlignerServiceMock,
+      debtPositionMapperMock
+    );
   }
 
   @Test
@@ -89,6 +109,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
 
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+    Mockito.doReturn(expectedResult)
+      .when(service).alignHierarchyStatusAndRemap(Mockito.same(debtPosition));
+
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
@@ -99,7 +123,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
 
-    assertNull(result);
+    assertSame(expectedResult, result);
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
   }
@@ -113,6 +137,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
 
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+    Mockito.doReturn(expectedResult)
+      .when(service).alignHierarchyStatusAndRemap(Mockito.same(debtPosition));
+
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
@@ -123,7 +151,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
 
-    assertNull(result);
+    assertSame(expectedResult, result);
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
     verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
   }
@@ -334,4 +362,26 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
 
+  @Test
+  void whenAlignHierarchyStatusAndRemapThenReturnRemap(){
+    // Given
+    DebtPosition debtPosition = new DebtPosition();
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+
+    Mockito.when(debtPositionMapperMock.mapToDto(Mockito.same(debtPosition)))
+      .thenReturn(expectedResult);
+
+    Mockito.doNothing()
+      .when(service)
+      .alignHierarchyStatus(Mockito.same(debtPosition));
+
+    // When
+    DebtPositionDTO result = service.alignHierarchyStatusAndRemap(debtPosition);
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+
+    Mockito.verify(service)
+      .alignHierarchyStatus(Mockito.same(debtPosition));
+  }
 }

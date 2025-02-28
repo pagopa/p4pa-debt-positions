@@ -29,7 +29,7 @@ public class ReceiptWithAdditionalInfoMapper {
       .iupdOrg(getIupdOrg(receiptDTO))
       .description(receiptDTO.getDescription())
       .status(DebtPositionStatus.PAID)
-      .validityDate(receiptDTO.getPaymentDateTime())
+      .validityDate(null)
       .flagIuvVolatile(false)
       .multiDebtor(false)
       .flagPagoPaPayment(true)
