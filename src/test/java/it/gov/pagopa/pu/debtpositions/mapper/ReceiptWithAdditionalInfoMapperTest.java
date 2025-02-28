@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.service.create.receipt.DebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.DebtPositionTypeOrgSecondaryOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
@@ -21,7 +21,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 class ReceiptWithAdditionalInfoMapperTest {
 
   @Mock
-  private DebtPositionTypeOrgRetrieverService debtPositionTypeOrgRetrieverServiceMock;
+  private DebtPositionTypeOrgSecondaryOrgRetrieverService debtPositionTypeOrgSecondaryOrgRetrieverServiceMock;
 
   @InjectMocks
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
@@ -35,7 +35,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
 
-    Mockito.when(debtPositionTypeOrgRetrieverServiceMock.getPagopaReceiptDebtPositionTypeOrg(organization.getOrganizationId())).thenReturn(debtPositionTypeOrg);
+    Mockito.when(debtPositionTypeOrgSecondaryOrgRetrieverServiceMock.getSecondaryOrgDebtPositionTypeOrg(organization.getOrganizationId())).thenReturn(debtPositionTypeOrg);
 
     //when
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization);
@@ -52,7 +52,7 @@ class ReceiptWithAdditionalInfoMapperTest {
       "ingestionFlowFileId", "ingestionFlowFileLineNumber");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
     installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO,"installmentId", "postalIban"));
-    Mockito.verify(debtPositionTypeOrgRetrieverServiceMock, Mockito.times(1)).getPagopaReceiptDebtPositionTypeOrg(organization.getOrganizationId());
+    Mockito.verify(debtPositionTypeOrgSecondaryOrgRetrieverServiceMock, Mockito.times(1)).getSecondaryOrgDebtPositionTypeOrg(organization.getOrganizationId());
   }
 
 }
