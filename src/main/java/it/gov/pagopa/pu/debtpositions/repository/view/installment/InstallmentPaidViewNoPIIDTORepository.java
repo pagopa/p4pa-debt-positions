@@ -51,8 +51,6 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       AND dp.organizationId = :organizationId
       AND r.paymentDateTime BETWEEN :paymentDateTimeFrom AND :paymentDateTimeTo
       AND dptoo.operatorExternalUserId = :operatorExternalUserId
-      AND (:debtPositionTypeOrgId IS NULL OR dp.debtPositionTypeOrgId = :debtPositionTypeOrgId)
-      AND (:debtPositionTypeOrgId IS NULL OR dptoo.debtPositionTypeOrgId = :debtPositionTypeOrgId)
       AND t.transferIndex = 1
   """
   )
