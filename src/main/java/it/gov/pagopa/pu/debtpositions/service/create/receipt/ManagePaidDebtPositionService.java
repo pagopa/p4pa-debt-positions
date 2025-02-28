@@ -78,7 +78,7 @@ public class ManagePaidDebtPositionService {
     //update installment status
     DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
     //align debt position status
-    DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
+    DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(debtPosition);
     //persist updated debt position
     DebtPositionDTO persistedDebtPosition = persistDebtPositionAndNotifyEvent(debtPositionDTO, organization);
     //start debt position workflow
@@ -87,7 +87,7 @@ public class ManagePaidDebtPositionService {
 
   private DebtPositionDTO persistDebtPositionAndNotifyEvent(DebtPositionDTO debtPositionDTO, Organization organization) {
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, organization);
+    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPositionAndRemap(debtPositionDTO, organization);
     log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
     //notify payment event
     paymentsProducerService.notifyPaymentsEvent(persistedDebtPosition, PaymentEventType.RT_RECEIVED);

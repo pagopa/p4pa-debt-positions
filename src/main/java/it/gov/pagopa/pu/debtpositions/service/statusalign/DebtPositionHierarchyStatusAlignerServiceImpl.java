@@ -78,7 +78,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         })
     );
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
       });
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
@@ -131,14 +131,19 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           }
         ));
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
-  public DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition) {
+  public void alignHierarchyStatus(DebtPosition debtPosition) {
     debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
     debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
+  }
 
+  /** Call only if you have to resolve PII */
+  @Override
+  public DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
+    alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
   }
 }

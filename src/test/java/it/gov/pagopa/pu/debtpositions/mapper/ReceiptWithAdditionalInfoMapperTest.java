@@ -42,7 +42,7 @@ class ReceiptWithAdditionalInfoMapperTest {
 
     //verify
     Assertions.assertNotNull(debtPositionDTO);
-    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId");
+    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate");
     Assertions.assertEquals(debtPositionTypeOrg.getDebtPositionTypeOrgId(), debtPositionDTO.getDebtPositionTypeOrgId());
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
     TestUtils.checkNotNullFields(paymentOptionDTO, "paymentOptionId", "debtPositionId", "dueDate");

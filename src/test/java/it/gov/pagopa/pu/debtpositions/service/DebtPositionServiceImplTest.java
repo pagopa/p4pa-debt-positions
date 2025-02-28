@@ -1,28 +1,17 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
-import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
-
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.*;
-import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-
-import java.util.List;
-import java.util.Map;
-import java.util.TreeSet;
-
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,6 +22,19 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -58,10 +60,10 @@ class DebtPositionServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionService = new DebtPositionServiceImpl(
+    debtPositionService = Mockito.spy(new DebtPositionServiceImpl(
       debtPositionRepository, paymentOptionRepository, installmentRepository, transferRepository,
       debtPositionMapper
-    );
+    ));
   }
 
   @Test
@@ -121,7 +123,9 @@ class DebtPositionServiceImplTest {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
       mockedStatic.when(Utilities::getRandomicUUID).thenReturn(generatedIupd);
 
-      debtPositionService.saveDebtPosition(debtPositionDTO, org);
+      DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
+
+      Assertions.assertSame(savedDebtPosition, result);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
@@ -187,13 +191,38 @@ class DebtPositionServiceImplTest {
 
       Organization org = buildOrganization();
       org.setIban("IT60X0542811101000000123456");
-      debtPositionService.saveDebtPosition(debtPositionDTO, org);
+      DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
+
+      Assertions.assertSame(savedDebtPosition, result);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
       Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
     }
+  }
+
+  @Test
+  void whenSaveDebtPositionAndRemapThenReturnReMap() {
+    // Given
+    DebtPositionDTO inputDP = new DebtPositionDTO();
+    DebtPosition saved = new DebtPosition();
+    Organization org = new Organization();
+
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+
+    Mockito.doReturn(saved)
+      .when(debtPositionService)
+      .saveDebtPosition(Mockito.same(inputDP), Mockito.same(org));
+
+    Mockito.when(debtPositionMapper.mapToDto(Mockito.same(saved)))
+      .thenReturn(expectedResult);
+
+    // When
+    DebtPositionDTO result = debtPositionService.saveDebtPositionAndRemap(inputDP, org);
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
   }
 
   @Test
