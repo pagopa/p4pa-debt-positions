@@ -15,10 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.service.create.receipt.DebtPositionTypeOrgSecondaryOrgRetrieverService.DEBT_POSITION_TYPE_SECONDARY_ORG;
+import static it.gov.pagopa.pu.debtpositions.service.create.receipt.UnknownDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_UNKNOWN;
 
 @ExtendWith(MockitoExtension.class)
-class DebtPositionTypeOrgSecondaryOrgRetrieverServiceTest {
+class UnknownDebtPositionTypeOrgRetrieverServiceTest {
 
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
@@ -28,37 +28,37 @@ class DebtPositionTypeOrgSecondaryOrgRetrieverServiceTest {
   private DebtPositionTypeOrgMapper debtPositionTypeOrgMapperMock;
 
   @InjectMocks
-  private DebtPositionTypeOrgSecondaryOrgRetrieverService debtPositionTypeOrgSecondaryOrgRetrieverService;
+  private UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
   @Test
-  void givenOrganizationIdWhenGetSecondaryOrgDebtPositionTypeOrgThenOk() {
+  void givenOrganizationIdWhenGetUnknownDebtPositionTypeOrgThenOk() {
     // given
     Long organizationId = 1L;
     DebtPositionType debtPositionType = new DebtPositionType();
     debtPositionType.setCode("TYPE_CODE");
-    Mockito.when(debtPositionTypeRepositoryMock.findById(DEBT_POSITION_TYPE_SECONDARY_ORG)).thenReturn(Optional.of(debtPositionType));
+    Mockito.when(debtPositionTypeRepositoryMock.findById(DEBT_POSITION_TYPE_UNKNOWN)).thenReturn(Optional.of(debtPositionType));
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(organizationId, debtPositionType.getCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
 
     // when
-    DebtPositionTypeOrg response = debtPositionTypeOrgSecondaryOrgRetrieverService.getSecondaryOrgDebtPositionTypeOrg(organizationId);
+    DebtPositionTypeOrg response = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organizationId);
 
     // verify
     Assertions.assertEquals(debtPositionTypeOrg, response);
-    Mockito.verify(debtPositionTypeRepositoryMock, Mockito.times(1)).findById(DEBT_POSITION_TYPE_SECONDARY_ORG);
+    Mockito.verify(debtPositionTypeRepositoryMock, Mockito.times(1)).findById(DEBT_POSITION_TYPE_UNKNOWN);
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.times(1))
       .findByOrganizationIdAndCode(organizationId, debtPositionType.getCode());
     Mockito.verifyNoInteractions(debtPositionTypeOrgMapperMock);
   }
 
   @Test
-  void givenNotFoundOrganizationIdWhenGetSecondaryOrgDebtPositionTypeOrgThenException() {
+  void givenNotFoundOrganizationIdWhenGetUnknownDebtPositionTypeOrgThenException() {
     // given
     Long organizationId = 1L;
     DebtPositionType debtPositionType = new DebtPositionType();
     debtPositionType.setCode("TYPE_CODE");
-    Mockito.when(debtPositionTypeRepositoryMock.findById(DEBT_POSITION_TYPE_SECONDARY_ORG)).thenReturn(Optional.of(debtPositionType));
+    Mockito.when(debtPositionTypeRepositoryMock.findById(DEBT_POSITION_TYPE_UNKNOWN)).thenReturn(Optional.of(debtPositionType));
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(organizationId, debtPositionType.getCode()))
       .thenReturn(Optional.empty());
@@ -67,11 +67,11 @@ class DebtPositionTypeOrgSecondaryOrgRetrieverServiceTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(debtPositionTypeOrg);
 
     // when
-    DebtPositionTypeOrg response = debtPositionTypeOrgSecondaryOrgRetrieverService.getSecondaryOrgDebtPositionTypeOrg(organizationId);
+    DebtPositionTypeOrg response = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organizationId);
 
     // verify
     Assertions.assertEquals(debtPositionTypeOrg, response);
-    Mockito.verify(debtPositionTypeRepositoryMock, Mockito.times(1)).findById(DEBT_POSITION_TYPE_SECONDARY_ORG);
+    Mockito.verify(debtPositionTypeRepositoryMock, Mockito.times(1)).findById(DEBT_POSITION_TYPE_UNKNOWN);
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.times(1))
       .findByOrganizationIdAndCode(organizationId, debtPositionType.getCode());
     Mockito.verify(debtPositionTypeOrgMapperMock, Mockito.times(1))

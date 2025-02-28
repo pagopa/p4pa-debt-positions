@@ -14,9 +14,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
-public class DebtPositionTypeOrgSecondaryOrgRetrieverService {
+public class UnknownDebtPositionTypeOrgRetrieverService {
 
-  public static final Long DEBT_POSITION_TYPE_SECONDARY_ORG = -1L;
+  public static final Long DEBT_POSITION_TYPE_UNKNOWN = -1L;
   private DebtPositionType debtPositionType;
 
 
@@ -26,7 +26,7 @@ public class DebtPositionTypeOrgSecondaryOrgRetrieverService {
 
   private final Map<Long, DebtPositionTypeOrg> debtPositionTypeOrgSecondaryOrgMap = new ConcurrentHashMap<>();
 
-  public DebtPositionTypeOrgSecondaryOrgRetrieverService(
+  public UnknownDebtPositionTypeOrgRetrieverService(
     DebtPositionTypeRepository debtPositionTypeRepository,
     DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
     DebtPositionTypeOrgMapper debtPositionTypeOrgMapper
@@ -36,7 +36,7 @@ public class DebtPositionTypeOrgSecondaryOrgRetrieverService {
     this.debtPositionTypeOrgMapper = debtPositionTypeOrgMapper;
   }
 
-  public DebtPositionTypeOrg getSecondaryOrgDebtPositionTypeOrg(Long organizationId) {
+  public DebtPositionTypeOrg getUnknownDebtPositionTypeOrg(Long organizationId) {
     return debtPositionTypeOrgSecondaryOrgMap.computeIfAbsent(organizationId,this::retrieveDebtPositionTypeOrg);
   }
 
@@ -48,15 +48,15 @@ public class DebtPositionTypeOrgSecondaryOrgRetrieverService {
   private DebtPositionTypeOrg createDebtPositionTypeOrg(Long organizationId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgMapper.mapFromDebtPositionType(debtPositionType, organizationId);
     debtPositionTypeOrg = debtPositionTypeOrgRepository.save(debtPositionTypeOrg);
-    log.info("debtPositionTypeOrg for secondary org created for organizationId[{}]: id[[{}]", organizationId, debtPositionTypeOrg.getDebtPositionTypeId());
+    log.info("debtPositionTypeOrg UNKNOWN created for organizationId[{}]: id[[{}]", organizationId, debtPositionTypeOrg.getDebtPositionTypeId());
     return debtPositionTypeOrg;
   }
 
   private DebtPositionType getDebtPositionTypeSecondaryOrg() {
     if(debtPositionType==null){
-      debtPositionType = debtPositionTypeRepository.findById(DEBT_POSITION_TYPE_SECONDARY_ORG)
-        .orElseThrow(() -> new NotFoundException("Debt position type for secondary org with id[" + DEBT_POSITION_TYPE_SECONDARY_ORG + "] not found"));
-      log.info("debt position type code for secondary org: {}", debtPositionType.getCode());
+      debtPositionType = debtPositionTypeRepository.findById(DEBT_POSITION_TYPE_UNKNOWN)
+        .orElseThrow(() -> new NotFoundException("Debt position type UNKNOWN with id[" + DEBT_POSITION_TYPE_UNKNOWN + "] not found"));
+      log.info("debt position type code UNKNOWN: {}", debtPositionType.getCode());
     }
     return debtPositionType;
   }

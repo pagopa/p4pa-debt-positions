@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.service.create.receipt.DebtPositionTypeOrgSecondaryOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
@@ -13,10 +13,10 @@ import java.util.List;
 @Service
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
-  private final DebtPositionTypeOrgSecondaryOrgRetrieverService debtPositionTypeOrgSecondaryOrgRetrieverService;
+  private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
-  public ReceiptWithAdditionalInfoMapper(DebtPositionTypeOrgSecondaryOrgRetrieverService debtPositionTypeOrgSecondaryOrgRetrieverService) {
-    this.debtPositionTypeOrgSecondaryOrgRetrieverService = debtPositionTypeOrgSecondaryOrgRetrieverService;
+  public ReceiptWithAdditionalInfoMapper(UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
+    this.unknownDebtPositionTypeOrgRetrieverService = unknownDebtPositionTypeOrgRetrieverService;
   }
 
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
@@ -24,7 +24,7 @@ public class ReceiptWithAdditionalInfoMapper {
     return DebtPositionDTO.builder()
       .organizationId(organization.getOrganizationId())
       .debtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA)
-      .debtPositionTypeOrgId(debtPositionTypeOrgSecondaryOrgRetrieverService.getSecondaryOrgDebtPositionTypeOrg(organization.getOrganizationId())
+      .debtPositionTypeOrgId(unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId())
         .getDebtPositionTypeOrgId())
       .iupdOrg(getIupdOrg(receiptDTO))
       .description(receiptDTO.getDescription())
