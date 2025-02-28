@@ -67,10 +67,10 @@ public class UpdatePaidDebtPositionService {
     //align debt position status
     DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, org);
-    log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
+    org.springframework.data.util.Pair<DebtPosition, DebtPositionDTO> persistedDebtPosition = debtPositionService.saveDebtPosition(debtPositionDTO, org);
+    log.info("updated debt position id[{}]", persistedDebtPosition.getFirst().getDebtPositionId());
     //start debt position workflow
-    invokeWorkflow(persistedDebtPosition, accessToken);
+    invokeWorkflow(persistedDebtPosition.getSecond(), accessToken);
   }
 
 }

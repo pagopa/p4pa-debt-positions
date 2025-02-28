@@ -70,10 +70,10 @@ public abstract class BaseDebtPositionOperationService {
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
+    org.springframework.data.util.Pair<DebtPosition, DebtPositionDTO> savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
 
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
-    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
+    //DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
+    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(savedDebtPosition.getFirst());
 
     String workflowId = invokeWorkflow(debtPositionAligned, eventType, accessToken, massive);
 
