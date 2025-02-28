@@ -145,8 +145,3 @@ rest:
 
 iuv:
   informationSystemId: "00"
-
-debt-position:
-  technical:
-    pagopa-receipt:
-      debt-position-type-org-code: "\${TECHNICAL_DEBT_POSITION_FROM_PAGOPA_RECEIPT_TYPE_ORG_CODE:TECH_DP_PAGOPA_RECEIPT}"
