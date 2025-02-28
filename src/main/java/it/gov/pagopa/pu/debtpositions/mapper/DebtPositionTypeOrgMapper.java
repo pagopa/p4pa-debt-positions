@@ -26,7 +26,7 @@ public class DebtPositionTypeOrgMapper {
       .flagSpontaneous(false)
       .flagNotifyIo(debtPositionType.isFlagNotifyIo())
       .ioTemplateMessage(debtPositionType.getIoTemplateMessage())
-      .flagActive(false)
+      .flagActive(true)
       .flagNotifyOutcomePush(false)
       .notifyOutcomePushOrgSilServiceId(null)
       .flagAmountActualization(false)

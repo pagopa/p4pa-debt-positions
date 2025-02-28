@@ -47,6 +47,10 @@ public class UnknownDebtPositionTypeOrgRetrieverService {
 
   private DebtPositionTypeOrg createDebtPositionTypeOrg(Long organizationId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgMapper.mapFromDebtPositionType(debtPositionType, organizationId);
+    //set specific fields of debtPositionTypeOrg
+    //flagActive is set to false because it's not possible to create ordinary debt positions with debtPositionType UNKNOWN
+    debtPositionTypeOrg.setFlagActive(false);
+
     debtPositionTypeOrg = debtPositionTypeOrgRepository.save(debtPositionTypeOrg);
     log.info("debtPositionTypeOrg UNKNOWN created for organizationId[{}]: id[[{}]", organizationId, debtPositionTypeOrg.getDebtPositionTypeId());
     return debtPositionTypeOrg;
