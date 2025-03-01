@@ -148,5 +148,5 @@ iuv:
 
 cache:
   pii:
-    size: "\${CACHE_PII_SIZE:10}"
+    size: "\${CACHE_PII_SIZE:1000}"
     expire-in: "\${CACHE_PII_MINUTES:60}"
