@@ -70,7 +70,7 @@ management:
       exposure.include: "*"
     web:
       exposure:
-        include: health, info, prometheus, metrics
+        include: health, info, prometheus, metrics, caches
       base-path: /actuator
   endpoint:
     health:
@@ -145,3 +145,8 @@ rest:
 
 iuv:
   informationSystemId: "00"
+
+cache:
+  pii:
+    size: "\${CACHE_PII_SIZE:10}"
+    expire-in: "\${CACHE_PII_MINUTES:60}"

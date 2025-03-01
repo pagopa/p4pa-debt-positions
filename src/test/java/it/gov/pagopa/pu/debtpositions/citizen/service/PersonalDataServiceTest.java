@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.citizen.service;
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
+import it.gov.pagopa.pu.debtpositions.config.CacheConfig;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -15,6 +16,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Optional;
@@ -26,6 +29,8 @@ class PersonalDataServiceTest {
   private PersonalDataRepository repositoryMock;
   @Mock
   private DataCipherService cipherServiceMock;
+  @Mock
+  private CacheManager cacheManagerMock;
 
   private PersonalDataService service;
 
@@ -33,7 +38,7 @@ class PersonalDataServiceTest {
 
   @BeforeEach
   void init() {
-    service = new PersonalDataService(repositoryMock, cipherServiceMock);
+    service = new PersonalDataService(repositoryMock, cipherServiceMock, cacheManagerMock);
   }
 
   @AfterEach
@@ -63,12 +68,15 @@ class PersonalDataServiceTest {
       .build();
 
     Mockito.when(repositoryMock.save(personalDataInput)).thenReturn(personalDataOutput);
+    ConcurrentMapCache cache = new ConcurrentMapCache(CacheConfig.Fields.pii);
+    Mockito.when(cacheManagerMock.getCache(CacheConfig.Fields.pii)).thenReturn(cache);
 
     // When
     long insert = service.insert(pii, PersonalDataType.INSTALLMENT);
 
     // Then
     Assertions.assertEquals(piiId, insert);
+    Assertions.assertSame(pii, cache.get(piiId, pii.getClass()));
   }
 
   //region get
