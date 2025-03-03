@@ -52,7 +52,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(buildDebtPosition());
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(buildDebtPosition());
 
     ConflictErrorException conflictErrorException = assertThrows(ConflictErrorException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.", conflictErrorException.getMessage());
@@ -72,7 +72,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setCode(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Debt position type organization is mandatory", invalidValueException.getMessage());
@@ -84,7 +84,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.setPaymentOptions(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Debt position payment options is mandatory", invalidValueException.getMessage());
@@ -96,7 +96,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().setInstallments(List.of());
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("At least one installment of the debt position is mandatory", invalidValueException.getMessage());
@@ -108,7 +108,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setRemittanceInformation(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Remittance information is mandatory", invalidValueException.getMessage());
@@ -121,7 +121,7 @@ class ValidateDebtPositionServiceImplTest {
     LocalDate localDate = LocalDate.of(2024, 5, 15);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(localDate);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The due date cannot be retroactive", invalidValueException.getMessage());
@@ -133,7 +133,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The due date is mandatory", invalidValueException.getMessage());
@@ -146,7 +146,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionTypeOrg.setFlagMandatoryDueDate(false);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setAmountCents(-200L);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Amount is not valid", invalidValueException.getMessage());
@@ -159,7 +159,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionTypeOrg.setAmountCents(200L);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setAmountCents(100L);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Amount is not valid for this debt position type org", invalidValueException.getMessage());
@@ -172,7 +172,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionTypeOrg.setAmountCents(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDebtor(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The debtor is mandatory for installment", invalidValueException.getMessage());
@@ -184,7 +184,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setFiscalCode(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Fiscal code is mandatory", invalidValueException.getMessage());
@@ -197,7 +197,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionTypeOrg.setFlagAnonymousFiscalCode(false);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setFiscalCode("ANONIMO");
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("This organization installment type or installment does not allow an anonymous unique identification code", invalidValueException.getMessage());
@@ -212,7 +212,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionTypeOrg.setFlagAnonymousFiscalCode(false);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setFullName(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Beneficiary name is mandatory", invalidValueException.getMessage());
@@ -226,7 +226,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Email is not valid", invalidValueException.getMessage());
@@ -240,7 +240,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail("test&it");
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Email is not valid", invalidValueException.getMessage());
@@ -254,7 +254,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(null);
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("At least one transfer is mandatory for installment", invalidValueException.getMessage());
@@ -274,7 +274,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Mismatch with transfers list", invalidValueException.getMessage());
@@ -294,7 +294,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Fiscal code of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -315,7 +315,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Fiscal code of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -334,7 +334,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Iban of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -353,7 +353,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Category of secondary beneficiary is mandatory", invalidValueException.getMessage());
@@ -372,7 +372,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.empty());
 
@@ -394,7 +394,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.of(new Taxonomy()));
 
@@ -415,7 +415,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.of(new Taxonomy()));
 
@@ -427,7 +427,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    Mockito.when(debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg())).thenReturn(null);
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
   }
