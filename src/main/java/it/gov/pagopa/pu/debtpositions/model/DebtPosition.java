@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.SortedSet;
 
 @NamedEntityGraph(
@@ -48,7 +48,7 @@ public class DebtPosition extends BaseEntity implements Serializable {
   private Long organizationId;
   @NotNull
   private Long debtPositionTypeOrgId;
-  private OffsetDateTime validityDate;
+  private LocalDate validityDate;
   private boolean flagIuvVolatile;
   private boolean multiDebtor;
   private boolean flagPagoPaPayment;

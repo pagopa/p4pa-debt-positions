@@ -35,7 +35,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Transactional
   @Override
-  public DebtPositionDTO saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
+  public DebtPosition saveDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
@@ -60,7 +60,13 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       });
     });
 
-    return debtPositionMapper.mapToDto(savedDebtPosition);
+    return savedDebtPosition;
+  }
+
+  @Transactional
+  @Override
+  public DebtPositionDTO saveDebtPositionAndRemap(DebtPositionDTO debtPositionDTO, Organization org) {
+    return debtPositionMapper.mapToDto(saveDebtPosition(debtPositionDTO, org));
   }
 
   @Override

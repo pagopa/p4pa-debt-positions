@@ -21,14 +21,14 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private final ReceiptNoPIIRepository receiptNoPIIRepository;
   private final ReceiptPIIRepository receiptPIIRepository;
   private final ReceiptMapper receiptMapper;
-  private final UpdatePaidDebtPositionService updateInstallmentStatusOfDebtPosition;
+  private final ManagePaidDebtPositionService managePaidDebtPositionService;
   private final CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService;
 
-  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, ReceiptMapper receiptMapper, UpdatePaidDebtPositionService updateInstallmentStatusOfDebtPosition, CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService) {
+  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, ReceiptMapper receiptMapper, ManagePaidDebtPositionService managePaidDebtPositionService, CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
     this.receiptMapper = receiptMapper;
-    this.updateInstallmentStatusOfDebtPosition = updateInstallmentStatusOfDebtPosition;
+    this.managePaidDebtPositionService = managePaidDebtPositionService;
     this.createPaidTechnicalDebtPositionsService = createPaidTechnicalDebtPositionsService;
   }
 
@@ -47,7 +47,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     saveReceipt(receiptDTO);
 
     //check if organization who handles the notice is managed by PU and update the installment status
-    boolean primaryOrgFound = updateInstallmentStatusOfDebtPosition.handleReceiptReceived(receiptDTO, accessToken);
+    boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
 
     //for every organization handled by PU and mentioned in the receipt
     createPaidTechnicalDebtPositionsService.createPaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);
