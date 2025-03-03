@@ -5,7 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -29,16 +28,21 @@ public abstract class BaseDebtPositionOperationService {
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionProcessorService debtPositionProcessorService;
   private final OrganizationService organizationService;
-  private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
 
-  protected BaseDebtPositionOperationService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionMapper debtPositionMapper, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+  protected BaseDebtPositionOperationService(
+    AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
+    DebtPositionService debtPositionService,
+    DebtPositionSyncService debtPositionSyncService,
+    DebtPositionProcessorService debtPositionProcessorService,
+    OrganizationService organizationService,
+    DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService
+  ) {
     this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.debtPositionService = debtPositionService;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionProcessorService = debtPositionProcessorService;
     this.organizationService = organizationService;
-    this.debtPositionMapper = debtPositionMapper;
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
   }
 
@@ -71,10 +75,9 @@ public abstract class BaseDebtPositionOperationService {
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPositionDTO savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
+    DebtPosition savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
 
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(savedDebtPosition).getFirst();
-    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
+    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
 
     String workflowId = invokeWorkflow(debtPositionAligned, eventType, accessToken, massive);
 

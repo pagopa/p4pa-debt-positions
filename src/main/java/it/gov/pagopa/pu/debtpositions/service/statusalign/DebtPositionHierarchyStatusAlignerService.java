@@ -14,5 +14,7 @@ public interface DebtPositionHierarchyStatusAlignerService {
 
   DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId);
 
-  DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition);
+  void alignHierarchyStatus(DebtPosition debtPosition);
+  /** Call only if PII are should be resolved */
+  DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition);
 }

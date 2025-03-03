@@ -4,6 +4,9 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -31,9 +34,8 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
                                                      DebtPositionSyncService debtPositionSyncService,
                                                      DebtPositionProcessorService debtPositionProcessorService,
                                                      OrganizationService organizationService,
-                                                     DebtPositionMapper debtPositionMapper,
                                                      DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
-    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionMapper, debtPositionHierarchyStatusAlignerService);
+    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
   }
 
   @Override

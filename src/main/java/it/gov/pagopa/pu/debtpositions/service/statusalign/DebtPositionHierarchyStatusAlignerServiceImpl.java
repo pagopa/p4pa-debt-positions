@@ -15,7 +15,7 @@ import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.TO_SYNC;
@@ -78,7 +78,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         })
     );
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
@@ -107,7 +107,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
       });
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
@@ -122,7 +122,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       paymentOption.getInstallments().stream()
         .filter(installment -> installment.getStatus().equals(InstallmentStatus.UNPAID))
         .forEach(installment -> {
-            if (installment.getDueDate() != null && installment.getDueDate().isBefore(OffsetDateTime.now())) {
+            if (installment.getDueDate() != null && installment.getDueDate().isBefore(LocalDate.now())) {
               InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
               installment.setStatus(newStatus);
               log.info("Updating status {} for installment with id {} related to debt position {} after checking the due date", newStatus, installment.getInstallmentId(), debtPositionId);
@@ -131,14 +131,19 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           }
         ));
 
-    return alignHierarchyStatus(debtPosition);
+    return alignHierarchyStatusAndRemap(debtPosition);
   }
 
   @Override
-  public DebtPositionDTO alignHierarchyStatus(DebtPosition debtPosition) {
+  public void alignHierarchyStatus(DebtPosition debtPosition) {
     debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
     debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
+  }
 
+  /** Call only if you have to resolve PII */
+  @Override
+  public DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
+    alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
   }
 }

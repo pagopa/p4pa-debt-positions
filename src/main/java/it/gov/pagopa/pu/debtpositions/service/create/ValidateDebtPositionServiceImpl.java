@@ -1,17 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,21 +23,26 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
 @Service
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
-  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final TaxonomyService taxonomyService;
+  private final DebtPositionRepository debtPositionRepository;
 
-  public ValidateDebtPositionServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, TaxonomyService taxonomyService) {
-    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+  public ValidateDebtPositionServiceImpl(TaxonomyService taxonomyService,
+                                         DebtPositionRepository debtPositionRepository) {
     this.taxonomyService = taxonomyService;
+    this.debtPositionRepository = debtPositionRepository;
   }
 
-  public void validate(DebtPositionDTO debtPositionDTO, String accessToken) {
+  public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
 
     validateDebtPositionOrigin(debtPositionDTO);
 
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
+    DebtPosition debtPosition = debtPositionRepository.findByIupdOrg(debtPositionDTO.getIupdOrg());
+
+    if (debtPosition != null) {
+      throw new ConflictErrorException("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
+    }
+
     if (debtPositionTypeOrg == null ||
-      debtPositionTypeOrg.getCode() == null ||
       StringUtils.isBlank(debtPositionTypeOrg.getCode())) {
       throw new InvalidValueException("Debt position type organization is mandatory");
     }
@@ -79,7 +86,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("Remittance information is mandatory");
     }
-    if (installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(OffsetDateTime.now())) {
+    if (installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
       throw new InvalidValueException("The due date cannot be retroactive");
     }
     if (debtPositionTypeOrgDTO.isFlagMandatoryDueDate() && installmentDTO.getDueDate() == null) {

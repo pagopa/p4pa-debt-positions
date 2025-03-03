@@ -130,6 +130,75 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /installments/{organizationId}/export:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsExport
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: paymentDateFrom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: paymentDateTo
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: versionTrack
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: "Version of track, versions  values allowed is [1.0, 1.1, 1.2, 1.3]"
+        - name: debtPositionTypeOrgId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedInstallmentsPaidView'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+      x-spring-paginated: true
   /receipts:
     post:
       tags:
@@ -451,7 +520,7 @@ components:
           format: int64
         validityDate:
           type: string
-          format: date-time
+          format: date
         flagIuvVolatile:
           type: boolean
         multiDebtor:
@@ -488,7 +557,7 @@ components:
           $ref: "#/components/schemas/PaymentOptionStatus"
         dueDate:
           type: string
-          format: date-time
+          format: date
         description:
           type: string
         paymentOptionType:
@@ -536,7 +605,7 @@ components:
           type: string
         dueDate:
           type: string
-          format: date-time
+          format: date
         paymentTypeCode:
           type: string
         amountCents:
@@ -729,7 +798,7 @@ components:
           format: int64
         dueDate:
           type: string
-          format: date-time
+          format: date
         debtor:
           $ref: "#/components/schemas/PersonDTO"
         debtPositionTypeOrgDescription:
@@ -836,7 +905,6 @@ components:
                 type: string
     PersonDTO:
       required:
-        - email
         - fullName
         - entityType
         - fiscalCode
@@ -1011,6 +1079,12 @@ components:
           format: int64
         flagExternal:
           type: boolean
+        serviceId:
+          type: string
+        subject:
+          type: string
+        markdown:
+          type: string
     InstallmentSynchronizeDTO:
       required:
         - action
@@ -1052,7 +1126,7 @@ components:
           type: string
         validityDate:
           type: string
-          format: date-time
+          format: date
         multiDebtor:
           type: boolean
         notificationDate:
@@ -1094,7 +1168,7 @@ components:
           type: string
         dueDate:
           type: string
-          format: date-time
+          format: date
         amountCents:
           type: integer
           format: int64
@@ -1146,3 +1220,28 @@ components:
         transferIndex:
           type: integer
           format: int32
+    PagedInstallmentsPaidView:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            type: 'InstallmentPaidView'
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64

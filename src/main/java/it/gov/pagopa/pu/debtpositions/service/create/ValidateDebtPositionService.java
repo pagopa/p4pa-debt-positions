@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 
 /**
  * Service class responsible to validate the new DebtPosition entity.
@@ -12,7 +13,8 @@ public interface ValidateDebtPositionService {
     /**
      * Validates a new debt position values
      * @param debtPositionRequestDTO representing the new debt position to be validated
+     * @param debtPositionTypeOrg representing the debt position type org
      * @throws InvalidValueException if a value does not comply with business rules
      */
-    void validate(DebtPositionDTO debtPositionRequestDTO, String accessToken);
+    void validate(DebtPositionDTO debtPositionRequestDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg);
 }
