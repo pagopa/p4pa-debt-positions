@@ -17,7 +17,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
-  private static final LocalDate DATE = LocalDate.of(2025, 1, 1);
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static DebtPosition buildDebtPosition() {

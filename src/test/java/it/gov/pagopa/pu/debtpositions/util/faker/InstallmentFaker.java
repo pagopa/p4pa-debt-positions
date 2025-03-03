@@ -20,7 +20,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 public class InstallmentFaker {
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
-  static LocalDateTime dateTime = LocalDateTime.now().plusDays(2);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
@@ -47,8 +46,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .noPII(buildInstallmentNoPII())
       .build();
@@ -81,8 +80,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
@@ -118,8 +117,8 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .build();
   }
 
@@ -147,8 +146,8 @@ public class InstallmentFaker {
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
-      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
+      .creationDate(DATETIME)
+      .updateDate(DATETIME)
       .build();
   }
 
@@ -176,8 +175,8 @@ public class InstallmentFaker {
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
-      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
+      .creationDate(DATETIME)
+      .updateDate(DATETIME)
       .build();
   }
 

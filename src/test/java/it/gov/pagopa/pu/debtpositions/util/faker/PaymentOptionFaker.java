@@ -14,7 +14,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 public class PaymentOptionFaker {
 
-  private static final LocalDate DATE = LocalDate.of(2025, 1, 1);
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
 
   public static PaymentOption buildPaymentOption() {
     PaymentOption paymentOption = new PaymentOption();
