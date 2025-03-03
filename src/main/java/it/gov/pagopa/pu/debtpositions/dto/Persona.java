@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class Persona {
 
+  private String codiceIdentificativoUnivoco;
   private String anagrafica;
   private String indirizzo;
   private String civico;
