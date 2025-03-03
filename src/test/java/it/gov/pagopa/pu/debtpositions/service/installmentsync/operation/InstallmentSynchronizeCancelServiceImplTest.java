@@ -73,8 +73,8 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The payment option with index %s not found",
-      installmentSynchronizeDTO.getPaymentOptionIndex()), notFoundException.getMessage());
+    assertEquals(String.format("The payment option with index %s of debt position with iupd %s not found",
+      installmentSynchronizeDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg()), notFoundException.getMessage());
   }
 
   @Test
