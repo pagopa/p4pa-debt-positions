@@ -33,8 +33,6 @@ public class DebtPositionTypeOrgMapper {
       .amountActualizationOrgSilServiceId(null)
       .flagExternal(false)
       .serviceId(null)
-      .subject(null)
-      .markdown(null)
       .creationDate(null)
       .updateDate(null)
       .updateOperatorExternalId(null)
