@@ -25,11 +25,11 @@ class InstallmentSynchronizeCancelServiceImplTest {
   @Mock
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentServiceMock;
 
-  private InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelService;
+  private InstallmentSynchronizeCancelService installmentSynchronizeCancelService;
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeCancelService = new InstallmentSynchronizeCancelServiceImpl(debtPositionCancelInstallmentServiceMock);
+    installmentSynchronizeCancelService = new InstallmentSynchronizeCancelService(debtPositionCancelInstallmentServiceMock);
   }
 
   @Test

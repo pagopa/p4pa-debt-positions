@@ -14,14 +14,14 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 public class InstallmentSynchronizeApplierPaymentOptionService {
 
   public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO paymentOptionDTO){
-    paymentOptionDTO.setDescription(installmentSynchronizeDTO.getDescription());
+    paymentOptionDTO.setDescription(installmentSynchronizeDTO.getPaymentOptionDescription());
 
     Set<String> modifiedFields = new HashSet<>();
     checkImmutableField("paymentOptionIndex", installmentSynchronizeDTO.getPaymentOptionIndex(), paymentOptionDTO.getPaymentOptionIndex(), modifiedFields);
-    checkImmutableField("paymentOptionType", installmentSynchronizeDTO.getPaymentOptionType(), paymentOptionDTO.getPaymentOptionType(), modifiedFields);
+    checkImmutableField("paymentOptionType", installmentSynchronizeDTO.getPaymentOptionType(), paymentOptionDTO.getPaymentOptionType().getValue(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException("These fields are not mutable: " + modifiedFields);
+      throw new ConflictErrorException(String.format("These fields for payment option with index %s of debt position with iupd %s are not mutable: %s", paymentOptionDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg(), modifiedFields));
     }
   }
 }

@@ -14,11 +14,11 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class InstallmentSynchronizeCancelServiceImpl extends BaseInstallmentSynchronizeService {
+public class InstallmentSynchronizeCancelService extends BaseInstallmentSynchronizeService {
 
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
 
-  public InstallmentSynchronizeCancelServiceImpl(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
+  public InstallmentSynchronizeCancelService(DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
   }
 

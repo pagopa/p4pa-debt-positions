@@ -30,11 +30,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
   @Mock
   private InstallmentSynchronizeApplierService installmentSynchronizeApplierServiceMock;
 
-  private InstallmentSynchronizeUpdateServiceImpl installmentSynchronizeUpdateService;
+  private InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService;
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeUpdateService = new InstallmentSynchronizeUpdateServiceImpl(debtPositionUpdateInstallmentServiceMock,
+    installmentSynchronizeUpdateService = new InstallmentSynchronizeUpdateService(debtPositionUpdateInstallmentServiceMock,
       installmentSynchronizeApplierServiceMock);
   }
 

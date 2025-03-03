@@ -29,30 +29,37 @@ public class InstallmentSynchronizeApplierInstallmentService {
     checkImmutableField("ingestionFlowFileLineNumber", installmentSynchronizeDTO.getIngestionFlowFileLineNumber(), installmentDTO.getIngestionFlowFileLineNumber(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException("These fields for installment are not mutable: " + modifiedFields);
+      throw new ConflictErrorException(String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
     }
 
+    if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()){
+      throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
+    }
+
+    if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()){
+      throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
+    }
+
+    updateTransferList(installmentDTO, installmentSynchronizeDTO);
   }
 
-  //TODO
-  private void updateTransferList(List<TransferDTO> transferDTOList, List<TransferSynchronizeDTO> transferSynchronizeDTOList) {
-
+  private void updateTransferList(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     Map<Integer, TransferSynchronizeDTO> mapIndexTransferSync = new HashMap<>();
-    for (TransferSynchronizeDTO transferSynchronizeDTO : transferSynchronizeDTOList) {
+    for (TransferSynchronizeDTO transferSynchronizeDTO : installmentSynchronizeDTO.getAdditionalTransfers()) {
       mapIndexTransferSync.put(transferSynchronizeDTO.getTransferIndex(), transferSynchronizeDTO);
     }
 
-    for(TransferDTO transferDTO : transferDTOList){
-      if(mapIndexTransferSync.containsKey(transferDTO.getTransferIndex())){
-        mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()));
-      } else {
-        transferDTOList.remove(transferDTO);
-      }
-    }
-
+    installmentDTO.getTransfers()
+      .forEach(transferDTO -> {
+        TransferSynchronizeDTO syncTransfer = findTransferByIndex(installmentSynchronizeDTO.getAdditionalTransfers(), transferDTO.getTransferIndex());
+        if (syncTransfer == null){
+          throw new ConflictErrorException(String.format("The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
+        }
+        mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()), installmentDTO.getIud());
+      });
   }
 
-  private void mergeTransfer(TransferDTO transferDTO, TransferSynchronizeDTO transferSynchronizeDTO) {
+  private void mergeTransfer(TransferDTO transferDTO, TransferSynchronizeDTO transferSynchronizeDTO, String iud) {
     transferDTO.setAmountCents(transferSynchronizeDTO.getAmountCents());
     transferDTO.setRemittanceInformation(transferSynchronizeDTO.getRemittanceInformation());
 
@@ -63,10 +70,10 @@ public class InstallmentSynchronizeApplierInstallmentService {
     checkImmutableField("category", transferDTO.getCategory(), transferSynchronizeDTO.getCategory(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException("These fields for transfer are not mutable: " + modifiedFields);
+      throw new ConflictErrorException(String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
+        transferDTO.getTransferIndex(), iud, modifiedFields));
     }
   }
-
 
   private TransferSynchronizeDTO findTransferByIndex(List<TransferSynchronizeDTO> transfers, Integer transferIndex) {
     return transfers.stream()

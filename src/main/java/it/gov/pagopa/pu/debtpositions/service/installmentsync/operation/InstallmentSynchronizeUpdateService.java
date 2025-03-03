@@ -15,12 +15,12 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class InstallmentSynchronizeUpdateServiceImpl extends BaseInstallmentSynchronizeService {
+public class InstallmentSynchronizeUpdateService extends BaseInstallmentSynchronizeService {
 
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final InstallmentSynchronizeApplierService installmentSynchronizeApplierService;
 
-  public InstallmentSynchronizeUpdateServiceImpl(DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService, InstallmentSynchronizeApplierService installmentSynchronizeApplierService) {
+  public InstallmentSynchronizeUpdateService(DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService, InstallmentSynchronizeApplierService installmentSynchronizeApplierService) {
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.installmentSynchronizeApplierService = installmentSynchronizeApplierService;
   }

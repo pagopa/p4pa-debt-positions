@@ -7,8 +7,8 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelServiceImpl;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateServiceImpl;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,9 +31,9 @@ class InstallmentSynchronizeServiceImplTest {
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
-  private InstallmentSynchronizeCancelServiceImpl installmentSynchronizeCancelServiceMock;
+  private InstallmentSynchronizeCancelService installmentSynchronizeCancelServiceMock;
   @Mock
-  private InstallmentSynchronizeUpdateServiceImpl installmentSynchronizeUpdateServiceMock;
+  private InstallmentSynchronizeUpdateService installmentSynchronizeUpdateServiceMock;
 
   private InstallmentSynchronizeService installmentSynchronizeService;
 

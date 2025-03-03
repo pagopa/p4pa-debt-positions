@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildSyncDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class InstallmentSynchronizeMapperTest {
 
@@ -24,6 +25,7 @@ class InstallmentSynchronizeMapperTest {
 
     DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, 1L);
 
+    assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
   }
 
@@ -38,6 +40,7 @@ class InstallmentSynchronizeMapperTest {
 
     DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, 1L);
 
+    assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
   }
 }

@@ -23,7 +23,7 @@ class DebtPositionProcessorServiceImplTest {
   private DebtPositionProcessorServiceImpl debtPositionProcessorService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     debtPositionProcessorService = new DebtPositionProcessorServiceImpl();
   }
 

@@ -73,8 +73,8 @@ public class Utilities {
   }
 
   public static void checkImmutableField(String fieldName, Object original, Object updated, Set<String> modifiedFields){
-    boolean multiDebtorUpdated = !Objects.equals(original, updated);
-    if(multiDebtorUpdated){
+    boolean fieldUpdated = !Objects.equals(original, updated);
+    if(fieldUpdated){
       modifiedFields.add(fieldName);
     }
   }

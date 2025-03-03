@@ -22,7 +22,7 @@ public class InstallmentSynchronizeApplierDebtPositionService {
     checkImmutableField("flagPagoPaPayment", installmentSynchronizeDTO.getFlagPagoPaPayment(), debtPositionDTO.getFlagPagoPaPayment(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException("These fields are not mutable: " + modifiedFields);
+      throw new ConflictErrorException(String.format("These fields for debt position with iupd %s are not mutable: %s", debtPositionDTO.getIupdOrg(), modifiedFields));
     }
   }
 }
