@@ -8,9 +8,10 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
@@ -47,15 +48,12 @@ public class InstallmentSynchronizeInstallmentApplierService {
   }
 
   private void updateTransferList(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
-    Map<Integer, TransferSynchronizeDTO> mapIndexTransferSync = new HashMap<>();
-    for (TransferSynchronizeDTO transferSynchronizeDTO : installmentSynchronizeDTO.getAdditionalTransfers()) {
-      mapIndexTransferSync.put(transferSynchronizeDTO.getTransferIndex(), transferSynchronizeDTO);
-    }
+    Map<Integer, TransferSynchronizeDTO> mapIndexTransferSync = installmentSynchronizeDTO.getAdditionalTransfers().stream()
+      .collect(Collectors.toMap(TransferSynchronizeDTO::getTransferIndex, Function.identity()));
 
     installmentDTO.getTransfers()
       .forEach(transferDTO -> {
-        TransferSynchronizeDTO syncTransfer = findTransferByIndex(installmentSynchronizeDTO.getAdditionalTransfers(), transferDTO.getTransferIndex());
-        if (syncTransfer == null){
+        if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null){
           throw new ConflictErrorException(String.format("The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
         }
         mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()), installmentDTO.getIud());
@@ -76,12 +74,5 @@ public class InstallmentSynchronizeInstallmentApplierService {
       throw new ConflictErrorException(String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
         transferDTO.getTransferIndex(), iud, modifiedFields));
     }
-  }
-
-  private TransferSynchronizeDTO findTransferByIndex(List<TransferSynchronizeDTO> transfers, Integer transferIndex) {
-    return transfers.stream()
-      .filter(transferSynchronizeDTO -> transferSynchronizeDTO.getTransferIndex().equals(transferIndex))
-      .findFirst()
-      .orElse(null);
   }
 }
