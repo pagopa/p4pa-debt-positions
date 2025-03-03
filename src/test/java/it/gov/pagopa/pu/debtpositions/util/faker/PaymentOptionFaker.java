@@ -57,4 +57,15 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));
     return paymentOptionDTO;
   }
+
+  public static PaymentOptionDTO buildSyncPaymentOptionDTO(){
+    PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
+    paymentOptionDTO.setDueDate(DATE);
+    paymentOptionDTO.setDescription("Payment description");
+    paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
+    paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionIndex(1);
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildSyncInstallmentDTO())));
+    return paymentOptionDTO;
+  }
 }

@@ -39,4 +39,16 @@ public class TransferFaker {
       .stampProvincialResidence("PR")
       .build();
   }
+
+  public static TransferDTO buildSyncTransferDTO(){
+    return TransferDTO.builder()
+      .orgFiscalCode("orgFiscalCode2")
+      .orgName("orgName2")
+      .amountCents(50L)
+      .remittanceInformation("remittanceInformation2")
+      .iban("iban2")
+      .category("category2")
+      .transferIndex(2)
+      .build();
+  }
 }

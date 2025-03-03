@@ -18,7 +18,7 @@ public class InstallmentSynchronizeMapper {
       .validityDate(installmentSynchronizeDTO.getValidityDate())
       .multiDebtor(installmentSynchronizeDTO.getMultiDebtor())
       .flagPagoPaPayment(installmentSynchronizeDTO.getFlagPagoPaPayment())
-      .status(DebtPositionStatus.UNPAID)
+      .status(installmentSynchronizeDTO.getDraft().equals(Boolean.TRUE) ? DebtPositionStatus.DRAFT : DebtPositionStatus.UNPAID)
       .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO)))
       .build();
   }
@@ -28,7 +28,8 @@ public class InstallmentSynchronizeMapper {
       .paymentOptionIndex(installmentSynchronizeDTO.getPaymentOptionIndex())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
       .description(installmentSynchronizeDTO.getPaymentOptionDescription())
-      .status(PaymentOptionStatus.UNPAID)
+      .dueDate(installmentSynchronizeDTO.getDueDate())
+      .status(installmentSynchronizeDTO.getDraft().equals(Boolean.TRUE) ? PaymentOptionStatus.DRAFT :PaymentOptionStatus.UNPAID)
       .installments(List.of(map2Installment(installmentSynchronizeDTO)))
       .build();
   }
@@ -47,6 +48,7 @@ public class InstallmentSynchronizeMapper {
       .ingestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber())
       .notificationDate(installmentSynchronizeDTO.getNotificationDate())
+      .status(installmentSynchronizeDTO.getDraft().equals(Boolean.TRUE) ? InstallmentStatus.DRAFT : InstallmentStatus.UNPAID)
       .transfers(installmentSynchronizeDTO.getAdditionalTransfers().stream().map(this::map2TransferDTO).toList())
       .build();
   }
