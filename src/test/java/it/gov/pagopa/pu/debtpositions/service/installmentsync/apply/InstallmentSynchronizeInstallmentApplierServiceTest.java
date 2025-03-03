@@ -14,9 +14,9 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFa
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class InstallmentSynchronizeApplierInstallmentServiceTest {
+class InstallmentSynchronizeInstallmentApplierServiceTest {
 
-  private InstallmentSynchronizeApplierInstallmentService applierInstallmentService;
+  private InstallmentSynchronizeInstallmentApplierService applierInstallmentService;
 
   private final TransferSynchronizeDTO firstSyncTransfer = TransferSynchronizeDTO.builder()
     .transferIndex(1)
@@ -40,7 +40,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
 
   @BeforeEach
   void setUp() {
-    applierInstallmentService = new InstallmentSynchronizeApplierInstallmentService();
+    applierInstallmentService = new InstallmentSynchronizeInstallmentApplierService();
   }
 
   @Test

@@ -11,13 +11,13 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFa
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-class InstallmentSynchronizeApplierDebtPositionServiceTest {
+class InstallmentSynchronizeDebtPositionApplierServiceTest {
 
-  private InstallmentSynchronizeApplierDebtPositionService applierDebtPositionService;
+  private InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService;
 
   @BeforeEach
   void setUp() {
-    applierDebtPositionService = new InstallmentSynchronizeApplierDebtPositionService();
+    applierDebtPositionService = new InstallmentSynchronizeDebtPositionApplierService();
   }
 
   @Test

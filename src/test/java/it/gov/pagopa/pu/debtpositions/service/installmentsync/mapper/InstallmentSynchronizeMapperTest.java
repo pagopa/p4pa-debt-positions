@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildSyncDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
@@ -27,6 +28,7 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
+    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate");
   }
 
   @Test
@@ -42,5 +44,6 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
+    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate");
   }
 }

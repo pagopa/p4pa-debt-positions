@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
@@ -14,14 +15,14 @@ import org.springframework.stereotype.Service;
 public class InstallmentSynchronizeApplierService {
 
   private final InstallmentSynchronizeMapper installmentSynchronizeMapper;
-  private final InstallmentSynchronizeApplierDebtPositionService applierDebtPositionService;
-  private final InstallmentSynchronizeApplierInstallmentService applierInstallmentService;
-  private final InstallmentSynchronizeApplierPaymentOptionService applierPaymentOptionService;
+  private final InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService;
+  private final InstallmentSynchronizeInstallmentApplierService applierInstallmentService;
+  private final InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final OrganizationService organizationService;
   private final DebtPositionTypeRepository debtPositionTypeRepository;
 
-  public InstallmentSynchronizeApplierService(InstallmentSynchronizeMapper installmentSynchronizeMapper, InstallmentSynchronizeApplierDebtPositionService applierDebtPositionService, InstallmentSynchronizeApplierInstallmentService applierInstallmentService, InstallmentSynchronizeApplierPaymentOptionService applierPaymentOptionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, OrganizationService organizationService, DebtPositionTypeRepository debtPositionTypeRepository) {
+  public InstallmentSynchronizeApplierService(InstallmentSynchronizeMapper installmentSynchronizeMapper, InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService, InstallmentSynchronizeInstallmentApplierService applierInstallmentService, InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, OrganizationService organizationService, DebtPositionTypeRepository debtPositionTypeRepository) {
     this.installmentSynchronizeMapper = installmentSynchronizeMapper;
     this.applierDebtPositionService = applierDebtPositionService;
     this.applierInstallmentService = applierInstallmentService;
@@ -79,7 +80,9 @@ public class InstallmentSynchronizeApplierService {
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
-    String category = debtPositionTypeRepository.findByDebtPositionTypeId(debtPositionTypeOrg.getDebtPositionTypeId()).getTaxonomyCode();
+    String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
+      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
+      .getTaxonomyCode();
 
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();

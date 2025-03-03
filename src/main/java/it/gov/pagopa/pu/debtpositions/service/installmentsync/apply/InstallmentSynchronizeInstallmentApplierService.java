@@ -7,12 +7,15 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
 @Service
-public class InstallmentSynchronizeApplierInstallmentService {
+public class InstallmentSynchronizeInstallmentApplierService {
 
   public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, InstallmentDTO installmentDTO) {
     installmentDTO.setDueDate(installmentSynchronizeDTO.getDueDate());
@@ -22,7 +25,7 @@ public class InstallmentSynchronizeApplierInstallmentService {
     installmentDTO.setLegacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata());
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
 
-    Set<String> modifiedFields = new HashSet<>();
+    List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
     checkImmutableField("paymentTypeCode", installmentSynchronizeDTO.getPaymentTypeCode(), installmentDTO.getPaymentTypeCode(), modifiedFields);
     checkImmutableField("ingestionFlowFileId", installmentSynchronizeDTO.getIngestionFlowFileId(), installmentDTO.getIngestionFlowFileId(), modifiedFields);
@@ -63,7 +66,7 @@ public class InstallmentSynchronizeApplierInstallmentService {
     transferDTO.setAmountCents(transferSynchronizeDTO.getAmountCents());
     transferDTO.setRemittanceInformation(transferSynchronizeDTO.getRemittanceInformation());
 
-    Set<String> modifiedFields = new HashSet<>();
+    List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("orgFiscalCode", transferDTO.getOrgFiscalCode(), transferSynchronizeDTO.getOrgFiscalCode(), modifiedFields);
     checkImmutableField("orgName", transferDTO.getOrgName(), transferSynchronizeDTO.getOrgName(), modifiedFields);
     checkImmutableField("iban", transferDTO.getIban(), transferSynchronizeDTO.getIban(), modifiedFields);
