@@ -484,6 +484,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-position-type-orgs/{debtPositionTypeOrgId}/notifications:
+    get:
+      tags:
+        - debt-position-type-org
+      description: Returns the serviceId, subject, and markdown message if the DebtPositionTypeOrg is enabled for AppIO notifications.
+      operationId: getAppIONotification
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position type organization.
+        - name: context
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/PaymentEventType"
+          description: The context for which to retrieve the notification details.
+      responses:
+        "200":
+          description: Successfully retrieved notification details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AppIONotificationDTO"
+        "400":
+          description: Invalid request parameters
+        "404":
+          description: No notification details found for the specified DebtPositionTypeOrgId or notifications are not enabled
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: []
 components:
@@ -1243,3 +1276,22 @@ components:
         number:
           type: integer
           format: int64
+    AppIONotificationDTO:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        ioTemplateSubject:
+          type: string
+        ioTemplateMessage:
+          type: string
+    PaymentEventType:
+      type: string
+      enum:
+        - DP_CREATED
+        - DP_UPDATED
+        - DPI_ADDED
+        - DPI_UPDATED
+        - DPI_CANCELLED
+        - RT_RECEIVED
+        - SYNC_ERROR
