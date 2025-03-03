@@ -17,8 +17,7 @@ import java.util.List;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeCancelServiceImplTest {
@@ -66,19 +65,51 @@ class InstallmentSynchronizeCancelServiceImplTest {
   }
 
   @Test
-  void testInstallmentSyncCancelWithInstallmentNotFoundThenThrowException() {
+  void testInstallmentSyncCancelWithPaymentOptionNotFoundThenThrowException() {
     boolean massive = true;
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setIud("iud2");
     installmentSynchronizeDTO.setPaymentOptionIndex(2);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The installment with iud %s in payment option with index %s not found",
-      installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getPaymentOptionIndex()), notFoundException.getMessage());
+    assertEquals(String.format("The payment option with index %s not found",
+      installmentSynchronizeDTO.getPaymentOptionIndex()), notFoundException.getMessage());
+  }
+
+  @Test
+  void testInstallmentSyncCancelWithInstallmentNotFoundThenThrowException() {
+    boolean massive = true;
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(1);
+    installmentSynchronizeDTO.setIud("iud2");
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
+      installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
+    assertEquals(String.format("The installment with iud %s not found",
+      installmentSynchronizeDTO.getIud()), notFoundException.getMessage());
+  }
+
+  @Test
+  void testInstallmentSyncCancelWithInstallmentAlreadyElaboratedThenThrowException() {
+    boolean massive = true;
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(1);
+    installmentSynchronizeDTO.setIud("iud");
+    installmentSynchronizeDTO.setIngestionFlowFileId(1L);
+    installmentSynchronizeDTO.setIngestionFlowFileLineNumber(100L);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    String result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
+
+    assertNull(result);
   }
 
   @Test
@@ -94,7 +125,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The installment with iud %s cannot be cancelled because is not in an allowed status: %s",
+    assertEquals(String.format("The installment with iud %s cannot be updated or cancelled because is not in an allowed status: %s",
       installmentSynchronizeDTO.getIud(), InstallmentStatus.PAID), conflictException.getMessage());
   }
 
@@ -112,7 +143,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The installment with %s cannot be cancelled because there was an error in the previous synchronization",
+    assertEquals(String.format("The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization",
       installmentSynchronizeDTO.getIud()), conflictException.getMessage());
   }
 
@@ -132,7 +163,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The installment with %s cannot be cancelled because is not in an allowed status to: %s",
+    assertEquals(String.format("The installment with iud %s cannot be updated or cancelled because is not in an allowed status to: %s",
       installmentSynchronizeDTO.getIud(), InstallmentStatus.PAID), conflictException.getMessage());
   }
 

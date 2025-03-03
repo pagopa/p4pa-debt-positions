@@ -68,13 +68,13 @@ public class InstallmentSynchronizeApplierService {
     return installmentDTO;
   }
 
-  public DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
+  private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
     return debtPositionTypeOrgRepository.findByOrganizationIdAndCode(
         organizationId, debtPositionTypeCode)
       .orElseThrow(() -> new InvalidValueException(String.format("The debt position type code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
   }
 
-  public void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
+  private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     Long organizationId = installmentSynchronizeDTO.getOrganizationId();
 
     Organization organization = organizationSearchClient.findByOrganizationId(organizationId, accessToken);

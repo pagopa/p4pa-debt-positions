@@ -26,6 +26,9 @@ public class InstallmentSynchronizeCancelServiceImpl extends BaseInstallmentSync
                                 Boolean massive, String accessToken, String operatorExternalUserId) {
 
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallmentAndThrowException(debtPositionDTO, installmentSynchronizeDTO);
+
+    if(isInstallmentAlreadyElaborated(result.getRight(), installmentSynchronizeDTO)){ return null;}
+
     validateStatus(result.getRight(), installmentSynchronizeDTO);
 
     return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(result.getRight()), massive, accessToken, operatorExternalUserId).getRight();

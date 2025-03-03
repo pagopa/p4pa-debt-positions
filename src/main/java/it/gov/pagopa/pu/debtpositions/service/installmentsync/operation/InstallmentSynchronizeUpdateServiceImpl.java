@@ -29,6 +29,9 @@ public class InstallmentSynchronizeUpdateServiceImpl extends BaseInstallmentSync
                                 Boolean massive, String accessToken, String operatorExternalUserId) {
 
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallmentAndThrowException(storedDebtPosition, installmentSynchronizeDTO);
+
+    if(isInstallmentAlreadyElaborated(result.getRight(), installmentSynchronizeDTO)){ return null;}
+
     validateStatus(result.getRight(), installmentSynchronizeDTO);
 
     InstallmentDTO installment2operate = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, result.getLeft(), result.getRight(), accessToken);

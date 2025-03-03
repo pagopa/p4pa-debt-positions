@@ -51,12 +51,17 @@ public abstract class BaseInstallmentSynchronizeService {
     return result;
   }
 
+  public boolean isInstallmentAlreadyElaborated(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO){
+    return installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId()) &&
+      installmentSynchronizeDTO.getIngestionFlowFileLineNumber().equals(installmentDTO.getIngestionFlowFileLineNumber());
+  }
+
   public void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     if (InstallmentStatus.TO_SYNC.equals(installmentDTO.getStatus())) {
       if (!installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId())) {
-        throw new ConflictErrorException(String.format("The installment with %s cannot be updated or cancelled because there was an error in the previous synchronization", installmentSynchronizeDTO.getIud()));
+        throw new ConflictErrorException(String.format("The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization", installmentSynchronizeDTO.getIud()));
       } else if (installmentDTO.getSyncStatus() != null && !installmentStatusesValidForUpdate.contains(installmentDTO.getSyncStatus().getSyncStatusTo())) {
-        throw new ConflictErrorException(String.format("The installment with %s cannot be updated or cancelled because is not in an allowed status to: %s",
+        throw new ConflictErrorException(String.format("The installment with iud %s cannot be updated or cancelled because is not in an allowed status to: %s",
           installmentSynchronizeDTO.getIud(), installmentDTO.getSyncStatus().getSyncStatusTo()));
       }
     } else if (!installmentStatusesValidForUpdate.contains(installmentDTO.getStatus())) {

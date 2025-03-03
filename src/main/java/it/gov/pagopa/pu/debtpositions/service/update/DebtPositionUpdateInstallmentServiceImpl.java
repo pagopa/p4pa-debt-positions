@@ -5,7 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -18,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,17 +26,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOperationService implements DebtPositionUpdateInstallmentService {
 
-    protected DebtPositionUpdateInstallmentServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                                       DebtPositionService debtPositionService,
-                                                       DebtPositionSyncService debtPositionSyncService,
-                                                       DebtPositionProcessorService debtPositionProcessorService,
-                                                       OrganizationService organizationService,
-                                                       DebtPositionMapper debtPositionMapper,
-                                                       DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
-        super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionMapper, debtPositionHierarchyStatusAlignerService);
-    }
+  protected DebtPositionUpdateInstallmentServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
+  }
 
-    @Override
+  @Override
     public Pair<DebtPositionDTO, String> updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
         if (log.isDebugEnabled()) {
             Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
@@ -62,7 +55,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
                         .ifPresent(installmentDTO -> {
                                     InstallmentStatus statusTo = installmentDTO.getStatus();
                                     if (installmentDTO.getStatus().equals(InstallmentStatus.EXPIRED) && installmentDTO.getDueDate() != null &&
-                                            installmentDTO.getDueDate().isAfter(OffsetDateTime.now())) {
+                                            installmentDTO.getDueDate().isAfter(LocalDate.now())) {
                                         statusTo = InstallmentStatus.UNPAID;
                                     }
                                     installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), statusTo));
