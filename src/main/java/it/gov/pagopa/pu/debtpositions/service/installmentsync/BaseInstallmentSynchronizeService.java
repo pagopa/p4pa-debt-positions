@@ -43,7 +43,8 @@ public abstract class BaseInstallmentSynchronizeService {
       throw new NotFoundException(String.format("The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
     }
     if (result.getLeft() == null) {
-      throw new NotFoundException(String.format("The payment option with index %s not found", installmentSynchronizeDTO.getPaymentOptionIndex()));
+      throw new NotFoundException(String.format("The payment option with index %s of debt position with iupd %s not found",
+        installmentSynchronizeDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg()));
     }
     if (result.getRight() == null) {
       throw new NotFoundException(String.format("The installment with iud %s not found", installmentSynchronizeDTO.getIud()));
