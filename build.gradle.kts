@@ -44,6 +44,7 @@ val postgresJdbcVersion = "42.7.5"
 val bouncycastleVersion = "1.80"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
+val caffeineVersion = "3.2.0"
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
@@ -53,6 +54,8 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-data-rest")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+  implementation("org.springframework.boot:spring-boot-starter-cache")
+  implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
   implementation("org.springframework.cloud:spring-cloud-starter-stream-kafka")
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
   implementation("io.micrometer:micrometer-registry-prometheus")

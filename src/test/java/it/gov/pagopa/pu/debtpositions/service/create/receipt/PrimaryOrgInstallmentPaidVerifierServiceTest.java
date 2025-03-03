@@ -16,7 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -66,7 +66,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallment(InstallmentStatus.UNPAID),
       getInstallmentToSync(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID),
-      getInstallmentExpired(OffsetDateTime.now().minusDays(1))
+      getInstallmentExpired(LocalDate.now().minusDays(1))
     );
     handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.EXCEPTION);
   }
@@ -83,14 +83,14 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID),
-      getInstallmentExpired(OffsetDateTime.now().minusDays(2))
+      getInstallmentExpired(LocalDate.now().minusDays(2))
     );
     handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.EXCEPTION);
   }
 
   @Test
   void givenSingleExpiredWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
-    InstallmentNoPII targetInstallment = getInstallmentExpired(OffsetDateTime.now().minusDays(3));
+    InstallmentNoPII targetInstallment = getInstallmentExpired(LocalDate.now().minusDays(3));
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     );
@@ -99,10 +99,10 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
 
   @Test
   void givenMultipleExpiredWhenFindAndValidatePrimaryOrgInstallmentThenFound() {
-    InstallmentNoPII targetInstallment = getInstallmentExpired(OffsetDateTime.now().minusDays(3));
+    InstallmentNoPII targetInstallment = getInstallmentExpired(LocalDate.now().minusDays(3));
     List<InstallmentNoPII> additionalInstallments = List.of(
       getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID),
-      getInstallmentExpired(OffsetDateTime.now().minusDays(4))
+      getInstallmentExpired(LocalDate.now().minusDays(4))
     );
     handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_VALID);
   }
@@ -123,10 +123,10 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
   static InstallmentNoPII getInstallmentToSync(InstallmentStatus statusFrom, InstallmentStatus statusTo) {
     return getInstallment(InstallmentStatus.TO_SYNC, statusFrom, statusTo, null);
   }
-  static InstallmentNoPII getInstallmentExpired(OffsetDateTime dueDate) {
+  static InstallmentNoPII getInstallmentExpired(LocalDate dueDate) {
     return getInstallment(InstallmentStatus.EXPIRED, null, null, dueDate);
   }
-  private static InstallmentNoPII getInstallment(InstallmentStatus status, InstallmentStatus statusFrom, InstallmentStatus statusTo, OffsetDateTime dueDate) {
+  private static InstallmentNoPII getInstallment(InstallmentStatus status, InstallmentStatus statusFrom, InstallmentStatus statusTo, LocalDate dueDate) {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     installment.setStatus(status);
     if(status == InstallmentStatus.TO_SYNC){

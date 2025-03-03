@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
@@ -45,12 +44,11 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          InstallmentNoPIIRepository installmentNoPIIRepository,
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
-                                         DebtPositionMapper debtPositionMapper,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
                                          DebtPositionTypeOrgRepository debtPositionTypeOrgRepository
                                          ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
-      debtPositionProcessorService, organizationService, debtPositionMapper, debtPositionHierarchyStatusAlignerService);
+      debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
     this.generateIuvService = generateIuvService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
