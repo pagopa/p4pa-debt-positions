@@ -18,7 +18,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
 
   private InstallmentSynchronizeApplierInstallmentService applierInstallmentService;
 
-  private final TransferSynchronizeDTO FIRST_SYNC_TRANSFER = TransferSynchronizeDTO.builder()
+  private final TransferSynchronizeDTO firstSyncTransfer = TransferSynchronizeDTO.builder()
     .transferIndex(1)
     .orgFiscalCode("orgFiscalCode1")
     .orgName("orgName1")
@@ -28,7 +28,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
     .category("category1")
     .build();
 
-  private final TransferDTO FIRST_TRANSFER = TransferDTO.builder()
+  private final TransferDTO firstTransfer = TransferDTO.builder()
     .transferIndex(1)
     .orgFiscalCode("orgFiscalCode1")
     .orgName("orgName1")
@@ -48,9 +48,9 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setAmountCents(500L);
     installmentSynchronizeDTO.setRemittanceInformation("New remittance information");
-    installmentSynchronizeDTO.addAdditionalTransfersItem(FIRST_SYNC_TRANSFER);
+    installmentSynchronizeDTO.addAdditionalTransfersItem(firstSyncTransfer);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
-    installmentDTO.addTransfersItem(FIRST_TRANSFER);
+    installmentDTO.addTransfersItem(firstTransfer);
 
     applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
 
@@ -85,7 +85,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
   @Test
   void testMergeInstallmentTransfersSizeNotMutableThenException(){
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.addAdditionalTransfersItem(FIRST_SYNC_TRANSFER);
+    installmentSynchronizeDTO.addAdditionalTransfersItem(firstSyncTransfer);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
@@ -100,7 +100,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
     transferSynchronizeDTO.setTransferIndex(3);
     installmentSynchronizeDTO.addAdditionalTransfersItem(transferSynchronizeDTO);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
-    installmentDTO.addTransfersItem(FIRST_TRANSFER);
+    installmentDTO.addTransfersItem(firstTransfer);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
@@ -115,7 +115,7 @@ class InstallmentSynchronizeApplierInstallmentServiceTest {
     transferSynchronizeDTO.setOrgFiscalCode("New fiscal code");
     installmentSynchronizeDTO.addAdditionalTransfersItem(transferSynchronizeDTO);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
-    installmentDTO.addTransfersItem(FIRST_TRANSFER);
+    installmentDTO.addTransfersItem(firstTransfer);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));

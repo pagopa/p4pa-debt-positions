@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -167,6 +168,8 @@ class InstallmentSynchronizeApplierServiceTest {
   void testApplyOrgNotFoundThenException(){
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
 
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
 
@@ -175,8 +178,7 @@ class InstallmentSynchronizeApplierServiceTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
       installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
-        debtPositionDTO.getPaymentOptions().getFirst(),
-        debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken));
+        paymentOptionDTO, installmentDTO, accessToken));
     assertEquals(String.format("Provided organization id %s not found", installmentSynchronizeDTO.getOrganizationId()), invalidValueException.getMessage());
   }
 
@@ -184,6 +186,9 @@ class InstallmentSynchronizeApplierServiceTest {
   void testApplyDebtPositionTypeOrgNotFoundThenException(){
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+
     Organization organization = buildOrganization();
 
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
@@ -195,8 +200,7 @@ class InstallmentSynchronizeApplierServiceTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
       installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
-        debtPositionDTO.getPaymentOptions().getFirst(),
-        debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken));
+        paymentOptionDTO, installmentDTO, accessToken));
     assertEquals(String.format("The debt position type code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
       invalidValueException.getMessage());
   }
