@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
@@ -46,8 +47,8 @@ public class ReceiptMapper {
       .standin(dto.getStandin())
       .debtor(personMapper.mapToModel(dto.getDebtor()))
       .payer(Optional.ofNullable(dto.getPayer()).map(personMapper::mapToModel).orElse(null))
-      .creationDate(dto.getCreationDate().toLocalDateTime())
-      .updateDate(dto.getUpdateDate().toLocalDateTime())
+      .creationDate(Optional.ofNullable(dto.getCreationDate()).map(OffsetDateTime::toLocalDateTime).orElse(null))
+      .updateDate(Optional.ofNullable(dto.getUpdateDate()).map(OffsetDateTime::toLocalDateTime).orElse(null))
       .build();
   }
 
