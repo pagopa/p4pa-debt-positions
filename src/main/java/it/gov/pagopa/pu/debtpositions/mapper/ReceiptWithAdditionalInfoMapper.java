@@ -23,7 +23,7 @@ public class ReceiptWithAdditionalInfoMapper {
     OffsetDateTime now = OffsetDateTime.now();
     return DebtPositionDTO.builder()
       .organizationId(organization.getOrganizationId())
-      .debtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA)
+      .debtPositionOrigin(getDebtPositionOrigin(receiptDTO, organization))
       .debtPositionTypeOrgId(unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId())
         .getDebtPositionTypeOrgId())
       .iupdOrg(getIupdOrg(receiptDTO))
@@ -68,6 +68,22 @@ public class ReceiptWithAdditionalInfoMapper {
           .build()))
         .build()))
       .build();
+  }
+
+  /**
+   * Rules for retrieving debtPositionOrigin from receipt:
+   * in case receiptOrigin is RECEIPT_PAGOPA:
+   * - if primary org -> RECEIPT_PAGOPA
+   * - if secondary org -> SECONDARY_ORG
+   * in all other cases it corresponds to receiptOrigin.
+   */
+  private DebtPositionOrigin getDebtPositionOrigin(ReceiptWithAdditionalNodeDataDTO receipt, Organization organization) {
+    return switch (receipt.getReceiptOrigin()) {
+      case RECEIPT_PAGOPA ->
+        organization.getOrgFiscalCode().equals(receipt.getOrgFiscalCode()) ? DebtPositionOrigin.RECEIPT_PAGOPA : DebtPositionOrigin.SECONDARY_ORG;
+      case PAYMENTS_REPORTING -> DebtPositionOrigin.REPORTING_PAGOPA;
+      case RECEIPT_FILE -> DebtPositionOrigin.RECEIPT_FILE;
+    };
   }
 
   private String getIupdOrg(ReceiptWithAdditionalNodeDataDTO receipt) {
