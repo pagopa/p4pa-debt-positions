@@ -106,6 +106,7 @@ class InstallmentPaidPIIMapperTest {
     //then
     assertNotNull(result);
     assertNull(result.getCodRtDatiPagDatiSingPagAllegatoRicevutaTipo());
+    assertNull(result.getBlbRtDatiPagDatiSingPagAllegatoRicevutaTest());
   }
 
   @Test
