@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
 import java.time.OffsetDateTime;
@@ -59,5 +60,21 @@ class UtilitiesTest {
     String regex = "^60206350377-\\d{12}-[a-f0-9]{10}$";
 
     assertTrue(uuid.matches(regex));
+  }
+
+  @ParameterizedTest
+  @CsvSource(value = {
+    "0, 0",
+    "102, 1.02",
+    "3566, 35.66",
+    "63582, 635.82",
+    "6985412, 69854.12"
+  })
+  void testCentsToEuro(Long cents, Double euro) {
+
+    Double result = Utilities.centsToEuro(cents);
+
+    assertNotNull(result);
+    assertEquals(euro, result);
   }
 }
