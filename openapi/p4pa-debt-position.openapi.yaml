@@ -484,6 +484,39 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-position-type-org/{debtPositionTypeOrgId}/io-notification/details:
+    get:
+      tags:
+        - debt-position-type-org
+      description: Returns the serviceId, subject, and markdown message if the DebtPositionTypeOrg is enabled for AppIO notifications.
+      operationId: getIONotificationDetails
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position type organization.
+        - name: context
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/IONotificationOperationType"
+          description: The context for which to retrieve the notification details.
+      responses:
+        "200":
+          description: Successfully retrieved notification details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IONotificationDTO"
+        "400":
+          description: Invalid request parameters
+        "404":
+          description: No notification details found for the specified DebtPositionTypeOrgId or notifications are not enabled
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: []
 components:
@@ -698,7 +731,6 @@ components:
         - idChannel
         - channelDescription
         - debtor
-        - payer
       properties:
         receiptId:
           type: integer
@@ -1243,3 +1275,18 @@ components:
         number:
           type: integer
           format: int64
+    IONotificationDTO:
+      type: object
+      properties:
+        serviceId:
+          type: string
+        ioTemplateSubject:
+          type: string
+        ioTemplateMessage:
+          type: string
+    IONotificationOperationType:
+      type: string
+      enum:
+        - CREATE_DP
+        - UPDATE_DP
+        - DELETE_DP
