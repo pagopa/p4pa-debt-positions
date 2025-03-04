@@ -17,19 +17,17 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
   @Override
   public IONotificationDTO getIONotificationDetails(Long debtPositionTypeOrgId, IONotificationOperationType context) {
-    if (!context.equals(IONotificationOperationType.CREATE_DP)) {
-      return null;
-    }
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
       .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId)));
 
-    if (!debtPositionTypeOrg.isFlagNotifyIo()) {
-      throw new IllegalArgumentException("DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " is not enabled for AppIO notifications.");
+    if (debtPositionTypeOrg.isFlagNotifyIo() && context.equals(IONotificationOperationType.CREATE_DP)) {
+      return IONotificationDTO.builder()
+        .serviceId(debtPositionTypeOrg.getServiceId())
+        .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject())
+        .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage())
+        .build();
     }
-    return IONotificationDTO.builder()
-      .serviceId(debtPositionTypeOrg.getServiceId())
-      .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject())
-      .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage())
-      .build();
+    return null;
   }
+
 }

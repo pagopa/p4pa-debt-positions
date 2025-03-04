@@ -63,22 +63,24 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionTypeOrgWhenGetIONotificationDetailThenIllegalArgumentException() {
+  void givenFlagNotifyIoFalseWhenGetIONotificationDetailThenNull() {
     Long debtPositionTypeOrgId = 1L;
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setFlagNotifyIo(false);
 
     Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
 
-    IllegalArgumentException notFoundException = Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP));
+    IONotificationDTO result = debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP);
 
-    Assertions.assertEquals("DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " is not enabled for AppIO notifications.", notFoundException.getMessage());
-    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+    Assertions.assertNull(result);
   }
 
   @Test
   void givenContextUpdateWhenGetIONotificationDetailThenNull() {
     Long debtPositionTypeOrgId = 1L;
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
 
     IONotificationDTO result = debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.UPDATE_DP);
 
