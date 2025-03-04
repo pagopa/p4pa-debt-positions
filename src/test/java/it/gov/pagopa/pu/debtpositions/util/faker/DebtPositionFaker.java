@@ -17,7 +17,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
-  private static final LocalDate DATE = LocalDate.of(2025, 1, 1);
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static DebtPosition buildDebtPosition() {
@@ -74,6 +74,21 @@ public class DebtPositionFaker {
     debtPositionDTO.setCreationDate(DATETIME);
     debtPositionDTO.setUpdateDate(DATETIME);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));
+    return debtPositionDTO;
+  }
+
+  public static DebtPositionDTO buildSyncDebtPositionDTO(){
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
+    debtPositionDTO.setDebtPositionTypeOrgId(1L);
+    debtPositionDTO.setIupdOrg("IUPD_ORG");
+    debtPositionDTO.setDescription("Test Description");
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
+    debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
+    debtPositionDTO.setOrganizationId(1L);
+    debtPositionDTO.setValidityDate(DATE);
+    debtPositionDTO.setMultiDebtor(true);
+    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildSyncPaymentOptionDTO())));
     return debtPositionDTO;
   }
 }

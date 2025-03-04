@@ -8,10 +8,7 @@ import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.time.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -22,9 +19,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 
 public class InstallmentFaker {
 
-  static LocalDate date = LocalDate.now();
-  static LocalDateTime dateTime = LocalDateTime.now().plusDays(2);
-  static OffsetDateTime offsetDateTime = OffsetDateTime.of(dateTime, ZoneOffset.UTC);
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
+  private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static Installment buildInstallment(){
     return Installment.builder()
@@ -38,7 +34,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(DATE)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -46,12 +42,12 @@ public class InstallmentFaker {
       .balance("balance")
       .transfers(new ArrayList<>(List.of(buildTransfer())))
       .debtor(buildPerson())
-      .notificationDate(offsetDateTime)
+      .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .noPII(buildInstallmentNoPII())
       .build();
@@ -71,7 +67,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(DATE)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .personalDataId(123L)
@@ -80,12 +76,12 @@ public class InstallmentFaker {
       .debtorEntityType(PersonEntityType.F)
       .debtorFiscalCodeHash(new byte[] {})
       .balance("balance")
-      .notificationDate(offsetDateTime)
+      .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
@@ -109,7 +105,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(DATE)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
@@ -117,12 +113,12 @@ public class InstallmentFaker {
       .balance("balance")
       .debtor(buildPerson())
       .transfers(new ArrayList<>(List.of(buildTransfer())))
-      .notificationDate(offsetDateTime)
+      .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
-      .creationDate(dateTime)
-      .updateDate(dateTime)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
       .build();
   }
 
@@ -138,20 +134,20 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
-      .dueDate(date)
+      .dueDate(DATE)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .balance("balance")
       .debtor(buildPersonDTO())
-      .notificationDate(offsetDateTime)
+      .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
-      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
+      .creationDate(DATETIME)
+      .updateDate(DATETIME)
       .build();
   }
 
@@ -167,21 +163,39 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("generatedNav")
-      .dueDate(date)
+      .dueDate(DATE)
       .paymentTypeCode("paymentTypeCode")
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .balance("1000.00")
       .debtor(buildPersonDTO())
-      .notificationDate(offsetDateTime)
+      .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
-      .creationDate(dateTime.atOffset(ZoneOffset.UTC))
-      .updateDate(dateTime.atOffset(ZoneOffset.UTC))
+      .creationDate(DATETIME)
+      .updateDate(DATETIME)
       .build();
   }
 
+  public static InstallmentDTO buildSyncInstallmentDTO(){
+    return InstallmentDTO.builder()
+      .iud("iud")
+      .iuv("iuv")
+      .dueDate(DATE)
+      .paymentTypeCode("paymentTypeCode")
+      .amountCents(100L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .balance("balance")
+      .debtor(buildPersonDTO())
+      .notificationDate(DATETIME)
+      .ingestionFlowFileId(1L)
+      .ingestionFlowFileLineNumber(101L)
+      .status(InstallmentStatus.UNPAID)
+      .transfers(new ArrayList<>(List.of(buildSyncTransferDTO())))
+      .build();
+  }
 }

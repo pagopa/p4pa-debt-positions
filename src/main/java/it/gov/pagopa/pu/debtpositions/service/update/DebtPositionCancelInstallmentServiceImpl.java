@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -51,7 +52,15 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 
-    setSyncStatus(debtPositionDTO, installmentIds, InstallmentStatus.CANCELLED);
+    debtPositionDTO.getPaymentOptions()
+      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
+        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
+        .findFirst()
+        .ifPresent(installmentDTO -> {
+            installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
+            installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+          }
+        ));
 
     return debtPositionDTO;
   }

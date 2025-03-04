@@ -51,5 +51,5 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
 
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findByIupdOrg(String iupdOrg);
+  DebtPosition findByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
 }

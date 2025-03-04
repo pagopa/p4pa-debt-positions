@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
@@ -16,7 +18,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -105,15 +106,4 @@ public abstract class BaseDebtPositionOperationService {
    */
   public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org);
 
-  public void setSyncStatus(DebtPositionDTO debtPositionDTO, Set<Long> installmentIds, InstallmentStatus statusTo) {
-    debtPositionDTO.getPaymentOptions()
-      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .findFirst()
-        .ifPresent(installmentDTO -> {
-            installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), statusTo));
-            installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
-          }
-        ));
-  }
 }
