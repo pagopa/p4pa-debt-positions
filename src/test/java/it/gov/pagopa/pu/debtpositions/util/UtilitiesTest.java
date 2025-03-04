@@ -77,4 +77,11 @@ class UtilitiesTest {
     assertNotNull(result);
     assertEquals(euro, result);
   }
+
+  @Test
+  void testCentsToEuroWhenCentsNull() {
+    Double result = Utilities.centsToEuro(null);
+
+    assertNull(result);
+  }
 }

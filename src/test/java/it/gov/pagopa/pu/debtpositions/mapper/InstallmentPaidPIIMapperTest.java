@@ -93,6 +93,22 @@ class InstallmentPaidPIIMapperTest {
   }
 
   @Test
+  void givenValidInstallmentPaidViewWithNullDebtorNoPIIAndVersionTrack1_whenMapToInstallmentPaidViewDTO_thenReturnInstallmentPaidViewDTO(){
+    //given
+    InstallmentPaidViewNoPII installmentPaidViewNoPII = InstallmentPaidViewFaker.mockInstanceInstallmentPaidViewNoPII();
+    installmentPaidViewNoPII.setCode("code");
+
+    Mockito.when(personalDataServiceMock.get(installmentPaidViewNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(new InstallmentPIIDTO());
+
+    //when
+    InstallmentPaidViewDTO result = installmentPaidPIIMapper.mapToInstallmentPaidViewDTO(1F, installmentPaidViewNoPII);
+
+    //then
+    assertNotNull(result);
+    assertNull(result.getCodRtDatiPagDatiSingPagAllegatoRicevutaTipo());
+  }
+
+  @Test
   void givenValidInstallmentPaidViewNoPIIAndVersionTrack1_1_whenMapToInstallmentPaidViewDTO_thenReturnInstallmentPaidViewDTO(){
     //given
     InstallmentPaidViewNoPII installmentPaidViewNoPII = InstallmentPaidViewFaker.mockInstanceInstallmentPaidViewNoPII();
