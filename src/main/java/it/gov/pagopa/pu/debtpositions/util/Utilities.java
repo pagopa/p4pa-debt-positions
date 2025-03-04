@@ -71,4 +71,12 @@ public class Utilities {
       lastUuidPart
     );
   }
+
+  public static Double centsToEuro(Long cents) {
+    if (cents == null) {
+      return null;
+    }
+    return cents / 100.0;
+  }
+
 }
