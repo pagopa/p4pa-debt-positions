@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.AppIONotificationDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationOperationType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -32,10 +32,10 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionTypeOrgWhenGetAppIONotificationDetailThenOk() {
+  void givenExistingDebtPositionTypeOrgWhenGetIONotificationDetailThenOk() {
     Long debtPositionTypeOrgId = 1L;
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    AppIONotificationDTO expectedResult = AppIONotificationDTO.builder()
+    IONotificationDTO expectedResult = IONotificationDTO.builder()
       .serviceId(debtPositionTypeOrg.getServiceId())
       .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage())
       .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject())
@@ -43,7 +43,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
     Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
 
-    AppIONotificationDTO result = debtPositionTypeOrgService.getAppIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED);
+    IONotificationDTO result = debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP);
 
     Assertions.assertNotNull(result);
     Assertions.assertEquals(expectedResult, result);
@@ -51,28 +51,37 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void giveNonExistingDebtPositionTypeOrgWhenGetAppIONotificationDetailThenNotFoundException() {
+  void givenNonExistingDebtPositionTypeOrgWhenGetIONotificationDetailThenNotFoundException() {
     Long debtPositionTypeOrgId = 1L;
 
     Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)).thenReturn(Optional.empty());
 
-    NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.getAppIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED));
+    NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP));
 
-    Assertions.assertEquals("DebtPositionTypeOrg having id %d not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
+    Assertions.assertEquals("DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
   }
 
   @Test
-  void giveExistingDebtPositionTypeOrgWhenGetAppIONotificationDetailThenIllegalArgumentException() {
+  void givenExistingDebtPositionTypeOrgWhenGetIONotificationDetailThenIllegalArgumentException() {
     Long debtPositionTypeOrgId = 1L;
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setFlagNotifyIo(false);
 
     Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
 
-    IllegalArgumentException notFoundException = Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionTypeOrgService.getAppIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED));
+    IllegalArgumentException notFoundException = Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP));
 
     Assertions.assertEquals("DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " is not enabled for AppIO notifications.", notFoundException.getMessage());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+  }
+
+  @Test
+  void givenContextUpdateWhenGetIONotificationDetailThenNull() {
+    Long debtPositionTypeOrgId = 1L;
+
+    IONotificationDTO result = debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.UPDATE_DP);
+
+    Assertions.assertNull(result);
   }
 }

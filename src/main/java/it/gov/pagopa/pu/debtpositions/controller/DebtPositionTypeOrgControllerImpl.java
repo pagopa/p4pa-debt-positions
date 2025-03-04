@@ -15,7 +15,7 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
   }
 
   @Override
-  public ResponseEntity<AppIONotificationDTO> getAppIONotification(Long debtPositionTypeOrgId, PaymentEventType context) {
-    return ResponseEntity.ok(debtPositionTypeOrgService.getAppIONotificationDetails(debtPositionTypeOrgId, context));
+  public ResponseEntity<IONotificationDTO> getIONotificationDetails(Long debtPositionTypeOrgId, IONotificationOperationType context) {
+    return ResponseEntity.ok(debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, context));
   }
 }

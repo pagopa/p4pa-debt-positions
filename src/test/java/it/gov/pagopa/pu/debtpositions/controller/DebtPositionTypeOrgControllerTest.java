@@ -31,20 +31,20 @@ class DebtPositionTypeOrgControllerTest {
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
 
   @Test
-  void whenGetAppIONotificationThenOk() throws Exception {
+  void whenGetIONotificationThenOk() throws Exception {
     Long debtPositionTypeOrgId = 1L;
 
-    AppIONotificationDTO expectedResult = new AppIONotificationDTO();
-    Mockito.when(debtPositionTypeOrgService.getAppIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED)).thenReturn(expectedResult);
+    IONotificationDTO expectedResult = new IONotificationDTO();
+    Mockito.when(debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, IONotificationOperationType.CREATE_DP)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
-        get("/debt-position-type-orgs/" + debtPositionTypeOrgId + "/notifications")
-          .param("context", PaymentEventType.DP_CREATED.getValue())
+        get("/debt-position-type-org/" + debtPositionTypeOrgId + "/io-notification/details")
+          .param("context", IONotificationOperationType.CREATE_DP.getValue())
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
       .andReturn();
 
-    AppIONotificationDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), AppIONotificationDTO.class);
+    IONotificationDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), IONotificationDTO.class);
     assertEquals(expectedResult, resultResponse);
   }
 }

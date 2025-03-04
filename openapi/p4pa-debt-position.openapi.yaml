@@ -484,12 +484,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
-  /debt-position-type-orgs/{debtPositionTypeOrgId}/notifications:
+  /debt-position-type-org/{debtPositionTypeOrgId}/io-notification/details:
     get:
       tags:
         - debt-position-type-org
       description: Returns the serviceId, subject, and markdown message if the DebtPositionTypeOrg is enabled for AppIO notifications.
-      operationId: getAppIONotification
+      operationId: getIONotificationDetails
       parameters:
         - name: debtPositionTypeOrgId
           in: path
@@ -502,7 +502,7 @@ paths:
           in: query
           required: true
           schema:
-            $ref: "#/components/schemas/PaymentEventType"
+            $ref: "#/components/schemas/IONotificationOperationType"
           description: The context for which to retrieve the notification details.
       responses:
         "200":
@@ -510,7 +510,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/AppIONotificationDTO"
+                $ref: "#/components/schemas/IONotificationDTO"
         "400":
           description: Invalid request parameters
         "404":
@@ -1276,7 +1276,7 @@ components:
         number:
           type: integer
           format: int64
-    AppIONotificationDTO:
+    IONotificationDTO:
       type: object
       properties:
         serviceId:
@@ -1285,13 +1285,9 @@ components:
           type: string
         ioTemplateMessage:
           type: string
-    PaymentEventType:
+    IONotificationOperationType:
       type: string
       enum:
-        - DP_CREATED
-        - DP_UPDATED
-        - DPI_ADDED
-        - DPI_UPDATED
-        - DPI_CANCELLED
-        - RT_RECEIVED
-        - SYNC_ERROR
+        - CREATE_DP
+        - UPDATE_DP
+        - DELETE_DP

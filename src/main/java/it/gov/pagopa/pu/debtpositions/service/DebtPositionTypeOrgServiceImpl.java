@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.AppIONotificationDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationOperationType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -16,14 +16,17 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   }
 
   @Override
-  public AppIONotificationDTO getAppIONotificationDetails(Long debtPositionTypeOrgId, PaymentEventType context) {
+  public IONotificationDTO getIONotificationDetails(Long debtPositionTypeOrgId, IONotificationOperationType context) {
+    if (!context.equals(IONotificationOperationType.CREATE_DP)) {
+      return null;
+    }
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg having id %d not found".formatted(debtPositionTypeOrgId)));
+      .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId)));
 
     if (!debtPositionTypeOrg.isFlagNotifyIo()) {
       throw new IllegalArgumentException("DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " is not enabled for AppIO notifications.");
     }
-    return AppIONotificationDTO.builder()
+    return IONotificationDTO.builder()
       .serviceId(debtPositionTypeOrg.getServiceId())
       .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject())
       .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage())
