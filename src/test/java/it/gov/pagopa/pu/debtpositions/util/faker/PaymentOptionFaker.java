@@ -14,7 +14,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 public class PaymentOptionFaker {
 
-  private static final LocalDate DATE = LocalDate.of(2025, 1, 1);
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
 
   public static PaymentOption buildPaymentOption() {
     PaymentOption paymentOption = new PaymentOption();
@@ -55,6 +55,17 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
     paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));
+    return paymentOptionDTO;
+  }
+
+  public static PaymentOptionDTO buildSyncPaymentOptionDTO(){
+    PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
+    paymentOptionDTO.setDueDate(DATE);
+    paymentOptionDTO.setDescription("Payment description");
+    paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
+    paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionIndex(1);
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildSyncInstallmentDTO())));
     return paymentOptionDTO;
   }
 }
