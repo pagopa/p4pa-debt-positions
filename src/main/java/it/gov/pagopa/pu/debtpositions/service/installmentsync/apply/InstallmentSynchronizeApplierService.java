@@ -47,7 +47,7 @@ public class InstallmentSynchronizeApplierService {
         .getPaymentOptions().getFirst()
         .getInstallments().getFirst();
     }
-    applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO);
+    applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
 
     return applyPaymentOption(installmentSynchronizeDTO, debtPositionDTO, paymentOptionDTO, installmentDTO);
   }

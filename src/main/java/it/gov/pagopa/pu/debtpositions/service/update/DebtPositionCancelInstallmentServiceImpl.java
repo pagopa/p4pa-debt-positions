@@ -57,10 +57,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
         .findFirst()
         .ifPresent(installmentDTO -> {
-            installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
-            installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
-          }
-        ));
+          installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), InstallmentStatus.CANCELLED));
+          installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+        })
+      );
 
     return debtPositionDTO;
   }

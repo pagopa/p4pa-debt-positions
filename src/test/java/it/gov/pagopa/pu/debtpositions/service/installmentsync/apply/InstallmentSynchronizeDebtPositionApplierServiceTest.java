@@ -26,7 +26,7 @@ class InstallmentSynchronizeDebtPositionApplierServiceTest {
     installmentSynchronizeDTO.setDescription("New description");
     DebtPositionDTO debtPositionDTO = buildSyncDebtPositionDTO();
 
-    applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO);
+    applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO, 1L);
 
     assertEquals("New description", debtPositionDTO.getDescription());
   }
@@ -39,7 +39,7 @@ class InstallmentSynchronizeDebtPositionApplierServiceTest {
     installmentSynchronizeDTO.setFlagPagoPaPayment(Boolean.FALSE);
     DebtPositionDTO debtPositionDTO = buildSyncDebtPositionDTO();
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class, () -> applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO));
+    ConflictErrorException exception = assertThrows(ConflictErrorException.class, () -> applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO, 1L));
     assertEquals("These fields for debt position with iupd IUPD_ORG are not mutable: [multiDebtor, flagPagoPaPayment]", exception.getMessage());
   }
 }
