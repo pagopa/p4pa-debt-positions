@@ -16,11 +16,11 @@ public class PagedInstallmentsPaidViewMapper {
     this.installmentPaidPIIMapper = installmentPaidPIIMapper;
   }
 
-  public PagedInstallmentsPaidView mapToPagedInstallmentsPaidView(Float versionTrack, Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO){
+  public PagedInstallmentsPaidView mapToPagedInstallmentsPaidView(Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO){
     PagedInstallmentsPaidView mappedPagedInstallmentsPaidView = new PagedInstallmentsPaidView();
     if(pagedInstallmentPaidViewNoPIIDTO != null){
       if (!pagedInstallmentPaidViewNoPIIDTO.getContent().isEmpty()){
-        mappedPagedInstallmentsPaidView.setContent(pagedInstallmentPaidViewNoPIIDTO.stream().map(p -> installmentPaidPIIMapper.mapToInstallmentPaidViewDTO(versionTrack, p)).toList());
+        mappedPagedInstallmentsPaidView.setContent(pagedInstallmentPaidViewNoPIIDTO.stream().map(installmentPaidPIIMapper::map).toList());
       }else {
         mappedPagedInstallmentsPaidView.setContent(Collections.emptyList());
       }
