@@ -1,114 +1,70 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
-import it.gov.pagopa.pu.debtpositions.enums.UniqueIdentifierType;
+import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.OffsetDateTime;
 
 @Data
-@SuperBuilder(toBuilder = true)
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InstallmentPaidViewDTO  extends InstallmentPaidViewPIIDTO{
+public class InstallmentPaidViewDTO implements FullPIIDTO<InstallmentPaidViewNoPII, InstallmentPIIDTO> {
 
+  private Long installmentId;
   private String iuf;
-  private Integer flowRowNumber;
   @NotNull
   private String iud;
   @NotNull
-  private String iuv;
-  private Integer objectVersion;
+  private String noticeNumber;
   @NotNull
-  private String domainIdentifier;
-  private String requestingStationIdentifier;
+  private String orgFiscalCode;
   @NotNull
-  private String receiptMessageIdentifier;
-  private OffsetDateTime receiptMessageDateTime;
+  private String paymentReceiptId;
+  private OffsetDateTime paymentDateTime;
   @NotNull
-  private String requestMessageReference;
-  private OffsetDateTime requestDateTimeReference;
-  private UniqueIdentifierType uniqueIdentifierType;
+  private String idPsp;
   @NotNull
-  private String uniqueIdentifierCode;
+  private String pspCompanyName;
   @NotNull
-  private String attestingName;
-  private String attestingUnitOperCode;
-  private String attestingUnitOperName;
-  private String attestingAddress;
-  private String attestingStreetNumber;
-  private String attestingPostalCode;
-  private String attestingCity;
-  private String attestingProvince;
-  private String attestingCountry;
-  private PersonEntityType beneficiaryEntityType;
-  private String beneficiaryUniqueIdentifierCode;
-  private String beneficiaryName;
-  private String beneficiaryUnitOperCode;
-  private String beneficiaryUnitOperName;
-  private String beneficiaryAddress;
-  private String beneficiaryStreetNumber;
-  private String beneficiaryPostalCode;
-  private String beneficiaryCity;
-  private String beneficiaryProvince;
-  private String beneficiaryCountry;
-  private PersonEntityType payerEntityType;
-  private PersonEntityType payerUniqueIdentifierCode;
+  private PersonEntityType debtorEntityType;
   @NotNull
-  private PersonEntityType subjectPayingEntityType;
-  private Integer paymentOutcomeCode;
+  private Person debtor;
   @NotNull
-  private Long totalAmountPaidCents;
+  private Long paymentAmountCents;
   @NotNull
-  private String uniquePaymentIdentifier;
+  private String creditorReferenceId;
   @NotNull
-  private String paymentContextCode;
-  @NotNull
-  private Long singleAmountPaidCents;
-  private String singlePaymentOutcome;
-  private OffsetDateTime singlePaymentOutcomeDateTime;
-  @NotNull
-  private String uniqueCollectionIdentifier;
-
+  private Long amountCents;
   @Min(1)
   @Max(140)
   @NotNull
-  private String paymentReason;
-
+  private String remittanceInformation;
   @Min(5)
   @Max(140)
   @NotNull
-  private String collectionSpecificData;
-
+  private String category;
   @NotBlank
   @Min(1)
   @Max(1024)
-  private String dueType;
-
-  @Min(1)
-  @Max(15)
-  private Integer signatureType;
-
-  private String rt;
+  private String code;
   @NotNull
-  private Integer singlePaymentDataIndex;
-  private Long pspAppliedFeesCents;
-  private String receiptAttachmentType;
-  private String receiptAttachmentTest;
+  private Integer transferIndex;
+  private Long feeCents;
   private String balance;
   @NotNull
-  private String orgFiscalCode;
-  private String orgName;
-  @NotNull
-  private String dueTaxonomicCode;
+  private String companyName;
+
+  @JsonIgnore
+  InstallmentPaidViewNoPII noPII;
 
 }
