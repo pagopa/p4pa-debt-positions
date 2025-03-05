@@ -4,7 +4,9 @@ import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -77,13 +79,6 @@ public class Utilities {
     if(fieldUpdated){
       modifiedFields.add(fieldName);
     }
-  }
-
-  public static Double centsToEuro(Long cents) {
-    if (cents == null) {
-      return null;
-    }
-    return cents / 100.0;
   }
 
 }
