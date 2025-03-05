@@ -39,13 +39,13 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     if(isInstallmentAlreadyElaborated(storedInstallment, installmentSynchronizeDTO)){ return null;}
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment);
 
-    InstallmentDTO installment2operate = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
+    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
 
-    if(storedDebtPosition.getDebtPositionId() == null) {
-      return debtPositionCreationService.createDebtPosition(storedDebtPosition, massive, accessToken, operatorExternalUserId).getRight();
+    if(debtPositionApplied.getLeft().getDebtPositionId() == null) {
+      return debtPositionCreationService.createDebtPosition(debtPositionApplied.getLeft(), massive, accessToken, operatorExternalUserId).getRight();
     }
 
-    return debtPositionAddInstallmentService.addInstallment(storedDebtPosition, List.of(installment2operate), massive, accessToken, operatorExternalUserId).getRight();
+    return debtPositionAddInstallmentService.addInstallment(debtPositionApplied.getLeft(), List.of(debtPositionApplied.getRight()), massive, accessToken, operatorExternalUserId).getRight();
   }
 
   private void checkStatus(DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment) {

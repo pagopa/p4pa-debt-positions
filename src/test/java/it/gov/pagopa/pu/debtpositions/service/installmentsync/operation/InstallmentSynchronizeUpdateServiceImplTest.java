@@ -49,7 +49,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
         debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
-      .thenReturn(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+      .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), massive, accessToken, operatorExternalUserId))
@@ -177,7 +177,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
       debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
-      .thenReturn(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+      .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), massive, accessToken, operatorExternalUserId))
@@ -202,7 +202,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
         debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
-      .thenReturn(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+      .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), massive, accessToken, operatorExternalUserId))

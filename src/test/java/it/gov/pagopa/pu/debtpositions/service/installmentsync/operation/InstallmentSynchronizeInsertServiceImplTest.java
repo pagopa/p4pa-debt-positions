@@ -55,7 +55,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
         debtPositionDTO.getPaymentOptions().getFirst(), null, accessToken))
-      .thenReturn(newInstallmentDTO);
+      .thenReturn(Pair.of(debtPositionDTO, newInstallmentDTO));
 
     Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(newInstallmentDTO), massive, accessToken, operatorExternalUserId))
       .thenReturn(Pair.of(debtPositionDTO, workflowId));
@@ -94,7 +94,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, newDebtPositionDTO,
         newDebtPositionDTO.getPaymentOptions().getFirst(), newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
-      .thenReturn(newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+      .thenReturn(Pair.of(newDebtPositionDTO, newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionCreationServiceMock.createDebtPosition(newDebtPositionDTO, massive, accessToken, operatorExternalUserId))
       .thenReturn(Pair.of(newDebtPositionDTO, workflowId));

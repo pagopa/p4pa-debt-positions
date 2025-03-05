@@ -88,6 +88,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setMultiDebtor(true);
     debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagIuvVolatile(false);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildSyncPaymentOptionDTO())));
     return debtPositionDTO;
   }

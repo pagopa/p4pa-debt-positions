@@ -51,8 +51,8 @@ public class InstallmentMapper {
     installment.setIngestionFlowFileId(dto.getIngestionFlowFileId());
     installment.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
     installment.setReceiptId(dto.getReceiptId());
-    installment.setCreationDate(dto.getCreationDate().toLocalDateTime());
-    installment.setUpdateDate(dto.getUpdateDate().toLocalDateTime());
+    installment.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
+    installment.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
     return installment;
   }
 
