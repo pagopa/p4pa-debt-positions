@@ -41,6 +41,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentDTO installmentDTO = buildInstallmentDTO();
+    installmentDTO.setIngestionFlowFileLineNumber(101L);
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installmentDTO), massive, accessToken, operatorExternalUserId))
       .thenReturn(Pair.of(debtPositionDTO, workflowId));
