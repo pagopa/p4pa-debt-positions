@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -35,8 +34,6 @@ public class InstallmentPaidViewDTO implements FullPIIDTO<InstallmentPaidViewNoP
   private String idPsp;
   @NotNull
   private String pspCompanyName;
-  @NotNull
-  private PersonEntityType debtorEntityType;
   @NotNull
   private Person debtor;
   @NotNull

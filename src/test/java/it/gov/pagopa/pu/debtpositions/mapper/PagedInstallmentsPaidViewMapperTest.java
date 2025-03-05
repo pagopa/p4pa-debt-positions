@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +29,8 @@ class PagedInstallmentsPaidViewMapperTest {
   private InstallmentPaidPIIMapper installmentPaidPIIMapperMock;
 
   private PagedInstallmentsPaidViewMapper pagedInstallmentsPaidViewMapper;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void setUp() {
@@ -48,12 +51,12 @@ class PagedInstallmentsPaidViewMapperTest {
 
     Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPII = new PageImpl<>(content, pageable, totalElements);
 
-    InstallmentPaidViewDTO installmentPaidViewDTO = InstallmentPaidViewFaker.mockInstanceInstallmentPaidViewDTO1_1();
+    InstallmentPaidViewDTO installmentPaidViewDTO = podamFactory.manufacturePojo(InstallmentPaidViewDTO.class);
 
-    Mockito.when(installmentPaidPIIMapperMock.mapToInstallmentPaidViewDTO(1.1F, installmentPaidViewNoPII)).thenReturn(installmentPaidViewDTO);
+    Mockito.when(installmentPaidPIIMapperMock.map(installmentPaidViewNoPII)).thenReturn(installmentPaidViewDTO);
     //when
 
-    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(1.1F, pagedInstallmentPaidViewNoPII);
+    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(pagedInstallmentPaidViewNoPII);
     //then
     assertNotNull(result);
     assertFalse(result.getContent().isEmpty());
@@ -76,7 +79,7 @@ class PagedInstallmentsPaidViewMapperTest {
     Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPII = new PageImpl<>(Collections.emptyList(), pageable, totalElements);
     //when
 
-    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(1.1F, pagedInstallmentPaidViewNoPII);
+    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(pagedInstallmentPaidViewNoPII);
     //then
     assertNotNull(result);
     assertTrue(result.getContent().isEmpty());
@@ -91,7 +94,7 @@ class PagedInstallmentsPaidViewMapperTest {
   @Test
   void givenNullPagedInstallmentPaidViewNoPIIDTO_whenMapToPagedInstallmentsPaidView_thenReturnNewPagedInstallmentPaidView(){
     //when
-    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(1.1F, null);
+    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView( null);
     //then
     assertNotNull(result);
   }
@@ -105,12 +108,12 @@ class PagedInstallmentsPaidViewMapperTest {
 
     Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPII = new PageImpl<>(content);
 
-    InstallmentPaidViewDTO installmentPaidViewDTO = InstallmentPaidViewFaker.mockInstanceInstallmentPaidViewDTO1_1();
+    InstallmentPaidViewDTO installmentPaidViewDTO = podamFactory.manufacturePojo(InstallmentPaidViewDTO.class);
 
-    Mockito.when(installmentPaidPIIMapperMock.mapToInstallmentPaidViewDTO(1.1F, installmentPaidViewNoPII)).thenReturn(installmentPaidViewDTO);
+    Mockito.when(installmentPaidPIIMapperMock.map(installmentPaidViewNoPII)).thenReturn(installmentPaidViewDTO);
 
     //when
-    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(1.1F, pagedInstallmentPaidViewNoPII);
+    PagedInstallmentsPaidView result = pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(pagedInstallmentPaidViewNoPII);
 
     //then
     assertNotNull(result);
