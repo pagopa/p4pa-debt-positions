@@ -8,6 +8,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
@@ -139,7 +141,7 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
       .transferDate(receipt.getTransferDate())
       .standin(receipt.isStandin())
       .debtor(personMapper.mapToDto(receipt.getDebtor()))
-      .payer(personMapper.mapToDto(receipt.getPayer()))
+      .payer(Optional.ofNullable(receipt.getPayer()).map(personMapper::mapToDto).orElse(null))
       .creationDate(localDatetimeToOffsetDateTime(receipt.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(receipt.getUpdateDate()))
       .build();

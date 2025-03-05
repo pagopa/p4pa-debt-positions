@@ -103,7 +103,9 @@ public class DebtPositionExceptionHandler {
       getRequestDetails(request),
       httpStatus.value(),
       ex.getMessage());
-    if(log.isDebugEnabled() && ex.getCause()!=null){
+    if(httpStatus.is5xxServerError()){
+      log.error("Exception stack trace: ", ex);
+    } else if(log.isDebugEnabled() && ex.getCause()!=null){
       log.debug("CausedBy: ", ex.getCause());
     }
   }
