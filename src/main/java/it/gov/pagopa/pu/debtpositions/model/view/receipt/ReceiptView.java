@@ -29,6 +29,6 @@ public class ReceiptView implements Serializable {
   @Enumerated(EnumType.STRING)
   private ReceiptOriginType receiptOrigin;
   private String iuv;
-  private String description;
+  private String debtPositionTypeOrgDescription;
 
 }
