@@ -26,7 +26,6 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       r.paymentDateTime as paymentDateTime,
       r.idPsp as idPsp,
       r.pspCompanyName as pspCompanyName,
-      i.debtorEntityType as debtorEntityType,
       r.paymentAmountCents as paymentAmountCents,
       r.creditorReferenceId as creditorReferenceId,
       t.amountCents as amountCents,
