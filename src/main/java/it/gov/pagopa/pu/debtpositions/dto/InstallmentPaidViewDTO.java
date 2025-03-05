@@ -22,93 +22,93 @@ import java.time.OffsetDateTime;
 public class InstallmentPaidViewDTO  extends InstallmentPaidViewPIIDTO{
 
   private String iuf;
-  private Integer numRigaFlusso;
+  private Integer flowRowNumber;
   @NotNull
-  private String codIud;
+  private String iud;
   @NotNull
-  private String codIuv;
-  private Integer versioneOggetto;
+  private String iuv;
+  private Integer objectVersion;
   @NotNull
-  private String identificativoDominio;
-  private String identificativoStazioneRichiedente;
+  private String domainIdentifier;
+  private String requestingStationIdentifier;
   @NotNull
-  private String identificativoMessaggioRicevuta;
-  private OffsetDateTime dataOraMessaggioRicevuta;
+  private String receiptMessageIdentifier;
+  private OffsetDateTime receiptMessageDateTime;
   @NotNull
-  private String riferimentoMessaggioRichiesta;
-  private OffsetDateTime riferimentoDataRichiesta;
-  private UniqueIdentifierType tipoIdentificativoUnivoco;
+  private String requestMessageReference;
+  private OffsetDateTime requestDateTimeReference;
+  private UniqueIdentifierType uniqueIdentifierType;
   @NotNull
-  private String codiceIdentificativoUnivoco;
+  private String uniqueIdentifierCode;
   @NotNull
-  private String denominazioneAttestante;
-  private String codiceUnitOperAttestante;
-  private String denomUnitOperAttestante;
-  private String indirizzoAttestante;
-  private String civicoAttestante;
-  private String capAttestante;
-  private String localitaAttestante;
-  private String provinciaAttestante;
-  private String nazioneAttestante;
-  private PersonEntityType enteBenefTipoIdentificativoUnivoco;
-  private String enteBenefCodiceIdentificativoUnivoco;
-  private String denominazioneBeneficiario;
-  private String codiceUnitOperBeneficiario;
-  private String denomUnitOperBeneficiario;
-  private String indirizzoBeneficiario;
-  private String civicoBeneficiario;
-  private String capBeneficiario;
-  private String localitaBeneficiario;
-  private String provinciaBeneficiario;
-  private String nazioneBeneficiario;
-  private PersonEntityType soggVersTipoIdentificativoUnivoco;
-  private PersonEntityType soggVersCodiceIdentificativoUnivoco;
+  private String attestingName;
+  private String attestingUnitOperCode;
+  private String attestingUnitOperName;
+  private String attestingAddress;
+  private String attestingStreetNumber;
+  private String attestingPostalCode;
+  private String attestingCity;
+  private String attestingProvince;
+  private String attestingCountry;
+  private PersonEntityType beneficiaryEntityType;
+  private String beneficiaryUniqueIdentifierCode;
+  private String beneficiaryName;
+  private String beneficiaryUnitOperCode;
+  private String beneficiaryUnitOperName;
+  private String beneficiaryAddress;
+  private String beneficiaryStreetNumber;
+  private String beneficiaryPostalCode;
+  private String beneficiaryCity;
+  private String beneficiaryProvince;
+  private String beneficiaryCountry;
+  private PersonEntityType payerEntityType;
+  private PersonEntityType payerUniqueIdentifierCode;
   @NotNull
-  private PersonEntityType soggPagTipoIdentificativoUnivoco;
-  private Integer codiceEsitoPagamento;
+  private PersonEntityType subjectPayingEntityType;
+  private Integer paymentOutcomeCode;
   @NotNull
-  private Double importoTotalePagato;
+  private Long totalAmountPaidCents;
   @NotNull
-  private String identificativoUnivocoVersamento;
+  private String uniquePaymentIdentifier;
   @NotNull
-  private String codiceContestoPagamento;
+  private String paymentContextCode;
   @NotNull
-  private Double singoloImportoPagato;
-  private String esitoSingoloPagamento;
-  private OffsetDateTime dataEsitoSingoloPagamento;
+  private Long singleAmountPaidCents;
+  private String singlePaymentOutcome;
+  private OffsetDateTime singlePaymentOutcomeDateTime;
   @NotNull
-  private String identificativoUnivocoRiscoss;
+  private String uniqueCollectionIdentifier;
 
   @Min(1)
   @Max(140)
   @NotNull
-  private String causaleVersamento;
+  private String paymentReason;
 
   @Min(5)
   @Max(140)
   @NotNull
-  private String datiSpecificiRiscossione;
+  private String collectionSpecificData;
 
   @NotBlank
   @Min(1)
   @Max(1024)
-  private String tipoDovuto;
+  private String dueType;
 
   @Min(1)
   @Max(15)
-  private Integer tipoFirma;
+  private Integer signatureType;
 
   private String rt;
   @NotNull
-  private Integer indiceDatiSingoloPagamento;
-  private Double numRtDatiPagDatiSingPagCommissioniApplicatePsp;
-  private String codRtDatiPagDatiSingPagAllegatoRicevutaTipo;
-  private String blbRtDatiPagDatiSingPagAllegatoRicevutaTest;
-  private String bilancio;
+  private Integer singlePaymentDataIndex;
+  private Long pspAppliedFeesCents;
+  private String receiptAttachmentType;
+  private String receiptAttachmentTest;
+  private String balance;
   @NotNull
-  private String cod_fiscale_pa1;
-  private String de_nome_pa1;
+  private String orgFiscalCode;
+  private String orgName;
   @NotNull
-  private String cod_tassonomico_dovuto_pa1;
+  private String dueTaxonomicCode;
 
 }

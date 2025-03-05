@@ -7,18 +7,17 @@ import it.gov.pagopa.pu.debtpositions.enums.PaymentOutcomeCode;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.enums.UniqueIdentifierType;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.springframework.stereotype.Service;
 
 @Service
 public class InstallmentPaidPIIMapper {
 
   private final PersonalDataService personalDataService;
-  private final PersonaMapper personaMapper;
+  private final PersonMapper personMapper;
 
-  public InstallmentPaidPIIMapper(PersonalDataService personalDataService, PersonaMapper personaMapper) {
+  public InstallmentPaidPIIMapper(PersonalDataService personalDataService, PersonMapper personMapper) {
     this.personalDataService = personalDataService;
-    this.personaMapper = personaMapper;
+    this.personMapper = personMapper;
   }
 
   public InstallmentPaidViewDTO mapToInstallmentPaidViewDTO(Float versionTrack, InstallmentPaidViewNoPII installmentPaidViewNoPII){
@@ -27,13 +26,13 @@ public class InstallmentPaidPIIMapper {
           return mapToInstallmentPaidViewDTO1(installmentPaidViewNoPII);
         }
         case "1.1" -> {
-          return mapToInstallmentPaidViewDTO11(installmentPaidViewNoPII);
+          return mapToInstallmentPaidViewDTO1_1(installmentPaidViewNoPII);
         }
         case "1.2" -> {
-          return mapToInstallmentPaidViewDTO12(installmentPaidViewNoPII);
+          return mapToInstallmentPaidViewDTO1_2(installmentPaidViewNoPII);
         }
         case "1.3" -> {
-          return mapToInstallmentPaidViewDTO13(installmentPaidViewNoPII);
+          return mapToInstallmentPaidViewDTO1_3(installmentPaidViewNoPII);
         }
         default -> throw new IllegalArgumentException("Unexpected versionTrack " + versionTrack);
       }
@@ -44,65 +43,65 @@ public class InstallmentPaidPIIMapper {
 
     return InstallmentPaidViewDTO.builder()
       .iuf(installmentPaidViewNoPII.getIuf())
-      .numRigaFlusso(1)
-      .codIud(installmentPaidViewNoPII.getIud())
-      .codIuv(installmentPaidViewNoPII.getNoticeNumber())
-      .identificativoDominio(installmentPaidViewNoPII.getOrgFiscalCode())
-      .identificativoMessaggioRicevuta(installmentPaidViewNoPII.getPaymentReceiptId())
-      .dataOraMessaggioRicevuta(installmentPaidViewNoPII.getPaymentDateTime())
-      .riferimentoMessaggioRichiesta(installmentPaidViewNoPII.getPaymentReceiptId())
-      .riferimentoDataRichiesta(installmentPaidViewNoPII.getPaymentDateTime())
-      .tipoIdentificativoUnivoco(UniqueIdentifierType.B)
-      .codiceIdentificativoUnivoco(installmentPaidViewNoPII.getIdPsp())
-      .denominazioneAttestante(installmentPaidViewNoPII.getPspCompanyName())
-      .enteBenefTipoIdentificativoUnivoco(PersonEntityType.G)
-      .enteBenefCodiceIdentificativoUnivoco(installmentPaidViewNoPII.getOrgFiscalCode())
-      .denominazioneBeneficiario(installmentPaidViewNoPII.getCompanyName())
-      .soggPagTipoIdentificativoUnivoco(installmentPaidViewNoPII.getDebtorEntityType())
-      .pagatore(installmentPii.getDebtor() != null ? personaMapper.mapToPersona(installmentPii.getDebtor()) : null)
-      .codiceEsitoPagamento(PaymentOutcomeCode.PAYMENT_EXECUTED.getCode())
-      .importoTotalePagato(Utilities.centsToEuro(installmentPaidViewNoPII.getPaymentAmountCents()))
-      .identificativoUnivocoVersamento(installmentPaidViewNoPII.getCreditorReferenceId())
-      .codiceContestoPagamento(installmentPaidViewNoPII.getPaymentReceiptId())
-      .singoloImportoPagato(Utilities.centsToEuro(installmentPaidViewNoPII.getAmountCents()))
-      .esitoSingoloPagamento("0")
-      .dataEsitoSingoloPagamento(installmentPaidViewNoPII.getPaymentDateTime())
-      .identificativoUnivocoRiscoss(installmentPaidViewNoPII.getPaymentReceiptId())
+      .flowRowNumber(1)
+      .iud(installmentPaidViewNoPII.getIud())
+      .iuv(installmentPaidViewNoPII.getNoticeNumber())
+      .domainIdentifier(installmentPaidViewNoPII.getOrgFiscalCode())
+      .receiptMessageIdentifier(installmentPaidViewNoPII.getPaymentReceiptId())
+      .receiptMessageDateTime(installmentPaidViewNoPII.getPaymentDateTime())
+      .requestMessageReference(installmentPaidViewNoPII.getPaymentReceiptId())
+      .requestDateTimeReference(installmentPaidViewNoPII.getPaymentDateTime())
+      .uniqueIdentifierType(UniqueIdentifierType.B)
+      .uniqueIdentifierCode(installmentPaidViewNoPII.getIdPsp())
+      .attestingName(installmentPaidViewNoPII.getPspCompanyName())
+      .beneficiaryEntityType(PersonEntityType.G)
+      .beneficiaryUniqueIdentifierCode(installmentPaidViewNoPII.getOrgFiscalCode())
+      .beneficiaryName(installmentPaidViewNoPII.getCompanyName())
+      .subjectPayingEntityType(installmentPaidViewNoPII.getDebtorEntityType())
+      .debtor(installmentPii.getDebtor() != null ? personMapper.mapToDto(installmentPii.getDebtor()) : null)
+      .paymentOutcomeCode(PaymentOutcomeCode.PAYMENT_EXECUTED.getCode())
+      .totalAmountPaidCents(installmentPaidViewNoPII.getPaymentAmountCents())
+      .uniquePaymentIdentifier(installmentPaidViewNoPII.getCreditorReferenceId())
+      .paymentContextCode(installmentPaidViewNoPII.getPaymentReceiptId())
+      .singleAmountPaidCents(installmentPaidViewNoPII.getAmountCents())
+      .singlePaymentOutcome("0")
+      .singlePaymentOutcomeDateTime(installmentPaidViewNoPII.getPaymentDateTime())
+      .uniqueCollectionIdentifier(installmentPaidViewNoPII.getPaymentReceiptId())
       .build();
   }
 
-  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO11(InstallmentPaidViewNoPII installmentPaidViewNoPII){
+  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO1_1(InstallmentPaidViewNoPII installmentPaidViewNoPII){
     InstallmentPaidViewDTO.InstallmentPaidViewDTOBuilder<?, ?> installmentPaidViewDTOBuilder = mapToInstallmentPaidViewDTO1(installmentPaidViewNoPII).toBuilder();
 
     installmentPaidViewDTOBuilder
-      .causaleVersamento(installmentPaidViewNoPII.getRemittanceInformation())
-      .datiSpecificiRiscossione( "9/".concat(installmentPaidViewNoPII.getCategory()))
-      .tipoDovuto(installmentPaidViewNoPII.getCode())
+      .paymentReason(installmentPaidViewNoPII.getRemittanceInformation())
+      .collectionSpecificData( "9/".concat(installmentPaidViewNoPII.getCategory()))
+      .dueType(installmentPaidViewNoPII.getCode())
       .rt(null)  //TODO field rt depends on task https://pagopa.atlassian.net/browse/P4ADEV-2306
-      .indiceDatiSingoloPagamento(installmentPaidViewNoPII.getTransferIndex())
-      .numRtDatiPagDatiSingPagCommissioniApplicatePsp(Utilities.centsToEuro(installmentPaidViewNoPII.getFeeCents()));
+      .singlePaymentDataIndex(installmentPaidViewNoPII.getTransferIndex())
+      .pspAppliedFeesCents(installmentPaidViewNoPII.getFeeCents());
 
     if (installmentPaidViewNoPII.getCode().equals("MARCA_BOLLO")){
-      installmentPaidViewDTOBuilder.codRtDatiPagDatiSingPagAllegatoRicevutaTipo("BD");
-      installmentPaidViewDTOBuilder.blbRtDatiPagDatiSingPagAllegatoRicevutaTest(null); //TODO field blbRtDatiPagDatiSingPagAllegatoRicevutaTest depends on task https://pagopa.atlassian.net/browse/P4ADEV-2306
+      installmentPaidViewDTOBuilder.receiptAttachmentType("BD");
+      installmentPaidViewDTOBuilder.receiptAttachmentTest(null); //TODO field blbRtDatiPagDatiSingPagAllegatoRicevutaTest depends on task https://pagopa.atlassian.net/browse/P4ADEV-2306
     }
 
     return installmentPaidViewDTOBuilder.build();
   }
 
-  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO12(InstallmentPaidViewNoPII installmentPaidViewNoPII){
+  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO1_2(InstallmentPaidViewNoPII installmentPaidViewNoPII){
 
-    return mapToInstallmentPaidViewDTO11(installmentPaidViewNoPII).toBuilder()
-      .bilancio(installmentPaidViewNoPII.getBalance())
+    return mapToInstallmentPaidViewDTO1_1(installmentPaidViewNoPII).toBuilder()
+      .balance(installmentPaidViewNoPII.getBalance())
       .build();
   }
 
-  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO13(InstallmentPaidViewNoPII installmentPaidViewNoPII){
+  private InstallmentPaidViewDTO mapToInstallmentPaidViewDTO1_3(InstallmentPaidViewNoPII installmentPaidViewNoPII){
 
-    return mapToInstallmentPaidViewDTO12(installmentPaidViewNoPII).toBuilder()
-      .cod_fiscale_pa1(installmentPaidViewNoPII.getOrgFiscalCode())
-      .de_nome_pa1(installmentPaidViewNoPII.getCompanyName())
-      .cod_tassonomico_dovuto_pa1(installmentPaidViewNoPII.getCategory())
+    return mapToInstallmentPaidViewDTO1_2(installmentPaidViewNoPII).toBuilder()
+      .orgFiscalCode(installmentPaidViewNoPII.getOrgFiscalCode())
+      .orgName(installmentPaidViewNoPII.getCompanyName())
+      .dueTaxonomicCode(installmentPaidViewNoPII.getCategory())
       .build();
   }
 }
