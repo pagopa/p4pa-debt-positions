@@ -60,5 +60,4 @@ class UtilitiesTest {
 
     assertTrue(uuid.matches(regex));
   }
-
 }
