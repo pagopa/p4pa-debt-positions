@@ -38,7 +38,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
       WHERE t.installmentId = :installmentId
       AND dptoo.operatorExternalUserId = :operatorExternalUserId
       """)
-  List<Transfer> findByInstallmentId(
+  List<Transfer> findAuthorizedByInstallmentId(
     @Parameter(required = true) @Param("installmentId") Long installmentId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
