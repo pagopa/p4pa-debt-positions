@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import uk.co.jemos.podam.api.PodamFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @ExtendWith(MockitoExtension.class)
 class InstallmentPaidPIIMapperTest {
 
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   private InstallmentPaidPIIMapper installmentPaidPIIMapper;
 
   @Mock
@@ -46,4 +48,31 @@ class InstallmentPaidPIIMapperTest {
     TestUtils.reflectionEqualsByName(installmentPIIDTO.getDebtor(), result.getDebtor());
     TestUtils.checkNotNullFields(result);
   }
+
+  @Test
+  void givenValidInstallmentPaidViewDTO_whenExtractNoPiiEntity_thenReturnInstallmentPaidViewNoPII(){
+    //given
+    InstallmentPaidViewDTO installmentPaidViewDTO = podamFactory.manufacturePojo(InstallmentPaidViewDTO.class);
+
+    //when
+    InstallmentPaidViewNoPII result = installmentPaidPIIMapper.extractNoPiiEntity(installmentPaidViewDTO);
+
+    //then
+    TestUtils.checkNotNullFields(result,"personalDataId");
+    TestUtils.reflectionEqualsByName(installmentPaidViewDTO, result);
+  }
+
+  @Test
+  void givenValidInstallmentPIIDTO_whenExtractPIIDTO_thenReturnInstallmentPIIDTO(){
+    //given
+    InstallmentPaidViewDTO installmentPaidViewDTO = podamFactory.manufacturePojo(InstallmentPaidViewDTO.class);
+
+    //when
+    InstallmentPIIDTO result = installmentPaidPIIMapper.extractPiiDto(installmentPaidViewDTO);
+
+    //then
+    TestUtils.checkNotNullFields(result);
+    TestUtils.reflectionEqualsByName(installmentPaidViewDTO, result);
+  }
+
 }
