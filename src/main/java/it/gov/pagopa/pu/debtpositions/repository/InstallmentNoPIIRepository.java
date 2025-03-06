@@ -1,17 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-
-import java.util.List;
 
 @RepositoryRestResource(path = "installments")
 public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoPII, Long> {
@@ -38,6 +40,23 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
       AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
     """)
   long countExistingInstallments(@Param("orgId") Long orgId, @Param("iud") String iud, @Param("iuv") String iuv, @Param("nav") String nav);
+
+  @Query(value = "SELECT i from InstallmentNoPII i " +
+    "JOIN Transfer t ON i.installmentId = t.installmentId " +
+    "JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId " +
+    "JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId " +
+    "JOIN DebtPositionTypeOrgOperators dptoo ON d.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId " +
+    "WHERE d.organizationId = :organizationId AND " +
+    "i.iuv = :iuv AND " +
+    "i.iur = :iur AND " +
+    "t.transferIndex = :transferIndex AND " +
+    "dptoo.operatorExternalUserId = :operatorExternalUserId")
+  Optional<InstallmentNoPII> findAuthorizedByTransferSemanticKey(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("iuv") String iuv,
+    @Parameter(required = true) @Param("iur") String iur,
+    @Parameter(required = true) @Param("transferIndex") int transferIndex,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
   @RestResource(exported = false)
   @Query(" select i" +
