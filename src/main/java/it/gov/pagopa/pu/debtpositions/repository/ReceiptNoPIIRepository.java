@@ -23,5 +23,5 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
     JOIN Transfer t ON t.installmentId = i.installmentId
     WHERE t.transferId = :transferId
   """)
-  ReceiptNoPII getByTransferId(@Param("transferId") Long transferId);
+  ReceiptNoPII getByTransferId(Long transferId);
 }
