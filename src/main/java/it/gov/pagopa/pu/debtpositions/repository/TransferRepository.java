@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -27,6 +28,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
   Optional<Transfer> findBySemanticKey(Long orgId, String iuv, String iur,
                                        int transferIndex, Set<InstallmentStatus> installmentStatusSet);
 
+  @ApiResponse(ref = "CollectionModelTransfer")
   @Query
     ("""
       SELECT t
