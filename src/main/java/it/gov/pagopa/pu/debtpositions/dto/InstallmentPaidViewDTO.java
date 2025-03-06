@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -17,7 +15,7 @@ import java.time.OffsetDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentPaidViewDTO implements FullPIIDTO<InstallmentPaidViewNoPII, InstallmentPIIDTO> {
+public class InstallmentPaidViewDTO {
 
   private Long installmentId;
   private String iuf;
@@ -60,8 +58,5 @@ public class InstallmentPaidViewDTO implements FullPIIDTO<InstallmentPaidViewNoP
   private String balance;
   @NotNull
   private String companyName;
-
-  @JsonIgnore
-  InstallmentPaidViewNoPII noPII;
 
 }

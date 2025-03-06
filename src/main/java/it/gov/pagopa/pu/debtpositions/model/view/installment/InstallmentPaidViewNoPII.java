@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.model.NoPIIEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -21,7 +19,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class InstallmentPaidViewNoPII implements Serializable, NoPIIEntity<InstallmentPIIDTO> {
+public class InstallmentPaidViewNoPII implements Serializable {
 
   @Id
   private Long installmentId;
