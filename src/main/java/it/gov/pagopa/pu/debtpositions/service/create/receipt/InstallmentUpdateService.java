@@ -90,7 +90,7 @@ public class InstallmentUpdateService {
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
-      if (TRANSITION_TO_SYNC_REQUIRED.contains(anInstallment.getStatus())) {
+      if (TRANSITION_TO_SYNC_REQUIRED.contains(anInstallment.getStatus() + "|" + InstallmentStatus.INVALID)) {
         updateInstallmentFields(anInstallment, InstallmentStatus.INVALID, null);
       }
     });
