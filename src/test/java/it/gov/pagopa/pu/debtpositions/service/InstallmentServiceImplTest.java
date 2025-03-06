@@ -11,27 +11,31 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDet
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
+@TestPropertySource(properties = {"installment-paid-view.max-months-range=6"})
 class InstallmentServiceImplTest {
 
   @Mock
@@ -43,10 +47,18 @@ class InstallmentServiceImplTest {
   @Mock
   private InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepositoryMock;
 
-  @InjectMocks
+  @Value("${installment-paid-view.max-months-range}")
+  private Integer maxMonthsRange;
+
+
   private InstallmentServiceImpl installmentService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
+  @BeforeEach
+  void setUp() {
+    installmentService = new InstallmentServiceImpl(installmentPIIRepositoryMock, installmentMapperMock, installmentDetailPIIViewRepositoryMock, installmentPaidViewPIIViewRepositoryMock, maxMonthsRange);
+  }
 
   @ParameterizedTest
   @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
@@ -91,7 +103,7 @@ class InstallmentServiceImplTest {
   }
 
   @Test
-  void givenWhenGetPagedInstallmentPaidViewThen() {
+  void whenGetPagedInstallmentPaidViewThenOk() {
     //given
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
@@ -109,5 +121,24 @@ class InstallmentServiceImplTest {
     assertEquals(pagedInstallmentsPaidView, result);
 
     Mockito.verify(installmentPaidViewPIIViewRepositoryMock).getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+  }
+
+  @Test
+  void givenRangeBetweenExceedTheMax_whenGetPagedInstallmentPaidView_ThenThrowException() {
+    //given
+    Long organizationId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    OffsetDateTime paymentDateFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
+    OffsetDateTime paymentDateTo = OffsetDateTime.parse("2025-11-06T17:05:04.686949700Z");
+    Long debtPositionTypeOrgId = 1L;
+
+    //then
+    DateTimeException ex = assertThrows(
+      DateTimeException.class,
+      () -> installmentService.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
+    );
+    //then
+    assertEquals("The date range between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months. The provided range is 8 months", ex.getMessage());
+
   }
 }
