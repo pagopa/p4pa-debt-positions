@@ -4,13 +4,12 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffse
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import org.springframework.data.util.Pair;
@@ -76,7 +75,7 @@ public class DebtPositionMapper {
       .paymentOptions(
         debtPosition.getPaymentOptions().stream()
           .map(paymentOptionMapper::mapToDto)
-          .toList()
+          .collect(Collectors.toCollection(ArrayList<PaymentOptionDTO>::new))
       )      .build();
   }
 }

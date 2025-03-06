@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -69,7 +70,7 @@ public class PaymentOptionMapper {
       .installments(
         paymentOption.getInstallments().stream()
           .map(installmentMapper::mapToDto)
-          .toList()
+          .collect(Collectors.toCollection(ArrayList<InstallmentDTO>::new))
       )
       .build();
   }

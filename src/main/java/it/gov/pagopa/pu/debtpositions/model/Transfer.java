@@ -3,14 +3,10 @@ package it.gov.pagopa.pu.debtpositions.model;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
+import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.Serializable;
-import java.util.Comparator;
 
 @Entity
 @Table(name = "transfer")
@@ -18,7 +14,7 @@ import java.util.Comparator;
 @NoArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(of = "transferId", callSuper = false)
+@EqualsAndHashCode(of = {"transferId", "transferIndex"}, callSuper = false)
 public class Transfer extends BaseEntity implements Serializable, Comparable<Transfer> {
 
   @Id
@@ -45,9 +41,10 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
 
   @Override
   public int compareTo(@Nonnull Transfer o) {
-    return Comparator
-      .comparing(Transfer::getTransferId, Comparator.nullsFirst(Comparator.naturalOrder()))
-      .compare(this, o);
+    return new CompareToBuilder()
+      .append(this.getTransferId(), o.getTransferId())
+      .append(this.getTransferIndex(), o.getTransferIndex())
+      .build();
   }
 
 }

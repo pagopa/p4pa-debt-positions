@@ -55,7 +55,7 @@ public class InstallmentSynchronizeApplierService {
   private Pair<DebtPositionDTO, InstallmentDTO> applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment) {
     if (storedPaymentOption == null) {
       PaymentOptionDTO paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO);
-      storedDebtPosition.getPaymentOptions().add(paymentOptionDTO);
+      storedDebtPosition.addPaymentOptionsItem(paymentOptionDTO);
       return Pair.of(storedDebtPosition, paymentOptionDTO.getInstallments().getFirst());
     } else {
       applierPaymentOptionService.merge(installmentSynchronizeDTO, storedPaymentOption);
