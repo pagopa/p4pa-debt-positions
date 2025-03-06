@@ -46,13 +46,13 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId " +
     "JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId " +
     "JOIN DebtPositionTypeOrgOperators dptoo ON d.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId " +
-    "WHERE d.organizationId = :orgId AND " +
+    "WHERE d.organizationId = :organizationId AND " +
     "i.iuv = :iuv AND " +
     "i.iur = :iur AND " +
     "t.transferIndex = :transferIndex AND " +
     "dptoo.operatorExternalUserId = :operatorExternalUserId")
   Optional<InstallmentNoPII> findAuthorizedByTransferSemanticKey(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("orgId") Long orgId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("iuv") String iuv,
     @Parameter(required = true) @Param("iur") String iur,
     @Parameter(required = true) @Param("transferIndex") int transferIndex,
