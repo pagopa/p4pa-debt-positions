@@ -18,8 +18,13 @@ import java.util.stream.Stream;
 @Slf4j
 public class InstallmentUpdateService {
 
-  public static final Set<InstallmentStatus> NOT_PAID = Set.of(InstallmentStatus.DRAFT, InstallmentStatus.TO_SYNC, InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED);
-
+  public static final Set<String> TRANSITION_TO_SYNC_REQUIRED = Set.of(
+    InstallmentStatus.DRAFT+"|"+InstallmentStatus.UNPAID,
+    InstallmentStatus.UNPAID+"|"+InstallmentStatus.EXPIRED,
+    InstallmentStatus.EXPIRED+"|"+InstallmentStatus.UNPAID,
+    InstallmentStatus.UNPAID+"|"+InstallmentStatus.INVALID,
+    InstallmentStatus.INVALID+"|"+InstallmentStatus.UNPAID,
+    InstallmentStatus.UNPAID+"|"+InstallmentStatus.CANCELLED);
 
   private final DebtPositionRepository debtPositionRepository;
 
@@ -63,7 +68,14 @@ public class InstallmentUpdateService {
     if (receiptId != null) {
       installment.setReceiptId(receiptId);
     }
-    updateSyncStatus(installment, status);
+    if(TRANSITION_TO_SYNC_REQUIRED.contains(installment.getStatus()+"|"+status)) {
+      updateSyncStatus(installment, status);
+    } else {
+      installment.setStatus(status);
+      installment.setSyncStatus(null);
+    }
+
+
   }
 
   private void updateSyncStatus(InstallmentNoPII installment, InstallmentStatus to) {
@@ -78,7 +90,7 @@ public class InstallmentUpdateService {
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
-      if (NOT_PAID.contains(anInstallment.getStatus())) {
+      if (TRANSITION_TO_SYNC_REQUIRED.contains(anInstallment.getStatus())) {
         updateInstallmentFields(anInstallment, InstallmentStatus.INVALID, null);
       }
     });

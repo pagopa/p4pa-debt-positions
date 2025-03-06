@@ -83,7 +83,7 @@ class InstallmentUpdateServiceTest {
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUpdateService.NOT_PAID.contains(anInstallment.getStatus())) {
+          if (InstallmentUpdateService.TRANSITION_TO_SYNC_REQUIRED.contains(anInstallment.getStatus())) {
             verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
               "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
                 idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(),anInstallment.getStatus()));
