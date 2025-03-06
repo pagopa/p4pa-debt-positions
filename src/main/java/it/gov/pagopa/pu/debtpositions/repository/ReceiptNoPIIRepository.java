@@ -15,4 +15,13 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
     "  from ReceiptNoPII r" +
     " where r.paymentReceiptId = :paymentReceiptId")
   ReceiptNoPII getByPaymentReceiptId(@Param("paymentReceiptId") String paymentReceiptId);
+
+  @Query("""
+    SELECT r
+    FROM ReceiptNoPII r
+    JOIN Installment i ON r.receiptId = i.receiptId
+    JOIN Transfer t ON t.installmentId = i.installmentId
+    WHERE t.transferId = :transferId
+  """)
+  ReceiptNoPII getByTransferId(@Param("transferId") Long transferId);
 }
