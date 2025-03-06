@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -17,15 +18,22 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(InstallmentControllerImpl.class)
@@ -95,5 +103,39 @@ class InstallmentControllerTest {
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
     Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
+  }
+
+  @Test
+  void whenGetInstallmentExportThenOk() throws Exception {
+    Long organizationId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
+    Long debtPositionTypeOrgId = 1L;
+
+    PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
+    System.out.println(expectedResponse);
+
+    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(organizationId),
+      eq(operatorExternalUserId),
+      eq(paymentDateFrom),
+      eq(paymentDateTo),
+      eq(debtPositionTypeOrgId),
+      any(PageRequest.class))).thenReturn(expectedResponse);
+
+    MvcResult result = mockMvc.perform(
+        MockMvcRequestBuilders.get("/installments/{organizationId}/export", organizationId)
+          .param("operatorExternalUserId",operatorExternalUserId)
+          .param("paymentDateFrom", String.valueOf(paymentDateFrom))
+          .param("paymentDateTo", String.valueOf(paymentDateTo))
+          .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
+          .param("size", "1"))
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+      .andReturn();
+
+    PagedInstallmentsPaidView response = objectMapper.readValue(result.getResponse().getContentAsString(), PagedInstallmentsPaidView.class);
+    TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "paymentDateTime");
+    Mockito.verify(installmentServiceMock).getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
   }
 }
