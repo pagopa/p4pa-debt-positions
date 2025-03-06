@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO;
+import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ public class InstallmentPaidPIIMapper {
   }
 
   public InstallmentPaidViewDTO map(InstallmentPaidViewNoPII noPii) {
-    InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
+    ReceiptPIIDTO pii = personalDataService.get(noPii.getReceiptPersonalDataId(), ReceiptPIIDTO.class);
 
     return InstallmentPaidViewDTO.builder()
             .installmentId(noPii.getInstallmentId())
@@ -29,6 +29,7 @@ public class InstallmentPaidPIIMapper {
             .idPsp(noPii.getIdPsp())
             .pspCompanyName(noPii.getPspCompanyName())
             .debtor(pii.getDebtor())
+            .payer(pii.getPayer())
             .paymentAmountCents(noPii.getPaymentAmountCents())
             .creditorReferenceId(noPii.getCreditorReferenceId())
             .amountCents(noPii.getAmountCents())

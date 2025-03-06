@@ -36,7 +36,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       r.feeCents as feeCents,
       i.balance as balance,
       r.companyName as companyName,
-      i.personalDataId as personalDataId
+      r.personalDataId as receiptPersonalDataId
     )
     FROM InstallmentNoPII i
     JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId

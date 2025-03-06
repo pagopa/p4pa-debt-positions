@@ -29,7 +29,7 @@ public class InstallmentPaidViewFaker {
       .feeCents(10L)
       .balance("balance")
       .companyName("company")
-      .personalDataId(123L)
+      .receiptPersonalDataId(123L)
       .build();
   }
 

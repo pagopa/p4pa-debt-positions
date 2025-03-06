@@ -34,6 +34,7 @@ public class InstallmentPaidViewDTO {
   private String pspCompanyName;
   @NotNull
   private Person debtor;
+  private Person payer;
   @NotNull
   private Long paymentAmountCents;
   @NotNull
