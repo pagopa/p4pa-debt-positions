@@ -1,114 +1,63 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
-import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
-import it.gov.pagopa.pu.debtpositions.enums.UniqueIdentifierType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.OffsetDateTime;
 
 @Data
-@SuperBuilder(toBuilder = true)
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = true)
-public class InstallmentPaidViewDTO  extends InstallmentPaidViewPIIDTO{
+public class InstallmentPaidViewDTO {
 
+  private Long installmentId;
   private String iuf;
-  private Integer numRigaFlusso;
   @NotNull
-  private String codIud;
+  private String iud;
   @NotNull
-  private String codIuv;
-  private Integer versioneOggetto;
+  private String noticeNumber;
   @NotNull
-  private String identificativoDominio;
-  private String identificativoStazioneRichiedente;
+  private String orgFiscalCode;
   @NotNull
-  private String identificativoMessaggioRicevuta;
-  private OffsetDateTime dataOraMessaggioRicevuta;
+  private String paymentReceiptId;
+  private OffsetDateTime paymentDateTime;
   @NotNull
-  private String riferimentoMessaggioRichiesta;
-  private OffsetDateTime riferimentoDataRichiesta;
-  private UniqueIdentifierType tipoIdentificativoUnivoco;
+  private String idPsp;
   @NotNull
-  private String codiceIdentificativoUnivoco;
+  private String pspCompanyName;
   @NotNull
-  private String denominazioneAttestante;
-  private String codiceUnitOperAttestante;
-  private String denomUnitOperAttestante;
-  private String indirizzoAttestante;
-  private String civicoAttestante;
-  private String capAttestante;
-  private String localitaAttestante;
-  private String provinciaAttestante;
-  private String nazioneAttestante;
-  private PersonEntityType enteBenefTipoIdentificativoUnivoco;
-  private String enteBenefCodiceIdentificativoUnivoco;
-  private String denominazioneBeneficiario;
-  private String codiceUnitOperBeneficiario;
-  private String denomUnitOperBeneficiario;
-  private String indirizzoBeneficiario;
-  private String civicoBeneficiario;
-  private String capBeneficiario;
-  private String localitaBeneficiario;
-  private String provinciaBeneficiario;
-  private String nazioneBeneficiario;
-  private PersonEntityType soggVersTipoIdentificativoUnivoco;
-  private PersonEntityType soggVersCodiceIdentificativoUnivoco;
+  private Person debtor;
+  private Person payer;
   @NotNull
-  private PersonEntityType soggPagTipoIdentificativoUnivoco;
-  private Integer codiceEsitoPagamento;
+  private Long paymentAmountCents;
   @NotNull
-  private Double importoTotalePagato;
+  private String creditorReferenceId;
   @NotNull
-  private String identificativoUnivocoVersamento;
-  @NotNull
-  private String codiceContestoPagamento;
-  @NotNull
-  private Double singoloImportoPagato;
-  private String esitoSingoloPagamento;
-  private OffsetDateTime dataEsitoSingoloPagamento;
-  @NotNull
-  private String identificativoUnivocoRiscoss;
-
+  private Long amountCents;
   @Min(1)
   @Max(140)
   @NotNull
-  private String causaleVersamento;
-
+  private String remittanceInformation;
   @Min(5)
   @Max(140)
   @NotNull
-  private String datiSpecificiRiscossione;
-
+  private String category;
   @NotBlank
   @Min(1)
   @Max(1024)
-  private String tipoDovuto;
-
-  @Min(1)
-  @Max(15)
-  private Integer tipoFirma;
-
-  private String rt;
+  private String code;
   @NotNull
-  private Integer indiceDatiSingoloPagamento;
-  private Double numRtDatiPagDatiSingPagCommissioniApplicatePsp;
-  private String codRtDatiPagDatiSingPagAllegatoRicevutaTipo;
-  private String blbRtDatiPagDatiSingPagAllegatoRicevutaTest;
-  private String bilancio;
+  private Integer transferIndex;
+  private Long feeCents;
+  private String balance;
   @NotNull
-  private String cod_fiscale_pa1;
-  private String de_nome_pa1;
-  @NotNull
-  private String cod_tassonomico_dovuto_pa1;
+  private String companyName;
 
 }
