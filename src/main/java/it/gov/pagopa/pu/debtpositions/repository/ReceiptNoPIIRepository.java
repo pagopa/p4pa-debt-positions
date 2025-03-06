@@ -19,7 +19,7 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
   @Query("""
     SELECT r
     FROM ReceiptNoPII r
-    JOIN Installment i ON r.receiptId = i.receiptId
+    JOIN InstallmentNoPII i ON r.receiptId = i.receiptId
     JOIN Transfer t ON t.installmentId = i.installmentId
     WHERE t.transferId = :transferId
   """)
