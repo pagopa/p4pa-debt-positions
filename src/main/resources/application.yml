@@ -146,6 +146,9 @@ rest:
 iuv:
   informationSystemId: "00"
 
+installment-paid-view:
+  max-total-elements: "\${INSTALLMENT_PAID_VIEW_MAX_TOTAL_ELEMENTS: 100000}"
+
 cache:
   pii:
     size: "\${CACHE_PII_SIZE:1000}"
