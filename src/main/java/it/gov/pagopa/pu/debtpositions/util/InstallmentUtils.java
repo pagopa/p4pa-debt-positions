@@ -37,7 +37,8 @@ public class InstallmentUtils {
 
   }
 
-  public static boolean isInstallmentNotPaid(InstallmentNoPII installment) {
+  /** It will check if the Installment is in a payable status */
+  public static boolean isPayable(InstallmentNoPII installment) {
     return NOT_PAID.contains(installment.getStatus());
   }
 
