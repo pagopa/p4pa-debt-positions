@@ -21,12 +21,17 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID,
     InstallmentStatus.EXPIRED);
 
-
-  private static boolean isTransitionToSync(InstallmentStatus statusFrom,
-    InstallmentStatus statusTo) {
-    return TRANSITION_TO_SYNC_REQUIRED.contains(statusFrom + "|" + statusTo);
+  /** It will check if the Installment is in a payable status */
+  public static boolean isPayable(InstallmentNoPII installment) {
+    return NOT_PAID.contains(installment.getStatus());
   }
 
+  /**
+   * It will set the Installment status verifying it will need the TO_SYNC transition
+   *
+   * @param installment the installment to update
+   * @param status the new status
+   */
   public static void setStatus(InstallmentNoPII installment, InstallmentStatus status) {
     if (InstallmentUtils.isTransitionToSync(installment.getStatus(), status)) {
       updateSyncStatus(installment, status);
@@ -37,9 +42,9 @@ public class InstallmentUtils {
 
   }
 
-  /** It will check if the Installment is in a payable status */
-  public static boolean isPayable(InstallmentNoPII installment) {
-    return NOT_PAID.contains(installment.getStatus());
+  private static boolean isTransitionToSync(InstallmentStatus statusFrom,
+    InstallmentStatus statusTo) {
+    return TRANSITION_TO_SYNC_REQUIRED.contains(statusFrom + "|" + statusTo);
   }
 
   private static void updateSyncStatus(InstallmentNoPII installment,

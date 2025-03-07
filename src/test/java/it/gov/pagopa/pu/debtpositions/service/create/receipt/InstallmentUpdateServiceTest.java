@@ -35,14 +35,14 @@ class InstallmentUpdateServiceTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @Test
-  void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk(){
+  void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk() {
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
     List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
 
-    paymentOptionList.get(0).setInstallments(new TreeSet<>(List.of(
+    paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
       targetInstallment
     )));
@@ -53,7 +53,7 @@ class InstallmentUpdateServiceTest {
     )));
     paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.INVALID)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     )));
 
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
@@ -78,10 +78,12 @@ class InstallmentUpdateServiceTest {
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUtils.isTransitionToSync(anInstallment.getStatus(), InstallmentStatus.INVALID)) {
-            verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
+          if (InstallmentUtils.isPayable(anInstallment)) {
+            InstallmentUtils.setStatus(anInstallment, InstallmentStatus.INVALID);
+            InstallmentStatus expectedStatus = anInstallment.getStatus();
+            verifyInstallmentStatus(anInstallment, expectedStatus,
               "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
-                idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(),anInstallment.getStatus()));
+                idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(), anInstallment.getStatus()));
           }
           idxInst[0]++;
         });

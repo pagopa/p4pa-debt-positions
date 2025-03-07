@@ -58,7 +58,7 @@ public class InstallmentUpdateService {
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
-      if (InstallmentUtils.isInstallmentNotPaid(anInstallment)) {
+      if (InstallmentUtils.isPayable(anInstallment)) {
         updateInstallment(anInstallment, InstallmentStatus.INVALID, null);
       }
     });
@@ -68,7 +68,7 @@ public class InstallmentUpdateService {
     if (receiptId != null) {
       installment.setReceiptId(receiptId);
     }
-    InstallmentUtils.updateInstallmentFields(installment, status);
+    InstallmentUtils.setStatus(installment, status);
 
   }
 
