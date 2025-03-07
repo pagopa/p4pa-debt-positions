@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
-import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -8,20 +7,18 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "installment")
-@Data
-@SuperBuilder(toBuilder = true)
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor
+@NoArgsConstructor
+@Data
+@EqualsAndHashCode(callSuper = false)
 public class InstallmentPaidViewNoPII implements Serializable {
 
   @Id
@@ -40,8 +37,6 @@ public class InstallmentPaidViewNoPII implements Serializable {
   private String idPsp;
   @NotNull
   private String pspCompanyName;
-  @NotNull
-  private PersonEntityType debtorEntityType;
   @NotNull
   private Long paymentAmountCents;
   @NotNull
@@ -67,5 +62,5 @@ public class InstallmentPaidViewNoPII implements Serializable {
   @NotNull
   private String companyName;
   @NotNull
-  private Long personalDataId;
+  private Long receiptPersonalDataId;
 }
