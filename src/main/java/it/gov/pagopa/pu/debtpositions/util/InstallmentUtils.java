@@ -27,11 +27,7 @@ public class InstallmentUtils {
     return TRANSITION_TO_SYNC_REQUIRED.contains(statusFrom + "|" + statusTo);
   }
 
-  public static void updateInstallmentFields(InstallmentNoPII installment,
-    InstallmentStatus status, Long receiptId) {
-    if (receiptId != null) {
-      installment.setReceiptId(receiptId);
-    }
+  public static void updateInstallmentFields(InstallmentNoPII installment, InstallmentStatus status) {
     if (InstallmentUtils.isTransitionToSync(installment.getStatus(), status)) {
       updateSyncStatus(installment, status);
     } else {

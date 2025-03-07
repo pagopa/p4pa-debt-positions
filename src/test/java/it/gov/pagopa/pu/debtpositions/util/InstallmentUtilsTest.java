@@ -36,29 +36,18 @@ class InstallmentUtilsTest {
   }
 
   @Test
-  void givenInstallmentWithNullReceiptIdWhenUpdateInstallmentFieldsThenStatusUpdated() {
+  void givenInstallmentWhenUpdateInstallmentFieldsThenStatusUpdated() {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setStatus(InstallmentStatus.UNPAID);
-    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.PAID, null);
+    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.PAID);
     Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
-    Assertions.assertNull(installment.getReceiptId());
-  }
-
-  @Test
-  void givenInstallmentWithReceiptIdWhenUpdateInstallmentFieldsThenReceiptIdSet() {
-    InstallmentNoPII installment = new InstallmentNoPII();
-    installment.setStatus(InstallmentStatus.UNPAID);
-    Long receiptId = 123L;
-    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.PAID, receiptId);
-    Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
-    Assertions.assertEquals(receiptId, installment.getReceiptId());
   }
 
   @Test
   void givenInstallmentTransitionToSyncWhenUpdateInstallmentFieldsThenSyncStatusUpdated() {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setStatus(InstallmentStatus.DRAFT);
-    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.UNPAID, null);
+    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.UNPAID);
     Assertions.assertEquals(InstallmentStatus.TO_SYNC, installment.getStatus());
     Assertions.assertNotNull(installment.getSyncStatus());
     Assertions.assertEquals(InstallmentStatus.DRAFT, installment.getSyncStatus().getSyncStatusFrom());
@@ -69,7 +58,7 @@ class InstallmentUtilsTest {
   void givenInstallmentNotTransitionToSyncWhenUpdateInstallmentFieldsThenSyncStatusNull() {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setStatus(InstallmentStatus.UNPAID);
-    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.PAID, null);
+    InstallmentUtils.updateInstallmentFields(installment, InstallmentStatus.PAID);
     Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
     Assertions.assertNull(installment.getSyncStatus());
   }

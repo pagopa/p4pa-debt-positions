@@ -46,7 +46,7 @@ public class InstallmentUpdateService {
       .ifPresentOrElse(paidInstallment -> {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
-        InstallmentUtils.updateInstallmentFields(paidInstallment, InstallmentStatus.PAID, receiptDTO.getReceiptId());
+        updateInstallment(paidInstallment, InstallmentStatus.PAID, receiptDTO.getReceiptId());
       }, () -> {
         throw new NotFoundException("primary installment not found " + installment.getInstallmentId() + " on debt position " + debtPosition.getDebtPositionId());
       });
@@ -59,8 +59,17 @@ public class InstallmentUpdateService {
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
       if (InstallmentUtils.isInstallmentNotPaid(anInstallment)) {
-        InstallmentUtils.updateInstallmentFields(anInstallment, InstallmentStatus.INVALID, null);
+        updateInstallment(anInstallment, InstallmentStatus.INVALID, null);
       }
     });
   }
+
+  private void updateInstallment(InstallmentNoPII installment, InstallmentStatus status, Long receiptId){
+    if (receiptId != null) {
+      installment.setReceiptId(receiptId);
+    }
+    InstallmentUtils.updateInstallmentFields(installment, status);
+
+  }
+
 }
