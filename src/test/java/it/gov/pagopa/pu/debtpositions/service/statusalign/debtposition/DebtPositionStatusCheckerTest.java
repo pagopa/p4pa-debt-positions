@@ -147,11 +147,11 @@ class DebtPositionStatusCheckerTest {
   void testGetChildStatuses() {
     DebtPosition debtPosition = new DebtPosition();
     PaymentOption option1 = new PaymentOption();
-    option1.setPaymentOptionId(1L);
+    option1.setPaymentOptionIndex(1);
     option1.setStatus(PaymentOptionStatus.PAID);
 
     PaymentOption option2 = new PaymentOption();
-    option2.setPaymentOptionId(2L);
+    option2.setPaymentOptionIndex(2);
     option2.setStatus(PaymentOptionStatus.UNPAID);
 
     debtPosition.setPaymentOptions(new TreeSet<>(List.of(option1, option2)));
