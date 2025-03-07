@@ -10,7 +10,7 @@ public class InstallmentUtils {
   private InstallmentUtils() {
   }
 
-  public static final Set<String> TRANSITION_TO_SYNC_REQUIRED = Set.of(
+  private static final Set<String> TRANSITION_TO_SYNC_REQUIRED = Set.of(
     InstallmentStatus.DRAFT + "|" + InstallmentStatus.UNPAID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.INVALID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.CANCELLED);
