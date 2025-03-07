@@ -33,8 +33,10 @@ public class InstallmentUtils {
    * @param status the new status
    */
   public static void setStatus(InstallmentNoPII installment, InstallmentStatus status) {
-    if (InstallmentUtils.isTransitionToSync(installment.getStatus(), status)) {
-      updateSyncStatus(installment, status);
+    log.info("Changing status of Installment (id={}, iud={}) from {} to {}", installment.getInstallmentId(), installment.getIud(), installment.getStatus(), status);
+    InstallmentStatus statusFrom = getStatusFrom(installment);
+    if (InstallmentUtils.isTransitionToSync(statusFrom, status)) {
+      updateSyncStatus(installment, statusFrom, status);
     } else {
       installment.setStatus(status);
       installment.setSyncStatus(null);
