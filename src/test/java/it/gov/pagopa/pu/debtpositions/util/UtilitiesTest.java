@@ -67,22 +67,27 @@ class UtilitiesTest {
 
   @ParameterizedTest
   @MethodSource("valueSource")
-  void testCalculateIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, Long interval){
+  void testIsValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, Long maxInterval,Boolean expectedResult){
 
-    long result = Utilities.calculateIntervalBetweenOffsetDateTime(dateFrom, dateTo, chronoUnit);
+    boolean result = Utilities.isValidIntervalBetweenOffsetDateTime(dateFrom, dateTo, chronoUnit, maxInterval);
 
-    assertEquals(interval, result);
+    assertEquals(expectedResult, result);
   }
 
   static Stream<Arguments> valueSource() {
     OffsetDateTime now = OffsetDateTime.now();
     return Stream.of(
-      Arguments.of(now, now.plusMinutes(24), ChronoUnit.MINUTES, 24L),
-      Arguments.of(now, now.plusHours(20), ChronoUnit.HOURS, 20L),
-      Arguments.of(now, now.plusDays(60), ChronoUnit.DAYS, 60L),
-      Arguments.of(now, now.plusWeeks(4), ChronoUnit.WEEKS, 4L),
-      Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 5L),
-      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,3L)
+      Arguments.of(now, now.plusMinutes(24), ChronoUnit.MINUTES, 24L, true),
+      Arguments.of(now, now.plusHours(20), ChronoUnit.HOURS, 20L, true),
+      Arguments.of(now, now.plusDays(60), ChronoUnit.DAYS, 60L, true),
+      Arguments.of(now, now.plusWeeks(4), ChronoUnit.WEEKS, 4L, true),
+      Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 5L, true),
+      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,3L, true),
+      Arguments.of(now, now.plusHours(20), ChronoUnit.HOURS, 10L, false),
+      Arguments.of(now, now.plusDays(60), ChronoUnit.DAYS, 30L, false),
+      Arguments.of(now, now.plusWeeks(4), ChronoUnit.WEEKS, 3L, false),
+      Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 2L, false),
+      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,2L, false)
     );
   }
 }

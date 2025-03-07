@@ -138,7 +138,7 @@ class InstallmentServiceImplTest {
       () -> installmentService.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
     );
     //then
-    assertEquals("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months. The provided interval is 8 months", ex.getMessage());
+    assertEquals("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months", ex.getMessage());
 
   }
 }

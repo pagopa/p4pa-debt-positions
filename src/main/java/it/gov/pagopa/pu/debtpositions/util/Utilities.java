@@ -80,7 +80,7 @@ public class Utilities {
     }
   }
 
-  public static long calculateIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit){
-    return chronoUnit.between(dateFrom, dateTo);
+  public static boolean isValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, long maxInterval){
+    return chronoUnit.between(dateFrom, dateTo) <= maxInterval;
   }
 }

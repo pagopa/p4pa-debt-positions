@@ -48,11 +48,10 @@ public class InstallmentServiceImpl implements InstallmentService {
 
   @Override
   public PagedInstallmentsPaidView getPagedInstallmentPaidView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
-    long intervalOffsetDateTime = Utilities.calculateIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS);
-
-    if(intervalOffsetDateTime > maxMonthsInterval){
-      throw new InvalidDateTimeIntervalException("The date interval between %s and %s cannot exceed %d months. The provided interval is %d months".formatted(paymentDateFrom, paymentDateTo, maxMonthsInterval, intervalOffsetDateTime));
+    if(!Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, maxMonthsInterval)){
+      throw new InvalidDateTimeIntervalException("The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, maxMonthsInterval));
     }
+
     return installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable);
   }
 }
