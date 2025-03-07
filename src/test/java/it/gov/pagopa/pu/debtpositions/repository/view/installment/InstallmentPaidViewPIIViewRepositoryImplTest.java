@@ -94,8 +94,9 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
 
     Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
     //when
-    TooManyElementsException ex = assertThrows(TooManyElementsException.class, () ->
-            installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
+    TooManyElementsException ex = assertThrows(
+            TooManyElementsException.class,
+            () -> installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
     );
     //then
     assertEquals("The number of InstallmentPaidViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());

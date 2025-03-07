@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidDateTimeIntervalException;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
@@ -26,7 +27,6 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.DateTimeException;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-@TestPropertySource(properties = {"installment-paid-view.max-months-range=6"})
+@TestPropertySource(properties = {"installment-paid-view.max-months-interval=6"})
 class InstallmentServiceImplTest {
 
   @Mock
@@ -47,8 +47,8 @@ class InstallmentServiceImplTest {
   @Mock
   private InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepositoryMock;
 
-  @Value("${installment-paid-view.max-months-range}")
-  private Integer maxMonthsRange;
+  @Value("${installment-paid-view.max-months-interval}")
+  private Integer maxMonthsInterval;
 
 
   private InstallmentServiceImpl installmentService;
@@ -57,7 +57,7 @@ class InstallmentServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    installmentService = new InstallmentServiceImpl(installmentPIIRepositoryMock, installmentMapperMock, installmentDetailPIIViewRepositoryMock, installmentPaidViewPIIViewRepositoryMock, maxMonthsRange);
+    installmentService = new InstallmentServiceImpl(installmentPIIRepositoryMock, installmentMapperMock, installmentDetailPIIViewRepositoryMock, installmentPaidViewPIIViewRepositoryMock, maxMonthsInterval);
   }
 
   @ParameterizedTest
@@ -133,8 +133,8 @@ class InstallmentServiceImplTest {
     Long debtPositionTypeOrgId = 1L;
 
     //then
-    DateTimeException ex = assertThrows(
-      DateTimeException.class,
+    InvalidDateTimeIntervalException ex = assertThrows(
+      InvalidDateTimeIntervalException.class ,
       () -> installmentService.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
     );
     //then
