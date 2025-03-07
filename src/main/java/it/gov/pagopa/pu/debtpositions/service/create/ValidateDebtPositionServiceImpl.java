@@ -56,9 +56,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("At least one installment of the debt position is mandatory");
       }
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
-        validateInstallment(installmentDTO, debtPositionTypeOrg);
-        validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-        validateTransfers(installmentDTO.getTransfers(), accessToken);
+        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg);
       }
     }
   }
@@ -82,22 +80,24 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateInstallment(InstallmentDTO installmentDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {
+  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("Remittance information is mandatory");
     }
     if (installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
       throw new InvalidValueException("The due date cannot be retroactive");
     }
-    if (debtPositionTypeOrgDTO.isFlagMandatoryDueDate() && installmentDTO.getDueDate() == null) {
+    if (debtPositionTypeOrg.isFlagMandatoryDueDate() && installmentDTO.getDueDate() == null) {
       throw new InvalidValueException("The due date is mandatory");
     }
     if (installmentDTO.getAmountCents() < 0) {
       throw new InvalidValueException("Amount is not valid");
     }
-    if (debtPositionTypeOrgDTO.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrgDTO.getAmountCents())) {
+    if (debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
       throw new InvalidValueException("Amount is not valid for this debt position type org");
     }
+    validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
+    validateTransfers(installmentDTO.getTransfers(), accessToken);
   }
 
   private void validatePersonData(PersonDTO personDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {

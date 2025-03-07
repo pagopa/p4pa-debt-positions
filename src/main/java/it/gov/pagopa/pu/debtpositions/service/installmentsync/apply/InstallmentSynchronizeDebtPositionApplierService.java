@@ -13,11 +13,12 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 @Service
 public class InstallmentSynchronizeDebtPositionApplierService {
 
-  public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO) {
+  public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO, Long debtPositionTypeOrgId) {
     debtPositionDTO.setDescription(installmentSynchronizeDTO.getDescription());
     debtPositionDTO.setValidityDate(installmentSynchronizeDTO.getValidityDate());
 
     List<String> modifiedFields = new ArrayList<>();
+    checkImmutableField("debtPositionTypeOrgId", debtPositionTypeOrgId, debtPositionDTO.getDebtPositionTypeOrgId(), modifiedFields);
     checkImmutableField("multiDebtor", installmentSynchronizeDTO.getMultiDebtor(), debtPositionDTO.getMultiDebtor(), modifiedFields);
     checkImmutableField("flagPagoPaPayment", installmentSynchronizeDTO.getFlagPagoPaPayment(), debtPositionDTO.getFlagPagoPaPayment(), modifiedFields);
 

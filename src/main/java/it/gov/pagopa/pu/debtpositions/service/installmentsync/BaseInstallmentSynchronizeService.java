@@ -53,6 +53,7 @@ public abstract class BaseInstallmentSynchronizeService {
   }
 
   public boolean isInstallmentAlreadyElaborated(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO){
+    if(installmentDTO == null) return false;
     return installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId()) &&
       installmentSynchronizeDTO.getIngestionFlowFileLineNumber().equals(installmentDTO.getIngestionFlowFileLineNumber());
   }

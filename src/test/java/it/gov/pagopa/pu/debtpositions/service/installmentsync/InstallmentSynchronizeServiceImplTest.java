@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,13 +35,16 @@ class InstallmentSynchronizeServiceImplTest {
   private InstallmentSynchronizeCancelService installmentSynchronizeCancelServiceMock;
   @Mock
   private InstallmentSynchronizeUpdateService installmentSynchronizeUpdateServiceMock;
+  @Mock
+  private InstallmentSynchronizeInsertService installmentSynchronizeInsertServiceMock;
 
   private InstallmentSynchronizeService installmentSynchronizeService;
 
   @BeforeEach
   void setUp() {
     installmentSynchronizeService = new InstallmentSynchronizeServiceImpl(debtPositionRepositoryMock,
-      debtPositionMapperMock, installmentSynchronizeCancelServiceMock, installmentSynchronizeUpdateServiceMock);
+      debtPositionMapperMock, installmentSynchronizeCancelServiceMock,
+      installmentSynchronizeUpdateServiceMock, installmentSynchronizeInsertServiceMock);
   }
 
   @Test
@@ -125,4 +129,27 @@ class InstallmentSynchronizeServiceImplTest {
     assertEquals("workflowId", result);
   }
 
+  @Test
+  void testInstallmentSynchronizeInsertActionThenOk(){
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    boolean massive = false;
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.I);
+
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.setDebtPositionOrigin(debtPositionOrigin);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    Mockito.when(debtPositionRepositoryMock.findByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(),
+        installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
+    Mockito.when(installmentSynchronizeInsertServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
+      massive, accessToken, operatorExternalUserId)).thenReturn("workflowId");
+
+    String result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, massive, debtPositionOrigin, accessToken, operatorExternalUserId);
+
+    assertEquals("workflowId", result);
+  }
 }

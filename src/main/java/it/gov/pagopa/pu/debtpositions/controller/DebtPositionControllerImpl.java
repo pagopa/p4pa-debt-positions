@@ -35,7 +35,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId);
+    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId).getLeft();
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 

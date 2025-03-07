@@ -18,7 +18,7 @@ import java.util.SortedSet;
 @NoArgsConstructor
 @Data
 @Builder
-@EqualsAndHashCode(of = "paymentOptionId", callSuper = false)
+@EqualsAndHashCode(of = {"paymentOptionId", "paymentOptionIndex"}, callSuper = false)
 public class PaymentOption extends BaseEntity implements Serializable, Comparable<PaymentOption> {
 
   @Id
@@ -47,8 +47,7 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   @Override
   public int compareTo(@Nonnull PaymentOption o) {
     return Comparator
-      .comparing(PaymentOption::getPaymentOptionId, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .comparing(PaymentOption::getPaymentOptionIndex, Comparator.nullsFirst(Comparator.naturalOrder()))
       .compare(this, o);
   }
-
 }

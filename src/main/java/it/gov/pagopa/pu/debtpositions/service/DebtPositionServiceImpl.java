@@ -4,15 +4,19 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.*;
-import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
-
-import java.util.Map;
-
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {

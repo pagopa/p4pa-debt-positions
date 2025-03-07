@@ -34,8 +34,8 @@ public class InstallmentSynchronizeUpdateService extends BaseInstallmentSynchron
 
     validateStatus(result.getRight(), installmentSynchronizeDTO);
 
-    InstallmentDTO installment2operate = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, result.getLeft(), result.getRight(), accessToken);
+    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, result.getLeft(), result.getRight(), accessToken);
 
-    return debtPositionUpdateInstallmentService.updateInstallment(storedDebtPosition, List.of(installment2operate), massive, accessToken, operatorExternalUserId).getRight();
+    return debtPositionUpdateInstallmentService.updateInstallment(debtPositionApplied.getLeft(), List.of(debtPositionApplied.getRight()), massive, accessToken, operatorExternalUserId).getRight();
   }
 }
