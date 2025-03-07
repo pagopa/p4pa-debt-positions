@@ -15,7 +15,7 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.INVALID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.CANCELLED);
 
-  public static final Set<InstallmentStatus> NOT_PAID = Set.of(
+  private static final Set<InstallmentStatus> NOT_PAID = Set.of(
     InstallmentStatus.DRAFT,
     InstallmentStatus.TO_SYNC,
     InstallmentStatus.UNPAID,
