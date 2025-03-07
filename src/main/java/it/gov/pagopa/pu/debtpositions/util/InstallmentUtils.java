@@ -41,7 +41,7 @@ public class InstallmentUtils {
     return NOT_PAID.contains(installment.getStatus());
   }
 
-  static void updateSyncStatus(InstallmentNoPII installment,
+  private static void updateSyncStatus(InstallmentNoPII installment,
     InstallmentStatus to) {
     InstallmentStatus from =
       installment.getStatus().equals(InstallmentStatus.TO_SYNC)
