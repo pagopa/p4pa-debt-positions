@@ -22,7 +22,7 @@ public class InstallmentUtils {
     InstallmentStatus.EXPIRED);
 
 
-  public static boolean isTransitionToSync(InstallmentStatus statusFrom,
+  private static boolean isTransitionToSync(InstallmentStatus statusFrom,
     InstallmentStatus statusTo) {
     return TRANSITION_TO_SYNC_REQUIRED.contains(statusFrom + "|" + statusTo);
   }
