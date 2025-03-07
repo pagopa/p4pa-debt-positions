@@ -139,6 +139,6 @@ class InstallmentServiceImplTest {
     );
     //then
     assertEquals("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months", ex.getMessage());
-
+    Mockito.verifyNoInteractions(installmentPaidViewPIIViewRepositoryMock);
   }
 }

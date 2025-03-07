@@ -74,7 +74,7 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
   }
 
   @Test
-  void givenWhenGetPagedInstallmentPaidViewThen() {
+  void givenTooManyElements_WhenGetPagedInstallmentPaidView_ThenReturnException() {
     //given
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
