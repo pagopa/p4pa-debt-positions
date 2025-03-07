@@ -11,11 +11,11 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.Comparator;
 import java.util.SortedSet;
 
 @Entity
@@ -71,9 +71,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
 
   @Override
   public int compareTo(@Nonnull InstallmentNoPII o) {
-    return new CompareToBuilder()
-      .append(this.getInstallmentId(), o.getInstallmentId())
-      .append(this.getIud(), o.getIud())
-      .build();
+    return Comparator
+      .comparing(InstallmentNoPII::getInstallmentId, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
 }

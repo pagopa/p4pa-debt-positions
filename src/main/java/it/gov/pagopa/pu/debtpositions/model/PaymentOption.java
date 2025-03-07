@@ -6,10 +6,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.Serializable;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.SortedSet;
 
 @Entity
@@ -46,9 +46,8 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
 
   @Override
   public int compareTo(@Nonnull PaymentOption o) {
-    return new CompareToBuilder()
-      .append(this.getPaymentOptionId(), o.getPaymentOptionId())
-      .append(this.getPaymentOptionIndex(), o.getPaymentOptionIndex())
-      .build();
+    return Comparator
+      .comparing(PaymentOption::getPaymentOptionIndex, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
 }

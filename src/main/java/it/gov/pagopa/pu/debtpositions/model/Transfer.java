@@ -4,9 +4,9 @@ import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.io.Serializable;
+import java.util.Comparator;
 
 @Entity
 @Table(name = "transfer")
@@ -41,10 +41,9 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
 
   @Override
   public int compareTo(@Nonnull Transfer o) {
-    return new CompareToBuilder()
-      .append(this.getTransferId(), o.getTransferId())
-      .append(this.getTransferIndex(), o.getTransferIndex())
-      .build();
+    return Comparator
+      .comparing(Transfer::getTransferIndex, Comparator.nullsFirst(Comparator.naturalOrder()))
+      .compare(this, o);
   }
 
 }
