@@ -25,12 +25,12 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setBalance(installmentSynchronizeDTO.getBalance());
     installmentDTO.setLegacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata());
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
+    installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
+    installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
     checkImmutableField("paymentTypeCode", installmentSynchronizeDTO.getPaymentTypeCode(), installmentDTO.getPaymentTypeCode(), modifiedFields);
-    checkImmutableField("ingestionFlowFileId", installmentSynchronizeDTO.getIngestionFlowFileId(), installmentDTO.getIngestionFlowFileId(), modifiedFields);
-    checkImmutableField("ingestionFlowFileLineNumber", installmentSynchronizeDTO.getIngestionFlowFileLineNumber(), installmentDTO.getIngestionFlowFileLineNumber(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
       throw new ConflictErrorException(String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));

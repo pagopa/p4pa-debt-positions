@@ -130,7 +130,7 @@ class DebtPositionServiceImplTest {
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
-      Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
+      Mockito.verify(transferRepository, Mockito.times(1)).save(transfer);
     }
   }
 
@@ -198,7 +198,7 @@ class DebtPositionServiceImplTest {
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
       Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
-      Mockito.verify(transferRepository, Mockito.times(2)).save(transfer);
+      Mockito.verify(transferRepository, Mockito.times(1)).save(transfer);
     }
   }
 

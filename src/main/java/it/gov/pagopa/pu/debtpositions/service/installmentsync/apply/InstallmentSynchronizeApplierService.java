@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,8 +33,8 @@ public class InstallmentSynchronizeApplierService {
     this.debtPositionTypeRepository = debtPositionTypeRepository;
   }
 
-  public InstallmentDTO apply(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO,
-                              PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO, String accessToken) {
+  public Pair<DebtPositionDTO, InstallmentDTO> apply(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition,
+                                                     PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, String accessToken) {
     Long organizationId = installmentSynchronizeDTO.getOrganizationId();
     Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
       .orElseThrow(() -> new InvalidValueException(String.format("Provided organization id %s not found", organizationId)));
@@ -42,31 +43,31 @@ public class InstallmentSynchronizeApplierService {
       installmentSynchronizeDTO.getDebtPositionTypeCode());
     populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg);
 
-    if (debtPositionDTO == null) {
-      return installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId())
-        .getPaymentOptions().getFirst()
-        .getInstallments().getFirst();
+    if (storedDebtPosition == null) {
+      DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
+      return Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
     }
-    applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO);
+    applierDebtPositionService.merge(installmentSynchronizeDTO, storedDebtPosition, debtPositionTypeOrg.getDebtPositionTypeOrgId());
 
-    return applyPaymentOption(installmentSynchronizeDTO, debtPositionDTO, paymentOptionDTO, installmentDTO);
+    return applyPaymentOption(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment);
   }
 
-  private InstallmentDTO applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO) {
-    if (paymentOptionDTO == null) {
-      paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO);
-      debtPositionDTO.getPaymentOptions().add(paymentOptionDTO);
-      return paymentOptionDTO.getInstallments().getFirst();
+  private Pair<DebtPositionDTO, InstallmentDTO> applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment) {
+    if (storedPaymentOption == null) {
+      PaymentOptionDTO paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO);
+      storedDebtPosition.addPaymentOptionsItem(paymentOptionDTO);
+      return Pair.of(storedDebtPosition, paymentOptionDTO.getInstallments().getFirst());
     } else {
-      applierPaymentOptionService.merge(installmentSynchronizeDTO, paymentOptionDTO);
-      return applyInstallment(installmentSynchronizeDTO, paymentOptionDTO, installmentDTO);
+      applierPaymentOptionService.merge(installmentSynchronizeDTO, storedPaymentOption);
+      InstallmentDTO installmentDTO = applyInstallment(installmentSynchronizeDTO, storedPaymentOption, storedInstallment);
+      return Pair.of(storedDebtPosition, installmentDTO);
     }
   }
 
-  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO paymentOptionDTO, InstallmentDTO installmentDTO) {
+  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO) {
     if (installmentDTO == null) {
       installmentDTO = installmentSynchronizeMapper.map2Installment(installmentSynchronizeDTO);
-      paymentOptionDTO.getInstallments().add(installmentDTO);
+      storedPaymentOption.getInstallments().add(installmentDTO);
     } else {
       applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
     }

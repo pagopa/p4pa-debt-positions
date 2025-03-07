@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -20,12 +21,14 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   private final DebtPositionMapper debtPositionMapper;
   private final InstallmentSynchronizeCancelService installmentSynchronizeCancelService;
   private final InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService;
+  private final InstallmentSynchronizeInsertService installmentSynchronizeInsertService;
 
-  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService) {
+  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentSynchronizeCancelService = installmentSynchronizeCancelService;
     this.installmentSynchronizeUpdateService = installmentSynchronizeUpdateService;
+    this.installmentSynchronizeInsertService = installmentSynchronizeInsertService;
   }
 
   @Override
@@ -34,7 +37,8 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
 
     InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
     return switch (action) {
-      case InstallmentSynchronizeDTO.ActionEnum.I -> "TODO insert";
+      case InstallmentSynchronizeDTO.ActionEnum.I ->
+        installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.M ->
         installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, massive, accessToken, operatorExternalUserId);
       case InstallmentSynchronizeDTO.ActionEnum.A ->

@@ -24,7 +24,7 @@ import java.util.SortedSet;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@EqualsAndHashCode(of = "installmentId", callSuper = false)
+@EqualsAndHashCode(of = {"installmentId", "iud"}, callSuper = false)
 public class InstallmentNoPII extends BaseEntity implements Serializable, Comparable<InstallmentNoPII>, NoPIIEntity<InstallmentPIIDTO> {
 
   @Id
