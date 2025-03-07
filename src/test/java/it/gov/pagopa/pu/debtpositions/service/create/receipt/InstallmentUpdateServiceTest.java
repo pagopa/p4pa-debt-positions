@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -77,7 +78,7 @@ class InstallmentUpdateServiceTest {
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUpdateService.TRANSITION_TO_SYNC_REQUIRED.contains(anInstallment.getStatus() + "|" + InstallmentStatus.INVALID)) {
+          if (InstallmentUtils.isTransitionToSync(anInstallment.getStatus(), InstallmentStatus.INVALID)) {
             verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
               "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
                 idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(),anInstallment.getStatus()));
