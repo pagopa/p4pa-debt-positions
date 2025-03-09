@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +43,7 @@ class WorkflowApisHolderTest extends BaseApiHolderTest {
         assertAuthenticationShouldBeSetInThreadSafeMode(
                 accessToken -> workflowApisHolder.getDebtPositionApi(accessToken)
                   .syncDebtPosition(new DebtPositionDTO(), null, null),
-                WorkflowCreatedDTO.class,
+                new ParameterizedTypeReference<>() {},
                 workflowApisHolder::unload);
     }
 
