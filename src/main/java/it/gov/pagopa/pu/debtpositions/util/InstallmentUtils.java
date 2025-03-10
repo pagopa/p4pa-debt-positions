@@ -17,7 +17,7 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.INVALID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.CANCELLED);
 
-  private static final Set<InstallmentStatus> NOT_PAID = Set.of(
+  private static final Set<InstallmentStatus> PAYABLE_STATUSES = Set.of(
     InstallmentStatus.DRAFT,
     InstallmentStatus.TO_SYNC,
     InstallmentStatus.UNPAID,
@@ -25,7 +25,7 @@ public class InstallmentUtils {
 
   /** It will check if the Installment is in a payable status */
   public static boolean isPayable(InstallmentNoPII installment) {
-    return NOT_PAID.contains(installment.getStatus());
+    return PAYABLE_STATUSES.contains(installment.getStatus());
   }
 
   /**

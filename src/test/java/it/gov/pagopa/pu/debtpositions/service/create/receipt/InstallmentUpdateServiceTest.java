@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -98,35 +97,26 @@ class InstallmentUpdateServiceTest {
     //verify that there no more NOT-PAID installments on payment options different of the one of the target installment
     int[] idxPo = {0};
     int[] idxInst = {0};
-    try (MockedStatic<InstallmentUtils> mockedInstallmentUtils = Mockito.mockStatic(
-      InstallmentUtils.class)) {
-      debtPosition.getPaymentOptions().forEach(paymentOption -> {
-        if (!paymentOption.getPaymentOptionId()
-          .equals(targetInstallment.getPaymentOptionId())) {
-          paymentOption.getInstallments().forEach(anInstallment -> {
-            if (InstallmentUtils.isPayable(anInstallment)) {
-              mockedInstallmentUtils.when(
-                  () -> InstallmentUtils.setStatus(anInstallment,
-                    InstallmentStatus.INVALID))
-                .thenAnswer(invocation -> {
-                  anInstallment.setStatus(InstallmentStatus.INVALID);
-                  return null;
-                });
-              InstallmentStatus expectedStatus = anInstallment.getStatus();
-              verifyInstallmentStatus(anInstallment, expectedStatus,
-                "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
-                  idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
-                  paymentOption.getPaymentOptionId(),
-                  anInstallment.getStatus()));
-            }
-            idxInst[0]++;
-          });
-        }
-        idxPo[0]++;
-      });
-      Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
-        .findByInstallmentId(targetInstallment.getInstallmentId());
-    }
+    debtPosition.getPaymentOptions().forEach(paymentOption -> {
+      if (!paymentOption.getPaymentOptionId()
+        .equals(targetInstallment.getPaymentOptionId())) {
+        paymentOption.getInstallments().forEach(anInstallment -> {
+          if (InstallmentUtils.isPayable(anInstallment)) {
+            InstallmentStatus expectedStatus = anInstallment.getStatus();
+            verifyInstallmentStatus(anInstallment, expectedStatus,
+              "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
+                idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
+                paymentOption.getPaymentOptionId(),
+                anInstallment.getStatus()));
+          }
+          idxInst[0]++;
+        });
+      }
+      idxPo[0]++;
+    });
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
+      .findByInstallmentId(targetInstallment.getInstallmentId());
+
   }
 
   @Test
