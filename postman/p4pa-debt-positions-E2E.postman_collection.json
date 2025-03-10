@@ -376,10 +376,6 @@
                   "\r",
                   "    pm.expect(recognizedOrganizations).to.eq(3)\r",
                   "\r",
-                  "    \r",
-                  "    //operatorExternalUserId\r",
-                  "    pm.collectionVariables.set(\"operatorExternalUserId\", jsonResponse.mappedExternalUserId);\r",
-                  "\r",
                   "});"
                 ],
                 "type": "text/javascript",
@@ -498,7 +494,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{operatorExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
+              "raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
               "host": [
                 "{{debtPositionBaseUrl}}"
               ],
@@ -512,7 +508,7 @@
               "query": [
                 {
                   "key": "operatorExternalUserId",
-                  "value": "{{operatorExternalUserId}}"
+                  "value": "{{mappedExternalUserId}}"
                 },
                 {
                   "key": "paymentDateFrom",
@@ -687,6 +683,14 @@
     },
     {
       "key": "dueDate",
+      "value": ""
+    },
+    {
+      "key": "mappedExternalUserId",
+      "value": ""
+    },
+    {
+      "key": "organizationIpaCode",
       "value": ""
     }
   ]
