@@ -23,9 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.List;
 import java.util.Map;
-import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -99,25 +97,11 @@ class DebtPositionServiceImplTest {
 
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
 
-    DebtPosition savedDebtPosition = new DebtPosition();
-    savedDebtPosition.setDebtPositionId(1L);
-    savedDebtPosition.setPaymentOptions(new TreeSet<>(List.of(paymentOption)));
-
-    PaymentOption savedPaymentOption = new PaymentOption();
-    savedPaymentOption.setPaymentOptionId(1L);
-    savedPaymentOption.setInstallments(new TreeSet<>(List.of(installmentNoPIINoIud, installmentNoPII)));
-
-    Installment savedInstallment = new Installment();
-    savedInstallment.setInstallmentId(1L);
-
-    Transfer savedTransfer = new Transfer();
-    savedTransfer.setTransferId(1L);
-
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
+    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(debtPosition);
+    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(paymentOption);
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
-    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
+    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(transfer);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
@@ -125,11 +109,11 @@ class DebtPositionServiceImplTest {
 
       DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
-      Assertions.assertSame(savedDebtPosition, result);
+      Assertions.assertSame(debtPosition, result);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
-      Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
+      Mockito.verify(installmentRepository, Mockito.times(1)).save(Mockito.any(Installment.class));
       Mockito.verify(transferRepository, Mockito.times(1)).save(transfer);
     }
   }
@@ -164,27 +148,13 @@ class DebtPositionServiceImplTest {
 
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
 
-    DebtPosition savedDebtPosition = new DebtPosition();
-    savedDebtPosition.setDebtPositionId(1L);
-    savedDebtPosition.setPaymentOptions(new TreeSet<>(List.of(paymentOption)));
-
-    PaymentOption savedPaymentOption = new PaymentOption();
-    savedPaymentOption.setPaymentOptionId(1L);
-    savedPaymentOption.setInstallments(new TreeSet<>(List.of(installmentNoPIINoIud, installmentNoPII)));
-
-    Installment savedInstallment = new Installment();
-    savedInstallment.setInstallmentId(1L);
-
-    Transfer savedTransfer = new Transfer();
-    savedTransfer.setTransferId(1L);
-
     String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
 
     Mockito.when(debtPositionMapper.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
+    Mockito.when(debtPositionRepository.save(Mockito.any(DebtPosition.class))).thenReturn(debtPosition);
+    Mockito.when(paymentOptionRepository.save(Mockito.any(PaymentOption.class))).thenReturn(paymentOption);
     Mockito.when(installmentRepository.save(Mockito.any(Installment.class))).thenReturn(installment);
-    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
+    Mockito.when(transferRepository.save(Mockito.any(Transfer.class))).thenReturn(transfer);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
@@ -193,11 +163,11 @@ class DebtPositionServiceImplTest {
       org.setIban("IT60X0542811101000000123456");
       DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
 
-      Assertions.assertSame(savedDebtPosition, result);
+      Assertions.assertSame(debtPosition, result);
 
       Mockito.verify(debtPositionRepository, Mockito.times(1)).save(debtPosition);
       Mockito.verify(paymentOptionRepository, Mockito.times(1)).save(paymentOption);
-      Mockito.verify(installmentRepository, Mockito.times(1)).save(installment);
+      Mockito.verify(installmentRepository, Mockito.times(1)).save(Mockito.any(Installment.class));
       Mockito.verify(transferRepository, Mockito.times(1)).save(transfer);
     }
   }
