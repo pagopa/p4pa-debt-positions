@@ -157,6 +157,10 @@ class InstallmentUpdateServiceTest {
   }
 
   private void verifyInstallmentStatus(InstallmentNoPII installment, InstallmentStatus expectedStatus, String message) {
-    Assertions.assertEquals(expectedStatus, installment.getStatus(), message);
+    if(installment.getStatus().equals(InstallmentStatus.TO_SYNC)){
+      Assertions.assertEquals(expectedStatus, installment.getSyncStatus().getSyncStatusTo(), message);
+    }
+    else
+      Assertions.assertEquals(expectedStatus, installment.getStatus(), message);
   }
 }
