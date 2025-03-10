@@ -61,8 +61,8 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 
-  @ExceptionHandler({TooManyElementsException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleTooManyElementsException(RuntimeException ex, HttpServletRequest request){
+  @ExceptionHandler({ExportTooManyRecordsException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleExportTooManyRecordsException(RuntimeException ex, HttpServletRequest request){
     return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.BAD_REQUEST);
   }
 

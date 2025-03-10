@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
-import it.gov.pagopa.pu.debtpositions.exception.custom.TooManyElementsException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -28,10 +28,10 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
-@TestPropertySource(properties = {"installment-paid-view.max-total-elements=10"})
+@TestPropertySource(properties = {"data-export.installment-paid-view.max-total-elements=10"})
 class InstallmentPaidViewPIIViewRepositoryImplTest {
 
-  @Value("${installment-paid-view.max-total-elements}")
+  @Value("${data-export.installment-paid-view.max-total-elements}")
   private Integer maxElements;
 
   @Mock
@@ -94,8 +94,8 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
 
     Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
     //when
-    TooManyElementsException ex = assertThrows(
-            TooManyElementsException.class,
+    ExportTooManyRecordsException ex = assertThrows(
+            ExportTooManyRecordsException.class,
             () -> installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
     );
     //then

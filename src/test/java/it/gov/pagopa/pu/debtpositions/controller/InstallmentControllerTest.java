@@ -16,11 +16,13 @@ import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -38,6 +40,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(InstallmentControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
+@TestPropertySource(properties = {"data-export.installment-paid-view.max-months-interval=6"})
 class InstallmentControllerTest {
 
   @Autowired
@@ -50,6 +53,9 @@ class InstallmentControllerTest {
   private InstallmentService installmentServiceMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
+  @Value("${data-export.installment-paid-view.max-months-interval}")
+  private Integer maxMonthsInterval;
 
   @ParameterizedTest
   @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
@@ -114,7 +120,6 @@ class InstallmentControllerTest {
     Long debtPositionTypeOrgId = 1L;
 
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
-    System.out.println(expectedResponse);
 
     Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(organizationId),
       eq(operatorExternalUserId),
@@ -124,7 +129,7 @@ class InstallmentControllerTest {
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/installments/{organizationId}/export", organizationId)
+        MockMvcRequestBuilders.get("/export/organization/{organizationId}/installments/paid", organizationId)
           .param("operatorExternalUserId",operatorExternalUserId)
           .param("paymentDateFrom", String.valueOf(paymentDateFrom))
           .param("paymentDateTo", String.valueOf(paymentDateTo))
@@ -137,5 +142,37 @@ class InstallmentControllerTest {
     PagedInstallmentsPaidView response = objectMapper.readValue(result.getResponse().getContentAsString(), PagedInstallmentsPaidView.class);
     TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "paymentDateTime");
     Mockito.verify(installmentServiceMock).getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+  }
+
+  @Test
+  void whenGetInstallmentExportThenThrowException() throws Exception {
+    Long organizationId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    OffsetDateTime paymentDateFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
+    OffsetDateTime paymentDateTo = OffsetDateTime.parse("2025-11-06T17:05:04.686949700Z");
+    Long debtPositionTypeOrgId = 1L;
+
+    PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
+
+    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(organizationId),
+      eq(operatorExternalUserId),
+      eq(paymentDateFrom),
+      eq(paymentDateTo),
+      eq(debtPositionTypeOrgId),
+      any(PageRequest.class))).thenReturn(expectedResponse);
+
+    mockMvc.perform(
+        MockMvcRequestBuilders.get("/export/organization/{organizationId}/installments/paid", organizationId)
+          .param("operatorExternalUserId",operatorExternalUserId)
+          .param("paymentDateFrom", String.valueOf(paymentDateFrom))
+          .param("paymentDateTo", String.valueOf(paymentDateTo))
+          .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
+          .param("size", "1"))
+      .andExpect(status().isBadRequest())
+      .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andReturn();
+
   }
 }
