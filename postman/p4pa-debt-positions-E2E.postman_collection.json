@@ -93,30 +93,59 @@
           "response": []
         },
         {
-          "name": "00_findOrganizationByIpaCode",
+          "name": "00_getUserInfo",
           "event": [
             {
               "listen": "test",
               "script": {
                 "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPosition - 00_findOrganizationByIpaCode - Responses with 200\", function () {\r",
+                  "pm.test(\"Auth - getUserInfo - Responses with 200\", function () {\r",
                   "    pm.response.to.have.status(200);\r",
                   "});\r",
                   "\r",
-                  "pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
+                  "pm.test(\"Auth - getUserInfo - Verify response body\", function () {\r",
                   "    let jsonResponse = pm.response.json();\r",
                   "\r",
-                  "    pm.expect(jsonResponse).have.property(\"organizationId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"orgFiscalCode\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"orgName\")\r",
-                  "});\r",
+                  "    pm.expect(jsonResponse).have.property(\"userId\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"mappedExternalUserId\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"name\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"familyName\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"fiscalCode\").to.eq(\"DMEMPY15L21L736U\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"issuer\").to.eq(pm.environment.get(\"tokenExchange_issuer\"))\r",
+                  "    pm.expect(jsonResponse).have.property(\"organizationAccess\")\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"brokerId\").that.is.a(\"number\");\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"brokerFiscalCode\").that.is.a(\"string\");\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"canManageUsers\").that.is.a(\"boolean\");\r",
+                  "    \r",
+                  "    pm.collectionVariables.set(\"mappedExternalUserId\",jsonResponse.mappedExternalUserId)\r",
+                  "    pm.collectionVariables.set(\"organizationIpaCode\",jsonResponse.organizationAccess)\r",
+                  "    var recognizedOrganizations = 0\r",
+                  "    const registeredOrganizations=[\r",
+                  "        \"IPA_TEST\",\r",
+                  "        \"IPA_TEST_2\",\r",
+                  "        \"DEMO\"\r",
+                  "    ]\r",
+                  "    jsonResponse.organizations.forEach(org => {\r",
+                  "        pm.expect(org).have.property(\"operatorId\")\r",
+                  "        pm.expect(org).have.property(\"organizationId\").that.is.a(\"number\");\r",
+                  "        if(registeredOrganizations.includes(org.organizationIpaCode)){\r",
+                  "            pm.expect(org.roles).have.property(\"length\").to.eq(1)\r",
+                  "            pm.expect(org).have.property(\"email\")\r",
+                  "            pm.expect(org.roles[0]).to.eq(\"ROLE_ADMIN\")\r",
+                  "            recognizedOrganizations++\r",
+                  "        }\r",
+                  "    });\r",
                   "\r",
-                  "let jsonResponse = pm.response.json();\r",
-                  "pm.collectionVariables.set(\"organizationId\", jsonResponse.organizationId);\r",
-                  "pm.collectionVariables.set(\"orgFiscalCode\", jsonResponse.orgFiscalCode);\r",
-                  "pm.collectionVariables.set(\"orgName\", jsonResponse.orgName);\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
                   ""
                 ],
                 "type": "text/javascript",
@@ -138,21 +167,13 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{ipaCode}}",
+              "raw": "{{p4paAuthBaseUrl}}/auth/userinfo",
               "host": [
-                "{{organizationBaseUrl}}"
+                "{{p4paAuthBaseUrl}}"
               ],
               "path": [
-                "crud",
-                "organizations",
-                "search",
-                "findByIpaCode"
-              ],
-              "query": [
-                {
-                  "key": "ipaCode",
-                  "value": "{{ipaCode}}"
-                }
+                "auth",
+                "userinfo"
               ]
             }
           },
@@ -163,6 +184,77 @@
     {
       "name": "01_createDp",
       "item": [
+        {
+          "name": "organizations",
+          "item": [
+            {
+              "name": "01_findOrganizationByIpaCode",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm=instrumentPmMethod(pm);\r",
+                      "\r",
+                      "pm.test(\"DebtPosition - 00_findOrganizationByIpaCode - Responses with 200\", function () {\r",
+                      "    pm.response.to.have.status(200);\r",
+                      "});\r",
+                      "\r",
+                      "pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
+                      "    let jsonResponse = pm.response.json();\r",
+                      "\r",
+                      "    pm.expect(jsonResponse).have.property(\"organizationId\")\r",
+                      "    pm.expect(jsonResponse).have.property(\"orgFiscalCode\")\r",
+                      "    pm.expect(jsonResponse).have.property(\"orgName\")\r",
+                      "});\r",
+                      "\r",
+                      "let jsonResponse = pm.response.json();\r",
+                      "pm.collectionVariables.set(\"organizationId\", jsonResponse.organizationId);\r",
+                      "pm.collectionVariables.set(\"orgFiscalCode\", jsonResponse.orgFiscalCode);\r",
+                      "pm.collectionVariables.set(\"orgName\", jsonResponse.orgName);\r",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {}
+                  }
+                }
+              ],
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{accessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{ipaCode}}",
+                  "host": [
+                    "{{organizationBaseUrl}}"
+                  ],
+                  "path": [
+                    "crud",
+                    "organizations",
+                    "search",
+                    "findByIpaCode"
+                  ],
+                  "query": [
+                    {
+                      "key": "ipaCode",
+                      "value": "{{ipaCode}}"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
         {
           "name": "01_findDebtPositionTypeOrgByOrgIdAndCode",
           "event": [
@@ -298,7 +390,7 @@
             "header": [],
             "body": {
               "mode": "raw",
-              "raw": "{\r\n    \"description\": \"description\",\r\n    \"status\": \"UNPAID\",\r\n    \"organizationId\": {{organizationId}},\r\n    \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n    \"validityDate\": \"{{currentDate}}\",\r\n    \"flagIuvVolatile\": false,\r\n    \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n    \"multiDebtor\": false,\r\n    \"flagPagoPaPayment\": true,\r\n    \"creationDate\": \"{{currentDate}}\",\r\n    \"updateDate\": \"{{currentDate}}\",\r\n    \"paymentOptions\": [\r\n        {\r\n            \"totalAmountCents\": {{amountCents}},\r\n            \"status\": \"TO_SYNC\",\r\n            \"dueDate\": \"2025-03-01T10:30:00+02:00\",\r\n            \"description\": \"description\",\r\n            \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n            \"paymentOptionIndex\": 1,\r\n            \"creationDate\": \"{{currentDate}}\",\r\n            \"updateDate\": \"{{currentDate}}\",\r\n            \"installments\": [\r\n                {\r\n                    \"status\": \"TO_SYNC\",\r\n                    \"iupdPagopa\": \"iupdPagopa\",\r\n                    \"iur\": \"iur\",\r\n                    \"iuf\": \"iuf\",\r\n                    \"dueDate\": \"2025-03-01T10:30:00+02:00\",\r\n                    \"paymentTypeCode\": \"paymentTypeCode\",\r\n                    \"amountCents\": {{amountCents}},\r\n                    \"remittanceInformation\": \"remittanceInformation\",\r\n                    \"balance\": \"balance\",\r\n                    \"legacyPaymentData\": \"DUMMY\",\r\n                    \"debtor\": {\r\n                        \"entityType\": \"F\",\r\n                        \"fiscalCode\": \"RSSMRA92A12B123A\",\r\n                        \"fullName\": \"Mario Rossi\",\r\n                        \"address\": \"via San Gaetanino\",\r\n                        \"civic\": \"10\",\r\n                        \"postalCode\": \"12312\",\r\n                        \"location\": \"Roma\",\r\n                        \"province\": \"RM\",\r\n                        \"nation\": \"IT\",\r\n                        \"email\": \"mario.rossi@email.it\"\r\n                    },\r\n                    \"syncStatus\": {\r\n                        \"syncStatusFrom\": \"TO_SYNC\",\r\n                        \"syncStatusTo\": \"TO_SYNC\"\r\n                    },\r\n                    \"notificationDate\": \"2024-02-17T10:30:00+02:00\",\r\n                    \"ingestionFlowFileId\": 1,\r\n                    \"ingestionFlowFileLineNumber\": 1,\r\n                    \"creationDate\": \"{{currentDate}}\",\r\n                    \"updateDate\": \"{{currentDate}}\",\r\n                    \"transfers\": [\r\n                        {\r\n                            \"orgFiscalCode\": \"60206350377\",\r\n                            \"orgName\": \"test\",\r\n                            \"amountCents\": 120,\r\n                            \"remittanceInformation\": \"Test Pull\",\r\n                            \"iban\": \"IT60X0542811101000000123456\",\r\n                            \"category\": \"0101108TS\",\r\n                            \"transferIndex\": 1\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+              "raw": "{\r\n    \"description\": \"description\",\r\n    \"status\": \"UNPAID\",\r\n    \"organizationId\": {{organizationId}},\r\n    \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n    \"validityDate\": \"{{currentDate}}\",\r\n    \"flagIuvVolatile\": false,\r\n    \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n    \"multiDebtor\": false,\r\n    \"flagPagoPaPayment\": true,\r\n    \"creationDate\": \"{{currentDate}}\",\r\n    \"updateDate\": \"{{currentDate}}\",\r\n    \"paymentOptions\": [\r\n        {\r\n            \"totalAmountCents\": {{amountCents}},\r\n            \"status\": \"TO_SYNC\",\r\n            \"description\": \"description\",\r\n            \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n            \"paymentOptionIndex\": 1,\r\n            \"creationDate\": \"{{currentDate}}\",\r\n            \"updateDate\": \"{{currentDate}}\",\r\n            \"installments\": [\r\n                {\r\n                    \"status\": \"TO_SYNC\",\r\n                    \"iupdPagopa\": \"iupdPagopa\",\r\n                    \"iur\": \"iur\",\r\n                    \"iuf\": \"iuf\",\r\n                    \"paymentTypeCode\": \"paymentTypeCode\",\r\n                    \"amountCents\": {{amountCents}},\r\n                    \"remittanceInformation\": \"remittanceInformation\",\r\n                    \"balance\": \"balance\",\r\n                    \"legacyPaymentData\": \"DUMMY\",\r\n                    \"debtor\": {\r\n                        \"entityType\": \"F\",\r\n                        \"fiscalCode\": \"RSSMRA92A12B123A\",\r\n                        \"fullName\": \"Mario Rossi\",\r\n                        \"address\": \"via San Gaetanino\",\r\n                        \"civic\": \"10\",\r\n                        \"postalCode\": \"12312\",\r\n                        \"location\": \"Roma\",\r\n                        \"province\": \"RM\",\r\n                        \"nation\": \"IT\",\r\n                        \"email\": \"mario.rossi@email.it\"\r\n                    },\r\n                    \"syncStatus\": {\r\n                        \"syncStatusFrom\": \"TO_SYNC\",\r\n                        \"syncStatusTo\": \"TO_SYNC\"\r\n                    },\r\n                    \"notificationDate\": \"2024-02-17T10:30:00+02:00\",\r\n                    \"ingestionFlowFileId\": 1,\r\n                    \"ingestionFlowFileLineNumber\": 1,\r\n                    \"creationDate\": \"{{currentDate}}\",\r\n                    \"updateDate\": \"{{currentDate}}\",\r\n                    \"transfers\": [\r\n                        {\r\n                            \"orgFiscalCode\": \"60206350377\",\r\n                            \"orgName\": \"test\",\r\n                            \"amountCents\": {{amountCents}},\r\n                            \"remittanceInformation\": \"Test Pull\",\r\n                            \"iban\": \"IT60X0542811101000000123456\",\r\n                            \"category\": \"0101108TS\",\r\n                            \"transferIndex\": 1\r\n                        }\r\n                    ]\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
               "options": {
                 "raw": {
                   "language": "json"
@@ -328,93 +420,6 @@
     {
       "name": "02_exportPaidInstallment",
       "item": [
-        {
-          "name": "getUserInfo",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Auth - getUserInfo - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Auth - getUserInfo - Verify response body\", function () {\r",
-                  "    let jsonResponse = pm.response.json();\r",
-                  "\r",
-                  "    pm.expect(jsonResponse).have.property(\"userId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"mappedExternalUserId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"name\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"familyName\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"fiscalCode\").to.eq(\"DMEMPY15L21L736U\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"issuer\").to.eq(pm.environment.get(\"tokenExchange_issuer\"))\r",
-                  "    pm.expect(jsonResponse).have.property(\"organizationAccess\")\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"brokerId\").that.is.a(\"number\");\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"brokerFiscalCode\").that.is.a(\"string\");\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"canManageUsers\").that.is.a(\"boolean\");\r",
-                  "    \r",
-                  "    pm.collectionVariables.set(\"mappedExternalUserId\",jsonResponse.mappedExternalUserId)\r",
-                  "    pm.collectionVariables.set(\"organizationIpaCode\",jsonResponse.organizationAccess)\r",
-                  "    var recognizedOrganizations = 0\r",
-                  "    const registeredOrganizations=[\r",
-                  "        \"IPA_TEST\",\r",
-                  "        \"IPA_TEST_2\",\r",
-                  "        \"DEMO\"\r",
-                  "    ]\r",
-                  "    jsonResponse.organizations.forEach(org => {\r",
-                  "        pm.expect(org).have.property(\"operatorId\")\r",
-                  "        pm.expect(org).have.property(\"organizationId\").that.is.a(\"number\");\r",
-                  "        if(registeredOrganizations.includes(org.organizationIpaCode)){\r",
-                  "            pm.expect(org.roles).have.property(\"length\").to.eq(1)\r",
-                  "            pm.expect(org).have.property(\"email\")\r",
-                  "            pm.expect(org.roles[0]).to.eq(\"ROLE_ADMIN\")\r",
-                  "            recognizedOrganizations++\r",
-                  "        }\r",
-                  "    });\r",
-                  "\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{p4paAuthBaseUrl}}/auth/userinfo",
-              "host": [
-                "{{p4paAuthBaseUrl}}"
-              ],
-              "path": [
-                "auth",
-                "userinfo"
-              ]
-            }
-          },
-          "response": []
-        },
         {
           "name": "02_getPagedInstallmentPaidView",
           "event": [
