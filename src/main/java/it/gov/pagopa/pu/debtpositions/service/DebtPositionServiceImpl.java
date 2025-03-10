@@ -44,11 +44,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
 
-    savedDebtPosition.getPaymentOptions().forEach(paymentOption -> {
+    mappedDebtPosition.getFirst().getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(savedDebtPosition.getDebtPositionId());
       PaymentOption savedPaymentOption = paymentOptionRepository.save(paymentOption);
 
-      savedPaymentOption.getInstallments().forEach(installmentNoPII -> {
+      paymentOption.getInstallments().forEach(installmentNoPII -> {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
 
@@ -64,7 +64,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       });
     });
 
-    return savedDebtPosition;
+    return mappedDebtPosition.getFirst();
   }
 
   @Transactional
