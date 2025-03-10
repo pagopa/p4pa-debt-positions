@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
@@ -34,66 +35,88 @@ class InstallmentUpdateServiceTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @Test
-  void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk(){
+  void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk() {
     //given
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
-    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+      InstallmentStatus.UNPAID);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(
+      DebtPosition.class);
 
-    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
+    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions()
+      .stream().toList();
 
     paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.PAID),
       targetInstallment
     )));
     paymentOptionList.get(1).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.DRAFT),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.REPORTED)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.DRAFT),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
+        InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.REPORTED)
     )));
     paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
+        InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     )));
 
     //align entities id
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(debtPosition.getDebtPositionId());
-      paymentOption.getInstallments().forEach(anInstallment -> anInstallment.setPaymentOptionId(paymentOption.getPaymentOptionId()));
+      paymentOption.getInstallments().forEach(
+        anInstallment -> anInstallment.setPaymentOptionId(
+          paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(
+      targetInstallment.getInstallmentId())).thenReturn(debtPosition);
 
     //when
-    DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO);
+    DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
+      targetInstallment, receiptDTO);
 
     //verify
     Assertions.assertEquals(debtPosition, response);
     //find target installment in response
-    InstallmentNoPII responseTargetInstallment = response.getPaymentOptions().stream()
+    InstallmentNoPII responseTargetInstallment = response.getPaymentOptions()
+      .stream()
       .flatMap(paymentOption -> paymentOption.getInstallments().stream())
-      .filter(anInstallment -> anInstallment.getInstallmentId().equals(targetInstallment.getInstallmentId()))
+      .filter(anInstallment -> anInstallment.getInstallmentId()
+        .equals(targetInstallment.getInstallmentId()))
       .findFirst().orElse(null);
     Assertions.assertNotNull(responseTargetInstallment);
     //verify that the target installment has been updated to (TO_SYNC->)PAID
-    verifyInstallmentStatus(responseTargetInstallment, InstallmentStatus.PAID, "target installment status");
+    Assertions.assertEquals(InstallmentStatus.PAID, responseTargetInstallment.getStatus(), "target installment status");
     //verify that there no more NOT-PAID installments on payment options different of the one of the target installment
     int[] idxPo = {0};
     int[] idxInst = {0};
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
-      if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
+      if (!paymentOption.getPaymentOptionId()
+        .equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUpdateService.NOT_PAID.contains(anInstallment.getStatus())) {
-            verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
-              "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
-                idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(),anInstallment.getStatus()));
+          if (InstallmentUtils.isPayable(anInstallment)) {
+            String message = "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
+              idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
+              paymentOption.getPaymentOptionId(),
+              anInstallment.getStatus());
+
+            Assertions.assertEquals(InstallmentStatus.TO_SYNC, anInstallment.getStatus(), message);
+            Assertions.assertEquals(InstallmentStatus.INVALID, anInstallment.getSyncStatus().getSyncStatusTo(), message + " syncStatusTo " + anInstallment.getSyncStatus().getSyncStatusTo());
           }
           idxInst[0]++;
         });
       }
       idxPo[0]++;
     });
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
+      .findByInstallmentId(targetInstallment.getInstallmentId());
+
   }
 
   @Test
@@ -133,11 +156,4 @@ class InstallmentUpdateServiceTest {
     Assertions.assertTrue(response.getMessage().startsWith("primary installment not found"));
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
   }
-
-  private void verifyInstallmentStatus(InstallmentNoPII installmentNoPII, InstallmentStatus expectedStatus, String message) {
-    Assertions.assertEquals(InstallmentStatus.TO_SYNC, installmentNoPII.getStatus(), message);
-    Assertions.assertNotNull(installmentNoPII.getSyncStatus());
-    Assertions.assertEquals(expectedStatus, installmentNoPII.getSyncStatus().getSyncStatusTo(), message);
-  }
-
 }
