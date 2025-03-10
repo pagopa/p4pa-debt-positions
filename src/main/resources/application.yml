@@ -146,6 +146,13 @@ rest:
 iuv:
   informationSystemId: "00"
 
+data-export:
+  default:
+    max-total-elements: "\${DATA_EXPORT_MAX_TOTAL_ELEMENTS: 100000}"
+  installment-paid-view:
+    max-months-interval: "\${INSTALLMENT_PAID_VIEW_MAX_MONTHS_INTERVAL: 6}"
+    max-total-elements: "\${INSTALLMENT_PAID_VIEW_MAX_TOTAL_ELEMENTS:\${data-export.default.max-total-elements}}"
+
 cache:
   pii:
     size: "\${CACHE_PII_SIZE:1000}"

@@ -96,4 +96,5 @@ class InstallmentControllerTest {
 
     Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
   }
+
 }
