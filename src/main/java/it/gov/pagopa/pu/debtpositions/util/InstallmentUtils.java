@@ -4,7 +4,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import java.util.Set;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class InstallmentUtils {
 
   private InstallmentUtils() {
@@ -36,7 +38,7 @@ public class InstallmentUtils {
     log.info("Changing status of Installment (id={}, iud={}) from {} to {}", installment.getInstallmentId(), installment.getIud(), installment.getStatus(), status);
     InstallmentStatus statusFrom = getStatusFrom(installment);
     if (InstallmentUtils.isTransitionToSync(statusFrom, status)) {
-      updateSyncStatus(installment, statusFrom, status);
+      updateSyncStatus(installment, status);
     } else {
       installment.setStatus(status);
       installment.setSyncStatus(null);
@@ -44,22 +46,27 @@ public class InstallmentUtils {
 
   }
 
-  private static boolean isTransitionToSync(InstallmentStatus statusFrom,
-    InstallmentStatus statusTo) {
+  private static boolean isTransitionToSync(InstallmentStatus statusFrom, InstallmentStatus statusTo) {
     return TRANSITION_TO_SYNC_REQUIRED.contains(statusFrom + "|" + statusTo);
   }
 
-  private static void updateSyncStatus(InstallmentNoPII installment,
-    InstallmentStatus to) {
-    InstallmentStatus from =
-      installment.getStatus().equals(InstallmentStatus.TO_SYNC)
-        ? installment.getSyncStatus().getSyncStatusFrom()
-        : installment.getStatus();
+  private static void updateSyncStatus(InstallmentNoPII installment, InstallmentStatus to) {
+    InstallmentStatus from = getStatusFrom(installment);
     installment.setSyncStatus(InstallmentSyncStatus.builder()
       .syncStatusFrom(from)
       .syncStatusTo(to)
       .build()
     );
     installment.setStatus(InstallmentStatus.TO_SYNC);
+  }
+
+  private static InstallmentStatus getStatusFrom(InstallmentNoPII installment) {
+    if (installment.getStatus().equals(InstallmentStatus.TO_SYNC)) {
+      log.warn("Transitioning Installment (installmentId={}, iud={}) from TO_SYNC status! {}",
+          installment.getInstallmentId(), installment.getIud(), installment.getSyncStatus());
+      return installment.getSyncStatus().getSyncStatusFrom();
+    } else {
+      return installment.getStatus();
+    }
   }
 }

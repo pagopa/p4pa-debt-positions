@@ -15,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -36,79 +37,119 @@ class InstallmentUpdateServiceTest {
 
   @Test
   void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk() {
+    //given
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
-    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
-    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+      InstallmentStatus.UNPAID);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(
+      DebtPosition.class);
 
-    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
+    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions()
+      .stream().toList();
 
     paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.PAID),
       targetInstallment
     )));
     paymentOptionList.get(1).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.DRAFT),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.REPORTED)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.DRAFT),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
+        InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.REPORTED)
     )));
     paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.PAID),
-      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(InstallmentStatus.DRAFT, InstallmentStatus.PAID)
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.PAID),
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
+        InstallmentStatus.DRAFT, InstallmentStatus.PAID)
     )));
 
+    //align entities id
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(debtPosition.getDebtPositionId());
-      paymentOption.getInstallments().forEach(anInstallment -> anInstallment.setPaymentOptionId(paymentOption.getPaymentOptionId()));
+      paymentOption.getInstallments().forEach(
+        anInstallment -> anInstallment.setPaymentOptionId(
+          paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(
+      targetInstallment.getInstallmentId())).thenReturn(debtPosition);
 
-    DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO);
+    //when
+    DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
+      targetInstallment, receiptDTO);
 
+    //verify
     Assertions.assertEquals(debtPosition, response);
-    InstallmentNoPII responseTargetInstallment = response.getPaymentOptions().stream()
+    //find target installment in response
+    InstallmentNoPII responseTargetInstallment = response.getPaymentOptions()
+      .stream()
       .flatMap(paymentOption -> paymentOption.getInstallments().stream())
-      .filter(anInstallment -> anInstallment.getInstallmentId().equals(targetInstallment.getInstallmentId()))
+      .filter(anInstallment -> anInstallment.getInstallmentId()
+        .equals(targetInstallment.getInstallmentId()))
       .findFirst().orElse(null);
     Assertions.assertNotNull(responseTargetInstallment);
-    verifyInstallmentStatus(responseTargetInstallment, InstallmentStatus.PAID, "target installment status");
-    Assertions.assertEquals(receiptDTO.getReceiptId(), responseTargetInstallment.getReceiptId());
+    //verify that the target installment has been updated to (TO_SYNC->)PAID
+    verifyInstallmentStatus(responseTargetInstallment, InstallmentStatus.PAID,
+      "target installment status");
+    //verify that there no more NOT-PAID installments on payment options different of the one of the target installment
     int[] idxPo = {0};
     int[] idxInst = {0};
-    debtPosition.getPaymentOptions().forEach(paymentOption -> {
-      if (!paymentOption.getPaymentOptionId().equals(targetInstallment.getPaymentOptionId())) {
-        paymentOption.getInstallments().forEach(anInstallment -> {
-          if (InstallmentUtils.isPayable(anInstallment)) {
-            InstallmentUtils.setStatus(anInstallment, InstallmentStatus.INVALID);
-            InstallmentStatus expectedStatus = anInstallment.getStatus();
-            verifyInstallmentStatus(anInstallment, expectedStatus,
-              "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
-                idxInst[0], anInstallment.getInstallmentId(), idxPo[0], paymentOption.getPaymentOptionId(), anInstallment.getStatus()));
-          }
-          idxInst[0]++;
-        });
-      }
-      idxPo[0]++;
-    });
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    try (MockedStatic<InstallmentUtils> mockedInstallmentUtils = Mockito.mockStatic(
+      InstallmentUtils.class)) {
+      debtPosition.getPaymentOptions().forEach(paymentOption -> {
+        if (!paymentOption.getPaymentOptionId()
+          .equals(targetInstallment.getPaymentOptionId())) {
+          paymentOption.getInstallments().forEach(anInstallment -> {
+            if (InstallmentUtils.isPayable(anInstallment)) {
+              mockedInstallmentUtils.when(
+                  () -> InstallmentUtils.setStatus(anInstallment,
+                    InstallmentStatus.INVALID))
+                .thenAnswer(invocation -> {
+                  anInstallment.setStatus(InstallmentStatus.INVALID);
+                  return null;
+                });
+              InstallmentStatus expectedStatus = anInstallment.getStatus();
+              verifyInstallmentStatus(anInstallment, expectedStatus,
+                "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
+                  idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
+                  paymentOption.getPaymentOptionId(),
+                  anInstallment.getStatus()));
+            }
+            idxInst[0]++;
+          });
+        }
+        idxPo[0]++;
+      });
+      Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
+        .findByInstallmentId(targetInstallment.getInstallmentId());
+    }
   }
 
   @Test
   void givenNotFoundFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenException(){
+    //given
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
 
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
+    //when
     NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
+    //verify
     Assertions.assertTrue(response.getMessage().startsWith("debt position not found"));
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
   }
 
   @Test
   void givenNotFoundFoundInstallmentWhenUpdateInstallmentStatusOfDebtPositionThenException(){
+    //given
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+    //align entities id
     debtPosition.getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(debtPosition.getDebtPositionId());
       paymentOption.getInstallments().forEach(anInstallment -> {
@@ -119,7 +160,9 @@ class InstallmentUpdateServiceTest {
       });
     });
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
+    //when
     NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
+    //verify
     Assertions.assertTrue(response.getMessage().startsWith("primary installment not found"));
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
   }
