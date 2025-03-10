@@ -19,6 +19,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -46,7 +47,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          OrganizationService organizationService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
                                          DebtPositionTypeOrgRepository debtPositionTypeOrgRepository
-                                         ) {
+  ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
@@ -58,17 +59,17 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
-  public DebtPositionDTO createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
 
-    DebtPositionDTO savedDebtPosition = execute(debtPositionDTO, installment2operate,
-      massive, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId).getLeft();
+    Pair<DebtPositionDTO, String> savedDebtPosition = execute(debtPositionDTO, installment2operate,
+      massive, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
 
-    log.info("DebtPosition created with id {}", savedDebtPosition.getDebtPositionId());
+    log.info("DebtPosition created with id {}", savedDebtPosition.getLeft().getDebtPositionId());
     return savedDebtPosition;
   }
 
@@ -81,8 +82,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
     validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
-    checkInstallment(debtPositionUpdated, org, debtPositionTypeOrg);
-    verifyInstallmentUniqueness(debtPositionUpdated);
+    checkAllInstallments(debtPositionUpdated, org, debtPositionTypeOrg);
 
     if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
       updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
@@ -108,47 +108,48 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     });
   }
 
-  private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO) {
+  private void checkAllInstallments(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg) {
     debtPositionDTO.getPaymentOptions().stream()
       .flatMap(po -> po.getInstallments().stream())
-      .forEach(installmentNoPII -> {
-        long countDuplicates = installmentNoPIIRepository.countExistingInstallments(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav());
-        if (countDuplicates > 0) {
-          log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav(), debtPositionDTO.getOrganizationId());
-          throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
-        }
-      });
+      .forEach(installment -> checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installment));
   }
 
-  private void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg) {
-    debtPositionDTO.getPaymentOptions().stream()
-      .flatMap(po -> po.getInstallments().stream())
-      .forEach(installment -> {
-        if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
-          String generatedIuv = generateIuvService.generateIuv(org);
-          String nav = generateIuvService.iuv2Nav(generatedIuv);
-          installment.setIuv(generatedIuv);
-          installment.setNav(nav);
-          String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
-          installment.setIupdPagopa(iupdPagopa);
-        }
+  @Override
+  public void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO) {
+    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
+      String generatedIuv = generateIuvService.generateIuv(org);
+      String nav = generateIuvService.iuv2Nav(generatedIuv);
+      installmentDTO.setIuv(generatedIuv);
+      installmentDTO.setNav(nav);
+      String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
+      installmentDTO.setIupdPagopa(iupdPagopa);
+    }
 
-        if (StringUtils.isBlank(installment.getIud())) {
-          String iud = Utilities.getRandomIUD();
-          installment.setIud(iud);
-        }
+    if (StringUtils.isBlank(installmentDTO.getIud())) {
+      String iud = Utilities.getRandomIUD();
+      installmentDTO.setIud(iud);
+    }
 
-        if (StringUtils.isBlank(installment.getBalance())) {
-          installment.setBalance(debtPositionTypeOrg.getBalance());
-        }
+    if (StringUtils.isBlank(installmentDTO.getBalance())) {
+      installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
+    }
 
-        installment.getTransfers()
-          .forEach(transfer -> {
-            if (transfer.getTransferIndex() == 1) {
-              transfer.setIban(StringUtils.isBlank(debtPositionTypeOrg.getIban()) ? org.getIban() : debtPositionTypeOrg.getIban());
-            }
-          });
+    installmentDTO.getTransfers()
+      .forEach(transfer -> {
+        if (transfer.getTransferIndex() == 1) {
+          transfer.setIban(StringUtils.isBlank(debtPositionTypeOrg.getIban()) ? org.getIban() : debtPositionTypeOrg.getIban());
+        }
       });
+
+    verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
+  }
+
+  private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
+    long countDuplicates = installmentNoPIIRepository.countExistingInstallments(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav());
+    if (countDuplicates > 0) {
+      log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), debtPositionDTO.getOrganizationId());
+      throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
+    }
   }
 
   private void checkDebtPosition(DebtPositionDTO debtPositionDTO, Organization org) {

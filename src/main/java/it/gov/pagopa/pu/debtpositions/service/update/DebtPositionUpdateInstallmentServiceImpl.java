@@ -31,39 +31,39 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-    public Pair<DebtPositionDTO, String> updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
-        if (log.isDebugEnabled()) {
-            Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
-            log.debug("Updating data of installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
-        }
-
-        Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DPI_UPDATED, accessToken, operatorExternalUserId);
-
-        log.debug("Updated installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-        return debtPositionUpdated;
+  public Pair<DebtPositionDTO, String> updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
+    if (log.isDebugEnabled()) {
+      Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
+      log.debug("Updating data of installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
     }
 
-    @Override
-    public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
-        Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
-        log.debug("Updating status for installments with ids {}", installmentIds);
+    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DPI_UPDATED, accessToken, operatorExternalUserId);
 
-        debtPositionDTO.getPaymentOptions()
-                .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-                        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-                        .findFirst()
-                        .ifPresent(installmentDTO -> {
-                                    InstallmentStatus statusTo = installmentDTO.getStatus();
-                                    if (installmentDTO.getStatus().equals(InstallmentStatus.EXPIRED) && installmentDTO.getDueDate() != null &&
-                                            installmentDTO.getDueDate().isAfter(LocalDate.now())) {
-                                        statusTo = InstallmentStatus.UNPAID;
-                                    }
-                                    installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), statusTo));
-                                    installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
-                                }
-                        ));
+    log.debug("Updated installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
+    return debtPositionUpdated;
+  }
 
-        return debtPositionDTO;
-    }
+  @Override
+  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+    Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
+    log.debug("Updating status for installments with ids {}", installmentIds);
+
+    debtPositionDTO.getPaymentOptions()
+      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
+        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
+        .findFirst()
+        .ifPresent(installmentDTO -> {
+          InstallmentStatus statusTo = installmentDTO.getStatus();
+          if (installmentDTO.getStatus().equals(InstallmentStatus.EXPIRED) && installmentDTO.getDueDate() != null &&
+            installmentDTO.getDueDate().isAfter(LocalDate.now())) {
+            statusTo = InstallmentStatus.UNPAID;
+          }
+          installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), statusTo));
+          installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+        })
+      );
+
+    return debtPositionDTO;
+  }
 
 }
