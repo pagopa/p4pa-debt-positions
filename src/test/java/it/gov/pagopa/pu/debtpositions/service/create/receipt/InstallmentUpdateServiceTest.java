@@ -102,8 +102,7 @@ class InstallmentUpdateServiceTest {
         .equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
           if (InstallmentUtils.isPayable(anInstallment)) {
-            InstallmentStatus expectedStatus = anInstallment.getStatus();
-            verifyInstallmentStatus(anInstallment, expectedStatus,
+            verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
               "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
                 idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
                 paymentOption.getPaymentOptionId(),
