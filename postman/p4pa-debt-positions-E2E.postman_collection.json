@@ -329,6 +329,101 @@
       "name": "02_exportPaidInstallment",
       "item": [
         {
+          "name": "getUserInfo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test(\"Auth - getUserInfo - Responses with 200\", function () {\r",
+                  "    pm.response.to.have.status(200);\r",
+                  "});\r",
+                  "\r",
+                  "pm.test(\"Auth - getUserInfo - Verify response body\", function () {\r",
+                  "    let jsonResponse = pm.response.json();\r",
+                  "\r",
+                  "    pm.expect(jsonResponse).have.property(\"userId\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"mappedExternalUserId\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"name\").to.eq(\"demo\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"familyName\").to.eq(\"demo\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"fiscalCode\").to.eq(\"DMEMPY15L21L736U\")\r",
+                  "    pm.expect(jsonResponse).have.property(\"issuer\").to.eq(pm.environment.get(\"tokenExchange_issuer\"))\r",
+                  "    pm.expect(jsonResponse).have.property(\"organizationAccess\").to.eq(\"IPA_TEST\")\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"brokerId\").that.is.a(\"number\");\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"brokerFiscalCode\").that.is.a(\"string\");\r",
+                  "    pm.expect(jsonResponse).to.have.property(\"canManageUsers\").that.is.a(\"boolean\");\r",
+                  "\r",
+                  "    pm.expect(jsonResponse.organizations).to.have.property(\"length\").to.gte(3);\r",
+                  "    \r",
+                  "    pm.collectionVariables.set(\"mappedExternalUserId\",jsonResponse.mappedExternalUserId)\r",
+                  "    pm.collectionVariables.set(\"organizationIpaCode\",jsonResponse.organizationAccess)\r",
+                  "    var recognizedOrganizations = 0\r",
+                  "    const registeredOrganizations=[\r",
+                  "        \"IPA_TEST\",\r",
+                  "        \"IPA_TEST_2\",\r",
+                  "        \"DEMO\"\r",
+                  "    ]\r",
+                  "    jsonResponse.organizations.forEach(org => {\r",
+                  "        pm.expect(org).have.property(\"operatorId\")\r",
+                  "        pm.expect(org).have.property(\"organizationId\").that.is.a(\"number\");\r",
+                  "        if(registeredOrganizations.includes(org.organizationIpaCode)){\r",
+                  "            pm.expect(org.roles).have.property(\"length\").to.eq(1)\r",
+                  "            pm.expect(org).have.property(\"email\")\r",
+                  "            pm.expect(org.roles[0]).to.eq(\"ROLE_ADMIN\")\r",
+                  "            recognizedOrganizations++\r",
+                  "        }\r",
+                  "    });\r",
+                  "\r",
+                  "    pm.expect(recognizedOrganizations).to.eq(3)\r",
+                  "\r",
+                  "    \r",
+                  "    //operatorExternalUserId\r",
+                  "    pm.collectionVariables.set(\"operatorExternalUserId\", jsonResponse.mappedExternalUserId);\r",
+                  "\r",
+                  "});"
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {}
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{p4paAuthBaseUrl}}/auth/userinfo",
+              "host": [
+                "{{p4paAuthBaseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "userinfo"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "02_getPagedInstallmentPaidView",
           "event": [
             {
@@ -382,9 +477,6 @@
                   "pm.collectionVariables.set(\"paymentDateFrom\", paymentDateFrom);\r",
                   "pm.collectionVariables.set(\"paymentDateTo\", paymentDateTo);\r",
                   "\r",
-                  "//operatorExternalUserId\r",
-                  "let operatorExternalUserId = \"EUqKiD1psLrGNuLxCGzriy-royPlBvuyeJMc0dxaxNs=\"\r",
-                  "pm.collectionVariables.set(\"operatorExternalUserId\", operatorExternalUserId);\r",
                   ""
                 ],
                 "type": "text/javascript",
