@@ -133,7 +133,7 @@ paths:
   /export/organization/{organizationId}/installments/paid:
     get:
       tags:
-        - installment
+        - data-exports
       operationId: exportPaidInstallments
       description: "|
       The API returns a list of paid installments.
