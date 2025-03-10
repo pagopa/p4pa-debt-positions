@@ -92,8 +92,7 @@ class InstallmentUpdateServiceTest {
       .findFirst().orElse(null);
     Assertions.assertNotNull(responseTargetInstallment);
     //verify that the target installment has been updated to (TO_SYNC->)PAID
-    verifyInstallmentStatus(responseTargetInstallment, InstallmentStatus.PAID,
-      "target installment status");
+    Assertions.assertEquals(InstallmentStatus.PAID, responseTargetInstallment.getStatus(), "target installment status");
     //verify that there no more NOT-PAID installments on payment options different of the one of the target installment
     int[] idxPo = {0};
     int[] idxInst = {0};
@@ -102,11 +101,13 @@ class InstallmentUpdateServiceTest {
         .equals(targetInstallment.getPaymentOptionId())) {
         paymentOption.getInstallments().forEach(anInstallment -> {
           if (InstallmentUtils.isPayable(anInstallment)) {
-            verifyInstallmentStatus(anInstallment, InstallmentStatus.INVALID,
-              "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
-                idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
-                paymentOption.getPaymentOptionId(),
-                anInstallment.getStatus()));
+            String message = "Installment[%s][%s] of payment option[%s][%s] is [%s]".formatted(
+              idxInst[0], anInstallment.getInstallmentId(), idxPo[0],
+              paymentOption.getPaymentOptionId(),
+              anInstallment.getStatus());
+
+            Assertions.assertEquals(InstallmentStatus.TO_SYNC, anInstallment.getStatus(), message);
+            Assertions.assertEquals(InstallmentStatus.INVALID, anInstallment.getSyncStatus().getSyncStatusTo(), message + " syncStatusTo " + anInstallment.getSyncStatus().getSyncStatusTo());
           }
           idxInst[0]++;
         });
@@ -154,13 +155,5 @@ class InstallmentUpdateServiceTest {
     //verify
     Assertions.assertTrue(response.getMessage().startsWith("primary installment not found"));
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
-  }
-
-  private void verifyInstallmentStatus(InstallmentNoPII installment, InstallmentStatus expectedStatus, String message) {
-    if(installment.getStatus().equals(InstallmentStatus.TO_SYNC)){
-      Assertions.assertEquals(expectedStatus, installment.getSyncStatus().getSyncStatusTo(), message);
-    }
-    else
-      Assertions.assertEquals(expectedStatus, installment.getStatus(), message);
   }
 }
