@@ -15,8 +15,8 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   private final E cancelledStatus;
   private final E reportedStatus;
 
-  private final Set<E> allowedCancelledStatuses;
-  private final Set<E> emptyAllowedStatuses;
+  protected final Set<E> allowedCancelledStatuses;
+  protected final Set<E> emptyAllowedStatuses;
 
   protected StatusRulesHandler(E syncStatus, E paidStatus, E unpaidStatus, E expiredStatus, E cancelledStatus, E reportedStatus) {
     this.syncStatus = syncStatus;
@@ -73,7 +73,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     return allMatch(childrenStatusList, expiredStatus, emptyAllowedStatuses);
   }
 
-  private boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {
+  protected boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {
     if (statusList.isEmpty()) {
       return false;
     }
