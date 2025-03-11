@@ -147,8 +147,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(category)) {
       throw new InvalidValueException("Category of secondary beneficiary is mandatory");
     } else {
-      String categoryCode = StringUtils.substringBeforeLast(category, "/") + "/";
-      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(categoryCode, accessToken);
+      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(category, accessToken);
       if (taxonomy.isEmpty()) {
         throw new InvalidValueException("The category code does not exist in the archive");
       }

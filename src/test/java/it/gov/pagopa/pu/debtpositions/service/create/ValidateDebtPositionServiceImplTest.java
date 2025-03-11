@@ -374,7 +374,7 @@ class ValidateDebtPositionServiceImplTest {
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
-    when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.empty());
+    when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.empty());
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The category code does not exist in the archive", invalidValueException.getMessage());
@@ -396,7 +396,7 @@ class ValidateDebtPositionServiceImplTest {
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
-    when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.of(new Taxonomy()));
+    when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.of(new Taxonomy()));
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The amount of secondary beneficiary is not valid", invalidValueException.getMessage());
@@ -417,7 +417,7 @@ class ValidateDebtPositionServiceImplTest {
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
-    when(taxonomyService.getTaxonomyByTaxonomyCode("category/", accessToken)).thenReturn(Optional.of(new Taxonomy()));
+    when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.of(new Taxonomy()));
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
   }
