@@ -9,6 +9,7 @@ plugins {
   id("com.github.ben-manes.versions") version "0.51.0"
   id("org.openapi.generator") version "7.10.0"
   id("org.ajoberstar.grgit") version "5.3.0"
+  id("com.gorylenko.gradle-git-properties") version "2.5.0"
 }
 
 group = "it.gov.pagopa.payhub"
@@ -47,8 +48,8 @@ val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.0"
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+  implementation("org.springframework.boot:spring-boot-starter")
+  implementation("org.springframework.boot:spring-boot-starter-web")
   implementation("org.springframework.boot:spring-boot-starter-validation")
   implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
   implementation("org.springframework.boot:spring-boot-starter-actuator")
@@ -145,6 +146,7 @@ configure<SourceSetContainer> {
 }
 
 springBoot {
+  buildInfo()
   mainClass.value("it.gov.pagopa.pu.debtpositions.DebtPositionsApplication")
 }
 
@@ -244,10 +246,12 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
   invokerPackage.set("it.gov.pagopa.pu.workflowhub.generated")
   apiPackage.set("it.gov.pagopa.pu.workflowhub.controller.generated")
   modelPackage.set("it.gov.pagopa.pu.workflowhub.dto.generated")
-  typeMappings.set(mapOf(
-    "DebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO",
-    "IngestionFlowFileType" to "String"
-  ))
+  typeMappings.set(
+    mapOf(
+      "DebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO",
+      "IngestionFlowFileType" to "String"
+    )
+  )
   configOptions.set(
     mapOf(
       "swaggerAnnotations" to "false",
