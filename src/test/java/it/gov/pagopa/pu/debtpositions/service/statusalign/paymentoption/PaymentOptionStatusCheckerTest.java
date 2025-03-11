@@ -84,6 +84,26 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is UNPAYABLE when all installments are UNPAYABLE.
+   */
+  @Test
+  void testCalculateNewStatus_Unpayable() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAYABLE, InstallmentStatus.UNPAYABLE);
+    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
+    assertEquals(PaymentOptionStatus.UNPAYABLE, result);
+  }
+
+  /**
+   * Test if the status is UNPAYABLE when all installments are CANCELLED, with at least one UNPAYABLE.
+   */
+  @Test
+  void testCalculateNewStatus_Unpayable2() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAYABLE, InstallmentStatus.CANCELLED, InstallmentStatus.CANCELLED);
+    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
+    assertEquals(PaymentOptionStatus.UNPAYABLE, result);
+  }
+
+  /**
    * Test if the status is PAID when all installments are PAID.
    */
   @Test
