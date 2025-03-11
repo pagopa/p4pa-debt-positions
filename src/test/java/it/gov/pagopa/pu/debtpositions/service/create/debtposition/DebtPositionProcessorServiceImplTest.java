@@ -54,6 +54,7 @@ class DebtPositionProcessorServiceImplTest {
       .mapToObj(i -> buildInstallmentDTO())
       .collect(Collectors.toCollection(ArrayList::new)));
     firstInstallment.setStatus(InstallmentStatus.CANCELLED);
+    firstInstallment.setSyncStatus(null);
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
