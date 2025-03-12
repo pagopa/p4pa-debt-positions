@@ -70,4 +70,9 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
                                                    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+
+  @Query(" select i" +
+    "  from InstallmentNoPII i" +
+    " where i.receiptId = :receiptId")
+  Optional<List<InstallmentNoPII>> getByReceiptId(@Param("receiptId") Long receiptId);
 }
