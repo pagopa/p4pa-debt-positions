@@ -1,122 +1,27 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 /**
- * Service class exposing methods related to IUV handling.
+ * Service class responsible for generating a valid and unique IUV for a given organization.
+ * Valid means that can be used to generate a notice
  */
-@Service
-@Slf4j
-public class IuvService {
-
-  public static final String AUX_DIGIT = "3";
-  private static final int CHECK_DIGIT_BASE = 93;
-
-  private final String informationSystemId;
-
-  private final IuvSequenceNumberService iuvSequenceNumberService;
-
-  public IuvService(@Value("${iuv.informationSystemId}") String informationSystemId,
-                    IuvSequenceNumberService iuvSequenceNumberService) {
-    this.informationSystemId = informationSystemId;
-    this.iuvSequenceNumberService = iuvSequenceNumberService;
-  }
+public interface IuvService {
 
   /**
-   * Generate a valid and unique IUV given the organization entity.
-   *
-   * @param org the organization for which to generate the IUV
-   * @return the generated IUV
+   * Generate a valid and unique IUV given the fiscal code of the organization.
+   * @param org the organization for which the IUV is requested
+   * @return the IUV generated
    */
-  public String generateIuv(Organization org) {
-    StringBuilder iuvBuilder = new StringBuilder();
-    //header
-    iuvBuilder.append(org.getSegregationCode());
-    iuvBuilder.append(informationSystemId);
+  String generateIuv(Organization org);
 
-    //payment index
-    String paymentIndex = generatePaymentIndex(org);
-    iuvBuilder.append(paymentIndex);
-
-    //check digit
-    String checkDigit = generateCheckDigit(iuvBuilder.toString());
-    iuvBuilder.append(checkDigit);
-
-    return iuvBuilder.toString();
-  }
-
-  private String generatePaymentIndex(Organization org) {
-    long paymentIndex = iuvSequenceNumberService.getNextIuvSequenceNumber(org.getOrganizationId());
-    if (paymentIndex < 1) {
-      log.error("invalid payment index returned for org[{}/{}]: {}", org.getIpaCode(), org.getOrgFiscalCode(), paymentIndex);
-      throw new InvalidValueException("invalid payment index");
-    }
-    return StringUtils.leftPad(String.valueOf(paymentIndex), 11, '0');
-  }
-
-  private String generateCheckDigit(String paymentIndex) {
-    String digitString = AUX_DIGIT + paymentIndex;
-    long digit = Long.parseLong(digitString);
-    long reminder = digit % CHECK_DIGIT_BASE;
-    return StringUtils.leftPad(String.valueOf(reminder), 2, '0');
-  }
+  String iuv2Nav(String iuv);
 
   /**
-   * Utility method to generate the NAV (notice number) given the corresponding IUV.
-   *
-   * @param iuv the IUV for which to generate the NAV
-   * @return the generated NAV
+   * Validate the syntax of the IUV that is passed by external services and returns the corresponding NAV
+   * @param iuv the IUV to be validated
+   * @param org the organization for which the IUV belongs
+   * @return the NAV created
    */
-  public String iuv2Nav(String iuv) {
-    if (isValidIuv(iuv))
-      return AUX_DIGIT + iuv;
-    else
-      throw new InvalidValueException("invalid iuv");
-  }
-
-  /**
-   * Utility method to extract the IUV given the corresponding NAV (notice number).
-   *
-   * @param nav the NAV for which to extract the IUV
-   * @return the extraxted IUV
-   */
-  public String nav2Iuv(String nav) {
-    if (isValidNav(nav)) {
-      return nav.substring(AUX_DIGIT.length());
-    } else {
-      throw new InvalidValueException("invalid nav");
-    }
-  }
-
-  /**
-   * Utility method to formally validate a IUV.
-   *
-   * @param iuv the IUV to validate
-   * @return true if valid, otherwise false
-   */
-  public boolean isValidIuv(String iuv) {
-    return isValidNav(StringUtils.join(AUX_DIGIT, iuv));
-  }
-
-  /**
-   * Utility method to formally validate a NAV.
-   *
-   * @param nav the NAV to validate
-   * @return true if valid, otherwise false
-   */
-  public boolean isValidNav(String nav) {
-    if (StringUtils.length(nav) == 18 && StringUtils.startsWith(nav, AUX_DIGIT)) {
-      try {
-        return Long.parseLong(nav.substring(0, 16)) % CHECK_DIGIT_BASE == Long.parseLong(nav.substring(16));
-      } catch (Exception e) {
-        return false;
-      }
-    }
-    return false;
-  }
+  String validateIuvAndRetrieveNav(String iuv, Organization org);
 }

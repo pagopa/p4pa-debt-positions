@@ -9,7 +9,7 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
-import it.gov.pagopa.pu.debtpositions.service.create.GenerateIuvService;
+import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -32,7 +32,7 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
 public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationService implements DebtPositionCreationService {
 
   private final ValidateDebtPositionService validateDebtPositionService;
-  private final GenerateIuvService generateIuvService;
+  private final IuvService iuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
@@ -40,7 +40,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
                                          DebtPositionService debtPositionService,
-                                         GenerateIuvService generateIuvService,
+                                         IuvService iuvService,
                                          DebtPositionSyncService debtPositionSyncService,
                                          InstallmentNoPIIRepository installmentNoPIIRepository,
                                          DebtPositionProcessorService debtPositionProcessorService,
@@ -51,7 +51,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
-    this.generateIuvService = generateIuvService;
+    this.iuvService = iuvService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
@@ -117,9 +117,15 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   @Override
   public void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO) {
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
-      String generatedIuv = generateIuvService.generateIuv(org);
-      String nav = generateIuvService.iuv2Nav(generatedIuv);
-      installmentDTO.setIuv(generatedIuv);
+      String nav;
+      if (installmentDTO.getIuv() != null) {
+        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), org);
+      } else {
+        String generatedIuv = iuvService.generateIuv(org);
+        nav = iuvService.iuv2Nav(generatedIuv);
+        installmentDTO.setIuv(generatedIuv);
+      }
+
       installmentDTO.setNav(nav);
       String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
       installmentDTO.setIupdPagopa(iupdPagopa);
