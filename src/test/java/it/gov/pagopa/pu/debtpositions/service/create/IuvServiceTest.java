@@ -17,7 +17,7 @@ class IuvServiceTest {
   @Mock
   private IuvSequenceNumberService iuvSequenceNumberService;
 
-  private IuvService iuvService;
+  private IuvServiceImpl iuvService;
 
   private static final String VALID_ORG_FISCAL_CODE = "VALID_FISCAL_CODE";
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
@@ -46,7 +46,7 @@ class IuvServiceTest {
 
   @BeforeEach
   void setUp() {
-    iuvService = new IuvService("00", iuvSequenceNumberService);
+    iuvService = new IuvServiceImpl("00", iuvSequenceNumberService);
   }
 
   //region test generateIuv
@@ -76,7 +76,7 @@ class IuvServiceTest {
     //When
     String result = iuvService.iuv2Nav(VALID_IUV);
     //Verify
-    Assertions.assertEquals(IuvService.AUX_DIGIT+VALID_IUV, result);
+    Assertions.assertEquals(IuvServiceImpl.AUX_DIGIT+VALID_IUV, result);
   }
 
   @Test
@@ -90,7 +90,7 @@ class IuvServiceTest {
   @Test
   void givenValidNavWhenNav2IuvThenOk(){
     //When
-    String result = iuvService.nav2Iuv(IuvService.AUX_DIGIT+VALID_IUV);
+    String result = iuvService.nav2Iuv(IuvServiceImpl.AUX_DIGIT+VALID_IUV);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
   }
@@ -106,7 +106,7 @@ class IuvServiceTest {
   @Test
   void givenValidNavWhenIsValidNavThenOk(){
     //When
-    boolean result = iuvService.isValidNav(IuvService.AUX_DIGIT+VALID_IUV);
+    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+VALID_IUV);
     //Verify
     Assertions.assertTrue(result);
   }
@@ -122,7 +122,7 @@ class IuvServiceTest {
   @Test
   void givenWrongLengthNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvService.AUX_DIGIT+WRONG_LENGTH_IUV);
+    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+WRONG_LENGTH_IUV);
     //Verify
     Assertions.assertFalse(result);
   }
@@ -130,7 +130,7 @@ class IuvServiceTest {
   @Test
   void givenWrongCheckDigitNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvService.AUX_DIGIT+WRONG_CHECK_IUV);
+    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+WRONG_CHECK_IUV);
     //Verify
     Assertions.assertFalse(result);
   }
@@ -138,9 +138,40 @@ class IuvServiceTest {
   @Test
   void givenNotNumericNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvService.AUX_DIGIT+"NOT_NUMERIC_12345");
+    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+"NOT_NUMERIC_12345");
     //Verify
     Assertions.assertFalse(result);
   }
-  //endregion
+
+  @Test
+  void givenIuvLengthNotValidWhenValidateIuvAndRetrieveNavThenException(){
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
+      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG));
+
+    Assertions.assertEquals("The iuv must be 17 characters long", exception.getMessage());
+  }
+
+  @Test
+  void givenIuvWithSegregationNotValidWhenValidateIuvAndRetrieveNavThenException(){
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
+      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG));
+
+    Assertions.assertEquals("The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
+  }
+
+  @Test
+  void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(){
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
+      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG));
+
+    Assertions.assertEquals("The third and fourth characters cannot be equals to: 00", exception.getMessage());
+  }
+
+  @Test
+  void givenIuvValidWhenValidateIuvAndRetrieveNavThenException(){
+    String externalIuv = "01990000000004285";
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG);
+
+    Assertions.assertEquals(3+externalIuv , result);
+  }
 }
