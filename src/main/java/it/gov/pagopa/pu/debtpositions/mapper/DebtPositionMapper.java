@@ -1,19 +1,21 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
-
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import org.springframework.data.domain.Page;
+import org.springframework.data.util.Pair;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import org.springframework.data.util.Pair;
-import org.springframework.stereotype.Service;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
 public class DebtPositionMapper {
@@ -57,7 +59,7 @@ public class DebtPositionMapper {
     return Pair.of(debtPosition, installmentMapping);
   }
 
-  public DebtPositionDTO mapToDto(DebtPosition debtPosition){
+  public DebtPositionDTO mapToDto(DebtPosition debtPosition) {
     return DebtPositionDTO.builder()
       .debtPositionId(debtPosition.getDebtPositionId())
       .iupdOrg(debtPosition.getIupdOrg())
@@ -76,7 +78,26 @@ public class DebtPositionMapper {
         debtPosition.getPaymentOptions().stream()
           .map(paymentOptionMapper::mapToDto)
           .collect(Collectors.toCollection(ArrayList<PaymentOptionDTO>::new))
-      )      .build();
+      ).build();
+  }
+
+  public PagedDebtPositions mapToPagedDebtPositions(Page<DebtPosition> pagedDebtPositionsDTO) {
+    PagedDebtPositions mappedPagedDebtPositions = new PagedDebtPositions();
+    if (pagedDebtPositionsDTO != null) {
+      if (!pagedDebtPositionsDTO.getContent().isEmpty()) {
+        mappedPagedDebtPositions.setContent(pagedDebtPositionsDTO.stream().map(this::mapToDto).toList());
+      } else {
+        mappedPagedDebtPositions.setContent(Collections.emptyList());
+      }
+
+      if (pagedDebtPositionsDTO.getPageable().isPaged()) {
+        mappedPagedDebtPositions.setTotalPages((long) pagedDebtPositionsDTO.getTotalPages());
+        mappedPagedDebtPositions.setSize((long) pagedDebtPositionsDTO.getSize());
+        mappedPagedDebtPositions.setNumber((long) pagedDebtPositionsDTO.getNumber());
+        mappedPagedDebtPositions.setTotalElements(pagedDebtPositionsDTO.getTotalElements());
+      }
+    }
+    return mappedPagedDebtPositions;
   }
 }
 
