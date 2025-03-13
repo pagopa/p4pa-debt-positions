@@ -100,7 +100,6 @@ public class ReceiptWithAdditionalInfoMapper {
 
   private TransferDTO mapTransfer(ReceiptTransferDTO transfer) {
     return TransferDTO.builder()
-      .transferId(transfer.getIdTransfer().longValue())
       .orgFiscalCode(transfer.getFiscalCodePA())
       .orgName(transfer.getCompanyName())
       .amountCents(transfer.getTransferAmountCents())
