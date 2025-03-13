@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.config;
 import com.nimbusds.jose.JOSEObjectType;
 import com.nimbusds.jose.proc.DefaultJOSEObjectTypeVerifier;
 import it.gov.pagopa.pu.debtpositions.util.CertUtils;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPublicKey;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Objects;
 
 import static com.nimbusds.jose.JOSEObjectType.JWT;
 
@@ -48,7 +50,11 @@ public class WebSecurityConfig {
   public Converter<Jwt, JwtAuthenticationToken> jwtAuthenticationConverter(){
     return source -> {
       String userExternalId = source.getSubject();
-      MDC.put("externalUserId", userExternalId);
+      String mdcUserId = SecurityUtils.resolvePuSystemUser(userExternalId);
+      if(!Objects.equals(userExternalId, SecurityUtils.resolvePuSystemUser(mdcUserId))){
+        mdcUserId = userExternalId+"]["+mdcUserId;
+      }
+      MDC.put("externalUserId", mdcUserId);
       return new JwtAuthenticationToken(source, null, userExternalId);
     };
   }
