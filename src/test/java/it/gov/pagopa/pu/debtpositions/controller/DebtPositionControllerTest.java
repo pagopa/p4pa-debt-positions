@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -147,5 +148,23 @@ class DebtPositionControllerTest {
       .andExpect(status().isCreated())
       .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
+  }
+
+  @Test
+  void whenGetDebtPositionsByIngestionFlowFileIdThenOk() throws Exception {
+    Long ingestionFlowFileId = 1L;
+
+    PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder().size(1L).build();
+    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/ingestion-flow-file/"+ingestionFlowFileId)
+          .param("size", "1")
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    PagedDebtPositions resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), PagedDebtPositions.class);
+    assertEquals(expectedPagedDebtPositions, resultResponse);
   }
 }

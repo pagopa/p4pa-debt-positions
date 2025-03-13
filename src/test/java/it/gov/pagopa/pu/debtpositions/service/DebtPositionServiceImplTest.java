@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.*;
@@ -20,9 +21,13 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.util.List;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
@@ -33,6 +38,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildIn
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -223,6 +229,24 @@ class DebtPositionServiceImplTest {
 
     Mockito.verifyNoMoreInteractions(debtPositionRepository);
     Mockito.verifyNoInteractions(debtPositionMapper);
+  }
+
+  @Test
+  void givenPagedDebtPositionWhenGetPagedDebtPositionsThenSuccess() {
+    Long ingestionFlowFileId = 1L;
+    Pageable pageable = Pageable.ofSize(5);
+    PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder()
+      .content(List.of(buildDebtPositionDTO()))
+      .size(5L).build();
+
+    Page<DebtPosition> pageDebtPosition = new PageImpl<>(List.of(buildDebtPosition()), pageable, 1);
+
+    Mockito.when(debtPositionRepository.findByIngestionFlowFileId(ingestionFlowFileId, pageable)).thenReturn(pageDebtPosition);
+    Mockito.when(debtPositionMapper.mapToPagedDebtPositions(pageDebtPosition)).thenReturn(expectedPagedDebtPositions);
+
+    PagedDebtPositions result = debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable);
+
+    assertEquals(result, expectedPagedDebtPositions);
   }
 }
 

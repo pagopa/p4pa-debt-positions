@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -13,6 +14,8 @@ import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
@@ -80,6 +83,13 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
     }
     return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  @Override
+  public PagedDebtPositions getPagedDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, Pageable pageable) {
+    Page<DebtPosition> pagedDebtPositionsDTO = debtPositionRepository.findByIngestionFlowFileId(ingestionFlowFileId, pageable);
+
+    return debtPositionMapper.mapToPagedDebtPositions(pagedDebtPositionsDTO);
   }
 }
 

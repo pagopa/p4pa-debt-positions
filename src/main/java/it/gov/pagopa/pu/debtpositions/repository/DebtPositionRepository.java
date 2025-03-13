@@ -3,6 +3,8 @@ package it.gov.pagopa.pu.debtpositions.repository;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -52,4 +54,18 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
 
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
+
+  @Query("""
+   SELECT DISTINCT d
+   FROM DebtPosition d
+   WHERE EXISTS (
+      SELECT 1
+      FROM PaymentOption p
+         JOIN p.installments i
+      WHERE p.debtPositionId = d.debtPositionId AND i.ingestionFlowFileId = :ingestionFlowFileId
+      )
+   """)
+  @EntityGraph(value = "completeDebtPosition")
+  Page<DebtPosition> findByIngestionFlowFileId(@Param("ingestionFlowFileId") Long ingestionFlowFileId,
+                                               Pageable pageable);
 }
