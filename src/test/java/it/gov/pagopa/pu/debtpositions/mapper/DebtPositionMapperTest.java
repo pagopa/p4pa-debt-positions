@@ -106,10 +106,6 @@ class DebtPositionMapperTest {
   void givenNullPagedDebtPositionsThenOk(){
     PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder()
       .content(List.of())
-      .size(null)
-      .totalElements(null)
-      .number(null)
-      .totalPages(null)
       .build();
 
     PagedDebtPositions result = debtPositionMapper.mapToPagedDebtPositions(null);
@@ -128,6 +124,20 @@ class DebtPositionMapperTest {
       .totalElements(1L)
       .number(0L)
       .totalPages(1L)
+      .build();
+
+    PagedDebtPositions result = debtPositionMapper.mapToPagedDebtPositions(pageDebtPositionsDTO);
+
+    assertEquals(expectedPagedDebtPositions, result);
+  }
+
+  @Test
+  void givenNotPageablePagedDebtPositionsThenOk(){
+    Pageable pageable = Pageable.unpaged();
+    Page<DebtPosition> pageDebtPositionsDTO = new PageImpl<>(List.of(), pageable, 1);
+
+    PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder()
+      .content(List.of())
       .build();
 
     PagedDebtPositions result = debtPositionMapper.mapToPagedDebtPositions(pageDebtPositionsDTO);
