@@ -80,17 +80,15 @@ public class ManagePaidDebtPositionService {
     //align debt position status
     DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(debtPosition);
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = persistDebtPositionAndNotifyEvent(debtPositionDTO, organization);
+    DebtPositionDTO persistedDebtPosition = persistDebtPosition(debtPositionDTO, organization);
     //start debt position workflow
     invokeWorkflow(persistedDebtPosition, accessToken);
   }
 
-  private DebtPositionDTO persistDebtPositionAndNotifyEvent(DebtPositionDTO debtPositionDTO, Organization organization) {
+  private DebtPositionDTO persistDebtPosition(DebtPositionDTO debtPositionDTO, Organization organization) {
     //persist updated debt position
     DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPositionAndRemap(debtPositionDTO, organization);
     log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
-    //notify payment event
-    paymentsProducerService.notifyPaymentsEvent(persistedDebtPosition, PaymentEventType.RT_RECEIVED);
     return persistedDebtPosition;
   }
 
@@ -99,7 +97,9 @@ public class ManagePaidDebtPositionService {
       receiptDTO.getReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
-    DebtPositionDTO createdDebtPositionDTO = persistDebtPositionAndNotifyEvent(debtPositionDTO, organization);
+    DebtPositionDTO createdDebtPositionDTO = persistDebtPosition(debtPositionDTO, organization);
+    //notify payment event
+    paymentsProducerService.notifyPaymentsEvent(createdDebtPositionDTO, PaymentEventType.RT_RECEIVED);
     log.info("Technical debt position created with id [{}]", createdDebtPositionDTO.getDebtPositionId());
   }
 

@@ -82,7 +82,6 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, receipt)).thenReturn(debtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPositionAndRemap(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
-    Mockito.doNothing().when(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
 
     //when
@@ -96,7 +95,6 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, receipt);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatusAndRemap(debtPosition);
     Mockito.verify(debtPositionServiceMock).saveDebtPositionAndRemap(debtPositionDTO, organization);
-    Mockito.verify(paymentsProducerServiceMock, Mockito.times(1)).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED);
     Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
   }
 
