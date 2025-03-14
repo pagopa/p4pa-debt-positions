@@ -129,6 +129,51 @@ paths:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
       x-spring-paginated: true
+  /debt-position-type/{debtPositionTypeId}:
+    get:
+      tags:
+        - debt-position-type
+      operationId: getDebtPositionTypeDetail
+      parameters:
+        - name: debtPositionTypeId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position type
+        - name: brokerId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the broker
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionTypeDetailDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /installments/{organizationId}/{nav}:
     get:
       tags:
@@ -1355,3 +1400,40 @@ components:
         number:
           type: integer
           format: int64
+    DebtPositionTypeDetailDTO:
+      required:
+        - debtPositionTypeId
+        - code
+        - description
+        - organizationTypeDescription
+        - macroAreaName
+        - serviceType
+        - collectionReason
+        - taxonomyCode
+      type: object
+      properties:
+        debtPositionTypeId:
+          type: integer
+          format: int64
+        code:
+          type: string
+        description:
+          type: string
+        organizationTypeDescription:
+          type: string
+        macroAreaName:
+          type: string
+        serviceType:
+          type: string
+        collectionReason:
+          type: string
+        taxonomyCode:
+          type: string
+        flagAnonymousFiscalCode:
+          type: boolean
+        flagMandatoryDueDate:
+          type: boolean
+        flagNotifyIo:
+          type: boolean
+        ioTemplateMessage:
+          type: string
