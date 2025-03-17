@@ -46,6 +46,7 @@ val bouncycastleVersion = "1.80"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.0"
+val httpClientVersion = "5.4.2"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter")
@@ -66,6 +67,7 @@ dependencies {
   implementation("org.mapstruct:mapstruct:$mapStructVersion")
   implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
   implementation("org.postgresql:postgresql:$postgresJdbcVersion")
+  implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
 
   compileOnly("org.projectlombok:lombok")
 
