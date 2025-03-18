@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 public class OrganizationFaker {
 
   public static Organization buildOrganization(){
-    return TestUtils.getPodamFactory().manufacturePojo(Organization.class);
+    return TestUtils.getPodamFactory().manufacturePojo(Organization.class)
+      .status(Organization.StatusEnum.ACTIVE);
   }
 }

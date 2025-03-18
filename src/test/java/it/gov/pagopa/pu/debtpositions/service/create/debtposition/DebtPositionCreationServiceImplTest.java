@@ -316,4 +316,18 @@ class DebtPositionCreationServiceImplTest {
     );
     assertEquals("Provided organization id not found on db.", exception.getMessage());
   }
+
+  @Test
+  void givenNotActiveOrgWhenCreateThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    Organization organization = buildOrganization();
+    organization.setStatus(Organization.StatusEnum.DRAFT);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
+
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+    );
+    assertEquals("Provided organization is not ACTIVE", exception.getMessage());
+  }
 }
