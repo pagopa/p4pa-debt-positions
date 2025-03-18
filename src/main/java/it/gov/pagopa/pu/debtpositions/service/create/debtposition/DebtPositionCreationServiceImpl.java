@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -59,7 +60,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
@@ -67,7 +68,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
 
     Pair<DebtPositionDTO, String> savedDebtPosition = execute(debtPositionDTO, installment2operate,
-      massive, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
+      wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
 
     log.info("DebtPosition created with id {}", savedDebtPosition.getLeft().getDebtPositionId());
     return savedDebtPosition;

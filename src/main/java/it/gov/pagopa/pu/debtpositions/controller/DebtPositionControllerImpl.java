@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
@@ -33,7 +34,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalUserId).getLeft();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(massive)
+      .partialChange(false)
+      .build();
+    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 
@@ -56,10 +61,14 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<Void> installmentSynchronize(DebtPositionOrigin origin, InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive){
+  public ResponseEntity<Void> installmentSynchronize(DebtPositionOrigin origin, InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive, Boolean partialChange){
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, massive, origin, accessToken, operatorExternalUserId);
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(massive)
+      .partialChange(partialChange)
+      .build();
+    String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
     return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
   }
 

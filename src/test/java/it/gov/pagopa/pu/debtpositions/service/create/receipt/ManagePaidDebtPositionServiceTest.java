@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
@@ -82,7 +83,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.when(installmentUpdateServiceMock.updateInstallmentStatusOfDebtPosition(installment, receipt)).thenReturn(debtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionServiceMock.saveDebtPositionAndRemap(debtPositionDTO, organization)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, accessToken)).thenReturn(workflowCreatedDTO);
 
     //when
     boolean response = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receipt, accessToken);
@@ -95,7 +96,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.verify(installmentUpdateServiceMock, Mockito.times(1)).updateInstallmentStatusOfDebtPosition(installment, receipt);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatusAndRemap(debtPosition);
     Mockito.verify(debtPositionServiceMock).saveDebtPositionAndRemap(debtPositionDTO, organization);
-    Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
+    Mockito.verify(debtPositionSyncServiceMock, Mockito.times(1)).syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, accessToken);
   }
 
   @Test
