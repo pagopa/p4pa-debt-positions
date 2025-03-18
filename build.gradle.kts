@@ -161,7 +161,8 @@ openApiGenerate {
   openapiNormalizer.set(mapOf("REF_AS_PARENT_IN_ALLOF" to "true"))
   typeMappings.set(mapOf(
     "ReceiptOrigin" to "it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType",
-    "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO"
+    "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO",
+    "PaymentEventType" to "it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",

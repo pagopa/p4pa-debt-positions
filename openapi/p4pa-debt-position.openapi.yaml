@@ -540,7 +540,7 @@ paths:
           in: query
           required: true
           schema:
-            $ref: "#/components/schemas/IONotificationOperationType"
+            type: PaymentEventType
           description: The context for which to retrieve the notification details.
       responses:
         "200":
@@ -1324,12 +1324,6 @@ components:
           type: string
         ioTemplateMessage:
           type: string
-    IONotificationOperationType:
-      type: string
-      enum:
-        - CREATE_DP
-        - UPDATE_DP
-        - DELETE_DP
     PagedDebtPositions:
       type: object
       required:
