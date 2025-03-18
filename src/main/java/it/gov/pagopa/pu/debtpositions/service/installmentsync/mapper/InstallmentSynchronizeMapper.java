@@ -29,7 +29,6 @@ public class InstallmentSynchronizeMapper {
       .paymentOptionIndex(installmentSynchronizeDTO.getPaymentOptionIndex())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
       .description(installmentSynchronizeDTO.getPaymentOptionDescription())
-      .dueDate(installmentSynchronizeDTO.getDueDate())
       .status(installmentSynchronizeDTO.getDraft().equals(Boolean.TRUE) ? PaymentOptionStatus.DRAFT :PaymentOptionStatus.UNPAID)
       .installments(List.of(map2Installment(installmentSynchronizeDTO)))
       .build();
@@ -40,7 +39,7 @@ public class InstallmentSynchronizeMapper {
       .iud(installmentSynchronizeDTO.getIud())
       .iuv(installmentSynchronizeDTO.getIuv())
       .dueDate(installmentSynchronizeDTO.getDueDate())
-      .paymentTypeCode(installmentSynchronizeDTO.getPaymentTypeCode())
+      .notificationFeeCents(installmentSynchronizeDTO.getNotificationFeeCents())
       .amountCents(installmentSynchronizeDTO.getAmountCents())
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
       .balance(installmentSynchronizeDTO.getBalance())

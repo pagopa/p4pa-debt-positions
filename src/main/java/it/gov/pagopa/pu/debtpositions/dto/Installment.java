@@ -32,7 +32,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private String iuf;
   private String nav;
   private LocalDate dueDate;
-  private String paymentTypeCode;
+  private Long notificationFeeCents;
   private Long amountCents;
   private String remittanceInformation;
   private String balance;
