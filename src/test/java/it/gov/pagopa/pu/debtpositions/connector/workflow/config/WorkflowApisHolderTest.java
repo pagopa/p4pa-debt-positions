@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.workflowhub.dto.generated.SyncDebtPositionRequestDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class WorkflowApisHolderTest extends BaseApiHolderTest {
     void whenDebtPositionApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
         assertAuthenticationShouldBeSetInThreadSafeMode(
                 accessToken -> workflowApisHolder.getDebtPositionApi(accessToken)
-                  .syncDebtPosition(new DebtPositionDTO(), null, null),
+                  .syncDebtPosition(new SyncDebtPositionRequestDTO(), null, null, null),
                 new ParameterizedTypeReference<>() {},
                 workflowApisHolder::unload);
     }

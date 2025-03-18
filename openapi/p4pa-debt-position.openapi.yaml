@@ -446,6 +446,14 @@ paths:
           required: false
           schema:
             type: boolean
+            default: false
+        - name: partialChange
+          in: query
+          description: Indicates if the operation is a cumulative operation (true), which at the end of the process will invoke again the API with the parameter set to false, or complete (false).
+          required: false
+          schema:
+            type: boolean
+            default: false
       requestBody:
         content:
           application/json:

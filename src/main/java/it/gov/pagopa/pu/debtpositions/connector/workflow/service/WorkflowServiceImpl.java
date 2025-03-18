@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowApiClient;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -15,8 +16,8 @@ public class WorkflowServiceImpl implements WorkflowService {
   }
 
   @Override
-  public WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive, PaymentEventType paymentEventType, String accessToken) {
-    return this.workflowApiClient.syncDebtPosition(debtPositionDTO, massive, paymentEventType, accessToken);
+  public WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, PaymentEventType paymentEventType, String accessToken) {
+    return this.workflowApiClient.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
   }
 
 }

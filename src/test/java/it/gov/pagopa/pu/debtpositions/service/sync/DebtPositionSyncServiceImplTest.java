@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.sync;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -33,16 +34,16 @@ class DebtPositionSyncServiceImplTest {
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
-    Boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
 
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
     expectedResult.setWorkflowId("1000");
 
-    Mockito.when(workflowService.syncDebtPosition(debtPositionDTO, massive, paymentEventType, accessToken))
+    Mockito.when(workflowService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken))
       .thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, paymentEventType, accessToken);
+    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
 
     assertEquals(expectedResult, result);
   }
@@ -52,10 +53,10 @@ class DebtPositionSyncServiceImplTest {
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA);
-    Boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
 
-    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, paymentEventType, accessToken);
+    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
 
     assertNull(result);
   }

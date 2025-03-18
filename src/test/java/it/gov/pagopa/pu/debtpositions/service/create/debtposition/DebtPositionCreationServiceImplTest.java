@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
@@ -77,7 +78,7 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenDebtPositionWhenCreateThenOk() {
     String accessToken = "ACCESSTOKEN";
-    boolean massive = false;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     String operatorExternalId = "OPERATOREXTERNALID";
 
@@ -93,11 +94,11 @@ class DebtPositionCreationServiceImplTest {
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DP_CREATED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, massive, accessToken, operatorExternalId).getLeft();
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalId).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -113,6 +114,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
@@ -126,11 +128,11 @@ class DebtPositionCreationServiceImplTest {
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null, debtPositionTypeOrg);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null)).thenReturn(0L);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -146,6 +148,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
@@ -160,10 +163,10 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null)).thenReturn(0L);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -177,6 +180,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
@@ -194,7 +198,7 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null).getLeft();
 
     assertEquals(debtPositionDTO, result);
     reflectionEqualsByName(debtPositionDTO, result);
@@ -207,6 +211,7 @@ class DebtPositionCreationServiceImplTest {
   void givenDebtPositionWithDuplicatesWhenCreateThenThrowConflictErrorException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPosition debtPosition = buildDebtPosition();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
@@ -220,7 +225,7 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(2L);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
-      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
     assertEquals("Duplicate records found: the provided data conflicts with existing records.", exception.getMessage());
   }
@@ -235,6 +240,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
     debtPositionDTO.setIupdOrg("");
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPositionDTO debtPositionIuvDTO = buildGeneratedIuvDebtPositionDTO();
     debtPositionIuvDTO.setFlagPagoPaPayment(true);
@@ -259,7 +265,7 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(iuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
     Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), "randomIUD", "generatedIuv", "generatedNav")).thenReturn(0L);
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionIuvDTO, false, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionIuvDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, null)).thenReturn(WorkflowCreatedDTO.builder().workflowId("1000").build());
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionIuvDTO);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
@@ -267,7 +273,7 @@ class DebtPositionCreationServiceImplTest {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn("randomIUD");
       mockedStatic.when(() -> Utilities.generateRandomIupd(organization.getOrgFiscalCode())).thenReturn("randomIUPD");
 
-      DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
+      DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null).getLeft();
 
       result.getPaymentOptions().stream()
         .flatMap(po -> po.getInstallments().stream())
@@ -281,6 +287,7 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
 
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setStatus(DebtPositionStatus.DRAFT);
@@ -297,22 +304,23 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(savedDebtPosition);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(savedDebtPosition)).thenReturn(debtPositionDTO);
 
-    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null).getLeft();
+    DebtPositionDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null).getLeft();
 
     assertEquals(DebtPositionStatus.DRAFT, result.getStatus());
     assertEquals(PaymentOptionStatus.DRAFT, result.getPaymentOptions().getFirst().getStatus());
     assertEquals(InstallmentStatus.DRAFT, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(debtPositionSyncServiceMock, times(0)).syncDebtPosition(debtPositionDTO, false, PaymentEventType.DP_CREATED, null);
+    verify(debtPositionSyncServiceMock, times(0)).syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, null);
   }
 
   @Test
   void givenDebtPositionWithInvalidOrgWhenCreateThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.empty());
 
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
     assertEquals("Provided organization id not found on db.", exception.getMessage());
   }
@@ -320,13 +328,14 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenNotActiveOrgWhenCreateThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
     organization.setStatus(Organization.StatusEnum.DRAFT);
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
 
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
-      createDebtPositionService.createDebtPosition(debtPositionDTO, false, null, null)
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
     assertEquals("Provided organization is not ACTIVE", exception.getMessage());
   }
