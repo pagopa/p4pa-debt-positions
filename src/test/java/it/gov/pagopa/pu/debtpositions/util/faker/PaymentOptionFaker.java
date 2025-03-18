@@ -5,7 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -14,14 +13,11 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 public class PaymentOptionFaker {
 
-  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
-
   public static PaymentOption buildPaymentOption() {
     PaymentOption paymentOption = new PaymentOption();
     paymentOption.setPaymentOptionId(1L);
     paymentOption.setDebtPositionId(1L);
     paymentOption.setTotalAmountCents(2000L);
-    paymentOption.setDueDate(DATE);
     paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
@@ -35,7 +31,6 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setPaymentOptionId(1L);
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
-    paymentOptionDTO.setDueDate(DATE);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
@@ -49,7 +44,6 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setPaymentOptionId(1L);
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
-    paymentOptionDTO.setDueDate(DATE);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
@@ -60,7 +54,6 @@ public class PaymentOptionFaker {
 
   public static PaymentOptionDTO buildSyncPaymentOptionDTO(){
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
-    paymentOptionDTO.setDueDate(DATE);
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);

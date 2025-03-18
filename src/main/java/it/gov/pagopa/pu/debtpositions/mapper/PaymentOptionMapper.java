@@ -48,7 +48,6 @@ public class PaymentOptionMapper {
     paymentOption.setDebtPositionId(dto.getDebtPositionId());
     paymentOption.setTotalAmountCents(dto.getTotalAmountCents());
     paymentOption.setStatus(dto.getStatus());
-    paymentOption.setDueDate(dto.getDueDate());
     paymentOption.setDescription(dto.getDescription());
     paymentOption.setPaymentOptionType(PaymentOptionType.valueOf(dto.getPaymentOptionType().name()));
     paymentOption.setPaymentOptionIndex(dto.getPaymentOptionIndex());
@@ -63,7 +62,6 @@ public class PaymentOptionMapper {
       .debtPositionId(paymentOption.getDebtPositionId())
       .totalAmountCents(paymentOption.getTotalAmountCents())
       .status(paymentOption.getStatus())
-      .dueDate(paymentOption.getDueDate())
       .description(paymentOption.getDescription())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(paymentOption.getPaymentOptionType().name()))
       .paymentOptionIndex(paymentOption.getPaymentOptionIndex())

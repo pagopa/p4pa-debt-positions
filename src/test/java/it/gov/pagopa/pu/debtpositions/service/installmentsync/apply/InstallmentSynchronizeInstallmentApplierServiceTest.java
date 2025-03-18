@@ -63,12 +63,12 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
   void testMergeInstallmentImmutableFieldThenException(){
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setDescription("New description");
-    installmentSynchronizeDTO.setPaymentTypeCode("New payment type code");
+    installmentSynchronizeDTO.setIuv("iuv_iuv");
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("These fields for installment with iud iud are not mutable: [paymentTypeCode]", exception.getMessage());
+    assertEquals("These fields for installment with iud iud are not mutable: [iuv]", exception.getMessage());
   }
 
   @Test
