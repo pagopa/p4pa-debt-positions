@@ -70,6 +70,9 @@ public abstract class BaseDebtPositionOperationService {
                                                Boolean massive, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
+    if(!Organization.StatusEnum.ACTIVE.equals(org.getStatus())){
+      throw new InvalidValueException("Provided organization is not ACTIVE");
+    }
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
