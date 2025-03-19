@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -59,7 +60,7 @@ public abstract class BaseDebtPositionOperationService {
    *
    * @param debtPositionDTO the debt position to operate on
    * @param installments2operate the list of {@link InstallmentDTO} included in the Debt Position involved in the operation (use same objects! it will be used == operator to identify them)
-   * @param massive indicates that the operation is massive or single
+   * @param wfExecutionParameters wf execution parameters
    * @param accessToken the access token
    * @param operatorExternalUserId the operator who requested the creation
    * @return the {@link DebtPositionDTO} created and WorkflowId of debt position synchronization
@@ -67,7 +68,7 @@ public abstract class BaseDebtPositionOperationService {
 
   @Transactional
   public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
-                                               Boolean massive, PaymentEventType eventType,
+                                               WfExecutionParameters wfExecutionParameters, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
     if(!Organization.StatusEnum.ACTIVE.equals(org.getStatus())){
@@ -82,15 +83,15 @@ public abstract class BaseDebtPositionOperationService {
 
     DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
 
-    String workflowId = invokeWorkflow(debtPositionAligned, eventType, accessToken, massive);
+    String workflowId = invokeWorkflow(debtPositionAligned, eventType, accessToken, wfExecutionParameters);
 
     return Pair.of(debtPositionAligned, workflowId);
   }
 
-  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, String accessToken, Boolean massive) {
+  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, String accessToken, WfExecutionParameters wfExecutionParameters) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, massive, eventType, accessToken);
+      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, eventType, accessToken);
       if (workflowCreatedDTO != null) {
         return workflowCreatedDTO.getWorkflowId();
       }

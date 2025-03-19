@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentEventDTO {
+  private String eventId;
   private DebtPositionDTO payload;
   private PaymentEventType eventType;
 }

@@ -446,6 +446,14 @@ paths:
           required: false
           schema:
             type: boolean
+            default: false
+        - name: partialChange
+          in: query
+          description: Indicates if the operation is a cumulative operation (true), which at the end of the process will invoke again the API with the parameter set to false, or complete (false).
+          required: false
+          schema:
+            type: boolean
+            default: false
       requestBody:
         content:
           application/json:
@@ -626,9 +634,6 @@ components:
           format: int64
         status:
           $ref: "#/components/schemas/PaymentOptionStatus"
-        dueDate:
-          type: string
-          format: date
         description:
           type: string
         paymentOptionType:
@@ -677,8 +682,9 @@ components:
         dueDate:
           type: string
           format: date
-        paymentTypeCode:
-          type: string
+        notificationFeeCents:
+          type: integer
+          format: int64
         amountCents:
           type: integer
           format: int64
@@ -1244,8 +1250,9 @@ components:
           format: int64
         debtPositionTypeCode:
           type: string
-        paymentTypeCode:
-          type: string
+        notificationFeeCents:
+          type: integer
+          format: int64
         remittanceInformation:
           type: string
         legacyPaymentMetadata:

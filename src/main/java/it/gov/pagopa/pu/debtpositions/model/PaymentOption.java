@@ -8,7 +8,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serializable;
-import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.SortedSet;
 
@@ -32,7 +31,6 @@ public class PaymentOption extends BaseEntity implements Serializable, Comparabl
   @Enumerated(EnumType.STRING)
   @NotNull
   private PaymentOptionStatus status;
-  private LocalDate dueDate;
   @NotNull
   private String description;
   @Enumerated(EnumType.STRING)

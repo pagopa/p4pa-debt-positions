@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -42,10 +43,10 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
   }
 
   @Override
-  public Pair<DebtPositionDTO, String> addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public Pair<DebtPositionDTO, String> addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.debug("Adding new installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
 
-    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, massive, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
+    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
 
     log.debug("Added installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
     return debtPositionUpdated;

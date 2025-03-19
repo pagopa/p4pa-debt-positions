@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -69,7 +70,7 @@ class DebtPositionAddInstallmentServiceImplTest {
   @Test
   void testAddInstallmentThenOK(){
     String accessToken = "ACCESSTOKEN";
-    boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String operatorExternalId = "OPERATOREXTERNALID";
     String workflowId = "workflowId";
 
@@ -88,9 +89,9 @@ class DebtPositionAddInstallmentServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPosition);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DPI_ADDED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
 
-    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), massive, accessToken, operatorExternalId);
+    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
 
     assertEquals(workflowId, result.getRight());
     DebtPositionDTO resultDebtPositionDTO = result.getLeft();
@@ -103,7 +104,7 @@ class DebtPositionAddInstallmentServiceImplTest {
   @Test
   void testAddInstallmentWhenDPTypeOrgNotFoundThenOK(){
     String accessToken = "ACCESSTOKEN";
-    boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String operatorExternalId = "OPERATOREXTERNALID";
 
     Organization organization = buildOrganization();
@@ -118,7 +119,7 @@ class DebtPositionAddInstallmentServiceImplTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L)).thenReturn(Optional.empty());
 
     NotFoundException conflictException = assertThrows(NotFoundException.class, () ->
-      debtPositionAddInstallmentService.addInstallment(debtPositionDTO,installments2Operate, massive, accessToken, operatorExternalId));
+      debtPositionAddInstallmentService.addInstallment(debtPositionDTO,installments2Operate, wfExecutionParameters, accessToken, operatorExternalId));
     assertEquals("The debt position type org with id 2 was not found for organization id 500", conflictException.getMessage());
   }
 

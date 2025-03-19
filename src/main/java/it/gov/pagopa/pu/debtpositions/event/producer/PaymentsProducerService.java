@@ -9,17 +9,19 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class PaymentsProducerService {
 
-    @Value("${spring.cloud.stream.bindings.paymentsProducer-out-0.binder}")
-    private String binder;
+  @Value("${spring.cloud.stream.bindings.paymentsProducer-out-0.binder}")
+  private String binder;
 
-    private final StreamBridge streamBridge;
+  private final StreamBridge streamBridge;
 
-    public PaymentsProducerService(StreamBridge streamBridge) {
-        this.streamBridge = streamBridge;
-    }
+  public PaymentsProducerService(StreamBridge streamBridge) {
+    this.streamBridge = streamBridge;
+  }
 
     /*
     Producer not connected on startup, but just on-demand
@@ -33,11 +35,12 @@ public class PaymentsProducerService {
     }
     */
 
-    public void notifyPaymentsEvent(DebtPositionDTO debtPosition, PaymentEventType event){
-        streamBridge.send("paymentsProducer-out-0", binder,
-          MessageBuilder.withPayload(new PaymentEventDTO(debtPosition, event))
-            .setHeader(KafkaHeaders.KEY, String.valueOf(debtPosition.getOrganizationId()))
-            .build()
-        );
-    }
+  public void notifyPaymentsEvent(DebtPositionDTO debtPosition, PaymentEventType event) {
+    String eventId = event.name() + debtPosition.getDebtPositionId() + UUID.randomUUID();
+    streamBridge.send("paymentsProducer-out-0", binder,
+      MessageBuilder.withPayload(new PaymentEventDTO(eventId, debtPosition, event))
+        .setHeader(KafkaHeaders.KEY, String.valueOf(debtPosition.getOrganizationId()))
+        .build()
+    );
+  }
 }

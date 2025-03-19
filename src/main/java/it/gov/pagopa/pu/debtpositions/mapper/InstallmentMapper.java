@@ -38,7 +38,7 @@ public class InstallmentMapper {
     installment.setIuf(dto.getIuf());
     installment.setNav(dto.getNav());
     installment.setDueDate(dto.getDueDate());
-    installment.setPaymentTypeCode(dto.getPaymentTypeCode());
+    installment.setNotificationFeeCents(dto.getNotificationFeeCents());
     installment.setAmountCents(dto.getAmountCents());
     installment.setRemittanceInformation(dto.getRemittanceInformation());
     installment.setBalance(dto.getBalance());
@@ -69,7 +69,7 @@ public class InstallmentMapper {
       .iuf(installment.getIuf())
       .nav(installment.getNav())
       .dueDate(installment.getDueDate())
-      .paymentTypeCode(installment.getPaymentTypeCode())
+      .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
       .remittanceInformation(installment.getRemittanceInformation())
       .balance(installment.getBalance())
@@ -112,7 +112,7 @@ public class InstallmentMapper {
       .iuf(installment.getIuf())
       .nav(installment.getNav())
       .dueDate(installment.getDueDate())
-      .paymentTypeCode(installment.getPaymentTypeCode())
+      .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
       .remittanceInformation(installment.getRemittanceInformation())
       .balance(installment.getBalance())

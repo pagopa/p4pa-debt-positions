@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
 
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
@@ -23,7 +24,7 @@ public class InstallmentSynchronizeCancelService extends BaseInstallmentSynchron
   }
 
   public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO debtPositionDTO,
-                                Boolean massive, String accessToken, String operatorExternalUserId) {
+                                WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
 
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallmentAndThrowException(debtPositionDTO, installmentSynchronizeDTO);
     InstallmentDTO installmentDTO = result.getRight();
@@ -34,6 +35,6 @@ public class InstallmentSynchronizeCancelService extends BaseInstallmentSynchron
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
 
-    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), massive, accessToken, operatorExternalUserId).getRight();
+    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
   }
 }

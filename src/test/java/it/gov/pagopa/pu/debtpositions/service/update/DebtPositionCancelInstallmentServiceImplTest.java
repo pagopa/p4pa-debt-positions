@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -57,7 +58,7 @@ class DebtPositionCancelInstallmentServiceImplTest {
   @Test
   void testCancelInstallmentThenOK(){
     String accessToken = "ACCESSTOKEN";
-    boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String operatorExternalId = "OPERATOREXTERNALID";
     String workflowId = "workflowId";
 
@@ -73,9 +74,9 @@ class DebtPositionCancelInstallmentServiceImplTest {
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPosition);
     Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, massive, PaymentEventType.DPI_CANCELLED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
 
-    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), massive, accessToken, operatorExternalId);
+    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
 
     assertEquals(workflowId, result.getRight());
     DebtPositionDTO resultDebtPositionDTO = result.getLeft();

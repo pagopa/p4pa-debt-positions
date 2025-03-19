@@ -45,7 +45,7 @@ public class InstallmentSynchronizeFaker {
       .dueDate(DATE)
       .amountCents(100L)
       .debtPositionTypeCode("TEST_CODE")
-      .paymentTypeCode("paymentTypeCode")
+      .notificationFeeCents(1000L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .flagPagoPaPayment(Boolean.TRUE)

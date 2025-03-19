@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
@@ -64,7 +65,7 @@ public class ManagePaidDebtPositionService {
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, false, PaymentEventType.RT_RECEIVED, accessToken);
+      WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, accessToken);
       if (workflow != null) {
         log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
       } else {

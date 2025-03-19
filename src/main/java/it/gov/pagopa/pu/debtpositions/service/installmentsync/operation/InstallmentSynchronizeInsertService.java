@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
 
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
@@ -31,7 +32,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
   }
 
-  public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, Boolean massive, String accessToken, String operatorExternalUserId) {
+  public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallment(storedDebtPosition, installmentSynchronizeDTO);
     PaymentOptionDTO storedPaymentOption = result == null ? null: result.getLeft();
     InstallmentDTO storedInstallment = result == null ? null: result.getRight();
@@ -42,10 +43,10 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
 
     if(debtPositionApplied.getLeft().getDebtPositionId() == null) {
-      return debtPositionCreationService.createDebtPosition(debtPositionApplied.getLeft(), massive, accessToken, operatorExternalUserId).getRight();
+      return debtPositionCreationService.createDebtPosition(debtPositionApplied.getLeft(), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
     }
 
-    return debtPositionAddInstallmentService.addInstallment(debtPositionApplied.getLeft(), List.of(debtPositionApplied.getRight()), massive, accessToken, operatorExternalUserId).getRight();
+    return debtPositionAddInstallmentService.addInstallment(debtPositionApplied.getLeft(), List.of(debtPositionApplied.getRight()), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
   }
 
   private void checkStatus(DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment) {
