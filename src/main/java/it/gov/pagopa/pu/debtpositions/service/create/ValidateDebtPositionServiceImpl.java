@@ -56,7 +56,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("At least one installment of the debt position is mandatory");
       }
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
-        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg);
+        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
       }
     }
   }
@@ -80,7 +80,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
+  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("Remittance information is mandatory");
     }
@@ -93,7 +93,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (installmentDTO.getAmountCents() < 0) {
       throw new InvalidValueException("Amount is not valid");
     }
-    if (debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
+    if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) &&
+      debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
       throw new InvalidValueException("Amount is not valid for this debt position type org");
     }
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
