@@ -2,17 +2,14 @@ package it.gov.pagopa.pu.debtpositions.model.view.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "debt_position")
@@ -24,6 +21,7 @@ public class DebtPositionView {
   @Id
   private Long debtPositionId;
   private String description;
+  @NotNull
   private String debtPositionTypeOrgDescription;
   private LocalDateTime creationDate;
   @Enumerated(EnumType.STRING)
