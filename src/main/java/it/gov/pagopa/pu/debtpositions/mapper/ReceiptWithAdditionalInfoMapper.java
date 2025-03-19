@@ -48,7 +48,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .iud(Utilities.getRandomIUD())
           .iuv(receiptDTO.getCreditorReferenceId())
           .iuf(null)
-          .iur(null)
+          .iur(receiptDTO.getPaymentReceiptId())
           .nav(receiptDTO.getNoticeNumber())
           .dueDate(null)
           .notificationFeeCents(receiptDTO.getFeeCents())

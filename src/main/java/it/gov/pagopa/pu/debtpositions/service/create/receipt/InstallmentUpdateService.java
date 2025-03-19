@@ -46,7 +46,7 @@ public class InstallmentUpdateService {
       .ifPresentOrElse(paidInstallment -> {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
-        updateInstallment(paidInstallment, InstallmentStatus.PAID, receiptDTO.getReceiptId());
+        updateInstallment(paidInstallment, InstallmentStatus.PAID, receiptDTO);
       }, () -> {
         throw new NotFoundException("primary installment not found " + installment.getInstallmentId() + " on debt position " + debtPosition.getDebtPositionId());
       });
@@ -64,9 +64,10 @@ public class InstallmentUpdateService {
     });
   }
 
-  private void updateInstallment(InstallmentNoPII installment, InstallmentStatus status, Long receiptId){
-    if (receiptId != null) {
-      installment.setReceiptId(receiptId);
+  private void updateInstallment(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt){
+    if (receipt != null) {
+      installment.setReceiptId(receipt.getReceiptId());
+      installment.setIur(receipt.getPaymentReceiptId());
     }
     InstallmentUtils.setStatus(installment, status);
 
