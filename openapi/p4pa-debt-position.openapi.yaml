@@ -1270,6 +1270,8 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
+        executionConfig:
+          type: string
     TransferSynchronizeDTO:
       required:
         - orgFiscalCode
