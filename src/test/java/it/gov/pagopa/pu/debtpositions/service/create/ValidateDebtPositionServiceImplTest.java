@@ -143,6 +143,7 @@ class ValidateDebtPositionServiceImplTest {
   void givenInstallmentWithAmountInvalidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
     debtPositionTypeOrg.setFlagMandatoryDueDate(false);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setAmountCents(-200L);
 
@@ -169,6 +170,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonNullThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setAmountCents(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDebtor(null);
