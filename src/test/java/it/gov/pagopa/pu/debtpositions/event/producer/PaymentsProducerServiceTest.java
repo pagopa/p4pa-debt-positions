@@ -21,35 +21,37 @@ import static org.mockito.Mockito.verify;
 @ExtendWith(MockitoExtension.class)
 class PaymentsProducerServiceTest {
 
-    @Mock
-    private StreamBridge streamBridge;
+  @Mock
+  private StreamBridge streamBridge;
 
-    private PaymentsProducerService paymentsProducerService;
+  private PaymentsProducerService paymentsProducerService;
 
-    @BeforeEach
-    public void setUp() {
-        paymentsProducerService = new PaymentsProducerService(streamBridge);
-    }
+  @BeforeEach
+  public void setUp() {
+    paymentsProducerService = new PaymentsProducerService(streamBridge);
+  }
 
-    @Test
-    void whenNotifyPaymentsEventThenSendMessage() {
-        // Given
-        DebtPositionDTO debtPosition = DebtPositionFaker.buildDebtPositionDTO();
-        PaymentEventType eventType = PaymentEventType.RT_RECEIVED;
+  @Test
+  void whenNotifyPaymentsEventThenSendMessage() {
+    // Given
+    DebtPositionDTO debtPosition = DebtPositionFaker.buildDebtPositionDTO();
+    PaymentEventType eventType = PaymentEventType.RT_RECEIVED;
 
-        // When
-        paymentsProducerService.notifyPaymentsEvent(debtPosition, eventType);
+    // When
+    paymentsProducerService.notifyPaymentsEvent(debtPosition, eventType);
 
-        // Then
-        verify(streamBridge, times(1)).send(
-                Mockito.eq("paymentsProducer-out-0"),
-                Mockito.any(),
-                Mockito.<Message<?>>argThat(m -> {
-                    PaymentEventDTO payload = (PaymentEventDTO) m.getPayload();
-                    Assertions.assertSame(debtPosition, payload.getPayload());
-                    Assertions.assertSame(eventType, payload.getEventType());
-                    Assertions.assertEquals(String.valueOf(debtPosition.getOrganizationId()), m.getHeaders().get(KafkaHeaders.KEY));
-                    return true;
-                }));
-    }
+    // Then
+    verify(streamBridge, times(1)).send(
+      Mockito.eq("paymentsProducer-out-0"),
+      Mockito.any(),
+      Mockito.<Message<?>>argThat(m -> {
+        PaymentEventDTO payload = (PaymentEventDTO) m.getPayload();
+        String eventIdPrefix = eventType.name() + debtPosition.getDebtPositionId();
+        Assertions.assertEquals(eventIdPrefix, payload.getEventId().substring(0, eventIdPrefix.length()));
+        Assertions.assertSame(debtPosition, payload.getPayload());
+        Assertions.assertSame(eventType, payload.getEventType());
+        Assertions.assertEquals(String.valueOf(debtPosition.getOrganizationId()), m.getHeaders().get(KafkaHeaders.KEY));
+        return true;
+      }));
+  }
 }
