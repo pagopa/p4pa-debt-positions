@@ -82,6 +82,6 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "join DebtPosition dp on po.debtPositionId = dp.debtPositionId " +
     "join DebtPositionTypeOrg dpto on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId " +
     "where i.installmentId = :installmentId")
-  String getDebtPositionTypeOrgCode(@Param("installmentId") long installmentId);
+  String getDebtPositionTypeOrgCodeByInstallmentId(long installmentId);
 
 }
