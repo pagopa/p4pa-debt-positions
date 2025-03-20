@@ -77,11 +77,4 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(ref = "CollectionModelInstallmentNoPII")))
   List<InstallmentNoPII> findByReceiptId(long receiptId);
 
-  @Query("select dpto.code from InstallmentNoPII i " +
-    "join PaymentOption po on i.paymentOptionId = po.paymentOptionId " +
-    "join DebtPosition dp on po.debtPositionId = dp.debtPositionId " +
-    "join DebtPositionTypeOrg dpto on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId " +
-    "where i.installmentId = :installmentId")
-  String getDebtPositionTypeOrgCodeByInstallmentId(long installmentId);
-
 }

@@ -33,4 +33,13 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   Optional<DebtPositionTypeOrg> findByDebtPositionTypeOrgIdAndOperatorExternalUserId(
     @Parameter(required = true) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
+
+
+  @Query("select dpto from InstallmentNoPII i " +
+    "join PaymentOption po on i.paymentOptionId = po.paymentOptionId " +
+    "join DebtPosition dp on po.debtPositionId = dp.debtPositionId " +
+    "join DebtPositionTypeOrg dpto on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId " +
+    "where i.installmentId = :installmentId")
+  DebtPositionTypeOrg getDebtPositionTypeOrgByInstallmentId(long installmentId);
+
 }
