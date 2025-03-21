@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyS
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -330,7 +331,7 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
-    organization.setStatus(Organization.StatusEnum.DRAFT);
+    organization.setStatus(OrganizationStatus.DRAFT);
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
 

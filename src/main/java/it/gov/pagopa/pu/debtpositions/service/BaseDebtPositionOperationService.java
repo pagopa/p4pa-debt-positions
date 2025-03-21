@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
@@ -71,7 +72,7 @@ public abstract class BaseDebtPositionOperationService {
                                                WfExecutionParameters wfExecutionParameters, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
-    if(!Organization.StatusEnum.ACTIVE.equals(org.getStatus())){
+    if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
       throw new InvalidValueException("Provided organization is not ACTIVE");
     }
     authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);

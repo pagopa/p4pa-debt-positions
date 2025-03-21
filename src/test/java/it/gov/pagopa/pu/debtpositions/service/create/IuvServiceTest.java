@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,7 +26,7 @@ class IuvServiceTest {
   private static final Organization VALID_ORG = OrganizationFaker.buildOrganization()
     .organizationId(1L)
     .orgName("ORG_NAME")
-    .status(Organization.StatusEnum.ACTIVE)
+    .status(OrganizationStatus.ACTIVE)
     .orgFiscalCode(VALID_ORG_FISCAL_CODE)
     .ipaCode(VALID_ORG_IPA_CODE)
     .segregationCode(VALID_APPLICATION_CODE);
@@ -40,7 +41,7 @@ class IuvServiceTest {
   private static final Organization INVALID_ORG = OrganizationFaker.buildOrganization()
     .organizationId(99L)
     .orgName("INVALID_ORG_NAME")
-    .status(Organization.StatusEnum.DRAFT)
+    .status(OrganizationStatus.DRAFT)
     .orgFiscalCode(INVALID_ORG_FISCAL_CODE)
     .ipaCode(INVALID_ORG_IPA_CODE);
 
