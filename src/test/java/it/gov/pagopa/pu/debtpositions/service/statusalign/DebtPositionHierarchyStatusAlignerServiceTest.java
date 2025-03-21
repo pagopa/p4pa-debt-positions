@@ -74,11 +74,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenFinalizeSyncStatusThenOk() {
     Long id = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    String iupdPagoPa = "iupdPagoPa";
     DebtPosition debtPosition = buildDebtPosition();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
-    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -87,7 +86,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = Map.of("iud", IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
-      .iupdPagopa(iupdPagoPa)
       .build());
 
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
@@ -103,7 +101,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenFinalizeSyncStatusWhenIsNotSyncThenDoNotUpdateStatus() {
     Long id = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    String iupdPagoPa = "iupdPagoPa";
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
 
@@ -116,7 +113,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
-      .iupdPagopa(iupdPagoPa)
       .build();
 
     syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
@@ -125,14 +121,13 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertSame(expectedResult, result);
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, newStatus);
   }
 
   @Test
   void givenFinalizeSyncStatusWhenDoesNotHaveIudThenDoNotUpdateStatus() {
     Long id = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    String iupdPagoPa = "iupdPagoPa";
     DebtPosition debtPosition = buildDebtPosition();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
@@ -144,7 +139,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
-      .iupdPagopa(iupdPagoPa)
       .build();
 
     syncStatusDTO.put("fake-iud", iupdSyncStatusUpdateDTO);
@@ -153,13 +147,12 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertSame(expectedResult, result);
     verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, newStatus);
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, newStatus);
   }
 
   @Test
   void givenFinalizeSyncStatusWhenDebtPositionNotFoundThenThrowsException() {
     Long id = 1L;
-    String iupdPagoPa = "iupdPagoPa";
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(null);
@@ -167,7 +160,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(id, syncStatusDTO),
       "Debt position related to the id 1 does not found");
 
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatusAndIupdPagopa(id, iupdPagoPa, InstallmentStatus.REPORTED);
+    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, InstallmentStatus.REPORTED);
     verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
     verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
   }
