@@ -122,6 +122,39 @@ class InstallmentSynchronizeInsertServiceImplTest {
   }
 
   @Test
+  void testDPToSyncAndIsNotDPToSyncAllowedInstallment() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIngestionFlowFileId(5L);
+
+    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+      installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+    assertEquals("The installment cannot be created because the debt position with iupd IUPD_ORG is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
+  }
+
+  @Test
+  void testPOToSyncAndIsNotDPToSyncAllowedInstallment() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
+    debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.TO_SYNC);
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIngestionFlowFileId(5L);
+
+    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+      installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+    assertEquals("The installment cannot be created because the payment option with index 1 is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
+  }
+
+  @Test
   void testInstallmentSyncPOStatusNotAllowedInstallment() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
@@ -135,6 +168,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
     assertEquals("The installment cannot be created because the payment option with index 1 is not in an allowed status: PAID", conflictException.getMessage());
   }
+
 
   @Test
   void testInstallmentSyncInstallmentStatusNotAllowedInstallment() {
