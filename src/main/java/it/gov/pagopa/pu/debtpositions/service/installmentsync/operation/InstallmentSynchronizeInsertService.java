@@ -23,8 +23,8 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
   private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
 
   private static final Set<InstallmentStatus> installmentStatusesValidForInsertion = Set.of(InstallmentStatus.CANCELLED, InstallmentStatus.INVALID);
-  private static final Set<PaymentOptionStatus> paymentOptionStatusesValidForInsertion = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID);
-  private static final Set<DebtPositionStatus> debtPositionStatusesValidForInsertion = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID);
+  private static final Set<PaymentOptionStatus> paymentOptionStatusesValidForInsertion = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID, PaymentOptionStatus.TO_SYNC);
+  private static final Set<DebtPositionStatus> debtPositionStatusesValidForInsertion = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID, DebtPositionStatus.TO_SYNC);
 
   public InstallmentSynchronizeInsertService(InstallmentSynchronizeApplierService installmentSynchronizeApplierService, DebtPositionCreationService debtPositionCreationService, DebtPositionAddInstallmentService debtPositionAddInstallmentService) {
     this.installmentSynchronizeApplierService = installmentSynchronizeApplierService;
