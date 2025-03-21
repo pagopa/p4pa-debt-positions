@@ -59,7 +59,6 @@ class DebtPositionControllerTest {
     Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
     IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
       .newStatus(newStatus)
-      .iupdPagopa("iupdPagoPa")
       .build();
 
     syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
