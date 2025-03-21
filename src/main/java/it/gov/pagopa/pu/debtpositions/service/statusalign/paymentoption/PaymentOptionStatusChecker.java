@@ -18,7 +18,8 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
 
   public PaymentOptionStatusChecker(PaymentOptionRepository paymentOptionRepository) {
     super(InstallmentStatus.TO_SYNC, InstallmentStatus.PAID, InstallmentStatus.UNPAID,
-      InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.REPORTED);
+      InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.INVALID,
+      InstallmentStatus.REPORTED);
     this.paymentOptionRepository = paymentOptionRepository;
   }
 

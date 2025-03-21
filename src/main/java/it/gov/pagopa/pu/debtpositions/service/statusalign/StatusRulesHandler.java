@@ -18,7 +18,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   protected final Set<E> allowedCancelledStatuses;
   protected final Set<E> emptyAllowedStatuses;
 
-  protected StatusRulesHandler(E syncStatus, E paidStatus, E unpaidStatus, E expiredStatus, E cancelledStatus, E reportedStatus) {
+  protected StatusRulesHandler(E syncStatus, E paidStatus, E unpaidStatus, E expiredStatus, E cancelledStatus, E invalidStatus, E reportedStatus) {
     this.syncStatus = syncStatus;
     this.paidStatus = paidStatus;
     this.unpaidStatus = unpaidStatus;
@@ -26,7 +26,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
 
-    this.allowedCancelledStatuses = Set.of(cancelledStatus);
+    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus);
     this.emptyAllowedStatuses = Set.of();
   }
 

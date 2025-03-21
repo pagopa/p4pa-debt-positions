@@ -118,7 +118,7 @@ class PaymentOptionStatusCheckerTest {
    */
   @Test
   void testCalculateNewStatus_Paid2() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.PAID, InstallmentStatus.CANCELLED);
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.PAID, InstallmentStatus.CANCELLED, InstallmentStatus.INVALID);
     PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
     assertEquals(PaymentOptionStatus.PAID, result);
   }

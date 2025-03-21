@@ -17,7 +17,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   private final DebtPositionRepository debtPositionRepository;
 
   public DebtPositionStatusChecker(DebtPositionRepository debtPositionRepository) {
-    super(TO_SYNC, PAID, UNPAID, EXPIRED, CANCELLED, REPORTED);
+    super(TO_SYNC, PAID, UNPAID, EXPIRED, CANCELLED, INVALID, REPORTED);
     this.debtPositionRepository = debtPositionRepository;
   }
 

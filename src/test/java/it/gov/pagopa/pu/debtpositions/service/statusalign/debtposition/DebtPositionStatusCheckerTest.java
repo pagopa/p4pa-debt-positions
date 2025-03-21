@@ -88,7 +88,7 @@ class DebtPositionStatusCheckerTest {
    */
   @Test
   void testDeterminePaymentOptionStatus_Paid2() {
-    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.PAID, PaymentOptionStatus.CANCELLED);
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.PAID, PaymentOptionStatus.CANCELLED, PaymentOptionStatus.INVALID);
     DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
     assertEquals(DebtPositionStatus.PAID, result);
   }
