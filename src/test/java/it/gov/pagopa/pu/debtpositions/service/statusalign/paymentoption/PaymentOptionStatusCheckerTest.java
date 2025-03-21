@@ -190,7 +190,7 @@ class PaymentOptionStatusCheckerTest {
   void testCalculateNewStatus_InvalidStatus() {
     List<InstallmentStatus> installmentStatusList = List.of();
     Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(installmentStatusList));
-    assertEquals("Unable to determine status for PaymentOption", exception.getMessage());
+    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: []", exception.getMessage());
   }
 
   /**
@@ -201,7 +201,7 @@ class PaymentOptionStatusCheckerTest {
   void testCalculateNewStatus_InvalidStatus2() {
     List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.INVALID, InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED);
     Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(installmentStatusList));
-    assertEquals("Unable to determine status for PaymentOption", exception.getMessage());
+    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: [INVALID, EXPIRED, CANCELLED]", exception.getMessage());
   }
 
   @Test

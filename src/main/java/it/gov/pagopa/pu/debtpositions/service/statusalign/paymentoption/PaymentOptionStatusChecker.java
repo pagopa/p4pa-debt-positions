@@ -43,7 +43,7 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
     } else if (isExpired(installmentStatusList)) {
       return PaymentOptionStatus.EXPIRED;
     } else {
-      throw new InvalidValueException("Unable to determine status for PaymentOption");
+      throw new InvalidValueException("Unable to determine status for PaymentOption having installmentStatuses: " + installmentStatusList);
     }
   }
 
