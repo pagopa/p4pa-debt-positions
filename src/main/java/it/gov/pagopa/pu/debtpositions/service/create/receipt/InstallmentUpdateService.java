@@ -8,9 +8,10 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
-import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -58,7 +59,7 @@ public class InstallmentUpdateService {
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
-      if (InstallmentUtils.isPayable(anInstallment)) {
+      if (InstallmentUtils.isInvalidable(anInstallment)) {
         updateInstallment(anInstallment, InstallmentStatus.INVALID, null);
       }
     });

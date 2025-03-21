@@ -3,7 +3,11 @@ package it.gov.pagopa.pu.debtpositions.util;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
+
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -24,7 +28,21 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID,
     InstallmentStatus.EXPIRED);
 
-  /** It will check if the Installment is in a payable status */
+  private static final Set<InstallmentStatus> INVALIDABLE_STATUSES = Stream.concat(
+    PAYABLE_STATUSES.stream(),
+    Stream.of(InstallmentStatus.UNPAYABLE)
+  ).collect(Collectors.toSet());
+
+  /**
+   * It will check if the Installment is in a payable status
+   */
+  public static boolean isInvalidable(InstallmentNoPII installment) {
+    return INVALIDABLE_STATUSES.contains(installment.getStatus());
+  }
+
+  /**
+   * It will check if the Installment is in a payable status
+   */
   public static boolean isPayable(InstallmentNoPII installment) {
     return PAYABLE_STATUSES.contains(installment.getStatus());
   }
@@ -33,7 +51,7 @@ public class InstallmentUtils {
    * It will set the Installment status verifying it will need the TO_SYNC transition
    *
    * @param installment the installment to update
-   * @param status the new status
+   * @param status      the new status
    */
   public static void setStatus(InstallmentNoPII installment, InstallmentStatus status) {
     log.info("Changing status of Installment (id={}, iud={}) from {} to {}", installment.getInstallmentId(), installment.getIud(), installment.getStatus(), status);
@@ -64,7 +82,7 @@ public class InstallmentUtils {
   private static InstallmentStatus getStatusFrom(InstallmentNoPII installment) {
     if (installment.getStatus().equals(InstallmentStatus.TO_SYNC)) {
       log.warn("Transitioning Installment (installmentId={}, iud={}) from TO_SYNC status! {}",
-          installment.getInstallmentId(), installment.getIud(), installment.getSyncStatus());
+        installment.getInstallmentId(), installment.getIud(), installment.getSyncStatus());
       return installment.getSyncStatus().getSyncStatusFrom();
     } else {
       return installment.getStatus();
