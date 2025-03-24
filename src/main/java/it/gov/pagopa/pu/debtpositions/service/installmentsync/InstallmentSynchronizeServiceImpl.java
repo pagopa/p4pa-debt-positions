@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.Installm
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -41,7 +42,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
-    if (!installmentSynchronizeDTO.getExecutionConfig().isBlank()) {
+    if (StringUtils.isNotBlank(installmentSynchronizeDTO.getExecutionConfig())) {
       try {
         wfExecutionParameters.setExecutionConfig(objectMapper.readTree(installmentSynchronizeDTO.getExecutionConfig()));
       } catch (JsonProcessingException e) {

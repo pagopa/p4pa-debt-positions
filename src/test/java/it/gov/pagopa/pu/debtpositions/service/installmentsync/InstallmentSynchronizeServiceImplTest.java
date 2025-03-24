@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -33,6 +34,8 @@ class InstallmentSynchronizeServiceImplTest {
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
+  private ObjectMapper objectMapperMock;
+  @Mock
   private InstallmentSynchronizeCancelService installmentSynchronizeCancelServiceMock;
   @Mock
   private InstallmentSynchronizeUpdateService installmentSynchronizeUpdateServiceMock;
@@ -44,7 +47,7 @@ class InstallmentSynchronizeServiceImplTest {
   @BeforeEach
   void setUp() {
     installmentSynchronizeService = new InstallmentSynchronizeServiceImpl(debtPositionRepositoryMock,
-      debtPositionMapperMock, installmentSynchronizeCancelServiceMock,
+      debtPositionMapperMock, objectMapperMock, installmentSynchronizeCancelServiceMock,
       installmentSynchronizeUpdateServiceMock, installmentSynchronizeInsertServiceMock);
   }
 
@@ -67,7 +70,7 @@ class InstallmentSynchronizeServiceImplTest {
   }
 
   @Test
-  void testInstallmentSynchronizeCancelActionThenOk(){
+  void testInstallmentSynchronizeCancelActionThenOk() {
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
