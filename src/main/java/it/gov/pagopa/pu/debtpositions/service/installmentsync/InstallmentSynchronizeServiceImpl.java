@@ -1,10 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -20,13 +23,15 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
 
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
+  private final ObjectMapper objectMapper;
   private final InstallmentSynchronizeCancelService installmentSynchronizeCancelService;
   private final InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService;
   private final InstallmentSynchronizeInsertService installmentSynchronizeInsertService;
 
-  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService) {
+  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, ObjectMapper objectMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
+    this.objectMapper = objectMapper;
     this.installmentSynchronizeCancelService = installmentSynchronizeCancelService;
     this.installmentSynchronizeUpdateService = installmentSynchronizeUpdateService;
     this.installmentSynchronizeInsertService = installmentSynchronizeInsertService;
@@ -36,7 +41,13 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
-    wfExecutionParameters.setExecutionConfig(installmentSynchronizeDTO.getExecutionConfig());
+    if (!installmentSynchronizeDTO.getExecutionConfig().isBlank()) {
+      try {
+        wfExecutionParameters.setExecutionConfig(objectMapper.readTree(installmentSynchronizeDTO.getExecutionConfig()));
+      } catch (JsonProcessingException e) {
+        throw new InvalidValueException("Invalid execution config value: " + e.getMessage());
+      }
+    }
 
     InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
     return switch (action) {
@@ -52,7 +63,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   private DebtPositionDTO retrieveAndVerifyOrigin(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
     DebtPosition debtPosition = debtPositionRepository.findByIupdOrgAndOrganizationId(iupdOrg, orgId);
 
-    if (debtPosition == null){
+    if (debtPosition == null) {
       return null;
     }
 
