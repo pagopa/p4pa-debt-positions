@@ -67,7 +67,7 @@ class InstallmentSynchronizeServiceImplTest {
   }
 
   @Test
-  void testInstallmentSynchronizeCancelActionThenOk() {
+  void testInstallmentSynchronizeCancelActionThenOk(){
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
