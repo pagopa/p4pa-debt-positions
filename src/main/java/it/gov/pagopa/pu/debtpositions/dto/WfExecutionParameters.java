@@ -12,4 +12,5 @@ import lombok.experimental.SuperBuilder;
 public class WfExecutionParameters {
   private boolean massive;
   private boolean partialChange;
+  private String executionConfig;
 }

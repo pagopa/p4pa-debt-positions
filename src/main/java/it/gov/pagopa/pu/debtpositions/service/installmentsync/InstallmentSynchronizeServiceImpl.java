@@ -36,6 +36,8 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
+    wfExecutionParameters.setExecutionConfig(installmentSynchronizeDTO.getExecutionConfig());
+
     InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
     return switch (action) {
       case InstallmentSynchronizeDTO.ActionEnum.I ->
