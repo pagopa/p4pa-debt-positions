@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -140,6 +141,7 @@ class DebtPositionControllerTest {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .massive(massive)
       .partialChange(partialChange)
+      .executionConfig(NullNode.instance)
       .build();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
 
