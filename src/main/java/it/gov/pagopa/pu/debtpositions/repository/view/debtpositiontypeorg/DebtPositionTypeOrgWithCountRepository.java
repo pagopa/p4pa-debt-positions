@@ -17,8 +17,8 @@ public interface DebtPositionTypeOrgWithCountRepository extends Repository<DebtP
     SELECT d
     FROM DebtPositionTypeOrgWithCount d
     WHERE d.organizationId = :organizationId
-    AND d.code = :code
-    AND d.description = :description
+    AND (:code IS NULL OR d.code = :code)
+    AND (:description IS NULL OR d.description = :description)
     """)
   Page<DebtPositionTypeOrgWithCount> findByCodeAndDescription(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
