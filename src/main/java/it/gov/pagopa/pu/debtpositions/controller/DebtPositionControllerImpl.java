@@ -67,6 +67,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .massive(massive)
       .partialChange(partialChange)
+      .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
     String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
     return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();

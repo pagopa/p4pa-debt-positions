@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
 
@@ -53,6 +54,7 @@ public class InstallmentSynchronizeFaker {
       .flagMultibeneficiary(Boolean.TRUE)
       .numberBeneficiary(2)
       .additionalTransfers(new ArrayList<>(List.of(buildTransferSynchronizeDTO())))
+      .executionConfig(NullNode.instance)
       .build();
   }
 
