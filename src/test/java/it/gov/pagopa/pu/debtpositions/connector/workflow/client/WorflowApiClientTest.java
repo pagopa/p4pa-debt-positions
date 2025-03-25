@@ -48,15 +48,16 @@ class WorflowApiClientTest {
       .partialChange(partialChange)
       .build();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
+    String eventDescription = "EVENTDESCRIPTION";
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
 
     Mockito.when(workflowApisHolderMock.getDebtPositionApi(accessToken))
       .thenReturn(debtPositionApiMock);
-    Mockito.when(debtPositionApiMock.syncDebtPosition(Mockito.argThat(i -> i.getDebtPosition() == debtPositionDTO && i.getExecutionConfig() == null), Mockito.same(massive), Mockito.same(partialChange), Mockito.same(paymentEventType)))
+    Mockito.when(debtPositionApiMock.syncDebtPosition(Mockito.argThat(i -> i.getDebtPosition() == debtPositionDTO && i.getExecutionConfig() == null), Mockito.same(massive), Mockito.same(partialChange), Mockito.same(paymentEventType), Mockito.same(eventDescription)))
       .thenReturn(new WorkflowCreatedDTO("1"));
 
     // When
-    WorkflowCreatedDTO result = workflowApiClient.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
+    WorkflowCreatedDTO result = workflowApiClient.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult.getWorkflowId(), result.getWorkflowId());

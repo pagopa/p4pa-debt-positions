@@ -20,6 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -84,15 +85,20 @@ public abstract class BaseDebtPositionOperationService {
 
     DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
 
-    String workflowId = invokeWorkflow(debtPositionAligned, eventType, accessToken, wfExecutionParameters);
+    String workflowId = invokeWorkflow(debtPositionAligned, eventType, installments2operate, accessToken, wfExecutionParameters);
 
     return Pair.of(debtPositionAligned, workflowId);
   }
 
-  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, String accessToken, WfExecutionParameters wfExecutionParameters) {
+  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, eventType, accessToken);
+      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(
+        debtPositionDTO,
+        wfExecutionParameters,
+        eventType,
+        "IUD:" + installments2operate.stream().map(InstallmentDTO::getIud).collect(Collectors.joining(",")),
+        accessToken);
       if (workflowCreatedDTO != null) {
         return workflowCreatedDTO.getWorkflowId();
       }

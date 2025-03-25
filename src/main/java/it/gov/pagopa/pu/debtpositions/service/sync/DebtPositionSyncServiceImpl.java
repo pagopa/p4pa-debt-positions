@@ -26,9 +26,9 @@ public class DebtPositionSyncServiceImpl implements DebtPositionSyncService {
   }
 
   @Override
-  public WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, PaymentEventType paymentEventType, String accessToken) {
+  public WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, PaymentEventType paymentEventType, String eventDescription, String accessToken) {
     if (DEBT_POSITION_ORIGIN_TO_SYNC.contains(debtPositionDTO.getDebtPositionOrigin())) {
-      return workflowService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
+      return workflowService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken);
     }
     return null;
   }

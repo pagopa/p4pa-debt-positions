@@ -13,4 +13,5 @@ public class PaymentEventDTO {
   private String eventId;
   private DebtPositionDTO payload;
   private PaymentEventType eventType;
+  private String eventDescription;
 }

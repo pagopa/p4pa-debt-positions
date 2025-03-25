@@ -62,10 +62,10 @@ public class ManagePaidDebtPositionService {
       .orElse(false);
   }
 
-  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, String accessToken) {
+  private void invokeWorkflow(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, accessToken);
+      WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO), accessToken);
       if (workflow != null) {
         log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
       } else {
@@ -83,7 +83,7 @@ public class ManagePaidDebtPositionService {
     //persist updated debt position
     DebtPositionDTO persistedDebtPosition = persistDebtPosition(debtPositionDTO, organization);
     //start debt position workflow
-    invokeWorkflow(persistedDebtPosition, accessToken);
+    invokeWorkflow(persistedDebtPosition, receiptDTO, accessToken);
   }
 
   private DebtPositionDTO persistDebtPosition(DebtPositionDTO debtPositionDTO, Organization organization) {
@@ -100,8 +100,12 @@ public class ManagePaidDebtPositionService {
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
     DebtPositionDTO createdDebtPositionDTO = persistDebtPosition(debtPositionDTO, organization);
     //notify payment event
-    paymentsProducerService.notifyPaymentsEvent(createdDebtPositionDTO, PaymentEventType.RT_RECEIVED);
+    paymentsProducerService.notifyPaymentsEvent(createdDebtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
     log.info("Technical debt position created with id [{}]", createdDebtPositionDTO.getDebtPositionId());
+  }
+
+  private String buildPaymentEventDescription(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    return "receiptId:" + receiptDTO.getReceiptId();
   }
 
 }

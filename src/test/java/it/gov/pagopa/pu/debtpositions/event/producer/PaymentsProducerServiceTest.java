@@ -36,9 +36,10 @@ class PaymentsProducerServiceTest {
     // Given
     DebtPositionDTO debtPosition = DebtPositionFaker.buildDebtPositionDTO();
     PaymentEventType eventType = PaymentEventType.RT_RECEIVED;
+    String eventDescription = "EVENTDESCRIPTION";
 
     // When
-    paymentsProducerService.notifyPaymentsEvent(debtPosition, eventType);
+    paymentsProducerService.notifyPaymentsEvent(debtPosition, eventType, eventDescription);
 
     // Then
     verify(streamBridge, times(1)).send(
@@ -50,6 +51,7 @@ class PaymentsProducerServiceTest {
         Assertions.assertEquals(eventIdPrefix, payload.getEventId().substring(0, eventIdPrefix.length()));
         Assertions.assertSame(debtPosition, payload.getPayload());
         Assertions.assertSame(eventType, payload.getEventType());
+        Assertions.assertSame(eventDescription, payload.getEventDescription());
         Assertions.assertEquals(String.valueOf(debtPosition.getOrganizationId()), m.getHeaders().get(KafkaHeaders.KEY));
         return true;
       }));

@@ -36,14 +36,15 @@ class DebtPositionSyncServiceImplTest {
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
+    String eventDescription = "EVENTDESCRIPTION";
 
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
     expectedResult.setWorkflowId("1000");
 
-    Mockito.when(workflowService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken))
+    Mockito.when(workflowService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken))
       .thenReturn(expectedResult);
 
-    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
+    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken);
 
     assertEquals(expectedResult, result);
   }
@@ -56,7 +57,7 @@ class DebtPositionSyncServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
 
-    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, accessToken);
+    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, null, accessToken);
 
     assertNull(result);
   }

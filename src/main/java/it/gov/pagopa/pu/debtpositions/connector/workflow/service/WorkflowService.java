@@ -7,5 +7,5 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 
 public interface WorkflowService {
 
-  WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, PaymentEventType paymentEventType, String accessToken);
+  WorkflowCreatedDTO syncDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, PaymentEventType paymentEventType, String eventDescription, String accessToken);
 }
