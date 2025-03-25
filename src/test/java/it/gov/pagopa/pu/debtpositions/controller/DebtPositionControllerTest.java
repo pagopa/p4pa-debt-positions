@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentServiceImpl;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -20,10 +21,13 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -51,6 +55,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private InstallmentSynchronizeService installmentSynchronizerService;
+
+  @MockitoBean
+  private DebtPositionUpdateInstallmentServiceImpl debtPositionUpdateInstallmentService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
@@ -176,5 +183,30 @@ class DebtPositionControllerTest {
 
     PagedDebtPositions resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), PagedDebtPositions.class);
     assertEquals(expectedPagedDebtPositions, resultResponse);
+  }
+
+  @Test
+  void whenUpdateInstallmentThenOk() throws Exception {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    List<InstallmentDTO> installmentList = Collections.singletonList(buildInstallmentDTO());
+    UpdateInstallmentRequest updateInstallmentRequest = UpdateInstallmentRequest.builder()
+      .debtPositionDTO(debtPositionDTO)
+      .installments2operate(installmentList)
+      .build();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installmentList, wfExecutionParameters, null, null))
+      .thenReturn(Pair.of(debtPositionDTO, "workflowId"));
+
+    mockMvc.perform(
+        put("/debt-positions/update-installment")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(updateInstallmentRequest)))
+      .andExpect(status().isCreated())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andReturn();
   }
 }

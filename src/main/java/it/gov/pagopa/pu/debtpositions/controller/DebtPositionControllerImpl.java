@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentServiceImpl;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,14 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionCreationService debtPositionCreationService;
   private final DebtPositionService debtPositionService;
   private final InstallmentSynchronizeService installmentSynchronizeService;
+  private final DebtPositionUpdateInstallmentServiceImpl debtPositionUpdateInstallmentService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, DebtPositionUpdateInstallmentServiceImpl debtPositionUpdateInstallmentService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
     this.installmentSynchronizeService = installmentSynchronizeService;
+    this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
   }
 
   @Override
@@ -70,6 +73,18 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
     String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
+    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
+  }
+
+  @Override
+  public ResponseEntity<Void> updateInstallment(UpdateInstallmentRequest updateInstallmentRequest) {
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+    String workflowId = debtPositionUpdateInstallmentService.updateInstallment(updateInstallmentRequest.getDebtPositionDTO(), updateInstallmentRequest.getInstallments2operate(), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
     return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
   }
 
