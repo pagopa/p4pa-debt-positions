@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.Installm
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -32,6 +33,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     this.installmentSynchronizeInsertService = installmentSynchronizeInsertService;
   }
 
+  @Transactional
   @Override
   public String installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
