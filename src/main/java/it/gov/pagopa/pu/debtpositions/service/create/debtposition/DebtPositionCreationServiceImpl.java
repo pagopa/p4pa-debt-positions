@@ -4,8 +4,10 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
@@ -36,6 +38,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final IuvService iuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final DebtPositionTypeRepository debtPositionTypeRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
@@ -47,7 +50,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository
+                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository
   ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -56,6 +59,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
+    this.debtPositionTypeRepository = debtPositionTypeRepository;
   }
 
   @Transactional
@@ -82,8 +86,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     checkDebtPosition(debtPositionDTO, org);
 
     DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
-    validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
     checkAllInstallments(debtPositionUpdated, org, debtPositionTypeOrg);
+    validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
 
     if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
       updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
@@ -141,12 +145,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
     }
 
-    installmentDTO.getTransfers()
-      .forEach(transfer -> {
-        if (transfer.getTransferIndex() == 1) {
-          transfer.setIban(StringUtils.isBlank(debtPositionTypeOrg.getIban()) ? org.getIban() : debtPositionTypeOrg.getIban());
-        }
-      });
+    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
   }
@@ -163,6 +162,27 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
       debtPositionDTO.setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
+  }
+
+  private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
+    String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
+      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
+      .getTaxonomyCode();
+
+    Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
+      .mapToLong(TransferDTO::getAmountCents).sum();
+
+    TransferDTO firstTransfer = TransferDTO.builder()
+      .transferIndex(1)
+      .orgFiscalCode(organization.getOrgFiscalCode())
+      .orgName(organization.getOrgName())
+      .iban(debtPositionTypeOrg.getIban().isBlank() ? organization.getIban() : debtPositionTypeOrg.getIban())
+      .category(category)
+      .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
+      .remittanceInformation(installmentDTO.getRemittanceInformation())
+      .build();
+
+    installmentDTO.addTransfersItem(firstTransfer);
   }
 
 }

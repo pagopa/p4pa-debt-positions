@@ -55,7 +55,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
-        debtPositionDTO.getPaymentOptions().getFirst(), null, accessToken))
+        debtPositionDTO.getPaymentOptions().getFirst(), null))
       .thenReturn(Pair.of(debtPositionDTO, newInstallmentDTO));
 
     Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(newInstallmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
@@ -94,7 +94,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIngestionFlowFileLineNumber(32L);
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, newDebtPositionDTO,
-        newDebtPositionDTO.getPaymentOptions().getFirst(), newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
+        newDebtPositionDTO.getPaymentOptions().getFirst(), newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()))
       .thenReturn(Pair.of(newDebtPositionDTO, newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionCreationServiceMock.createDebtPosition(newDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId))
