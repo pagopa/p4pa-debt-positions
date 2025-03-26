@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.stream.Stream;
 
@@ -23,6 +24,7 @@ public class InstallmentUpdateService {
     this.debtPositionRepository = debtPositionRepository;
   }
 
+  @Transactional
   public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptDTO receiptDTO) {
     //retrieve debt position
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());

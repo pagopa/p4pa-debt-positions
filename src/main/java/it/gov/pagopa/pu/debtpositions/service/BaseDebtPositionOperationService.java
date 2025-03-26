@@ -115,6 +115,6 @@ public abstract class BaseDebtPositionOperationService {
    * @param org                  the organization related to debt position
    * @return the {@link DebtPositionDTO} updated
    */
-  public abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org);
+  protected abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org);
 
 }
