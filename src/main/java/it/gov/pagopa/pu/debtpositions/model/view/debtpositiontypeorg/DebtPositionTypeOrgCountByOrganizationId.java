@@ -14,7 +14,7 @@ import org.hibernate.annotations.Formula;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class DebtPositionTypeOrgWithActiveOrganizationsCount implements Serializable {
+public class DebtPositionTypeOrgCountByOrganizationId implements Serializable {
   @Id
   private Long organizationId;
   @Formula("(SELECT COUNT(*) "

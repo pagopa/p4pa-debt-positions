@@ -373,10 +373,10 @@
         }
       }
     },
-    "/crud/debt-position-type-orgs-with-active-organizations-count/search/countByOrganizationIds" : {
+    "/crud/debt-position-type-orgs-by-organization/search/countByOrganizationIds" : {
       "get" : {
-        "tags" : [ "debt-position-type-org-with-active-organizations-count-search-controller" ],
-        "operationId" : "crud-debt-position-type-orgs-with-active-organizations-count-countByOrganizationIds",
+        "tags" : [ "debt-position-type-org-count-by-organization-id-search-controller" ],
+        "operationId" : "crud-debt-position-type-orgs-by-organization-countByOrganizationIds",
         "parameters" : [ {
           "name" : "organizationIds",
           "in" : "query",
@@ -394,7 +394,7 @@
             "content" : {
               "application/hal+json" : {
                 "schema" : {
-                  "$ref" : "#/components/schemas/CollectionModelDebtPositionTypeOrgWithActiveOrganizationsCount"
+                  "$ref" : "#/components/schemas/CollectionModelDebtPositionTypeOrgCountByOrganizationId"
                 }
               }
             }
@@ -5839,16 +5839,16 @@
           }
         }
       },
-      "CollectionModelDebtPositionTypeOrgWithActiveOrganizationsCount" : {
+      "CollectionModelDebtPositionTypeOrgCountByOrganizationId" : {
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "debtPositionTypeOrgWithActiveOrganizationsCounts" : {
+              "debtPositionTypeOrgCountByOrganizationIds" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgWithActiveOrganizationsCount"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgCountByOrganizationId"
                 }
               }
             }
@@ -5858,7 +5858,7 @@
           }
         }
       },
-      "DebtPositionTypeOrgWithActiveOrganizationsCount" : {
+      "DebtPositionTypeOrgCountByOrganizationId" : {
         "type" : "object",
         "properties" : {
           "organizationId" : {
