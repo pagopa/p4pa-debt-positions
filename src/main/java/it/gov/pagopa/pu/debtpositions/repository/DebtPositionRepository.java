@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
@@ -23,7 +22,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Transactional
   @Modifying
   @Query("UPDATE DebtPosition d SET d.status = :status WHERE d.debtPositionId = :debtPositionId")
-  void updateStatus(@Param("debtPositionId") Long debtPositionId, @Param("status") DebtPositionStatus status);
+  void updateStatus(Long debtPositionId, DebtPositionStatus status);
 
   @Query("""
    SELECT d
@@ -37,7 +36,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findByTransferId(@Param("transferId") Long transferId);
+  DebtPosition findByTransferId(Long transferId);
 
   @Query("""
    SELECT d
@@ -50,7 +49,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findByInstallmentId(@Param("installmentId") Long installmentId);
+  DebtPosition findByInstallmentId(Long installmentId);
 
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
@@ -66,6 +65,15 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  Page<DebtPosition> findByIngestionFlowFileId(@Param("ingestionFlowFileId") Long ingestionFlowFileId,
+  Page<DebtPosition> findByIngestionFlowFileId(Long ingestionFlowFileId,
                                                Pageable pageable);
+
+  @Query("""
+   SELECT d
+   FROM DebtPosition d
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+   WHERE d.organizationId = :organizationId AND i.nav = :nav
+   """)
+  DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
 }
