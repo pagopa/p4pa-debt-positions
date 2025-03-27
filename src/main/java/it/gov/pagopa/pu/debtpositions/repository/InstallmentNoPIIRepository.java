@@ -8,6 +8,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +27,12 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
   void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i SET i.dueDate = :dueDate WHERE i.installmentId = :installmentId")
+  void updateDueDate(@Param("installmentId") Long installmentId, @Param("dueDate") LocalDate dueDate);
 
   @Query("""
     SELECT COUNT(i)
