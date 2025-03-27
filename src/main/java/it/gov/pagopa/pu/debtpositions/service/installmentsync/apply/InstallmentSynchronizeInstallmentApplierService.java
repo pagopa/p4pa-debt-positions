@@ -40,7 +40,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
       throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
     }
 
-    if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()){
+    if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
     }
 
@@ -53,7 +53,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
 
     installmentDTO.getTransfers()
       .forEach(transferDTO -> {
-        if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null){
+        if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null) {
           throw new ConflictErrorException(String.format("The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
         }
         mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()), installmentDTO.getIud());

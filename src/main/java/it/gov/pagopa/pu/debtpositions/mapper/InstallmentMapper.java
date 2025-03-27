@@ -5,13 +5,8 @@ import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.stream.Collectors;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
@@ -51,7 +46,7 @@ public class InstallmentMapper {
     installment.setDebtor(personMapper.mapToModel(dto.getDebtor()));
     installment.setTransfers(dto.getTransfers().stream()
       .map(transferMapper::mapToModel)
-      .collect(Collectors.toCollection(ArrayList<Transfer>::new)));
+      .toList());
     installment.setNotificationDate(dto.getNotificationDate());
     installment.setIngestionFlowFileId(dto.getIngestionFlowFileId());
     installment.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
@@ -82,7 +77,7 @@ public class InstallmentMapper {
       .debtor(personMapper.mapToDto(pii.getDebtor()))
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
-        .collect(Collectors.toCollection(ArrayList<TransferDTO>::new)))
+        .toList())
       .notificationDate(installment.getNotificationDate())
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
@@ -125,7 +120,7 @@ public class InstallmentMapper {
       .debtor(personMapper.mapToDto(pii.getDebtor()))
       .transfers(installment.getTransfers().stream()
         .map(transferMapper::mapToDto)
-        .collect(Collectors.toCollection(ArrayList<TransferDTO>::new)))
+        .toList())
       .notificationDate(installment.getNotificationDate())
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
