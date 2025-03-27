@@ -42,7 +42,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     }
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment, installmentSynchronizeDTO.getIngestionFlowFileId());
 
-    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
+    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment);
 
     if (debtPositionApplied.getLeft().getDebtPositionId() == null) {
       return debtPositionCreationService.createDebtPosition(debtPositionApplied.getLeft(), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
@@ -79,13 +79,13 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
   private boolean isDPToSyncAllowed(DebtPositionDTO storedDebtPosition, Long ingestionFlowFileId) {
     return storedDebtPosition.getPaymentOptions().stream().allMatch(
       paymentOptionDTO -> paymentOptionDTO.getInstallments()
-        .stream().allMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId))
+        .stream().anyMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId))
     );
   }
 
   private boolean isPOToSyncAllowed(PaymentOptionDTO storedPaymentOption, Long ingestionFlowFileId) {
     return storedPaymentOption.getInstallments()
-      .stream().allMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId));
+      .stream().anyMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId));
   }
 
 }

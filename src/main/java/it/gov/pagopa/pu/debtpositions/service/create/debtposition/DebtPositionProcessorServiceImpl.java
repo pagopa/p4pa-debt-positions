@@ -11,13 +11,7 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
     debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
       long totalPaymentOptionAmount = paymentOption.getInstallments().stream()
         .filter(this::isInstallmentCancelled)
-        .mapToLong(installment -> {
-          long totalInstallmentAmount = installment.getTransfers().stream()
-            .mapToLong(TransferDTO::getAmountCents)
-            .sum();
-          installment.setAmountCents(totalInstallmentAmount);
-          return totalInstallmentAmount;
-        })
+        .mapToLong(InstallmentDTO::getAmountCents)
         .sum();
 
       paymentOption.setTotalAmountCents(totalPaymentOptionAmount);

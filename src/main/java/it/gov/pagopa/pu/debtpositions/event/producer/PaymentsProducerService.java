@@ -9,6 +9,7 @@ import org.springframework.integration.support.MessageBuilder;
 import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.stereotype.Component;
 
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Component
@@ -38,7 +39,7 @@ public class PaymentsProducerService {
   public void notifyPaymentsEvent(DebtPositionDTO debtPosition, PaymentEventType event, String eventDescription) {
     String eventId = event.name() + debtPosition.getDebtPositionId() + UUID.randomUUID();
     streamBridge.send("paymentsProducer-out-0", binder,
-      MessageBuilder.withPayload(new PaymentEventDTO(eventId, debtPosition, event, eventDescription))
+      MessageBuilder.withPayload(new PaymentEventDTO(eventId, event, OffsetDateTime.now(), debtPosition, eventDescription))
         .setHeader(KafkaHeaders.KEY, String.valueOf(debtPosition.getOrganizationId()))
         .build()
     );

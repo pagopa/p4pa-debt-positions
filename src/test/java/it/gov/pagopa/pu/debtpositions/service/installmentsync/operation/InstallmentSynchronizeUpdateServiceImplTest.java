@@ -49,7 +49,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
-        debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
+        debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
@@ -177,7 +177,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(null);
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
-      debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
+      debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
@@ -202,7 +202,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
       .setSyncStatus(InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.UNPAID).build());
 
     Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
-        debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
+        debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,

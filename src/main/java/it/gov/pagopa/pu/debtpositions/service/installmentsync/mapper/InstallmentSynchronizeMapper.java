@@ -3,7 +3,9 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class InstallmentSynchronizeMapper {
@@ -49,7 +51,9 @@ public class InstallmentSynchronizeMapper {
       .ingestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber())
       .notificationDate(installmentSynchronizeDTO.getNotificationDate())
       .status(installmentSynchronizeDTO.getDraft().equals(Boolean.TRUE) ? InstallmentStatus.DRAFT : InstallmentStatus.UNPAID)
-      .transfers(installmentSynchronizeDTO.getAdditionalTransfers().stream().map(this::map2TransferDTO).toList())
+      .transfers(installmentSynchronizeDTO.getAdditionalTransfers()
+        .stream().map(this::map2TransferDTO)
+        .collect(Collectors.toCollection(ArrayList<TransferDTO>::new)))
       .build();
   }
 

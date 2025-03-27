@@ -6,12 +6,15 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.OffsetDateTime;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentEventDTO {
   private String eventId;
-  private DebtPositionDTO payload;
   private PaymentEventType eventType;
+  private OffsetDateTime eventDateTime;
+  private DebtPositionDTO payload;
   private String eventDescription;
 }

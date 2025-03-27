@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -31,6 +32,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
   }
 
+  @Transactional
   @Override
   public Pair<DebtPositionDTO, String> updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     if (log.isDebugEnabled()) {
@@ -45,7 +47,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status for installments with ids {}", installmentIds);
 

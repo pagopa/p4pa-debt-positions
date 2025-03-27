@@ -22,6 +22,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
+  @Transactional
   @Override
   public Pair<DebtPositionDTO, String> addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.debug("Adding new installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
@@ -53,7 +55,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
@@ -65,8 +67,8 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
         .findFirst()
         .ifPresent(installmentDTO -> {
-          validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
           debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO);
+          validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
           installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
           installmentDTO.setSyncStatus(InstallmentSyncStatus.builder().syncStatusFrom(InstallmentStatus.DRAFT).syncStatusTo(InstallmentStatus.UNPAID).build());
         })

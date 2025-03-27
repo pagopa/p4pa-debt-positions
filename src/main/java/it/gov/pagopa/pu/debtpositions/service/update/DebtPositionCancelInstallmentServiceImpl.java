@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -35,6 +36,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
   }
 
+  @Transactional
   @Override
   public Pair<DebtPositionDTO, String> cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     if (log.isDebugEnabled()) {
@@ -49,7 +51,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  public DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 
