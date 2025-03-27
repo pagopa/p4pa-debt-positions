@@ -164,7 +164,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     }
   }
 
-  public void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
+  private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
     String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
       .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
       .getTaxonomyCode();
@@ -184,4 +184,5 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
     installmentDTO.addTransfersItem(firstTransfer);
   }
+
 }

@@ -33,7 +33,7 @@ class DebtPositionProcessorServiceImplTest {
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(30000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(300, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -48,7 +48,7 @@ class DebtPositionProcessorServiceImplTest {
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(20000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -63,6 +63,6 @@ class DebtPositionProcessorServiceImplTest {
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(20000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 }
