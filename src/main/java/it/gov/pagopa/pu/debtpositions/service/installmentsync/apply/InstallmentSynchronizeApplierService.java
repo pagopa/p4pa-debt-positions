@@ -36,14 +36,8 @@ public class InstallmentSynchronizeApplierService {
   public Pair<DebtPositionDTO, InstallmentDTO> apply(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition,
                                                      PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, String accessToken) {
 
-    Long organizationId = installmentSynchronizeDTO.getOrganizationId();
-    Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
-      .orElseThrow(() -> new InvalidValueException(String.format("Provided organization id %s not found", organizationId)));
-
-    DebtPositionTypeOrg debtPositionTypeOrg = retrieveDebtPositionTypeOrg(organizationId,
+    DebtPositionTypeOrg debtPositionTypeOrg = retrieveDebtPositionTypeOrg(installmentSynchronizeDTO.getOrganizationId(),
       installmentSynchronizeDTO.getDebtPositionTypeCode());
-
-    populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg);
 
     if (storedDebtPosition == null) {
       DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
@@ -51,26 +45,31 @@ public class InstallmentSynchronizeApplierService {
     }
     applierDebtPositionService.merge(installmentSynchronizeDTO, storedDebtPosition, debtPositionTypeOrg.getDebtPositionTypeOrgId());
 
-    return applyPaymentOption(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment);
+    return applyPaymentOption(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken, debtPositionTypeOrg);
   }
 
-  private Pair<DebtPositionDTO, InstallmentDTO> applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment) {
+  private Pair<DebtPositionDTO, InstallmentDTO> applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     if (storedPaymentOption == null) {
       PaymentOptionDTO paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO);
       storedDebtPosition.addPaymentOptionsItem(paymentOptionDTO);
       return Pair.of(storedDebtPosition, paymentOptionDTO.getInstallments().getFirst());
     } else {
       applierPaymentOptionService.merge(installmentSynchronizeDTO, storedPaymentOption);
-      InstallmentDTO installmentDTO = applyInstallment(installmentSynchronizeDTO, storedPaymentOption, storedInstallment);
+      InstallmentDTO installmentDTO = applyInstallment(installmentSynchronizeDTO, storedPaymentOption, storedInstallment, accessToken, debtPositionTypeOrg);
       return Pair.of(storedDebtPosition, installmentDTO);
     }
   }
 
-  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO) {
+  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     if (installmentDTO == null) {
       installmentDTO = installmentSynchronizeMapper.map2Installment(installmentSynchronizeDTO);
       storedPaymentOption.getInstallments().add(installmentDTO);
     } else {
+      Long organizationId = installmentSynchronizeDTO.getOrganizationId();
+      Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
+        .orElseThrow(() -> new InvalidValueException(String.format("Provided organization id %s not found", organizationId)));
+
+      populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg);
       applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
     }
     return installmentDTO;

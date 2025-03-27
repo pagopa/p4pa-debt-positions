@@ -63,18 +63,13 @@ class InstallmentSynchronizeApplierServiceTest {
   void testApplyWhenPONullThenOk() {
     String accessToken = "ACCESSTOKEN";
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    Organization organization = buildOrganization();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     DebtPositionDTO syncDebtPositionDTO = buildSyncDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeOrg.getDebtPositionTypeId()))
-      .thenReturn(Optional.of(buildDebtPositionType()));
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.when(installmentSynchronizeMapperMock.map2PaymentOptionDTO(installmentSynchronizeDTO))
       .thenReturn(syncDebtPositionDTO.getPaymentOptions().getFirst());
@@ -89,18 +84,13 @@ class InstallmentSynchronizeApplierServiceTest {
   void testApplyWhenInstallmentNullThenOk() {
     String accessToken = "ACCESSTOKEN";
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    Organization organization = buildOrganization();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     DebtPositionDTO syncDebtPositionDTO = buildSyncDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeOrg.getDebtPositionTypeId()))
-      .thenReturn(Optional.of(buildDebtPositionType()));
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
     Mockito.when(installmentSynchronizeMapperMock.map2Installment(installmentSynchronizeDTO))
@@ -142,10 +132,16 @@ class InstallmentSynchronizeApplierServiceTest {
   void testApplyOrgNotFoundThenException() {
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
     InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
 
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
+    Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
 
     Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.empty());
@@ -163,12 +159,8 @@ class InstallmentSynchronizeApplierServiceTest {
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
     InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
 
-    Organization organization = buildOrganization();
-
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.empty());
 
