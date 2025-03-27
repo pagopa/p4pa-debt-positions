@@ -33,13 +33,11 @@ import java.util.stream.Collectors;
 public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOperationService implements DebtPositionUpdateInstallmentService {
 
   private final ValidateDebtPositionService validateDebtPositionService;
-  private final DebtPositionProcessorService debtPositionProcessorService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
   protected DebtPositionUpdateInstallmentServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, ValidateDebtPositionService validateDebtPositionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
-    this.debtPositionProcessorService = debtPositionProcessorService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
@@ -71,7 +69,6 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
         .findFirst()
         .ifPresent(installmentDTO -> {
-          debtPositionProcessorService.populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
           validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
 
           InstallmentStatus statusTo = installmentDTO.getStatus();

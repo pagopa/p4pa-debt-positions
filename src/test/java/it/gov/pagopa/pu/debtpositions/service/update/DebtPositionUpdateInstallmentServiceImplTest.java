@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -32,6 +33,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionUpdateInstallmentServiceImplTest {
@@ -137,5 +139,26 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     assertEquals(new InstallmentSyncStatus(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID), resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
     assertEquals(InstallmentStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
 
+  }
+
+  @Test
+  void testUpdateInstallmentWhenDPTypeOrgNotFoundThenException(){
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String operatorExternalId = "OPERATOREXTERNALID";
+
+    Organization organization = buildOrganization();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    List<InstallmentDTO> installments = List.of(buildInstallmentDTO());
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(2L, operatorExternalId)).thenReturn(debtPositionTypeOrg);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L)).thenReturn(Optional.empty());
+
+    NotFoundException exception = assertThrows(NotFoundException.class, () -> debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installments, wfExecutionParameters, accessToken, operatorExternalId));
+
+    assertEquals("The debt position type org with id 2 was not found for organization id 500", exception.getMessage());
   }
 }
