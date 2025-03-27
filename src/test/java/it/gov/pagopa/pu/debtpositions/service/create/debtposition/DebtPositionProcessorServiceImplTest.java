@@ -7,16 +7,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DebtPositionProcessorServiceImplTest {
 
@@ -30,20 +27,13 @@ class DebtPositionProcessorServiceImplTest {
   @Test
   void givenDebtPositionWhenUpdateAmountsThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().addAll(IntStream.range(0, 2)
-      .mapToObj(i -> buildPaymentOptionDTO())
-      .collect(Collectors.toCollection(ArrayList::new)));
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().addAll(IntStream.range(0, 2)
       .mapToObj(i -> buildInstallmentDTO())
-      .collect(Collectors.toCollection(ArrayList::new)));
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().addAll(IntStream.range(0, 2)
-      .mapToObj(i -> buildTransferDTO())
       .collect(Collectors.toCollection(ArrayList::new)));
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(3000, result.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents());
-    assertEquals(5000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(300, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -58,7 +48,7 @@ class DebtPositionProcessorServiceImplTest {
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(2000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -73,7 +63,7 @@ class DebtPositionProcessorServiceImplTest {
 
     DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(2000, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 }
 

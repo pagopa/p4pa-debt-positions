@@ -124,33 +124,32 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("At least one transfer is mandatory for installment");
     }
 
-    if (transferDTOList.size() > 1) {
-      TransferDTO transferSecondaryBeneficiary = transferDTOList.stream()
-        .filter(transfer -> (transfer.getTransferIndex() == 2)).findAny()
-        .orElseThrow(() -> new InvalidValueException("Mismatch with transfers list"));
-
-      if (StringUtils.isBlank(transferSecondaryBeneficiary.getOrgFiscalCode()) ||
-        !isValidPIVA(transferSecondaryBeneficiary.getOrgFiscalCode())) {
-        throw new InvalidValueException("Fiscal code of secondary beneficiary is not valid");
-      }
-      if (!isValidIban(transferSecondaryBeneficiary.getIban())) {
-        throw new InvalidValueException("Iban of secondary beneficiary is not valid");
-      }
-      checkTaxonomyCategory(transferSecondaryBeneficiary.getCategory(), accessToken);
-
-      if (transferSecondaryBeneficiary.getAmountCents() < 0) {
-        throw new InvalidValueException("The amount of secondary beneficiary is not valid");
-      }
+    if(transferDTOList.size() > 5){
+      throw new InvalidValueException("At most 5 transfers is allowed for installment");
     }
+
+    transferDTOList.forEach(transferDTO -> {
+      if(transferDTO.getAmountCents() <= 0) {
+        throw new InvalidValueException("The amount of transfer with index " + transferDTO.getTransferIndex() + " must be greater than 0");
+      }
+      if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
+        !isValidPIVA(transferDTO.getOrgFiscalCode())) {
+        throw new InvalidValueException("Fiscal code of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+      if (!isValidIban(transferDTO.getIban())) {
+        throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+      checkTaxonomyCategory(transferDTO, accessToken);
+    });
   }
 
-  private void checkTaxonomyCategory(String category, String accessToken) {
-    if (StringUtils.isBlank(category)) {
-      throw new InvalidValueException("Category of secondary beneficiary is mandatory");
+  private void checkTaxonomyCategory(TransferDTO transferDTO, String accessToken) {
+    if (StringUtils.isBlank(transferDTO.getCategory())) {
+      throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
-      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(category, accessToken);
+      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(transferDTO.getCategory(), accessToken);
       if (taxonomy.isEmpty()) {
-        throw new InvalidValueException("The category code does not exist in the archive");
+        throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not exist in the archive");
       }
     }
   }
