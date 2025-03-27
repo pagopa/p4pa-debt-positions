@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -51,6 +52,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private InstallmentSynchronizeService installmentSynchronizerService;
+
+  @MockitoBean
+  private InstallmentService installmentService;
 
   @Test
   void whenFinalizeSyncStatusThenOk() throws Exception {
