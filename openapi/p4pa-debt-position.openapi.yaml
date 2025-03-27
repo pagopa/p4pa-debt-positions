@@ -492,23 +492,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
-  /debt-positions/update-installment:
+  /debt-positions/update-installment-notification-date:
     put:
       tags:
         - debt-position
-      operationId: updateInstallment
+      operationId: updateInstallmentNotificationDate
       requestBody:
         content:
           application/json:
             schema:
               type: object
               properties:
-                debtPositionDTO:
-                  $ref: "#/components/schemas/DebtPositionDTO"
-                installments2operate:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/InstallmentDTO"
+                debtPositionId:
+                  type: integer
+                  format: int64
+                notificationDate:
+                  type: string
+                  format: date-time
+                nav:
+                  type: string
         required: true
       responses:
         "201":

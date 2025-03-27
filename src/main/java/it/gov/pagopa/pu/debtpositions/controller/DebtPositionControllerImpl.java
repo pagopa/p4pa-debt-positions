@@ -4,10 +4,10 @@ import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
-import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentServiceImpl;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -23,14 +23,14 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionCreationService debtPositionCreationService;
   private final DebtPositionService debtPositionService;
   private final InstallmentSynchronizeService installmentSynchronizeService;
-  private final DebtPositionUpdateInstallmentServiceImpl debtPositionUpdateInstallmentService;
+  private final InstallmentService installmentService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, DebtPositionUpdateInstallmentServiceImpl debtPositionUpdateInstallmentService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
     this.installmentSynchronizeService = installmentSynchronizeService;
-    this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
+    this.installmentService = installmentService;
   }
 
   @Override
@@ -77,20 +77,21 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<Void> updateInstallment(UpdateInstallmentRequest updateInstallmentRequest) {
+  public ResponseEntity<PagedDebtPositions> getDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, Pageable pageable) {
+    return ResponseEntity.ok(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable));
+  }
+
+  @Override
+  public ResponseEntity<Void> updateInstallmentNotificationDate(UpdateInstallmentNotificationDateRequest updateInstallmentNotificationDateRequest) {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .massive(false)
       .partialChange(false)
       .build();
-    String workflowId = debtPositionUpdateInstallmentService.updateInstallment(updateInstallmentRequest.getDebtPositionDTO(), updateInstallmentRequest.getInstallments2operate(), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
-    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
-  }
 
-  @Override
-  public ResponseEntity<PagedDebtPositions> getDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, Pageable pageable) {
-    return ResponseEntity.ok(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable));
+    String workflowId = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
+    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
   }
 }
 

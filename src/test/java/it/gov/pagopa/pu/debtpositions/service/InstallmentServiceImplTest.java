@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
+import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,6 +43,10 @@ class InstallmentServiceImplTest {
   private InstallmentDetailPIIViewRepository installmentDetailPIIViewRepositoryMock;
   @Mock
   private InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepositoryMock;
+  @Mock
+  DebtPositionService debtPositionService;
+  @Mock
+  DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
 
   private InstallmentServiceImpl installmentService;
 
@@ -49,7 +54,7 @@ class InstallmentServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    installmentService = new InstallmentServiceImpl(installmentPIIRepositoryMock, installmentMapperMock, installmentDetailPIIViewRepositoryMock, installmentPaidViewPIIViewRepositoryMock);
+    installmentService = new InstallmentServiceImpl(installmentPIIRepositoryMock, installmentMapperMock, installmentDetailPIIViewRepositoryMock, installmentPaidViewPIIViewRepositoryMock, debtPositionService, debtPositionUpdateInstallmentService);
   }
 
   @ParameterizedTest
