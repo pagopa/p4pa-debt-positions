@@ -4,10 +4,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
@@ -38,28 +36,15 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final IuvService iuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
-  private final DebtPositionTypeRepository debtPositionTypeRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
 
-  public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-                                         ValidateDebtPositionService validateDebtPositionService,
-                                         DebtPositionService debtPositionService,
-                                         IuvService iuvService,
-                                         DebtPositionSyncService debtPositionSyncService,
-                                         InstallmentNoPIIRepository installmentNoPIIRepository,
-                                         DebtPositionProcessorService debtPositionProcessorService,
-                                         OrganizationService organizationService,
-                                         DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository
-  ) {
-    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
-      debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
+  protected DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, ValidateDebtPositionService validateDebtPositionService, IuvService iuvService, InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
+    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.validateDebtPositionService = validateDebtPositionService;
     this.iuvService = iuvService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
-    this.debtPositionTypeRepository = debtPositionTypeRepository;
   }
 
   @Transactional
@@ -145,7 +130,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
     }
 
-    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
+    debtPositionProcessorService.populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
   }
@@ -162,27 +147,6 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     if (StringUtils.isBlank(debtPositionDTO.getIupdOrg())) {
       debtPositionDTO.setIupdOrg(Utilities.generateRandomIupd(org.getOrgFiscalCode()));
     }
-  }
-
-  private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
-    String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
-      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
-      .getTaxonomyCode();
-
-    Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
-      .mapToLong(TransferDTO::getAmountCents).sum();
-
-    TransferDTO firstTransfer = TransferDTO.builder()
-      .transferIndex(1)
-      .orgFiscalCode(organization.getOrgFiscalCode())
-      .orgName(organization.getOrgName())
-      .iban(debtPositionTypeOrg.getIban().isBlank() ? organization.getIban() : debtPositionTypeOrg.getIban())
-      .category(category)
-      .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
-      .remittanceInformation(installmentDTO.getRemittanceInformation())
-      .build();
-
-    installmentDTO.addTransfersItem(firstTransfer);
   }
 
 }

@@ -44,7 +44,7 @@ public class InstallmentSynchronizeFaker {
       .nation("nation")
       .email("email@test.it")
       .dueDate(DATE)
-      .amountCents(100L)
+      .amountCents(10000L)
       .debtPositionTypeCode("TEST_CODE")
       .notificationFeeCents(1000L)
       .remittanceInformation("remittanceInformation")
