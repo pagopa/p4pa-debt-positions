@@ -11,11 +11,19 @@ public interface DebtPositionHierarchyStatusAlignerService {
 
   DebtPositionDTO finalizeSyncStatus(Long debtPositionId, Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO);
 
-  DebtPositionDTO notifyReportedTransferId(Long transferId);
+  /**
+   * It will set the installment as REPORTED and then invoking sync debtPosition in order to publish the event
+   * @return The DebtPosition updated and workflowId started
+   */
+  Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, String accessToken);
 
+  /**
+   * It will verify installment expiration and then invoking sync debtPosition in order to publish the event and re-schedule expiration check
+   * @return The DebtPosition updated and workflowId started
+   */
   Pair<DebtPositionDTO, String> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
 
   void alignHierarchyStatus(DebtPosition debtPosition);
-  /** Call only if PII are should be resolved */
+  /** Call only if PII should be resolved */
   DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition);
 }

@@ -91,17 +91,16 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   @Transactional
   @Override
-  public DebtPositionDTO notifyReportedTransferId(Long transferId) {
+  public Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
       throw new NotFoundException(String.format("Debt position related to the transfer with id %s was not found", transferId));
     }
 
-    debtPosition.getPaymentOptions().stream()
+    String reportedIuds = debtPosition.getPaymentOptions().stream()
       .flatMap(p -> p.getInstallments().stream())
       .filter(i -> i.getTransfers().stream().anyMatch(transfer -> transfer.getTransferId().equals(transferId)))
-      .findFirst()
       .filter(i ->
         switch (i.getStatus()) {
           case InstallmentStatus.REPORTED -> false;
@@ -109,14 +108,24 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
           default ->
             throw new InvalidStatusTransitionException("The installment with id " + i.getInstallmentId() + " is in " + i.getStatus() + " status and cannot be set to reported status");
         })
-      .ifPresent(installment -> {
+      .map(installment -> {
         InstallmentStatus newStatus = InstallmentStatus.REPORTED;
         installment.setStatus(newStatus);
         log.info("Updating status {} for installment with id {} after report notification on transfer {}", newStatus, installment.getInstallmentId(), transferId);
         installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
-      });
+        return installment.getIud();
+      })
+      .collect(Collectors.joining(","));
 
-    return alignHierarchyStatusAndRemap(debtPosition);
+    DebtPositionDTO debtPositionDTO = alignHierarchyStatusAndRemap(debtPosition);
+    String workflowId = null;
+
+    if(StringUtils.isNotEmpty(reportedIuds)){
+      workflowId = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
+        PaymentEventType.DPI_REPORTED, "IUD:" + reportedIuds, accessToken).getWorkflowId();
+    }
+
+    return Pair.of(debtPositionDTO, workflowId);
   }
 
   @Transactional

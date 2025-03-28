@@ -66,14 +66,12 @@ class DebtPositionControllerTest {
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
-  private String accesstoken;
-  private String userId;
+  private final String accessToken = "ACCESSTOKEN";
+  private final String userId = "USERID";
 
   @BeforeEach
   void init(){
-    accesstoken = "ACCESSTOKEN";
-    userId = "USERID";
-    SecurityUtilsTest.configureSecurityContext(accesstoken, userId);
+    SecurityUtilsTest.configureSecurityContext(accessToken, userId);
   }
 
   @AfterEach
@@ -114,7 +112,7 @@ class DebtPositionControllerTest {
       .massive(massive)
       .build();
 
-    Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accesstoken, userId))
+    Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
       .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
 
     MvcResult result = mockMvc.perform(
@@ -134,7 +132,7 @@ class DebtPositionControllerTest {
   void whenCheckAndUpdateInstallmentExpirationThenOk() throws Exception {
     Long id = 1L;
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accesstoken))
+    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
 
     MvcResult result = mockMvc.perform(
@@ -177,7 +175,7 @@ class DebtPositionControllerTest {
       .build();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
 
-    Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accesstoken, userId))
+    Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
       .thenReturn("workflowId");
 
     mockMvc.perform(
@@ -222,7 +220,7 @@ class DebtPositionControllerTest {
       .partialChange(false)
       .build();
 
-    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accesstoken))
+    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accessToken))
       .thenReturn("workflowId");
 
     mockMvc.perform(
