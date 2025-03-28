@@ -36,11 +36,11 @@ public class InstallmentSynchronizeInstallmentApplierService {
       throw new ConflictErrorException(String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
     }
 
-    if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()){
+    if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
     }
 
-    if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()){
+    if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
     }
 
