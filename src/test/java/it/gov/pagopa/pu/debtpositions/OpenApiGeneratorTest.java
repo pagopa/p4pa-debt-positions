@@ -21,7 +21,6 @@ import java.nio.file.StandardOpenOption;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @TestPropertySource(properties = {
@@ -37,6 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
   "logging.level.org.springdoc.core.utils.SpringDocAnnotationsUtils=OFF"
 })
+@Slf4j
 class OpenApiGeneratorTest {
 
   @Autowired
