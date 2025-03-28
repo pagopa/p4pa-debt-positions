@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentO
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -265,9 +266,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
       .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
+    Pair<DebtPositionDTO, String> result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
-    assertEquals(InstallmentStatus.INVALID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(InstallmentStatus.INVALID, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals("WFID", result.getRight());
   }
 
   @Test
@@ -291,9 +293,11 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         Mockito.eq(PaymentEventType.DPI_EXPIRED), Mockito.eq("IUD:"+expiredInstallment.getIud()), Mockito.same(accessToken)))
       .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
+    Pair<DebtPositionDTO, String> result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
-    assertEquals(InstallmentStatus.EXPIRED, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(InstallmentStatus.EXPIRED, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals("WFID", result.getRight());
+
     verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED);
   }
 
@@ -317,9 +321,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
       .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
+    Pair<DebtPositionDTO, String> result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
-    assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(InstallmentStatus.UNPAID, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals("WFID", result.getRight());
   }
 
   @Test
@@ -341,9 +346,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
       .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
+    Pair<DebtPositionDTO, String> result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
-    assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(InstallmentStatus.UNPAID, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals("WFID", result.getRight());
   }
 
   @Test

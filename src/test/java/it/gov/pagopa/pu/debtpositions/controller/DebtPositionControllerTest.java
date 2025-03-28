@@ -123,6 +123,7 @@ class DebtPositionControllerTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(debtPosition)))
       .andExpect(status().isOk())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
@@ -133,12 +134,14 @@ class DebtPositionControllerTest {
   void whenCheckAndUpdateInstallmentExpirationThenOk() throws Exception {
     Long id = 1L;
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accesstoken)).thenReturn(buildDebtPositionDTO());
+    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accesstoken))
+      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/check-installment-expiration")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
@@ -219,7 +222,7 @@ class DebtPositionControllerTest {
       .partialChange(false)
       .build();
 
-    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, null, null))
+    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accesstoken))
       .thenReturn("workflowId");
 
     mockMvc.perform(

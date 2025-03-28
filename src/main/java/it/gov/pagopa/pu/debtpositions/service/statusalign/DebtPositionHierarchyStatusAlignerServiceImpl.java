@@ -14,9 +14,11 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPosit
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -119,7 +121,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   @Transactional
   @Override
-  public DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken) {
+  public Pair<DebtPositionDTO, String> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
@@ -142,10 +144,10 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPositionDTO debtPositionDTO = alignHierarchyStatusAndRemap(debtPosition);
 
     PaymentEventType paymentEventType = StringUtils.isNotEmpty(expiredIuds) ? PaymentEventType.DPI_EXPIRED : null;
-    debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
-      paymentEventType, paymentEventType!=null?"IUD:" + expiredIuds : null, accessToken);
+    WorkflowCreatedDTO workflowCreated = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
+      paymentEventType, paymentEventType != null ? "IUD:" + expiredIuds : null, accessToken);
 
-    return debtPositionDTO;
+    return Pair.of(debtPositionDTO, workflowCreated.getWorkflowId());
   }
 
   @Override
