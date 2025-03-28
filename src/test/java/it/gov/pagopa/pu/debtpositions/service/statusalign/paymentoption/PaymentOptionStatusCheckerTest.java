@@ -202,13 +202,14 @@ class PaymentOptionStatusCheckerTest {
 
   /**
    * Test if an exception is thrown when the list of installments contains an invalid combination of statuses,
-   * including at least one INVALID, an unsupported status (e.g., EXPIRED), and CANCELLED.
+   * including at least one INVALID, an unsupported status (e.g., DRAFT), and CANCELLED.
    */
   @Test
   void testCalculateNewStatus_InvalidStatus2() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.INVALID, InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED);
-    Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(installmentStatusList));
-    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: [INVALID, EXPIRED, CANCELLED]", exception.getMessage());
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.INVALID, InstallmentStatus.DRAFT, InstallmentStatus.CANCELLED);
+    PaymentOptionStatus[] unexpectedStatus = {null};
+    Exception exception = assertThrows(InvalidValueException.class, () -> unexpectedStatus[0] = checker.calculateNewStatus(installmentStatusList), () -> "Unexpected status determined: " + unexpectedStatus[0]);
+    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: [INVALID, DRAFT, CANCELLED]", exception.getMessage());
   }
 
   @Test
