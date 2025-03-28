@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -23,6 +24,10 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -54,6 +59,12 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private InstallmentSynchronizeService installmentSynchronizerService;
+
+  @MockitoBean
+  private InstallmentService installmentService;
+
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
+  private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   private String accesstoken;
   private String userId;
@@ -142,7 +153,7 @@ class DebtPositionControllerTest {
     Mockito.when(debtPositionService.getDebtPosition(debtPositionId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
-        get("/debt-positions/"+debtPositionId)
+        get("/debt-positions/" + debtPositionId)
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
       .andReturn();
@@ -155,7 +166,7 @@ class DebtPositionControllerTest {
   void whenInstallmentSynchronizeThenOk() throws Exception {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     Boolean massive = true;
-    Boolean partialChange=false;
+    Boolean partialChange = false;
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .massive(massive)
       .partialChange(partialChange)
@@ -186,7 +197,7 @@ class DebtPositionControllerTest {
     Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
 
     MvcResult result = mockMvc.perform(
-        get("/debt-positions/ingestion-flow-file/"+ingestionFlowFileId)
+        get("/debt-positions/ingestion-flow-file/" + ingestionFlowFileId)
           .param("size", "1")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
@@ -194,5 +205,29 @@ class DebtPositionControllerTest {
 
     PagedDebtPositions resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), PagedDebtPositions.class);
     assertEquals(expectedPagedDebtPositions, resultResponse);
+  }
+
+  @Test
+  void whenUpdateInstallmentNotificationDateThenOk() throws Exception {
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(1L)
+      .nav("123456789123")
+      .notificationDate(DATETIME)
+      .build();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, null, null))
+      .thenReturn("workflowId");
+
+    mockMvc.perform(
+        put("/debt-positions/update-installment-notification-date")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
+      .andExpect(status().isCreated())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andReturn();
   }
 }
