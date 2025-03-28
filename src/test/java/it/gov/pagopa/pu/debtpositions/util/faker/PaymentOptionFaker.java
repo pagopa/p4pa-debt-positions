@@ -15,7 +15,7 @@ public class PaymentOptionFaker {
 
   public static PaymentOption buildPaymentOption() {
     PaymentOption paymentOption = new PaymentOption();
-    paymentOption.setPaymentOptionId(1L);
+    paymentOption.setPaymentOptionId(10L);
     paymentOption.setDebtPositionId(1L);
     paymentOption.setTotalAmountCents(2000L);
     paymentOption.setStatus(PaymentOptionStatus.TO_SYNC);
@@ -28,7 +28,7 @@ public class PaymentOptionFaker {
 
   public static PaymentOptionDTO buildPaymentOptionDTO() {
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
-    paymentOptionDTO.setPaymentOptionId(1L);
+    paymentOptionDTO.setPaymentOptionId(10L);
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
@@ -41,7 +41,7 @@ public class PaymentOptionFaker {
 
   public static PaymentOptionDTO buildGeneratedIuvPaymentOptionDTO() {
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
-    paymentOptionDTO.setPaymentOptionId(1L);
+    paymentOptionDTO.setPaymentOptionId(10L);
     paymentOptionDTO.setDebtPositionId(1L);
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);

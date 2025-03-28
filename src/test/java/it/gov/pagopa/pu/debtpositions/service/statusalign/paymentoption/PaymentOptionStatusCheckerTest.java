@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,11 @@ class PaymentOptionStatusCheckerTest {
   @BeforeEach
   void setUp() {
     checker = new PaymentOptionStatusChecker(paymentOptionRepositoryMock);
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(paymentOptionRepositoryMock);
   }
 
   /**
@@ -239,10 +246,8 @@ class PaymentOptionStatusCheckerTest {
     PaymentOption paymentOption = buildPaymentOption();
     PaymentOptionStatus newStatus = PaymentOptionStatus.PAID;
 
-    Mockito.doNothing().when(paymentOptionRepositoryMock).updateStatus(1L, newStatus);
+    Mockito.doNothing().when(paymentOptionRepositoryMock).updateStatus(10L, newStatus);
 
-    checker.storeStatus(paymentOption, newStatus);
-
-    Mockito.verify(paymentOptionRepositoryMock).updateStatus(1L, newStatus);
+    Assertions.assertDoesNotThrow(() -> checker.storeStatus(paymentOption, newStatus));
   }
 }

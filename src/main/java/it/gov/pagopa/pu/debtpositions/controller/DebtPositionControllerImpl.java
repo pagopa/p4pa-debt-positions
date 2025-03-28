@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,8 @@ import java.util.Map;
 
 @RestController
 public class DebtPositionControllerImpl implements DebtPositionApi {
+
+  public static final String HEADER_X_WORKFLOW_ID = "x-workflow-id";
 
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
   private final DebtPositionCreationService debtPositionCreationService;
@@ -41,8 +44,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(massive)
       .partialChange(false)
       .build();
-    DebtPositionDTO body = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
-    return new ResponseEntity<>(body, HttpStatus.OK);
+    Pair<DebtPositionDTO, String> result = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
   }
 
 
@@ -54,8 +57,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
   @Override
   public ResponseEntity<DebtPositionDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId) {
-    DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId);
-    return new ResponseEntity<>(body, HttpStatus.OK);
+    Pair<DebtPositionDTO, String> result = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId, SecurityUtils.getAccessToken());
+    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
   }
 
   @Override
@@ -73,7 +76,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
     String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
+    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
   }
 
   @Override
@@ -91,7 +94,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .build();
 
     String workflowId = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
-    return ResponseEntity.status(HttpStatus.CREATED).header("x-workflow-id", workflowId).build();
+    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
   }
 }
 
