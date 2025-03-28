@@ -22,12 +22,6 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @RepositoryRestResource(path = "installments")
 public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoPII, Long> {
 
-  @RestResource(exported = false)
-  @Transactional
-  @Modifying
-  @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
-  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
-
   @Query("""
     SELECT COUNT(i)
     FROM DebtPosition dp
@@ -77,8 +71,14 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Transactional
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.dueDate = :dueDate WHERE i.installmentId = :installmentId")
-  @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(ref = "CollectionModelInstallmentNoPII")))
+  @ApiResponse(responseCode = "200", description = "Due date updated successfully")
   void updateDueDate(@Param("installmentId") Long installmentId, @Param("dueDate") LocalDate dueDate);
+
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
+  @ApiResponse(responseCode = "200", description = "Status updated successfully")
+  void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
   //endregion
 
 }
