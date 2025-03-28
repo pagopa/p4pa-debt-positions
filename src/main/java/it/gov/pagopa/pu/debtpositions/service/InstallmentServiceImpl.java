@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -14,6 +15,7 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 public class InstallmentServiceImpl implements InstallmentService {
   private final InstallmentPIIRepository installmentPIIRepository;
@@ -50,18 +52,23 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public String updateInstallmentNotificationDate(UpdateInstallmentNotificationDateRequest updateInstallmentNotificationDateRequest, WfExecutionParameters wfExecutionParameters, String operatorExternalUserId, String accessToken) {
-    DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(updateInstallmentNotificationDateRequest.getDebtPositionId());
+  public String updateInstallmentNotificationDate(UpdateInstallmentNotificationDateRequest request, WfExecutionParameters wfExecutionParameters, String operatorExternalUserId, String accessToken) {
+    DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(request.getDebtPositionId());
 
     List<InstallmentDTO> updatedInstallments = new ArrayList<>();
 
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-      .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()) && installmentDTO.getNav().equals(updateInstallmentNotificationDateRequest.getNav()))
+      .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()) && installmentDTO.getNav().equals(request.getNav()))
       .forEach(installmentDTO -> {
-        installmentDTO.setNotificationDate(updateInstallmentNotificationDateRequest.getNotificationDate());
+        log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
+        installmentDTO.setNotificationDate(request.getNotificationDate());
         updatedInstallments.add(installmentDTO);
       }));
+
+    if (updatedInstallments.isEmpty()) {
+      return null;
+    }
 
     return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, operatorExternalUserId, accessToken).getRight();
   }

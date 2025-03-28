@@ -1,10 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
@@ -29,8 +27,9 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentServiceImplTest {
@@ -64,7 +63,7 @@ class InstallmentServiceImplTest {
     //given
     List<Installment> installmentList = podamFactory.manufacturePojo(List.class, Installment.class);
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
-    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+    List<DebtPositionOrigin> originList = debtPositionOrigin == null ? null : List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentList);
     installmentList.forEach(installment -> {
@@ -89,14 +88,14 @@ class InstallmentServiceImplTest {
     String operatorExternalUserId = "operatorExternalUserId";
     InstallmentDetailDTO installment = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
 
-    Mockito.when(installmentDetailPIIViewRepositoryMock.getInstallmentDetail(installmentId,operatorExternalUserId)).thenReturn(installment);
+    Mockito.when(installmentDetailPIIViewRepositoryMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(installment);
 
-    InstallmentDetailDTO response = installmentService.getInstallmentDetail(installmentId,operatorExternalUserId);
+    InstallmentDetailDTO response = installmentService.getInstallmentDetail(installmentId, operatorExternalUserId);
 
     assertNotNull(response);
     Assertions.assertEquals(installment, response);
 
-    Mockito.verify(installmentDetailPIIViewRepositoryMock).getInstallmentDetail(installmentId,operatorExternalUserId);
+    Mockito.verify(installmentDetailPIIViewRepositoryMock).getInstallmentDetail(installmentId, operatorExternalUserId);
   }
 
   @Test
@@ -118,6 +117,93 @@ class InstallmentServiceImplTest {
     assertEquals(pagedInstallmentsPaidView, result);
 
     Mockito.verify(installmentPaidViewPIIViewRepositoryMock).getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+  }
+
+  @Test
+  void whenUpdateInstallmentNotificationDateThenSuccess() {
+    // Given
+    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setNotificationDate(dateTime);
+    InstallmentDTO installmentDTO = buildInstallmentDTO();
+    installmentDTO.setNotificationDate(dateTime);
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(1L)
+      .nav("nav")
+      .notificationDate(dateTime)
+      .build();
+
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionService.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, null, null))
+      .thenReturn(org.apache.commons.lang3.tuple.Pair.of(debtPositionDTO, "workflowId"));
+
+    // When
+    String workflowId = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, null, null);
+
+    // Then
+    assertEquals("workflowId", workflowId);
+    Mockito.verify(debtPositionService).getDebtPosition(request.getDebtPositionId());
+    Mockito.verify(debtPositionUpdateInstallmentService).updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, null, null);
+  }
+
+  @Test
+  void whenInstallmentIsCancelledThenNoUpdate() {
+    // Given
+    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.CANCELLED);
+
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(1L)
+      .nav("nav")
+      .notificationDate(dateTime)
+      .build();
+
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionService.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+
+    // When
+    String workflowId = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, null, null);
+
+    // Then
+    assertNull(workflowId);
+    Mockito.verify(debtPositionService).getDebtPosition(request.getDebtPositionId());
+  }
+
+  @Test
+  void whenNavDoesNotMatchThenNoUpdate() {
+    // Given
+    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(1L)
+      .nav("1234")
+      .notificationDate(dateTime)
+      .build();
+
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionService.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+
+    // When
+    String workflowId = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, null, null);
+
+    // Then
+    assertNull(workflowId);
+    Mockito.verify(debtPositionService).getDebtPosition(request.getDebtPositionId());
   }
 
 }
