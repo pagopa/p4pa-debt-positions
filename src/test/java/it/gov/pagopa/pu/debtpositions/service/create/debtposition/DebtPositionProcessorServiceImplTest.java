@@ -66,4 +66,3 @@ class DebtPositionProcessorServiceImplTest {
     assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 }
-

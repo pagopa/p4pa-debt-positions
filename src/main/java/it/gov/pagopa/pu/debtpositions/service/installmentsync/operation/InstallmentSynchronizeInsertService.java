@@ -42,7 +42,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     }
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment, installmentSynchronizeDTO.getIngestionFlowFileId());
 
-    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment);
+    Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
 
     if (debtPositionApplied.getLeft().getDebtPositionId() == null) {
       return debtPositionCreationService.createDebtPosition(debtPositionApplied.getLeft(), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
