@@ -12,7 +12,7 @@ public interface DebtPositionHierarchyStatusAlignerService {
 
   DebtPositionDTO notifyReportedTransferId(Long transferId);
 
-  DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId);
+  DebtPositionDTO checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
 
   void alignHierarchyStatus(DebtPosition debtPosition);
   /** Call only if PII are should be resolved */

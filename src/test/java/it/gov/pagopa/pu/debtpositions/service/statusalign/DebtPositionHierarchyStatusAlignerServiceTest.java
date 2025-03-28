@@ -1,14 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,8 +32,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,6 +47,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   private DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
+  @Mock
+  private DebtPositionSyncService syncServiceMock;
 
   private DebtPositionHierarchyStatusAlignerService service;
 
@@ -55,7 +60,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         installmentNoPIIRepositoryMock,
         paymentOptionInnerStatusAlignerServiceMock,
         debtPositionInnerStatusAlignerServiceMock,
-        debtPositionMapperMock)
+        debtPositionMapperMock,
+        syncServiceMock)
     );
   }
 
@@ -66,18 +72,19 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       installmentNoPIIRepositoryMock,
       paymentOptionInnerStatusAlignerServiceMock,
       debtPositionInnerStatusAlignerServiceMock,
-      debtPositionMapperMock
+      debtPositionMapperMock,
+      syncServiceMock
     );
   }
 
   @Test
   void givenFinalizeSyncStatusThenOk() {
-    Long id = 1L;
+    Long debtPositionId = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
     DebtPosition debtPosition = buildDebtPosition();
 
-    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(id)).thenReturn(debtPosition);
-    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(id, newStatus);
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(100L, newStatus);
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -88,7 +95,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       .newStatus(newStatus)
       .build());
 
-    DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
+    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, syncStatusDTO);
 
     assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     assertEquals(PaymentOptionStatus.UNPAID, result.getPaymentOptions().getFirst().getStatus());
@@ -120,8 +127,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
 
     assertSame(expectedResult, result);
-    verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, newStatus);
   }
 
   @Test
@@ -146,8 +151,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     DebtPositionDTO result = service.finalizeSyncStatus(id, syncStatusDTO);
 
     assertSame(expectedResult, result);
-    verify(debtPositionRepositoryMock).findOneWithAllDataByDebtPositionId(id);
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, newStatus);
   }
 
   @Test
@@ -159,10 +162,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(id, syncStatusDTO),
       "Debt position related to the id 1 does not found");
-
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(id, InstallmentStatus.REPORTED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
   }
 
   @Test
@@ -173,15 +172,11 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertThrows(NotFoundException.class, () -> service.notifyReportedTransferId(transferId),
       "Debt position related to the transfer with id 1 does not found");
-
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
   }
 
   @Test
   void givenNotifyReportedTransferIdWhenInstallmentIsNotPaidThenThrowsException() {
-    Long transferId = 1L;
+    Long transferId = 1000L;
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
@@ -189,10 +184,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertThrows(InvalidStatusTransitionException.class, () -> service.notifyReportedTransferId(transferId),
       "The installment with id 1 is in TO_SYNC status and cannot be set to reported status");
-
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
   }
 
   @Test
@@ -216,15 +207,15 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertEquals(DebtPositionStatus.REPORTED, result.getStatus());
     assertEquals(PaymentOptionStatus.REPORTED, result.getPaymentOptions().getFirst().getStatus());
     reflectionEqualsByName(debtPositionDTOexpected, result);
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(transferId, InstallmentStatus.REPORTED);
   }
 
   @Test
   void givenNotifyReportedTransferIdThenOk() {
-    Long transferId = 1L;
+    Long transferId = 1000L;
     DebtPosition debtPosition = buildDebtPosition();
-    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
-    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
+    InstallmentNoPII reportedInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    reportedInstallment.setStatus(InstallmentStatus.PAID);
+    reportedInstallment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
     DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
     debtPositionDTOexpected.setStatus(DebtPositionStatus.REPORTED);
@@ -232,7 +223,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
 
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(debtPosition);
-    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(1L, InstallmentStatus.REPORTED);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(100L, InstallmentStatus.REPORTED);
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
@@ -243,28 +234,23 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertEquals(PaymentOptionStatus.REPORTED, result.getPaymentOptions().getFirst().getStatus());
     assertEquals(InstallmentStatus.REPORTED, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
     reflectionEqualsByName(debtPositionDTOexpected, result);
-    verify(installmentNoPIIRepositoryMock, times(1)).updateStatus(transferId, InstallmentStatus.REPORTED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
 
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDebtPositionNotFoundThenThrowsException() {
     Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
 
-    assertThrows(NotFoundException.class, () -> service.checkAndUpdateInstallmentExpiration(debtPositionId),
+    assertThrows(NotFoundException.class, () -> service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken),
       "Debt position related to the id 1 does not found");
-
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(0)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(0)).updateDebtPositionStatus(any());
   }
 
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenInstallmentIsInvalidThenOk() {
     Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.INVALID);
 
@@ -275,22 +261,24 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
+      .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
     assertEquals(InstallmentStatus.INVALID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
 
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsBeforeNowThenOk() {
     Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.of(2025, 1, 1);
     DebtPosition debtPosition = buildDebtPosition();
-    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
-    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
+    InstallmentNoPII expiredInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    expiredInstallment.setStatus(InstallmentStatus.UNPAID);
+    expiredInstallment.setDueDate(dueDate);
 
     DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
     debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
@@ -299,18 +287,20 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.eq(PaymentEventType.DPI_EXPIRED), Mockito.eq("IUD:"+expiredInstallment.getIud()), Mockito.same(accessToken)))
+      .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
     assertEquals(InstallmentStatus.EXPIRED, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(installmentNoPIIRepositoryMock, times(1)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
+    verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED);
   }
 
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsAfterNowThenOk() {
     Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.now().plusDays(2);
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
@@ -323,18 +313,19 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
+      .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
     assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
 
   @Test
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsNullNowThenOk() {
     Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(null);
@@ -346,13 +337,13 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.isNull(), Mockito.isNull(), Mockito.same(accessToken)))
+      .thenReturn(new WorkflowCreatedDTO("WFID"));
 
-    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId);
+    DebtPositionDTO result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
 
     assertEquals(InstallmentStatus.UNPAID, result.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
-    verify(installmentNoPIIRepositoryMock, times(0)).updateStatus(debtPositionId, InstallmentStatus.EXPIRED);
-    verify(paymentOptionInnerStatusAlignerServiceMock, times(1)).updatePaymentOptionStatus(any());
-    verify(debtPositionInnerStatusAlignerServiceMock, times(1)).updateDebtPositionStatus(any());
   }
 
   @Test
@@ -373,8 +364,5 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     // Then
     Assertions.assertSame(expectedResult, result);
-
-    Mockito.verify(service)
-      .alignHierarchyStatus(Mockito.same(debtPosition));
   }
 }

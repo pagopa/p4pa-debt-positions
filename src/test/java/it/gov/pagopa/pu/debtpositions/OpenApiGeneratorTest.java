@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import java.nio.file.StandardOpenOption;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+@Slf4j
 @SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE)
 @TestPropertySource(properties = {
@@ -63,7 +65,7 @@ class OpenApiGeneratorTest {
         JsonAssert.comparator(JsonCompareMode.STRICT).assertIsMatch(storedOpenApi, openApiResult);
         toStore=false;
       } catch (Throwable e){
-        //Do Nothing
+        log.info("Observed the following changes: {}", e.getMessage());
       }
     }
     if(toStore){
