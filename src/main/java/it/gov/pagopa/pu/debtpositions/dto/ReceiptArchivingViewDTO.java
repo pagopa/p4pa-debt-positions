@@ -1,8 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +21,6 @@ public class ReceiptArchivingViewDTO {
   private OffsetDateTime paymentDateTime;
   @NotNull
   private String creditorReferenceId;
-  @Enumerated(EnumType.STRING)
   @NotNull
   private PersonEntityType debtorEntityType;
   private String iuv;
