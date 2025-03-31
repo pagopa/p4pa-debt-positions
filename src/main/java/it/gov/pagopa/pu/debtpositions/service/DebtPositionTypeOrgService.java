@@ -1,0 +1,8 @@
+package it.gov.pagopa.pu.debtpositions.service;
+
+import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+
+public interface DebtPositionTypeOrgService {
+  IONotificationDTO getIONotificationDetails(Long debtPositionTypeId, PaymentEventType context);
+}

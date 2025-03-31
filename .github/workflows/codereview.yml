@@ -1,4 +1,4 @@
-name: TEMPLATE-PAYMENTS - Code Review
+name: p4pa-debt-positions - Code Review
 
 on:
   push:

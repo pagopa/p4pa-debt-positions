@@ -1,0 +1,23 @@
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.apache.commons.lang3.tuple.Pair;
+
+public interface DebtPositionCreationService {
+
+  /***
+   *
+   * @param debtPositionDTO the debt position to be created
+   * @param wfExecutionParameters wf execution parameters
+   * @param accessToken the access token
+   * @param operatorExternalUserId the operator who requested the creation
+   * @return the {@link DebtPositionDTO} created and WorkflowId of debt position synchronization
+   */
+  Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
+
+  void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO);
+}
