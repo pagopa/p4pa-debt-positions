@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -91,7 +92,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, String accessToken) {
+  public Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
@@ -111,8 +112,9 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       .map(installment -> {
         InstallmentStatus newStatus = InstallmentStatus.REPORTED;
         installment.setStatus(newStatus);
+        installment.setIuf(transferReportedRequest.getIuf());
         log.info("Updating status {} for installment with id {} after report notification on transfer {}", newStatus, installment.getInstallmentId(), transferId);
-        installmentNoPIIRepository.updateStatus(installment.getInstallmentId(), newStatus);
+        installmentNoPIIRepository.updateStatusAndIuf(installment.getInstallmentId(), newStatus, installment.getIuf());
         return installment.getIud();
       })
       .collect(Collectors.joining(","));

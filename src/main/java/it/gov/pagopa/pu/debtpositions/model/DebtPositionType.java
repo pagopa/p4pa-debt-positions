@@ -1,13 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.annotation.Nulls;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "debt_position_type")
@@ -22,20 +28,28 @@ public class DebtPositionType extends BaseEntity implements Serializable {
   @SequenceGenerator(name = "debt_position_type_generator", sequenceName = "debt_position_type_seq", allocationSize = 1)
   private Long debtPositionTypeId;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private Long brokerId;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String code;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String description;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String orgType;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String macroArea;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String serviceType;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String collectingReason;
   @NotNull
+  @JsonSetter(nulls = Nulls.SKIP)
   private String taxonomyCode;
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;
