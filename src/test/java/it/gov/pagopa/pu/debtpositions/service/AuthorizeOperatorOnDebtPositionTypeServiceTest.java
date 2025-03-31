@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +13,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgOperatorsFaker.buildDebtPositionTypeOrgOperators;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
@@ -20,43 +24,99 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
 
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  @Mock
+  private DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepositoryMock;
 
   private AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
 
   @BeforeEach
   void init() {
-    authorizeOperatorOnDebtPositionTypeService = new AuthorizeOperatorOnDebtPositionTypeServiceImpl(debtPositionTypeOrgRepositoryMock);
+    authorizeOperatorOnDebtPositionTypeService = new AuthorizeOperatorOnDebtPositionTypeServiceImpl(
+      debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsRepositoryMock);
   }
 
   @Test
   void givenAuthorizeThenSuccess() {
-    String username = "username";
-    Long debtPositionTypeOrgId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    String orgIpaCode = "orgIpaCode";
+    Long debtPositionTypeOrgId = 2L;
 
-    DebtPositionTypeOrg debtPositionTypeOrgDTO = new DebtPositionTypeOrg();
-    debtPositionTypeOrgDTO.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    when(debtPositionTypeOrgRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(debtPositionTypeOrgId, username))
-      .thenReturn(Optional.of(debtPositionTypeOrgDTO));
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(debtPositionTypeOrgId, operatorExternalUserId))
+      .thenReturn(Optional.of(buildDebtPositionTypeOrgOperators()));
 
-    DebtPositionTypeOrg result = authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionTypeOrgId, username);
+    DebtPositionTypeOrg result = authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId);
 
-    assertEquals(debtPositionTypeOrgDTO, result);
+    assertEquals(debtPositionTypeOrg, result);
   }
 
   @Test
-  void givenAuthorizeWhenNotEqualTypeCodeThenThrowValidatorException() {
-    String username = "username";
+  void givenAuthorizeOrgTechnicalUserThenSuccess() {
+    String operatorExternalUserId = "WS_USER-orgIpaCode";
+    String orgIpaCode = "orgIpaCode";
+    Long debtPositionTypeOrgId = 2L;
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+
+    DebtPositionTypeOrg result = authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId);
+
+    assertEquals(debtPositionTypeOrg, result);
+  }
+
+  @Test
+  void givenAuthorizeSystemTechnicalUserThenSuccess() {
+    String operatorExternalUserId = "WS_USER-piattaforma-unitaria_";
+    String orgIpaCode = "orgIpaCode";
+    Long debtPositionTypeOrgId = 2L;
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+
+    DebtPositionTypeOrg result = authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId);
+
+    assertEquals(debtPositionTypeOrg, result);
+  }
+
+  @Test
+  void givenAuthorizeWhenDebtPositionTypeOrgNotFoundThenException() {
+    String operatorExternalUserId = "operatorExternalUserId";
+    String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 1L;
 
-    DebtPositionTypeOrg debtPositionTypeOrgDTO = new DebtPositionTypeOrg();
-    debtPositionTypeOrgDTO.setDebtPositionTypeOrgId(1L);
-
-    when(debtPositionTypeOrgRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(debtPositionTypeOrgId, username))
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
       .thenReturn(Optional.empty());
 
-    assertThrows(OperatorNotAuthorizedException.class, () ->
-      authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionTypeOrgId, username));
+    NotFoundException exception = assertThrows(NotFoundException.class, () ->
+      authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId));
+
+    assertEquals("The DebtPositionTypeOrg with id 1 was not found", exception.getMessage());
+  }
+
+  @Test
+  void givenAuthorizeWhenOperatorNotAuthorizedThenException() {
+    String operatorExternalUserId = "operatorExternalUserId";
+    String orgIpaCode = "orgIpaCode";
+    Long debtPositionTypeOrgId = 2L;
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(debtPositionTypeOrgId, operatorExternalUserId))
+      .thenReturn(Optional.empty());
+
+    OperatorNotAuthorizedException exception = assertThrows(OperatorNotAuthorizedException.class, () ->
+      authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId));
+
+    assertEquals("The operator operatorExternalUserId is not authorized on the DebtPositionTypeOrg 2", exception.getMessage());
   }
 }
 
