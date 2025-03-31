@@ -237,6 +237,74 @@ paths:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
       x-spring-paginated: true
+  /export/organization/{organizationId}/receipts/archiving:
+    get:
+      tags:
+        - data-exports
+      operationId: exportArchivingReceipts
+      description: "|
+      The API returns a list of archiving receipts.
+      **Error:** If the size of the requested export is too large, the API will return an error."
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: paymentDateFrom
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: paymentDateTo
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: debtPositionTypeOrgId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedReceiptsArchivingView'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+              example:
+                code: "DEBT_POSITION_BAD_REQUEST"
+                message: "The number of ReceiptsArchivingViewNOPII records returned exceeds the maximum allowed"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+      x-spring-paginated: true
   /receipts:
     post:
       tags:
@@ -1380,6 +1448,31 @@ components:
         number:
           type: integer
           format: int64
+    PagedReceiptsArchivingView:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ReceiptArchivingView"
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
     IONotificationDTO:
       type: object
       properties:
@@ -1389,6 +1482,32 @@ components:
           type: string
         ioTemplateMessage:
           type: string
+    ReceiptArchivingView:
+      type: object
+      required:
+        - paymentReceiptId
+        - creditorReferenceId
+        - remittanceInformation
+        - orgFiscalCode
+      properties:
+        receiptId:
+          type: integer
+          format: int64
+        paymentReceiptId:
+          type: string
+        paymentDateTime:
+          type: string
+          format: date-time
+        creditorReferenceId:
+          type: string
+        iuv:
+          type: string
+        remittanceInformation:
+          type: string
+        orgFiscalCode:
+          type: string
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
     PagedDebtPositions:
       type: object
       required:
