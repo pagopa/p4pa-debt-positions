@@ -1487,7 +1487,6 @@ components:
       required:
         - paymentReceiptId
         - creditorReferenceId
-        - debtorEntityType
         - remittanceInformation
         - orgFiscalCode
       properties:
@@ -1501,18 +1500,13 @@ components:
           format: date-time
         creditorReferenceId:
           type: string
-        debtorEntityType:
-          type: string
-          enum:
-            - F
-            - G
         iuv:
           type: string
         remittanceInformation:
           type: string
         orgFiscalCode:
           type: string
-        payer:
+        debtor:
           $ref: "#/components/schemas/PersonDTO"
     PagedDebtPositions:
       type: object
