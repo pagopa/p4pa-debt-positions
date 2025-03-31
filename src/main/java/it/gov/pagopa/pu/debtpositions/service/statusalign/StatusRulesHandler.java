@@ -70,7 +70,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   }
 
   public boolean isExpired(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, expiredStatus, emptyAllowedStatuses);
+    return allMatch(childrenStatusList, expiredStatus, allowedCancelledStatuses);
   }
 
   protected boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {

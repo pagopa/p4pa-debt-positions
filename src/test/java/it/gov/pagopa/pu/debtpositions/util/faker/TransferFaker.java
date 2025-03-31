@@ -8,8 +8,8 @@ public class TransferFaker {
 
   public static Transfer buildTransfer() {
     Transfer transfer = new Transfer();
-    transfer.setTransferId(1L);
-    transfer.setInstallmentId(1L);
+    transfer.setTransferId(1000L);
+    transfer.setInstallmentId(100L);
     transfer.setOrgFiscalCode("12345678903");
     transfer.setOrgName("Organization Name");
     transfer.setAmountCents(1000L);
@@ -24,8 +24,8 @@ public class TransferFaker {
 
   public static TransferDTO buildTransferDTO() {
     return TransferDTO.builder()
-      .transferId(1L)
-      .installmentId(1L)
+      .transferId(1000L)
+      .installmentId(100L)
       .orgFiscalCode("12345678903")
       .orgName("Organization Name")
       .amountCents(1000L)

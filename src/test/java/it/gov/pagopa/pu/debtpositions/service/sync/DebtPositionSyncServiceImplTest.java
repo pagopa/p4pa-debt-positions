@@ -14,7 +14,6 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionSyncServiceImplTest {
@@ -30,7 +29,7 @@ class DebtPositionSyncServiceImplTest {
   }
 
   @Test
-  void givenAllowedOriginWhenSyncDebtPositionThenInvokeWF() {
+  void whenSyncDebtPositionThenInvokeWF() {
     String accessToken = "ACCESSTOKEN";
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
@@ -47,19 +46,6 @@ class DebtPositionSyncServiceImplTest {
     WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken);
 
     assertEquals(expectedResult, result);
-  }
-
-  @Test
-  void givenNotAllowedOriginWhenSyncDebtPositionThenInvokeWF() {
-    String accessToken = "ACCESSTOKEN";
-    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA);
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
-
-    WorkflowCreatedDTO result = debtPositionSyncService.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, null, accessToken);
-
-    assertNull(result);
   }
 
 }

@@ -24,8 +24,8 @@ public class InstallmentFaker {
 
   public static Installment buildInstallment(){
     return Installment.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
+      .installmentId(100L)
+      .paymentOptionId(10L)
       .status(InstallmentStatus.TO_SYNC)
       .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
@@ -55,8 +55,8 @@ public class InstallmentFaker {
 
   public static InstallmentNoPII buildInstallmentNoPII(){
     return InstallmentNoPII.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
+      .installmentId(100L)
+      .paymentOptionId(10L)
       .status(InstallmentStatus.TO_SYNC)
       .syncStatus(InstallmentSyncStatus.builder()
         .syncStatusFrom(InstallmentStatus.DRAFT)
@@ -95,8 +95,8 @@ public class InstallmentFaker {
 
   public static Installment buildInstallmentNoUpdate(){
     return Installment.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
+      .installmentId(100L)
+      .paymentOptionId(10L)
       .status(InstallmentStatus.TO_SYNC)
       .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
@@ -124,8 +124,8 @@ public class InstallmentFaker {
 
   public static InstallmentDTO buildInstallmentDTO() {
     return InstallmentDTO.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
+      .installmentId(100L)
+      .paymentOptionId(10L)
       .status(InstallmentStatus.UNPAID)
       .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
@@ -153,8 +153,8 @@ public class InstallmentFaker {
 
   public static InstallmentDTO buildGeneratedIuvInstallmentDTO() {
     return InstallmentDTO.builder()
-      .installmentId(1L)
-      .paymentOptionId(1L)
+      .installmentId(100L)
+      .paymentOptionId(10L)
       .status(InstallmentStatus.UNPAID)
       .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")

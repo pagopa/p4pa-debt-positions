@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,6 +33,11 @@ class PaymentOptionStatusCheckerTest {
   @BeforeEach
   void setUp() {
     checker = new PaymentOptionStatusChecker(paymentOptionRepositoryMock);
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(paymentOptionRepositoryMock);
   }
 
   /**
@@ -195,13 +202,14 @@ class PaymentOptionStatusCheckerTest {
 
   /**
    * Test if an exception is thrown when the list of installments contains an invalid combination of statuses,
-   * including at least one INVALID, an unsupported status (e.g., EXPIRED), and CANCELLED.
+   * including at least one INVALID, an unsupported status (e.g., DRAFT), and CANCELLED.
    */
   @Test
   void testCalculateNewStatus_InvalidStatus2() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.INVALID, InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED);
-    Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(installmentStatusList));
-    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: [INVALID, EXPIRED, CANCELLED]", exception.getMessage());
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.INVALID, InstallmentStatus.DRAFT, InstallmentStatus.CANCELLED);
+    PaymentOptionStatus[] unexpectedStatus = {null};
+    Exception exception = assertThrows(InvalidValueException.class, () -> unexpectedStatus[0] = checker.calculateNewStatus(installmentStatusList), () -> "Unexpected status determined: " + unexpectedStatus[0]);
+    assertEquals("Unable to determine status for PaymentOption having installmentStatuses: [INVALID, DRAFT, CANCELLED]", exception.getMessage());
   }
 
   @Test
@@ -239,10 +247,8 @@ class PaymentOptionStatusCheckerTest {
     PaymentOption paymentOption = buildPaymentOption();
     PaymentOptionStatus newStatus = PaymentOptionStatus.PAID;
 
-    Mockito.doNothing().when(paymentOptionRepositoryMock).updateStatus(1L, newStatus);
+    Mockito.doNothing().when(paymentOptionRepositoryMock).updateStatus(10L, newStatus);
 
-    checker.storeStatus(paymentOption, newStatus);
-
-    Mockito.verify(paymentOptionRepositoryMock).updateStatus(1L, newStatus);
+    Assertions.assertDoesNotThrow(() -> checker.storeStatus(paymentOption, newStatus));
   }
 }

@@ -7,11 +7,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import jakarta.transaction.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +28,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Transactional
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.status = :status WHERE i.installmentId = :installmentId")
+  @ApiResponse(responseCode = "200", description = "Status updated successfully")
   void updateStatus(@Param("installmentId") Long installmentId, @Param("status") InstallmentStatus status);
 
   @Query("""
@@ -58,14 +61,14 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
 
   @RestResource(exported = false)
   @Query(" select i" +
-          "  from InstallmentNoPII i" +
-          "  join PaymentOption po" +
-          "    on i.paymentOptionId = po.paymentOptionId" +
-          "  join DebtPosition dp" +
-          "    on po.debtPositionId = dp.debtPositionId" +
-          " where dp.organizationId = :organizationId" +
-          "   and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))" +
-          "   and i.nav = :nav")
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "    on i.paymentOptionId = po.paymentOptionId" +
+    "  join DebtPosition dp" +
+    "    on po.debtPositionId = dp.debtPositionId" +
+    " where dp.organizationId = :organizationId" +
+    "   and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))" +
+    "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(@Param("organizationId") Long organizationId, @Param("nav") String nav,
                                                    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
@@ -77,8 +80,20 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Transactional
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.dueDate = :dueDate WHERE i.installmentId = :installmentId")
-  @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(ref = "CollectionModelInstallmentNoPII")))
+  @ApiResponse(responseCode = "200", description = "Due date updated successfully")
   void updateDueDate(@Param("installmentId") Long installmentId, @Param("dueDate") LocalDate dueDate);
-  //endregion
 
+  @Transactional
+  @Modifying
+  @Query("""
+    UPDATE InstallmentNoPII i SET i.status = :status,
+    i.syncStatus = :syncStatus
+    WHERE i.installmentId = :installmentId
+    """)
+  @ApiResponse(responseCode = "200", description = "Status and syncStatus updated successfully")
+  void updateStatusAndToSyncStatus(@Param("installmentId") Long installmentId,
+                                   @Param("status") InstallmentStatus status,
+                                   @Param("syncStatus") InstallmentSyncStatus syncStatus);
+
+  //endregion
 }

@@ -134,6 +134,16 @@ class DebtPositionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is EXPIRED when all paymentOptions are EXPIRED o CANCELLED.
+   */
+  @Test
+  void testCalculateNewStatus_Expired2() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.EXPIRED, PaymentOptionStatus.CANCELLED);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.EXPIRED, result);
+  }
+
+  /**
    * Test if an exception is thrown when the list of paymentOptions is empty.
    */
   @Test
