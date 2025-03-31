@@ -36,7 +36,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
   }
 
   @Test
-  void givenAuthorizeThenSuccess() {
+  void givenOperatorAuthorizedWhenAuthorizeThenSuccess() {
     String operatorExternalUserId = "operatorExternalUserId";
     String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 2L;
@@ -54,7 +54,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
   }
 
   @Test
-  void givenAuthorizeOrgTechnicalUserThenSuccess() {
+  void givenOrgTechnicalUserWhenAuthorizeThenSuccess() {
     String operatorExternalUserId = "WS_USER-orgIpaCode";
     String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 2L;
@@ -70,7 +70,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
   }
 
   @Test
-  void givenAuthorizeSystemTechnicalUserThenSuccess() {
+  void givenSystemTechnicalUserWhenAuthorizeThenSuccess() {
     String operatorExternalUserId = "WS_USER-piattaforma-unitaria_";
     String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 2L;
@@ -86,7 +86,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
   }
 
   @Test
-  void givenAuthorizeWhenDebtPositionTypeOrgNotFoundThenException() {
+  void givenDebtPositionTypeOrgNotFoundWhenAuthorizeThenException() {
     String operatorExternalUserId = "operatorExternalUserId";
     String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 1L;
@@ -101,7 +101,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
   }
 
   @Test
-  void givenAuthorizeWhenOperatorNotAuthorizedThenException() {
+  void givenOperatorNotAuthorizedWhenAuthorizeThenException() {
     String operatorExternalUserId = "operatorExternalUserId";
     String orgIpaCode = "orgIpaCode";
     Long debtPositionTypeOrgId = 2L;
