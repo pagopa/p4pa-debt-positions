@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import org.apache.commons.lang3.tuple.Pair;
@@ -51,13 +52,15 @@ class TransferControllerTest {
   @Test
   void whenNotifyReportedTransferIdThenOk() throws Exception {
     Long transferId = 1L;
+    TransferReportedRequest request = new TransferReportedRequest("IUF");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, accessToken))
+    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
 
     MvcResult result = mockMvc.perform(
         put("/transfers/1/reported")
-          .contentType(MediaType.APPLICATION_JSON_VALUE))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
@@ -69,13 +72,15 @@ class TransferControllerTest {
   @Test
   void givenNoWorkflowIdWhenNotifyReportedTransferIdThenOk() throws Exception {
     Long transferId = 1L;
+    TransferReportedRequest request = new TransferReportedRequest("IUF");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, accessToken))
+    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), null));
 
     MvcResult result = mockMvc.perform(
         put("/transfers/1/reported")
-          .contentType(MediaType.APPLICATION_JSON_VALUE))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andReturn();
 
