@@ -76,7 +76,7 @@ public abstract class BaseDebtPositionOperationService {
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
       throw new InvalidValueException("Provided organization is not ACTIVE");
     }
-    authorizeOperatorOnDebtPositionTypeService.authorize(debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+    authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
