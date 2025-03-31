@@ -510,7 +510,9 @@ paths:
                   type: string
                   format: date-time
                 nav:
-                  type: string
+                  type: array
+                  items:
+                    type: string
         required: true
       responses:
         "201":

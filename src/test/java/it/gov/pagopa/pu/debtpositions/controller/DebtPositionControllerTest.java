@@ -28,6 +28,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -212,7 +213,7 @@ class DebtPositionControllerTest {
   void whenUpdateInstallmentNotificationDateThenOk() throws Exception {
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
       .debtPositionId(1L)
-      .nav("123456789123")
+      .nav(Collections.singletonList("123456789123"))
       .notificationDate(DATETIME)
       .build();
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()

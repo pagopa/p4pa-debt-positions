@@ -25,6 +25,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -129,7 +130,7 @@ class InstallmentServiceImplTest {
     installmentDTO.setNotificationDate(dateTime);
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
       .debtPositionId(1L)
-      .nav("nav")
+      .nav(Collections.singletonList("nav"))
       .notificationDate(dateTime)
       .build();
 
@@ -160,7 +161,7 @@ class InstallmentServiceImplTest {
 
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
       .debtPositionId(1L)
-      .nav("nav")
+      .nav(Collections.singletonList("nav"))
       .notificationDate(dateTime)
       .build();
 
@@ -187,7 +188,7 @@ class InstallmentServiceImplTest {
 
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
       .debtPositionId(1L)
-      .nav("1234")
+      .nav(Collections.singletonList("1234"))
       .notificationDate(dateTime)
       .build();
 
