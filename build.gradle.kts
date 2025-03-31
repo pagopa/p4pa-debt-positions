@@ -163,8 +163,7 @@ openApiGenerate {
     "ReceiptOrigin" to "it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType",
     "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO",
     "PaymentEventType" to "it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType",
-    "object" to "com.fasterxml.jackson.databind.JsonNode",
-    "ReceiptArchivingView" to "it.gov.pagopa.pu.debtpositions.dto.ReceiptArchivingViewDTO"
+    "object" to "com.fasterxml.jackson.databind.JsonNode"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",

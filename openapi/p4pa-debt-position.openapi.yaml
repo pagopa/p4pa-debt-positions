@@ -1455,7 +1455,7 @@ components:
         content:
           type: array
           items:
-            type: 'ReceiptArchivingView'
+            $ref: "#/components/schemas/ReceiptArchivingView"
         size:
           type: integer
           format: int64
@@ -1477,6 +1477,38 @@ components:
           type: string
         ioTemplateMessage:
           type: string
+    ReceiptArchivingView:
+      type: object
+      required:
+        - paymentReceiptId
+        - creditorReferenceId
+        - debtorEntityType
+        - remittanceInformation
+        - orgFiscalCode
+      properties:
+        receiptId:
+          type: integer
+          format: int64
+        paymentReceiptId:
+          type: string
+        paymentDateTime:
+          type: string
+          format: date-time
+        creditorReferenceId:
+          type: string
+        debtorEntityType:
+          type: string
+          enum:
+            - F
+            - G
+        iuv:
+          type: string
+        remittanceInformation:
+          type: string
+        orgFiscalCode:
+          type: string
+        payer:
+          $ref: "#/components/schemas/PersonDTO"
     PagedDebtPositions:
       type: object
       required:
