@@ -37,7 +37,7 @@ public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements Authorize
   }
 
   private boolean isOperatorAuthorized(String orgIpaCode, Long debtPositionTypeOrgId, String operatorExternalUserId) {
-    if (operatorExternalUserId.startsWith(SYSTEM_USERID_PREFIX) || operatorExternalUserId.equals(ORG_USER_ID_PREFIX + orgIpaCode)) {
+    if (operatorExternalUserId.startsWith(SYSTEM_USERID_PREFIX) || operatorExternalUserId.startsWith(ORG_USER_ID_PREFIX + orgIpaCode)) {
       return true;
     }
     Optional<DebtPositionTypeOrgOperators> debtPositionTypeOrgOperators =
