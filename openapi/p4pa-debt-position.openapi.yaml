@@ -557,6 +557,11 @@ paths:
             type: integer
             format: int64
           description: The ID of the transfer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TransferReportedRequest'
       responses:
         "200":
           description: Ok
@@ -1409,3 +1414,10 @@ components:
         number:
           type: integer
           format: int64
+    TransferReportedRequest:
+      type: object
+      required:
+        - iuf
+      properties:
+        iuf:
+          type: string

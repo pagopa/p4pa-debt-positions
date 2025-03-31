@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.TransferApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,9 +25,9 @@ public class TransferControllerImpl implements TransferApi {
   }
 
   @Override
-  public ResponseEntity<DebtPositionDTO> notifyReportedTransferId(Long transferId){
+  public ResponseEntity<DebtPositionDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest){
     log.info("Reported transfer {}", transferId);
-    Pair<DebtPositionDTO, String> result = debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, SecurityUtils.getAccessToken());
+    Pair<DebtPositionDTO, String> result = debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, transferReportedRequest, SecurityUtils.getAccessToken());
     ResponseEntity.BodyBuilder outBuilder = ResponseEntity.status(HttpStatus.OK);
     if(StringUtils.isNotEmpty(result.getRight())){
       outBuilder.header(HEADER_X_WORKFLOW_ID, result.getRight());
