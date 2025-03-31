@@ -7,11 +7,11 @@ import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIVi
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReceiptArchivingPIIMapping {
+public class ReceiptArchivingPIIMapper {
   private final PersonalDataService personalDataService;
   private final PersonMapper personMapper;
 
-  public ReceiptArchivingPIIMapping(PersonalDataService personalDataService, PersonMapper personMapper) {
+  public ReceiptArchivingPIIMapper(PersonalDataService personalDataService, PersonMapper personMapper) {
     this.personalDataService = personalDataService;
     this.personMapper = personMapper;
   }

@@ -16,7 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 @ExtendWith(MockitoExtension.class)
-class ReceiptArchivingPIIMappingTest {
+class ReceiptArchivingPIIMapperTest {
 
   @Mock
   private PersonalDataService personalDataServiceMock;
@@ -25,11 +25,11 @@ class ReceiptArchivingPIIMappingTest {
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
-  ReceiptArchivingPIIMapping receiptArchivingPIIMapping;
+  ReceiptArchivingPIIMapper receiptArchivingPIIMapper;
 
   @BeforeEach
   void setUp() {
-    receiptArchivingPIIMapping = new ReceiptArchivingPIIMapping(personalDataServiceMock, personMapperMock);
+    receiptArchivingPIIMapper = new ReceiptArchivingPIIMapper(personalDataServiceMock, personMapperMock);
   }
 
   @Test
@@ -42,7 +42,7 @@ class ReceiptArchivingPIIMappingTest {
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getInstallmentPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     Mockito.when(personMapperMock.mapToDto(installmentPIIDTO.getDebtor())).thenReturn(personDTO);
     //when
-    ReceiptArchivingView result = receiptArchivingPIIMapping.map(receiptArchivingNoPIIView);
+    ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
     //then
     Assertions.assertNotNull(result);
     TestUtils.reflectionEqualsByName(receiptArchivingNoPIIView, result);

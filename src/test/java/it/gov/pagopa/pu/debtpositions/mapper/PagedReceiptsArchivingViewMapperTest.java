@@ -25,7 +25,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class PagedReceiptsArchivingViewMapperTest {
 
   @Mock
-  private ReceiptArchivingPIIMapping receiptArchivingPIIMappingMock;
+  private ReceiptArchivingPIIMapper receiptArchivingPIIMapperMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
@@ -33,7 +33,7 @@ class PagedReceiptsArchivingViewMapperTest {
 
   @BeforeEach
   void setUp() {
-    pagedReceiptsArchivingViewMapper = new PagedReceiptsArchivingViewMapper(receiptArchivingPIIMappingMock);
+    pagedReceiptsArchivingViewMapper = new PagedReceiptsArchivingViewMapper(receiptArchivingPIIMapperMock);
   }
 
   @Test
@@ -52,7 +52,7 @@ class PagedReceiptsArchivingViewMapperTest {
 
     ReceiptArchivingView receiptArchivingView = podamFactory.manufacturePojo(ReceiptArchivingView.class);
 
-    Mockito.when(receiptArchivingPIIMappingMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
+    Mockito.when(receiptArchivingPIIMapperMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
     //when
 
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(pagedReceiptArchivingNoPII);
@@ -108,7 +108,7 @@ class PagedReceiptsArchivingViewMapperTest {
 
     ReceiptArchivingView receiptArchivingView = podamFactory.manufacturePojo(ReceiptArchivingView.class);
 
-    Mockito.when(receiptArchivingPIIMappingMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
+    Mockito.when(receiptArchivingPIIMapperMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
 
     //when
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(unpagedReceiptArchivingNoPIIView);
