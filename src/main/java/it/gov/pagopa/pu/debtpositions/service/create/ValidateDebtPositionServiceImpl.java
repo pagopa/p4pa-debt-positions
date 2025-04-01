@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -25,11 +26,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
+  private final BalanceService balanceService;
 
   public ValidateDebtPositionServiceImpl(TaxonomyService taxonomyService,
-                                         DebtPositionRepository debtPositionRepository) {
+                                         DebtPositionRepository debtPositionRepository, BalanceService balanceService) {
     this.taxonomyService = taxonomyService;
     this.debtPositionRepository = debtPositionRepository;
+    this.balanceService = balanceService;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -97,6 +100,11 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
       throw new InvalidValueException("Amount is not valid for this debt position type org");
     }
+    if(StringUtils.isNotBlank(installmentDTO.getBalance()) &&
+      !Boolean.TRUE.equals(balanceService.validateBalance(installmentDTO.getBalance(), accessToken))){
+        throw new InvalidValueException("Balance is not formally valid");
+    }
+
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
     validateTransfers(installmentDTO.getTransfers(), accessToken);
   }
