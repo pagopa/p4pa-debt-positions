@@ -13,7 +13,7 @@ public class BalanceServiceImpl implements BalanceService {
   }
 
   @Override
-  public Boolean validateBalance(String balance, String accessToken) {
+  public Boolean isValidBalance(String balance, String accessToken) {
     return balanceClient.validateBalance(balance, accessToken);
   }
 }

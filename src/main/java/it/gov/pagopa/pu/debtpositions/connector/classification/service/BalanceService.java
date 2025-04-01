@@ -11,5 +11,5 @@ public interface BalanceService {
    * @param accessToken the access token
    * @return a Boolean based on whether the value is formally valid or not
    */
-  Boolean validateBalance(String balance, String accessToken);
+  Boolean isValidBalance(String balance, String accessToken);
 }

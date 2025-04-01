@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -101,7 +102,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("Amount is not valid for this debt position type org");
     }
     if(StringUtils.isNotBlank(installmentDTO.getBalance()) &&
-      !Boolean.TRUE.equals(balanceService.validateBalance(installmentDTO.getBalance(), accessToken))){
+      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), accessToken))){
         throw new InvalidValueException("Balance is not formally valid");
     }
 

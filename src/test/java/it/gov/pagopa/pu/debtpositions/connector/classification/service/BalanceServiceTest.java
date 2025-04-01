@@ -38,7 +38,7 @@ class BalanceServiceTest {
       .thenReturn(Boolean.TRUE);
 
     // When
-    Boolean result = balanceService.validateBalance(balance, accessToken);
+    Boolean result = balanceService.isValidBalance(balance, accessToken);
 
     // Then
     Assertions.assertEquals(Boolean.TRUE, result);
