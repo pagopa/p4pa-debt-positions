@@ -1,9 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.repository.validator.DebtPositionTypeOrgValidator;
+import it.gov.pagopa.pu.debtpositions.repository.validator.BalanceValidator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -15,7 +18,6 @@ import java.io.Serializable;
 @Data
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
-@EntityListeners(DebtPositionTypeOrgValidator.class)
 public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
 
   @Id
@@ -26,6 +28,7 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private Long debtPositionTypeId;
   @NotNull
   private Long organizationId;
+  @BalanceValidator
   private String balance;
   @NotNull
   private String code;
