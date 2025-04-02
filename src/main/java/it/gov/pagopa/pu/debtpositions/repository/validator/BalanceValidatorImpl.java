@@ -6,14 +6,14 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class BalanceValidatorImpl implements ConstraintValidator<BalanceValidator, String> {
 
-  @Autowired
-  private BalanceService balanceService;
+  private final BalanceService balanceService;
+
+  public BalanceValidatorImpl(BalanceService balanceService) {
+    this.balanceService = balanceService;
+  }
 
   @Override
   public boolean isValid(String balance, ConstraintValidatorContext context) {
@@ -21,3 +21,4 @@ public class BalanceValidatorImpl implements ConstraintValidator<BalanceValidato
       BooleanUtils.isTrue(balanceService.isValidBalance(balance, SecurityUtils.getAccessToken()));
   }
 }
+

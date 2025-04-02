@@ -1,21 +1,24 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
-import org.springframework.context.ApplicationContext;
+import it.gov.pagopa.pu.debtpositions.repository.validator.CustomValidatorFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
-import org.springframework.validation.beanvalidation.SpringConstraintValidatorFactory;
 
 @Configuration
 public class AppConfig {
 
-  @Bean
-  public LocalValidatorFactoryBean validator(ApplicationContext applicationContext) {
-    LocalValidatorFactoryBean factoryBean = new LocalValidatorFactoryBean();
-    factoryBean.setConstraintValidatorFactory(
-      new SpringConstraintValidatorFactory(applicationContext.getAutowireCapableBeanFactory())
-    );
-    return factoryBean;
+  private final CustomValidatorFactory customValidatorFactory;
+
+  public AppConfig(CustomValidatorFactory customValidatorFactory) {
+    this.customValidatorFactory = customValidatorFactory;
   }
 
+  @Bean
+  public LocalValidatorFactoryBean validator() {
+    LocalValidatorFactoryBean factory = new LocalValidatorFactoryBean();
+    factory.setConstraintValidatorFactory(customValidatorFactory);
+    return factory;
+  }
 }
+
