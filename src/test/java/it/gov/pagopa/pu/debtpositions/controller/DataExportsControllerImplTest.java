@@ -34,7 +34,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {"data-export.installment-paid-view.max-months-interval=6", "data-export.receipt-archiving-view.max-months-interval=6"})
 class DataExportsControllerImplTest {
 
-
   @Autowired
   private MockMvc mockMvc;
 
@@ -50,7 +49,7 @@ class DataExportsControllerImplTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @Test
-  void whenGetInstallmentExportThenOk() throws Exception {
+  void givenValidParams_whenGetInstallmentExport_thenOk() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
@@ -83,7 +82,7 @@ class DataExportsControllerImplTest {
   }
 
   @Test
-  void whenGetInstallmentExportThenThrowException() throws Exception {
+  void givenWrongDateTimeInterval_whenGetInstallmentExport_thenThrowException() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
@@ -115,7 +114,7 @@ class DataExportsControllerImplTest {
   }
 
   @Test
-  void whenGetReceiptExportThenOk() throws Exception {
+  void givenValidParams_whenGetReceiptExport_thenOk() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
@@ -148,7 +147,7 @@ class DataExportsControllerImplTest {
   }
 
   @Test
-  void whenGetReceiptExportThenThrowException() throws Exception {
+  void givenWrongDateTimeInterval_whenGetReceiptExport_ThenThrowException() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
