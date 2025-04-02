@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.repository.validator.DebtPositionTypeOrgValidator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,6 +15,7 @@ import java.io.Serializable;
 @Data
 @SuperBuilder(toBuilder = true)
 @EqualsAndHashCode(callSuper = false)
+@EntityListeners(DebtPositionTypeOrgValidator.class)
 public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
 
   @Id
