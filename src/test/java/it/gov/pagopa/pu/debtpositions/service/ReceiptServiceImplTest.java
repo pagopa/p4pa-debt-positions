@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptArchivingPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
@@ -10,13 +12,19 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 @ExtendWith(MockitoExtension.class)
 class ReceiptServiceImplTest {
 
   @Mock
   private ReceiptDetailPIIViewRepository receiptDetailPIIViewRepositoryMock;
+  @Mock
+  private ReceiptArchivingPIIViewRepository receiptArchivingPIIViewRepositoryMock;
 
   @InjectMocks
   private ReceiptServiceImpl receiptService;
@@ -40,5 +48,26 @@ class ReceiptServiceImplTest {
     Assertions.assertEquals(receipt, response);
 
     Mockito.verify(receiptDetailPIIViewRepositoryMock).getReceiptDetail(receiptId,operatorExternalUserId);
+  }
+
+  @Test
+  void whenGetReceiptArchivingThenOk(){
+    //given
+    Long organizationId = 1L;
+    String operatorExternalUserId = "operatorExternalUserId";
+    OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
+    Long debtPositionTypeOrgId = 1L;
+
+    PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
+
+    Mockito.when(receiptArchivingPIIViewRepositoryMock.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(expectedResponse);
+    //when
+    PagedReceiptsArchivingView result = receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+    //then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(expectedResponse, result);
+
+    Mockito.verifyNoMoreInteractions(receiptArchivingPIIViewRepositoryMock);
   }
 }
