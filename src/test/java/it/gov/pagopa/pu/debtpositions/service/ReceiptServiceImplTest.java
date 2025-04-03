@@ -57,13 +57,12 @@ class ReceiptServiceImplTest {
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
-    Long debtPositionTypeOrgId = 1L;
 
     PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
 
-    Mockito.when(receiptArchivingPIIViewRepositoryMock.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(expectedResponse);
+    Mockito.when(receiptArchivingPIIViewRepositoryMock.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1))).thenReturn(expectedResponse);
     //when
-    PagedReceiptsArchivingView result = receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+    PagedReceiptsArchivingView result = receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1));
     //then
     Assertions.assertNotNull(result);
     Assertions.assertEquals(expectedResponse, result);

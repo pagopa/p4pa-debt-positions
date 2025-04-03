@@ -25,9 +25,9 @@ public class ReceiptArchivingPIIViewRepositoryImpl implements ReceiptArchivingPI
   }
 
   @Override
-  public PagedReceiptsArchivingView getPagedReceiptsArchivingView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
+  public PagedReceiptsArchivingView getPagedReceiptsArchivingView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable) {
 
-    Page<ReceiptArchivingNoPIIView> receiptArchivingViewNoPIIDTO = receiptArchivingNoPIIViewRepository.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable);
+    Page<ReceiptArchivingNoPIIView> receiptArchivingViewNoPIIDTO = receiptArchivingNoPIIViewRepository.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable);
 
     if (receiptArchivingViewNoPIIDTO.getTotalElements() > maxTotalElements){
       throw new ExportTooManyRecordsException("The number of ReceiptArchivingViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(receiptArchivingViewNoPIIDTO.getTotalElements(), maxTotalElements));

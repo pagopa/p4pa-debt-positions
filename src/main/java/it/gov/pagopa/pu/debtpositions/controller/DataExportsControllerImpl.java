@@ -42,11 +42,11 @@ public class DataExportsControllerImpl implements DataExportsApi {
   }
 
   @Override
-  public ResponseEntity<PagedReceiptsArchivingView> exportArchivingReceipts(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
+  public ResponseEntity<PagedReceiptsArchivingView> exportArchivingReceipts(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable) {
     if (!Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportArchivingMaxMonthsInterval)) {
       throw new InvalidDateTimeIntervalException("The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, exportArchivingMaxMonthsInterval));
     }
 
-    return ResponseEntity.ok(receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable));
+    return ResponseEntity.ok(receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable));
   }
 }

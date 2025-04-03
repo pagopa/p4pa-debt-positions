@@ -38,7 +38,6 @@ public interface ReceiptArchivingNoPIIViewRepository extends Repository<ReceiptA
       AND dp.organizationId = :organizationId
       AND r.paymentDateTime BETWEEN :paymentDateTimeFrom AND :paymentDateTimeTo
       AND dptoo.operatorExternalUserId = :operatorExternalUserId
-      AND (:debtPositionTypeOrgId IS NULL OR dptoo.debtPositionTypeOrgId = :debtPositionTypeOrgId)
       AND t.transferIndex = 1
   """
     )
@@ -47,7 +46,6 @@ public interface ReceiptArchivingNoPIIViewRepository extends Repository<ReceiptA
             @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
             @Parameter(required = true) @Param("paymentDateTimeFrom") OffsetDateTime paymentDateTimeFrom,
             @Parameter(required = true) @Param("paymentDateTimeTo") OffsetDateTime paymentDateTimeTo,
-            @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
             Pageable pageable
     );
 }

@@ -54,7 +54,6 @@ class ReceiptArchivingPIIViewRepositoryImplTest {
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
-    Long debtPositionTypeOrgId = 1L;
 
     List<ReceiptArchivingNoPIIView> content = podamFactory.manufacturePojo(List.class, ReceiptArchivingNoPIIView.class);
 
@@ -62,10 +61,10 @@ class ReceiptArchivingPIIViewRepositoryImplTest {
     Page<ReceiptArchivingNoPIIView> receiptArchivingNoPIIViews = new PageImpl<>(content, pageable, 10);
 
     PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
-    Mockito.when(receiptArchivingNoPIIViewRepositoryMock.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable)).thenReturn(receiptArchivingNoPIIViews);
+    Mockito.when(receiptArchivingNoPIIViewRepositoryMock.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo,  pageable)).thenReturn(receiptArchivingNoPIIViews);
     Mockito.when(pagedReceiptsArchivingViewMapperMock.mapToPagedReceiptsArchivingView(receiptArchivingNoPIIViews)).thenReturn(expectedResponse);
     //when
-    PagedReceiptsArchivingView result = receiptArchivingPIIViewRepository.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(10));
+    PagedReceiptsArchivingView result = receiptArchivingPIIViewRepository.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(10));
     //then
     assertNotNull(result);
     assertEquals(expectedResponse, result);
@@ -78,7 +77,6 @@ class ReceiptArchivingPIIViewRepositoryImplTest {
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
-    Long debtPositionTypeOrgId = 1L;
 
     List<ReceiptArchivingNoPIIView> content = new ArrayList<>();
     Pageable pageable = PageRequest.of(0, 10);
@@ -90,11 +88,11 @@ class ReceiptArchivingPIIViewRepositoryImplTest {
 
     Page<ReceiptArchivingNoPIIView> receiptArchivingNoPIIViews= new PageImpl<>(content, pageable, 12);
 
-    Mockito.when(receiptArchivingNoPIIViewRepositoryMock.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(receiptArchivingNoPIIViews);
+    Mockito.when(receiptArchivingNoPIIViewRepositoryMock.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1))).thenReturn(receiptArchivingNoPIIViews);
     //when
     ExportTooManyRecordsException ex = assertThrows(
       ExportTooManyRecordsException.class,
-      () -> receiptArchivingPIIViewRepository.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
+      () -> receiptArchivingPIIViewRepository.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1))
     );
     //then
     assertEquals("The number of ReceiptArchivingViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
