@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.repository.validator.BalanceValidator;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -28,7 +27,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private Long debtPositionTypeId;
   @NotNull
   private Long organizationId;
-  @BalanceValidator
   private String balance;
   @NotNull
   private String code;
