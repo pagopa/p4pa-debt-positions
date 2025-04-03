@@ -8,5 +8,5 @@ import java.time.OffsetDateTime;
 
 public interface ReceiptService {
   ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId);
-  PagedReceiptsArchivingView getPagedReceiptArchivingView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable);
+  PagedReceiptsArchivingView getPagedReceiptArchivingView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable);
 }

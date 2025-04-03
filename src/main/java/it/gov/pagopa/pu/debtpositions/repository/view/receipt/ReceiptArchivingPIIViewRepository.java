@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 import java.time.OffsetDateTime;
 
 public interface ReceiptArchivingPIIViewRepository {
-  PagedReceiptsArchivingView getPagedReceiptsArchivingView (Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable);
+  PagedReceiptsArchivingView getPagedReceiptsArchivingView (Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable);
 }

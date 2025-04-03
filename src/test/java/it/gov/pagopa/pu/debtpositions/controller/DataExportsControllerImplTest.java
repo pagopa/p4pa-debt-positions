@@ -119,7 +119,6 @@ class DataExportsControllerImplTest {
     String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
-    Long debtPositionTypeOrgId = 1L;
 
     PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
 
@@ -127,7 +126,6 @@ class DataExportsControllerImplTest {
       eq(operatorExternalUserId),
       eq(paymentDateFrom),
       eq(paymentDateTo),
-      eq(debtPositionTypeOrgId),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
@@ -135,7 +133,6 @@ class DataExportsControllerImplTest {
           .param("operatorExternalUserId",operatorExternalUserId)
           .param("paymentDateFrom", String.valueOf(paymentDateFrom))
           .param("paymentDateTo", String.valueOf(paymentDateTo))
-          .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
           .param("size", "1"))
       .andExpect(status().isOk())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -143,7 +140,7 @@ class DataExportsControllerImplTest {
 
     PagedReceiptsArchivingView response = objectMapper.readValue(result.getResponse().getContentAsString(), PagedReceiptsArchivingView.class);
     TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "paymentDateTime");
-    Mockito.verify(receiptServiceMock).getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+    Mockito.verify(receiptServiceMock).getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1));
   }
 
   @Test
@@ -160,7 +157,6 @@ class DataExportsControllerImplTest {
       eq(operatorExternalUserId),
       eq(paymentDateFrom),
       eq(paymentDateTo),
-      eq(debtPositionTypeOrgId),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     mockMvc.perform(

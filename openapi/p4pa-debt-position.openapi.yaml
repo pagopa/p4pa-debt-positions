@@ -270,12 +270,6 @@ paths:
           schema:
             type: string
             format: date-time
-        - name: debtPositionTypeOrgId
-          in: query
-          required: false
-          schema:
-            type: integer
-            format: int64
       responses:
         "200":
           description: Ok
