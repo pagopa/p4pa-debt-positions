@@ -166,9 +166,13 @@ iuv:
 data-export:
   default:
     max-total-elements: "\${DATA_EXPORT_MAX_TOTAL_ELEMENTS: 100000}"
+    max-months-interval: "${DATA_EXPORT_MAX_MONTHS_INTERVAL: 6}"
   installment-paid-view:
-    max-months-interval: "\${INSTALLMENT_PAID_VIEW_MAX_MONTHS_INTERVAL: 6}"
+    max-months-interval: "\${INSTALLMENT_PAID_VIEW_MAX_MONTHS_INTERVAL:\${data-export.default.max-months-interval}}"
     max-total-elements: "\${INSTALLMENT_PAID_VIEW_MAX_TOTAL_ELEMENTS:\${data-export.default.max-total-elements}}"
+  receipt-archiving-view:
+    max-months-interval: "\${RECEIPT_ARCHIVING_VIEW_MAX_MONTHS_INTERVAL: \${data-export.default.max-months-interval}}"
+    max-total-elements: "\${RECEIPT_ARCHIVING_VIEW_MAX_TOTAL_ELEMENTS:\${data-export.default.max-total-elements}}"
 
 cache:
   pii:
