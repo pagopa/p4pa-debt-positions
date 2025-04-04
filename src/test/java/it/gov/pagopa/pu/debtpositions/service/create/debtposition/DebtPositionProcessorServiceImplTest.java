@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
@@ -58,10 +57,11 @@ public class InstallmentMapper {
 
   public InstallmentDTO mapToDto(InstallmentNoPII installment) {
     InstallmentPIIDTO pii = personalDataService.get(installment.getPersonalDataId(), InstallmentPIIDTO.class);
-    InstallmentDTO installmentDTO = InstallmentDTO.builder()
+    return InstallmentDTO.builder()
       .installmentId(installment.getInstallmentId())
       .paymentOptionId(installment.getPaymentOptionId())
       .status(installment.getStatus())
+      .syncStatus(installment.getSyncStatus())
       .iupdPagopa(installment.getIupdPagopa())
       .iud(installment.getIud())
       .iuv(installment.getIuv())
@@ -85,15 +85,6 @@ public class InstallmentMapper {
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();
-
-    if(installment.getSyncStatus() != null) {
-      InstallmentSyncStatus installmentSyncStatus = InstallmentSyncStatus.builder()
-        .syncStatusFrom(installment.getSyncStatus().getSyncStatusFrom())
-        .syncStatusTo(installment.getSyncStatus().getSyncStatusTo()).build();
-      installmentDTO.setSyncStatus(installmentSyncStatus);
-    }
-
-    return installmentDTO;
   }
 
   public InstallmentDTO mapToDto(Installment installment) {

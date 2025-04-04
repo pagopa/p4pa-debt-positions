@@ -5,7 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -16,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
@@ -76,8 +76,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
             installmentDTO.getDueDate().isAfter(LocalDate.now())) {
             statusTo = InstallmentStatus.UNPAID;
           }
-          installmentDTO.setSyncStatus(new InstallmentSyncStatus(installmentDTO.getStatus(), statusTo));
-          installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+          InstallmentUtils.setStatus(installmentDTO, statusTo);
         })
       );
 
