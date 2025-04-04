@@ -778,6 +778,7 @@ components:
         - remittanceInformation
         - transfers
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseInstallment"]
       properties:
         installmentId:
           type: integer
@@ -788,7 +789,7 @@ components:
         status:
           $ref: "#/components/schemas/InstallmentStatus"
         syncStatus:
-          $ref: "#/components/schemas/InstallmentSyncStatus"
+          type: "InstallmentSyncStatus"
         iupdPagopa:
           type: string
         iud:
@@ -1185,16 +1186,6 @@ components:
       type: object
       properties:
         newStatus:
-          $ref: "#/components/schemas/InstallmentStatus"
-    InstallmentSyncStatus:
-      required:
-        - syncStatusFrom
-        - syncStatusTo
-      type: object
-      properties:
-        syncStatusFrom:
-          $ref: "#/components/schemas/InstallmentStatus"
-        syncStatusTo:
           $ref: "#/components/schemas/InstallmentStatus"
     DebtPositionErrorDTO:
       type: object

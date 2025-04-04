@@ -2,8 +2,8 @@ package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +19,7 @@ import java.util.List;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIIDTO> {
+public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIIDTO>, BaseInstallment {
 
   private Long installmentId;
   private Long paymentOptionId;
