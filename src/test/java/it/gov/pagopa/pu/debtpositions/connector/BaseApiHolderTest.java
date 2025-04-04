@@ -36,9 +36,10 @@ public abstract class BaseApiHolderTest {
             String.class.equals(apiReturnedType.getType()) ? (T)"RESULT"
             : Integer.class.equals(apiReturnedType.getType()) ? (T)Integer.valueOf(0)
             : Long.class.equals(apiReturnedType.getType()) ? (T)Long.valueOf(0L)
-              : apiReturnedType.getType().getTypeName().startsWith(List.class.getName()) ? (T)List.of()
-              : Void.class.equals(apiReturnedType.getType()) ? (T)voidMock
-              : (T)Mockito.mock(Class.forName(apiReturnedType.getType().getTypeName()));
+            : Boolean.class.equals(apiReturnedType.getType()) ? (T) Boolean.TRUE
+            : apiReturnedType.getType().getTypeName().startsWith(List.class.getName()) ? (T)List.of()
+            : Void.class.equals(apiReturnedType.getType()) ? (T)voidMock
+            : (T)Mockito.mock(Class.forName(apiReturnedType.getType().getTypeName()));
 
           Mockito.doReturn(ResponseEntity.ok(expectedResult))
             .when(restTemplateMock)

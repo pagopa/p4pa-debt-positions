@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.validation.beanvalidation.LocalValidatorFactoryBean;
 
 import javax.sql.DataSource;
 import java.util.Map;
@@ -34,13 +35,15 @@ public class CitizenDataSourceConfig {
   @Bean(name = "emfCitizen")
   public LocalContainerEntityManagerFactoryBean citizenEntityManagerFactory(
           @Qualifier("dsCitizen") DataSource dataSource,
-          EntityManagerFactoryBuilder builder) {
+          EntityManagerFactoryBuilder builder,
+          LocalValidatorFactoryBean validatorFactoryBean) {
 
     return builder.dataSource(dataSource)
             .packages("it.gov.pagopa.pu.debtpositions.citizen.model")
             .properties(Map.of(
                     "hibernate.physical_naming_strategy", CamelCaseToUnderscoresNamingStrategy.class.getName(),
-                    "hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName()
+                    "hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName(),
+                    "jakarta.persistence.validation.factory", validatorFactoryBean
             ))
             .persistenceUnit("citizen")
             .build();
