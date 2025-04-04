@@ -70,7 +70,7 @@ public class InstallmentServiceImpl implements InstallmentService {
       return null;
     }
 
-    return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, operatorExternalUserId, accessToken).getRight();
+    return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
   }
 
 }
