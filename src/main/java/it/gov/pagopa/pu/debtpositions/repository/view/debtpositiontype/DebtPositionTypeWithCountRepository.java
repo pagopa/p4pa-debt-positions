@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.debtpositiontype;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.model.view.debtpositiontype.DebtPositionTypeWithCount;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -13,7 +15,10 @@ public interface DebtPositionTypeWithCountRepository extends Repository<DebtPosi
 
   @Query(value = "SELECT d "
     + "FROM DebtPositionTypeWithCount d "
-    + "WHERE d.brokerId = :brokerId ")
-  Page<DebtPositionTypeWithCount> findByBrokerId(@Param("brokerId") Long brokerId, Pageable pageable);
+    + "WHERE d.brokerId = :brokerId "
+    + "AND (:description is null OR d.description ILIKE CONCAT('%', :description, '%'))")
+  Page<DebtPositionTypeWithCount> findByBrokerId(@Param("brokerId") @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) Long brokerId,
+    String description,
+    Pageable pageable);
 
 }
