@@ -1495,6 +1495,8 @@ components:
           type: string
         debtor:
           $ref: "#/components/schemas/PersonDTO"
+        payer:
+          $ref: "#/components/schemas/PersonDTO"
     PagedDebtPositions:
       type: object
       required:
