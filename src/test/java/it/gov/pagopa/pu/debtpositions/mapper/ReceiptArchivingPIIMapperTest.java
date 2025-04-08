@@ -57,11 +57,11 @@ class ReceiptArchivingPIIMapperTest {
     //given
     ReceiptArchivingNoPIIView receiptArchivingNoPIIView = podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class);
     ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
+    receiptPIIDTO.setPayer(null);
     PersonDTO personDTO = podamFactory.manufacturePojo(PersonDTO.class);
 
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
     Mockito.when(personMapperMock.mapToDto(receiptPIIDTO.getDebtor())).thenReturn(personDTO);
-    Mockito.when(personMapperMock.mapToDto(receiptPIIDTO.getPayer())).thenReturn(null);
     //when
     ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
     //then
