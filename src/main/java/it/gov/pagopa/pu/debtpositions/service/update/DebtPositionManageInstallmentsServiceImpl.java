@@ -42,23 +42,29 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
   }
 
+  private static final Set<InstallmentStatus> MODIFIABLE_DPI_STATUSES = Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
+  private static final Set<PaymentOptionStatus> MODIFIABLE_PO_STATUSES = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID, PaymentOptionStatus.DRAFT);
+  private static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID, DebtPositionStatus.DRAFT);
+
   @Override
   @Transactional
   public Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
-    if (!Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.DRAFT).contains(storedDebtPosition.getStatus())) {
+    if (!MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
       throw new ConflictErrorException(String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
         debtPositionId, storedDebtPosition.getStatus()));
     }
 
     storedDebtPosition.setDescription(manageDebtPositionDTO.getDebtPositionDescription());
+    storedDebtPosition.setValidityDate(manageDebtPositionDTO.getValidityDate());
+
     PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
       .filter(paymentOptionDTO -> paymentOptionDTO.getPaymentOptionId().equals(manageDebtPositionDTO.getPaymentOptionId()))
       .findFirst()
       .orElseThrow(() -> new NotFoundException(String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
-    if (!Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.DRAFT).contains(storedPaymentOption.getStatus())) {
+    if (!MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
       throw new ConflictErrorException(String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
     }
 
@@ -118,7 +124,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
       .findFirst()
       .orElseThrow(() -> new NotFoundException(String.format("The installment with id %s not found", installmentId)));
 
-    if (!Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT).contains(installment.getStatus())) {
+    if (!MODIFIABLE_DPI_STATUSES.contains(installment.getStatus())) {
       throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
     }
     return installment;
