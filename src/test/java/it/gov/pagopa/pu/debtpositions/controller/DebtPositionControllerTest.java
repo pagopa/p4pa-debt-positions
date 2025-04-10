@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
@@ -63,6 +64,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private InstallmentService installmentService;
+
+  @MockitoBean
+  private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
