@@ -820,7 +820,6 @@ components:
         - amountCents
         - debtor
         - remittanceInformation
-        - transfers
       type: object
       x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseInstallment"]
       properties:
