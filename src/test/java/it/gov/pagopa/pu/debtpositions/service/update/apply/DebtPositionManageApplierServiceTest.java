@@ -19,7 +19,7 @@ class DebtPositionManageApplierServiceTest {
   private DebtPositionManageApplierService applier;
 
   private static final LocalDate DATE = LocalDate.of(2089, 1, 1);
-  private static final TransferDTO TRANSFER_1 = buildTransferDTO().transferIndex(1);
+  private static final TransferDTO TRANSFER_1 = buildTransferDTO().transferIndex(1).transferId(1L);
 
   @BeforeEach
   void setUp() {
@@ -75,5 +75,16 @@ class DebtPositionManageApplierServiceTest {
     assertEquals("The transfer having id 1000 of installment having id 100 does not found", exception.getMessage());
   }
 
+  @Test
+  void givenUpdatedInstallmentWithTransfersDataUnmodifiableWhenMergeThenSuccess(){
+    InstallmentDTO storedInstallment = buildInstallmentDTO();
+    InstallmentDTO updatedInstallment = buildInstallmentDTO();
+    updatedInstallment.getTransfers().getFirst().setOrgName("new_org_name");
+    updatedInstallment.getTransfers().getFirst().setOrgFiscalCode("new_org_fiscal_code");
+
+    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+            () -> applier.merge(updatedInstallment, storedInstallment));
+    assertEquals("These fields for transfer with index 2 of installment having id 100 are not mutable: [orgFiscalCode, orgName]", exception.getMessage());
+  }
 
 }

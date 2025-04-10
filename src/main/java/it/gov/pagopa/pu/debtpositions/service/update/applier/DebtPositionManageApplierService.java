@@ -22,11 +22,12 @@ public class DebtPositionManageApplierService {
     storedInstallment.setRemittanceInformation(updatedInstallment.getRemittanceInformation());
     storedInstallment.setBalance(updatedInstallment.getBalance());
     storedInstallment.setLegacyPaymentMetadata(updatedInstallment.getLegacyPaymentMetadata());
+    storedInstallment.setAmountCents(updatedInstallment.getAmountCents());
     storedInstallment.setNotificationFeeCents(updatedInstallment.getNotificationFeeCents());
     storedInstallment.setNotificationDate(updatedInstallment.getNotificationDate());
 
-    long notificationFeeDiff = updatedInstallment.getNotificationFeeCents() - storedInstallment.getNotificationFeeCents();
-    storedInstallment.setAmountCents(storedInstallment.getAmountCents() + notificationFeeDiff);
+    // TODO if IUN is present only recalculate amount with new notificationFee and the other fields are all unmodifiable
+    // long notificationFeeDiff = updatedInstallment.getNotificationFeeCents() - storedInstallment.getNotificationFeeCents();
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionId", updatedInstallment.getPaymentOptionId(), storedInstallment.getPaymentOptionId(), modifiedFields);
@@ -80,6 +81,7 @@ public class DebtPositionManageApplierService {
         }
         if(transferDTO.getTransferIndex() == 1){
           mapIndexTransferUpdated.get(transferDTO.getTransferId()).setAmountCents(storedInstallment.getAmountCents() - totalAmountOtherTransfersUpdated);
+          mapIndexTransferUpdated.get(transferDTO.getTransferId()).setRemittanceInformation(storedInstallment.getRemittanceInformation());
         }
 
         mergeTransfer(transferDTO, mapIndexTransferUpdated.get(transferDTO.getTransferId()), storedInstallment.getInstallmentId());
@@ -89,15 +91,15 @@ public class DebtPositionManageApplierService {
   private void mergeTransfer(TransferDTO storedTransfer, TransferDTO updatedTransfer, Long installmentId) {
     storedTransfer.setAmountCents(updatedTransfer.getAmountCents());
     storedTransfer.setRemittanceInformation(updatedTransfer.getRemittanceInformation());
+    storedTransfer.setIban(updatedTransfer.getIban());
+    storedTransfer.setPostalIban(updatedTransfer.getPostalIban());
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("installmentId", storedTransfer.getInstallmentId(), updatedTransfer.getInstallmentId(), modifiedFields);
     checkImmutableField("transferIndex", storedTransfer.getTransferIndex(), updatedTransfer.getTransferIndex(), modifiedFields);
     checkImmutableField("orgFiscalCode", storedTransfer.getOrgFiscalCode(), updatedTransfer.getOrgFiscalCode(), modifiedFields);
     checkImmutableField("orgName", storedTransfer.getOrgName(), updatedTransfer.getOrgName(), modifiedFields);
-    checkImmutableField("iban", storedTransfer.getIban(), updatedTransfer.getIban(), modifiedFields);
     checkImmutableField("category", storedTransfer.getCategory(), updatedTransfer.getCategory(), modifiedFields);
-    checkImmutableField("postalIban", storedTransfer.getPostalIban(), updatedTransfer.getPostalIban(), modifiedFields);
     checkImmutableField("stampType", storedTransfer.getStampType(), updatedTransfer.getStampType(), modifiedFields);
     checkImmutableField("stampHashDocument", storedTransfer.getStampHashDocument(), updatedTransfer.getStampHashDocument(), modifiedFields);
     checkImmutableField("stampProvincialResidence", storedTransfer.getStampProvincialResidence(), updatedTransfer.getStampProvincialResidence(), modifiedFields);
