@@ -23,10 +23,8 @@ public class DebtPositionManageApplierService {
     storedInstallment.setBalance(updatedInstallment.getBalance());
     storedInstallment.setLegacyPaymentMetadata(updatedInstallment.getLegacyPaymentMetadata());
     storedInstallment.setAmountCents(updatedInstallment.getAmountCents());
-    storedInstallment.setNotificationFeeCents(updatedInstallment.getNotificationFeeCents());
 
-    // TODO if IUN is present the fields are all unmodifiable
-    // long notificationFeeDiff = updatedInstallment.getNotificationFeeCents() - storedInstallment.getNotificationFeeCents();
+    // TODO task P4ADEV-2668: if IUN is present the fields are all unmodifiable
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionId", updatedInstallment.getPaymentOptionId(), storedInstallment.getPaymentOptionId(), modifiedFields);
@@ -40,6 +38,7 @@ public class DebtPositionManageApplierService {
     checkImmutableField("ingestionFlowFileLineNumber", updatedInstallment.getIngestionFlowFileLineNumber(), storedInstallment.getIngestionFlowFileLineNumber(), modifiedFields);
     checkImmutableField("receiptId", updatedInstallment.getReceiptId(), storedInstallment.getReceiptId(), modifiedFields);
     checkImmutableField("notificationDate", updatedInstallment.getNotificationDate(), storedInstallment.getNotificationDate(), modifiedFields);
+    checkImmutableField("notificationFeeCents", updatedInstallment.getNotificationFeeCents(), storedInstallment.getNotificationFeeCents(), modifiedFields);
 
     checkDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 

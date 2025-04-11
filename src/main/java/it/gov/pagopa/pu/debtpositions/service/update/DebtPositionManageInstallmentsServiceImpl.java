@@ -106,7 +106,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
         WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(true).build();
 
-        // TODO add check wait for workflow completion
+        // TODO task P4ADEV-2669: add check wait for workflow completion
         DebtPositionDTO dpWithInstallmentsAdded = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
         DebtPositionDTO dpWithInstallmentsUpdated = debtPositionUpdateInstallmentService.updateInstallment(dpWithInstallmentsAdded, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
         DebtPositionDTO dpWithInstallmentCancelled = debtPositionCancelInstallmentService.cancelInstallment(dpWithInstallmentsUpdated, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
