@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
 
 class LocalDateTimeToOffsetDateTimeDeserializerTest {
 
@@ -57,7 +58,8 @@ class LocalDateTimeToOffsetDateTimeDeserializerTest {
     OffsetDateTime result = deserializer.deserialize(parser, null);
 
     // Then
-    Assertions.assertEquals(OffsetDateTime.of(localDateTime, OffsetDateTime.now().atZoneSameInstant(Constants.ZONEID).getOffset()), result);
+    Assertions.assertEquals(ZonedDateTime.of(localDateTime, Constants.ZONEID).toOffsetDateTime(), result);
   }
 }
+
 

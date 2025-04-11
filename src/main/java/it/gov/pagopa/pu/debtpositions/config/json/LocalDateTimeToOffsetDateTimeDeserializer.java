@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @Configuration
 public class LocalDateTimeToOffsetDateTimeDeserializer extends JsonDeserializer<OffsetDateTime> {
@@ -19,8 +20,7 @@ public class LocalDateTimeToOffsetDateTimeDeserializer extends JsonDeserializer<
     if (dateString.contains("+") || dateString.endsWith("Z")) {
       return OffsetDateTime.parse(dateString);
     } else {
-      return OffsetDateTime.of(LocalDateTime.parse(dateString),
-        OffsetDateTime.now().atZoneSameInstant(Constants.ZONEID).getOffset());
+      return ZonedDateTime.of(LocalDateTime.parse(dateString), Constants.ZONEID).toOffsetDateTime();
     }
   }
 }
