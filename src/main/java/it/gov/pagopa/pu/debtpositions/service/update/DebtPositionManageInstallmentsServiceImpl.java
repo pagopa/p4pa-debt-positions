@@ -70,15 +70,15 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
         storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
 
-        List<InstallmentDTO> installment2operate = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
+        Pair<DebtPositionDTO, List<InstallmentDTO>> dpManaged = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
 
-        Pair<DebtPositionDTO, String> debtPositionManaged = execute(storedDebtPosition, installment2operate, wfExecutionParameters, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
+        Pair<DebtPositionDTO, String> debtPositionManaged = execute(dpManaged.getLeft(), dpManaged.getRight(), wfExecutionParameters, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
 
         log.debug("Managed installments for debt position with id {}", storedDebtPosition.getDebtPositionId());
         return debtPositionManaged;
     }
 
-    private List<InstallmentDTO> managePaymentOptionInstallments(DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, List<ManageInstallmentDTO> manageInstallments, String accessToken, String operatorExternalUserId) {
+    private Pair<DebtPositionDTO, List<InstallmentDTO>> managePaymentOptionInstallments(DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, List<ManageInstallmentDTO> manageInstallments, String accessToken, String operatorExternalUserId) {
         ArrayList<InstallmentDTO> installmentsToAdd = new ArrayList<>();
         ArrayList<InstallmentDTO> installmentsToUpdate = new ArrayList<>();
         ArrayList<InstallmentDTO> installmentsToCancel = new ArrayList<>();
@@ -109,14 +109,14 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
         // TODO add check wait for workflow completion
         DebtPositionDTO dpWithInstallmentsAdded = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
         DebtPositionDTO dpWithInstallmentsUpdated = debtPositionUpdateInstallmentService.updateInstallment(dpWithInstallmentsAdded, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
-        debtPositionCancelInstallmentService.cancelInstallment(dpWithInstallmentsUpdated, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
+        DebtPositionDTO dpWithInstallmentCancelled = debtPositionCancelInstallmentService.cancelInstallment(dpWithInstallmentsUpdated, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
 
         List<InstallmentDTO> installment2operate = new ArrayList<>();
         installment2operate.addAll(installmentsToAdd);
         installment2operate.addAll(installmentsToUpdate);
         installment2operate.addAll(installmentsToCancel);
 
-        return installment2operate;
+        return Pair.of(dpWithInstallmentCancelled, installment2operate);
     }
 
     private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {
