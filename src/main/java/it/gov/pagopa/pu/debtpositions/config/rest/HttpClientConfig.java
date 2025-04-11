@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.config;
+package it.gov.pagopa.pu.debtpositions.config.rest;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

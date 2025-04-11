@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.config;
+package it.gov.pagopa.pu.debtpositions.config.rest;
 
 import it.gov.pagopa.pu.debtpositions.performancelogger.RestInvokePerformanceLogger;
 import it.gov.pagopa.pu.debtpositions.util.HttpUtils;

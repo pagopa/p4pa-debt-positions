@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.classification.config;
 import it.gov.pagopa.pu.classification.controller.generated.BalanceApi;
 import it.gov.pagopa.pu.classification.generated.ApiClient;
 import it.gov.pagopa.pu.classification.generated.BaseApi;
-import it.gov.pagopa.pu.debtpositions.config.RestTemplateConfig;
+import it.gov.pagopa.pu.debtpositions.config.rest.RestTemplateConfig;
 import jakarta.annotation.PreDestroy;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;

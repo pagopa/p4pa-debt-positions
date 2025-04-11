@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
-import it.gov.pagopa.pu.debtpositions.config.RestTemplateConfig;
+import it.gov.pagopa.pu.debtpositions.config.rest.RestTemplateConfig;
 import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.workflowhub.generated.ApiClient;
 import it.gov.pagopa.pu.workflowhub.generated.BaseApi;
