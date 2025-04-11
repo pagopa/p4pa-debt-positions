@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,6 +13,5 @@ public interface DebtPositionTypeOrgOperatorsRepository extends JpaRepository<De
   Optional<DebtPositionTypeOrgOperators> findByDebtPositionTypeOrgIdAndOperatorExternalUserId(Long debtPositionTypeOrgId, String operatorExternalUserId);
   List<DebtPositionTypeOrgOperators> findByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
   @Transactional
-  @Modifying
   long deleteByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
 }
