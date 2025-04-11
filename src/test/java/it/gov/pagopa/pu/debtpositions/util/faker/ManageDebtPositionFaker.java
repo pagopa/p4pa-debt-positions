@@ -18,15 +18,29 @@ public class ManageDebtPositionFaker {
       .debtPositionDescription("debtPositionDescription")
       .validityDate(DATE)
       .paymentOptionDescription("paymentOptionDescription")
-      .paymentOptionId(1L)
-      .installments(new ArrayList<>(List.of(buildManageInstallmentDTO())))
+      .paymentOptionId(10L)
+      .installments(new ArrayList<>(List.of(buildManageInsertInstallmentDTO(), buildManageUpdateInstallmentDTO(), buildManageCancelInstallmentDTO())))
       .build();
   }
 
-  public static ManageInstallmentDTO buildManageInstallmentDTO() {
+  public static ManageInstallmentDTO buildManageInsertInstallmentDTO() {
     return ManageInstallmentDTO.builder()
       .action(ManageInstallmentDTO.ActionEnum.I)
-      .installment(buildInstallmentDTO())
+      .installment(buildInstallmentDTO().installmentId(1L).iud("iud1"))
+      .build();
+  }
+
+  public static ManageInstallmentDTO buildManageUpdateInstallmentDTO() {
+    return ManageInstallmentDTO.builder()
+      .action(ManageInstallmentDTO.ActionEnum.M)
+      .installment(buildInstallmentDTO().installmentId(2L))
+      .build();
+  }
+
+  public static ManageInstallmentDTO buildManageCancelInstallmentDTO() {
+    return ManageInstallmentDTO.builder()
+      .action(ManageInstallmentDTO.ActionEnum.A)
+      .installment(buildInstallmentDTO().installmentId(3L))
       .build();
   }
 }

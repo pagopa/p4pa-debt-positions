@@ -29,7 +29,9 @@ class DebtPositionManageApplierServiceTest {
   @Test
   void givenUpdatedInstallmentWithNewDataWhenMergeThenSuccess(){
     InstallmentDTO storedInstallment = buildInstallmentDTO();
+    storedInstallment.getTransfers().add(TRANSFER_1);
     InstallmentDTO updatedInstallment = buildInstallmentDTO();
+    updatedInstallment.getTransfers().add(TRANSFER_1);
     updatedInstallment.setRemittanceInformation("remittanceInformation_updated");
     updatedInstallment.setDueDate(DATE);
 

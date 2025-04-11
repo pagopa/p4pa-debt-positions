@@ -27,111 +27,112 @@ import java.util.Set;
 @Slf4j
 public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionOperationService implements DebtPositionManageInstallmentsService {
 
-  private final DebtPositionService debtPositionService;
-  private final DebtPositionManageApplierService debtPositionManageApplierService;
-  private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
-  private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
-  private final DebtPositionCancelInstallmentServiceImpl debtPositionCancelInstallmentService;
+    private final DebtPositionService debtPositionService;
+    private final DebtPositionManageApplierService debtPositionManageApplierService;
+    private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
+    private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
+    private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
 
-  protected DebtPositionManageInstallmentsServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionManageApplierService debtPositionManageApplierService, DebtPositionAddInstallmentService debtPositionAddInstallmentService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService, DebtPositionCancelInstallmentServiceImpl debtPositionCancelInstallmentService) {
-    super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
-    this.debtPositionService = debtPositionService;
-    this.debtPositionManageApplierService = debtPositionManageApplierService;
-    this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
-    this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
-    this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
-  }
-
-  private static final Set<InstallmentStatus> MODIFIABLE_DPI_STATUSES = Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
-  private static final Set<PaymentOptionStatus> MODIFIABLE_PO_STATUSES = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID, PaymentOptionStatus.DRAFT);
-  private static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID, DebtPositionStatus.DRAFT);
-
-  @Override
-  @Transactional
-  public Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
-
-    if (!MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
-      throw new ConflictErrorException(String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
-        debtPositionId, storedDebtPosition.getStatus()));
+    protected DebtPositionManageInstallmentsServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionManageApplierService debtPositionManageApplierService, DebtPositionAddInstallmentService debtPositionAddInstallmentService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService, DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
+        super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
+        this.debtPositionService = debtPositionService;
+        this.debtPositionManageApplierService = debtPositionManageApplierService;
+        this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
+        this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
+        this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
     }
 
-    storedDebtPosition.setDescription(manageDebtPositionDTO.getDebtPositionDescription());
-    storedDebtPosition.setValidityDate(manageDebtPositionDTO.getValidityDate());
+    private static final Set<InstallmentStatus> MODIFIABLE_DPI_STATUSES = Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
+    private static final Set<PaymentOptionStatus> MODIFIABLE_PO_STATUSES = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID, PaymentOptionStatus.DRAFT);
+    private static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID, DebtPositionStatus.DRAFT);
 
-    PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
-      .filter(paymentOptionDTO -> paymentOptionDTO.getPaymentOptionId().equals(manageDebtPositionDTO.getPaymentOptionId()))
-      .findFirst()
-      .orElseThrow(() -> new NotFoundException(String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
+    @Override
+    @Transactional
+    public Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+        DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
-    if (!MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
-      throw new ConflictErrorException(String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
-    }
-
-    storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
-
-    List<InstallmentDTO> installment2operate = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
-
-    Pair<DebtPositionDTO, String> debtPositionManaged = execute(storedDebtPosition, installment2operate, wfExecutionParameters, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
-
-    log.debug("Managed installments for debt position with id {}", storedDebtPosition.getDebtPositionId());
-    return debtPositionManaged;
-  }
-
-  private List<InstallmentDTO> managePaymentOptionInstallments(DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, List<ManageInstallmentDTO> manageInstallments, String accessToken, String operatorExternalUserId) {
-    ArrayList<InstallmentDTO> installmentsToAdd = new ArrayList<>();
-    ArrayList<InstallmentDTO> installmentsToUpdate = new ArrayList<>();
-    ArrayList<InstallmentDTO> installmentsToCancel = new ArrayList<>();
-
-    manageInstallments.forEach(
-      manageInstallmentDTO -> {
-        InstallmentDTO manageInstallment = manageInstallmentDTO.getInstallment();
-        switch (manageInstallmentDTO.getAction()) {
-          case I -> {
-            paymentOptionDTO.addInstallmentsItem(manageInstallment);
-            installmentsToAdd.add(manageInstallment);
-          }
-          case M -> {
-            InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
-            debtPositionManageApplierService.merge(manageInstallment, storedInstallment);
-            installmentsToUpdate.add(storedInstallment);
-          }
-          case A -> {
-            InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
-            installmentsToCancel.add(storedInstallment);
-          }
+        if (!MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
+            throw new ConflictErrorException(String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
+                    debtPositionId, storedDebtPosition.getStatus()));
         }
-      }
-    );
 
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(true).build();
+        storedDebtPosition.setDescription(manageDebtPositionDTO.getDebtPositionDescription());
+        storedDebtPosition.setValidityDate(manageDebtPositionDTO.getValidityDate());
 
-    DebtPositionDTO dpWithInstallmentsAdded = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
-    DebtPositionDTO dpWithInstallmentsUpdated = debtPositionUpdateInstallmentService.updateInstallment(dpWithInstallmentsAdded, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
-    debtPositionCancelInstallmentService.cancelInstallment(dpWithInstallmentsUpdated, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
+        PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
+                .filter(paymentOptionDTO -> paymentOptionDTO.getPaymentOptionId().equals(manageDebtPositionDTO.getPaymentOptionId()))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
-    List<InstallmentDTO> installment2operate = new ArrayList<>();
-    installment2operate.addAll(installmentsToAdd);
-    installment2operate.addAll(installmentsToUpdate);
-    installment2operate.addAll(installmentsToCancel);
+        if (!MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
+            throw new ConflictErrorException(String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
+        }
 
-    return installment2operate;
-  }
+        storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
 
-  private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {
-    InstallmentDTO installment = paymentOptionDTO.getInstallments().stream()
-      .filter(installmentDTO -> installmentDTO.getInstallmentId().equals(installmentId))
-      .findFirst()
-      .orElseThrow(() -> new NotFoundException(String.format("The installment with id %s not found", installmentId)));
+        List<InstallmentDTO> installment2operate = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
 
-    if (!MODIFIABLE_DPI_STATUSES.contains(installment.getStatus())) {
-      throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
+        Pair<DebtPositionDTO, String> debtPositionManaged = execute(storedDebtPosition, installment2operate, wfExecutionParameters, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
+
+        log.debug("Managed installments for debt position with id {}", storedDebtPosition.getDebtPositionId());
+        return debtPositionManaged;
     }
-    return installment;
-  }
 
-  @Override
-  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
-    return debtPositionDTO;
-  }
+    private List<InstallmentDTO> managePaymentOptionInstallments(DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, List<ManageInstallmentDTO> manageInstallments, String accessToken, String operatorExternalUserId) {
+        ArrayList<InstallmentDTO> installmentsToAdd = new ArrayList<>();
+        ArrayList<InstallmentDTO> installmentsToUpdate = new ArrayList<>();
+        ArrayList<InstallmentDTO> installmentsToCancel = new ArrayList<>();
+
+        manageInstallments.forEach(
+                manageInstallmentDTO -> {
+                    InstallmentDTO manageInstallment = manageInstallmentDTO.getInstallment();
+                    switch (manageInstallmentDTO.getAction()) {
+                        case I -> {
+                            paymentOptionDTO.addInstallmentsItem(manageInstallment);
+                            installmentsToAdd.add(manageInstallment);
+                        }
+                        case M -> {
+                            InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
+                            debtPositionManageApplierService.merge(manageInstallment, storedInstallment);
+                            installmentsToUpdate.add(storedInstallment);
+                        }
+                        case A -> {
+                            InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
+                            installmentsToCancel.add(storedInstallment);
+                        }
+                    }
+                }
+        );
+
+        WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(true).build();
+
+        // TODO add check wait for workflow completion
+        DebtPositionDTO dpWithInstallmentsAdded = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
+        DebtPositionDTO dpWithInstallmentsUpdated = debtPositionUpdateInstallmentService.updateInstallment(dpWithInstallmentsAdded, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId).getLeft();
+        debtPositionCancelInstallmentService.cancelInstallment(dpWithInstallmentsUpdated, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
+
+        List<InstallmentDTO> installment2operate = new ArrayList<>();
+        installment2operate.addAll(installmentsToAdd);
+        installment2operate.addAll(installmentsToUpdate);
+        installment2operate.addAll(installmentsToCancel);
+
+        return installment2operate;
+    }
+
+    private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {
+        InstallmentDTO installment = paymentOptionDTO.getInstallments().stream()
+                .filter(installmentDTO -> installmentDTO.getInstallmentId().equals(installmentId))
+                .findFirst()
+                .orElseThrow(() -> new NotFoundException(String.format("The installment with id %s not found", installmentId)));
+
+        if (!MODIFIABLE_DPI_STATUSES.contains(installment.getStatus())) {
+            throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
+        }
+        return installment;
+    }
+
+    @Override
+    protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+        return debtPositionDTO;
+    }
 }

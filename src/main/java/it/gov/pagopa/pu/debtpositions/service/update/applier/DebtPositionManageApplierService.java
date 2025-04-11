@@ -26,7 +26,7 @@ public class DebtPositionManageApplierService {
     storedInstallment.setNotificationFeeCents(updatedInstallment.getNotificationFeeCents());
     storedInstallment.setNotificationDate(updatedInstallment.getNotificationDate());
 
-    // TODO if IUN is present only recalculate amount with new notificationFee and the other fields are all unmodifiable
+    // TODO if IUN is present the fields are all unmodifiable
     // long notificationFeeDiff = updatedInstallment.getNotificationFeeCents() - storedInstallment.getNotificationFeeCents();
 
     List<String> modifiedFields = new ArrayList<>();
