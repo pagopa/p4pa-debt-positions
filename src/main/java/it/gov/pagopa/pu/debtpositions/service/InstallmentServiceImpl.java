@@ -2,11 +2,14 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -73,4 +76,44 @@ public class InstallmentServiceImpl implements InstallmentService {
     return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
   }
 
+  @Override
+  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFee) {
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
+      .filter(installment ->
+        installment.getStatus().equals(InstallmentStatus.UNPAID) ||
+        installment.getStatus().equals(InstallmentStatus.EXPIRED) ||
+        installment.getStatus().equals(InstallmentStatus.UNPAYABLE))
+      .map(installmentMapper::mapToDto)
+      .toList();
+
+    if(installments.isEmpty())
+      throw new NotFoundException("The installment with NAV: "+nav+" was not found");
+    if(installments.size() > 1)
+      throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
+
+    InstallmentDTO installment = calculateNewFee(installments.getFirst(), notificationFee);
+    installmentPIIRepository.save(installmentMapper.mapToModel(installment));
+    //invoke TO_SYNC
+    return installment;
+  }
+
+  private InstallmentDTO calculateNewFee(InstallmentDTO installmentDTO, long newNotificationFee) {
+    long oldNotificationFee = installmentDTO.getNotificationFeeCents() != null ? installmentDTO.getNotificationFeeCents() : 0L;
+    long notificationFeeDifference = newNotificationFee - oldNotificationFee;
+    installmentDTO.setNotificationFeeCents(notificationFeeDifference); // or newNotificationFee?
+
+    //non mdb???? perchè il primo?
+    List<TransferDTO> transfers = installmentDTO.getTransfers();
+    if(transfers.getFirst()!=null)
+      transfers.getFirst().setAmountCents(transfers.getFirst().getAmountCents() + notificationFeeDifference);
+    else
+      throw new IllegalStateException("No eligible transfer found to update notification fee");
+
+    long newInstallmentAmount = transfers.stream()
+      .mapToLong(TransferDTO::getAmountCents)
+      .sum();
+
+    installmentDTO.setAmountCents(newInstallmentAmount);
+    return installmentDTO;
+  }
 }

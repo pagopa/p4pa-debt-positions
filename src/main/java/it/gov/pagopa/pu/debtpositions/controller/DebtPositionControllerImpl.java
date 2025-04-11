@@ -106,5 +106,19 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     String workflowId = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
     return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
   }
+
+  @Override
+  public ResponseEntity<InstallmentDTO> updateInstallmentNotificationFee(UpdateInstallmentNotificationFeeRequest updateInstallmentNotificationFeeRequest) {
+    log.info("Updating notification fee on installment having NAV {} and OrganizationId {}",
+      updateInstallmentNotificationFeeRequest.getNav(), updateInstallmentNotificationFeeRequest.getOrganizationId());
+
+    InstallmentDTO installmentDTO = installmentService.updateInstallmentNotificationFee(
+      updateInstallmentNotificationFeeRequest.getOrganizationId(),
+      updateInstallmentNotificationFeeRequest.getNav(),
+      updateInstallmentNotificationFeeRequest.getDebtPositionOrigin(),
+      updateInstallmentNotificationFeeRequest.getNewFee());
+
+    return ResponseEntity.ok(installmentDTO);
+  }
 }
 
