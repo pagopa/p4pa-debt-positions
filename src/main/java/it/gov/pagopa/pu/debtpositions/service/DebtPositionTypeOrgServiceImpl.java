@@ -6,9 +6,11 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
@@ -41,7 +43,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(
       debtPositionTypeOrgId).orElseThrow(
         () -> new NotFoundException("DebtPositionTypeOrg having id "+debtPositionTypeOrgId+" not found"));
-    debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    long deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(
+      debtPositionTypeOrgId);
+    log.info("Deleted {} operators having debtPositionTypeOrgId {}", deletedOperators,debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
 }
