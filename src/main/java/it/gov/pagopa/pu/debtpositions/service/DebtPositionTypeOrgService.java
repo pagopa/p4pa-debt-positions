@@ -5,4 +5,6 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 
 public interface DebtPositionTypeOrgService {
   IONotificationDTO getIONotificationDetails(Long debtPositionTypeId, PaymentEventType context);
+
+  void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId);
 }
