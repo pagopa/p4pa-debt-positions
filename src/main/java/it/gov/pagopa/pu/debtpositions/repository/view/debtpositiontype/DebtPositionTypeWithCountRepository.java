@@ -16,7 +16,7 @@ public interface DebtPositionTypeWithCountRepository extends Repository<DebtPosi
   @Query(value = "SELECT d "
     + "FROM DebtPositionTypeWithCount d "
     + "WHERE d.brokerId = :brokerId "
-    + "AND (:description is null OR d.description ILIKE CONCAT('%', :description, '%'))")
+    + "AND (:description is null OR d.description ILIKE CONCAT('%', cast(:description as text), '%'))")
   Page<DebtPositionTypeWithCount> findByBrokerId(@Param("brokerId") @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) Long brokerId,
     String description,
     Pageable pageable);
