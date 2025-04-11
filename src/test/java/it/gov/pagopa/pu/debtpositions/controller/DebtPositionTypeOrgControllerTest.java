@@ -1,5 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
@@ -13,10 +18,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DebtPositionTypeOrgControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -47,5 +48,17 @@ class DebtPositionTypeOrgControllerTest {
 
     IONotificationDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), IONotificationDTO.class);
     assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void whenDeleteDebtPositionTypeOrgThenOk() throws Exception {
+    Long debtPositionTypeOrgId = 1L;
+
+    Mockito.doNothing().when(debtPositionTypeOrgService).deleteDebtPositionTypeOrg(debtPositionTypeOrgId);
+
+    mockMvc.perform(
+        delete("/debt-position-type-org/" + debtPositionTypeOrgId))
+      .andExpect(status().isOk())
+      .andReturn();
   }
 }

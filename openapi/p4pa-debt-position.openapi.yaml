@@ -695,6 +695,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-position-type-org/{debtPositionTypeOrgId}:
+    delete:
+      tags:
+        - debt-position-type-org
+      operationId: deleteDebtPositionTypeOrg
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+        "500":
+          description: Internal server error
   /debt-position-type-org/{debtPositionTypeOrgId}/io-notification/details:
     get:
       tags:
