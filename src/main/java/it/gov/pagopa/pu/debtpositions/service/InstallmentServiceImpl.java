@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDet
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -91,22 +92,30 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(installments.size() > 1)
       throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
 
-    InstallmentDTO installment = calculateNewFee(installments.getFirst(), notificationFee);
+    InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFee);
     installmentPIIRepository.save(installmentMapper.mapToModel(installment));
-    //invoke TO_SYNC
+
+    InstallmentUtils.setStatus(installment, installment.getStatus());
     return installment;
   }
 
-  private InstallmentDTO calculateNewFee(InstallmentDTO installmentDTO, long newNotificationFee) {
+  private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long newNotificationFee) {
     long oldNotificationFee = installmentDTO.getNotificationFeeCents() != null ? installmentDTO.getNotificationFeeCents() : 0L;
     long notificationFeeDifference = newNotificationFee - oldNotificationFee;
-    installmentDTO.setNotificationFeeCents(notificationFeeDifference); // or newNotificationFee?
+    installmentDTO.setNotificationFeeCents(notificationFeeDifference);
 
-    //non mdb???? perchè il primo?
+    boolean transferUpdated = false;
     List<TransferDTO> transfers = installmentDTO.getTransfers();
-    if(transfers.getFirst()!=null)
-      transfers.getFirst().setAmountCents(transfers.getFirst().getAmountCents() + notificationFeeDifference);
-    else
+    for (TransferDTO transfer : transfers) {
+      //exclude first item if it's a tax stamp
+      if (transfer.getStampType()==null) {
+        transfer.setAmountCents(transfer.getAmountCents()+notificationFeeDifference);
+        transferUpdated = true;
+        break;
+      }
+    }
+
+    if (!transferUpdated)
       throw new IllegalStateException("No eligible transfer found to update notification fee");
 
     long newInstallmentAmount = transfers.stream()
