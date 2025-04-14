@@ -100,4 +100,15 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   void updateStatusAndToSyncStatus(Long installmentId, InstallmentStatus status, InstallmentSyncStatus syncStatus);
 
   //endregion
+
+  @Query(" select i" +
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "    on i.paymentOptionId = po.paymentOptionId" +
+    "  join DebtPosition dp" +
+    "    on po.debtPositionId = dp.debtPositionId" +
+    " where dp.organizationId = :organizationId" +
+    "   and i.iud = :iud")
+  List<InstallmentNoPII> getByOrganizationIdAndIud(Long organizationId, String iud);
+
 }
