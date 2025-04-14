@@ -109,6 +109,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "    on po.debtPositionId = dp.debtPositionId" +
     " where dp.organizationId = :organizationId" +
     "   and i.iud = :iud")
+  @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(ref = "CollectionModelInstallmentNoPII")))
   List<InstallmentNoPII> getByOrganizationIdAndIud(Long organizationId, String iud);
 
 }
