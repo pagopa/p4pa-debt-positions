@@ -608,6 +608,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/{debtPositionId}/manage-installments:
+    put:
+      tags:
+        - debt-position
+      operationId: manageDebtPositionInstallments
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ManageDebtPositionDTO"
+        required: true
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionDTO'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /transfers/{transferId}/reported:
     put:
       tags:
@@ -651,6 +695,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-position-type-org/{debtPositionTypeOrgId}:
+    delete:
+      tags:
+        - debt-position-type-org
+      operationId: deleteDebtPositionTypeOrg
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+        "500":
+          description: Internal server error
   /debt-position-type-org/{debtPositionTypeOrgId}/io-notification/details:
     get:
       tags:
@@ -776,8 +839,8 @@ components:
         - amountCents
         - debtor
         - remittanceInformation
-        - transfers
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseInstallment"]
       properties:
         installmentId:
           type: integer
@@ -788,7 +851,7 @@ components:
         status:
           $ref: "#/components/schemas/InstallmentStatus"
         syncStatus:
-          $ref: "#/components/schemas/InstallmentSyncStatus"
+          type: "InstallmentSyncStatus"
         iupdPagopa:
           type: string
         iud:
@@ -1186,16 +1249,6 @@ components:
       properties:
         newStatus:
           $ref: "#/components/schemas/InstallmentStatus"
-    InstallmentSyncStatus:
-      required:
-        - syncStatusFrom
-        - syncStatusTo
-      type: object
-      properties:
-        syncStatusFrom:
-          $ref: "#/components/schemas/InstallmentStatus"
-        syncStatusTo:
-          $ref: "#/components/schemas/InstallmentStatus"
     DebtPositionErrorDTO:
       type: object
       required:
@@ -1504,6 +1557,8 @@ components:
           type: string
         debtor:
           $ref: "#/components/schemas/PersonDTO"
+        payer:
+          $ref: "#/components/schemas/PersonDTO"
     PagedDebtPositions:
       type: object
       required:
@@ -1536,3 +1591,37 @@ components:
       properties:
         iuf:
           type: string
+    ManageDebtPositionDTO:
+      type: object
+      required:
+        - paymentOptionId
+        - installments
+      properties:
+        debtPositionDescription:
+          type: string
+        validityDate:
+          type: string
+          format: date
+        paymentOptionId:
+          type: integer
+          format: int64
+        paymentOptionDescription:
+          type: string
+        installments:
+          type: array
+          items:
+            $ref: "#/components/schemas/ManageInstallmentDTO"
+    ManageInstallmentDTO:
+      type: object
+      required:
+        - action
+        - installment
+      properties:
+        action:
+          type: string
+          enum:
+            - I
+            - M
+            - A
+        installment:
+          $ref: "#/components/schemas/InstallmentDTO"

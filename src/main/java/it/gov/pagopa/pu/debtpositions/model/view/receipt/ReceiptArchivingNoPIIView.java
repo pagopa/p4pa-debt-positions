@@ -31,5 +31,5 @@ public class ReceiptArchivingNoPIIView implements Serializable {
   @NotNull
   private String orgFiscalCode;
   @NotNull
-  private Long installmentPersonalDataId;
+  private Long receiptPersonalDataId;
 }

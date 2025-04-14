@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
@@ -36,17 +36,39 @@ class ReceiptArchivingPIIMapperTest {
   void givenValidReceiptArchivingNoPIIView_whenMapToReceiptArchivingView_thenReturnReceiptArchivingView() {
     //given
     ReceiptArchivingNoPIIView receiptArchivingNoPIIView = podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class);
-    InstallmentPIIDTO installmentPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
     PersonDTO personDTO = podamFactory.manufacturePojo(PersonDTO.class);
 
-    Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getInstallmentPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
-    Mockito.when(personMapperMock.mapToDto(installmentPIIDTO.getDebtor())).thenReturn(personDTO);
+    Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    Mockito.when(personMapperMock.mapToDto(receiptPIIDTO.getDebtor())).thenReturn(personDTO);
+    Mockito.when(personMapperMock.mapToDto(receiptPIIDTO.getPayer())).thenReturn(personDTO);
     //when
     ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
     //then
     Assertions.assertNotNull(result);
     TestUtils.reflectionEqualsByName(receiptArchivingNoPIIView, result);
     TestUtils.reflectionEqualsByName(personDTO, result.getDebtor());
+    TestUtils.reflectionEqualsByName(personDTO, result.getPayer());
     TestUtils.checkNotNullFields(result);
+  }
+
+  @Test
+  void givenValidReceiptArchivingNoPIIViewWithoutPayer_whenMapToReceiptArchivingView_thenReturnReceiptArchivingView() {
+    //given
+    ReceiptArchivingNoPIIView receiptArchivingNoPIIView = podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class);
+    ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
+    receiptPIIDTO.setPayer(null);
+    PersonDTO personDTO = podamFactory.manufacturePojo(PersonDTO.class);
+
+    Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    Mockito.when(personMapperMock.mapToDto(receiptPIIDTO.getDebtor())).thenReturn(personDTO);
+    //when
+    ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
+    //then
+    Assertions.assertNotNull(result);
+    Assertions.assertNull(result.getPayer());
+    TestUtils.reflectionEqualsByName(receiptArchivingNoPIIView, result);
+    TestUtils.reflectionEqualsByName(personDTO, result.getDebtor());
+    TestUtils.checkNotNullFields(result, "payer");
   }
 }

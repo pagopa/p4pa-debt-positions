@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.config;
 
-import it.gov.pagopa.pu.debtpositions.config.RestTemplateConfig;
+import it.gov.pagopa.pu.debtpositions.config.rest.RestTemplateConfig;
 import it.gov.pagopa.pu.organization.client.generated.BrokerSearchControllerApi;
 import it.gov.pagopa.pu.organization.client.generated.*;
 import it.gov.pagopa.pu.organization.generated.ApiClient;

@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +29,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setInstallmentId(fullDTO.getInstallmentId());
     noPII.setPaymentOptionId(fullDTO.getPaymentOptionId());
     noPII.setStatus(fullDTO.getStatus());
+    noPII.setSyncStatus(fullDTO.getSyncStatus());
     noPII.setIupdPagopa(fullDTO.getIupdPagopa());
     noPII.setIud(fullDTO.getIud());
     noPII.setIuv(fullDTO.getIuv());
@@ -53,12 +53,6 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
     noPII.setTransfers(new TreeSet<>(fullDTO.getTransfers()));
 
-    if(fullDTO.getSyncStatus() != null){
-      noPII.setSyncStatus(it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus.builder()
-        .syncStatusFrom(fullDTO.getSyncStatus().getSyncStatusFrom())
-        .syncStatusTo(fullDTO.getSyncStatus().getSyncStatusTo()).build());
-    }
-
     return noPII;
   }
 
@@ -72,10 +66,11 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
   @Override
   public Installment map(InstallmentNoPII noPii) {
     InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
-    Installment installment = Installment.builder()
+    return Installment.builder()
       .installmentId(noPii.getInstallmentId())
       .paymentOptionId(noPii.getPaymentOptionId())
       .status(noPii.getStatus())
+      .syncStatus(noPii.getSyncStatus())
       .iupdPagopa(noPii.getIupdPagopa())
       .iud(noPii.getIud())
       .iuv(noPii.getIuv())
@@ -99,13 +94,5 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .transfers(Optional.ofNullable(noPii.getTransfers()).map(List::copyOf).orElse(List.of()))
       .noPII(noPii)
       .build();
-
-    if(noPii.getSyncStatus() != null) {
-      installment.setSyncStatus(InstallmentSyncStatus.builder()
-        .syncStatusFrom(noPii.getSyncStatus().getSyncStatusFrom())
-        .syncStatusTo(noPii.getSyncStatus().getSyncStatusTo())
-        .build());
-    }
-    return installment;
   }
 }

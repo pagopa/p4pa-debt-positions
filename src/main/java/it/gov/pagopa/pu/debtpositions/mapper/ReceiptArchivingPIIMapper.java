@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class ReceiptArchivingPIIMapper {
   }
 
   public ReceiptArchivingView map(ReceiptArchivingNoPIIView noPII){
-    InstallmentPIIDTO installmentPIIDTO = personalDataService.get(noPII.getInstallmentPersonalDataId(), InstallmentPIIDTO.class);
+    ReceiptPIIDTO pii = personalDataService.get(noPII.getReceiptPersonalDataId(), ReceiptPIIDTO.class);
 
     return ReceiptArchivingView.builder()
       .receiptId(noPII.getReceiptId())
@@ -27,7 +27,8 @@ public class ReceiptArchivingPIIMapper {
       .iuv(noPII.getIuv())
       .remittanceInformation(noPII.getRemittanceInformation())
       .orgFiscalCode(noPII.getOrgFiscalCode())
-      .debtor(personMapper.mapToDto(installmentPIIDTO.getDebtor()))
+      .debtor(personMapper.mapToDto(pii.getDebtor()))
+      .payer(pii.getPayer() != null ? personMapper.mapToDto(pii.getPayer()) : null)
       .build();
   }
 }
