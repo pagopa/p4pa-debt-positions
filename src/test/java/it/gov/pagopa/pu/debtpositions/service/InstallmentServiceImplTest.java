@@ -294,6 +294,54 @@ class InstallmentServiceImplTest {
         orgId, nav, debtPositionOrigin, newNotificationFee));
   }
 
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenFiltersCorrectStatus() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    Installment paidInstallment = new Installment();
+    paidInstallment.setStatus(InstallmentStatus.PAID);
+    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+      .thenReturn(List.of(paidInstallment));
+
+    // When Then
+    assertThrows(NotFoundException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, debtPositionOrigin, newNotificationFee));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNoEligibleTransfer() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
+
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+    installmentDTO.getTransfers().clear();
+    TransferDTO taxTransfer = new TransferDTO();
+    taxTransfer.setStampType("MDB");
+    taxTransfer.setAmountCents(100L);
+    installmentDTO.getTransfers().add(taxTransfer);
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.EXPIRED);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+      .thenReturn(List.of(installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+
+    // When Then
+    assertThrows(IllegalStateException.class, () ->
+      installmentService.updateInstallmentNotificationFee(orgId, nav, debtPositionOrigin, newNotificationFee));
+  }
+
 
   private static InstallmentDTO getInstallmentDTO() {
     InstallmentDTO installmentDTO = new InstallmentDTO();
