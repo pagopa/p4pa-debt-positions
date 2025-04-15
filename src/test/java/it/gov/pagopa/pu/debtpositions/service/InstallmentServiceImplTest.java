@@ -3,6 +3,8 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
@@ -221,4 +223,93 @@ class InstallmentServiceImplTest {
     assertNull(workflowId);
   }
 
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenSuccess() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.UNPAID);
+    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+      .thenReturn(List.of(installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+    Mockito.when(installmentMapperMock.mapToModel(Mockito.any(InstallmentDTO.class)))
+      .thenReturn(installment);
+
+    // When
+    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
+      orgId, nav, debtPositionOrigin, newNotificationFee);
+
+    // Then
+    assertEquals(100L, result.getNotificationFeeCents());
+    assertEquals(1100L, result.getAmountCents());
+    assertEquals(900L, result.getTransfers().getFirst().getAmountCents());
+    Mockito.verify(installmentPIIRepositoryMock).save(Mockito.any(Installment.class));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNotFoundException() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+      .thenReturn(Collections.emptyList());
+
+    // When Then
+    assertThrows(NotFoundException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, debtPositionOrigin, newNotificationFee));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenConflictErrorException() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.UNPAID);
+    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+      .thenReturn(List.of(installment, installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+
+    // When Then
+    assertThrows(ConflictErrorException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, debtPositionOrigin, newNotificationFee));
+  }
+
+
+  private static InstallmentDTO getInstallmentDTO() {
+    InstallmentDTO installmentDTO = new InstallmentDTO();
+    installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.setNotificationFeeCents(100L);
+    installmentDTO.setAmountCents(1000L);
+
+    List<TransferDTO> transfers = new ArrayList<>();
+    TransferDTO transfer1 = new TransferDTO();
+    transfer1.setAmountCents(900L);
+    transfer1.setStampType("TAX");
+    TransferDTO transfer2 = new TransferDTO();
+    transfer2.setAmountCents(100L);
+    transfers.add(transfer1);
+    transfers.add(transfer2);
+    installmentDTO.setTransfers(transfers);
+    return installmentDTO;
+  }
 }
