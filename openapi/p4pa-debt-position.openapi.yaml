@@ -672,13 +672,13 @@ paths:
                   type: array
                   items:
                     $ref: "#/components/schemas/DebtPositionOrigin"
-                newFee:
+                newFeeCents:
                   type: integer
                   format: int64
               required:
                 - organizationId
                 - nav
-                - newFee
+                - newFeeCents
       responses:
         "200":
           description: Ok

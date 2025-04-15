@@ -131,7 +131,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       updateInstallmentNotificationFeeRequest.getOrganizationId(),
       updateInstallmentNotificationFeeRequest.getNav(),
       updateInstallmentNotificationFeeRequest.getDebtPositionOrigin(),
-      updateInstallmentNotificationFeeRequest.getNewFee());
+      updateInstallmentNotificationFeeRequest.getNewFeeCents());
 
     return ResponseEntity.ok(installmentDTO);
   }

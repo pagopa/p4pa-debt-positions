@@ -78,7 +78,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFee) {
+  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFeeCents) {
     List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
       .filter(installment ->
         installment.getStatus().equals(InstallmentStatus.UNPAID) ||
@@ -92,16 +92,16 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(installments.size() > 1)
       throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
 
-    InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFee);
+    InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
     installmentPIIRepository.save(installmentMapper.mapToModel(installment));
 
     InstallmentUtils.setStatus(installment, installment.getStatus());
     return installment;
   }
 
-  private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long newNotificationFee) {
-    long oldNotificationFee = installmentDTO.getNotificationFeeCents() != null ? installmentDTO.getNotificationFeeCents() : 0L;
-    long notificationFeeDifference = newNotificationFee - oldNotificationFee;
+  private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long notificationFeeCents) {
+    long oldNotificationFeeCents = installmentDTO.getNotificationFeeCents() != null ? installmentDTO.getNotificationFeeCents() : 0L;
+    long notificationFeeDifference = notificationFeeCents - oldNotificationFeeCents;
     installmentDTO.setNotificationFeeCents(notificationFeeDifference);
 
     boolean transferUpdated = false;
