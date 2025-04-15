@@ -261,4 +261,27 @@ class DebtPositionControllerTest {
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
+
+  @Test
+  void whenUpdateInstallmentNotificationFeeThenOk()
+    throws Exception {
+    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
+      .builder()
+      .organizationId(0L)
+      .nav("NAV")
+      .newFee(1L)
+      .build();
+
+    InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
+
+    Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(), request.getDebtPositionOrigin(), request.getNewFee()))
+      .thenReturn(installmentDTO);
+
+    mockMvc.perform(
+        put("/debt-positions/update-notification-fee")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
+      .andExpect(status().isOk())
+      .andReturn();
+  }
 }
