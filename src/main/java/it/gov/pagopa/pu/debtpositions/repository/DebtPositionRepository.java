@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -81,5 +80,5 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
 
-  List<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId);
+  Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
 }
