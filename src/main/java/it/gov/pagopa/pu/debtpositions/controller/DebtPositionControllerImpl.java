@@ -121,4 +121,18 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     Pair<DebtPositionDTO, String> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
   }
+
+  @Override
+  public ResponseEntity<InstallmentDTO> updateInstallmentNotificationFee(UpdateInstallmentNotificationFeeRequest updateInstallmentNotificationFeeRequest) {
+    log.info("Updating notification fee on installment having NAV {} and OrganizationId {}",
+      updateInstallmentNotificationFeeRequest.getNav(), updateInstallmentNotificationFeeRequest.getOrganizationId());
+
+    InstallmentDTO installmentDTO = installmentService.updateInstallmentNotificationFee(
+      updateInstallmentNotificationFeeRequest.getOrganizationId(),
+      updateInstallmentNotificationFeeRequest.getNav(),
+      updateInstallmentNotificationFeeRequest.getDebtPositionOrigin(),
+      updateInstallmentNotificationFeeRequest.getNewFee());
+
+    return ResponseEntity.ok(installmentDTO);
+  }
 }
