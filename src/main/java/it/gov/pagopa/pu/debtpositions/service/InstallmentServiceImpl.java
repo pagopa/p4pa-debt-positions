@@ -4,13 +4,17 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,14 +32,20 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository;
   private final DebtPositionService debtPositionService;
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
+  private final DebtPositionRepository debtPositionRepository;
+  private final DebtPositionMapper debtPositionMapper;
 
-  public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService) {
+  public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
+    DebtPositionRepository debtPositionRepository,
+    DebtPositionMapper debtPositionMapper) {
     this.installmentPIIRepository = installmentPIIRepository;
     this.installmentMapper = installmentMapper;
     this.installmentDetailPIIViewRepository = installmentDetailPIIViewRepository;
     this.installmentPaidViewPIIViewRepository = installmentPaidViewPIIViewRepository;
     this.debtPositionService = debtPositionService;
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
+    this.debtPositionRepository = debtPositionRepository;
+    this.debtPositionMapper = debtPositionMapper;
   }
 
   @Override
@@ -78,12 +88,10 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFeeCents) {
+  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFeeCents,
+    WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
-      .filter(installment ->
-        installment.getStatus().equals(InstallmentStatus.UNPAID) ||
-        installment.getStatus().equals(InstallmentStatus.EXPIRED) ||
-        installment.getStatus().equals(InstallmentStatus.UNPAYABLE))
+      .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .map(installmentMapper::mapToDto)
       .toList();
 
@@ -93,14 +101,16 @@ public class InstallmentServiceImpl implements InstallmentService {
       throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
-    installmentPIIRepository.save(installmentMapper.mapToModel(installment));
 
-    InstallmentUtils.setStatus(installment, installment.getStatus());
+    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
+    debtPositionUpdateInstallmentService.updateInstallment(debtPositionMapper.mapToDto(debtPosition), Collections.singletonList(installment),
+      wfExecutionParameters, accessToken, operatorExternalUserId);
+
     return installment;
   }
 
   private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long notificationFeeCents) {
-    long oldNotificationFeeCents = installmentDTO.getNotificationFeeCents() != null ? installmentDTO.getNotificationFeeCents() : 0L;
+    long oldNotificationFeeCents = java.util.Objects.requireNonNullElse(installmentDTO.getNotificationFeeCents(), 0L);
     long notificationFeeDifference = notificationFeeCents - oldNotificationFeeCents;
     installmentDTO.setNotificationFeeCents(notificationFeeDifference);
 

@@ -127,11 +127,21 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     log.info("Updating notification fee on installment having NAV {} and OrganizationId {}",
       updateInstallmentNotificationFeeRequest.getNav(), updateInstallmentNotificationFeeRequest.getOrganizationId());
 
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
     InstallmentDTO installmentDTO = installmentService.updateInstallmentNotificationFee(
       updateInstallmentNotificationFeeRequest.getOrganizationId(),
       updateInstallmentNotificationFeeRequest.getNav(),
       updateInstallmentNotificationFeeRequest.getDebtPositionOrigin(),
-      updateInstallmentNotificationFeeRequest.getNewFeeCents());
+      updateInstallmentNotificationFeeRequest.getNewFeeCents(),
+      wfExecutionParameters,
+      accessToken,
+      operatorExternalUserId);
 
     return ResponseEntity.ok(installmentDTO);
   }
