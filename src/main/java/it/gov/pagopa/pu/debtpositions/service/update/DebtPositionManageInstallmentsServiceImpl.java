@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
@@ -21,7 +22,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Slf4j
@@ -42,16 +42,12 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
         this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
     }
 
-    private static final Set<InstallmentStatus> MODIFIABLE_DPI_STATUSES = Set.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.DRAFT);
-    private static final Set<PaymentOptionStatus> MODIFIABLE_PO_STATUSES = Set.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.PARTIALLY_PAID, PaymentOptionStatus.DRAFT);
-    private static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(DebtPositionStatus.UNPAID, DebtPositionStatus.EXPIRED, DebtPositionStatus.PARTIALLY_PAID, DebtPositionStatus.DRAFT);
-
     @Override
     @Transactional
     public Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
         DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
-        if (!MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
+        if (!InstallmentUtils.MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
             throw new ConflictErrorException(String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
                     debtPositionId, storedDebtPosition.getStatus()));
         }
@@ -64,7 +60,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
-        if (!MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
+        if (!InstallmentUtils.MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
             throw new ConflictErrorException(String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
         }
 
@@ -125,7 +121,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                 .findFirst()
                 .orElseThrow(() -> new NotFoundException(String.format("The installment with id %s not found", installmentId)));
 
-        if (!MODIFIABLE_DPI_STATUSES.contains(installment.getStatus())) {
+        if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus())) {
             throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
         }
         return installment;

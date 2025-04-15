@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +24,25 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.UNPAID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.INVALID,
     InstallmentStatus.UNPAID + "|" + InstallmentStatus.CANCELLED);
+
+  public static final Set<PaymentOptionStatus> MODIFIABLE_PO_STATUSES = Set.of(
+    PaymentOptionStatus.DRAFT,
+    PaymentOptionStatus.UNPAID,
+    PaymentOptionStatus.EXPIRED,
+    PaymentOptionStatus.PARTIALLY_PAID,
+    PaymentOptionStatus.UNPAYABLE);
+
+  public static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(
+    DebtPositionStatus.DRAFT,
+    DebtPositionStatus.UNPAID,
+    DebtPositionStatus.EXPIRED,
+    DebtPositionStatus.PARTIALLY_PAID);
+
+  public static final Set<InstallmentStatus> MODIFIABLE_STATUSES = Set.of(
+    InstallmentStatus.DRAFT,
+    InstallmentStatus.UNPAID,
+    InstallmentStatus.EXPIRED,
+    InstallmentStatus.UNPAYABLE);
 
   private static final Set<InstallmentStatus> PAYABLE_STATUSES = Set.of(
     InstallmentStatus.DRAFT,
