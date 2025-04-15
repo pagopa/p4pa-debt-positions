@@ -3,9 +3,11 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,13 +17,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 class DebtPositionTypeOrgServiceImplTest {
 
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  @Mock
+  private DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepositoryMock;
 
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
 
@@ -29,7 +31,8 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepository));
+    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepository,
+      debtPositionTypeOrgOperatorsRepositoryMock));
   }
 
   @Test
@@ -86,5 +89,33 @@ class DebtPositionTypeOrgServiceImplTest {
     IONotificationDTO result = debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_UPDATED);
 
     Assertions.assertNull(result);
+  }
+
+  @Test
+  void givenExistingDebtPositionTypeOrgWhenDeleteDebtPositionTypeOrgThenOk(){
+    Long debtPositionTypeOrgId = 1L;
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10L);
+    Mockito.doNothing().when(debtPositionTypeOrgRepository).delete(debtPositionTypeOrg);
+
+    debtPositionTypeOrgService.deleteDebtPositionTypeOrg(debtPositionTypeOrgId);
+
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository,debtPositionTypeOrgOperatorsRepositoryMock);
+  }
+
+  @Test
+  void givenNonExistingDebtPositionTypeOrgWhenDeleteDebtPositionTypeOrgThenNotFoundException(){
+    Long debtPositionTypeOrgId = 1L;
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId))
+      .thenReturn(Optional.empty());
+
+    Assertions.assertThrows(NotFoundException.class, () ->debtPositionTypeOrgService.deleteDebtPositionTypeOrg(debtPositionTypeOrgId));
+
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsRepositoryMock);
   }
 }

@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
@@ -34,6 +35,7 @@ import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -63,6 +65,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private InstallmentService installmentService;
+
+  @MockitoBean
+  private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -231,5 +236,29 @@ class DebtPositionControllerTest {
       .andExpect(status().isCreated())
       .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
+  }
+
+  @Test
+  void whenManageDebtPositionInstallmentsThenOk() throws Exception {
+    Long debtPositionId = 1L;
+    ManageDebtPositionDTO request = buildManageDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
+      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+
+    MvcResult result = mockMvc.perform(
+        put("/debt-positions/" + debtPositionId + "/manage-installments")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
+      .andExpect(status().isOk())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 }

@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
-import it.gov.pagopa.pu.debtpositions.config.HttpClientConfig;
+import it.gov.pagopa.pu.debtpositions.config.rest.HttpClientConfig;
 import org.apache.hc.client5.http.HttpRoute;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.config.ConnectionConfig;
