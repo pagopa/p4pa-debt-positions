@@ -112,7 +112,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long notificationFeeCents) {
     long oldNotificationFeeCents = java.util.Objects.requireNonNullElse(installmentDTO.getNotificationFeeCents(), 0L);
     long notificationFeeDifference = notificationFeeCents - oldNotificationFeeCents;
-    installmentDTO.setNotificationFeeCents(notificationFeeDifference);
+    installmentDTO.setNotificationFeeCents(notificationFeeCents);
 
     boolean transferUpdated = false;
     List<TransferDTO> transfers = installmentDTO.getTransfers();
