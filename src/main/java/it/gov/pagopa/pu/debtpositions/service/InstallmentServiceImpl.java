@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallme
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 
 import java.util.Collections;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -103,7 +104,18 @@ public class InstallmentServiceImpl implements InstallmentService {
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
 
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
-    debtPositionUpdateInstallmentService.updateInstallment(debtPositionMapper.mapToDto(debtPosition), Collections.singletonList(installment),
+    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
+    debtPositionDTO.getPaymentOptions()
+      .forEach(paymentOptionDTO -> {
+        List<InstallmentDTO> updatedInstallmentsList = paymentOptionDTO.getInstallments().stream()
+          .map(installmentDTO ->
+            installmentDTO.getInstallmentId().equals(installment.getInstallmentId()) ? installment : installmentDTO
+          )
+          .collect(Collectors.toList());
+        paymentOptionDTO.setInstallments(updatedInstallmentsList);
+      });
+
+    debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, Collections.singletonList(installment),
       wfExecutionParameters, accessToken, operatorExternalUserId);
 
     return installment;
