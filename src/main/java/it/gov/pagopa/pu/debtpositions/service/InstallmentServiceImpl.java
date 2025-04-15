@@ -15,7 +15,6 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallme
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 
 import java.util.Collections;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -110,8 +109,7 @@ public class InstallmentServiceImpl implements InstallmentService {
         List<InstallmentDTO> updatedInstallmentsList = paymentOptionDTO.getInstallments().stream()
           .map(installmentDTO ->
             installmentDTO.getInstallmentId().equals(installment.getInstallmentId()) ? installment : installmentDTO
-          )
-          .collect(Collectors.toList());
+          ).toList();
         paymentOptionDTO.setInstallments(updatedInstallmentsList);
       });
 

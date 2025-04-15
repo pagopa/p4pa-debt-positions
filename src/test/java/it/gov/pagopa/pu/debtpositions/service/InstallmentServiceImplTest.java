@@ -235,6 +235,10 @@ class InstallmentServiceImplTest {
     DebtPosition debtPosition = new DebtPosition();
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
+    PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
+
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
       .thenReturn(List.of(installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
@@ -351,6 +355,7 @@ class InstallmentServiceImplTest {
 
   private static InstallmentDTO getInstallmentDTO() {
     InstallmentDTO installmentDTO = new InstallmentDTO();
+    installmentDTO.setInstallmentId(1L);
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
     installmentDTO.setNotificationFeeCents(100L);
     installmentDTO.setAmountCents(1000L);
