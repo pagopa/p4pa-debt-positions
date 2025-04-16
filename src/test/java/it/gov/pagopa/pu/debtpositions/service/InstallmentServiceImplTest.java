@@ -231,7 +231,6 @@ class InstallmentServiceImplTest {
 
     Installment installment = new Installment();
     installment.setStatus(InstallmentStatus.UNPAID);
-    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
     DebtPosition debtPosition = new DebtPosition();
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
@@ -239,7 +238,7 @@ class InstallmentServiceImplTest {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
       .thenReturn(List.of(installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
       .thenReturn(installmentDTO);
@@ -249,7 +248,7 @@ class InstallmentServiceImplTest {
 
     // When
     InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
-      orgId, nav, debtPositionOrigin, newNotificationFee,wfExecutionParameters, accessToken, operatorExternalUserId);
+      orgId, nav, newNotificationFee,wfExecutionParameters, accessToken, operatorExternalUserId);
 
     // Then
     assertEquals(200L, result.getNotificationFeeCents());
@@ -270,15 +269,14 @@ class InstallmentServiceImplTest {
     String nav = "NAV";
     Long orgId = 1L;
     long newNotificationFee = 200L;
-    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
       .thenReturn(Collections.emptyList());
 
     // When Then
     assertThrows(NotFoundException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, debtPositionOrigin, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
@@ -291,9 +289,8 @@ class InstallmentServiceImplTest {
 
     Installment installment = new Installment();
     installment.setStatus(InstallmentStatus.UNPAID);
-    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
       .thenReturn(List.of(installment, installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
       .thenReturn(installmentDTO);
@@ -301,7 +298,7 @@ class InstallmentServiceImplTest {
     // When Then
     assertThrows(ConflictErrorException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, debtPositionOrigin, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
@@ -313,15 +310,14 @@ class InstallmentServiceImplTest {
 
     Installment paidInstallment = new Installment();
     paidInstallment.setStatus(InstallmentStatus.PAID);
-    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
       .thenReturn(List.of(paidInstallment));
 
     // When Then
     assertThrows(NotFoundException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, debtPositionOrigin, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
@@ -330,7 +326,6 @@ class InstallmentServiceImplTest {
     String nav = "NAV";
     Long orgId = 1L;
     long newNotificationFee = 200L;
-    List<DebtPositionOrigin> debtPositionOrigin = List.of(DebtPositionOrigin.valueOf( "ORDINARY_SIL"));
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
     installmentDTO.getTransfers().clear();
@@ -342,14 +337,15 @@ class InstallmentServiceImplTest {
     Installment installment = new Installment();
     installment.setStatus(InstallmentStatus.EXPIRED);
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, debtPositionOrigin))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
       .thenReturn(List.of(installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
       .thenReturn(installmentDTO);
 
     // When Then
     assertThrows(IllegalStateException.class, () ->
-      installmentService.updateInstallmentNotificationFee(orgId, nav, debtPositionOrigin, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+      installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
+        wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
 

@@ -16,5 +16,5 @@ public interface InstallmentService {
 
   String updateInstallmentNotificationDate(UpdateInstallmentNotificationDateRequest updateInstallmentNotificationDateRequest, WfExecutionParameters wfExecutionParameters, String operatorExternalUserId,  String accessToken);
 
-  InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long newFeeCents, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
+  InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long newFeeCents, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
 }

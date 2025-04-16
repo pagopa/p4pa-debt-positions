@@ -668,10 +668,6 @@ paths:
                   format: int64
                 nav:
                   type: string
-                debtPositionOrigin:
-                  type: array
-                  items:
-                    $ref: "#/components/schemas/DebtPositionOrigin"
                 newFeeCents:
                   type: integer
                   format: int64

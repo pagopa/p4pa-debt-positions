@@ -88,9 +88,9 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, long notificationFeeCents,
+  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, null).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .map(installmentMapper::mapToDto)
       .toList();

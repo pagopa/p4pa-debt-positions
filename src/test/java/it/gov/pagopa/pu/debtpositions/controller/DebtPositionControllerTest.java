@@ -280,7 +280,7 @@ class DebtPositionControllerTest {
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
     Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
-        request.getDebtPositionOrigin(), request.getNewFeeCents(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
+      request.getNewFeeCents(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(
         put("/debt-positions/update-notification-fee")
