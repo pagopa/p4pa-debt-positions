@@ -3,13 +3,15 @@ package it.gov.pagopa.pu.debtpositions.repository;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+
+import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(path = "debt-position-type-orgs")
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg, Long> {
@@ -26,7 +28,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgs(@Parameter(required = true) @Param("organizationId") Long organizationId,
                                                      @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
-  List<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId);
+  Page<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId);
 
   @Query("select dpto from InstallmentNoPII i " +
     "join PaymentOption po on i.paymentOptionId = po.paymentOptionId " +
@@ -37,5 +39,5 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
 
   @RestResource(exported = false)
   @Override
-  void deleteById(Long aLong);
+  void deleteById(Long debtPositionTypeOrgId);
 }
