@@ -466,6 +466,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/payment-option/by-paymentOptionId-status:
+    put:
+      tags:
+        - payment-option-entity-extended-controller
+      operationId: updateStatus
+      parameters:
+        - name: paymentOptionId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/PaymentOptionStatus"
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:
