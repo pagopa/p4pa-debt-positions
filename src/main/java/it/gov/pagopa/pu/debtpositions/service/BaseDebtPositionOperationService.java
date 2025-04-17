@@ -80,8 +80,8 @@ public abstract class BaseDebtPositionOperationService {
 
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPosition savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
+    debtPositionProcessorService.updateAmounts(debtPositionOperated);
+    DebtPosition savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionOperated, org);
 
     DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
 

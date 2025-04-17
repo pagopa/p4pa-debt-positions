@@ -184,7 +184,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), 2L, OPERATOR_EXTERNAL_ID)).thenReturn(buildDebtPositionTypeOrg());
     Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPosition);
-    Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString())).thenReturn(WorkflowCreatedDTO.builder().workflowId(WORKFLOW_ID).build());
 
@@ -192,6 +191,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     assertEquals(WORKFLOW_ID, result.getRight());
     assertEquals(debtPositionDTO, result.getLeft());
+
+    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
   }
 
 }

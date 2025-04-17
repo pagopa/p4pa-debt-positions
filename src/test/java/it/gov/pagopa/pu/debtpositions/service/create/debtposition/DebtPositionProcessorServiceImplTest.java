@@ -31,9 +31,9 @@ class DebtPositionProcessorServiceImplTest {
       .mapToObj(i -> buildInstallmentDTO())
       .collect(Collectors.toCollection(ArrayList::new)));
 
-    DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(300, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(300, debtPositionDTO.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -46,9 +46,9 @@ class DebtPositionProcessorServiceImplTest {
     firstInstallment.setStatus(InstallmentStatus.CANCELLED);
     firstInstallment.setSyncStatus(null);
 
-    DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, debtPositionDTO.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 
   @Test
@@ -61,8 +61,8 @@ class DebtPositionProcessorServiceImplTest {
     firstInstallment.setSyncStatus(InstallmentSyncStatus.builder()
       .syncStatusFrom(InstallmentStatus.UNPAID).syncStatusTo(InstallmentStatus.CANCELLED).build());
 
-    DebtPositionDTO result = debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    assertEquals(200, result.getPaymentOptions().getFirst().getTotalAmountCents());
+    assertEquals(200, debtPositionDTO.getPaymentOptions().getFirst().getTotalAmountCents());
   }
 }

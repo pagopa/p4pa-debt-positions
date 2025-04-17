@@ -86,18 +86,18 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
     checkDebtPosition(debtPositionDTO, org);
 
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
-    checkAllInstallments(debtPositionUpdated, org, debtPositionTypeOrg);
-    validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    checkAllInstallments(debtPositionDTO, org, debtPositionTypeOrg);
+    validateDebtPositionService.validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
 
-    if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
+    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
-    return debtPositionUpdated;
+    return debtPositionDTO;
   }
 
   private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,
