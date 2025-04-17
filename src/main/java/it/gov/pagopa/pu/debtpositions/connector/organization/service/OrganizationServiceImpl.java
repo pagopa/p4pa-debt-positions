@@ -2,11 +2,14 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
+@CacheConfig(cacheNames = it.gov.pagopa.pu.debtpositions.config.CacheConfig.Fields.organization)
 public class OrganizationServiceImpl implements OrganizationService {
 
   private final OrganizationSearchClient organizationSearchClient;
@@ -16,6 +19,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
+  @Cacheable(key = "'fiscalCode-' + #orgFiscalCode", unless = "#result == null")
   public Optional<Organization> getOrganizationByFiscalCode(String orgFiscalCode, String accessToken) {
     return Optional.ofNullable(
       organizationSearchClient.findByOrgFiscalCode(orgFiscalCode, accessToken)
@@ -23,6 +27,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
+  @Cacheable(key = "'ipaCode-' + #ipaCode", unless = "#result == null")
   public Optional<Organization> getOrganizationByIpaCode(String ipaCode, String accessToken) {
     return Optional.ofNullable(
       organizationSearchClient.findByIpaCode(ipaCode, accessToken)
@@ -30,6 +35,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
+  @Cacheable(key = "'orgId-' + #orgId", unless = "#result == null")
   public Optional<Organization> getOrganizationById(Long orgId, String accessToken) {
     return Optional.ofNullable(
       organizationSearchClient.findByOrganizationId(orgId, accessToken)
