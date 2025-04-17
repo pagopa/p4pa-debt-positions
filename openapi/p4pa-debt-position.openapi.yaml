@@ -408,6 +408,64 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-dueDate:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateDueDate
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: dueDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-status-syncStatus:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateStatusAndToSyncStatus
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/InstallmentStatus"
+        - name: syncStatus
+          in: query
+          required: true
+          schema:
+            type: "InstallmentSyncStatus"
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:
