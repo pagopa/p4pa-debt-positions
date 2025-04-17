@@ -454,7 +454,6 @@ paths:
             $ref: "#/components/schemas/InstallmentStatus"
         - name: syncStatus
           in: query
-          required: true
           schema:
             type: "InstallmentSyncStatus"
       responses:
