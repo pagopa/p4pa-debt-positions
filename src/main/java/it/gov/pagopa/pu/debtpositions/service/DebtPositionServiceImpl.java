@@ -1,13 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
@@ -46,28 +46,66 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
+    mappedDebtPosition.getFirst().setDebtPositionId(savedDebtPosition.getDebtPositionId());
+    debtPositionDTO.setDebtPositionId(savedDebtPosition.getDebtPositionId());
 
     mappedDebtPosition.getFirst().getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(savedDebtPosition.getDebtPositionId());
       PaymentOption savedPaymentOption = paymentOptionRepository.save(paymentOption);
+      paymentOption.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+
+      PaymentOptionDTO paymentOptionDTO = alignPaymentOptionDTO(debtPositionDTO, savedPaymentOption);
 
       paymentOption.getInstallments().forEach(installmentNoPII -> {
         Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
         mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
 
         InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment).getNoPII();
+        mappedInstallment.setInstallmentId(savedInstallment.getInstallmentId());
+        mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
         installmentNoPII.setPersonalDataId(savedInstallment.getPersonalDataId());
         installmentNoPII.setInstallmentId(savedInstallment.getInstallmentId());
         installmentNoPII.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
 
+        InstallmentDTO installmentDTO = alignInstallmentDTO(paymentOptionDTO, savedInstallment);
+
         mappedInstallment.getTransfers().forEach(transfer -> {
           transfer.setInstallmentId(savedInstallment.getInstallmentId());
-          transferRepository.save(transfer);
+          Transfer savedTransfer = transferRepository.save(transfer);
+          transfer.setTransferId(savedTransfer.getTransferId());
+
+          alignTransferDTO(installmentDTO, savedTransfer);
         });
       });
     });
 
     return mappedDebtPosition.getFirst();
+  }
+
+  private PaymentOptionDTO alignPaymentOptionDTO(DebtPositionDTO debtPositionDTO, PaymentOption paymentOption) {
+    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
+      .filter(po -> po.getPaymentOptionIndex().equals(paymentOption.getPaymentOptionIndex()))
+      .findFirst().orElseThrow();
+    paymentOptionDTO.setDebtPositionId(paymentOption.getDebtPositionId());
+    paymentOptionDTO.setPaymentOptionId(paymentOption.getPaymentOptionId());
+    return paymentOptionDTO;
+  }
+
+  private InstallmentDTO alignInstallmentDTO(PaymentOptionDTO paymentOptionDTO, InstallmentNoPII savedInstallment) {
+    InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().stream()
+      .filter(i -> i.getIud().equals(savedInstallment.getIud()))
+      .findFirst().orElseThrow();
+    installmentDTO.setInstallmentId(savedInstallment.getInstallmentId());
+    installmentDTO.setPaymentOptionId(savedInstallment.getPaymentOptionId());
+    return installmentDTO;
+  }
+
+  private void alignTransferDTO(InstallmentDTO installmentDTO, Transfer savedTransfer) {
+    TransferDTO transferDTO = installmentDTO.getTransfers().stream()
+      .filter(t -> t.getTransferIndex().equals(savedTransfer.getTransferIndex()))
+      .findFirst().orElseThrow();
+    transferDTO.setTransferId(savedTransfer.getTransferId());
+    transferDTO.setInstallmentId(savedTransfer.getInstallmentId());
   }
 
   @Transactional
