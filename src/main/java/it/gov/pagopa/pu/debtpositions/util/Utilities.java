@@ -77,7 +77,10 @@ public class Utilities {
 
   public static <T> void checkImmutableField(String fieldName, T original, T updated, List<String> modifiedFields){
     @SuppressWarnings("unchecked") // suppressing: same type due to same Generic type
-    boolean fieldUpdated = (original instanceof @SuppressWarnings("rawtypes")Comparable c1 && updated instanceof Comparable<?> c2)
+    boolean fieldUpdated =
+      (original instanceof OffsetDateTime o1 && updated instanceof OffsetDateTime o2)
+      ? o1.toEpochSecond() != o2.toEpochSecond()
+      : (original instanceof @SuppressWarnings("rawtypes")Comparable c1 && updated instanceof Comparable<?> c2)
       ? c1.compareTo(c2) != 0
       : !Objects.equals(original, updated);
     if(fieldUpdated){
