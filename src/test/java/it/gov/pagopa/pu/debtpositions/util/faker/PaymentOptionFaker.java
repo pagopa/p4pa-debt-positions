@@ -5,6 +5,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
@@ -12,6 +16,8 @@ import java.util.TreeSet;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 public class PaymentOptionFaker {
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 2);
+  private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static PaymentOption buildPaymentOption() {
     PaymentOption paymentOption = new PaymentOption();
@@ -22,6 +28,9 @@ public class PaymentOptionFaker {
     paymentOption.setDescription("Payment description");
     paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
     paymentOption.setPaymentOptionIndex(1);
+    paymentOption.setCreationDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildInstallmentNoPII()))));
     return paymentOption;
   }
@@ -35,6 +44,9 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
     paymentOptionDTO.setPaymentOptionIndex(1);
+    paymentOptionDTO.setCreationDate(DATETIME);
+    paymentOptionDTO.setUpdateDate(DATETIME);
+    paymentOptionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
     return paymentOptionDTO;
   }

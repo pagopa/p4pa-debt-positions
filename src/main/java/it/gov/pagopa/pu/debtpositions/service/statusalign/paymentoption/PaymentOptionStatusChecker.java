@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
+import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.TO_SYNC;
 
-public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentStatus, PaymentOption, PaymentOptionStatus> {
+public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentStatus, BasePaymentOption, PaymentOptionStatus> {
 
   private final PaymentOptionRepository paymentOptionRepository;
 
@@ -49,19 +49,19 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   }
 
   @Override
-  protected List<InstallmentStatus> getChildStatuses(PaymentOption paymentOption) {
+  protected List<InstallmentStatus> getChildStatuses(BasePaymentOption paymentOption) {
     return paymentOption.getInstallments().stream()
-      .map(InstallmentNoPII::getStatus)
+      .map(BaseInstallment::getStatus)
       .toList();
   }
 
   @Override
-  protected void setStatus(PaymentOption paymentOption, PaymentOptionStatus newStatus) {
+  protected void setStatus(BasePaymentOption paymentOption, PaymentOptionStatus newStatus) {
     paymentOption.setStatus(newStatus);
   }
 
   @Override
-  protected void storeStatus(PaymentOption paymentOption, PaymentOptionStatus newStatus) {
+  protected void storeStatus(BasePaymentOption paymentOption, PaymentOptionStatus newStatus) {
     paymentOptionRepository.updateStatus(paymentOption.getPaymentOptionId(), newStatus);
   }
 

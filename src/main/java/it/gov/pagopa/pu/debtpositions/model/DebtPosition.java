@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import jakarta.persistence.*;
@@ -29,7 +30,7 @@ import java.util.SortedSet;
 @Data
 @Builder
 @EqualsAndHashCode(of = {"debtPositionId", "iupdOrg"}, callSuper = false)
-public class DebtPosition extends BaseEntity implements Serializable {
+public class DebtPosition extends BaseEntity implements BaseDebtPosition, Serializable {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_generator")

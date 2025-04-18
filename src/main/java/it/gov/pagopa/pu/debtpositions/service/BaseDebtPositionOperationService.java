@@ -6,7 +6,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -81,13 +80,13 @@ public abstract class BaseDebtPositionOperationService {
     DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
     debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPosition savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionOperated, org);
+    debtPositionService.saveDebtPosition(debtPositionOperated);
 
-    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
+    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionOperated);
 
-    String workflowId = invokeWorkflow(debtPositionAligned, eventType, installments2operate, accessToken, wfExecutionParameters);
+    String workflowId = invokeWorkflow(debtPositionOperated, eventType, installments2operate, accessToken, wfExecutionParameters);
 
-    return Pair.of(debtPositionAligned, workflowId);
+    return Pair.of(debtPositionOperated, workflowId);
   }
 
   private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {

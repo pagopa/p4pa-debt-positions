@@ -35,6 +35,7 @@ public class DebtPositionFaker {
     debtPosition.setFlagPagoPaPayment(false);
     debtPosition.setCreationDate(DATETIME.toLocalDateTime());
     debtPosition.setUpdateDate(DATETIME.toLocalDateTime());
+    debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildPaymentOption()))));
     return debtPosition;
   }
@@ -54,6 +55,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setFlagPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATETIME);
     debtPositionDTO.setUpdateDate(DATETIME);
+    debtPositionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
     return debtPositionDTO;
   }

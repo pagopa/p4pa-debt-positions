@@ -4,7 +4,14 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+
 public class TransferFaker {
+  private static final LocalDate DATE = LocalDate.of(2099, 1, 3);
+  private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   public static Transfer buildTransfer() {
     Transfer transfer = new Transfer();
@@ -19,6 +26,9 @@ public class TransferFaker {
     transfer.setCategory("category");
     transfer.setTransferIndex(2);
     transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
+    transfer.setCreationDate(DATETIME.toLocalDateTime());
+    transfer.setUpdateDate(DATETIME.toLocalDateTime());
+    transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     return transfer;
   }
 
@@ -37,6 +47,9 @@ public class TransferFaker {
       .stampType("TYPE")
       .stampHashDocument("HASH")
       .stampProvincialResidence("PR")
+      .creationDate(DATETIME)
+      .updateDate(DATETIME)
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 
