@@ -5,7 +5,9 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,8 +75,11 @@ public class Utilities {
     );
   }
 
-  public static void checkImmutableField(String fieldName, Object original, Object updated, List<String> modifiedFields){
-    boolean fieldUpdated = !Objects.equals(original, updated);
+  public static <T> void checkImmutableField(String fieldName, T original, T updated, List<String> modifiedFields){
+    @SuppressWarnings("unchecked") // suppressing: same type due to same Generic type
+    boolean fieldUpdated = (original instanceof @SuppressWarnings("rawtypes")Comparable c1 && updated instanceof Comparable<?> c2)
+      ? c1.compareTo(c2) == 0
+      : !Objects.equals(original, updated);
     if(fieldUpdated){
       modifiedFields.add(fieldName);
     }
