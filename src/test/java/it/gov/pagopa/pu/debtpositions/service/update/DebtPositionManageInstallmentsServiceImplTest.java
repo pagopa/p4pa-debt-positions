@@ -12,7 +12,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,14 +22,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
-import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageUpdateInstallmentDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -162,7 +158,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
     ManageDebtPositionDTO manageDebtPositionDTO = buildManageDebtPositionDTO();
     WfExecutionParameters wfExecutionParametersPartial = WfExecutionParameters.builder().massive(false).partialChange(true).build();
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(false).build();
-    Organization organization = buildOrganization();
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentDTO installment2insert = buildInstallmentDTO().installmentId(1L).iud("iud1");
@@ -181,8 +176,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_ID_CANCEL);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), 2L, OPERATOR_EXTERNAL_ID)).thenReturn(buildDebtPositionTypeOrg());
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString()))
       .thenReturn(WorkflowCreatedDTO.builder().workflowId(WORKFLOW_ID).build());
 
@@ -190,10 +183,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     assertEquals(WORKFLOW_ID, result.getRight());
     assertEquals(debtPositionDTO, result.getLeft());
-
-    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
 }

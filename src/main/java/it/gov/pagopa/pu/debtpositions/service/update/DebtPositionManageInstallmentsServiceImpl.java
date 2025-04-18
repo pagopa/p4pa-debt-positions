@@ -68,7 +68,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
     List<InstallmentDTO> involvedInstallments = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
 
-    String workflowId = execute(storedDebtPosition, involvedInstallments, wfExecutionParameters, PaymentEventType.DP_UPDATED, accessToken, operatorExternalUserId);
+    String workflowId = invokeWorkflow(storedDebtPosition, PaymentEventType.DP_UPDATED, involvedInstallments, accessToken, wfExecutionParameters);
 
     log.debug("Managed installments for debt position with id {}", storedDebtPosition.getDebtPositionId());
     return Pair.of(storedDebtPosition, workflowId);
