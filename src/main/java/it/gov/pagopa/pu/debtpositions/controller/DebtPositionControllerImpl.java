@@ -49,8 +49,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(massive)
       .partialChange(false)
       .build();
-    Pair<DebtPositionDTO, String> result = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    String workflowId = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, workflowId).body(debtPositionDTO);
   }
 
 

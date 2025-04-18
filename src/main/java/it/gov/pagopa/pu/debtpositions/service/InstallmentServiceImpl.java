@@ -13,14 +13,13 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDet
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
-
-import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Slf4j
@@ -84,7 +83,7 @@ public class InstallmentServiceImpl implements InstallmentService {
       return null;
     }
 
-    return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
+    return debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, updatedInstallments, wfExecutionParameters, accessToken, operatorExternalUserId);
   }
 
   @Override

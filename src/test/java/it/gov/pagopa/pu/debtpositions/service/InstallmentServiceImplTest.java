@@ -102,7 +102,7 @@ class InstallmentServiceImplTest {
   @NullSource
   void givenValidOrganizationAndNavWhGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     //given
-    List<Installment> installmentList = podamFactory.manufacturePojo(List.class, Installment.class);
+    List<Installment> installmentList = TestUtils.getPodamFactory().manufacturePojo(List.class, Installment.class);
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
     List<DebtPositionOrigin> originList = debtPositionOrigin == null ? null : List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
@@ -168,7 +168,7 @@ class InstallmentServiceImplTest {
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(org.apache.commons.lang3.tuple.Pair.of(debtPositionDTO, "workflowId"));
+      .thenReturn("workflowId");
 
     // When
     String workflowId = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, operatorExternalUserId, accessToken);

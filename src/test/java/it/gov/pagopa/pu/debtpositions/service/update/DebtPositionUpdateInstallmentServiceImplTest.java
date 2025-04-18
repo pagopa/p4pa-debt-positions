@@ -85,14 +85,13 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
 
-    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
+    String result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
 
-    assertEquals(workflowId, result.getRight());
-    DebtPositionDTO resultDebtPositionDTO = result.getLeft();
-    assertEquals(DebtPositionStatus.TO_SYNC, resultDebtPositionDTO.getStatus());
-    assertEquals(PaymentOptionStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getStatus());
-    assertEquals(new InstallmentSyncStatus(InstallmentStatus.UNPAID, InstallmentStatus.UNPAID), resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
-    assertEquals(InstallmentStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(workflowId, result);
+    assertEquals(DebtPositionStatus.TO_SYNC, debtPositionDTO.getStatus());
+    assertEquals(PaymentOptionStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getStatus());
+    assertEquals(new InstallmentSyncStatus(InstallmentStatus.UNPAID, InstallmentStatus.UNPAID), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
+    assertEquals(InstallmentStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
@@ -123,15 +122,14 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(LocalDate.now().plusDays(1));
 
-    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO,
+    String result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO,
       List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalId);
 
-    assertEquals(workflowId, result.getRight());
-    DebtPositionDTO resultDebtPositionDTO = result.getLeft();
-    assertEquals(DebtPositionStatus.TO_SYNC, resultDebtPositionDTO.getStatus());
-    assertEquals(PaymentOptionStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getStatus());
-    assertEquals(new InstallmentSyncStatus(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID), resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
-    assertEquals(InstallmentStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(workflowId, result);
+    assertEquals(DebtPositionStatus.TO_SYNC, debtPositionDTO.getStatus());
+    assertEquals(PaymentOptionStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getStatus());
+    assertEquals(new InstallmentSyncStatus(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
+    assertEquals(InstallmentStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);

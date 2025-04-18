@@ -23,7 +23,6 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -65,22 +64,22 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public String createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
 
-    Pair<DebtPositionDTO, String> savedDebtPosition = execute(debtPositionDTO, installment2operate,
+    String workflowId = execute(debtPositionDTO, installment2operate,
       wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
 
-    log.info("DebtPosition created with id {}", savedDebtPosition.getLeft().getDebtPositionId());
-    return savedDebtPosition;
+    log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
+    return workflowId;
   }
 
   @Override
-  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
+  protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                         String accessToken, Organization org) {
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
@@ -97,7 +96,6 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
       updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
-    return debtPositionDTO;
   }
 
   private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,

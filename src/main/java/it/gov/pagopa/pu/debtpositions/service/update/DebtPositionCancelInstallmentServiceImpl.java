@@ -15,7 +15,6 @@ import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,20 +37,20 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public String cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     if (log.isDebugEnabled()) {
       Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
       log.debug("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
     }
 
-    Pair<DebtPositionDTO, String> debtPositionUpdated = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, accessToken, operatorExternalUserId);
+    String workflowId = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, accessToken, operatorExternalUserId);
 
     log.debug("Cancelled installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-    return debtPositionUpdated;
+    return workflowId;
   }
 
   @Override
-  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+  protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 
@@ -61,8 +60,6 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
         .findFirst()
         .ifPresent(installmentDTO -> InstallmentUtils.setStatus(installmentDTO, InstallmentStatus.CANCELLED))
       );
-
-    return debtPositionDTO;
   }
 
 }

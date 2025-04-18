@@ -119,7 +119,7 @@ class DebtPositionControllerTest {
       .build();
 
     Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
-      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+      .thenReturn("workflowId");
 
     MvcResult result = mockMvc.perform(
         post("/debt-positions")
