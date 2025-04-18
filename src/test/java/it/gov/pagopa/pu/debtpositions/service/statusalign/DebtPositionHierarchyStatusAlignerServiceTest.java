@@ -51,7 +51,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   @Mock
   private DebtPositionSyncService syncServiceMock;
 
-  private DebtPositionHierarchyStatusAlignerService service;
+  private DebtPositionHierarchyStatusAlignerServiceImpl service;
 
   @BeforeEach
   void setUp() {

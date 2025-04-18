@@ -14,6 +14,8 @@ import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 @Service
 public class PaymentOptionMapper {
 
@@ -57,8 +59,7 @@ public class PaymentOptionMapper {
   }
 
   public PaymentOptionDTO mapToDto(PaymentOption paymentOption) {
-    return PaymentOptionDTO.builder()
-      .paymentOptionId(paymentOption.getPaymentOptionId())
+    PaymentOptionDTO dto = PaymentOptionDTO.builder()
       .debtPositionId(paymentOption.getDebtPositionId())
       .totalAmountCents(paymentOption.getTotalAmountCents())
       .status(paymentOption.getStatus())
@@ -71,6 +72,16 @@ public class PaymentOptionMapper {
           .collect(Collectors.toCollection(ArrayList<InstallmentDTO>::new))
       )
       .build();
+
+    setToDtoAutoDbFields(dto, paymentOption);
+    return dto;
+  }
+
+  public static void setToDtoAutoDbFields(PaymentOptionDTO paymentOptionDTO, PaymentOption paymentOption){
+    paymentOptionDTO.setPaymentOptionId(paymentOption.getPaymentOptionId());
+    paymentOptionDTO.setCreationDate(localDatetimeToOffsetDateTime(paymentOption.getCreationDate()));
+    paymentOptionDTO.setUpdateDate(localDatetimeToOffsetDateTime(paymentOption.getUpdateDate()));
+    paymentOptionDTO.setUpdateOperatorExternalId(paymentOption.getUpdateOperatorExternalId());
   }
 
 }

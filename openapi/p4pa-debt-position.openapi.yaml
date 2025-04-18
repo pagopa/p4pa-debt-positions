@@ -900,6 +900,7 @@ components:
         - paymentOptions
         - flagPagoPaPayment
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"]
       properties:
         debtPositionId:
           type: integer
@@ -933,6 +934,8 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
         paymentOptions:
           type: array
           items:
@@ -943,6 +946,7 @@ components:
         - totalAmountCents
         - paymentOptionType
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption"]
       properties:
         paymentOptionId:
           type: integer
@@ -967,6 +971,14 @@ components:
         paymentOptionIndex:
           type: integer
           format: int32
+        creationDate:
+          type: string
+          format: date-time
+        updateDate:
+          type: string
+          format: date-time
+        updateOperatorExternalId:
+          type: string
         installments:
           type: array
           items:
@@ -1040,6 +1052,8 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
     TransferDTO:
       required:
         - amountCents
@@ -1080,6 +1094,14 @@ components:
         transferIndex:
           type: integer
           format: int32
+        creationDate:
+          type: string
+          format: date-time
+        updateDate:
+          type: string
+          format: date-time
+        updateOperatorExternalId:
+          type: string
     ReceiptDTO:
       type: object
       required:

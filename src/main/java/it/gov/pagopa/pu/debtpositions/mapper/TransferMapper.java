@@ -5,6 +5,8 @@ import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.springframework.stereotype.Service;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 @Service
 public class TransferMapper {
 
@@ -26,7 +28,6 @@ public class TransferMapper {
 
   public TransferDTO mapToDto(Transfer transfer) {
     TransferDTO transferDTO = TransferDTO.builder()
-      .transferId(transfer.getTransferId())
       .installmentId(transfer.getInstallmentId())
       .orgFiscalCode(transfer.getOrgFiscalCode())
       .orgName(transfer.getOrgName())
@@ -44,7 +45,15 @@ public class TransferMapper {
       transferDTO.setStampProvincialResidence(transfer.getStamp().getStampProvincialResidence());
     }
 
+    setToDtoAutoDbFields(transferDTO, transfer);
     return transferDTO;
+  }
+
+  public static void setToDtoAutoDbFields(TransferDTO transferDTO, Transfer transfer){
+    transferDTO.setTransferId(transfer.getTransferId());
+    transferDTO.setCreationDate(localDatetimeToOffsetDateTime(transfer.getCreationDate()));
+    transferDTO.setUpdateDate(localDatetimeToOffsetDateTime(transfer.getUpdateDate()));
+    transferDTO.setUpdateOperatorExternalId(transfer.getUpdateOperatorExternalId());
   }
 
 }

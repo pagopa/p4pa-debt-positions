@@ -1,44 +1,29 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.*;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
-import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
-import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
@@ -47,11 +32,7 @@ class DebtPositionServiceImplTest {
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
   @Mock
-  private PaymentOptionRepository paymentOptionRepositoryMock;
-  @Mock
-  private InstallmentPIIRepository installmentRepositoryMock;
-  @Mock
-  private TransferRepository transferRepositoryMock;
+  private DebtPositionSaveService debtPositionSaveServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
 
@@ -61,173 +42,43 @@ class DebtPositionServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionService = Mockito.spy(new DebtPositionServiceImpl(
+    debtPositionService = new DebtPositionServiceImpl(
       debtPositionRepositoryMock,
-      paymentOptionRepositoryMock,
-      installmentRepositoryMock,
-      transferRepositoryMock,
+      debtPositionSaveServiceMock,
       debtPositionMapperMock
-    ));
+    );
   }
 
   @AfterEach
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
       debtPositionRepositoryMock,
-      paymentOptionRepositoryMock,
-      installmentRepositoryMock,
-      transferRepositoryMock,
+      debtPositionSaveServiceMock,
       debtPositionMapperMock);
   }
 
   @Test
-  void givenValidDebtPositionDTO_WhenSaveDebtPosition_ThenSaveAllEntities() {
-    String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
-    String generatedIupd = "e04940029-18b140108de0-e39271476234";
-
-    Organization org = buildOrganization();
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
-    InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().getFirst();
-    TransferDTO transferDTO = installmentDTO.getTransfers().getFirst();
-    transferDTO.setTransferIndex(1);
-
-    DebtPosition debtPosition = buildDebtPosition();
-
-    InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
-    Installment installmentNoIud = buildInstallment();
-    installmentNoIud.setIud("");
-
-    InstallmentNoPII installmentNoPII = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
-    installmentNoPII.setInstallmentId(10L);
-    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
-    Installment installment = buildInstallment();
-    installment.setInstallmentId(10L);
-    installment.setTransfers(new ArrayList<>(installmentNoPII.getTransfers()));
-    installment.setNoPII(installmentNoPII);
-
-    DebtPosition savedDebtPosition = Mockito.mock(DebtPosition.class, Mockito.RETURNS_DEEP_STUBS);
-    PaymentOption savedPaymentOption = Mockito.mock(PaymentOption.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedPaymentOption.getPaymentOptionIndex()).thenReturn(paymentOptionDTO.getPaymentOptionIndex());
-    Installment savedInstallment = Mockito.mock(Installment.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedInstallment.getNoPII().getIud()).thenReturn(installmentDTO.getIud());
-    Transfer savedTransfer = Mockito.mock(Transfer.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedTransfer.getTransferIndex()).thenReturn(transferDTO.getTransferIndex());
-
-    Map<InstallmentNoPII, Installment> installmentMap = Map.of(
-      installmentNoPIINoIud, installmentNoIud,
-      installmentNoPII, installment
-    );
-
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
-
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepositoryMock.save(Mockito.any(DebtPosition.class))).thenReturn(savedDebtPosition);
-    Mockito.when(paymentOptionRepositoryMock.save(Mockito.any(PaymentOption.class))).thenReturn(savedPaymentOption);
-    Mockito.when(installmentRepositoryMock.save(Mockito.any(Installment.class))).thenReturn(savedInstallment);
-    Mockito.when(transferRepositoryMock.save(Mockito.any(Transfer.class))).thenReturn(savedTransfer);
-
-    try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
-      mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
-      mockedStatic.when(Utilities::getRandomicUUID).thenReturn(generatedIupd);
-
-      DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
-
-      Assertions.assertSame(debtPosition, result);
-      Assertions.assertSame(savedDebtPosition.getDebtPositionId(), debtPosition.getDebtPositionId());
-      Assertions.assertSame(savedDebtPosition.getDebtPositionId(), debtPositionDTO.getDebtPositionId());
-
-      PaymentOption po = debtPosition.getPaymentOptions().getFirst();
-      Assertions.assertSame(savedDebtPosition.getDebtPositionId(), po.getDebtPositionId());
-      Assertions.assertSame(savedPaymentOption.getDebtPositionId(), paymentOptionDTO.getDebtPositionId());
-      Assertions.assertSame(savedPaymentOption.getPaymentOptionId(), paymentOptionDTO.getPaymentOptionId());
-
-      InstallmentNoPII i = po.getInstallments().getFirst();
-      Assertions.assertSame(savedInstallment.getPaymentOptionId(), i.getPaymentOptionId());
-      Assertions.assertSame(savedInstallment.getPaymentOptionId(), installmentDTO.getPaymentOptionId());
-      Assertions.assertSame(savedInstallment.getInstallmentId(), installmentDTO.getInstallmentId());
-
-      Assertions.assertSame(savedTransfer.getInstallmentId(), installment.getTransfers().getFirst().getInstallmentId());
-      Assertions.assertSame(savedTransfer.getInstallmentId(), transferDTO.getInstallmentId());
-      Assertions.assertSame(savedTransfer.getTransferId(), transferDTO.getTransferId());
-    }
-  }
-
-  @Test
-  void givenValidDebtPositionDTONoOrg_WhenSaveDebtPosition_ThenSaveAllEntities() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    debtPositionTypeOrg.setIban("");
-
-    DebtPosition debtPosition = buildDebtPosition();
-    PaymentOption paymentOption = buildPaymentOption();
-
-    InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
-    Installment installmentNoIud = buildInstallment();
-    installmentNoIud.setIud("");
-
-    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
-    installmentNoPII.getTransfers().getFirst().setTransferIndex(1);
-    Installment installment = buildInstallment();
-    installment.getTransfers().getFirst().setTransferIndex(1);
-    installment.setInstallmentId(10L);
-    installmentNoPII.setInstallmentId(10L);
-    installment.setBalance("");
-
-    Transfer transfer = buildTransfer();
-
-    Map<InstallmentNoPII, Installment> installmentMap = Map.of(
-      installmentNoPIINoIud, installmentNoIud,
-      installmentNoPII, installment
-    );
-
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(debtPosition, installmentMap);
-
-    String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
-
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
-    Mockito.when(debtPositionRepositoryMock.save(Mockito.any(DebtPosition.class))).thenReturn(debtPosition);
-    Mockito.when(paymentOptionRepositoryMock.save(Mockito.any(PaymentOption.class))).thenReturn(paymentOption);
-    Mockito.when(installmentRepositoryMock.save(Mockito.any(Installment.class))).thenReturn(installment);
-    Mockito.when(transferRepositoryMock.save(Mockito.any(Transfer.class))).thenReturn(transfer);
-
-    try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
-      mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
-
-      Organization org = buildOrganization();
-      org.setIban("IT60X0542811101000000123456");
-      DebtPosition result = debtPositionService.saveDebtPosition(debtPositionDTO, org);
-
-      Assertions.assertSame(debtPosition, result);
-
-      Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).save(debtPosition);
-      Mockito.verify(paymentOptionRepositoryMock, Mockito.times(1)).save(paymentOption);
-      Mockito.verify(installmentRepositoryMock, Mockito.times(1)).save(Mockito.any(Installment.class));
-      Mockito.verify(transferRepositoryMock, Mockito.times(1)).save(transfer);
-    }
-  }
-
-  @Test
-  void whenSaveDebtPositionAndRemapThenReturnReMap() {
+  void whenSaveDebtPositionDTOThenInvokeSaveService() {
     // Given
-    DebtPositionDTO inputDP = new DebtPositionDTO();
-    DebtPosition saved = new DebtPosition();
-    Organization org = new Organization();
-
-    DebtPositionDTO expectedResult = new DebtPositionDTO();
-
-    Mockito.doReturn(saved)
-      .when(debtPositionService)
-      .saveDebtPosition(Mockito.same(inputDP), Mockito.same(org));
-
-    Mockito.when(debtPositionMapperMock.mapToDto(Mockito.same(saved)))
-      .thenReturn(expectedResult);
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
     // When
-    DebtPositionDTO result = debtPositionService.saveDebtPositionAndRemap(inputDP, org);
+    debtPositionService.saveDebtPosition(debtPositionDTO);
 
     // Then
-    Assertions.assertSame(expectedResult, result);
+    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO));
+  }
+
+  @Test
+  void whenSaveDebtPositionThenInvokeSaveService(){
+    // Given
+    DebtPosition debtPosition = new DebtPosition();
+
+    // When
+    debtPositionService.saveDebtPosition(debtPosition);
+
+    // Then
+    Mockito.verify(debtPositionSaveServiceMock).saveDebtPosition(Mockito.same(debtPosition));
   }
 
   @Test

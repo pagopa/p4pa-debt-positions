@@ -148,6 +148,7 @@ public class InstallmentFaker {
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
       .creationDate(DATETIME)
       .updateDate(DATETIME)
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .build();
   }
 

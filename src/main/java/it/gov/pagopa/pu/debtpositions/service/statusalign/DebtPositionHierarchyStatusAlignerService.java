@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
@@ -24,7 +24,5 @@ public interface DebtPositionHierarchyStatusAlignerService {
    */
   Pair<DebtPositionDTO, String> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
 
-  void alignHierarchyStatus(DebtPosition debtPosition);
-  /** Call only if PII should be resolved */
-  DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition);
+  void alignHierarchyStatus(BaseDebtPosition debtPosition);
 }
