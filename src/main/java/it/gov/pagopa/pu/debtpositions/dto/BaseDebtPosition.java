@@ -11,5 +11,5 @@ public interface BaseDebtPosition extends Serializable {
   DebtPositionStatus getStatus();
   void setStatus(DebtPositionStatus status);
 
-  Collection<BasePaymentOption> getPaymentOptions();
+  Collection<? extends BasePaymentOption> getPaymentOptions();
 }

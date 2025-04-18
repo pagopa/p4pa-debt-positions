@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -28,7 +27,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
@@ -74,7 +72,6 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     String workflowId = "workflowId";
 
     Organization organization = buildOrganization();
-    DebtPosition debtPosition = buildDebtPosition();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.TO_SYNC);
@@ -99,7 +96,7 @@ class DebtPositionUpdateInstallmentServiceImplTest {
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
   @Test
@@ -110,7 +107,6 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     String workflowId = "workflowId";
 
     Organization organization = buildOrganization();
-    DebtPosition debtPosition = buildDebtPosition();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.TO_SYNC);
@@ -139,7 +135,7 @@ class DebtPositionUpdateInstallmentServiceImplTest {
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
   @Test

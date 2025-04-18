@@ -61,8 +61,8 @@ class DebtPositionMapperTest {
 
     Pair<DebtPosition, Map<InstallmentNoPII, Installment>> result = debtPositionMapper.mapToModel(debtPositionDTO);
 
-    reflectionEqualsByName(debtPositionExpected, result.getFirst());
-    checkNotNullFields(result.getFirst(), "updateOperatorExternalId");
+    reflectionEqualsByName(debtPositionExpected, result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId");
+    checkNotNullFields(result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId");
   }
 
   @Test

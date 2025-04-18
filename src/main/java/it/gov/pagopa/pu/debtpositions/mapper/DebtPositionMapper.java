@@ -41,8 +41,6 @@ public class DebtPositionMapper {
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
     debtPosition.setMultiDebtor(dto.getMultiDebtor());
     debtPosition.setFlagPagoPaPayment(dto.getFlagPagoPaPayment());
-    debtPosition.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
-    debtPosition.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
 
     Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
 

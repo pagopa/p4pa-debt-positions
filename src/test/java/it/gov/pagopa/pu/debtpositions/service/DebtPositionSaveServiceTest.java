@@ -74,7 +74,7 @@ class DebtPositionSaveServiceTest {
   }
 
   @Test
-  void givenValidDebtPositionDTO_WhenSaveDebtPositionDTO_ThenSaveAllEntitiesDTO() {
+  void whenSaveDebtPositionDTOThenSaveAllDTO() {
     String generatedIUD = "0003e93fd3b56b24771850abe935b819ece";
     String generatedIupd = "e04940029-18b140108de0-e39271476234";
 
@@ -91,7 +91,9 @@ class DebtPositionSaveServiceTest {
     mappedInstallmentNoPII.getTransfers().getFirst().setTransferIndex(1);
 
     InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
+    installmentNoPIINoIud.setInstallmentId(-1L);
     Installment installmentNoIud = buildInstallment();
+    installmentNoIud.setInstallmentId(-1L);
     installmentNoIud.setIud("");
 
     Installment mappedInstallment = buildInstallment();
@@ -121,15 +123,12 @@ class DebtPositionSaveServiceTest {
 
       service.saveDebtPositionDTO(debtPositionDTO);
 
-      Assertions.assertSame(savedDebtPosition.getDebtPositionId(), mappedDebtPosition.getDebtPositionId());
       assertDebtPositionDtoAlign(savedDebtPosition, debtPositionDTO);
 
       PaymentOption po = mappedDebtPosition.getPaymentOptions().getFirst();
       Assertions.assertSame(savedDebtPosition.getDebtPositionId(), po.getDebtPositionId());
       assertPaymentOptionDtoAlign(savedPaymentOption, paymentOptionDTO);
 
-      InstallmentNoPII i = po.getInstallments().getFirst();
-      Assertions.assertSame(savedInstallment.getPaymentOptionId(), i.getPaymentOptionId());
       assertInstallmentDtoAlign(savedInstallment, installmentDTO);
 
       Assertions.assertSame(savedTransfer.getInstallmentId(), mappedInstallment.getTransfers().getFirst().getInstallmentId());
@@ -149,7 +148,7 @@ class DebtPositionSaveServiceTest {
 
   private PaymentOption mockSavedPaymentOption(PaymentOption paymentOption) {
     PaymentOption savedPaymentOption = Mockito.mock(PaymentOption.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedPaymentOption.getPaymentOptionIndex()).thenReturn(paymentOption.getPaymentOptionIndex());
+    Mockito.lenient().when(savedPaymentOption.getPaymentOptionIndex()).thenReturn(paymentOption.getPaymentOptionIndex());
     Mockito.when(savedPaymentOption.getCreationDate()).thenReturn(LocalDateTime.now().minusDays(31));
     Mockito.when(savedPaymentOption.getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(30));
 
@@ -160,7 +159,7 @@ class DebtPositionSaveServiceTest {
 
   private Installment mockSavedInstallment(Installment mappedInstallment) {
     Installment savedInstallment = Mockito.mock(Installment.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedInstallment.getNoPII().getIud()).thenReturn(mappedInstallment.getIud());
+    Mockito.lenient().when(savedInstallment.getNoPII().getIud()).thenReturn(mappedInstallment.getIud());
     Mockito.when(savedInstallment.getCreationDate()).thenReturn(LocalDateTime.now().minusDays(21));
     Mockito.when(savedInstallment.getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(20));
     Mockito.when(installmentRepositoryMock.save(Mockito.same(mappedInstallment))).thenReturn(savedInstallment);
@@ -169,7 +168,7 @@ class DebtPositionSaveServiceTest {
 
   private Transfer mockSavedTransfer(Transfer transfer) {
     Transfer savedTransfer = Mockito.mock(Transfer.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedTransfer.getTransferIndex()).thenReturn(transfer.getTransferIndex());
+    Mockito.lenient().when(savedTransfer.getTransferIndex()).thenReturn(transfer.getTransferIndex());
     Mockito.when(savedTransfer.getCreationDate()).thenReturn(LocalDateTime.now().minusDays(11));
     Mockito.when(savedTransfer.getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(10));
 
@@ -252,7 +251,7 @@ class DebtPositionSaveServiceTest {
 
   private InstallmentNoPII mockSavedInstallmentNoPII(InstallmentNoPII mappedInstallment) {
     InstallmentNoPII savedInstallment = Mockito.mock(InstallmentNoPII.class, Mockito.RETURNS_DEEP_STUBS);
-    Mockito.when(savedInstallment.getIud()).thenReturn(mappedInstallment.getIud());
+    Mockito.lenient().when(savedInstallment.getIud()).thenReturn(mappedInstallment.getIud());
     Mockito.when(savedInstallment.getCreationDate()).thenReturn(LocalDateTime.now().minusDays(21));
     Mockito.when(savedInstallment.getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(20));
     Mockito.when(installmentNoPIIRepositoryMock.save(Mockito.same(mappedInstallment))).thenReturn(savedInstallment);

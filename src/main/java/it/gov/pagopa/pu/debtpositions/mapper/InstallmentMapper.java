@@ -52,6 +52,7 @@ public class InstallmentMapper {
     installment.setReceiptId(dto.getReceiptId());
     installment.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
     installment.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
+    installment.setUpdateOperatorExternalId(dto.getUpdateOperatorExternalId());
     return installment;
   }
 

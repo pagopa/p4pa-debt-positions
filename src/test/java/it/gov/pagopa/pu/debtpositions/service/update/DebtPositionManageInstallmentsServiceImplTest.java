@@ -6,7 +6,6 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
@@ -26,7 +25,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
@@ -162,7 +160,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
     WfExecutionParameters wfExecutionParametersPartial = WfExecutionParameters.builder().massive(false).partialChange(true).build();
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(false).build();
     Organization organization = buildOrganization();
-    DebtPosition debtPosition = buildDebtPosition();
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentDTO installment2insert = buildInstallmentDTO().installmentId(1L).iud("iud1");
@@ -192,7 +189,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
 }
