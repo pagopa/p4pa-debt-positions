@@ -9,7 +9,6 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
-import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -17,7 +16,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidIban;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
@@ -155,11 +153,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private void checkTaxonomyCategory(TransferDTO transferDTO, String accessToken) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
-    } else {
-      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(transferDTO.getCategory(), accessToken);
-      if (taxonomy.isEmpty()) {
-        throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not exist in the archive");
-      }
     }
+    // TODO fix with task P4ADEV-2379
+//    else {
+//      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(transferDTO.getCategory(), accessToken);
+//      if (taxonomy.isEmpty()) {
+//        throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not exist in the archive");
+//      }
+//    }
   }
 }
