@@ -36,6 +36,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setIur(fullDTO.getIur());
     noPII.setIuf(fullDTO.getIuf());
     noPII.setNav(fullDTO.getNav());
+    noPII.setIun(fullDTO.getIun());
     noPII.setDueDate(fullDTO.getDueDate());
     noPII.setNotificationFeeCents(fullDTO.getNotificationFeeCents());
     noPII.setAmountCents(fullDTO.getAmountCents());
@@ -77,6 +78,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .iur(noPii.getIur())
       .iuf(noPii.getIuf())
       .nav(noPii.getNav())
+      .iun(noPii.getIun())
       .dueDate(noPii.getDueDate())
       .notificationFeeCents(noPii.getNotificationFeeCents())
       .amountCents(noPii.getAmountCents())

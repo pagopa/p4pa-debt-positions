@@ -36,6 +36,7 @@ public class InstallmentMapper {
     installment.setIur(dto.getIur());
     installment.setIuf(dto.getIuf());
     installment.setNav(dto.getNav());
+    installment.setIun(dto.getIun());
     installment.setDueDate(dto.getDueDate());
     installment.setNotificationFeeCents(dto.getNotificationFeeCents());
     installment.setAmountCents(dto.getAmountCents());
@@ -68,6 +69,7 @@ public class InstallmentMapper {
       .iur(installment.getIur())
       .iuf(installment.getIuf())
       .nav(installment.getNav())
+      .iun(installment.getIun())
       .dueDate(installment.getDueDate())
       .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
@@ -110,6 +112,7 @@ public class InstallmentMapper {
       .iur(installment.getIur())
       .iuf(installment.getIuf())
       .nav(installment.getNav())
+      .iun(installment.getIun())
       .dueDate(installment.getDueDate())
       .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
