@@ -2,8 +2,10 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -24,7 +26,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
@@ -64,7 +65,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
     String workflowId = "workflowId";
 
     Organization organization = buildOrganization();
-    DebtPosition debtPosition = buildDebtPosition();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.TO_SYNC);
@@ -74,19 +74,18 @@ class DebtPositionCancelInstallmentServiceImplTest {
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), 2L, operatorExternalId)).thenReturn(debtPositionTypeOrg);
-    Mockito.when(debtPositionServiceMock.saveDebtPosition(debtPositionDTO, organization)).thenReturn(debtPosition);
-    Mockito.when(debtPositionProcessorServiceMock.updateAmounts(debtPositionDTO)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionHierarchyStatusAlignerServiceMock.alignHierarchyStatusAndRemap(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, "IUD:"+iud, accessToken)).thenReturn(WorkflowCreatedDTO.builder().workflowId(workflowId).build());
 
-    org.apache.commons.lang3.tuple.Pair<DebtPositionDTO, String> result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
+    String result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
 
-    assertEquals(workflowId, result.getRight());
-    DebtPositionDTO resultDebtPositionDTO = result.getLeft();
-    assertEquals(DebtPositionStatus.TO_SYNC, resultDebtPositionDTO.getStatus());
-    assertEquals(PaymentOptionStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getStatus());
-    assertEquals(new InstallmentSyncStatus(InstallmentStatus.UNPAID, InstallmentStatus.CANCELLED), resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
-    assertEquals(InstallmentStatus.TO_SYNC, resultDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(workflowId, result);
+    assertEquals(DebtPositionStatus.TO_SYNC, debtPositionDTO.getStatus());
+    assertEquals(PaymentOptionStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getStatus());
+    assertEquals(new InstallmentSyncStatus(InstallmentStatus.UNPAID, InstallmentStatus.CANCELLED), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
+    assertEquals(InstallmentStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
 
+    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 }

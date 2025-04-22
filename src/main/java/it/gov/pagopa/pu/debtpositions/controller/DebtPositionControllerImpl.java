@@ -49,8 +49,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(massive)
       .partialChange(false)
       .build();
-    Pair<DebtPositionDTO, String> result = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    String workflowId = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, workflowId).body(debtPositionDTO);
   }
 
 
@@ -120,5 +120,28 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .build();
     Pair<DebtPositionDTO, String> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+  }
+
+  @Override
+  public ResponseEntity<InstallmentDTO> updateInstallmentNotificationFee(UpdateInstallmentNotificationFeeRequest updateInstallmentNotificationFeeRequest) {
+    log.info("Updating notification fee on installment having NAV {} and OrganizationId {}",
+      updateInstallmentNotificationFeeRequest.getNav(), updateInstallmentNotificationFeeRequest.getOrganizationId());
+
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    InstallmentDTO installmentDTO = installmentService.updateInstallmentNotificationFee(
+      updateInstallmentNotificationFeeRequest.getOrganizationId(),
+      updateInstallmentNotificationFeeRequest.getNav(),
+      updateInstallmentNotificationFeeRequest.getNewFeeCents(),
+      wfExecutionParameters,
+      accessToken,
+      operatorExternalUserId);
+
+    return ResponseEntity.ok(installmentDTO);
   }
 }

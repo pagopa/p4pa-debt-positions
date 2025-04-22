@@ -1,13 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 
+import java.math.BigDecimal;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -89,5 +94,41 @@ class UtilitiesTest {
       Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 2L, false),
       Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,2L, false)
     );
+  }
+
+  @Test
+  void testCheckImmutableField_OffsetDateTime(){
+    List<String> result = new ArrayList<>();
+    OffsetDateTime o1 = OffsetDateTime.now();
+    OffsetDateTime o2 = o1.withOffsetSameInstant(ZoneOffset.MIN);
+    Utilities.checkImmutableField("fieldName", o1, o2, result);
+
+    Utilities.checkImmutableField("expectedDiffer", o1, o2.minusSeconds(1), result);
+
+    Assertions.assertEquals(List.of("expectedDiffer"), result);
+  }
+
+  @Test
+  void testCheckImmutableField_Comparable(){
+    List<String> result = new ArrayList<>();
+    BigDecimal o1 = BigDecimal.ONE;
+    BigDecimal o2 = BigDecimal.valueOf(1_00, 2);
+    Utilities.checkImmutableField("fieldName", o1, o2, result);
+
+    Utilities.checkImmutableField("expectedDiffer", o1, o2.add(BigDecimal.ONE), result);
+
+    Assertions.assertEquals(List.of("expectedDiffer"), result);
+  }
+
+  @Test
+  void testCheckImmutableField_Object(){
+    List<String> result = new ArrayList<>();
+    String o1 = "string";
+    String o2 = "string";
+    Utilities.checkImmutableField("fieldName", o1, o2, result);
+
+    Utilities.checkImmutableField("expectedDiffer", o1, o2.concat("1"), result);
+
+    Assertions.assertEquals(List.of("expectedDiffer"), result);
   }
 }

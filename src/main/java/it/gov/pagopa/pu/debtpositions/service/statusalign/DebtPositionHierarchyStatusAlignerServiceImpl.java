@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -162,7 +163,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   }
 
   @Override
-  public void alignHierarchyStatus(DebtPosition debtPosition) {
+  public void alignHierarchyStatus(BaseDebtPosition debtPosition) {
     debtPosition.getPaymentOptions().forEach(paymentOptionInnerStatusAlignerService::updatePaymentOptionStatus);
     debtPositionInnerStatusAlignerService.updateDebtPositionStatus(debtPosition);
   }
@@ -170,8 +171,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   /**
    * Call only if you have to resolve PII
    */
-  @Override
-  public DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
+  protected DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
     alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
   }

@@ -6,7 +6,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -16,7 +15,6 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -65,11 +63,11 @@ public abstract class BaseDebtPositionOperationService {
    * @param wfExecutionParameters wf execution parameters
    * @param accessToken the access token
    * @param operatorExternalUserId the operator who requested the creation
-   * @return the {@link DebtPositionDTO} created and WorkflowId of debt position synchronization
+   * @return the WorkflowId of debt position synchronization
    */
 
   @Transactional
-  public Pair<DebtPositionDTO, String> execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
+  public String execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                                WfExecutionParameters wfExecutionParameters, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
@@ -78,19 +76,17 @@ public abstract class BaseDebtPositionOperationService {
     }
     authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
-    DebtPositionDTO debtPositionOperated = applyOperation(debtPositionDTO, installments2operate, accessToken, org);
+    applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionOperated);
-    DebtPosition savedDebtPosition = debtPositionService.saveDebtPosition(debtPositionUpdated, org);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    DebtPositionDTO debtPositionAligned = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(savedDebtPosition);
+    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
 
-    String workflowId = invokeWorkflow(debtPositionAligned, eventType, installments2operate, accessToken, wfExecutionParameters);
-
-    return Pair.of(debtPositionAligned, workflowId);
+    return invokeWorkflow(debtPositionDTO, eventType, installments2operate, accessToken, wfExecutionParameters);
   }
 
-  private String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
+  protected String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
       WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(
@@ -113,8 +109,7 @@ public abstract class BaseDebtPositionOperationService {
    * @param installments2operate the involved installments
    * @param accessToken          the access token
    * @param org                  the organization related to debt position
-   * @return the {@link DebtPositionDTO} updated
    */
-  protected abstract DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org);
+  protected abstract void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org);
 
 }

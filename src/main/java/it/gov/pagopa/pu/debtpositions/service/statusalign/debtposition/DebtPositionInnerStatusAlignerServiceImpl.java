@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition;
 
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +12,7 @@ public class DebtPositionInnerStatusAlignerServiceImpl extends DebtPositionStatu
   }
 
   @Override
-  public void updateDebtPositionStatus(DebtPosition debtPosition) {
+  public void updateDebtPositionStatus(BaseDebtPosition debtPosition) {
     updateEntityStatus(debtPosition);
   }
 }

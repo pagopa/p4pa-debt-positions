@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorService {
 
   @Override
-  public DebtPositionDTO updateAmounts(DebtPositionDTO debtPositionDTO) {
+  public void updateAmounts(DebtPositionDTO debtPositionDTO) {
     debtPositionDTO.getPaymentOptions().forEach(paymentOption -> {
       long totalPaymentOptionAmount = paymentOption.getInstallments().stream()
         .filter(this::isInstallmentCancelled)
@@ -16,8 +16,6 @@ public class DebtPositionProcessorServiceImpl implements DebtPositionProcessorSe
 
       paymentOption.setTotalAmountCents(totalPaymentOptionAmount);
     });
-
-    return debtPositionDTO;
   }
 
   private boolean isInstallmentCancelled(InstallmentDTO installment){

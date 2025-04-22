@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import org.springframework.stereotype.Service;
 
@@ -13,7 +13,7 @@ public class PaymentOptionInnerStatusAlignerServiceImpl extends PaymentOptionSta
   }
 
   @Override
-  public void updatePaymentOptionStatus(PaymentOption paymentOption) {
+  public void updatePaymentOptionStatus(BasePaymentOption paymentOption) {
     updateEntityStatus(paymentOption);
   }
 }

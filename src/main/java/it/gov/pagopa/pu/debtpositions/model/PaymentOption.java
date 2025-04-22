@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import jakarta.annotation.Nonnull;
@@ -18,7 +19,7 @@ import java.util.SortedSet;
 @Data
 @Builder
 @EqualsAndHashCode(of = {"paymentOptionId", "paymentOptionIndex"}, callSuper = false)
-public class PaymentOption extends BaseEntity implements Serializable, Comparable<PaymentOption> {
+public class PaymentOption extends BaseEntity implements BasePaymentOption, Serializable, Comparable<PaymentOption> {
 
   @Id
   @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "payment_option_generator")

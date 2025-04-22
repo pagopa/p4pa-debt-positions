@@ -24,29 +24,35 @@ import java.util.concurrent.TimeUnit;
 @FieldNameConstants
 public class CacheConfig {
 
-    @NestedConfigurationProperty
-    private CacheConfigurationProperties pii;
+  @NestedConfigurationProperty
+  private CacheConfigurationProperties pii;
+  @NestedConfigurationProperty
+  private CacheConfigurationProperties organization;
+  @NestedConfigurationProperty
+  private CacheConfigurationProperties taxonomy;
 
-    @Data
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class CacheConfigurationProperties {
-        private long size;
-        private long expireIn;
-    }
+  @Data
+  @NoArgsConstructor
+  @AllArgsConstructor
+  public static class CacheConfigurationProperties {
+    private long size;
+    private long expireIn;
+  }
 
-    @Bean
-    @Primary
-    public CacheManager localCacheManager() {
-        CaffeineCacheManager cacheManager = new CaffeineCacheManager();
-        cacheManager.registerCustomCache(Fields.pii, buildCache(pii));
-        return cacheManager;
-    }
+  @Bean
+  @Primary
+  public CacheManager localCacheManager() {
+    CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+    cacheManager.registerCustomCache(Fields.pii, buildCache(pii));
+    cacheManager.registerCustomCache(Fields.organization, buildCache(organization));
+    cacheManager.registerCustomCache(Fields.taxonomy, buildCache(taxonomy));
+    return cacheManager;
+  }
 
-    private Cache<Object, Object> buildCache(CacheConfigurationProperties cacheConfig) {
-        return Caffeine.newBuilder()
-                .maximumSize(cacheConfig.size)
-                .expireAfterAccess(cacheConfig.expireIn, TimeUnit.MINUTES)
-                .build();
-    }
+  private Cache<Object, Object> buildCache(CacheConfigurationProperties cacheConfig) {
+    return Caffeine.newBuilder()
+      .maximumSize(cacheConfig.size)
+      .expireAfterAccess(cacheConfig.expireIn, TimeUnit.MINUTES)
+      .build();
+  }
 }

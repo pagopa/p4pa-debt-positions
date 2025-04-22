@@ -7,5 +7,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 public interface DebtPositionManageInstallmentsService {
 
+  /** It will manage DebtPosition installments and return the updated DebtPosition and the workflowId launched */
   Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
 }

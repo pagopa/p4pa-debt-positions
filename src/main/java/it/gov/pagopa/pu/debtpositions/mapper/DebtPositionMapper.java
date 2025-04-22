@@ -41,8 +41,6 @@ public class DebtPositionMapper {
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
     debtPosition.setMultiDebtor(dto.getMultiDebtor());
     debtPosition.setFlagPagoPaPayment(dto.getFlagPagoPaPayment());
-    debtPosition.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
-    debtPosition.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
 
     Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
 
@@ -60,8 +58,7 @@ public class DebtPositionMapper {
   }
 
   public DebtPositionDTO mapToDto(DebtPosition debtPosition) {
-    return DebtPositionDTO.builder()
-      .debtPositionId(debtPosition.getDebtPositionId())
+    DebtPositionDTO dto = DebtPositionDTO.builder()
       .iupdOrg(debtPosition.getIupdOrg())
       .description(debtPosition.getDescription())
       .status(debtPosition.getStatus())
@@ -72,13 +69,22 @@ public class DebtPositionMapper {
       .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
       .multiDebtor(debtPosition.isMultiDebtor())
       .flagPagoPaPayment(debtPosition.isFlagPagoPaPayment())
-      .creationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()))
-      .updateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()))
       .paymentOptions(
         debtPosition.getPaymentOptions().stream()
           .map(paymentOptionMapper::mapToDto)
           .collect(Collectors.toCollection(ArrayList<PaymentOptionDTO>::new))
-      ).build();
+      )
+      .build();
+
+    setToDtoAutoDbFields(dto, debtPosition);
+    return dto;
+  }
+
+  public static void setToDtoAutoDbFields(DebtPositionDTO debtPositionDTO, DebtPosition debtPosition) {
+    debtPositionDTO.setDebtPositionId(debtPosition.getDebtPositionId());
+    debtPositionDTO.setCreationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()));
+    debtPositionDTO.setUpdateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()));
+    debtPositionDTO.setUpdateOperatorExternalId(debtPosition.getUpdateOperatorExternalId());
   }
 
   public PagedDebtPositions mapToPagedDebtPositions(Page<DebtPosition> pagedDebtPositionsDTO) {

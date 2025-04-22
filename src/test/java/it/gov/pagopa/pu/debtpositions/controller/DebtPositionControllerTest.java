@@ -119,7 +119,7 @@ class DebtPositionControllerTest {
       .build();
 
     Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
-      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+      .thenReturn("workflowId");
 
     MvcResult result = mockMvc.perform(
         post("/debt-positions")
@@ -260,5 +260,33 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
+
+  @Test
+  void whenUpdateInstallmentNotificationFeeThenOk()
+    throws Exception {
+    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
+      .builder()
+      .organizationId(0L)
+      .nav("NAV")
+      .newFeeCents(1L)
+      .build();
+
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
+
+    Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
+      request.getNewFeeCents(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
+
+    mockMvc.perform(
+        put("/debt-positions/update-notification-fee")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
+      .andExpect(status().isOk())
+      .andReturn();
   }
 }

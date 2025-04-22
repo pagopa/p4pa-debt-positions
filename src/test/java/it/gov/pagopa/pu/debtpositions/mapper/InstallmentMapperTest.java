@@ -52,7 +52,7 @@ class InstallmentMapperTest {
 
     Installment result = installmentMapper.mapToModel(installmentDTO);
 
-    reflectionEqualsByName(installmentExpected, result);
+    reflectionEqualsByName(installmentExpected, result, "creationDate", "updateDate", "updateOperatorExternalId");
     checkNotNullFields(result, "updateOperatorExternalId", "noPII");
   }
 

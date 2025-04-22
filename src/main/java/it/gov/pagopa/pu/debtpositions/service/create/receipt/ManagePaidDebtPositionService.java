@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
@@ -56,41 +55,32 @@ public class ManagePaidDebtPositionService {
     return organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken)
       .map(primaryOrg -> {
         Pair<Optional<InstallmentNoPII>, Boolean> installmentAndPrimaryOrgFound = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(primaryOrg, receiptDTO.getNoticeNumber());
-        installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> setInstallmentAsPaid(installment, receiptDTO, accessToken, primaryOrg));
+        installmentAndPrimaryOrgFound.getLeft().ifPresent(installment -> setInstallmentAsPaid(installment, receiptDTO, accessToken));
         return installmentAndPrimaryOrgFound.getRight();
       })
       .orElse(false);
   }
 
   private void invokeWorkflow(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO), accessToken);
-      if (workflow != null) {
-        log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
-      } else {
-        log.warn("Workflow creation KO for debtPositionId[{}]: received null response", debtPositionDTO.getDebtPositionId());
-      }
+    log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
+    WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO), accessToken);
+    if (workflow != null) {
+      log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
+    } else {
+      log.warn("Workflow creation KO for debtPositionId[{}]: received null response", debtPositionDTO.getDebtPositionId());
     }
   }
 
-  private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken, Organization organization) {
+  private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
     DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
     //align debt position status
-    DebtPositionDTO debtPositionDTO = debtPositionHierarchyStatusAlignerService.alignHierarchyStatusAndRemap(debtPosition);
+    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = persistDebtPosition(debtPositionDTO, organization);
+    debtPositionService.saveDebtPosition(debtPosition);
     //start debt position workflow
-    invokeWorkflow(persistedDebtPosition, receiptDTO, accessToken);
-  }
-
-  private DebtPositionDTO persistDebtPosition(DebtPositionDTO debtPositionDTO, Organization organization) {
-    //persist updated debt position
-    DebtPositionDTO persistedDebtPosition = debtPositionService.saveDebtPositionAndRemap(debtPositionDTO, organization);
-    log.info("updated debt position id[{}]", persistedDebtPosition.getDebtPositionId());
-    return persistedDebtPosition;
+    invokeWorkflow(debtPositionService.mapDebtPosition(debtPosition), receiptDTO, accessToken);
   }
 
   void persistTechnicalDebtPositionFromReceiptAndNotifyEvent(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
@@ -98,10 +88,10 @@ public class ManagePaidDebtPositionService {
       receiptDTO.getReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
-    DebtPositionDTO createdDebtPositionDTO = persistDebtPosition(debtPositionDTO, organization);
+    debtPositionService.saveDebtPosition(debtPositionDTO);
     //notify payment event
-    paymentsProducerService.notifyPaymentsEvent(createdDebtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
-    log.info("Technical debt position created with id [{}]", createdDebtPositionDTO.getDebtPositionId());
+    paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
+    log.info("Technical debt position created with id [{}]", debtPositionDTO.getDebtPositionId());
   }
 
   private String buildPaymentEventDescription(ReceiptWithAdditionalNodeDataDTO receiptDTO) {

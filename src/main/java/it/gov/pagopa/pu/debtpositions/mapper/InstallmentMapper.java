@@ -52,13 +52,13 @@ public class InstallmentMapper {
     installment.setReceiptId(dto.getReceiptId());
     installment.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
     installment.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
+    installment.setUpdateOperatorExternalId(dto.getUpdateOperatorExternalId());
     return installment;
   }
 
   public InstallmentDTO mapToDto(InstallmentNoPII installment) {
     InstallmentPIIDTO pii = personalDataService.get(installment.getPersonalDataId(), InstallmentPIIDTO.class);
-    return InstallmentDTO.builder()
-      .installmentId(installment.getInstallmentId())
+    InstallmentDTO dto = InstallmentDTO.builder()
       .paymentOptionId(installment.getPaymentOptionId())
       .status(installment.getStatus())
       .syncStatus(installment.getSyncStatus())
@@ -82,9 +82,17 @@ public class InstallmentMapper {
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
       .receiptId(installment.getReceiptId())
-      .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
-      .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .build();
+
+    setToDtoAutoDbFields(dto, installment);
+    return dto;
+  }
+
+  public static void setToDtoAutoDbFields(InstallmentDTO installmentDTO, InstallmentNoPII installment){
+    installmentDTO.setInstallmentId(installment.getInstallmentId());
+    installmentDTO.setCreationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()));
+    installmentDTO.setUpdateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()));
+    installmentDTO.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
   }
 
   public InstallmentDTO mapToDto(Installment installment) {
@@ -118,8 +126,8 @@ public class InstallmentMapper {
       .receiptId(installment.getReceiptId())
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
+      .updateOperatorExternalId(installment.getUpdateOperatorExternalId())
       .build();
   }
-
 
 }

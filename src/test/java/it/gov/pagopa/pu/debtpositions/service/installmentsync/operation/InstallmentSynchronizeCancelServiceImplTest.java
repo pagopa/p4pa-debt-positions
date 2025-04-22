@@ -1,12 +1,14 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentService;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,7 +48,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     installmentDTO.setIngestionFlowFileLineNumber(101L);
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(Pair.of(debtPositionDTO, workflowId));
+      .thenReturn(workflowId);
 
     String result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
@@ -170,7 +172,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(Pair.of(debtPositionDTO, workflowId));
+      .thenReturn(workflowId);
 
     String result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
@@ -191,7 +193,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(Pair.of(debtPositionDTO, workflowId));
+      .thenReturn(workflowId);
 
     String result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 

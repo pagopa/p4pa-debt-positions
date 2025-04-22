@@ -23,7 +23,6 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -65,39 +64,38 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public String createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
 
-    Pair<DebtPositionDTO, String> savedDebtPosition = execute(debtPositionDTO, installment2operate,
+    String workflowId = execute(debtPositionDTO, installment2operate,
       wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
 
-    log.info("DebtPosition created with id {}", savedDebtPosition.getLeft().getDebtPositionId());
-    return savedDebtPosition;
+    log.info("DebtPosition created with id {}", debtPositionDTO.getDebtPositionId());
+    return workflowId;
   }
 
   @Override
-  protected DebtPositionDTO applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
+  protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                         String accessToken, Organization org) {
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
     checkDebtPosition(debtPositionDTO, org);
 
-    DebtPositionDTO debtPositionUpdated = debtPositionProcessorService.updateAmounts(debtPositionDTO);
-    checkAllInstallments(debtPositionUpdated, org, debtPositionTypeOrg);
-    validateDebtPositionService.validate(debtPositionUpdated, accessToken, debtPositionTypeOrg);
+    debtPositionProcessorService.updateAmounts(debtPositionDTO);
+    checkAllInstallments(debtPositionDTO, org, debtPositionTypeOrg);
+    validateDebtPositionService.validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
 
-    if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.UNPAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.DRAFT)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
-    } else if (debtPositionUpdated.getStatus().equals(DebtPositionStatus.PAID)) {
-      updateDebtPositionStatus(debtPositionUpdated, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
+    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
+    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
+      updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
-    return debtPositionUpdated;
   }
 
   private void updateDebtPositionStatus(DebtPositionDTO debtPositionDTO, DebtPositionStatus debtPositionStatus, PaymentOptionStatus paymentStatus,

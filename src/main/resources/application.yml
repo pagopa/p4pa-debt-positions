@@ -178,3 +178,9 @@ cache:
   pii:
     size: "\${CACHE_PII_SIZE:1000}"
     expire-in: "\${CACHE_PII_MINUTES:60}"
+  organization:
+    size: "\${CACHE_ORGANIZATION_SIZE:100}"
+    expire-in: "\${CACHE_ORGANIZATION_MINUTES:60}"
+  taxonomy:
+    size: "\${CACHE_TAXONOMY_SIZE:100}"
+    expire-in: "\${CACHE_TAXONOMY_MINUTES:60}"

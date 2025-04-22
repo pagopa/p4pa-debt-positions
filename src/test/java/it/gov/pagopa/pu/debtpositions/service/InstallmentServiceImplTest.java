@@ -3,7 +3,12 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
@@ -48,10 +53,18 @@ class InstallmentServiceImplTest {
   private DebtPositionService debtPositionServiceMock;
   @Mock
   private DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentServiceMock;
+  @Mock
+  private DebtPositionRepository debtPositionRepositoryMock;
+  @Mock
+  private DebtPositionMapper debtPositionMapperMock;
 
   private InstallmentServiceImpl installmentService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
+  private final String accessToken = "ACCESS_TOKEN";
+  private final String operatorExternalUserId = "OPERATOR_EXTERNAL_USER_ID";
+  private WfExecutionParameters wfExecutionParameters;
 
   @BeforeEach
   void setUp() {
@@ -61,7 +74,14 @@ class InstallmentServiceImplTest {
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,
       debtPositionServiceMock,
-      debtPositionUpdateInstallmentServiceMock);
+      debtPositionUpdateInstallmentServiceMock,
+      debtPositionRepositoryMock,
+      debtPositionMapperMock);
+
+      wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
   }
 
   @AfterEach
@@ -72,7 +92,9 @@ class InstallmentServiceImplTest {
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,
       debtPositionServiceMock,
-      debtPositionUpdateInstallmentServiceMock);
+      debtPositionUpdateInstallmentServiceMock,
+      debtPositionRepositoryMock,
+      debtPositionMapperMock);
   }
 
   @ParameterizedTest
@@ -80,7 +102,7 @@ class InstallmentServiceImplTest {
   @NullSource
   void givenValidOrganizationAndNavWhGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     //given
-    List<Installment> installmentList = podamFactory.manufacturePojo(List.class, Installment.class);
+    List<Installment> installmentList = TestUtils.getPodamFactory().manufacturePojo(List.class, Installment.class);
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
     List<DebtPositionOrigin> originList = debtPositionOrigin == null ? null : List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
@@ -102,7 +124,6 @@ class InstallmentServiceImplTest {
   @Test
   void whenGetInstallmentDetailThenOk() {
     Long installmentId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
     InstallmentDetailDTO installment = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
 
     Mockito.when(installmentDetailPIIViewRepositoryMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(installment);
@@ -117,7 +138,6 @@ class InstallmentServiceImplTest {
   void whenGetPagedInstallmentPaidViewThenOk() {
     //given
     Long organizationId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
     OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
     Long debtPositionTypeOrgId = 1L;
@@ -135,8 +155,6 @@ class InstallmentServiceImplTest {
   @Test
   void whenUpdateInstallmentNotificationDateThenSuccess() {
     // Given
-    String accessToken = "ACCESS_TOKEN";
-    String operatorExternalUserId = "OPERATOR_EXTERNAL_USER_ID";
     OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setNotificationDate(dateTime);
@@ -148,14 +166,9 @@ class InstallmentServiceImplTest {
       .notificationDate(dateTime)
       .build();
 
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(false)
-      .partialChange(false)
-      .build();
-
     Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(org.apache.commons.lang3.tuple.Pair.of(debtPositionDTO, "workflowId"));
+      .thenReturn("workflowId");
 
     // When
     String workflowId = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, operatorExternalUserId, accessToken);
@@ -167,8 +180,6 @@ class InstallmentServiceImplTest {
   @Test
   void whenInstallmentIsCancelledThenNoUpdate() {
     // Given
-    String accessToken = "ACCESS_TOKEN";
-    String operatorExternalUserId = "OPERATOR_EXTERNAL_USER_ID";
     OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.CANCELLED);
@@ -177,11 +188,6 @@ class InstallmentServiceImplTest {
       .debtPositionId(1L)
       .nav(Collections.singletonList("nav"))
       .notificationDate(dateTime)
-      .build();
-
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(false)
-      .partialChange(false)
       .build();
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
@@ -196,8 +202,6 @@ class InstallmentServiceImplTest {
   @Test
   void whenNavDoesNotMatchThenNoUpdate() {
     // Given
-    String accessToken = "ACCESS_TOKEN";
-    String operatorExternalUserId = "OPERATOR_EXTERNAL_USER_ID";
     OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
@@ -205,11 +209,6 @@ class InstallmentServiceImplTest {
       .debtPositionId(1L)
       .nav(Collections.singletonList("1234"))
       .notificationDate(dateTime)
-      .build();
-
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(false)
-      .partialChange(false)
       .build();
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
@@ -221,4 +220,151 @@ class InstallmentServiceImplTest {
     assertNull(workflowId);
   }
 
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenSuccess() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.UNPAID);
+    DebtPosition debtPosition = new DebtPosition();
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
+
+    PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(List.of(installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
+
+
+    // When
+    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
+      orgId, nav, newNotificationFee,wfExecutionParameters, accessToken, operatorExternalUserId);
+
+    // Then
+    assertEquals(200L, result.getNotificationFeeCents());
+    assertEquals(1100L, result.getAmountCents());
+    assertEquals(900L, result.getTransfers().getFirst().getAmountCents());
+    Mockito.verify(debtPositionUpdateInstallmentServiceMock).updateInstallment(
+      Mockito.eq(debtPositionDTO),
+      Mockito.argThat(list -> list.size() == 1),
+      Mockito.eq(wfExecutionParameters),
+      Mockito.eq(accessToken),
+      Mockito.eq(operatorExternalUserId)
+    );
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNotFoundException() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(Collections.emptyList());
+
+    // When Then
+    assertThrows(NotFoundException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenConflictErrorException() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.UNPAID);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(List.of(installment, installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+
+    // When Then
+    assertThrows(ConflictErrorException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenFiltersCorrectStatus() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    Installment paidInstallment = new Installment();
+    paidInstallment.setStatus(InstallmentStatus.PAID);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(List.of(paidInstallment));
+
+    // When Then
+    assertThrows(NotFoundException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
+  void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNoEligibleTransfer() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+    installmentDTO.getTransfers().clear();
+    TransferDTO taxTransfer = new TransferDTO();
+    taxTransfer.setStampType("MDB");
+    taxTransfer.setAmountCents(100L);
+    installmentDTO.getTransfers().add(taxTransfer);
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.EXPIRED);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(List.of(installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+
+    // When Then
+    assertThrows(IllegalStateException.class, () ->
+      installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
+        wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+
+  private static InstallmentDTO getInstallmentDTO() {
+    InstallmentDTO installmentDTO = new InstallmentDTO();
+    installmentDTO.setInstallmentId(1L);
+    installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.setNotificationFeeCents(100L);
+    installmentDTO.setAmountCents(1000L);
+
+    List<TransferDTO> transfers = new ArrayList<>();
+    TransferDTO transfer1 = new TransferDTO();
+    transfer1.setAmountCents(900L);
+    transfer1.setStampType("TAX");
+    TransferDTO transfer2 = new TransferDTO();
+    transfer2.setAmountCents(100L);
+    transfers.add(transfer1);
+    transfers.add(transfer2);
+    installmentDTO.setTransfers(transfers);
+    return installmentDTO;
+  }
 }

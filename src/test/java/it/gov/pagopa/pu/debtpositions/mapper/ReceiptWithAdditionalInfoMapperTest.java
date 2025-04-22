@@ -55,17 +55,17 @@ class ReceiptWithAdditionalInfoMapperTest {
       default -> null;
     };
     Assertions.assertNotNull(debtPositionDTO);
-    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate");
+    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate", "creationDate", "updateDate", "updateOperatorExternalId");
     Assertions.assertEquals(debtPositionOrigin, debtPositionDTO.getDebtPositionOrigin());
     Assertions.assertEquals(debtPositionTypeOrg.getDebtPositionTypeOrgId(), debtPositionDTO.getDebtPositionTypeOrgId());
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
-    TestUtils.checkNotNullFields(paymentOptionDTO, "paymentOptionId", "debtPositionId", "dueDate");
+    TestUtils.checkNotNullFields(paymentOptionDTO, "paymentOptionId", "debtPositionId", "dueDate", "creationDate", "updateDate", "updateOperatorExternalId");
     InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().getFirst();
     TestUtils.checkNotNullFields(installmentDTO, "paymentOptionId", "installmentId", "dueDate",
       "syncStatus", "iuf", "iur", "paymentTypeCode", "balance", "legacyPaymentMetadata", "notificationDate",
-      "ingestionFlowFileId", "ingestionFlowFileLineNumber");
+      "ingestionFlowFileId", "ingestionFlowFileLineNumber", "creationDate", "updateDate", "updateOperatorExternalId");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
-    installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO,"transferId","installmentId", "postalIban"));
+    installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO,"transferId","installmentId", "postalIban", "creationDate", "updateDate", "updateOperatorExternalId"));
     Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock, Mockito.times(1)).getUnknownDebtPositionTypeOrg(organization.getOrganizationId());
   }
 

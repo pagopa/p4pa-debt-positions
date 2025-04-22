@@ -408,6 +408,89 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-dueDate:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateDueDate
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: dueDate
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-status-syncStatus:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateStatusAndToSyncStatus
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/InstallmentStatus"
+        - name: syncStatus
+          in: query
+          schema:
+            type: "InstallmentSyncStatus"
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/payment-option/by-paymentOptionId-status:
+    put:
+      tags:
+        - payment-option-entity-extended-controller
+      operationId: updateStatus
+      parameters:
+        - name: paymentOptionId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          required: true
+          schema:
+            $ref: "#/components/schemas/PaymentOptionStatus"
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:
@@ -652,6 +735,60 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/update-notification-fee:
+    put:
+      tags:
+        - debt-position
+      operationId: updateInstallmentNotificationFee
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                organizationId:
+                  type: integer
+                  format: int64
+                nav:
+                  type: string
+                newFeeCents:
+                  type: integer
+                  format: int64
+              required:
+                - organizationId
+                - nav
+                - newFeeCents
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InstallmentDTO'
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "500":
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /transfers/{transferId}/reported:
     put:
       tags:
@@ -763,6 +900,7 @@ components:
         - paymentOptions
         - flagPagoPaPayment
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"]
       properties:
         debtPositionId:
           type: integer
@@ -796,6 +934,8 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
         paymentOptions:
           type: array
           items:
@@ -806,6 +946,7 @@ components:
         - totalAmountCents
         - paymentOptionType
       type: object
+      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption"]
       properties:
         paymentOptionId:
           type: integer
@@ -830,6 +971,14 @@ components:
         paymentOptionIndex:
           type: integer
           format: int32
+        creationDate:
+          type: string
+          format: date-time
+        updateDate:
+          type: string
+          format: date-time
+        updateOperatorExternalId:
+          type: string
         installments:
           type: array
           items:
@@ -903,6 +1052,8 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
     TransferDTO:
       required:
         - amountCents
@@ -943,6 +1094,14 @@ components:
         transferIndex:
           type: integer
           format: int32
+        creationDate:
+          type: string
+          format: date-time
+        updateDate:
+          type: string
+          format: date-time
+        updateOperatorExternalId:
+          type: string
     ReceiptDTO:
       type: object
       required:

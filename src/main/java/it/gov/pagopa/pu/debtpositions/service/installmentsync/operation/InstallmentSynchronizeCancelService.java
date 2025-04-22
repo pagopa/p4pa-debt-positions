@@ -35,6 +35,6 @@ public class InstallmentSynchronizeCancelService extends BaseInstallmentSynchron
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
 
-    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId).getRight();
+    return debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId);
   }
 }

@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
+import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
 
@@ -12,7 +12,7 @@ import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.*;
 
-public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionStatus, DebtPosition, DebtPositionStatus> {
+public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionStatus, BaseDebtPosition, DebtPositionStatus> {
 
   private final DebtPositionRepository debtPositionRepository;
 
@@ -49,19 +49,19 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
 
 
   @Override
-  protected List<PaymentOptionStatus> getChildStatuses(DebtPosition debtPosition) {
+  protected List<PaymentOptionStatus> getChildStatuses(BaseDebtPosition debtPosition) {
     return debtPosition.getPaymentOptions().stream()
-      .map(PaymentOption::getStatus)
+      .map(BasePaymentOption::getStatus)
       .toList();
   }
 
   @Override
-  protected void setStatus(DebtPosition debtPosition, DebtPositionStatus newStatus) {
+  protected void setStatus(BaseDebtPosition debtPosition, DebtPositionStatus newStatus) {
     debtPosition.setStatus(newStatus);
   }
 
   @Override
-  protected void storeStatus(DebtPosition debtPosition, DebtPositionStatus newStatus) {
+  protected void storeStatus(BaseDebtPosition debtPosition, DebtPositionStatus newStatus) {
     debtPositionRepository.updateStatus(debtPosition.getDebtPositionId(), newStatus);
   }
 }
