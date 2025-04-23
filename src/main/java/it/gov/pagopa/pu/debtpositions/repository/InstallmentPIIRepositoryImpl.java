@@ -53,4 +53,6 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<Installment,
   PersonalDataType getPIIPersonalDataType() {
     return PersonalDataType.INSTALLMENT;
   }
+
+
 }

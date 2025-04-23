@@ -10,4 +10,6 @@ public interface InstallmentPIIRepository {
   Installment save(Installment installment);
 
   List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin);
+
+  void delete(Installment installment);
 }
