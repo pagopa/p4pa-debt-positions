@@ -27,6 +27,9 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.util.List;
 import java.util.Optional;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 @ExtendWith(MockitoExtension.class)
 class InstallmentPIIRepositoryImplTest {
 
@@ -223,4 +226,21 @@ class InstallmentPIIRepositoryImplTest {
     installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
   }
 
+  @Test
+  void givenInstallmentValidWhenDeleteThenOk(){
+    Installment installment = buildInstallment();
+    InstallmentNoPII noPII = buildInstallmentNoPII();
+    InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
+    Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(noPII, buildInstallmentPIIDTO());
+
+    Mockito.when(mapperMock.map(installment)).thenReturn(p);
+    Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
+    Mockito.doNothing().when(personalDataServiceMock).delete(123L);
+    Mockito.doNothing().when(installmentNoPIIRepository).delete(noPII);
+
+    assertDoesNotThrow(() -> installmentPIIRepository.delete(installment));
+
+    Mockito.verify(personalDataServiceMock, Mockito.times(1)).delete(123L);
+    Mockito.verify(installmentNoPIIRepository, Mockito.times(1)).delete(noPII);
+  }
 }

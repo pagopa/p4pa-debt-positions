@@ -17,7 +17,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   private final DebtPositionRepository debtPositionRepository;
 
   public DebtPositionStatusChecker(DebtPositionRepository debtPositionRepository) {
-    super(TO_SYNC, PAID, UNPAID, EXPIRED, CANCELLED, INVALID, REPORTED);
+    super(TO_SYNC, PAID, DRAFT, UNPAID, EXPIRED, CANCELLED, INVALID, REPORTED);
     this.debtPositionRepository = debtPositionRepository;
   }
 
@@ -27,6 +27,8 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
       return DebtPositionStatus.TO_SYNC;
     } else if (isPartiallyPaid(paymentOptionStatusList)){
       return DebtPositionStatus.PARTIALLY_PAID;
+    } else if (isDraft(paymentOptionStatusList)) {
+      return DebtPositionStatus.DRAFT;
     } else if (isUnpaid(paymentOptionStatusList)){
       return DebtPositionStatus.UNPAID;
     } else if (isPaid(paymentOptionStatusList)){
