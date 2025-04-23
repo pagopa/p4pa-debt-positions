@@ -51,6 +51,7 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
 
     if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       deleteEntireDebtPosition(debtPositionDTO);
+      log.info("Permanently deleted debt position with id {} having status DRAFT", debtPositionDTO.getDebtPositionId());
       return null;
     }
 

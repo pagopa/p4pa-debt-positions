@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
@@ -68,6 +69,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
+
+  @MockitoBean
+  private DebtPositionDeletionService debtPositionDeletionService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -287,6 +291,20 @@ class DebtPositionControllerTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
+      .andReturn();
+  }
+
+  @Test
+  void whenDeleteDebtPositionThenOk() throws Exception {
+    Long debtPositionId = 1L;
+
+    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId)).thenReturn("workflowId");
+
+    mockMvc.perform(
+        delete("/debt-positions/" + debtPositionId + "/delete")
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isNoContent())
+      .andExpect(header().string("x-workflow-id", "workflowId"))
       .andReturn();
   }
 }
