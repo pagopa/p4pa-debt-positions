@@ -301,7 +301,7 @@ class DebtPositionControllerTest {
     Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId)).thenReturn("workflowId");
 
     mockMvc.perform(
-        delete("/debt-positions/" + debtPositionId + "/delete")
+        delete("/debt-positions/" + debtPositionId)
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isNoContent())
       .andExpect(header().string("x-workflow-id", "workflowId"))

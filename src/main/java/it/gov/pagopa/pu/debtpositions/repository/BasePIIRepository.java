@@ -72,16 +72,9 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
     }
   }
 
-  public void delete(F fullDTO) {
-    Pair<E, P> p = piiMapper.map(fullDTO);
-
-    Pair<Long, Optional<P>> retrievedPII = retrievePII(p.getFirst());
-
-    if (retrievedPII != null) {
-      personalDataService.delete(retrievedPII.getFirst());
-    }
-
-    noPIIRepository.delete(p.getFirst());
+  public void delete(E noPii) {
+    personalDataService.delete(noPii.getPersonalDataId());
+    noPIIRepository.delete(noPii);
   }
 
 }

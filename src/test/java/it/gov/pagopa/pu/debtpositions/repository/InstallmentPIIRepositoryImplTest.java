@@ -228,17 +228,12 @@ class InstallmentPIIRepositoryImplTest {
 
   @Test
   void givenInstallmentValidWhenDeleteThenOk(){
-    Installment installment = buildInstallment();
     InstallmentNoPII noPII = buildInstallmentNoPII();
-    InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
-    Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(noPII, buildInstallmentPIIDTO());
 
-    Mockito.when(mapperMock.map(installment)).thenReturn(p);
-    Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     Mockito.doNothing().when(personalDataServiceMock).delete(123L);
     Mockito.doNothing().when(installmentNoPIIRepository).delete(noPII);
 
-    assertDoesNotThrow(() -> installmentPIIRepository.delete(installment));
+    assertDoesNotThrow(() -> installmentPIIRepository.delete(noPII));
 
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).delete(123L);
     Mockito.verify(installmentNoPIIRepository, Mockito.times(1)).delete(noPII);

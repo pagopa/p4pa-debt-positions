@@ -1,17 +1,22 @@
 package it.gov.pagopa.pu.debtpositions.service.delete;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentServiceImpl;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -25,20 +30,14 @@ import java.util.List;
 public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionService {
 
   private final DebtPositionService debtPositionService;
-  private final DebtPositionRepository debtPositionRepository;
-  private final PaymentOptionRepository paymentOptionRepository;
-  private final InstallmentPIIRepository installmentPIIRepository;
-  private final TransferRepository transferRepository;
-  private final InstallmentMapper installmentMapper;
+  private final OrganizationService organizationService;
+  private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
   private final DebtPositionCancelInstallmentServiceImpl debtPositionCancelInstallmentService;
 
-  public DebtPositionDeletionServiceImpl(DebtPositionService debtPositionService, DebtPositionRepository debtPositionRepository, PaymentOptionRepository paymentOptionRepository, InstallmentPIIRepository installmentPIIRepository, TransferRepository transferRepository, InstallmentMapper installmentMapper, DebtPositionCancelInstallmentServiceImpl debtPositionCancelInstallmentService) {
+  public DebtPositionDeletionServiceImpl(DebtPositionService debtPositionService, OrganizationService organizationService, AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionCancelInstallmentServiceImpl debtPositionCancelInstallmentService) {
     this.debtPositionService = debtPositionService;
-    this.debtPositionRepository = debtPositionRepository;
-    this.paymentOptionRepository = paymentOptionRepository;
-    this.installmentPIIRepository = installmentPIIRepository;
-    this.transferRepository = transferRepository;
-    this.installmentMapper = installmentMapper;
+    this.organizationService = organizationService;
+    this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
   }
 
@@ -47,21 +46,22 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
   public String deleteDebtPosition(Long debtPositionId, String accessToken, String operatorExternalUserId) {
     log.info("Cancelling debt position having id {}", debtPositionId);
 
-    DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
+    DebtPosition debtPosition = debtPositionService.getDebtPositionNoPII(debtPositionId);
 
-    if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      deleteEntireDebtPosition(debtPositionDTO);
-      log.info("Permanently deleted debt position with id {} having status DRAFT", debtPositionDTO.getDebtPositionId());
+    if (DebtPositionStatus.DRAFT.equals(debtPosition.getStatus())) {
+      manageDraftDebtPosition(debtPosition, accessToken, operatorExternalUserId);
       return null;
     }
 
-    if(isIunPresent(debtPositionDTO)) {
+    if(isIunPresent(debtPosition)) {
       throw new ConflictErrorException("The debt position with id " + debtPositionId + " cannot be deleted because it is been notified");
     }
 
-    if(!InstallmentUtils.DELETABLE_DP_STATUSES.contains(debtPositionDTO.getStatus())){
-      throw new ConflictErrorException("The debt position with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPositionDTO.getStatus());
+    if(!InstallmentUtils.DELETABLE_DP_STATUSES.contains(debtPosition.getStatus())){
+      throw new ConflictErrorException("The debt position with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
     }
+
+    DebtPositionDTO debtPositionDTO = debtPositionService.mapDebtPosition(debtPosition);
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
@@ -75,27 +75,22 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
   }
 
 
-  private void deleteEntireDebtPosition(DebtPositionDTO debtPositionDTO) {
-    debtPositionDTO.getPaymentOptions()
-      .forEach(paymentOptionDTO -> {
-          paymentOptionDTO.getInstallments()
-            .forEach(installmentDTO -> {
-                installmentDTO.getTransfers()
-                  .forEach(transferDTO -> transferRepository.deleteById(transferDTO.getTransferId()));
-                Installment installment = installmentMapper.mapToModel(installmentDTO);
-                installmentPIIRepository.delete(installment);
-              }
-            );
-          paymentOptionRepository.deleteById(paymentOptionDTO.getPaymentOptionId());
-        }
-      );
-    debtPositionRepository.deleteById(debtPositionDTO.getDebtPositionId());
+  private void manageDraftDebtPosition(DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
+    Organization org = organizationService.getOrganizationById(debtPosition.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
+    if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
+      throw new InvalidValueException("Provided organization is not ACTIVE");
+    }
+    authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPosition.getDebtPositionTypeOrgId(), operatorExternalUserId);
+
+    debtPositionService.delete(debtPosition);
+
+    log.info("Permanently deleted debt position with id {} having status DRAFT", debtPosition.getDebtPositionId());
   }
 
-  private boolean isIunPresent(DebtPositionDTO debtPositionDTO) {
-    return debtPositionDTO.getPaymentOptions().stream()
-      .flatMap(paymentOptionDTO -> paymentOptionDTO.getInstallments()
+  private boolean isIunPresent(DebtPosition debtPosition) {
+    return debtPosition.getPaymentOptions().stream()
+      .flatMap(paymentOption -> paymentOption.getInstallments()
         .stream())
-        .anyMatch(installmentDTO -> StringUtils.isNotBlank(installmentDTO.getIun()));
+        .anyMatch(installment -> StringUtils.isNotBlank(installment.getIun()));
   }
 }

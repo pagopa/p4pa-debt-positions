@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 
 import java.util.List;
 
@@ -11,5 +12,5 @@ public interface InstallmentPIIRepository {
 
   List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin);
 
-  void delete(Installment installment);
+  void delete(InstallmentNoPII installmentNoPII);
 }
