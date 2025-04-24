@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
@@ -31,14 +32,16 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final InstallmentSynchronizeService installmentSynchronizeService;
   private final InstallmentService installmentService;
   private final DebtPositionManageInstallmentsService debtPositionManageService;
+  private final DebtPositionDeletionService debtPositionDeletionService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
     this.installmentSynchronizeService = installmentSynchronizeService;
     this.installmentService = installmentService;
     this.debtPositionManageService = debtPositionManageService;
+    this.debtPositionDeletionService = debtPositionDeletionService;
   }
 
   @Override
@@ -143,5 +146,13 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       operatorExternalUserId);
 
     return ResponseEntity.ok(installmentDTO);
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteDebtPosition(Long debtPositionId){
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    String workflowId = debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, operatorExternalUserId);
+    return ResponseEntity.status(HttpStatus.NO_CONTENT).header(HEADER_X_WORKFLOW_ID, workflowId).build();
   }
 }

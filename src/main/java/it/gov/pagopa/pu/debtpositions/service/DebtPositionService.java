@@ -11,6 +11,8 @@ public interface DebtPositionService {
   void saveDebtPosition(DebtPosition debtPosition);
   DebtPositionDTO mapDebtPosition(DebtPosition debtPosition);
   DebtPositionDTO getDebtPosition(Long debtPositionId);
+  DebtPosition getDebtPositionNoPII(Long debtPositionId);
 
   PagedDebtPositions getPagedDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, Pageable pageable);
+  void delete(DebtPosition debtPosition);
 }

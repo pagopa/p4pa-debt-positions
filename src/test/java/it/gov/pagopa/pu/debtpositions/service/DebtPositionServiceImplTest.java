@@ -35,6 +35,8 @@ class DebtPositionServiceImplTest {
   private DebtPositionSaveService debtPositionSaveServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
+  @Mock
+  private DebtPositionDeleteService debtPositionDeleteServiceMock;
 
   private DebtPositionServiceImpl debtPositionService;
 
@@ -45,7 +47,8 @@ class DebtPositionServiceImplTest {
     debtPositionService = new DebtPositionServiceImpl(
       debtPositionRepositoryMock,
       debtPositionSaveServiceMock,
-      debtPositionMapperMock
+      debtPositionMapperMock,
+      debtPositionDeleteServiceMock
     );
   }
 
@@ -54,7 +57,8 @@ class DebtPositionServiceImplTest {
     Mockito.verifyNoMoreInteractions(
       debtPositionRepositoryMock,
       debtPositionSaveServiceMock,
-      debtPositionMapperMock);
+      debtPositionMapperMock,
+      debtPositionDeleteServiceMock);
   }
 
   @Test
@@ -127,6 +131,30 @@ class DebtPositionServiceImplTest {
     PagedDebtPositions result = debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable);
 
     assertEquals(result, expectedPagedDebtPositions);
+  }
+
+  @Test
+  void givenDebtPositionWhenGetDebtPositionNoPIIThenSuccess(){
+    Long debtPositionId = 1L;
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+
+    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+
+    DebtPosition result = debtPositionService.getDebtPositionNoPII(debtPositionId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(debtPosition, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock);
+  }
+
+  @Test
+  void givenDebtPositionWhenDeleteThenSuccess(){
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+
+    Mockito.doNothing().when(debtPositionDeleteServiceMock).delete(debtPosition);
+
+    Assertions.assertDoesNotThrow(() -> debtPositionService.delete(debtPosition));
+    Mockito.verifyNoMoreInteractions(debtPositionDeleteServiceMock);
   }
 }
 

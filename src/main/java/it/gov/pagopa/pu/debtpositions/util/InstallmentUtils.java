@@ -38,6 +38,10 @@ public class InstallmentUtils {
     DebtPositionStatus.EXPIRED,
     DebtPositionStatus.PARTIALLY_PAID);
 
+  public static final Set<DebtPositionStatus> DELETABLE_DP_STATUSES = Set.of(
+    DebtPositionStatus.UNPAID,
+    DebtPositionStatus.EXPIRED);
+
   public static final Set<InstallmentStatus> MODIFIABLE_STATUSES = Set.of(
     InstallmentStatus.DRAFT,
     InstallmentStatus.UNPAID,

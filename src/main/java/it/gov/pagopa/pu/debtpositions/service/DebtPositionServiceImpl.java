@@ -16,13 +16,15 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionSaveService debtPositionSaveService;
   private final DebtPositionMapper debtPositionMapper;
+  private final DebtPositionDeleteService debtPositionDeleteService;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository,
                                  DebtPositionSaveService debtPositionSaveService,
-                                 DebtPositionMapper debtPositionMapper) {
+                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionSaveService = debtPositionSaveService;
     this.debtPositionMapper = debtPositionMapper;
+    this.debtPositionDeleteService = debtPositionDeleteService;
   }
 
   @Override
@@ -42,11 +44,17 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public DebtPositionDTO getDebtPosition(Long debtPositionId) {
+    DebtPosition debtPosition = getDebtPositionNoPII(debtPositionId);
+    return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  @Override
+  public DebtPosition getDebtPositionNoPII(Long debtPositionId) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
     if (debtPosition == null) {
       throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
     }
-    return debtPositionMapper.mapToDto(debtPosition);
+    return debtPosition;
   }
 
   @Override
@@ -54,6 +62,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     Page<DebtPosition> pagedDebtPositionsDTO = debtPositionRepository.findByIngestionFlowFileId(ingestionFlowFileId, pageable);
 
     return debtPositionMapper.mapToPagedDebtPositions(pagedDebtPositionsDTO);
+  }
+
+  @Override
+  public void delete(DebtPosition debtPosition) {
+    debtPositionDeleteService.delete(debtPosition);
   }
 }
 

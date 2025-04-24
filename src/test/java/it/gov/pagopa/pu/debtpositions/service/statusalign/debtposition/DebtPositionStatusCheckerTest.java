@@ -64,6 +64,16 @@ class DebtPositionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is DRAFT when all paymentOptions are DRAFT.
+   */
+  @Test
+  void testCalculateNewStatus_Draft() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.DRAFT, PaymentOptionStatus.DRAFT);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.DRAFT, result);
+  }
+
+  /**
    * Test if the status is UNPAID when all paymentOptions are CANCELLED, with at least one UNPAID.
    */
   @Test
