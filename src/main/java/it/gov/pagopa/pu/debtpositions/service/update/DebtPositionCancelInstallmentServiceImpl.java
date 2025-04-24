@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -51,6 +52,14 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+    List<String> installmentsNonCancellable = installments2operate.stream()
+      .filter(installmentDTO -> !InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus()))
+      .map(InstallmentDTO::getIud).toList();
+
+    if(!installmentsNonCancellable.isEmpty()){
+      throw new ConflictErrorException(String.format("Installments having iud %s cannot be cancelled because are not in allowed status", installmentsNonCancellable));
+    }
+
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 

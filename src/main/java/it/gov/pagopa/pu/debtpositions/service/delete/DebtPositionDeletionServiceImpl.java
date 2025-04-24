@@ -2,10 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.delete;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -47,7 +44,7 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
     DebtPosition debtPosition = debtPositionService.getDebtPositionNoPII(debtPositionId);
 
     if (DebtPositionStatus.DRAFT.equals(debtPosition.getStatus())) {
-      manageDraftDebtPosition(debtPosition, accessToken, operatorExternalUserId);
+      deleteDraftDebtPosition(debtPosition, accessToken, operatorExternalUserId);
       return null;
     }
 
@@ -62,7 +59,9 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
     DebtPositionDTO debtPositionDTO = debtPositionService.mapDebtPosition(debtPosition);
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
-      .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
+      .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream)
+      .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
+      .toList();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .partialChange(false)
@@ -73,7 +72,7 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
   }
 
 
-  private void manageDraftDebtPosition(DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
+  private void deleteDraftDebtPosition(DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPosition.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
       throw new InvalidValueException("Provided organization is not ACTIVE");
