@@ -103,6 +103,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), 2L, operatorExternalId)).thenReturn(debtPositionTypeOrg);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () -> debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, installments, wfExecutionParameters, accessToken, operatorExternalId));
-    assertEquals("Installments having iud [iud] cannot be cancelled because are not in allowed status", exception.getMessage());
+    assertEquals("The installment with id 100 cannot be cancelled because is not in allowed status: PAID", exception.getMessage());
   }
 }

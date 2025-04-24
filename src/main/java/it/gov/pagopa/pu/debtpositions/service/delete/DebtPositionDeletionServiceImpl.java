@@ -60,7 +60,7 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream)
-      .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
+      .filter(installmentDTO -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus()))
       .toList();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()

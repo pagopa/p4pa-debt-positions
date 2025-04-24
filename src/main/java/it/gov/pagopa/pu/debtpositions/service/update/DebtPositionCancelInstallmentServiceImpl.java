@@ -52,13 +52,15 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
-    List<String> installmentsNonCancellable = installments2operate.stream()
-      .filter(installmentDTO -> !InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus()))
-      .map(InstallmentDTO::getIud).toList();
-
-    if(!installmentsNonCancellable.isEmpty()){
-      throw new ConflictErrorException(String.format("Installments having iud %s cannot be cancelled because are not in allowed status", installmentsNonCancellable));
-    }
+    installments2operate = installments2operate.stream()
+      .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
+      .map(installmentDTO -> {
+        if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus())) {
+          throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
+        }
+        return installmentDTO;
+      })
+      .toList();
 
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status cancelled for installments with ids {}", installmentIds);
