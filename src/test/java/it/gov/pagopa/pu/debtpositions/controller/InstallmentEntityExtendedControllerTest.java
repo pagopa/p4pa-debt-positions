@@ -63,12 +63,12 @@ class InstallmentEntityExtendedControllerTest {
   void whenUpdateIunThenInvokeRepository() {
     // Given
     Long installmentId = 1L;
-    String IUN = "IUN";
+    String iun = "IUN";
 
     // When
-    controller.updateIun(installmentId, IUN);
+    controller.updateIun(installmentId, iun);
 
     // Then
-    verify(repositoryMock).updateIun(installmentId, IUN);
+    verify(repositoryMock).updateIun(installmentId, iun);
   }
 }
