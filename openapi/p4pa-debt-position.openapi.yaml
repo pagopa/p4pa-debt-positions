@@ -530,6 +530,32 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-iun:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateIun
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: iun
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/finalize-sync-status:
     put:
       tags:

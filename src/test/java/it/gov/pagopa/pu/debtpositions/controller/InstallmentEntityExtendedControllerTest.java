@@ -58,4 +58,17 @@ class InstallmentEntityExtendedControllerTest {
     // Then
     verify(repositoryMock).updateStatusAndToSyncStatus(installmentId, InstallmentStatus.UNPAID, new InstallmentSyncStatus());
   }
+
+  @Test
+  void whenUpdateIunThenInvokeRepository() {
+    // Given
+    Long installmentId = 1L;
+    String iun = "IUN";
+
+    // When
+    controller.updateIun(installmentId, iun);
+
+    // Then
+    verify(repositoryMock).updateIun(installmentId, iun);
+  }
 }
