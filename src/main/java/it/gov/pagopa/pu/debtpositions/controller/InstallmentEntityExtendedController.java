@@ -30,4 +30,11 @@ public class InstallmentEntityExtendedController implements InstallmentsEntityEx
     repository.updateStatusAndToSyncStatus(installmentId, status, syncStatus);
     return ResponseEntity.ok().build();
   }
+
+  @Override
+  public ResponseEntity<Void> updateIun(Long installmentId, String iun) {
+    repository.updateIun(installmentId, iun);
+    return ResponseEntity.ok().build();
+  }
+
 }
