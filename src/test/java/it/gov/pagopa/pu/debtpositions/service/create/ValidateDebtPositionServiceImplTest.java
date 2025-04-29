@@ -444,6 +444,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void testValidateThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
