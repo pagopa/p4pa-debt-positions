@@ -58,7 +58,7 @@ class DebtPositionStatusCheckerTest {
    */
   @Test
   void testCalculateNewStatus_Unpaid() {
-    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAID);
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAYABLE);
     DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
     assertEquals(DebtPositionStatus.UNPAID, result);
   }
