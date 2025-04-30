@@ -26,7 +26,11 @@ public class InstallmentEntityExtendedController implements InstallmentsEntityEx
   }
 
   @Override
-  public ResponseEntity<Void> updateStatusAndToSyncStatus(Long installmentId, InstallmentStatus status, InstallmentSyncStatus syncStatus) {
+  public ResponseEntity<Void> updateStatusAndToSyncStatus(Long installmentId, InstallmentStatus status, InstallmentStatus syncStatusFrom, InstallmentStatus syncStatusTo) {
+    InstallmentSyncStatus syncStatus=null;
+    if(syncStatusFrom!=null && syncStatusTo!=null){
+      syncStatus = new InstallmentSyncStatus(syncStatusFrom, syncStatusTo);
+    }
     repository.updateStatusAndToSyncStatus(installmentId, status, syncStatus);
     return ResponseEntity.ok().build();
   }

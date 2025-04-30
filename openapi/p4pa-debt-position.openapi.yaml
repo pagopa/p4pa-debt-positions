@@ -491,10 +491,14 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/InstallmentStatus"
-        - name: syncStatus
+        - name: syncStatusFrom
           in: query
           schema:
-            type: "InstallmentSyncStatus"
+            $ref: "#/components/schemas/InstallmentStatus"
+        - name: syncStatusTo
+          in: query
+          schema:
+            $ref: "#/components/schemas/InstallmentStatus"
       responses:
         '200':
           description: OK
