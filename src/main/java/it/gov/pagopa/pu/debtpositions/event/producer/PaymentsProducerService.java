@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.event.producer;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.dto.PaymentEventDTO;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.stream.function.StreamBridge;
@@ -38,8 +39,9 @@ public class PaymentsProducerService {
 
   public void notifyPaymentsEvent(DebtPositionDTO debtPosition, PaymentEventType event, String eventDescription) {
     String eventId = event.name() + debtPosition.getDebtPositionId() + UUID.randomUUID();
+    String traceId = Utilities.getTraceId();
     streamBridge.send("paymentsProducer-out-0", binder,
-      MessageBuilder.withPayload(new PaymentEventDTO(eventId, event, OffsetDateTime.now(), debtPosition, eventDescription))
+      MessageBuilder.withPayload(new PaymentEventDTO(eventId, traceId, event, OffsetDateTime.now(), debtPosition, eventDescription))
         .setHeader(KafkaHeaders.KEY, String.valueOf(debtPosition.getOrganizationId()))
         .build()
     );

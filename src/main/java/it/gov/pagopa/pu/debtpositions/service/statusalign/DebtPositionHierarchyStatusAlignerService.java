@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IupdSyncStatusUpdateDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Map;
@@ -16,13 +17,13 @@ public interface DebtPositionHierarchyStatusAlignerService {
    * It will set the installment as REPORTED and then invoking sync debtPosition in order to publish the event
    * @return The DebtPosition updated and workflowId started
    */
-  Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken);
+  Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken);
 
   /**
    * It will verify installment expiration and then invoking sync debtPosition in order to publish the event and re-schedule expiration check
    * @return The DebtPosition updated and workflowId started
    */
-  Pair<DebtPositionDTO, String> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
+  Pair<DebtPositionDTO, WorkflowCreatedDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
 
   void alignHierarchyStatus(BaseDebtPosition debtPosition);
 }

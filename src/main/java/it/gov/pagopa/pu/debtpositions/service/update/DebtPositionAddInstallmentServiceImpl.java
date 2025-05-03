@@ -19,6 +19,7 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyS
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,13 +45,13 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
 
   @Transactional
   @Override
-  public String addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public WorkflowCreatedDTO addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.debug("Adding new installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
 
-    String workflowId = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO workflow = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
 
     log.debug("Added installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-    return workflowId;
+    return workflow;
   }
 
   @Override

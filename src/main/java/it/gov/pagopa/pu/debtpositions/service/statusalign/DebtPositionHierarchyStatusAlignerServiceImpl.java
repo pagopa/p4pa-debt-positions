@@ -93,7 +93,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
+  public Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
 
     if (debtPosition == null) {
@@ -121,19 +121,19 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       .collect(Collectors.joining(","));
 
     DebtPositionDTO debtPositionDTO = alignHierarchyStatusAndRemap(debtPosition);
-    String workflowId = null;
+    WorkflowCreatedDTO workflow = null;
 
     if(StringUtils.isNotEmpty(reportedIuds)){
-      workflowId = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
-        PaymentEventType.DPI_REPORTED, "IUD:" + reportedIuds, accessToken).getWorkflowId();
+      workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
+        PaymentEventType.DPI_REPORTED, "IUD:" + reportedIuds, accessToken);
     }
 
-    return Pair.of(debtPositionDTO, workflowId);
+    return Pair.of(debtPositionDTO, workflow);
   }
 
   @Transactional
   @Override
-  public Pair<DebtPositionDTO, String> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken) {
+  public Pair<DebtPositionDTO, WorkflowCreatedDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
@@ -159,7 +159,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     WorkflowCreatedDTO workflowCreated = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
       paymentEventType, paymentEventType != null ? "IUD:" + expiredIuds : null, accessToken);
 
-    return Pair.of(debtPositionDTO, workflowCreated.getWorkflowId());
+    return Pair.of(debtPositionDTO, workflowCreated);
   }
 
   @Override

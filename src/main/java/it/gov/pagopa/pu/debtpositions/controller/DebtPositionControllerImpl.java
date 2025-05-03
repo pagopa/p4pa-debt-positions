@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,7 @@ import java.util.Map;
 public class DebtPositionControllerImpl implements DebtPositionApi {
 
   public static final String HEADER_X_WORKFLOW_ID = "x-workflow-id";
+  public static final String HEADER_X_RUN_ID = "x-run-id";
 
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
   private final DebtPositionCreationService debtPositionCreationService;
@@ -52,8 +54,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(massive)
       .partialChange(false)
       .build();
-    String workflowId = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, workflowId).body(debtPositionDTO);
+    WorkflowCreatedDTO workflow = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .body(debtPositionDTO);
   }
 
 
@@ -67,8 +73,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   @Override
   public ResponseEntity<DebtPositionDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId) {
     log.info("Checking installment expired on debtPosition {}", debtPositionId);
-    Pair<DebtPositionDTO, String> result = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId, SecurityUtils.getAccessToken());
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId, SecurityUtils.getAccessToken());
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+      .body(result.getLeft());
   }
 
   @Override
@@ -88,8 +98,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(partialChange)
       .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
-    String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
+    WorkflowCreatedDTO workflow = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.CREATED)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .build();
   }
 
   @Override
@@ -109,8 +123,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(false)
       .build();
 
-    String workflowId = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
-    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
+    WorkflowCreatedDTO workflow = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
+    return ResponseEntity
+      .status(HttpStatus.CREATED)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .build();
   }
 
   @Override
@@ -121,8 +139,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(false)
       .partialChange(false)
       .build();
-    Pair<DebtPositionDTO, String> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+      .body(result.getLeft());
   }
 
   @Override
@@ -152,7 +174,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<Void> deleteDebtPosition(Long debtPositionId){
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
-    String workflowId = debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.NO_CONTENT).header(HEADER_X_WORKFLOW_ID, workflowId).build();
+    WorkflowCreatedDTO workflow = debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.NO_CONTENT)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .build();
   }
 }

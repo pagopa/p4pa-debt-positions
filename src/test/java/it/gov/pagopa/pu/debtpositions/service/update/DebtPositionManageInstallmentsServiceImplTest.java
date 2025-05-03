@@ -27,8 +27,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageUpdateInstallmentDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionManageInstallmentsServiceImplTest {
@@ -58,10 +57,10 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
   private static final String OPERATOR_EXTERNAL_ID = "operatorExternalId";
   private static final String ACCESS_TOKEN = "accessToken";
-  private static final String WORKFLOW_ID = "workflowId";
-  private static final String WORKFLOW_ID_ADD = "workflowId_ADD";
-  private static final String WORKFLOW_ID_UPDATE = "workflowId_UPDATE";
-  private static final String WORKFLOW_ID_CANCEL = "workflowId_CANCEL";
+  private static final WorkflowCreatedDTO WORKFLOW = new WorkflowCreatedDTO("workflowId", "runId");
+  private static final WorkflowCreatedDTO WORKFLOW_ADD = new WorkflowCreatedDTO("workflowId_ADD", "runId");
+  private static final WorkflowCreatedDTO WORKFLOW_UPDATE = new WorkflowCreatedDTO("workflowId_UPDATE", "runId");
+  private static final WorkflowCreatedDTO WORKFLOW_CANCEL = new WorkflowCreatedDTO("workflowId_CANCEL", "runId");
 
   @BeforeEach
   void setUp() {
@@ -167,21 +166,22 @@ class DebtPositionManageInstallmentsServiceImplTest {
     InstallmentDTO installment2cancel = buildInstallmentDTO().installmentId(3L).iud("iud3");
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2cancel);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId))
+      .thenReturn(debtPositionDTO);
     Mockito.doNothing().when(debtPositionManageApplierServiceMock).merge(buildManageUpdateInstallmentDTO().getInstallment(), installment2update);
     Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(installment2insert), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
-      .thenReturn(WORKFLOW_ID_ADD);
+      .thenReturn(WORKFLOW_ADD);
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installment2update), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
-      .thenReturn(WORKFLOW_ID_UPDATE);
+      .thenReturn(WORKFLOW_UPDATE);
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
-      .thenReturn(WORKFLOW_ID_CANCEL);
+      .thenReturn(WORKFLOW_CANCEL);
 
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-      .thenReturn(WorkflowCreatedDTO.builder().workflowId(WORKFLOW_ID).build());
+      .thenReturn(WORKFLOW);
 
-    Pair<DebtPositionDTO, String> result = debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
 
-    assertEquals(WORKFLOW_ID, result.getRight());
+    assertSame(WORKFLOW, result.getRight());
     assertEquals(debtPositionDTO, result.getLeft());
   }
 

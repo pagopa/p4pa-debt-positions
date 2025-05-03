@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.delete;
 
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+
 public interface DebtPositionDeletionService {
 
-  String deleteDebtPosition(Long debtPositionId, String accessToken, String operatorExternalUserId);
+  WorkflowCreatedDTO deleteDebtPosition(Long debtPositionId, String accessToken, String operatorExternalUserId);
 }

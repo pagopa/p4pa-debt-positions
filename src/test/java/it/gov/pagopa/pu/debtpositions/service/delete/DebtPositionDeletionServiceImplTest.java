@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentServiceImpl;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -44,7 +45,7 @@ class DebtPositionDeletionServiceImplTest {
 
   private static final String OPERATOR_EXTERNAL_ID = "operatorExternalId";
   private static final String ACCESS_TOKEN = "accessToken";
-  private static final String WORKFLOW_ID = "workflowId";
+  private static final WorkflowCreatedDTO WORKFLOW = new WorkflowCreatedDTO("workflowId", "runId");
 
   @BeforeEach
   void setUp() {
@@ -66,7 +67,7 @@ class DebtPositionDeletionServiceImplTest {
       .thenReturn(buildDebtPositionTypeOrg());
     Mockito.doNothing().when(debtPositionServiceMock).delete(debtPosition);
 
-    String result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
+    WorkflowCreatedDTO result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
 
     assertNull(result);
     Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
@@ -138,11 +139,11 @@ class DebtPositionDeletionServiceImplTest {
     Mockito.when(debtPositionServiceMock.mapDebtPosition(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
-      .thenReturn(WORKFLOW_ID);
+      .thenReturn(WORKFLOW);
 
-    String result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
+    WorkflowCreatedDTO result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
 
-    assertEquals(WORKFLOW_ID, result);
+    assertSame(WORKFLOW, result);
 
   }
 

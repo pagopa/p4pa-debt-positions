@@ -2,7 +2,10 @@ package it.gov.pagopa.pu.debtpositions.service.delete;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -12,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallme
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +42,7 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
 
   @Override
   @Transactional
-  public String deleteDebtPosition(Long debtPositionId, String accessToken, String operatorExternalUserId) {
+  public WorkflowCreatedDTO deleteDebtPosition(Long debtPositionId, String accessToken, String operatorExternalUserId) {
     log.info("Cancelling debt position having id {}", debtPositionId);
 
     DebtPosition debtPosition = debtPositionService.getDebtPositionNoPII(debtPositionId);

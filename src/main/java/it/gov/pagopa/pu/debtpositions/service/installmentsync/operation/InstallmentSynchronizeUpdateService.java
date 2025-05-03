@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.BaseInstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -26,8 +27,8 @@ public class InstallmentSynchronizeUpdateService extends BaseInstallmentSynchron
     this.installmentSynchronizeApplierService = installmentSynchronizeApplierService;
   }
 
-  public String syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition,
-                                WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public WorkflowCreatedDTO syncInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition,
+                                            WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
 
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallmentAndThrowException(storedDebtPosition, installmentSynchronizeDTO);
 

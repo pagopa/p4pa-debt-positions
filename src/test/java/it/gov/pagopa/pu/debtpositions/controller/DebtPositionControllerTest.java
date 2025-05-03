@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -121,9 +122,10 @@ class DebtPositionControllerTest {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
       .massive(massive)
       .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
-      .thenReturn("workflowId");
+      .thenReturn(workflow);
 
     MvcResult result = mockMvc.perform(
         post("/debt-positions")
@@ -131,7 +133,8 @@ class DebtPositionControllerTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(debtPosition)))
       .andExpect(status().isOk())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
@@ -141,15 +144,17 @@ class DebtPositionControllerTest {
   @Test
   void whenCheckAndUpdateInstallmentExpirationThenOk() throws Exception {
     Long id = 1L;
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accessToken))
-      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+      .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/check-installment-expiration")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
@@ -184,9 +189,10 @@ class DebtPositionControllerTest {
       .executionConfig(NullNode.instance)
       .build();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
-      .thenReturn("workflowId");
+      .thenReturn(workflow);
 
     mockMvc.perform(
         put("/debt-positions/installment-synchronize")
@@ -196,7 +202,8 @@ class DebtPositionControllerTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
       .andExpect(status().isCreated())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
   }
 
@@ -229,16 +236,18 @@ class DebtPositionControllerTest {
       .massive(false)
       .partialChange(false)
       .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accessToken))
-      .thenReturn("workflowId");
+      .thenReturn(workflow);
 
     mockMvc.perform(
         put("/debt-positions/update-installment-notification-date")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isCreated())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
   }
 
@@ -250,16 +259,18 @@ class DebtPositionControllerTest {
       .massive(false)
       .partialChange(false)
       .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
-      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+      .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/" + debtPositionId + "/manage-installments")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
@@ -297,14 +308,17 @@ class DebtPositionControllerTest {
   @Test
   void whenDeleteDebtPositionThenOk() throws Exception {
     Long debtPositionId = 1L;
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId)).thenReturn("workflowId");
+    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
+      .thenReturn(workflow);
 
     mockMvc.perform(
         delete("/debt-positions/" + debtPositionId)
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isNoContent())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
   }
 }

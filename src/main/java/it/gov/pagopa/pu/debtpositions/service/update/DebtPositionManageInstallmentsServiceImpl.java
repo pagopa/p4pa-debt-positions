@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageA
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,7 +45,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
   @Override
   @Transactional
-  public Pair<DebtPositionDTO, String> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public Pair<DebtPositionDTO, WorkflowCreatedDTO> manageDebtPositionInstallments(Long debtPositionId, ManageDebtPositionDTO manageDebtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!InstallmentUtils.MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
@@ -68,10 +69,10 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
     List<InstallmentDTO> involvedInstallments = managePaymentOptionInstallments(storedDebtPosition, storedPaymentOption, manageDebtPositionDTO.getInstallments(), accessToken, operatorExternalUserId);
 
-    String workflowId = invokeWorkflow(storedDebtPosition, PaymentEventType.DP_UPDATED, involvedInstallments, accessToken, wfExecutionParameters);
+    WorkflowCreatedDTO workflow = invokeWorkflow(storedDebtPosition, PaymentEventType.DP_UPDATED, involvedInstallments, accessToken, wfExecutionParameters);
 
     log.debug("Managed installments for debt position with id {}", storedDebtPosition.getDebtPositionId());
-    return Pair.of(storedDebtPosition, workflowId);
+    return Pair.of(storedDebtPosition, workflow);
   }
 
   private List<InstallmentDTO> managePaymentOptionInstallments(DebtPositionDTO debtPositionDTO, PaymentOptionDTO paymentOptionDTO, List<ManageInstallmentDTO> manageInstallments, String accessToken, String operatorExternalUserId) {
