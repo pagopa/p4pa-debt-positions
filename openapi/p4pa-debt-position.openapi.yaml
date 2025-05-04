@@ -1005,6 +1005,8 @@ components:
           format: date-time
         updateOperatorExternalId:
           type: string
+        updateTraceId:
+          type: string
         paymentOptions:
           type: array
           items:
@@ -1047,6 +1049,8 @@ components:
           type: string
           format: date-time
         updateOperatorExternalId:
+          type: string
+        updateTraceId:
           type: string
         installments:
           type: array
@@ -1125,6 +1129,8 @@ components:
           format: date-time
         updateOperatorExternalId:
           type: string
+        updateTraceId:
+          type: string
     TransferDTO:
       required:
         - amountCents
@@ -1172,6 +1178,8 @@ components:
           type: string
           format: date-time
         updateOperatorExternalId:
+          type: string
+        updateTraceId:
           type: string
     ReceiptDTO:
       type: object

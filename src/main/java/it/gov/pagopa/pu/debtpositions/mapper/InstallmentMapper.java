@@ -95,6 +95,7 @@ public class InstallmentMapper {
     installmentDTO.setCreationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()));
     installmentDTO.setUpdateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()));
     installmentDTO.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
+    installmentDTO.setUpdateTraceId(installment.getUpdateTraceId());
   }
 
   public InstallmentDTO mapToDto(Installment installment) {
@@ -130,6 +131,7 @@ public class InstallmentMapper {
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .updateOperatorExternalId(installment.getUpdateOperatorExternalId())
+      .updateTraceId(installment.getUpdateTraceId())
       .build();
   }
 

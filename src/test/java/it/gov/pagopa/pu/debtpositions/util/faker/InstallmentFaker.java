@@ -50,6 +50,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME.toLocalDateTime())
       .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .noPII(buildInstallmentNoPII())
       .build();
   }
@@ -85,6 +86,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME.toLocalDateTime())
       .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
   }
@@ -153,6 +155,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME)
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .build();
   }
 

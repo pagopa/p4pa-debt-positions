@@ -31,6 +31,7 @@ public class PaymentOptionFaker {
     paymentOption.setCreationDate(DATETIME.toLocalDateTime());
     paymentOption.setUpdateDate(DATETIME.toLocalDateTime());
     paymentOption.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    paymentOption.setUpdateTraceId("TRACEID");
     paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildInstallmentNoPII()))));
     return paymentOption;
   }
@@ -47,6 +48,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setCreationDate(DATETIME);
     paymentOptionDTO.setUpdateDate(DATETIME);
     paymentOptionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    paymentOptionDTO.setUpdateTraceId("TRACEID");
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
     return paymentOptionDTO;
   }

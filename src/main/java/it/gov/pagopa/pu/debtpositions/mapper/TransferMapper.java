@@ -54,6 +54,7 @@ public class TransferMapper {
     transferDTO.setCreationDate(localDatetimeToOffsetDateTime(transfer.getCreationDate()));
     transferDTO.setUpdateDate(localDatetimeToOffsetDateTime(transfer.getUpdateDate()));
     transferDTO.setUpdateOperatorExternalId(transfer.getUpdateOperatorExternalId());
+    transferDTO.setUpdateTraceId(transfer.getUpdateTraceId());
   }
 
 }

@@ -29,6 +29,7 @@ public class TransferFaker {
     transfer.setCreationDate(DATETIME.toLocalDateTime());
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    transfer.setUpdateTraceId("TRACEID");
     return transfer;
   }
 
@@ -50,6 +51,7 @@ public class TransferFaker {
       .creationDate(DATETIME)
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .build();
   }
 

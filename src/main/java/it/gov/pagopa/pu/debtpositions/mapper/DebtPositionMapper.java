@@ -85,6 +85,7 @@ public class DebtPositionMapper {
     debtPositionDTO.setCreationDate(localDatetimeToOffsetDateTime(debtPosition.getCreationDate()));
     debtPositionDTO.setUpdateDate(localDatetimeToOffsetDateTime(debtPosition.getUpdateDate()));
     debtPositionDTO.setUpdateOperatorExternalId(debtPosition.getUpdateOperatorExternalId());
+    debtPositionDTO.setUpdateTraceId(debtPosition.getUpdateTraceId());
   }
 
   public PagedDebtPositions mapToPagedDebtPositions(Page<DebtPosition> pagedDebtPositionsDTO) {

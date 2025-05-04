@@ -82,6 +82,7 @@ public class PaymentOptionMapper {
     paymentOptionDTO.setCreationDate(localDatetimeToOffsetDateTime(paymentOption.getCreationDate()));
     paymentOptionDTO.setUpdateDate(localDatetimeToOffsetDateTime(paymentOption.getUpdateDate()));
     paymentOptionDTO.setUpdateOperatorExternalId(paymentOption.getUpdateOperatorExternalId());
+    paymentOptionDTO.setUpdateTraceId(paymentOption.getUpdateTraceId());
   }
 
 }

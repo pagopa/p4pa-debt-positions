@@ -47,6 +47,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private String updateOperatorExternalId;
+  private String updateTraceId;
 
   @JsonIgnore
   private InstallmentNoPII noPII;

@@ -52,6 +52,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setCreationDate(fullDTO.getCreationDate());
     noPII.setUpdateDate(fullDTO.getUpdateDate());
     noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
+    noPII.setUpdateTraceId(fullDTO.getUpdateTraceId());
     noPII.setTransfers(new TreeSet<>(fullDTO.getTransfers()));
 
     return noPII;
@@ -92,6 +93,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .creationDate(noPii.getCreationDate())
       .updateDate(noPii.getUpdateDate())
       .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
+      .updateTraceId(noPii.getUpdateTraceId())
       .debtor(pii.getDebtor())
       .transfers(Optional.ofNullable(noPii.getTransfers()).map(List::copyOf).orElse(List.of()))
       .noPII(noPii)
