@@ -4,9 +4,12 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentServiceImpl;
@@ -132,13 +135,19 @@ class DebtPositionDeletionServiceImplTest {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(false).build();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setStatus(DebtPositionStatus.UNPAID);
-    debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
+    InstallmentNoPII installment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installment.setIun(null);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setSyncStatus(null);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.setSyncStatus(null);
 
     Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
     Mockito.when(debtPositionServiceMock.mapDebtPosition(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
-        List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
+        List.of(installmentDTO), wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW);
 
     WorkflowCreatedDTO result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);

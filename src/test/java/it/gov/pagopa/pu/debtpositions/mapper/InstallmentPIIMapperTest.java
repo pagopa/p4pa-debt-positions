@@ -85,6 +85,7 @@ class InstallmentPIIMapperTest {
   void testMapInstallmentNoPII() {
     //given
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    installmentNoPII.getSyncStatus().setSyncError("DUMMY");
     InstallmentPIIDTO installmentPIIDTO = buildInstallmentPIIDTO();
     Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
 

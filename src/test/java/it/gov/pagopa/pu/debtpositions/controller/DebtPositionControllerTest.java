@@ -32,7 +32,6 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -95,19 +94,19 @@ class DebtPositionControllerTest {
     Long id = 1L;
     InstallmentStatus newStatus = InstallmentStatus.TO_SYNC;
 
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
-    IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
+    Map<String, SyncCompleteDTO> iupd2finalize = Map.of("iud", SyncCompleteDTO.builder()
       .newStatus(newStatus)
-      .build();
+      .build());
+    Map<String, SyncErrorDTO> iupdSyncError = Map.of("iud2", new SyncErrorDTO("SYNCERROR"));
 
-    syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
+    SyncStatusUpdateRequestDTO requestDTO = new SyncStatusUpdateRequestDTO(iupd2finalize, iupdSyncError);
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(id, syncStatusDTO)).thenReturn(buildDebtPositionDTO());
+    Mockito.when(debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(id, requestDTO)).thenReturn(buildDebtPositionDTO());
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/finalize-sync-status")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(syncStatusDTO)))
+          .content(objectMapper.writeValueAsString(requestDTO)))
       .andExpect(status().isOk())
       .andReturn();
 

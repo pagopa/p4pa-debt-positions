@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign;
 
+import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
@@ -7,11 +8,14 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker;
+import it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
@@ -25,10 +29,12 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
@@ -82,21 +88,23 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenFinalizeSyncStatusThenOk() {
     Long debtPositionId = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = buildTestDebtPosition();
+    BaseInstallment installmentSyncError = debtPosition.getPaymentOptions().getFirst().getInstallments().getLast();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
-    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(100L, newStatus);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(100L, newStatus, null);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(101L, installmentSyncError.getStatus(), new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID, "SYNCERROR"));
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
     Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().syncStatus(null);
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.syncStatus(null);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = Map.of("iud", IupdSyncStatusUpdateDTO.builder()
-      .newStatus(newStatus)
-      .build());
+    SyncStatusUpdateRequestDTO requestDTO = buildSyncStatusUpdateRequest("iud", "iud2", newStatus);
 
-    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, syncStatusDTO);
+    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, requestDTO);
 
     assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     assertEquals(PaymentOptionStatus.UNPAID, result.getPaymentOptions().getFirst().getStatus());
@@ -105,12 +113,31 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     reflectionEqualsByName(debtPositionDTO, result);
   }
 
+  private DebtPosition buildTestDebtPosition() {
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    InstallmentNoPII installmentSyncError = InstallmentFaker.buildInstallmentNoPII();
+    installmentSyncError.setInstallmentId(101L);
+    installmentSyncError.setIud("iud2");
+    debtPosition.getPaymentOptions().getFirst().getInstallments().add(installmentSyncError);
+    return debtPosition;
+  }
+
+  private SyncStatusUpdateRequestDTO buildSyncStatusUpdateRequest(String iud2finalize, String iud2error, InstallmentStatus newStatus) {
+    Map<String, SyncCompleteDTO> iupd2finalize = Map.of(iud2finalize, SyncCompleteDTO.builder()
+      .newStatus(newStatus)
+      .build());
+    Map<String, SyncErrorDTO> iupdSyncError = Map.of(iud2error, new SyncErrorDTO("SYNCERROR"));
+
+    return new SyncStatusUpdateRequestDTO(iupd2finalize, iupdSyncError);
+  }
+
   @Test
   void givenFinalizeSyncStatusWhenIsNotSyncThenDoNotUpdateStatus() {
     Long debtPositionId = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = buildTestDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
+    debtPosition.getPaymentOptions().getFirst().getInstallments().getLast().setStatus(InstallmentStatus.PAID);
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
 
@@ -118,14 +145,9 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doReturn(expectedResult)
       .when(service).alignHierarchyStatusAndRemap(Mockito.same(debtPosition));
 
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
-    IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
-      .newStatus(newStatus)
-      .build();
+    SyncStatusUpdateRequestDTO requestDTO = buildSyncStatusUpdateRequest("iud", "iud2", newStatus);
 
-    syncStatusDTO.put("iud", iupdSyncStatusUpdateDTO);
-
-    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, syncStatusDTO);
+    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, requestDTO);
 
     assertSame(expectedResult, result);
   }
@@ -134,7 +156,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenFinalizeSyncStatusWhenDoesNotHaveIudThenDoNotUpdateStatus() {
     Long debtPositionId = 1L;
     InstallmentStatus newStatus = InstallmentStatus.UNPAID;
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = buildTestDebtPosition();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
 
@@ -142,14 +164,9 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Mockito.doReturn(expectedResult)
       .when(service).alignHierarchyStatusAndRemap(Mockito.same(debtPosition));
 
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
-    IupdSyncStatusUpdateDTO iupdSyncStatusUpdateDTO = IupdSyncStatusUpdateDTO.builder()
-      .newStatus(newStatus)
-      .build();
+    SyncStatusUpdateRequestDTO requestDTO = buildSyncStatusUpdateRequest("DUMMY", "DUMMY2", newStatus);
 
-    syncStatusDTO.put("fake-iud", iupdSyncStatusUpdateDTO);
-
-    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, syncStatusDTO);
+    DebtPositionDTO result = service.finalizeSyncStatus(debtPositionId, requestDTO);
 
     assertSame(expectedResult, result);
   }
@@ -157,11 +174,11 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   @Test
   void givenFinalizeSyncStatusWhenDebtPositionNotFoundThenThrowsException() {
     Long debtPositionId = 1L;
-    Map<String, IupdSyncStatusUpdateDTO> syncStatusDTO = new HashMap<>();
+    SyncStatusUpdateRequestDTO request = new SyncStatusUpdateRequestDTO();
 
     Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
 
-    assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(debtPositionId, syncStatusDTO),
+    assertThrows(NotFoundException.class, () -> service.finalizeSyncStatus(debtPositionId, request),
       "Debt position related to the id 1 does not found");
   }
 
@@ -186,7 +203,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(debtPosition);
@@ -202,7 +219,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
@@ -230,7 +247,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     InstallmentNoPII reportedInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
     reportedInstallment.setStatus(InstallmentStatus.PAID);
     reportedInstallment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
@@ -279,7 +296,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenCheckAndUpdateInstallmentExpirationWhenInstallmentIsInvalidThenOk() {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.INVALID);
 
     DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
@@ -305,7 +322,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.of(2025, 1, 1);
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     InstallmentNoPII expiredInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
     expiredInstallment.setStatus(InstallmentStatus.UNPAID);
     expiredInstallment.setDueDate(dueDate);
@@ -327,7 +344,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertEquals(InstallmentStatus.EXPIRED, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
     assertSame(workflow, result.getRight());
 
-    verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED);
+    verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED, null);
   }
 
   @Test
@@ -335,7 +352,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.now().plusDays(2);
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
 
@@ -361,7 +378,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsNullNowThenOk() {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(null);
 

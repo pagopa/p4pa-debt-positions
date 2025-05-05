@@ -31,7 +31,7 @@ public class InstallmentEntityExtendedController implements InstallmentsEntityEx
     if(syncStatusFrom!=null && syncStatusTo!=null){
       syncStatus = new InstallmentSyncStatus(syncStatusFrom, syncStatusTo);
     }
-    repository.updateStatusAndToSyncStatus(installmentId, status, syncStatus);
+    repository.updateStatus(installmentId, status, syncStatus);
     return ResponseEntity.ok().build();
   }
 
