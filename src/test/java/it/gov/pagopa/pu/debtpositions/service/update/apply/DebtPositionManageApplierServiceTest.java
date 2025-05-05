@@ -86,7 +86,7 @@ class DebtPositionManageApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
             () -> applier.merge(updatedInstallment, storedInstallment));
-    assertEquals("These fields for transfer with index 2 of installment having id 100 are not mutable: [orgFiscalCode, orgName]", exception.getMessage());
+    assertEquals("These fields for transfer with index 1 of installment having id 100 are not mutable: [orgFiscalCode, orgName]", exception.getMessage());
   }
 
 }

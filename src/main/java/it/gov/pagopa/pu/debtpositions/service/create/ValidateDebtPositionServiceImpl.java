@@ -15,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidIban;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
@@ -23,6 +25,7 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
 @Service
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
+  public static final int TRANSFER_INDEX_MAX_SIZE = 5;
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
@@ -131,20 +134,28 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("At least one transfer is mandatory for installment");
     }
 
-    if(transferDTOList.size() > 5){
+    if(transferDTOList.size() > TRANSFER_INDEX_MAX_SIZE){
       throw new InvalidValueException("At most 5 transfers is allowed for installment");
     }
 
+    Set<Integer> transferIndexes = HashSet.newHashSet(transferDTOList.size());
     transferDTOList.forEach(transferDTO -> {
+      Integer index = transferDTO.getTransferIndex();
+      if(!transferIndexes.add(index)){
+        throw new InvalidValueException("Transfer index duplicated: " + index);
+      }
+      if(index < 1 || index > TRANSFER_INDEX_MAX_SIZE){
+        throw new InvalidValueException("Transfer index should be between 1 and " + TRANSFER_INDEX_MAX_SIZE + ", provided: " + index);
+      }
       if(transferDTO.getAmountCents() <= 0) {
-        throw new InvalidValueException("The amount of transfer with index " + transferDTO.getTransferIndex() + " must be greater than 0");
+        throw new InvalidValueException("The amount of transfer with index " + index + " must be greater than 0");
       }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
         !isValidPIVA(transferDTO.getOrgFiscalCode())) {
-        throw new InvalidValueException("Fiscal code of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+        throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
       if (!isValidIban(transferDTO.getIban())) {
-        throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+        throw new InvalidValueException("Iban of transfer with index " + index + " is not valid");
       }
       checkTaxonomyCategory(transferDTO, accessToken);
     });
