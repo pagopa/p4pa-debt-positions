@@ -315,9 +315,23 @@ class DebtPositionControllerTest {
     mockMvc.perform(
         delete("/debt-positions/" + debtPositionId)
           .contentType(MediaType.APPLICATION_JSON_VALUE))
-      .andExpect(status().isNoContent())
+      .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
+      .andReturn();
+  }
+
+  @Test
+  void whenDeleteDraftDebtPositionThenOk() throws Exception {
+    Long debtPositionId = 1L;
+
+    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
+      .thenReturn(null);
+
+    mockMvc.perform(
+        delete("/debt-positions/" + debtPositionId)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isNoContent())
       .andReturn();
   }
 }

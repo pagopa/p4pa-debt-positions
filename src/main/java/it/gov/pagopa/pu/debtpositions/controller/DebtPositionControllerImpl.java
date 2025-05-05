@@ -172,10 +172,16 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
     WorkflowCreatedDTO workflow = debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, operatorExternalUserId);
-    return ResponseEntity
-      .status(HttpStatus.NO_CONTENT)
-      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
-      .header(HEADER_X_RUN_ID, workflow.getRunId())
-      .build();
+    if(workflow != null) {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+        .header(HEADER_X_RUN_ID, workflow.getRunId())
+        .build();
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+    }
   }
 }
