@@ -37,6 +37,8 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   @Enumerated(EnumType.STRING)
   @NotNull
   private InstallmentStatus status;
+  @Embedded
+  private InstallmentSyncStatus syncStatus;
   private String iupdPagopa;
   @NotNull
   private String iud;
@@ -60,8 +62,6 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private PersonEntityType debtorEntityType;
   @NotNull
   private byte[] debtorFiscalCodeHash;
-  @Embedded
-  private InstallmentSyncStatus syncStatus;
   private OffsetDateTime notificationDate;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;

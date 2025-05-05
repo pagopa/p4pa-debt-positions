@@ -56,7 +56,7 @@ class InstallmentEntityExtendedControllerTest {
     controller.updateStatusAndToSyncStatus(installmentId, InstallmentStatus.UNPAID, null, null);
 
     // Then
-    verify(repositoryMock).updateStatusAndToSyncStatus(installmentId, InstallmentStatus.UNPAID, null);
+    verify(repositoryMock).updateStatus(installmentId, InstallmentStatus.UNPAID, null);
   }
 
   @Test
@@ -69,7 +69,7 @@ class InstallmentEntityExtendedControllerTest {
     controller.updateStatusAndToSyncStatus(installmentId, InstallmentStatus.TO_SYNC, syncStatus.getSyncStatusFrom(), syncStatus.getSyncStatusTo());
 
     // Then
-    verify(repositoryMock).updateStatusAndToSyncStatus(installmentId, InstallmentStatus.TO_SYNC, syncStatus);
+    verify(repositoryMock).updateStatus(installmentId, InstallmentStatus.TO_SYNC, syncStatus);
   }
 
   @Test

@@ -27,7 +27,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @RestResource(exported = false)
   @Transactional
   @Modifying
-  @Query("UPDATE InstallmentNoPII i SET i.status = :status i.syncStatus = : syncStatus WHERE i.installmentId = :installmentId")
+  @Query("UPDATE InstallmentNoPII i SET i.status = :status, i.syncStatus = :syncStatus WHERE i.installmentId = :installmentId")
   @ApiResponse(responseCode = "200", description = "Status updated successfully")
   void updateStatus(Long installmentId, InstallmentStatus status, InstallmentSyncStatus syncStatus);
 
@@ -42,16 +42,6 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.iun = :iun WHERE i.installmentId = :installmentId")
   void updateIun(Long installmentId, String iun);
-
-  @Transactional
-  @RestResource(exported = false)
-  @Modifying
-  @Query("""
-    UPDATE InstallmentNoPII i SET i.status = :status,
-    i.syncStatus = :syncStatus
-    WHERE i.installmentId = :installmentId
-    """)
-  void updateStatusAndToSyncStatus(Long installmentId, InstallmentStatus status, InstallmentSyncStatus syncStatus);
 
   @RestResource(exported = false)
   @Transactional
