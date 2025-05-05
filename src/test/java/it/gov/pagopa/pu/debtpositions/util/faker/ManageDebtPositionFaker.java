@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ManageInstallmentDTO;
 
@@ -26,21 +27,21 @@ public class ManageDebtPositionFaker {
   public static ManageInstallmentDTO buildManageInsertInstallmentDTO() {
     return ManageInstallmentDTO.builder()
       .action(ManageInstallmentDTO.ActionEnum.I)
-      .installment(buildInstallmentDTO().installmentId(1L).iud("iud1"))
+      .installment(buildInstallmentDTO().installmentId(1L).iud("iud1").status(InstallmentStatus.UNPAID).syncStatus(null))
       .build();
   }
 
   public static ManageInstallmentDTO buildManageUpdateInstallmentDTO() {
     return ManageInstallmentDTO.builder()
       .action(ManageInstallmentDTO.ActionEnum.M)
-      .installment(buildInstallmentDTO().installmentId(2L))
+      .installment(buildInstallmentDTO().installmentId(2L).status(InstallmentStatus.UNPAID).syncStatus(null))
       .build();
   }
 
   public static ManageInstallmentDTO buildManageCancelInstallmentDTO() {
     return ManageInstallmentDTO.builder()
       .action(ManageInstallmentDTO.ActionEnum.A)
-      .installment(buildInstallmentDTO().installmentId(3L))
+      .installment(buildInstallmentDTO().installmentId(3L).status(InstallmentStatus.UNPAID).syncStatus(null))
       .build();
   }
 }

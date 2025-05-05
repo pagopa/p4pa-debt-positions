@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -159,11 +160,16 @@ class DebtPositionManageInstallmentsServiceImplTest {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(false).build();
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    InstallmentDTO installment2insert = buildInstallmentDTO().installmentId(1L).iud("iud1");
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()
+      .status(InstallmentStatus.UNPAID).syncStatus(null);
+    InstallmentDTO installment2insert = buildInstallmentDTO().installmentId(1L).iud("iud1")
+      .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2insert);
-    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iud("iud2");
+    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iud("iud2")
+      .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
-    InstallmentDTO installment2cancel = buildInstallmentDTO().installmentId(3L).iud("iud3");
+    InstallmentDTO installment2cancel = buildInstallmentDTO().installmentId(3L).iud("iud3")
+      .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2cancel);
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId))
@@ -176,7 +182,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_CANCEL);
 
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString(), Mockito.anyString()))
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_UPDATED, "IUD:iud1,iud2,iud3", ACCESS_TOKEN))
       .thenReturn(WORKFLOW);
 
     Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);

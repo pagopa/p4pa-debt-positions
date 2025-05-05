@@ -19,11 +19,17 @@ import java.io.Serializable;
 @Builder
 public class InstallmentSyncStatus implements Serializable {
 
+  public InstallmentSyncStatus(InstallmentStatus from, InstallmentStatus to){
+    this.syncStatusFrom = from;
+    this.syncStatusTo = to;
+  }
+
   @NotNull
   @Enumerated(EnumType.STRING)
   private InstallmentStatus syncStatusFrom;
   @NotNull
   @Enumerated(EnumType.STRING)
   private InstallmentStatus syncStatusTo;
+  private String syncError;
 
 }

@@ -1480,13 +1480,32 @@ components:
         - DRAFT
     SyncStatusUpdateRequestDTO:
       type: object
-      additionalProperties:
-        $ref: "#/components/schemas/IupdSyncStatusUpdateDTO"
-    IupdSyncStatusUpdateDTO:
+      required:
+        - iupd2finalize
+        - iupdSyncError
+      properties:
+        iupd2finalize:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SyncCompleteDTO"
+        iupdSyncError:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SyncErrorDTO"
+    SyncCompleteDTO:
       type: object
+      required:
+        - newStatus
       properties:
         newStatus:
           $ref: "#/components/schemas/InstallmentStatus"
+    SyncErrorDTO:
+      type: object
+      required:
+        - error_description
+      properties:
+        error_description:
+          type: string
     DebtPositionErrorDTO:
       type: object
       required:
