@@ -84,6 +84,16 @@ class DebtPositionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is UNPAID when all paymentOptions are EXPIRED, with at least one UNPAID.
+   */
+  @Test
+  void testDeterminePaymentOptionStatus_Unpaid3() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.EXPIRED);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.UNPAID, result);
+  }
+
+  /**
    * Test if the status is PAID when all paymentOptions are PAID.
    */
   @Test

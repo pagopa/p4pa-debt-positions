@@ -30,7 +30,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
 
-    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus);
+    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus, expiredStatus);
     this.emptyAllowedStatuses = Set.of();
   }
 
