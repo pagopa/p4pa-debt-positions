@@ -65,7 +65,7 @@ public class ManagePaidDebtPositionService {
     log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
     WorkflowCreatedDTO workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO), accessToken);
     if (workflow != null) {
-      log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId());
+      log.info("Workflow creation OK for debtPositionId[{}}: workflowId[{}] runId[{}]", debtPositionDTO.getDebtPositionId(), workflow.getWorkflowId(), workflow.getRunId());
     } else {
       log.warn("Workflow creation KO for debtPositionId[{}]: received null response", debtPositionDTO.getDebtPositionId());
     }

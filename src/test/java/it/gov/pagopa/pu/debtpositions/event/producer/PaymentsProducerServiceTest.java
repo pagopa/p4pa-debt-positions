@@ -2,8 +2,10 @@ package it.gov.pagopa.pu.debtpositions.event.producer;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.dto.PaymentEventDTO;
-import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.debtpositions.util.UtilitiesTest;
 import it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,8 +32,13 @@ class PaymentsProducerServiceTest {
   private PaymentsProducerService paymentsProducerService;
 
   @BeforeEach
-  public void setUp() {
+  void setUp() {
     paymentsProducerService = new PaymentsProducerService(streamBridge);
+  }
+
+  @AfterEach
+  void clear(){
+    UtilitiesTest.clearTraceIdContext();
   }
 
   @Test
@@ -40,6 +47,8 @@ class PaymentsProducerServiceTest {
     DebtPositionDTO debtPosition = DebtPositionFaker.buildDebtPositionDTO();
     PaymentEventType eventType = PaymentEventType.RT_RECEIVED;
     String eventDescription = "EVENTDESCRIPTION";
+    String traceId = "TRACEID";
+    UtilitiesTest.setTraceId(traceId);
 
     // When
     paymentsProducerService.notifyPaymentsEvent(debtPosition, eventType, eventDescription);
@@ -52,6 +61,7 @@ class PaymentsProducerServiceTest {
         PaymentEventDTO payload = (PaymentEventDTO) m.getPayload();
         String eventIdPrefix = eventType.name() + debtPosition.getDebtPositionId();
         Assertions.assertEquals(eventIdPrefix, payload.getEventId().substring(0, eventIdPrefix.length()));
+        Assertions.assertEquals(traceId, payload.getTraceId());
         Assertions.assertSame(debtPosition, payload.getPayload());
         Assertions.assertSame(eventType, payload.getEventType());
         Assertions.assertTrue(Duration.between(payload.getEventDateTime(), OffsetDateTime.now()).toSeconds() <=5);

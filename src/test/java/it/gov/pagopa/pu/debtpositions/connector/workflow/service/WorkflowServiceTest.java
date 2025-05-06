@@ -44,7 +44,7 @@ class WorkflowServiceTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     PaymentEventType paymentEventType = PaymentEventType.DP_CREATED;
     String eventDescription = "EVENTDESCRIPTION";
-    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1");
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1", "runId");
 
     Mockito.when(workflowApiClientMock.syncDebtPosition(Mockito.same(debtPositionDTO), Mockito.same(wfExecutionParameters), Mockito.same(paymentEventType), Mockito.same(eventDescription), Mockito.same(accessToken)))
       .thenReturn(expectedResult);

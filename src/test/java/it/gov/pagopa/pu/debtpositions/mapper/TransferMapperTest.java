@@ -29,8 +29,8 @@ class TransferMapperTest {
 
     Transfer result = transferMapper.mapToModel(transferDTO);
 
-    reflectionEqualsByName(transferExpected, result, "creationDate", "updateDate", "updateOperatorExternalId");
-    checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId");
+    reflectionEqualsByName(transferExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 
   @Test

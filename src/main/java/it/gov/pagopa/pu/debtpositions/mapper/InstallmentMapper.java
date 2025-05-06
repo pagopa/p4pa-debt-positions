@@ -36,6 +36,7 @@ public class InstallmentMapper {
     installment.setIur(dto.getIur());
     installment.setIuf(dto.getIuf());
     installment.setNav(dto.getNav());
+    installment.setIun(dto.getIun());
     installment.setDueDate(dto.getDueDate());
     installment.setNotificationFeeCents(dto.getNotificationFeeCents());
     installment.setAmountCents(dto.getAmountCents());
@@ -68,6 +69,7 @@ public class InstallmentMapper {
       .iur(installment.getIur())
       .iuf(installment.getIuf())
       .nav(installment.getNav())
+      .iun(installment.getIun())
       .dueDate(installment.getDueDate())
       .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
@@ -93,6 +95,7 @@ public class InstallmentMapper {
     installmentDTO.setCreationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()));
     installmentDTO.setUpdateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()));
     installmentDTO.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
+    installmentDTO.setUpdateTraceId(installment.getUpdateTraceId());
   }
 
   public InstallmentDTO mapToDto(Installment installment) {
@@ -110,6 +113,7 @@ public class InstallmentMapper {
       .iur(installment.getIur())
       .iuf(installment.getIuf())
       .nav(installment.getNav())
+      .iun(installment.getIun())
       .dueDate(installment.getDueDate())
       .notificationFeeCents(installment.getNotificationFeeCents())
       .amountCents(installment.getAmountCents())
@@ -127,6 +131,7 @@ public class InstallmentMapper {
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
       .updateOperatorExternalId(installment.getUpdateOperatorExternalId())
+      .updateTraceId(installment.getUpdateTraceId())
       .build();
   }
 

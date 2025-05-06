@@ -32,7 +32,6 @@ public class PaymentOption extends BaseEntity implements BasePaymentOption, Seri
   @Enumerated(EnumType.STRING)
   @NotNull
   private PaymentOptionStatus status;
-  @NotNull
   private String description;
   @Enumerated(EnumType.STRING)
   @NotNull

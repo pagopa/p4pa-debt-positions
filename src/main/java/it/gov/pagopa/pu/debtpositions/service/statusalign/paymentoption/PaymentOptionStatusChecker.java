@@ -17,9 +17,9 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   private final PaymentOptionRepository paymentOptionRepository;
 
   public PaymentOptionStatusChecker(PaymentOptionRepository paymentOptionRepository) {
-    super(InstallmentStatus.TO_SYNC, InstallmentStatus.PAID, InstallmentStatus.UNPAID,
-      InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED, InstallmentStatus.INVALID,
-      InstallmentStatus.REPORTED);
+    super(InstallmentStatus.TO_SYNC, InstallmentStatus.PAID, InstallmentStatus.DRAFT,
+      InstallmentStatus.UNPAID, InstallmentStatus.UNPAYABLE, InstallmentStatus.EXPIRED, InstallmentStatus.CANCELLED,
+      InstallmentStatus.INVALID, InstallmentStatus.REPORTED);
     this.paymentOptionRepository = paymentOptionRepository;
   }
 
@@ -29,8 +29,8 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
       return TO_SYNC;
     } else if (isPartiallyPaid(installmentStatusList)) {
       return PaymentOptionStatus.PARTIALLY_PAID;
-    } else if (isUnpayable(installmentStatusList)) {
-      return PaymentOptionStatus.UNPAYABLE;
+    } else if (isDraft(installmentStatusList)) {
+      return PaymentOptionStatus.DRAFT;
     } else if (isUnpaid(installmentStatusList)) {
       return PaymentOptionStatus.UNPAID;
     } else if (isPaid(installmentStatusList)) {
@@ -39,6 +39,8 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
       return PaymentOptionStatus.REPORTED;
     } else if (isInvalid(installmentStatusList)) {
       return PaymentOptionStatus.INVALID;
+    } else if (isUnpayable(installmentStatusList)) {
+      return PaymentOptionStatus.UNPAYABLE;
     } else if (isCancelled(installmentStatusList)) {
       return PaymentOptionStatus.CANCELLED;
     } else if (isExpired(installmentStatusList)) {
@@ -69,10 +71,6 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   protected boolean isPartiallyPaid(List<InstallmentStatus> childrenStatusList) {
     return (childrenStatusList.contains(InstallmentStatus.PAID) || childrenStatusList.contains(InstallmentStatus.REPORTED)) &&
       (childrenStatusList.contains(InstallmentStatus.UNPAID) || childrenStatusList.contains(InstallmentStatus.EXPIRED));
-  }
-
-  protected boolean isUnpayable(List<InstallmentStatus> childrenStatusList) {
-    return allMatch(childrenStatusList, InstallmentStatus.UNPAYABLE, allowedCancelledStatuses);
   }
 
   private boolean isInvalid(List<InstallmentStatus> childrenStatusList) {

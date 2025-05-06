@@ -47,6 +47,7 @@ public class Receipt implements FullPIIDTO<ReceiptNoPII, ReceiptPIIDTO> {
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private String updateOperatorExternalId;
+  private String updateTraceId;
 
   @JsonIgnore
   private ReceiptNoPII noPII;

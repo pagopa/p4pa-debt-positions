@@ -10,23 +10,29 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   private final E syncStatus;
   private final E paidStatus;
+  private final E draftStatus;
   private final E unpaidStatus;
+  private final E unpayableStatus;
   private final E expiredStatus;
   private final E cancelledStatus;
   private final E reportedStatus;
+  private final E invalidStatus;
 
   protected final Set<E> allowedCancelledStatuses;
   protected final Set<E> emptyAllowedStatuses;
 
-  protected StatusRulesHandler(E syncStatus, E paidStatus, E unpaidStatus, E expiredStatus, E cancelledStatus, E invalidStatus, E reportedStatus) {
+  protected StatusRulesHandler(E syncStatus, E paidStatus, E draftStatus, E unpaidStatus, E unpayableStatus, E expiredStatus, E cancelledStatus, E invalidStatus, E reportedStatus) {
     this.syncStatus = syncStatus;
     this.paidStatus = paidStatus;
+    this.draftStatus = draftStatus;
     this.unpaidStatus = unpaidStatus;
+    this.unpayableStatus = unpayableStatus;
     this.expiredStatus = expiredStatus;
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
+    this.invalidStatus = invalidStatus;
 
-    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus);
+    this.allowedCancelledStatuses = getAllowedCancelledStatuses();
     this.emptyAllowedStatuses = Set.of();
   }
 
@@ -47,6 +53,10 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   protected abstract void storeStatus(T entity, D newStatus);
 
+  protected Set<E> getAllowedCancelledStatuses() {
+    return Set.of(cancelledStatus, invalidStatus, unpayableStatus);
+  }
+
   public boolean isToSync(List<E> childrenStatusList) {
     return childrenStatusList.contains(syncStatus);
   }
@@ -55,6 +65,14 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   public boolean isUnpaid(List<E> childrenStatusList) {
     return allMatch(childrenStatusList, unpaidStatus, allowedCancelledStatuses);
+  }
+
+  public boolean isUnpayable(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, unpayableStatus, allowedCancelledStatuses);
+  }
+
+  public boolean isDraft(List<E> childrenStatusList) {
+    return allMatch(childrenStatusList, draftStatus, emptyAllowedStatuses);
   }
 
   public boolean isPaid(List<E> childrenStatusList) {

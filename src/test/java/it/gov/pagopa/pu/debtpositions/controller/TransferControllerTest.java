@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -53,16 +54,18 @@ class TransferControllerTest {
   void whenNotifyReportedTransferIdThenOk() throws Exception {
     Long transferId = 1L;
     TransferReportedRequest request = new TransferReportedRequest("IUF");
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
-      .thenReturn(Pair.of(buildDebtPositionDTO(), "workflowId"));
+      .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
         put("/transfers/1/reported")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
-      .andExpect(header().string("x-workflow-id", "workflowId"))
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);

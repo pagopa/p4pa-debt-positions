@@ -67,7 +67,7 @@ public abstract class BaseDebtPositionOperationService {
    */
 
   @Transactional
-  public String execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
+  public WorkflowCreatedDTO execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                                WfExecutionParameters wfExecutionParameters, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
     Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
@@ -86,18 +86,15 @@ public abstract class BaseDebtPositionOperationService {
     return invokeWorkflow(debtPositionDTO, eventType, installments2operate, accessToken, wfExecutionParameters);
   }
 
-  protected String invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
+  protected WorkflowCreatedDTO invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
-      WorkflowCreatedDTO workflowCreatedDTO = debtPositionSyncService.syncDebtPosition(
+      return debtPositionSyncService.syncDebtPosition(
         debtPositionDTO,
         wfExecutionParameters,
         eventType,
         "IUD:" + installments2operate.stream().map(InstallmentDTO::getIud).collect(Collectors.joining(",")),
         accessToken);
-      if (workflowCreatedDTO != null) {
-        return workflowCreatedDTO.getWorkflowId();
-      }
     }
     return null;
   }

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.config.BaseEntityListener;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
@@ -20,7 +21,7 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @AllArgsConstructor
 @NoArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
+@EntityListeners({AuditingEntityListener.class, BaseEntityListener.class})
 public abstract class BaseEntity implements Serializable {
   @Column(updatable = false)
   @CreatedDate
@@ -29,4 +30,5 @@ public abstract class BaseEntity implements Serializable {
   private LocalDateTime updateDate;
   @LastModifiedBy
   private String updateOperatorExternalId;
+  private String updateTraceId;
 }

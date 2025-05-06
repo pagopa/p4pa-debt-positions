@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -44,7 +45,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
-    String workflowId = "workflowId";
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
@@ -54,11 +55,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(workflowId);
+      .thenReturn(expectedResult);
 
-    String result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
-    assertEquals(workflowId, result);
+    assertSame(expectedResult, result);
   }
 
   @Test
@@ -112,7 +113,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     installmentSynchronizeDTO.setIngestionFlowFileLineNumber(100L);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    String result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertNull(result);
   }
@@ -170,7 +171,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
-    String workflowId = "workflowId";
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
@@ -182,11 +183,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(workflowId);
+      .thenReturn(expectedResult);
 
-    String result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
-    assertEquals(workflowId, result);
+    assertSame(expectedResult, result);
   }
 
   @Test
@@ -194,7 +195,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
-    String workflowId = "workflowId";
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
@@ -207,10 +208,10 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
-      .thenReturn(workflowId);
+      .thenReturn(expectedResult);
 
-    String result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO result = installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
-    assertEquals(workflowId, result);
+    assertSame(expectedResult, result);
   }
 }

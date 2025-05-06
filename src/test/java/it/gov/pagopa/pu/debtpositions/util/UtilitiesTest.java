@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.slf4j.MDC;
 
 import java.math.BigDecimal;
 import java.time.OffsetDateTime;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class UtilitiesTest {
+public class UtilitiesTest {
 
   @Test
   void testIbanInvalid(){
@@ -130,5 +131,26 @@ class UtilitiesTest {
     Utilities.checkImmutableField("expectedDiffer", o1, o2.concat("1"), result);
 
     Assertions.assertEquals(List.of("expectedDiffer"), result);
+  }
+
+  @Test
+  void testGetTraceId(){
+    // Given
+    String expectedResult = "TRACEID";
+    setTraceId(expectedResult);
+
+    // When
+    String result = Utilities.getTraceId();
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+    clearTraceIdContext();
+  }
+
+  public static void setTraceId(String traceId) {
+    MDC.put("traceId", traceId);
+  }
+  public static void clearTraceIdContext(){
+    MDC.clear();
   }
 }

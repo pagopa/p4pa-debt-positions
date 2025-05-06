@@ -58,9 +58,19 @@ class DebtPositionStatusCheckerTest {
    */
   @Test
   void testCalculateNewStatus_Unpaid() {
-    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAID);
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAID, PaymentOptionStatus.UNPAYABLE);
     DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
     assertEquals(DebtPositionStatus.UNPAID, result);
+  }
+
+  /**
+   * Test if the status is DRAFT when all paymentOptions are DRAFT.
+   */
+  @Test
+  void testCalculateNewStatus_Draft() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.DRAFT, PaymentOptionStatus.DRAFT);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.DRAFT, result);
   }
 
   /**
@@ -69,6 +79,16 @@ class DebtPositionStatusCheckerTest {
   @Test
   void testDeterminePaymentOptionStatus_Unpaid2() {
     List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.CANCELLED, PaymentOptionStatus.CANCELLED);
+    DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
+    assertEquals(DebtPositionStatus.UNPAID, result);
+  }
+
+  /**
+   * Test if the status is UNPAID when all paymentOptions are EXPIRED, with at least one UNPAID.
+   */
+  @Test
+  void testDeterminePaymentOptionStatus_Unpaid3() {
+    List<PaymentOptionStatus> paymentOptionStatusList = List.of(PaymentOptionStatus.UNPAID, PaymentOptionStatus.EXPIRED, PaymentOptionStatus.EXPIRED);
     DebtPositionStatus result = checker.calculateNewStatus(paymentOptionStatusList);
     assertEquals(DebtPositionStatus.UNPAID, result);
   }

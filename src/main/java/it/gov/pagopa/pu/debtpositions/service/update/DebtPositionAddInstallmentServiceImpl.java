@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
@@ -19,10 +20,12 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyS
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,13 +47,13 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
 
   @Transactional
   @Override
-  public String addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public WorkflowCreatedDTO addInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.debug("Adding new installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
 
-    String workflowId = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO workflow = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_ADDED, accessToken, operatorExternalUserId);
 
     log.debug("Added installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-    return workflowId;
+    return workflow;
   }
 
   @Override
@@ -61,16 +64,23 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
       .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
+
+    Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     debtPositionDTO.getPaymentOptions()
-      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .findFirst()
-        .ifPresent(installmentDTO -> {
-          debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO);
-          validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
-          installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
-          installmentDTO.setSyncStatus(InstallmentSyncStatus.builder().syncStatusFrom(InstallmentStatus.DRAFT).syncStatusTo(InstallmentStatus.UNPAID).build());
-        })
+      .forEach(paymentOptionDTO -> {
+          if(!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())){
+            throw new InvalidValueException("PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
+          }
+          paymentOptionDTO.getInstallments().stream()
+            .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
+            .findFirst()
+            .ifPresent(installmentDTO -> {
+              debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO);
+              validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+              installmentDTO.setStatus(InstallmentStatus.TO_SYNC);
+              installmentDTO.setSyncStatus(InstallmentSyncStatus.builder().syncStatusFrom(InstallmentStatus.DRAFT).syncStatusTo(InstallmentStatus.UNPAID).build());
+            });
+        }
       );
   }
 }

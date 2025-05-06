@@ -24,11 +24,12 @@ public class TransferFaker {
     transfer.setIban("IT60X0542811101000000123456");
     transfer.setPostalIban("123456");
     transfer.setCategory("category");
-    transfer.setTransferIndex(2);
+    transfer.setTransferIndex(1);
     transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
     transfer.setCreationDate(DATETIME.toLocalDateTime());
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    transfer.setUpdateTraceId("TRACEID");
     return transfer;
   }
 
@@ -43,13 +44,14 @@ public class TransferFaker {
       .iban("IT60X0542811101000000123456")
       .postalIban("123456")
       .category("category")
-      .transferIndex(2)
+      .transferIndex(1)
       .stampType("TYPE")
       .stampHashDocument("HASH")
       .stampProvincialResidence("PR")
       .creationDate(DATETIME)
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .build();
   }
 

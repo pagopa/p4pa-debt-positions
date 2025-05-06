@@ -44,7 +44,6 @@ class InstallmentMapperTest {
   @Test
   void givenValidInstallmentDTO_WhenMapToModel_ThenReturnInstallment() {
     Installment installmentExpected = buildInstallmentNoUpdate();
-    installmentExpected.setStatus(InstallmentStatus.UNPAID);
     InstallmentDTO installmentDTO = buildInstallmentDTO();
 
     Mockito.when(personMapperMock.mapToModel(buildPersonDTO())).thenReturn(buildPerson());
@@ -53,15 +52,16 @@ class InstallmentMapperTest {
     Installment result = installmentMapper.mapToModel(installmentDTO);
 
     reflectionEqualsByName(installmentExpected, result, "creationDate", "updateDate", "updateOperatorExternalId");
-    checkNotNullFields(result, "updateOperatorExternalId", "noPII");
+    checkNotNullFields(result, "updateOperatorExternalId", "updateTraceId", "noPII");
   }
 
   @Test
   void givenMapToDtoThenOk(){
     InstallmentDTO installmentExpected = buildInstallmentDTO();
-    installmentExpected.setStatus(InstallmentStatus.TO_SYNC);
+    installmentExpected.getSyncStatus().setSyncError("DUMMY");
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
     installmentNoPII.setTransfers(new TreeSet<>(List.of(buildTransfer())));
+    installmentNoPII.getSyncStatus().setSyncError("DUMMY");
 
     Mockito.when(personalDataServiceMock.get(123L, InstallmentPIIDTO.class)).thenReturn(buildInstallmentPIIDTO());
     Mockito.when(personMapperMock.mapToDto(buildPerson())).thenReturn(buildPersonDTO());

@@ -34,6 +34,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
+      .iun("iun")
       .dueDate(DATE)
       .notificationFeeCents(1000L)
       .amountCents(100L)
@@ -49,6 +50,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME.toLocalDateTime())
       .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .noPII(buildInstallmentNoPII())
       .build();
   }
@@ -67,6 +69,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
+      .iun("iun")
       .dueDate(DATE)
       .notificationFeeCents(1000L)
       .amountCents(100L)
@@ -83,6 +86,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME.toLocalDateTime())
       .updateDate(DATETIME.toLocalDateTime())
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .transfers(new TreeSet<>(List.of(buildTransfer())))
       .build();
   }
@@ -105,6 +109,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
+      .iun("iun")
       .dueDate(DATE)
       .notificationFeeCents(1000L)
       .amountCents(100L)
@@ -126,7 +131,7 @@ public class InstallmentFaker {
     return InstallmentDTO.builder()
       .installmentId(100L)
       .paymentOptionId(10L)
-      .status(InstallmentStatus.UNPAID)
+      .status(InstallmentStatus.TO_SYNC)
       .syncStatus(buildInstallmentSyncStatus())
       .iupdPagopa("iupdPagoPa")
       .iud("iud")
@@ -134,6 +139,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("nav")
+      .iun("iun")
       .dueDate(DATE)
       .notificationFeeCents(1000L)
       .amountCents(100L)
@@ -149,6 +155,7 @@ public class InstallmentFaker {
       .creationDate(DATETIME)
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
       .build();
   }
 
@@ -164,6 +171,7 @@ public class InstallmentFaker {
       .iur("iur")
       .iuf("iuf")
       .nav("generatedNav")
+      .iun("iun")
       .dueDate(DATE)
       .notificationFeeCents(1000L)
       .amountCents(100L)

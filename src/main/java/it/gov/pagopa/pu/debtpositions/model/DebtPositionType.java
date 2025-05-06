@@ -55,4 +55,5 @@ public class DebtPositionType extends BaseEntity implements Serializable {
   private boolean flagMandatoryDueDate;
   private boolean flagNotifyIo;
   private String ioTemplateMessage;
+  private String ioTemplateSubject;
 }

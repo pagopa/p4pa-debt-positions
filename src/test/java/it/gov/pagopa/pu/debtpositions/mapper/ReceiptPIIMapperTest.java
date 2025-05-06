@@ -49,7 +49,7 @@ class ReceiptPIIMapperTest {
     //verify
     Assertions.assertNotNull(response);
     Assertions.assertNotNull(response.getFirst());
-    TestUtils.reflectionEqualsByName(receipt, response.getFirst(), "debtor", "payer", "updateOperatorExternalId");
+    TestUtils.reflectionEqualsByName(receipt, response.getFirst(), "debtor", "payer");
     TestUtils.checkNotNullFields(response.getFirst());
     Assertions.assertNotNull(response.getSecond());
     TestUtils.reflectionEqualsByName(receipt.getDebtor(), response.getSecond().getDebtor());

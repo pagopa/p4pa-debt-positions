@@ -9,6 +9,9 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.*;
 
@@ -17,25 +20,27 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   private final DebtPositionRepository debtPositionRepository;
 
   public DebtPositionStatusChecker(DebtPositionRepository debtPositionRepository) {
-    super(TO_SYNC, PAID, UNPAID, EXPIRED, CANCELLED, INVALID, REPORTED);
+    super(TO_SYNC, PAID, DRAFT, UNPAID, UNPAYABLE, EXPIRED, CANCELLED, INVALID, REPORTED);
     this.debtPositionRepository = debtPositionRepository;
   }
 
   @Override
   public DebtPositionStatus calculateNewStatus(List<PaymentOptionStatus> paymentOptionStatusList) {
-    if (isToSync(paymentOptionStatusList)){
+    if (isToSync(paymentOptionStatusList)) {
       return DebtPositionStatus.TO_SYNC;
-    } else if (isPartiallyPaid(paymentOptionStatusList)){
+    } else if (isPartiallyPaid(paymentOptionStatusList)) {
       return DebtPositionStatus.PARTIALLY_PAID;
-    } else if (isUnpaid(paymentOptionStatusList)){
+    } else if (isDraft(paymentOptionStatusList)) {
+      return DebtPositionStatus.DRAFT;
+    } else if (isUnpaid(paymentOptionStatusList)) {
       return DebtPositionStatus.UNPAID;
-    } else if (isPaid(paymentOptionStatusList)){
+    } else if (isPaid(paymentOptionStatusList)) {
       return DebtPositionStatus.PAID;
-    } else if (isReported(paymentOptionStatusList)){
+    } else if (isReported(paymentOptionStatusList)) {
       return DebtPositionStatus.REPORTED;
-    } else if (isCancelled(paymentOptionStatusList)){
+    } else if (isCancelled(paymentOptionStatusList)) {
       return DebtPositionStatus.CANCELLED;
-    } else if (isExpired(paymentOptionStatusList)){
+    } else if (isExpired(paymentOptionStatusList)) {
       return DebtPositionStatus.EXPIRED;
     } else {
       throw new InvalidValueException("Unable to determine status for DebtPosition having paymentOptionStatuses: " + paymentOptionStatusList);
@@ -63,5 +68,13 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   @Override
   protected void storeStatus(BaseDebtPosition debtPosition, DebtPositionStatus newStatus) {
     debtPositionRepository.updateStatus(debtPosition.getDebtPositionId(), newStatus);
+  }
+
+  @Override
+  protected Set<PaymentOptionStatus> getAllowedCancelledStatuses() {
+    return Stream.concat(
+      super.getAllowedCancelledStatuses().stream(),
+      Stream.of(EXPIRED)
+    ).collect(Collectors.toSet());
   }
 }

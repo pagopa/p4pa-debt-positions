@@ -31,6 +31,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private String iur;
   private String iuf;
   private String nav;
+  private String iun;
   private LocalDate dueDate;
   private Long notificationFeeCents;
   private Long amountCents;
@@ -46,6 +47,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private String updateOperatorExternalId;
+  private String updateTraceId;
 
   @JsonIgnore
   private InstallmentNoPII noPII;

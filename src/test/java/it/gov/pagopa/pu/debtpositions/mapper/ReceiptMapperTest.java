@@ -38,7 +38,7 @@ class ReceiptMapperTest {
 
     //verify
     TestUtils.reflectionEqualsByName(receiptDTO, response, "debtor", "payer");
-    TestUtils.checkNotNullFields(response, "updateOperatorExternalId", "noPII");
+    TestUtils.checkNotNullFields(response, "updateOperatorExternalId", "updateTraceId", "noPII");
     Mockito.verify(personMapperMock, Mockito.times(1)).mapToModel(receiptDTO.getDebtor());
     Mockito.verify(personMapperMock, Mockito.times(1)).mapToModel(receiptDTO.getPayer());
   }

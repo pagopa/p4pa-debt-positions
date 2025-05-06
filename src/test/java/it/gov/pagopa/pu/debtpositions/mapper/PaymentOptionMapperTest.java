@@ -48,8 +48,8 @@ class PaymentOptionMapperTest {
 
     Pair<PaymentOption, Map<InstallmentNoPII, Installment>> result = paymentOptionMapper.mapToModel(paymentOptionDTO);
 
-    reflectionEqualsByName(paymentOptionExpected, result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId");
-    checkNotNullFields(result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId");
+    reflectionEqualsByName(paymentOptionExpected, result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    checkNotNullFields(result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 
   @Test

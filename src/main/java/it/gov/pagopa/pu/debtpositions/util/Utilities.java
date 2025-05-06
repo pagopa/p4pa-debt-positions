@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import org.slf4j.MDC;
+
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -90,5 +92,9 @@ public class Utilities {
 
   public static boolean isValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, long maxInterval){
     return chronoUnit.between(dateFrom, dateTo) <= maxInterval;
+  }
+
+  public static String getTraceId(){
+    return MDC.get("traceId");
   }
 }

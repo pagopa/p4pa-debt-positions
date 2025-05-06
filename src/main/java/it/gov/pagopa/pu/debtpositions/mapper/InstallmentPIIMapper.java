@@ -36,6 +36,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setIur(fullDTO.getIur());
     noPII.setIuf(fullDTO.getIuf());
     noPII.setNav(fullDTO.getNav());
+    noPII.setIun(fullDTO.getIun());
     noPII.setDueDate(fullDTO.getDueDate());
     noPII.setNotificationFeeCents(fullDTO.getNotificationFeeCents());
     noPII.setAmountCents(fullDTO.getAmountCents());
@@ -51,6 +52,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setCreationDate(fullDTO.getCreationDate());
     noPII.setUpdateDate(fullDTO.getUpdateDate());
     noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
+    noPII.setUpdateTraceId(fullDTO.getUpdateTraceId());
     noPII.setTransfers(new TreeSet<>(fullDTO.getTransfers()));
 
     return noPII;
@@ -77,6 +79,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .iur(noPii.getIur())
       .iuf(noPii.getIuf())
       .nav(noPii.getNav())
+      .iun(noPii.getIun())
       .dueDate(noPii.getDueDate())
       .notificationFeeCents(noPii.getNotificationFeeCents())
       .amountCents(noPii.getAmountCents())
@@ -90,6 +93,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .creationDate(noPii.getCreationDate())
       .updateDate(noPii.getUpdateDate())
       .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
+      .updateTraceId(noPii.getUpdateTraceId())
       .debtor(pii.getDebtor())
       .transfers(Optional.ofNullable(noPii.getTransfers()).map(List::copyOf).orElse(List.of()))
       .noPII(noPii)

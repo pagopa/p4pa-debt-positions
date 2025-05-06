@@ -6,10 +6,12 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
@@ -17,13 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-
 @RestController
 @Slf4j
 public class DebtPositionControllerImpl implements DebtPositionApi {
 
   public static final String HEADER_X_WORKFLOW_ID = "x-workflow-id";
+  public static final String HEADER_X_RUN_ID = "x-run-id";
 
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
   private final DebtPositionCreationService debtPositionCreationService;
@@ -31,14 +32,16 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final InstallmentSynchronizeService installmentSynchronizeService;
   private final InstallmentService installmentService;
   private final DebtPositionManageInstallmentsService debtPositionManageService;
+  private final DebtPositionDeletionService debtPositionDeletionService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
     this.installmentSynchronizeService = installmentSynchronizeService;
     this.installmentService = installmentService;
     this.debtPositionManageService = debtPositionManageService;
+    this.debtPositionDeletionService = debtPositionDeletionService;
   }
 
   @Override
@@ -49,13 +52,16 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(massive)
       .partialChange(false)
       .build();
-    String workflowId = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, workflowId).body(debtPositionDTO);
+    WorkflowCreatedDTO workflow = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .body(debtPositionDTO);
   }
 
-
   @Override
-  public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, Map<String, IupdSyncStatusUpdateDTO> requestBody) {
+  public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, SyncStatusUpdateRequestDTO requestBody) {
     log.info("Finalizing debtPosition TO_SYNC installment status on debtPosition {}: {}", debtPositionId, requestBody);
     DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(debtPositionId, requestBody);
     return new ResponseEntity<>(body, HttpStatus.OK);
@@ -64,8 +70,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   @Override
   public ResponseEntity<DebtPositionDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId) {
     log.info("Checking installment expired on debtPosition {}", debtPositionId);
-    Pair<DebtPositionDTO, String> result = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId, SecurityUtils.getAccessToken());
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(debtPositionId, SecurityUtils.getAccessToken());
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+      .body(result.getLeft());
   }
 
   @Override
@@ -85,8 +95,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(partialChange)
       .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
-    String workflowId = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
+    WorkflowCreatedDTO workflow = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.CREATED)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .build();
   }
 
   @Override
@@ -106,8 +120,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(false)
       .build();
 
-    String workflowId = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
-    return ResponseEntity.status(HttpStatus.CREATED).header(HEADER_X_WORKFLOW_ID, workflowId).build();
+    WorkflowCreatedDTO workflow = installmentService.updateInstallmentNotificationDate(updateInstallmentNotificationDateRequest, wfExecutionParameters, operatorExternalUserId, accessToken);
+    return ResponseEntity
+      .status(HttpStatus.CREATED)
+      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+      .header(HEADER_X_RUN_ID, workflow.getRunId())
+      .build();
   }
 
   @Override
@@ -118,8 +136,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .massive(false)
       .partialChange(false)
       .build();
-    Pair<DebtPositionDTO, String> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity.status(HttpStatus.OK).header(HEADER_X_WORKFLOW_ID, result.getRight()).body(result.getLeft());
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+      .body(result.getLeft());
   }
 
   @Override
@@ -143,5 +165,23 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       operatorExternalUserId);
 
     return ResponseEntity.ok(installmentDTO);
+  }
+
+  @Override
+  public ResponseEntity<Void> deleteDebtPosition(Long debtPositionId){
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    WorkflowCreatedDTO workflow = debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, operatorExternalUserId);
+    if(workflow != null) {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+        .header(HEADER_X_RUN_ID, workflow.getRunId())
+        .build();
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+    }
   }
 }

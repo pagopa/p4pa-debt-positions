@@ -13,6 +13,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 public class PaymentEventDTO {
   private String eventId;
+  private String traceId;
   private PaymentEventType eventType;
   private OffsetDateTime eventDateTime;
   private DebtPositionDTO payload;

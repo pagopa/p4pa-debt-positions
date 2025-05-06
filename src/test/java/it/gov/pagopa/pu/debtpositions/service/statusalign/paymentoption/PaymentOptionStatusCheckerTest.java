@@ -81,6 +81,16 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is DRAFT when all installments are DRAFT.
+   */
+  @Test
+  void testCalculateNewStatus_Draft() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.DRAFT, InstallmentStatus.DRAFT);
+    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
+    assertEquals(PaymentOptionStatus.DRAFT, result);
+  }
+
+  /**
    * Test if the status is UNPAID when all installments are CANCELLED, with at least one UNPAID.
    */
   @Test

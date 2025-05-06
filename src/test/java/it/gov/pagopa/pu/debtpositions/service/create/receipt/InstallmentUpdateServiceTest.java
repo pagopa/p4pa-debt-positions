@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -9,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -20,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
 @Slf4j
@@ -40,31 +44,57 @@ class InstallmentUpdateServiceTest {
     ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
       InstallmentStatus.UNPAID);
-    DebtPosition debtPosition = podamFactory.manufacturePojo(
-      DebtPosition.class);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+    debtPosition.setStatus(DebtPositionStatus.UNPAID);
 
-    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions()
-      .stream().toList();
-
-    paymentOptionList.getFirst().setInstallments(new TreeSet<>(List.of(
+    PaymentOption po0 = PaymentOptionFaker.buildPaymentOption();
+    po0.setPaymentOptionIndex(1);
+    po0.setStatus(PaymentOptionStatus.PAID);
+    po0.setInstallments(new TreeSet<>(List.of(
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
         InstallmentStatus.PAID),
       targetInstallment
     )));
-    paymentOptionList.get(1).setInstallments(new TreeSet<>(List.of(
+
+    PaymentOption po1 = PaymentOptionFaker.buildPaymentOption();
+    po1.setStatus(PaymentOptionStatus.TO_SYNC);
+    po1.setPaymentOptionIndex(2);
+    po1.setInstallments(new TreeSet<>(List.of(
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
-        InstallmentStatus.DRAFT),
+        InstallmentStatus.EXPIRED),
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
-        InstallmentStatus.DRAFT, InstallmentStatus.UNPAID),
+        InstallmentStatus.UNPAID, InstallmentStatus.UNPAID),
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
-        InstallmentStatus.REPORTED)
+        InstallmentStatus.CANCELLED)
     )));
-    paymentOptionList.get(2).setInstallments(new TreeSet<>(List.of(
+
+    PaymentOption po2 = PaymentOptionFaker.buildPaymentOption();
+    po2.setStatus(PaymentOptionStatus.UNPAID);
+    po2.setPaymentOptionIndex(3);
+    po2.setInstallments(new TreeSet<>(List.of(
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
-        InstallmentStatus.PAID),
+        InstallmentStatus.UNPAID)
+    )));
+
+    PaymentOption po3 = PaymentOptionFaker.buildPaymentOption();
+    po3.setPaymentOptionIndex(4);
+    po3.setStatus(PaymentOptionStatus.CANCELLED);
+    po3.setInstallments(new TreeSet<>(List.of(
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.CANCELLED)
+    )));
+
+    PaymentOption po4 = PaymentOptionFaker.buildPaymentOption();
+    po4.setPaymentOptionIndex(5);
+    po4.setStatus(PaymentOptionStatus.TO_SYNC);
+    po4.setInstallments(new TreeSet<>(List.of(
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.CANCELLED),
       PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallmentToSync(
-        InstallmentStatus.DRAFT, InstallmentStatus.PAID)
+        InstallmentStatus.UNPAID, InstallmentStatus.CANCELLED)
     )));
+
+    debtPosition.setPaymentOptions(new TreeSet<>(Set.of(po0, po1, po2, po3, po4)));
 
     //align entities id
     debtPosition.getPaymentOptions().forEach(paymentOption -> {

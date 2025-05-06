@@ -28,7 +28,7 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
-    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate", "updateOperatorExternalId");
+    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 
   @Test
@@ -44,6 +44,6 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
-    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate", "updateOperatorExternalId");
+    checkNotNullFields(result, "debtPositionId", "flagIuvVolatile", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 }

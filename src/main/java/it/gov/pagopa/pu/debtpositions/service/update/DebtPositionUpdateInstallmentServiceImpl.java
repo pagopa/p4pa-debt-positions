@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -42,16 +43,16 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Transactional
   @Override
-  public String updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+  public WorkflowCreatedDTO updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     if (log.isDebugEnabled()) {
       Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
       log.debug("Updating data of installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
     }
 
-    String workflowId = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_UPDATED, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO workflow = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_UPDATED, accessToken, operatorExternalUserId);
 
     log.debug("Updated installments for debt position with id {}", debtPositionDTO.getDebtPositionId());
-    return workflowId;
+    return workflow;
   }
 
   @Override

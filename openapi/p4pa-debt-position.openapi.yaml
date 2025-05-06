@@ -90,6 +90,45 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+    delete:
+      tags:
+        - debt-position
+      operationId: deleteDebtPosition
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      responses:
+        "204":
+          description: No content
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/ingestion-flow-file/{ingestionFlowFileId}:
     get:
       tags:
@@ -452,10 +491,14 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/InstallmentStatus"
-        - name: syncStatus
+        - name: syncStatusFrom
           in: query
           schema:
-            type: "InstallmentSyncStatus"
+            $ref: "#/components/schemas/InstallmentStatus"
+        - name: syncStatusTo
+          in: query
+          schema:
+            $ref: "#/components/schemas/InstallmentStatus"
       responses:
         '200':
           description: OK
@@ -482,6 +525,32 @@ paths:
           required: true
           schema:
             $ref: "#/components/schemas/PaymentOptionStatus"
+      responses:
+        '200':
+          description: OK
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/installments/by-installmentId-iun:
+    put:
+      tags:
+        - installments-entity-extended-controller
+      operationId: updateIun
+      parameters:
+        - name: installmentId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: iun
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         '200':
           description: OK
@@ -936,6 +1005,8 @@ components:
           format: date-time
         updateOperatorExternalId:
           type: string
+        updateTraceId:
+          type: string
         paymentOptions:
           type: array
           items:
@@ -979,6 +1050,8 @@ components:
           format: date-time
         updateOperatorExternalId:
           type: string
+        updateTraceId:
+          type: string
         installments:
           type: array
           items:
@@ -1012,6 +1085,8 @@ components:
         iuf:
           type: string
         nav:
+          type: string
+        iun:
           type: string
         dueDate:
           type: string
@@ -1053,6 +1128,8 @@ components:
           type: string
           format: date-time
         updateOperatorExternalId:
+          type: string
+        updateTraceId:
           type: string
     TransferDTO:
       required:
@@ -1101,6 +1178,8 @@ components:
           type: string
           format: date-time
         updateOperatorExternalId:
+          type: string
+        updateTraceId:
           type: string
     ReceiptDTO:
       type: object
@@ -1401,13 +1480,32 @@ components:
         - DRAFT
     SyncStatusUpdateRequestDTO:
       type: object
-      additionalProperties:
-        $ref: "#/components/schemas/IupdSyncStatusUpdateDTO"
-    IupdSyncStatusUpdateDTO:
+      required:
+        - iupd2finalize
+        - iupdSyncError
+      properties:
+        iupd2finalize:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SyncCompleteDTO"
+        iupdSyncError:
+          type: object
+          additionalProperties:
+            $ref: "#/components/schemas/SyncErrorDTO"
+    SyncCompleteDTO:
       type: object
+      required:
+        - newStatus
       properties:
         newStatus:
           $ref: "#/components/schemas/InstallmentStatus"
+    SyncErrorDTO:
+      type: object
+      required:
+        - error_description
+      properties:
+        error_description:
+          type: string
     DebtPositionErrorDTO:
       type: object
       required:
