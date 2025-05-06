@@ -56,7 +56,11 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("Debt position payment options is mandatory");
     }
 
+    Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
+      if(!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())){
+        throw new InvalidValueException("PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
+      }
       if (CollectionUtils.isEmpty(paymentOptionDTO.getInstallments())) {
         throw new InvalidValueException("At least one installment of the debt position is mandatory");
       }

@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,6 +90,20 @@ class ValidateDebtPositionServiceImplTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Debt position payment options is mandatory", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenDuplicatePaymentOptionIndexThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    debtPositionDTO.setPaymentOptions(List.of(PaymentOptionFaker.buildPaymentOptionDTO(), PaymentOptionFaker.buildPaymentOptionDTO()));
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("PaymentOption index duplicated: 1", invalidValueException.getMessage());
   }
 
   @Test
