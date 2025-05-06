@@ -30,7 +30,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
 
-    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus, expiredStatus);
+    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus);
     this.emptyAllowedStatuses = Set.of();
   }
 
@@ -51,6 +51,10 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   protected abstract void storeStatus(T entity, D newStatus);
 
+  protected Set<E> getAllowedCancelledStatuses() {
+    return allowedCancelledStatuses;
+  }
+
   public boolean isToSync(List<E> childrenStatusList) {
     return childrenStatusList.contains(syncStatus);
   }
@@ -58,11 +62,11 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   protected abstract boolean isPartiallyPaid(List<E> childrenStatusList);
 
   public boolean isUnpaid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, unpaidStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, unpaidStatus, getAllowedCancelledStatuses());
   }
 
   public boolean isUnpayable(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, unpayableStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, unpayableStatus, getAllowedCancelledStatuses());
   }
 
   public boolean isDraft(List<E> childrenStatusList) {
@@ -70,11 +74,11 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   }
 
   public boolean isPaid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, paidStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, paidStatus, getAllowedCancelledStatuses());
   }
 
   public boolean isReported(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, reportedStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, reportedStatus, getAllowedCancelledStatuses());
   }
 
   public boolean isCancelled(List<E> childrenStatusList) {
@@ -82,7 +86,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   }
 
   public boolean isExpired(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, expiredStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, expiredStatus, getAllowedCancelledStatuses());
   }
 
   protected boolean allMatch(List<E> statusList, E requiredState, Set<E> allowedStatuses) {

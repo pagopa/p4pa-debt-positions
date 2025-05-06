@@ -101,16 +101,6 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
-   * Test if the status is UNPAID when all installments are EXPIRED, with at least one UNPAID.
-   */
-  @Test
-  void testCalculateNewStatus_Unpaid3() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAID, InstallmentStatus.EXPIRED, InstallmentStatus.EXPIRED);
-    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
-    assertEquals(PaymentOptionStatus.UNPAID, result);
-  }
-
-  /**
    * Test if the status is UNPAYABLE when all installments are UNPAYABLE.
    */
   @Test
