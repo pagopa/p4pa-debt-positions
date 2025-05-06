@@ -16,6 +16,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   private final E expiredStatus;
   private final E cancelledStatus;
   private final E reportedStatus;
+  private final E invalidStatus;
 
   protected final Set<E> allowedCancelledStatuses;
   protected final Set<E> emptyAllowedStatuses;
@@ -29,8 +30,9 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.expiredStatus = expiredStatus;
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
+    this.invalidStatus = invalidStatus;
 
-    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus);
+    this.allowedCancelledStatuses = getAllowedCancelledStatuses();
     this.emptyAllowedStatuses = Set.of();
   }
 
@@ -52,7 +54,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   protected abstract void storeStatus(T entity, D newStatus);
 
   protected Set<E> getAllowedCancelledStatuses() {
-    return allowedCancelledStatuses;
+    return Set.of(cancelledStatus, invalidStatus, unpayableStatus);
   }
 
   public boolean isToSync(List<E> childrenStatusList) {
