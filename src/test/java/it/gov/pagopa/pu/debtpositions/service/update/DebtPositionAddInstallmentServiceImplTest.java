@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
@@ -17,6 +18,8 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,8 +68,16 @@ class DebtPositionAddInstallmentServiceImplTest {
       debtPositionCreationServiceMock, debtPositionTypeOrgRepositoryMock);
   }
 
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(authorizeOperatorOnDebtPositionTypeServiceMock,
+      debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
+      organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, validateDebtPositionServiceMock,
+      debtPositionCreationServiceMock, debtPositionTypeOrgRepositoryMock);
+  }
+
   @Test
-  void testAddInstallmentThenOK(){
+  void whenAddInstallmentThenOK(){
     String accessToken = "ACCESSTOKEN";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String operatorExternalId = "OPERATOREXTERNALID";
@@ -105,7 +116,38 @@ class DebtPositionAddInstallmentServiceImplTest {
   }
 
   @Test
-  void testAddInstallmentWhenDPTypeOrgNotFoundThenOK(){
+  void givenDuplicatePaymentOptionIndexWhenAddInstallmentThenThrowInvalidValueException(){
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String operatorExternalId = "OPERATOREXTERNALID";
+
+    Organization organization = buildOrganization();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    PaymentOptionDTO po = debtPositionDTO.getPaymentOptions().getFirst();
+    po.setStatus(PaymentOptionStatus.TO_SYNC);
+    debtPositionDTO.setPaymentOptions(List.of(po, po));
+
+    List<InstallmentDTO> installments2operate = po.getInstallments();
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
+      .thenReturn(debtPositionTypeOrg);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(po.getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+    Mockito.doNothing().when(debtPositionCreationServiceMock).checkInstallment(debtPositionDTO, organization, debtPositionTypeOrg, po.getInstallments().getFirst());
+
+    InvalidValueException result = assertThrows(InvalidValueException.class, () -> debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installments2operate, wfExecutionParameters, accessToken, operatorExternalId));
+
+    Assertions.assertEquals("PaymentOption index duplicated: 1", result.getMessage());
+  }
+
+  @Test
+  void givenDPTypeOrgNotFoundWhenTestAddInstallmentThenOK(){
     String accessToken = "ACCESSTOKEN";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String operatorExternalId = "OPERATOREXTERNALID";
