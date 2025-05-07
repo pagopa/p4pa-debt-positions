@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -43,7 +44,7 @@ class DebtPositionTypeOrgOperatorsServiceImplTest {
   }
 
   @Test
-  void whenSaveOperatorsThenOk() {
+  void givenNoExistingDebtPositionTypeOrgOperatorsWhenSaveOperatorsThenOk() {
     Long debtPositionTypeOrgId = 1L;
     Set<String> operatorsSet = new HashSet<>();
     operatorsSet.add("operator1");
@@ -56,22 +57,43 @@ class DebtPositionTypeOrgOperatorsServiceImplTest {
       i++;
     }
 
-    ArgumentCaptor<List<DebtPositionTypeOrgOperators>> captor = ArgumentCaptor.forClass(
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(
+      Collections.emptyList());
+    ArgumentCaptor<List<DebtPositionTypeOrgOperators>> saveCaptor = ArgumentCaptor.forClass(
       List.class) ;
     Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.saveAll(
-      captor.capture())).thenReturn(expectedResult);
+      saveCaptor.capture())).thenReturn(expectedResult);
 
     List<DebtPositionTypeOrgOperators> result = debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrgId,operatorsSet);
 
     Assertions.assertNotNull(result);
     Assertions.assertEquals(expectedResult,result);
-    List<DebtPositionTypeOrgOperators> operators = captor.getValue();
+    List<DebtPositionTypeOrgOperators> operators = saveCaptor.getValue();
     Assertions.assertEquals(operatorsSet.size(),operators.size());
     for (DebtPositionTypeOrgOperators operator : operators) {
       Assertions.assertEquals(debtPositionTypeOrgId,operator.getDebtPositionTypeOrgId());
       Assertions.assertTrue(operatorsSet.contains(operator.getOperatorExternalUserId()));
       operatorsSet.remove(operator.getOperatorExternalUserId());
     }
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgOperatorsRepositoryMock);
+  }
+
+  @Test
+  void givenExistingDebtPositionTypeOrgOperatorsWhenSaveOperatorsThenEmptyList() {
+    Long debtPositionTypeOrgId = 1L;
+    Set<String> operatorsSet = new HashSet<>();
+    operatorsSet.add("operator1");
+    DebtPositionTypeOrgOperators operator = new DebtPositionTypeOrgOperators();
+    operator.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    operator.setOperatorExternalUserId("operator1");
+
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(
+      Collections.singletonList(operator));
+
+    List<DebtPositionTypeOrgOperators> result = debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrgId,operatorsSet);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isEmpty());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgOperatorsRepositoryMock);
   }
 
