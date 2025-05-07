@@ -54,6 +54,10 @@ public class InstallmentUtils {
     InstallmentStatus.UNPAID,
     InstallmentStatus.EXPIRED);
 
+  public static final Set<InstallmentStatus> PAID_STATUSES = Set.of(
+    InstallmentStatus.PAID,
+    InstallmentStatus.REPORTED);
+
   private static final Set<InstallmentStatus> INVALIDABLE_STATUSES = Stream.concat(
     PAYABLE_STATUSES.stream(),
     Stream.of(InstallmentStatus.UNPAYABLE)

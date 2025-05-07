@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
@@ -45,6 +46,8 @@ class InstallmentServiceImplTest {
   @Mock
   private InstallmentPIIRepository installmentPIIRepositoryMock;
   @Mock
+  private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
+  @Mock
   private InstallmentMapper installmentMapperMock;
   @Mock
   private InstallmentDetailPIIViewRepository installmentDetailPIIViewRepositoryMock;
@@ -71,6 +74,7 @@ class InstallmentServiceImplTest {
   void setUp() {
     installmentService = new InstallmentServiceImpl(
       installmentPIIRepositoryMock,
+      installmentNoPIIRepositoryMock,
       installmentMapperMock,
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,

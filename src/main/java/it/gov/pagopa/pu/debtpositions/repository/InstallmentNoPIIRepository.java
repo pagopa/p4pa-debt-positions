@@ -108,4 +108,10 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @ApiResponse(responseCode = "200", content = @Content(schema = @Schema(ref = "CollectionModelInstallmentNoPII")))
   List<InstallmentNoPII> getByOrganizationIdAndIudAndStatus(Long organizationId, String iud, List<InstallmentStatus> installmentStatuses);
 
+  @RestResource(exported = false)
+  @Query(" select i" +
+    "  from InstallmentNoPII i" +
+    "   where i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAID_STATUSES})" +
+    "   and i.iun = :iun")
+  List<InstallmentNoPII> findPaidByIun(@Param("iun") String iun);
 }
