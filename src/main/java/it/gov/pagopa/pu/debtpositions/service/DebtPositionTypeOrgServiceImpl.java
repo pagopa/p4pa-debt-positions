@@ -62,13 +62,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     if(Boolean.TRUE.equals(saveDebtPositionTypeOrgDTO.getRemoveEnabledOperators())){
       debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId());
     }
-    if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())){
-      debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
-        saveDebtPositionTypeOrgDTO.getEnabledOperators());
-    }
     if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getDisabledOperators())){
       debtPositionTypeOrgOperatorsService.deleteOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getDisabledOperators());
+    }
+    if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())){
+      debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
+        saveDebtPositionTypeOrgDTO.getEnabledOperators());
     }
   }
 }
