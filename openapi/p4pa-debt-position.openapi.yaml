@@ -901,6 +901,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-position-type-org:
+    post:
+      tags:
+        - debt-position-type-org
+      operationId: saveDebtPositionTypeOrg
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SaveDebtPositionTypeOrgDTO"
+      responses:
+        '200':
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: 'DebtPositionTypeOrg'
+        '404':
+          description: Not Found
+        "500":
+          description: Internal server error
   /debt-position-type-org/{debtPositionTypeOrgId}:
     delete:
       tags:
@@ -1882,3 +1903,22 @@ components:
             - A
         installment:
           $ref: "#/components/schemas/InstallmentDTO"
+    SaveDebtPositionTypeOrgDTO:
+      type: object
+      required:
+        - debtPositionTypeOrg
+      properties:
+        debtPositionTypeOrg:
+          type: 'DebtPositionTypeOrg'
+        enabledOperators:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        disabledOperators:
+          type: array
+          uniqueItems: true
+          items:
+            type: string
+        removeEnabledOperators:
+          type: boolean
