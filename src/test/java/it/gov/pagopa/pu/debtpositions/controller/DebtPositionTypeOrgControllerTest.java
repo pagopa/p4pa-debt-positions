@@ -3,10 +3,14 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.junit.jupiter.api.Test;
@@ -31,6 +35,8 @@ class DebtPositionTypeOrgControllerTest {
 
   @MockitoBean
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
+  @MockitoBean
+  private BalanceService balanceServiceMock;
 
   @Test
   void whenGetIONotificationThenOk() throws Exception {
@@ -60,5 +66,29 @@ class DebtPositionTypeOrgControllerTest {
         delete("/debt-position-type-org/" + debtPositionTypeOrgId))
       .andExpect(status().isOk())
       .andReturn();
+  }
+
+  @Test
+  void whenSaveDebtPositionTypeOrgThenOk() throws Exception {
+    SaveDebtPositionTypeOrgDTO requestBody = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+    debtPositionTypeOrg.setDebtPositionTypeId(1L);
+    debtPositionTypeOrg.setOrganizationId(1L);
+    debtPositionTypeOrg.setCode("code");
+    debtPositionTypeOrg.setDescription("description");
+    debtPositionTypeOrg.setIban("iban");
+    requestBody.setDebtPositionTypeOrg(debtPositionTypeOrg);
+    DebtPositionTypeOrg expectedResult = new DebtPositionTypeOrg();
+    Mockito.when(debtPositionTypeOrgService.saveDebtPositionTypeOrg(requestBody)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        post("/debt-position-type-org")
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(objectMapper.writeValueAsString(requestBody)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionTypeOrg response = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionTypeOrg.class);
+    assertEquals(expectedResult,response);
   }
 }

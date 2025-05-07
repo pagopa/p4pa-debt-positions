@@ -3,13 +3,12 @@ package it.gov.pagopa.pu.debtpositions.config;
 import io.swagger.v3.oas.models.PathItem;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
+import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
-
-import java.util.Set;
 
 @Configuration
 public class RepositoryRestCustomConfiguration {
