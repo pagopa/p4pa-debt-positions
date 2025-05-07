@@ -43,7 +43,9 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
     //Check for already existing DebtPositionTypeOrgOperators
     List<DebtPositionTypeOrgOperators> debtPositionTypeOrgOperatorsList = debtPositionTypeOrgOperatorsRepository.findByDebtPositionTypeOrgId(
       debtPositionTypeOrgId);
-    externalOperatorUserIds.removeIf(o->debtPositionTypeOrgOperatorsList.stream().anyMatch(dptoo->dptoo.getOperatorExternalUserId().equals(o)));
+    if(!CollectionUtils.isEmpty(debtPositionTypeOrgOperatorsList)){
+      externalOperatorUserIds.removeIf(o->debtPositionTypeOrgOperatorsList.stream().anyMatch(dptoo->dptoo.getOperatorExternalUserId().equals(o)));
+    }
     if(CollectionUtils.isEmpty(externalOperatorUserIds)){
       return Collections.emptyList();
     }

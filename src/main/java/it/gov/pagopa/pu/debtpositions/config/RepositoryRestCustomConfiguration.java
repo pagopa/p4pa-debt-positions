@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
 import io.swagger.v3.oas.models.PathItem;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.metamodel.EntityType;
 import java.util.Set;
@@ -44,8 +43,6 @@ public class RepositoryRestCustomConfiguration {
             )
             + (PathItem.HttpMethod.GET.equals(httpMethod) && paths.length == 3 ? "s" : "")
         ));
-        // removing duplicate schema due to ControllerExt
-        openApi.getComponents().getSchemas().remove(DebtPositionTypeOrg.class.getSimpleName());
       });
   }
 
