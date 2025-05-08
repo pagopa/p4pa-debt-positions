@@ -53,11 +53,17 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(false)
       .build();
     WorkflowCreatedDTO workflow = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
-      .header(HEADER_X_RUN_ID, workflow.getRunId())
-      .body(debtPositionDTO);
+    if(workflow != null) {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+        .header(HEADER_X_RUN_ID, workflow.getRunId())
+        .body(debtPositionDTO);
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(debtPositionDTO);
+    }
   }
 
   @Override
@@ -96,11 +102,17 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .executionConfig(installmentSynchronizeDTO.getExecutionConfig())
       .build();
     WorkflowCreatedDTO workflow = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
-    return ResponseEntity
-      .status(HttpStatus.CREATED)
-      .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
-      .header(HEADER_X_RUN_ID, workflow.getRunId())
-      .build();
+    if(workflow != null) {
+      return ResponseEntity
+        .status(HttpStatus.CREATED)
+        .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+        .header(HEADER_X_RUN_ID, workflow.getRunId())
+        .build();
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.NO_CONTENT)
+        .build();
+    }
   }
 
   @Override
@@ -137,11 +149,17 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .partialChange(false)
       .build();
     Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-    return ResponseEntity
-      .status(HttpStatus.OK)
-      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
-      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
-      .body(result.getLeft());
+    if(result.getRight() != null) {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+        .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+        .body(result.getLeft());
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(result.getLeft());
+    }
   }
 
   @Override
