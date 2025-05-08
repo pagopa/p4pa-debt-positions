@@ -141,6 +141,30 @@ class DebtPositionControllerTest {
   }
 
   @Test
+  void whenCreateDraftDebtPositionThenOk() throws Exception {
+    DebtPositionDTO debtPosition = buildDebtPositionDTO();
+    debtPosition.setStatus(DebtPositionStatus.DRAFT);
+    boolean massive = true;
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(massive)
+      .build();
+
+    Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
+      .thenReturn(null);
+
+    MvcResult result = mockMvc.perform(
+        post("/debt-positions")
+          .param("massive", String.valueOf(massive))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(debtPosition)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), resultResponse);
+  }
+
+  @Test
   void whenCheckAndUpdateInstallmentExpirationThenOk() throws Exception {
     Long id = 1L;
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
@@ -200,9 +224,35 @@ class DebtPositionControllerTest {
           .param("origin", String.valueOf(debtPositionOrigin))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
-      .andExpect(status().isCreated())
+      .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
+      .andReturn();
+  }
+
+  @Test
+  void whenDraftInstallmentSynchronizeThenOk() throws Exception {
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    Boolean massive = true;
+    Boolean partialChange = false;
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(massive)
+      .partialChange(partialChange)
+      .executionConfig(NullNode.instance)
+      .build();
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+
+    Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
+      .thenReturn(null);
+
+    mockMvc.perform(
+        put("/debt-positions/installment-synchronize")
+          .param("massive", String.valueOf(massive))
+          .param("partialChange", String.valueOf(partialChange))
+          .param("origin", String.valueOf(debtPositionOrigin))
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
+      .andExpect(status().isOk())
       .andReturn();
   }
 
@@ -274,6 +324,29 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
+
+  @Test
+  void whenManageDraftDebtPositionInstallmentsThenOk() throws Exception {
+    Long debtPositionId = 1L;
+    ManageDebtPositionDTO request = buildManageDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
+      .thenReturn(Pair.of(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), null));
+
+    MvcResult result = mockMvc.perform(
+        put("/debt-positions/" + debtPositionId + "/manage-installments")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(request)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), resultResponse);
   }
 
   @Test

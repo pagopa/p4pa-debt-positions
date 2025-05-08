@@ -29,6 +29,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
@@ -36,7 +37,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -124,13 +124,16 @@ class InstallmentServiceImplTest {
 
   @Test
   void whenGetInstallmentDetailThenOk() {
+    // Given
     Long installmentId = 1L;
     InstallmentDetailDTO installment = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
 
     Mockito.when(installmentDetailPIIViewRepositoryMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(installment);
 
+    // When
     InstallmentDetailDTO response = installmentService.getInstallmentDetail(installmentId, operatorExternalUserId);
 
+    // Then
     assertNotNull(response);
     Assertions.assertEquals(installment, response);
   }
@@ -153,18 +156,16 @@ class InstallmentServiceImplTest {
     assertEquals(pagedInstallmentsPaidView, result);
   }
 
+//region test updateInstallmentNotificationDate
   @Test
   void whenUpdateInstallmentNotificationDateThenSuccess() {
     // Given
-    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setNotificationDate(dateTime);
-    InstallmentDTO installmentDTO = buildInstallmentDTO();
-    installmentDTO.setNotificationDate(dateTime);
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
-      .debtPositionId(1L)
-      .nav(Collections.singletonList("nav"))
-      .notificationDate(dateTime)
+      .debtPositionId(debtPositionDTO.getDebtPositionId())
+      .nav(Collections.singletonList(installmentDTO.getNav()))
+      .notificationDate(OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC))
       .build();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
@@ -177,18 +178,20 @@ class InstallmentServiceImplTest {
 
     // Then
     assertSame(expectedResult, result);
+    assertEquals(request.getNotificationDate(), installmentDTO.getNotificationDate());
   }
 
   @Test
-  void whenInstallmentIsCancelledThenNoUpdate() {
+  void givenInstallmentIsCancelledWhenUpdateInstallmentNotificationDateThenNoUpdate() {
     // Given
     OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.CANCELLED);
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentDTO.setStatus(InstallmentStatus.CANCELLED);
 
     UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
-      .debtPositionId(1L)
-      .nav(Collections.singletonList("nav"))
+      .debtPositionId(debtPositionDTO.getDebtPositionId())
+      .nav(Collections.singletonList(installmentDTO.getNav()))
       .notificationDate(dateTime)
       .build();
 
@@ -202,7 +205,7 @@ class InstallmentServiceImplTest {
   }
 
   @Test
-  void whenNavDoesNotMatchThenNoUpdate() {
+  void givenNavDoesNotMatchWhenUpdateInstallmentNotificationDateThenNoUpdate() {
     // Given
     OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -222,6 +225,35 @@ class InstallmentServiceImplTest {
     assertNull(result);
   }
 
+  @Test
+  void givenExpiredInstallmentWhenUpdateInstallmentNotificationDateThenUpdateAlsoDueDate() {
+    // Given
+    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentDTO.setDueDate(LocalDate.MIN);
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(debtPositionDTO.getDebtPositionId())
+      .nav(Collections.singletonList(installmentDTO.getNav()))
+      .notificationDate(dateTime)
+      .build();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
+      .thenReturn(expectedResult);
+
+    // When
+    WorkflowCreatedDTO result = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, operatorExternalUserId, accessToken);
+
+    // Then
+    assertSame(expectedResult, result);
+    Assertions.assertEquals(request.getNotificationDate(), installmentDTO.getNotificationDate());
+    Assertions.assertEquals(LocalDate.now(), installmentDTO.getDueDate());
+  }
+//endregion
+
+//region test updateInstallmentNotificationFee
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenSuccess() {
     // Given
@@ -349,7 +381,7 @@ class InstallmentServiceImplTest {
       installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }
-
+//endregion
 
   private static InstallmentDTO getInstallmentDTO() {
     InstallmentDTO installmentDTO = new InstallmentDTO();

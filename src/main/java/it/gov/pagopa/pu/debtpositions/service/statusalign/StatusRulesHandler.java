@@ -4,6 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
@@ -16,9 +18,9 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   private final E expiredStatus;
   private final E cancelledStatus;
   private final E reportedStatus;
-  private final E invalidStatus;
 
   protected final Set<E> allowedCancelledStatuses;
+  protected final Set<E> allowedCancelledOrExpiredStatuses;
   protected final Set<E> emptyAllowedStatuses;
 
   protected StatusRulesHandler(E syncStatus, E paidStatus, E draftStatus, E unpaidStatus, E unpayableStatus, E expiredStatus, E cancelledStatus, E invalidStatus, E reportedStatus) {
@@ -30,9 +32,13 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
     this.expiredStatus = expiredStatus;
     this.cancelledStatus = cancelledStatus;
     this.reportedStatus = reportedStatus;
-    this.invalidStatus = invalidStatus;
 
-    this.allowedCancelledStatuses = getAllowedCancelledStatuses();
+    this.allowedCancelledStatuses = Set.of(cancelledStatus, invalidStatus, unpayableStatus);
+    this.allowedCancelledOrExpiredStatuses = Stream.concat(
+        allowedCancelledStatuses.stream(),
+        Stream.of(expiredStatus)
+      )
+      .collect(Collectors.toSet());
     this.emptyAllowedStatuses = Set.of();
   }
 
@@ -53,10 +59,6 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   protected abstract void storeStatus(T entity, D newStatus);
 
-  protected Set<E> getAllowedCancelledStatuses() {
-    return Set.of(cancelledStatus, invalidStatus, unpayableStatus);
-  }
-
   public boolean isToSync(List<E> childrenStatusList) {
     return childrenStatusList.contains(syncStatus);
   }
@@ -64,7 +66,7 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
   protected abstract boolean isPartiallyPaid(List<E> childrenStatusList);
 
   public boolean isUnpaid(List<E> childrenStatusList) {
-    return allMatch(childrenStatusList, unpaidStatus, allowedCancelledStatuses);
+    return allMatch(childrenStatusList, unpaidStatus, allowedCancelledOrExpiredStatuses);
   }
 
   public boolean isUnpayable(List<E> childrenStatusList) {
