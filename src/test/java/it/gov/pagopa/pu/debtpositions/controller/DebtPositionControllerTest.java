@@ -252,7 +252,7 @@ class DebtPositionControllerTest {
           .param("origin", String.valueOf(debtPositionOrigin))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
-      .andExpect(status().isNoContent())
+      .andExpect(status().isOk())
       .andReturn();
   }
 

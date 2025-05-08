@@ -110,7 +110,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
         .build();
     } else {
       return ResponseEntity
-        .status(HttpStatus.NO_CONTENT)
+        .status(HttpStatus.OK)
         .build();
     }
   }
