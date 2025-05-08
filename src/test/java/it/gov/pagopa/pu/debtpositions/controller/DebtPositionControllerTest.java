@@ -224,7 +224,7 @@ class DebtPositionControllerTest {
           .param("origin", String.valueOf(debtPositionOrigin))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
           .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
-      .andExpect(status().isCreated())
+      .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();

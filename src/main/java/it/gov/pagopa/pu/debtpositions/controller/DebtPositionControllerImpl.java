@@ -104,7 +104,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     WorkflowCreatedDTO workflow = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, origin, accessToken, operatorExternalUserId);
     if(workflow != null) {
       return ResponseEntity
-        .status(HttpStatus.CREATED)
+        .status(HttpStatus.OK)
         .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
         .header(HEADER_X_RUN_ID, workflow.getRunId())
         .build();
