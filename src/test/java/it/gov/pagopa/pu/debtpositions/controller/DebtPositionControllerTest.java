@@ -334,10 +334,9 @@ class DebtPositionControllerTest {
       .massive(false)
       .partialChange(false)
       .build();
-    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
-      .thenReturn(Pair.of(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), workflow));
+      .thenReturn(Pair.of(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), null));
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/" + debtPositionId + "/manage-installments")
