@@ -71,6 +71,11 @@ public class WebSecurityConfig {
           "/v3/api-docs/**"
         ).permitAll()
 
+        // springwolf endpoints
+        .requestMatchers(
+          "/springwolf/**"
+        ).permitAll()
+
         // Actuator endpoints
         .requestMatchers(
           "/actuator",
