@@ -108,8 +108,6 @@ management:
       http: true
       logback: true
 
-springdoc.api-docs.version: OPENAPI_3_0
-
 springwolf:
   docket:
     base-package: it.gov.pagopa.pu.debtpositions.event
