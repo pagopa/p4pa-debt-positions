@@ -7,13 +7,16 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +31,7 @@ import java.util.List;
 @Service
 public class InstallmentServiceImpl implements InstallmentService {
   private final InstallmentPIIRepository installmentPIIRepository;
+  private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final InstallmentMapper installmentMapper;
   private final InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository;
   private final InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository;
@@ -36,10 +40,12 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
 
-  public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
+  public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository,
+    InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
     DebtPositionRepository debtPositionRepository,
     DebtPositionMapper debtPositionMapper) {
     this.installmentPIIRepository = installmentPIIRepository;
+    this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.installmentMapper = installmentMapper;
     this.installmentDetailPIIViewRepository = installmentDetailPIIViewRepository;
     this.installmentPaidViewPIIViewRepository = installmentPaidViewPIIViewRepository;
@@ -106,6 +112,8 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(installments.size() > 1)
       throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
 
+    notificationFeeCents = calculateFeeAlreadyPaid(notificationFeeCents, installments.getFirst().getIun());
+
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
 
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
@@ -123,6 +131,15 @@ public class InstallmentServiceImpl implements InstallmentService {
       wfExecutionParameters, accessToken, operatorExternalUserId);
 
     return installment;
+  }
+
+  private long calculateFeeAlreadyPaid(long notificationFeeCents, String iun) {
+    List<InstallmentNoPII> installmentNoPIIS = installmentNoPIIRepository.findPaidByIun(iun);
+    if(installmentNoPIIS==null)
+      return notificationFeeCents;
+    long feeAlreadyPaid = installmentNoPIIS.stream()
+      .mapToLong(i -> Objects.requireNonNullElse(i.getNotificationFeeCents(),0L)).sum();
+    return notificationFeeCents-feeAlreadyPaid;
   }
 
   private InstallmentDTO calculateNewAmount(InstallmentDTO installmentDTO, long notificationFeeCents) {
