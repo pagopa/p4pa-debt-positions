@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
@@ -93,6 +94,7 @@ class InstallmentServiceImplTest {
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
       installmentPIIRepositoryMock,
+      installmentNoPIIRepositoryMock,
       installmentMapperMock,
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,
@@ -280,6 +282,7 @@ class InstallmentServiceImplTest {
       .thenReturn(List.of(installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
       .thenReturn(installmentDTO);
+    Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
@@ -379,11 +382,62 @@ class InstallmentServiceImplTest {
       .thenReturn(List.of(installment));
     Mockito.when(installmentMapperMock.mapToDto(installment))
       .thenReturn(installmentDTO);
+    Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
 
     // When Then
     assertThrows(IllegalStateException.class, () ->
       installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
         wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
+  void givenNotificationFeeWhenFeeAlreadyPaidThenSubtractFromInput() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+    long alreadyPaidFee = 50L;
+
+    InstallmentDTO installmentDTO = getInstallmentDTO();
+
+    Installment installment = new Installment();
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setIun(installmentDTO.getIun());
+    DebtPosition debtPosition = new DebtPosition();
+    DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
+
+    PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
+    paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
+    debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, null))
+      .thenReturn(List.of(installment));
+    Mockito.when(installmentMapperMock.mapToDto(installment))
+      .thenReturn(installmentDTO);
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId()))
+      .thenReturn(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
+
+    InstallmentNoPII installmentNoPII = new InstallmentNoPII();
+    installmentNoPII.setNotificationFeeCents(alreadyPaidFee);
+    Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun()))
+      .thenReturn(List.of(installmentNoPII));
+
+    // When
+    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
+      orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId);
+
+    // Then
+    assertEquals(150L, result.getNotificationFeeCents()); // 200 - 50
+    assertEquals(1050L, result.getAmountCents());
+    assertEquals(900L, result.getTransfers().getFirst().getAmountCents());
+    Mockito.verify(debtPositionUpdateInstallmentServiceMock).updateInstallment(
+      Mockito.eq(debtPositionDTO),
+      Mockito.argThat(list -> list.size() == 1),
+      Mockito.eq(wfExecutionParameters),
+      Mockito.eq(accessToken),
+      Mockito.eq(operatorExternalUserId)
+    );
   }
 //endregion
 
@@ -391,6 +445,7 @@ class InstallmentServiceImplTest {
     InstallmentDTO installmentDTO = new InstallmentDTO();
     installmentDTO.setInstallmentId(1L);
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.setIun("IUN");
     installmentDTO.setNotificationFeeCents(100L);
     installmentDTO.setAmountCents(1000L);
 

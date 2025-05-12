@@ -135,6 +135,8 @@ public class InstallmentServiceImpl implements InstallmentService {
 
   private long calculateFeeAlreadyPaid(long notificationFeeCents, String iun) {
     List<InstallmentNoPII> installmentNoPIIS = installmentNoPIIRepository.findPaidByIun(iun);
+    if(installmentNoPIIS==null || installmentNoPIIS.isEmpty())
+      return notificationFeeCents;
     long feeAlreadyPaid = installmentNoPIIS.stream()
       .mapToLong(i -> Objects.requireNonNullElse(i.getNotificationFeeCents(),0L)).sum();
     return notificationFeeCents-feeAlreadyPaid;
