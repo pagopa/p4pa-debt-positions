@@ -263,7 +263,8 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
       "DebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO",
       "IngestionFlowFileType" to "String",
       "WfExecutionConfig" to "com.fasterxml.jackson.databind.JsonNode",
-      "ExportFileType" to "String"
+      "ExportFileType" to "String",
+      "WorkflowTypeOrg" to "String"
     )
   )
   configOptions.set(
