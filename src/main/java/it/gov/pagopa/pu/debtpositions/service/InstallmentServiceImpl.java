@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,6 +84,11 @@ public class InstallmentServiceImpl implements InstallmentService {
         .forEach(installmentDTO -> {
           log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
           installmentDTO.setNotificationDate(request.getNotificationDate());
+          if(installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+            log.info("Obtained a notificationDate on an already expired Installment: installmentId:{} dueDate:{} status:{}",
+              installmentDTO.getInstallmentId(), installmentDTO.getDueDate(), installmentDTO.getStatus());
+            installmentDTO.setDueDate(LocalDate.now());
+          }
           updatedInstallments.add(installmentDTO);
         }));
 

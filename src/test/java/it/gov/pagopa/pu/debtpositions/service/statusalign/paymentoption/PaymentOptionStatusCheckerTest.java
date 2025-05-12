@@ -71,13 +71,13 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
-   * Test if the status is UNPAID when all installments are UNPAID.
+   * Test if the status is PARTIALLY_PAID when there is at least one PAID and one EXPIRED installment.
    */
   @Test
-  void testCalculateNewStatus_Unpaid() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAID, InstallmentStatus.UNPAID);
+  void testCalculateNewStatus_PartiallyPaid3() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.REPORTED, InstallmentStatus.EXPIRED);
     PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
-    assertEquals(PaymentOptionStatus.UNPAID, result);
+    assertEquals(PaymentOptionStatus.PARTIALLY_PAID, result);
   }
 
   /**
@@ -91,11 +91,21 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
+   * Test if the status is UNPAID when all installments are UNPAID.
+   */
+  @Test
+  void testCalculateNewStatus_Unpaid() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAID, InstallmentStatus.UNPAID);
+    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
+    assertEquals(PaymentOptionStatus.UNPAID, result);
+  }
+
+  /**
    * Test if the status is UNPAID when all installments are CANCELLED, with at least one UNPAID.
    */
   @Test
   void testCalculateNewStatus_Unpaid2() {
-    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAID, InstallmentStatus.CANCELLED, InstallmentStatus.CANCELLED);
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.UNPAID, InstallmentStatus.CANCELLED, InstallmentStatus.EXPIRED);
     PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
     assertEquals(PaymentOptionStatus.UNPAID, result);
   }

@@ -39,8 +39,9 @@ dependencyManagement {
   }
 }
 
-val springDocOpenApiVersion = "2.8.5"
+val springDocOpenApiVersion = "2.8.6"
 val openApiToolsVersion = "0.2.6"
+val springWolfAsyncApiVersion = "1.13.0"
 val micrometerVersion = "1.4.3"
 val postgresJdbcVersion = "42.7.5"
 val bouncycastleVersion = "1.80"
@@ -63,6 +64,9 @@ dependencies {
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
   implementation("io.micrometer:micrometer-registry-prometheus")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
+  implementation("io.github.springwolf:springwolf-kafka:${springWolfAsyncApiVersion}")
+  implementation("io.github.springwolf:springwolf-ui:${springWolfAsyncApiVersion}")
+  implementation("io.github.springwolf:springwolf-cloud-stream:${springWolfAsyncApiVersion}")
   implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
   implementation("org.openapitools:jackson-databind-nullable:$openApiToolsVersion")
   implementation("org.mapstruct:mapstruct:$mapStructVersion")
@@ -166,7 +170,8 @@ openApiGenerate {
     "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO",
     "PaymentEventType" to "it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType",
     "object" to "com.fasterxml.jackson.databind.JsonNode",
-    "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus"
+    "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
+    "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",

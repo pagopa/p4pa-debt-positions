@@ -9,9 +9,6 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
 
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.*;
 
@@ -68,13 +65,5 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
   @Override
   protected void storeStatus(BaseDebtPosition debtPosition, DebtPositionStatus newStatus) {
     debtPositionRepository.updateStatus(debtPosition.getDebtPositionId(), newStatus);
-  }
-
-  @Override
-  protected Set<PaymentOptionStatus> getAllowedCancelledStatuses() {
-    return Stream.concat(
-      super.getAllowedCancelledStatuses().stream(),
-      Stream.of(EXPIRED)
-    ).collect(Collectors.toSet());
   }
 }

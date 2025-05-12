@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc(print = MockMvcPrint.NONE)
+@AutoConfigureMockMvc(print = MockMvcPrint.NONE, addFilters = false)
 @TestPropertySource(properties = {
   "spring.datasource.debt-position.driver-class-name=org.h2.Driver",
   "spring.datasource.debt-position.jdbc-url=jdbc:h2:mem:db;DB_CLOSE_DELAY=-1",
@@ -34,11 +34,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   "spring.datasource.citizen.username=sa",
   "spring.datasource.citizen.password=sa",
 
-  "logging.level.org.springdoc.core.utils.SpringDocAnnotationsUtils=OFF",
-  "springwolf.enabled=false",
+  "springwolf.enabled=true",
+  "springwolf.use-fqn=false",
 })
 @Slf4j
-class OpenApiGeneratorTest {
+class AsyncApiGeneratorTest {
 
   @Autowired
   private MockMvc mockMvc;
@@ -46,35 +46,33 @@ class OpenApiGeneratorTest {
   @Test
   void generateAndVerifyCommit() throws Exception {
     MvcResult result = mockMvc.perform(
-      get("/v3/api-docs")
+      get("/springwolf/docs")
         .contentType(MediaType.APPLICATION_JSON)
         .accept(MediaType.APPLICATION_JSON)
     ).andExpect(status().isOk())
       .andReturn();
 
-    String openApiResult = result.getResponse().getContentAsString()
-      .replace("\r", "")
-      .replace("EntityModel", "");
+    String asyncApiResult = result.getResponse().getContentAsString();
 
-    Assertions.assertTrue(openApiResult.startsWith("{\n  \"openapi\" : \"3."));
+    Assertions.assertTrue(asyncApiResult.startsWith("{\n  \"asyncapi\": \"3"));
 
-    Path openApiGeneratedPath = Path.of("openapi/generated.openapi.json");
+    Path asyncApiGeneratedPath = Path.of("asyncapi/generated.asyncapi.json");
     boolean toStore=true;
-    if(Files.exists(openApiGeneratedPath)){
-      String storedOpenApi = Files.readString(openApiGeneratedPath);
+    if(Files.exists(asyncApiGeneratedPath)){
+      String storedOpenApi = Files.readString(asyncApiGeneratedPath);
       try {
-        JsonAssert.comparator(JsonCompareMode.STRICT).assertIsMatch(storedOpenApi, openApiResult);
+        JsonAssert.comparator(JsonCompareMode.STRICT).assertIsMatch(storedOpenApi, asyncApiResult);
         toStore=false;
       } catch (Throwable e){
         log.info("Observed the following changes: {}", e.getMessage());
       }
     }
     if(toStore){
-      Files.writeString(openApiGeneratedPath, openApiResult, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+      Files.writeString(asyncApiGeneratedPath, asyncApiResult, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
     }
 
     String gitStatus = execCmd("git", "status");
-    Assertions.assertFalse(gitStatus.contains("openapi/generated.openapi.json"), "Generated OpenApi not committed");
+    Assertions.assertFalse(gitStatus.contains("asyncapi/generated.asyncapi.json"), "Generated AsyncApi not committed");
   }
 
   public static String execCmd(String... cmd) throws java.io.IOException {
