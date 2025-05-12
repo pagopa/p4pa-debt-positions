@@ -428,7 +428,7 @@ class InstallmentServiceImplTest {
       orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     // Then
-    assertEquals(150L, result.getNotificationFeeCents()); // 200 - 50
+    assertEquals(150L, result.getNotificationFeeCents());
     assertEquals(1050L, result.getAmountCents());
     assertEquals(900L, result.getTransfers().getFirst().getAmountCents());
     Mockito.verify(debtPositionUpdateInstallmentServiceMock).updateInstallment(
