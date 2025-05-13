@@ -1,7 +1,10 @@
 package it.gov.pagopa.pu.debtpositions;
 
+import io.github.springwolf.core.asyncapi.schemas.converters.SchemaTitleModelConverter;
+import io.swagger.v3.core.converter.ModelConverters;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -42,6 +45,16 @@ class OpenApiGeneratorTest {
 
   @Autowired
   private MockMvc mockMvc;
+
+  @BeforeEach
+  void init() {
+    // removing ModelConverters configured by SpringWolf which will cause the setting of the title in each schema
+    boolean openapi31 = true;
+    ModelConverters modelConverters = ModelConverters.getInstance(openapi31);
+    modelConverters.getConverters().stream()
+      .filter(SchemaTitleModelConverter.class::isInstance)
+      .forEach(modelConverters::removeConverter);
+  }
 
   @Test
   void generateAndVerifyCommit() throws Exception {
