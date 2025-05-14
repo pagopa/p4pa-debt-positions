@@ -68,11 +68,11 @@ class PublishDebtPositionServiceTest {
       debtPositionHierarchyStatusAlignerServiceMock,
       validateDebtPositionServiceMock,
       debtPositionTypeOrgRepositoryMock
-      );
+    );
   }
 
   @AfterEach
-  void verifyNoMoreInteractions(){
+  void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionServiceMock,
@@ -144,14 +144,16 @@ class PublishDebtPositionServiceTest {
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).build();
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setStatus(DebtPositionStatus.TO_SYNC);
+    debtPositionDTO.setStatus(DebtPositionStatus.UNPAID);
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
     // When & Then
-    assertThrows(ConflictErrorException.class,
+    ConflictErrorException conflictErrorException = assertThrows(ConflictErrorException.class,
       () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId),
       "Only debt positions in DRAFT status can be published"
     );
+
+    assertEquals("The debt position with id 1 cannot be published because is not in an allowed status: UNPAID", conflictErrorException.getMessage());
   }
 }

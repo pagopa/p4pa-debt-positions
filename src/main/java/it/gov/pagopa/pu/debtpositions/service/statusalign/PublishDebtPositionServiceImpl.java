@@ -49,14 +49,12 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!DRAFT.equals(debtPositionDTO.getStatus())) {
-      throw new ConflictErrorException("Only debt positions in DRAFT status can be published");
+      throw new ConflictErrorException(String.format("The debt position with id %s cannot be published because is not in an allowed status: %s"
+        ,debtPositionId, debtPositionDTO.getStatus()));
     }
 
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
-
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
-    installment2operate.forEach(installmentDTO -> validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin()));
 
     WorkflowCreatedDTO workflow = execute(debtPositionDTO, installment2operate,
       wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);
@@ -68,8 +66,11 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
+
     debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().forEach(installment -> {
+        validateDebtPositionService.validateInstallment(installment, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
         installment.setStatus(TO_SYNC);
         InstallmentUtils.setStatus(installment, UNPAID);
       }));
