@@ -35,6 +35,7 @@ import java.util.Map;
 import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
@@ -56,6 +57,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
   private DebtPositionSyncService syncServiceMock;
+  @Mock
+  private PublishDebtPositionService publishDebtPositionService;
 
   private DebtPositionHierarchyStatusAlignerServiceImpl service;
 
@@ -68,7 +71,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         paymentOptionInnerStatusAlignerServiceMock,
         debtPositionInnerStatusAlignerServiceMock,
         debtPositionMapperMock,
-        syncServiceMock)
+        syncServiceMock,
+        publishDebtPositionService)
     );
   }
 
@@ -80,7 +84,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       paymentOptionInnerStatusAlignerServiceMock,
       debtPositionInnerStatusAlignerServiceMock,
       debtPositionMapperMock,
-      syncServiceMock
+      syncServiceMock,
+      publishDebtPositionService
     );
   }
 
@@ -203,7 +208,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
     Mockito.when(debtPositionRepositoryMock.findByTransferId(transferId)).thenReturn(debtPosition);
@@ -219,7 +224,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
 
@@ -247,7 +252,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     TransferReportedRequest request = TransferReportedRequest.builder()
       .iuf("IUF")
       .build();
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     InstallmentNoPII reportedInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
     reportedInstallment.setStatus(InstallmentStatus.PAID);
     reportedInstallment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
@@ -296,7 +301,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenCheckAndUpdateInstallmentExpirationWhenInstallmentIsInvalidThenOk() {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.INVALID);
 
     DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
@@ -322,7 +327,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.of(2025, 1, 1);
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     InstallmentNoPII expiredInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
     expiredInstallment.setStatus(InstallmentStatus.UNPAID);
     expiredInstallment.setDueDate(dueDate);
@@ -352,7 +357,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
     LocalDate dueDate = LocalDate.now().plusDays(2);
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(dueDate);
 
@@ -378,7 +383,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsNullNowThenOk() {
     Long debtPositionId = 1L;
     String accessToken = "ACCESSTOKEN";
-    DebtPosition debtPosition = DebtPositionFaker.buildDebtPosition();
+    DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.UNPAID);
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(null);
 
@@ -418,5 +423,28 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     // Then
     Assertions.assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenPublishDebtPositionThenOk() {
+    // Given
+    Long debtPositionId = 1L;
+    String userId = "userId";
+    DebtPositionDTO debtPosition = buildDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
+    String accessToken = "accessToken";
+
+    Mockito.when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
+      .thenReturn(Pair.of(debtPosition, workflow));
+
+    // When
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId);
+
+    // Then
+    assertEquals(debtPosition, result.getLeft());
+    assertEquals(workflow, result.getRight());
   }
 }

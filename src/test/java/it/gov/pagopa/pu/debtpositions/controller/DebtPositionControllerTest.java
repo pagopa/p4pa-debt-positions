@@ -407,4 +407,29 @@ class DebtPositionControllerTest {
       .andExpect(status().isNoContent())
       .andReturn();
   }
+
+  @Test
+  void whenPublishDebtPositionThenOk() throws Exception {
+    DebtPositionDTO debtPosition = buildDebtPositionDTO();
+    Long debtPositionId = 1L;
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(debtPositionHierarchyStatusAlignerService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
+      .thenReturn(Pair.of(debtPosition, workflow));
+
+    MvcResult result = mockMvc.perform(
+        put("/debt-positions/1/publish")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(debtPosition)))
+      .andExpect(status().isOk())
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
 }

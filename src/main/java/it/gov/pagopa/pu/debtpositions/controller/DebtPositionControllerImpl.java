@@ -202,4 +202,22 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
         .build();
     }
   }
+
+  @Override
+  public ResponseEntity<DebtPositionDTO> publishDebtPosition(Long debtPositionId) {
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .partialChange(false)
+      .build();
+
+    log.info("Publishing debtPosition with id {}", debtPositionId);
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionHierarchyStatusAlignerService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalUserId);
+    return ResponseEntity
+      .status(HttpStatus.OK)
+      .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
+      .header(HEADER_X_RUN_ID, result.getRight().getRunId())
+      .body(result.getLeft());
+  }
 }

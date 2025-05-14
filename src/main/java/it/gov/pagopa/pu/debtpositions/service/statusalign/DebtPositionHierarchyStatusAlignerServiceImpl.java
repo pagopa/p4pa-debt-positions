@@ -38,16 +38,18 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   private final DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionSyncService debtPositionSyncService;
+  private final PublishDebtPositionService publishDebtPositionService;
 
 
   public DebtPositionHierarchyStatusAlignerServiceImpl(DebtPositionRepository debtPositionRepository,
-                                                       InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService) {
+                                                       InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService, PublishDebtPositionService publishDebtPositionService) {
     this.debtPositionRepository = debtPositionRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.paymentOptionInnerStatusAlignerService = paymentOptionInnerStatusAlignerService;
     this.debtPositionInnerStatusAlignerService = debtPositionInnerStatusAlignerService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionSyncService = debtPositionSyncService;
+    this.publishDebtPositionService = publishDebtPositionService;
   }
 
   @Transactional
@@ -197,5 +199,10 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   protected DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
     alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  @Override
+  public Pair<DebtPositionDTO, WorkflowCreatedDTO> publishDebtPosition(Long debtPositionId, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+    return publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalUserId);
   }
 }
