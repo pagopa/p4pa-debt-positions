@@ -129,7 +129,7 @@ public class InstallmentMapper {
       .notificationDate(installment.getNotificationDate())
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
-      .ingestionFlowFileGenerateAdvice(false)
+      .ingestionFlowFileGenerateAdvice(installment.isIngestionFlowFileGenerateAdvice())
       .receiptId(installment.getReceiptId())
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()))
