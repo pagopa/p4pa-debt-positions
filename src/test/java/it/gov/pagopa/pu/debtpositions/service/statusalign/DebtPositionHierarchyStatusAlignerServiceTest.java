@@ -57,8 +57,6 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   private DebtPositionMapper debtPositionMapperMock;
   @Mock
   private DebtPositionSyncService syncServiceMock;
-  @Mock
-  private PublishDebtPositionService publishDebtPositionService;
 
   private DebtPositionHierarchyStatusAlignerServiceImpl service;
 
@@ -71,8 +69,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         paymentOptionInnerStatusAlignerServiceMock,
         debtPositionInnerStatusAlignerServiceMock,
         debtPositionMapperMock,
-        syncServiceMock,
-        publishDebtPositionService)
+        syncServiceMock)
     );
   }
 
@@ -84,8 +81,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       paymentOptionInnerStatusAlignerServiceMock,
       debtPositionInnerStatusAlignerServiceMock,
       debtPositionMapperMock,
-      syncServiceMock,
-      publishDebtPositionService
+      syncServiceMock
     );
   }
 
@@ -423,28 +419,5 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     // Then
     Assertions.assertSame(expectedResult, result);
-  }
-
-  @Test
-  void givenPublishDebtPositionThenOk() {
-    // Given
-    Long debtPositionId = 1L;
-    String userId = "userId";
-    DebtPositionDTO debtPosition = buildDebtPositionDTO();
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(false)
-      .build();
-    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
-    String accessToken = "accessToken";
-
-    Mockito.when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
-      .thenReturn(Pair.of(debtPosition, workflow));
-
-    // When
-    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId);
-
-    // Then
-    assertEquals(debtPosition, result.getLeft());
-    assertEquals(workflow, result.getRight());
   }
 }

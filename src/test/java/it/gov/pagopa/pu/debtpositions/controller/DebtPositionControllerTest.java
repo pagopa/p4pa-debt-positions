@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -72,6 +73,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionDeletionService debtPositionDeletionService;
+
+  @MockitoBean
+  private PublishDebtPositionService publishDebtPositionService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -417,7 +421,7 @@ class DebtPositionControllerTest {
       .build();
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
+    Mockito.when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
       .thenReturn(Pair.of(debtPosition, workflow));
 
     MvcResult result = mockMvc.perform(

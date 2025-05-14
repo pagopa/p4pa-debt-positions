@@ -60,7 +60,7 @@ class PublishDebtPositionServiceTest {
 
   @BeforeEach
   void setUp() {
-    service = new PublishDebtPositionService(
+    service = new PublishDebtPositionServiceImpl(
       authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionServiceMock,
       debtPositionSyncServiceMock,

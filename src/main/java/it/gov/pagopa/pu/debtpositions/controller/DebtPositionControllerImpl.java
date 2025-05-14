@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -33,8 +34,9 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final InstallmentService installmentService;
   private final DebtPositionManageInstallmentsService debtPositionManageService;
   private final DebtPositionDeletionService debtPositionDeletionService;
+  private final PublishDebtPositionService publishDebtPositionService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService, PublishDebtPositionService publishDebtPositionService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
@@ -42,6 +44,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     this.installmentService = installmentService;
     this.debtPositionManageService = debtPositionManageService;
     this.debtPositionDeletionService = debtPositionDeletionService;
+    this.publishDebtPositionService = publishDebtPositionService;
   }
 
   @Override
@@ -213,7 +216,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .build();
 
     log.info("Publishing debtPosition with id {}", debtPositionId);
-    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionHierarchyStatusAlignerService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalUserId);
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalUserId);
     return ResponseEntity
       .status(HttpStatus.OK)
       .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
