@@ -6,11 +6,12 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -33,27 +34,29 @@ import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.UNP
 @Slf4j
 public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationService implements PublishDebtPositionService {
 
-  private final DebtPositionMapper debtPositionMapper;
+  private final ValidateDebtPositionService validateDebtPositionService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
-  public PublishDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionMapper debtPositionMapper) {
+  public PublishDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, ValidateDebtPositionService validateDebtPositionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
-
-    this.debtPositionMapper = debtPositionMapper;
+    this.validateDebtPositionService = validateDebtPositionService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   @Transactional
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> publishDebtPosition(Long debtPositionId, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    DebtPosition debtPosition = debtPositionService.getDebtPositionNoPII(debtPositionId);
+    DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
 
-    if (!DRAFT.equals(debtPosition.getStatus())) {
+    if (!DRAFT.equals(debtPositionDTO.getStatus())) {
       throw new ConflictErrorException("Only debt positions in DRAFT status can be published");
     }
 
-    DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
-
     List<InstallmentDTO> installment2operate = debtPositionDTO.getPaymentOptions().stream()
       .map(PaymentOptionDTO::getInstallments).flatMap(Collection::stream).toList();
+
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
+    installment2operate.forEach(installmentDTO -> validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin()));
 
     WorkflowCreatedDTO workflow = execute(debtPositionDTO, installment2operate,
       wfExecutionParameters, PaymentEventType.DP_CREATED, accessToken, operatorExternalUserId);

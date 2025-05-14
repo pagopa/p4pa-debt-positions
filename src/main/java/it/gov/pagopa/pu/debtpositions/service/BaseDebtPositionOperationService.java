@@ -25,11 +25,12 @@ import java.util.stream.Collectors;
 public abstract class BaseDebtPositionOperationService {
 
   private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
-  protected final DebtPositionService debtPositionService;
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionProcessorService debtPositionProcessorService;
   private final OrganizationService organizationService;
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
+
+  protected final DebtPositionService debtPositionService;
 
   protected BaseDebtPositionOperationService(
     AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
