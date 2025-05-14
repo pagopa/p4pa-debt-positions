@@ -7,6 +7,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
@@ -50,7 +52,7 @@ public class InstallmentMapper {
     installment.setNotificationDate(dto.getNotificationDate());
     installment.setIngestionFlowFileId(dto.getIngestionFlowFileId());
     installment.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
-    installment.setIngestionFlowFileGenerateAdvice(dto.getIngestionFlowFileGenerateAdvice());
+    installment.setIngestionFlowFileGenerateAdvice(Optional.ofNullable(dto.getIngestionFlowFileGenerateAdvice()).orElse(false));
     installment.setReceiptId(dto.getReceiptId());
     installment.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
     installment.setUpdateDate(dto.getUpdateDate() != null ? dto.getUpdateDate().toLocalDateTime() : null);
