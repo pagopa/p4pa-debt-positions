@@ -65,6 +65,7 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private OffsetDateTime notificationDate;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;
+  private boolean ingestionFlowFileGenerateAdvice;
   private Long receiptId;
 
   @OneToMany(mappedBy = "installmentId")
