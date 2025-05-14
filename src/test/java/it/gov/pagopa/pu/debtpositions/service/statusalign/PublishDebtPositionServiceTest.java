@@ -6,12 +6,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
@@ -41,8 +39,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class PublishDebtPositionServiceTest {
 
   @Mock
-  private DebtPositionRepository debtPositionRepositoryMock;
-  @Mock
   private DebtPositionMapper debtPositionMapperMock;
 
 
@@ -70,7 +66,6 @@ class PublishDebtPositionServiceTest {
       debtPositionProcessorServiceMock,
       organizationServiceMock,
       debtPositionHierarchyStatusAlignerServiceMock,
-      debtPositionRepositoryMock,
       debtPositionMapperMock);
   }
 
@@ -83,7 +78,6 @@ class PublishDebtPositionServiceTest {
       debtPositionProcessorServiceMock,
       organizationServiceMock,
       debtPositionHierarchyStatusAlignerServiceMock,
-      debtPositionRepositoryMock,
       debtPositionMapperMock
     );
   }
@@ -107,7 +101,7 @@ class PublishDebtPositionServiceTest {
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
 
-    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
@@ -137,24 +131,7 @@ class PublishDebtPositionServiceTest {
   }
 
   @Test
-  void givenPublishDebtPositionWhenDebtPositionNotFoundThenThrowNotFoundException() {
-    // Given
-    Long debtPositionId = 1L;
-    String accessToken = "accessToken";
-    String operatorExternalId = "OPERATOREXTERNALID";
-    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(false)
-      .build();
-
-    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(null);
-
-    // When & Then
-    assertThrows(NotFoundException.class, () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId),
-      "Debt position related to the id 1 does not found");
-  }
-
-  @Test
-  void givenNonDraftDebtPositionWhenPublishThenThrowException() {
+  void givenNonDraftDebtPositionWhenPublishThenThrowConflictErrorException() {
     // Given
     Long debtPositionId = 1L;
     String accessToken = "accessToken";
@@ -164,16 +141,10 @@ class PublishDebtPositionServiceTest {
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setStatus(DebtPositionStatus.TO_SYNC);
 
-    DebtPositionDTO dto = buildDebtPositionDTO();
-    dto.setStatus(DebtPositionStatus.TO_SYNC);
-
-    Mockito.when(debtPositionRepositoryMock.findOneWithAllDataByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(dto);
-    Mockito.when(organizationServiceMock.getOrganizationById(dto.getOrganizationId(), accessToken)).thenReturn(Optional.of(buildOrganization()));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(buildDebtPositionTypeOrg());
+    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
 
     // When & Then
-    assertThrows(InvalidValueException.class,
+    assertThrows(ConflictErrorException.class,
       () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId),
       "Only debt positions in DRAFT status can be published"
     );

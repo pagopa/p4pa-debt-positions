@@ -5,11 +5,9 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -35,22 +33,21 @@ import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.UNP
 @Slf4j
 public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationService implements PublishDebtPositionService {
 
-  private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
 
-  public PublishDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper) {
+  public PublishDebtPositionServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionMapper debtPositionMapper) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
-    this.debtPositionRepository = debtPositionRepository;
+
     this.debtPositionMapper = debtPositionMapper;
   }
 
   @Transactional
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> publishDebtPosition(Long debtPositionId, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    DebtPosition debtPosition = debtPositionService.getDebtPositionNoPII(debtPositionId);
 
-    if (debtPosition == null) {
-      throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
+    if (!DRAFT.equals(debtPosition.getStatus())) {
+      throw new ConflictErrorException("Only debt positions in DRAFT status can be published");
     }
 
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
@@ -68,14 +65,10 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
-    if (DRAFT.equals(debtPositionDTO.getStatus())) {
-      debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
-        paymentOption.getInstallments().forEach(installment -> {
-          installment.setStatus(TO_SYNC);
-          InstallmentUtils.setStatus(installment, UNPAID);
-        }));
-    } else {
-      throw new InvalidValueException("Only debt positions in DRAFT status can be published");
-    }
+    debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
+      paymentOption.getInstallments().forEach(installment -> {
+        installment.setStatus(TO_SYNC);
+        InstallmentUtils.setStatus(installment, UNPAID);
+      }));
   }
 }
