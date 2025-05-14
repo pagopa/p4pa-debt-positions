@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -152,5 +153,26 @@ class PublishDebtPositionServiceTest {
     ConflictErrorException conflictErrorException = assertThrows(ConflictErrorException.class,
       () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId));
     assertEquals("The debt position with id 1 cannot be published because is not in an allowed status: UNPAID", conflictErrorException.getMessage());
+  }
+
+  @Test
+  void givenDebtPositionTypeOrgNotFoundWhenPublishThenThrowNotFoundException() {
+    // Given
+    Long debtPositionId = 1L;
+    String accessToken = "accessToken";
+    String operatorExternalId = "OPERATOREXTERNALID";
+    Long debtPositionTypeOrgId = 2L;
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).build();
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenReturn(Optional.empty());
+
+    // When & Then
+    NotFoundException notFoundException = assertThrows(NotFoundException.class,
+      () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId));
+    assertEquals("The DebtPositionTypeOrg with id 2 was not found", notFoundException.getMessage());
   }
 }
