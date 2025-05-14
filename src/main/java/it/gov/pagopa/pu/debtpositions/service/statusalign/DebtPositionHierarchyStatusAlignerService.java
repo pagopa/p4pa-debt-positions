@@ -13,15 +13,18 @@ public interface DebtPositionHierarchyStatusAlignerService {
 
   /**
    * It will set the installment as REPORTED and then invoking sync debtPosition in order to publish the event
+   *
    * @return The DebtPosition updated and workflowId started
    */
   Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken);
 
   /**
    * It will verify installment expiration and then invoking sync debtPosition in order to publish the event and re-schedule expiration check
+   *
    * @return The DebtPosition updated and workflowId started
    */
   Pair<DebtPositionDTO, WorkflowCreatedDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken);
 
   void alignHierarchyStatus(BaseDebtPosition debtPosition);
+
 }

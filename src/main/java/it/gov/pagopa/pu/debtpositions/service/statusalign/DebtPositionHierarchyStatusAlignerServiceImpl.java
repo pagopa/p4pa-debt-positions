@@ -40,6 +40,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   private final DebtPositionSyncService debtPositionSyncService;
 
 
+
   public DebtPositionHierarchyStatusAlignerServiceImpl(DebtPositionRepository debtPositionRepository,
                                                        InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService) {
     this.debtPositionRepository = debtPositionRepository;

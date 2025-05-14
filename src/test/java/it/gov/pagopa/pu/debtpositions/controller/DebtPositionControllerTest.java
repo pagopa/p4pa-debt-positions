@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -72,6 +73,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionDeletionService debtPositionDeletionService;
+
+  @MockitoBean
+  private PublishDebtPositionService publishDebtPositionService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -406,5 +410,30 @@ class DebtPositionControllerTest {
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isNoContent())
       .andReturn();
+  }
+
+  @Test
+  void whenPublishDebtPositionThenOk() throws Exception {
+    DebtPositionDTO debtPosition = buildDebtPositionDTO();
+    Long debtPositionId = 1L;
+    WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
+      .massive(false)
+      .build();
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
+      .thenReturn(Pair.of(debtPosition, workflow));
+
+    MvcResult result = mockMvc.perform(
+        put("/debt-positions/1/publish")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(debtPosition)))
+      .andExpect(status().isOk())
+      .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
+      .andExpect(header().string("x-run-id", workflow.getRunId()))
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 }
