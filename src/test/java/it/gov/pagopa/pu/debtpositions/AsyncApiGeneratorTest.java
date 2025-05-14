@@ -52,7 +52,8 @@ class AsyncApiGeneratorTest {
     ).andExpect(status().isOk())
       .andReturn();
 
-    String asyncApiResult = result.getResponse().getContentAsString();
+    String asyncApiResult = result.getResponse().getContentAsString()
+      .replace("\r", "");
 
     Assertions.assertTrue(asyncApiResult.startsWith("{\n  \"asyncapi\": \"3"));
 
