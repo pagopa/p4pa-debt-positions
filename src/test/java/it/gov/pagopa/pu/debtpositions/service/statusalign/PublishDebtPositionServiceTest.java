@@ -150,10 +150,7 @@ class PublishDebtPositionServiceTest {
 
     // When & Then
     ConflictErrorException conflictErrorException = assertThrows(ConflictErrorException.class,
-      () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId),
-      "Only debt positions in DRAFT status can be published"
-    );
-
+      () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId));
     assertEquals("The debt position with id 1 cannot be published because is not in an allowed status: UNPAID", conflictErrorException.getMessage());
   }
 }
