@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -73,6 +74,8 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
           installment.setStatus(TO_SYNC);
           InstallmentUtils.setStatus(installment, UNPAID);
         }));
+    } else {
+      throw new InvalidValueException("Only debt positions in DRAFT status can be published");
     }
   }
 }
