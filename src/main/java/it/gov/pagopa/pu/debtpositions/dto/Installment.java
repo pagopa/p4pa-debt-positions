@@ -43,6 +43,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private OffsetDateTime notificationDate;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;
+  private boolean ingestionFlowFileGenerateAdvice;
   private Long receiptId;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;

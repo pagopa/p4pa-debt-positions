@@ -1139,6 +1139,8 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
+        ingestionFlowFileGenerateAdvice:
+          type: boolean
         receiptId:
           type: integer
           format: int64
