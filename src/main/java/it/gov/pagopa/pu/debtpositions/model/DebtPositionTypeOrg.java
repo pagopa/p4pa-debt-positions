@@ -3,7 +3,10 @@ package it.gov.pagopa.pu.debtpositions.model;
 import it.gov.pagopa.pu.debtpositions.model.validator.BalanceConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import java.io.Serializable;
@@ -31,7 +34,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private String code;
   @NotNull
   private String description;
-  @NotNull
   private String iban;
   private String postalIban;
   private String postalAccountCode;
