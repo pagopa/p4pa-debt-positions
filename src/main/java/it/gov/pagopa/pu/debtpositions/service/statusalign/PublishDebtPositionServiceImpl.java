@@ -28,7 +28,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus.DRAFT;
-import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.TO_SYNC;
 import static it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus.UNPAID;
 
 @Service
@@ -73,7 +72,6 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
     debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().forEach(installment -> {
         validateDebtPositionService.validateInstallment(installment, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
-        installment.setStatus(TO_SYNC);
         InstallmentUtils.setStatus(installment, UNPAID);
       }));
   }
