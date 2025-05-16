@@ -38,8 +38,11 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Transactional
   @RestResource(exported = false)
   @Modifying
-  @Query("UPDATE InstallmentNoPII i SET i.iun = :iun WHERE i.installmentId = :installmentId")
-  void updateIun(Long installmentId, String iun);
+  @Query("UPDATE InstallmentNoPII i SET i.iun = :iun " +
+    "WHERE i.paymentOptionId IN (" +
+    "  SELECT po.paymentOptionId FROM PaymentOption po WHERE po.debtPositionId = :debtPositionId" +
+    ")")
+  void updateIun(Long debtPositionId, String iun);
 
   @RestResource(exported = false)
   @Transactional

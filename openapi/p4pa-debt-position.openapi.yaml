@@ -578,13 +578,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
-  /crud-ext/installments/by-installmentId-iun:
+  /crud-ext/installments/by-debtPositionId-iun:
     put:
       tags:
         - installments-entity-extended-controller
       operationId: updateIun
       parameters:
-        - name: installmentId
+        - name: debtPositionId
           in: query
           required: true
           schema:
