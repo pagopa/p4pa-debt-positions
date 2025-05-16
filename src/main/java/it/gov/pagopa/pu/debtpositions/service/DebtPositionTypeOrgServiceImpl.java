@@ -5,17 +5,26 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.util.ValidationUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+
+import java.util.List;
 
 @Slf4j
 @Service
 public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
+  public static final List<String> debtPositionTypeOrgReadOnlyFields = List.of(
+          "debtPositionTypeOrgId", "debtPositionTypeId", "organizationId",
+          "balance", "code", "description", "orgSector", "flagAnonymousFiscalCode",
+          "flagMandatoryDueDate", "flagNotifyIo", "flagActive", "flagAmountActualization",
+          "flagExternal");
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
     DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService) {
@@ -52,6 +61,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Override
   public DebtPositionTypeOrg saveDebtPositionTypeOrg(
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
+    validateDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
     DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(
       saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
     handleOperators(savedDebtPositionTypeOrg,saveDebtPositionTypeOrgDTO);
@@ -69,6 +79,24 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())){
       debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getEnabledOperators());
+    }
+  }
+
+  private void validateDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
+      if (debtPositionTypeOrg == null) {
+          throw new ValidationException("DebtPositionTypeOrg must not be null");
+      }
+      if(debtPositionTypeOrg.getDebtPositionTypeOrgId()!=null){
+        DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
+                .orElseThrow(()->new NotFoundException("DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
+        checkReadOnlyFields(dpto, debtPositionTypeOrg);
+      }
+  }
+
+  private void checkReadOnlyFields(DebtPositionTypeOrg existingDebtPositionTypeOrg, DebtPositionTypeOrg updatedDebtPositionTypeOrg) {
+    List<String> updatedFields = ValidationUtils.checkReadOnlyFields(existingDebtPositionTypeOrg, updatedDebtPositionTypeOrg, debtPositionTypeOrgReadOnlyFields);
+    if(!CollectionUtils.isEmpty(updatedFields)){
+      throw new ValidationException("The following DebtPositionTypeOrg fields are readOnly. "+updatedFields);
     }
   }
 }

@@ -7,8 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
-import java.util.Collections;
-import java.util.Optional;
+import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +16,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.Collections;
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionTypeOrgServiceImplTest {
@@ -120,10 +122,11 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void givenOperatorsToHandleWhenSaveDebtPositionTypeOrgThenOk(){
+  void givenOperatorsToHandleAndNonExistingDebtPositionTypeOrgWhenSaveDebtPositionTypeOrgThenOk(){
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = podamFactory.manufacturePojo(SaveDebtPositionTypeOrgDTO.class);
     saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(true);
     DebtPositionTypeOrg expectedResult = saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg();
+    expectedResult.setDebtPositionTypeOrgId(null);
 
     Mockito.when(debtPositionTypeOrgRepository.save(expectedResult))
       .thenReturn(expectedResult);
@@ -142,9 +145,10 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void givenNoOperatorsToHandleWhenSaveDebtPositionTypeOrgThenOk(){
+  void givenNoOperatorsToHandleAndNonExistingDebtPositionTypeOrgWhenSaveDebtPositionTypeOrgThenOk(){
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
     saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
@@ -157,6 +161,46 @@ class DebtPositionTypeOrgServiceImplTest {
       saveDebtPositionTypeOrgDTO);
 
     Assertions.assertEquals(debtPositionTypeOrg,result);
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenNonExistingDebtPositionTypeOrgAndDebtPositionTypeOrgIdPopulatedWhenSaveDebtPositionTypeOrgThenNotFoundException(){
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+    saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(false);
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId()))
+            .thenReturn(Optional.empty());
+
+    Assertions.assertThrows(NotFoundException.class,()->debtPositionTypeOrgService.saveDebtPositionTypeOrg(
+            saveDebtPositionTypeOrgDTO));
+
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenExistingDebtPositionTypeOrgAndUpdatedReadOnlyFieldWhenSaveDebtPositionTypeOrgThenValidationException(){
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+    saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(false);
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId()))
+            .thenReturn(Optional.of(podamFactory.manufacturePojo(DebtPositionTypeOrg.class)));
+
+    Assertions.assertThrows(ValidationException.class,()->debtPositionTypeOrgService.saveDebtPositionTypeOrg(
+            saveDebtPositionTypeOrgDTO));
+
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
     Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsServiceMock);
   }
