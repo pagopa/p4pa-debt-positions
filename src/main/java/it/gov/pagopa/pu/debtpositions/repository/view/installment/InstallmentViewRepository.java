@@ -34,7 +34,8 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
     WHERE dp.organizationId = :organizationId
     AND dptoo.operatorExternalUserId = :operatorExternalUserId
-    AND i.dueDate BETWEEN :dueDateFrom AND :dueDateTo
+    AND (cast(:dueDateFrom as date) IS NULL OR i.dueDate >= :dueDateFrom)
+    AND (cast(:dueDateTo as date) IS NULL OR i.dueDate <= :dueDateTo)
     AND (:iuv IS NULL OR i.iuv = :iuv)
     AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
     AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
@@ -42,8 +43,8 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
   Page<InstallmentView> findInstallmentsByFilters(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true, schema = @Schema(type = "string", format = "date-time")) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
-    @Parameter(required = true, schema = @Schema(type = "string", format = "date-time")) @Param("dueDateTo") OffsetDateTime dueDateTo,
+    @Parameter(schema = @Schema(type = "string", format = "date-time")) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
+    @Parameter(schema = @Schema(type = "string", format = "date-time")) @Param("dueDateTo") OffsetDateTime dueDateTo,
     String iuv,
     String fiscalCode,
     Long debtPositionTypeOrgId,
