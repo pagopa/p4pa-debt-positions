@@ -578,7 +578,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
-  /crud-ext/installments/by-debtPositionId-iun:
+  /crud-ext/installments/set-iun-by-debtPositionId:
     put:
       tags:
         - installments-entity-extended-controller
