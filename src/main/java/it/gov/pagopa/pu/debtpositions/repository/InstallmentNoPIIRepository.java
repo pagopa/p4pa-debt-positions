@@ -42,7 +42,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "WHERE i.paymentOptionId IN (" +
     "  SELECT po.paymentOptionId FROM PaymentOption po WHERE po.debtPositionId = :debtPositionId" +
     ")")
-  void updateIun(Long debtPositionId, String iun);
+  void updateIunByDebtPositionId(Long debtPositionId, String iun);
 
   @RestResource(exported = false)
   @Transactional

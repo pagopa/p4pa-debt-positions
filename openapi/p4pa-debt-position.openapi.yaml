@@ -582,7 +582,7 @@ paths:
     put:
       tags:
         - installments-entity-extended-controller
-      operationId: updateIun
+      operationId: updateIunByDebtPositionId
       parameters:
         - name: debtPositionId
           in: query

@@ -79,9 +79,9 @@ class InstallmentEntityExtendedControllerTest {
     String iun = "IUN";
 
     // When
-    controller.updateIun(debtPositionId, iun);
+    controller.updateIunByDebtPositionId(debtPositionId, iun);
 
     // Then
-    verify(repositoryMock).updateIun(debtPositionId, iun);
+    verify(repositoryMock).updateIunByDebtPositionId(debtPositionId, iun);
   }
 }

@@ -36,8 +36,8 @@ public class InstallmentEntityExtendedController implements InstallmentsEntityEx
   }
 
   @Override
-  public ResponseEntity<Void> updateIun(Long debtPositionId, String iun) {
-    repository.updateIun(debtPositionId, iun);
+  public ResponseEntity<Void> updateIunByDebtPositionId(Long debtPositionId, String iun) {
+    repository.updateIunByDebtPositionId(debtPositionId, iun);
     return ResponseEntity.ok().build();
   }
 
