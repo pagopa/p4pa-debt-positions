@@ -67,8 +67,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .findFirst()
-        .ifPresent(installmentDTO -> {
+        .forEach(installmentDTO -> {
           validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
 
           InstallmentStatus statusTo = installmentDTO.getStatus();

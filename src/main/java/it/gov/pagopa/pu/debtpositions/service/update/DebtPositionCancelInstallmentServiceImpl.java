@@ -69,8 +69,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .findFirst()
-        .ifPresent(installmentDTO -> InstallmentUtils.setStatus(installmentDTO, InstallmentStatus.CANCELLED))
+        .forEach(installmentDTO -> InstallmentUtils.setStatus(installmentDTO, InstallmentStatus.CANCELLED))
       );
   }
 
