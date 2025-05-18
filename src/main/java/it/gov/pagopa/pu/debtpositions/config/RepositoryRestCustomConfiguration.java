@@ -3,18 +3,17 @@ package it.gov.pagopa.pu.debtpositions.config;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.PathItem;
 import io.swagger.v3.oas.models.media.Schema;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.metamodel.EntityType;
 import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.context.PersistentEntities;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.MediaType;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 import java.util.stream.Stream;
 
 @Configuration
@@ -22,20 +21,18 @@ public class RepositoryRestCustomConfiguration {
 
   public static final String SPRING_DATA_REST_MODEL_PREFIX = "EntityModel";
 
-  private final EntityManager entityManager;
+  private final PersistentEntities persistentEntities;
 
-  public RepositoryRestCustomConfiguration(EntityManager entityManager) {
-    this.entityManager = entityManager;
+  public RepositoryRestCustomConfiguration(PersistentEntities persistentEntities) {
+    this.persistentEntities = persistentEntities;
   }
 
   @Bean
   public RepositoryRestConfigurer repositoryRestConfigurer() {
-    return RepositoryRestConfigurer.withConfig(config -> {
-      Set<EntityType<?>> entities = entityManager.getMetamodel().getEntities();
-      config.exposeIdsFor(entities.stream()
-        .map(EntityType::getJavaType)
-        .toArray(Class[]::new));
-    });
+    return RepositoryRestConfigurer.withConfig(config ->
+      config.exposeIdsFor(persistentEntities.get()
+        .map(PersistentEntity::getType)
+        .toArray(Class[]::new)));
   }
 
   @Bean
@@ -67,15 +64,15 @@ public class RepositoryRestCustomConfiguration {
       .forEach(this::renameModelsInNestedSchemas);
   }
 
-  private void renameModelsInNestedSchemas(Schema<?> schema){
-    if(schema.get$ref()!= null){
-      if(schema.get$ref().contains(SPRING_DATA_REST_MODEL_PREFIX)){
+  private void renameModelsInNestedSchemas(Schema<?> schema) {
+    if (schema.get$ref() != null) {
+      if (schema.get$ref().contains(SPRING_DATA_REST_MODEL_PREFIX)) {
         schema.set$ref(schema.get$ref().replace(SPRING_DATA_REST_MODEL_PREFIX, ""));
       }
     } else {
-      if(schema.getItems() != null){
+      if (schema.getItems() != null) {
         renameModelsInNestedSchemas(schema.getItems());
-      } else if(schema.getProperties()!=null){
+      } else if (schema.getProperties() != null) {
         schema.getProperties().values().forEach(this::renameModelsInNestedSchemas);
       }
     }
