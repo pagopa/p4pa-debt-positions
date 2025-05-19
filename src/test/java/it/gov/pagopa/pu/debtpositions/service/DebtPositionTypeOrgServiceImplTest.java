@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.BeanUtils;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
@@ -203,5 +204,49 @@ class DebtPositionTypeOrgServiceImplTest {
 
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
     Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenExistingDebtPositionTypeOrgAndUnchangedReadOnlyFieldsWhenSaveDebtPositionTypeOrgThenValidationException(){
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
+    DebtPositionTypeOrg updatedDebtPositionTypeOrg = buildUpdatedDebtPositionTypeOrg(debtPositionTypeOrg);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(updatedDebtPositionTypeOrg);
+    saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(false);
+
+    Mockito.when(debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId()))
+            .thenReturn(Optional.of(debtPositionTypeOrg));
+
+    Mockito.when(debtPositionTypeOrgRepository.save(updatedDebtPositionTypeOrg))
+            .thenReturn(updatedDebtPositionTypeOrg);
+
+    DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
+            saveDebtPositionTypeOrgDTO);
+
+    Assertions.assertEquals(updatedDebtPositionTypeOrg,result);
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepository);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  private static DebtPositionTypeOrg buildUpdatedDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
+    DebtPositionTypeOrg dpto = new DebtPositionTypeOrg();
+    BeanUtils.copyProperties(debtPositionTypeOrg,dpto);
+    return dpto.toBuilder()
+              //updatable fields
+              .iban(debtPositionTypeOrg.getIban()+1)
+              .postalIban(debtPositionTypeOrg.getPostalIban()+1)
+              .postalAccountCode(debtPositionTypeOrg.getPostalAccountCode()+1)
+              .holderPostalCc(debtPositionTypeOrg.getHolderPostalCc()+1)
+              .xsdDefinitionRef(debtPositionTypeOrg.getXsdDefinitionRef()+1)
+              .amountCents(debtPositionTypeOrg.getAmountCents()+1)
+              .externalPaymentUrl(debtPositionTypeOrg.getExternalPaymentUrl()+1)
+              .flagSpontaneous(!debtPositionTypeOrg.isFlagSpontaneous())
+              .serviceId(debtPositionTypeOrg.getServiceId()+1)
+              .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject()+1)
+              .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage()+1)
+              .build();
   }
 }
