@@ -36,9 +36,10 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
     JOIN InstallmentNoPII i ON i.paymentOptionId = po.paymentOptionId
     WHERE
       dp.organizationId = :organizationId
-      AND dp.debtPositionOrigin IN :debtPositionOrigins
+      AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN :debtPositionOrigins)
       AND dptoo.operatorExternalUserId = :operatorExternalUserId
-      AND dp.creationDate BETWEEN :creationDateFrom AND :creationDateTo
+      AND (cast(:creationDateFrom as date) IS NULL OR dp.creationDate >= :creationDateFrom)
+      AND (cast(:creationDateTo as date) IS NULL OR dp.creationDate <= :creationDateTo)
       AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
       AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
       AND ((:status IS NULL) OR (dp.status = :status ))
@@ -46,10 +47,10 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
   )
   Page<DebtPositionView> findDebtPositionViews(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-    @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
+    @Parameter(array = @ArraySchema(schema = @Schema(type = "string"))) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true, schema = @Schema(type = "LocalDateTime")) @Param("creationDateFrom") LocalDateTime creationDateFrom,
-    @Parameter(required = true, schema = @Schema(type = "LocalDateTime")) @Param("creationDateTo") LocalDateTime creationDateTo,
+    @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateFrom") LocalDateTime creationDateFrom,
+    @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateTo") LocalDateTime creationDateTo,
     String fiscalCode,
     Long debtPositionTypeOrgId,
     DebtPositionStatus status,

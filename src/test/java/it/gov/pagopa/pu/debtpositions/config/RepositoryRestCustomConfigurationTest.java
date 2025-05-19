@@ -1,9 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.metamodel.EntityType;
-import jakarta.persistence.metamodel.Metamodel;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,33 +9,28 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.mapping.PersistentEntity;
+import org.springframework.data.mapping.context.PersistentEntities;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 
-import java.util.Collections;
-
-import static org.mockito.Mockito.times;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class RepositoryRestCustomConfigurationTest {
 
   @Mock
-  private EntityManager entityManager;
-
+  private PersistentEntities persistentEntities;
   @Mock
-  private Metamodel metamodel;
-
-  @Mock
-  private EntityType<?> entityType;
+  private PersistentEntity<DebtPosition,?> persistentEntity;
 
   @InjectMocks
   private RepositoryRestCustomConfiguration config;
 
   @BeforeEach
   void setUp(){
-    Mockito.when(entityManager.getMetamodel()).thenReturn(metamodel);
-    Mockito.when(metamodel.getEntities()).thenReturn(Collections.singleton(entityType));
-    Mockito.when(entityType.getJavaType()).thenReturn((Class) DebtPosition.class);
+    Mockito.when(persistentEntities.get()).thenReturn(Stream.of(persistentEntity));
+    Mockito.when(persistentEntity.getType()).thenReturn(DebtPosition.class);
   }
 
   @Test
@@ -50,8 +42,7 @@ class RepositoryRestCustomConfigurationTest {
 
     // Assert
     Assertions.assertNotNull(configurer);
-    Mockito.verify(entityManager, times(1)).getMetamodel();
-    Mockito.verify(metamodel, times(1)).getEntities();
-    Mockito.verify(entityType, times(1)).getJavaType();
+    Mockito.verify(persistentEntities).get();
+    Mockito.verify(persistentEntity).getType();
   }
 }

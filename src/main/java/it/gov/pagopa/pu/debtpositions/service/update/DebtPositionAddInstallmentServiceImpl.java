@@ -73,8 +73,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
           }
           paymentOptionDTO.getInstallments().stream()
             .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-            .findFirst()
-            .ifPresent(installmentDTO -> {
+            .forEach(installmentDTO -> {
               debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO);
               validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
               installmentDTO.setStatus(InstallmentStatus.TO_SYNC);

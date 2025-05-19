@@ -129,6 +129,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/{debtPositionId}/publish:
+    put:
+      tags:
+        - debt-position
+      operationId: publishDebtPosition
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the debt position
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/ingestion-flow-file/{ingestionFlowFileId}:
     get:
       tags:
@@ -534,13 +578,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
-  /crud-ext/installments/by-installmentId-iun:
+  /crud-ext/installments/set-iun-by-debtPositionId:
     put:
       tags:
         - installments-entity-extended-controller
-      operationId: updateIun
+      operationId: updateIunByDebtPositionId
       parameters:
-        - name: installmentId
+        - name: debtPositionId
           in: query
           required: true
           schema:
@@ -1139,6 +1183,8 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
+        ingestionFlowFileGenerateAdvice:
+          type: boolean
         receiptId:
           type: integer
           format: int64

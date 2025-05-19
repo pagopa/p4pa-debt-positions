@@ -24,7 +24,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
     + "WHERE dp.organizationId = :organizationId "
     + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
-    + "AND r.receiptOrigin = :receiptOrigin "
+    + "AND (:receiptOrigin IS NULL OR r.receiptOrigin = :receiptOrigin) "
     + "AND (:iuv IS NULL OR i.iuv = :iuv) "
     + "AND (:iur IS NULL OR i.iur = :iur) "
     + "AND (:iud IS NULL OR i.iud = :iud) "
@@ -33,7 +33,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo) ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Parameter(required = true) @Param("receiptOrigin") ReceiptOriginType receiptOrigin,
+    @Param("receiptOrigin") ReceiptOriginType receiptOrigin,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @Param("iuv") String iuv,
     @Param("iur") String iur,

@@ -28,6 +28,8 @@ spring:
     rest:
       basePath: crud
   cloud:
+    function:
+      definition: paymentsProducer
     stream:
       binders:
         kafka-payments-producer:
@@ -42,7 +44,7 @@ spring:
         paymentsProducer-out-0:
           binder: kafka-payments-producer
           content-type: "\${KAFKA_CONTENT_TYPE:application/json}"
-          destination: "\${KAFKA_TOPIC_PAYMENTS:}"
+          destination: "\${KAFKA_TOPIC_PAYMENTS:p4pa-payhub-payments-evh}"
       kafka:
         binder:
           auto-create-topics: false
@@ -105,6 +107,18 @@ management:
       system: true
       http: true
       logback: true
+
+springwolf:
+  docket:
+    base-package: it.gov.pagopa.pu.debtpositions.event
+    info:
+      title: "\${spring.application.name}"
+      version: "\${spring.application.version}"
+      description: AsyncAPI And Models
+    servers.kafka-server:
+      protocol: kafka
+      host: "\${KAFKA_BINDER_BROKER:localhost:9093}"
+  use-fqn: false
 
 logging:
   level:
