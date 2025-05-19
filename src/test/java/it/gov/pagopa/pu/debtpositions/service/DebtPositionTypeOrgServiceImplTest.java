@@ -247,6 +247,8 @@ class DebtPositionTypeOrgServiceImplTest {
               .serviceId(debtPositionTypeOrg.getServiceId()+1)
               .ioTemplateSubject(debtPositionTypeOrg.getIoTemplateSubject()+1)
               .ioTemplateMessage(debtPositionTypeOrg.getIoTemplateMessage()+1)
+              .amountActualizationOrgSilServiceId(debtPositionTypeOrg.getAmountActualizationOrgSilServiceId()+1)
+              .notifyOutcomePushOrgSilServiceId(debtPositionTypeOrg.getNotifyOutcomePushOrgSilServiceId()+1)
               .build();
   }
 }
