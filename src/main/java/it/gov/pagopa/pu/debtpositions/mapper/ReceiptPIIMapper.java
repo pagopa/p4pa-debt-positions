@@ -33,6 +33,7 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
     receiptNoPII.setReceiptId(fullDTO.getReceiptId());
     receiptNoPII.setIngestionFlowFileId(fullDTO.getIngestionFlowFileId());
     receiptNoPII.setReceiptOrigin(fullDTO.getReceiptOrigin());
+    receiptNoPII.setRtFilePath(fullDTO.getRtFilePath());
     receiptNoPII.setPaymentReceiptId(fullDTO.getPaymentReceiptId());
     receiptNoPII.setNoticeNumber(fullDTO.getNoticeNumber());
     receiptNoPII.setPaymentNote(fullDTO.getPaymentNote());
@@ -80,6 +81,7 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
       .receiptId(noPii.getReceiptId())
       .ingestionFlowFileId(noPii.getIngestionFlowFileId())
       .receiptOrigin(noPii.getReceiptOrigin())
+      .rtFilePath(noPii.getRtFilePath())
       .paymentReceiptId(noPii.getPaymentReceiptId())
       .noticeNumber(noPii.getNoticeNumber())
       .paymentNote(noPii.getPaymentNote())
@@ -120,6 +122,7 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
       .receiptId(receipt.getReceiptId())
       .ingestionFlowFileId(receipt.getIngestionFlowFileId())
       .receiptOrigin(receipt.getReceiptOrigin())
+      .rtFilePath(receipt.getRtFilePath())
       .paymentReceiptId(receipt.getPaymentReceiptId())
       .noticeNumber(receipt.getNoticeNumber())
       .paymentNote(receipt.getPaymentNote())

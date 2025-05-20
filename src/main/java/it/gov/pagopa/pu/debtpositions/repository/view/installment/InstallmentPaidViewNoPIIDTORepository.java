@@ -36,7 +36,8 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       r.feeCents as feeCents,
       i.balance as balance,
       r.companyName as companyName,
-      r.personalDataId as receiptPersonalDataId
+      r.personalDataId as receiptPersonalDataId,
+      r.rtFilePath as rtFilePath;
     )
     FROM InstallmentNoPII i
     JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
@@ -46,7 +47,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
     JOIN DebtPositionTypeOrgOperators dptoo ON dp.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
     JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
     WHERE
-      (i.status = 'PAID' OR i.status = 'REPORTED')
+      i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAID_STATUSES})
       AND dp.organizationId = :organizationId
       AND r.paymentDateTime BETWEEN :paymentDateTimeFrom AND :paymentDateTimeTo
       AND dptoo.operatorExternalUserId = :operatorExternalUserId

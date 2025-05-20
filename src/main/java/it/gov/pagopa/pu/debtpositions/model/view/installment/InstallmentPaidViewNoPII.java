@@ -63,4 +63,5 @@ public class InstallmentPaidViewNoPII implements Serializable {
   private String companyName;
   @NotNull
   private Long receiptPersonalDataId;
+  private String rtFilePath;
 }

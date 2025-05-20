@@ -30,6 +30,7 @@ public class InstallmentPaidViewFaker {
       .balance("balance")
       .companyName("company")
       .receiptPersonalDataId(123L)
+      .rtFilePath("rtFilePath")
       .build();
   }
 
