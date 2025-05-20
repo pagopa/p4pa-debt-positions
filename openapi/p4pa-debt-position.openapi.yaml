@@ -1274,6 +1274,8 @@ components:
           format: int64
         receiptOrigin:
           type: ReceiptOrigin
+        rtFilePath:
+          type: string
         paymentReceiptId:
           type: string
         noticeNumber:

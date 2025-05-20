@@ -35,6 +35,7 @@ public class ReceiptNoPII extends BaseEntity implements Serializable, NoPIIEntit
   @NotNull
   @Enumerated(EnumType.STRING)
   private ReceiptOriginType receiptOrigin;
+  private String rtFilePath;
   @NotNull
   private String paymentReceiptId;
   @NotNull

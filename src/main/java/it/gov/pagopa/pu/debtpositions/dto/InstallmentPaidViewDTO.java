@@ -59,5 +59,6 @@ public class InstallmentPaidViewDTO {
   private String balance;
   @NotNull
   private String companyName;
+  private String rtFilePath;
 
 }
