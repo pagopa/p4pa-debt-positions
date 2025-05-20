@@ -76,7 +76,10 @@ public class InstallmentUpdateService {
         log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
         installment.setNotificationFeeCents(feeAmountCents);
         log.debug("Update amount for first Transfer");
-        installment.getTransfers().getFirst().setAmountCents(installment.getTransfers().getFirst().getAmountCents()-feeAmountCents);
+        installment.getTransfers()
+          .stream().filter(t -> t.getTransferIndex() == 1)
+          .findFirst()
+          .ifPresent(transfer -> transfer.setAmountCents(transfer.getAmountCents()-feeAmountCents));
       }
     }
     InstallmentUtils.setStatus(installment, status);
