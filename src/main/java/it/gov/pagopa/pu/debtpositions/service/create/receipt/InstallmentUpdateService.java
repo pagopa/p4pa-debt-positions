@@ -71,9 +71,15 @@ public class InstallmentUpdateService {
     if (receipt != null) {
       installment.setReceiptId(receipt.getReceiptId());
       installment.setIur(receipt.getPaymentReceiptId());
+      long feeAmountCents = receipt.getPaymentAmountCents()-installment.getAmountCents();
+      if(feeAmountCents>0) {
+        log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
+        installment.setNotificationFeeCents(feeAmountCents);
+        log.debug("Update amount for first Transfer");
+        installment.getTransfers().getFirst().setAmountCents(installment.getTransfers().getFirst().getAmountCents()-feeAmountCents);
+      }
     }
     InstallmentUtils.setStatus(installment, status);
-
   }
 
 }
