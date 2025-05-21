@@ -112,4 +112,13 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "   where i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAID_STATUSES})" +
     "   and i.iun = :iun")
   List<InstallmentNoPII> findPaidByIun(@Param("iun") String iun);
+
+  @Query("  select i" +
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "  on i.paymentOptionId = po.paymentOptionId" +
+    "  where po.debtPositionId = :debtPositionId " +
+    "  and (:installmentStatuses is null or i.status in (:installmentStatuses))")
+  List<InstallmentNoPII> findByDebtPositionIdAndStatuses(Long debtPositionId, List<InstallmentStatus> installmentStatuses);
+
 }
