@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -32,6 +33,7 @@ public class ManagePaidDebtPositionService {
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
   private final PaymentsProducerService paymentsProducerService;
   private final ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
+  private final DebtPositionProcessorService debtPositionProcessorService;
 
   public ManagePaidDebtPositionService(OrganizationService organizationService,
                                        PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService,
@@ -40,7 +42,8 @@ public class ManagePaidDebtPositionService {
                                        DebtPositionService debtPositionService,
                                        DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
                                        PaymentsProducerService paymentsProducerService,
-                                       ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper) {
+                                       ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper,
+    DebtPositionProcessorService debtPositionProcessorService) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
@@ -49,6 +52,7 @@ public class ManagePaidDebtPositionService {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.paymentsProducerService = paymentsProducerService;
     this.receiptWithAdditionalInfoMapper = receiptWithAdditionalInfoMapper;
+    this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
   boolean handleReceiptReceivedPrimaryOrg(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
@@ -75,6 +79,8 @@ public class ManagePaidDebtPositionService {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
     DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
+    //update amounts
+    debtPositionProcessorService.updateAmounts(debtPosition);
     //align debt position status
     debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position

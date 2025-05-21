@@ -11,5 +11,7 @@ public interface BasePaymentOption extends Serializable {
   PaymentOptionStatus getStatus();
   void setStatus(PaymentOptionStatus status);
 
+  void setTotalAmountCents(Long totalAmountCents);
+
   Collection<? extends BaseInstallment> getInstallments();
 }
