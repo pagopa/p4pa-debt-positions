@@ -14,4 +14,6 @@ public interface BaseInstallment extends Serializable {
 
   InstallmentSyncStatus getSyncStatus();
   void setSyncStatus(InstallmentSyncStatus syncStatus);
+
+  Long getAmountCents();
 }
