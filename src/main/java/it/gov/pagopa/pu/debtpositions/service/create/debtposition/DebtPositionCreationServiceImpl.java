@@ -90,11 +90,11 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     checkAllInstallments(debtPositionDTO, org, debtPositionTypeOrg);
     validateDebtPositionService.validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
 
-    if (debtPositionDTO.getStatus().equals(DebtPositionStatus.UNPAID)) {
+    if (DebtPositionStatus.UNPAID.equals(debtPositionDTO.getStatus())) {
       updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
-    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.DRAFT)) {
+    } else if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.DRAFT, PaymentOptionStatus.DRAFT, InstallmentStatus.DRAFT);
-    } else if (debtPositionDTO.getStatus().equals(DebtPositionStatus.PAID)) {
+    } else if (DebtPositionStatus.PAID.equals(debtPositionDTO.getStatus())) {
       updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.PAID, PaymentOptionStatus.PAID, InstallmentStatus.PAID);
     }
   }
@@ -176,7 +176,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(debtPositionTypeOrg.getIban().isBlank() ? organization.getIban() : debtPositionTypeOrg.getIban())
+      .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
       .category(category)
       .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentDTO.getRemittanceInformation())
