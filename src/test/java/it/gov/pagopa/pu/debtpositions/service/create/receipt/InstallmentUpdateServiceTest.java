@@ -8,10 +8,13 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
+import java.util.Comparator;
+import java.util.SortedSet;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -147,6 +150,88 @@ class InstallmentUpdateServiceTest {
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
       .findByInstallmentId(targetInstallment.getInstallmentId());
 
+  }
+
+  @Test
+  void givenReceiptWithGreaterPaymentAmountWhenUpdateInstallmentThenAmountsAreUpdatedForFee() {
+    // Given
+    long installmentAmount = 1000L;
+    long paymentAmount = 1200L;
+    long feeAmount = paymentAmount - installmentAmount; // = 200
+
+    ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
+    receiptDTO.setPaymentReceiptId("RECEIPTID");
+    receiptDTO.setPaymentAmountCents(paymentAmount);
+
+    InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+      InstallmentStatus.UNPAID);
+    targetInstallment.setAmountCents(installmentAmount);
+
+    // Transfer with transferIndex=1 (it will be changed with fee)
+    Transfer transferWithIndex1 = new Transfer();
+    transferWithIndex1.setTransferIndex(1);
+    transferWithIndex1.setAmountCents(installmentAmount);
+
+    // Other transfer (untouched)
+    Transfer otherTransfer = new Transfer();
+    otherTransfer.setTransferIndex(0);
+    otherTransfer.setAmountCents(500L);
+
+    // Add transfers
+    SortedSet<Transfer> transfers = new TreeSet<>(Comparator.comparingInt(Transfer::getTransferIndex));
+    transfers.add(otherTransfer);
+    transfers.add(transferWithIndex1);
+    targetInstallment.setTransfers(transfers);
+
+    // Payment Option with target installment
+    PaymentOption po0 = PaymentOptionFaker.buildPaymentOption();
+    po0.setPaymentOptionIndex(1);
+    po0.setStatus(PaymentOptionStatus.PAID);
+    po0.setInstallments(new TreeSet<>(List.of(
+      PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
+        InstallmentStatus.PAID),
+      targetInstallment
+    )));
+
+    // Debt position
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+    debtPosition.setPaymentOptions(new TreeSet<>(List.of(po0)));
+
+    //align entities id
+    debtPosition.getPaymentOptions().forEach(paymentOption -> {
+      paymentOption.setDebtPositionId(debtPosition.getDebtPositionId());
+      paymentOption.getInstallments().forEach(
+        anInstallment -> anInstallment.setPaymentOptionId(
+          paymentOption.getPaymentOptionId()));
+    });
+
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId()))
+      .thenReturn(debtPosition);
+
+    // When
+    DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
+      targetInstallment, receiptDTO);
+
+    // Then
+    InstallmentNoPII updatedInstallment = response.getPaymentOptions().getFirst()
+      .getInstallments().getFirst();
+    Assertions.assertEquals(InstallmentStatus.PAID, updatedInstallment.getStatus(), "status must be PAID");
+    Assertions.assertEquals(receiptDTO.getReceiptId(), updatedInstallment.getReceiptId(), "set receiptId");
+    Assertions.assertEquals(receiptDTO.getPaymentReceiptId(), updatedInstallment.getIur(), "set iur");
+    Assertions.assertEquals(feeAmount, updatedInstallment.getNotificationFeeCents(), "set notificationFeeCents");
+    Assertions.assertEquals(installmentAmount + feeAmount, updatedInstallment.getAmountCents(), "update amountCents");
+
+    // test Transfer with transferIndex=1 updated
+    Transfer updatedTransfer = updatedInstallment.getTransfers().stream()
+      .filter(t -> t.getTransferIndex() == 1)
+      .findFirst().orElseThrow(() -> new AssertionError("Transfer with transferIndex=1 missing"));
+    Assertions.assertEquals(installmentAmount + feeAmount, updatedTransfer.getAmountCents(), "update Transfer amountCents with fee");
+
+    // test untouched Transfer with index 0
+    Transfer untouched = updatedInstallment.getTransfers().stream()
+      .filter(t -> t.getTransferIndex() == 0)
+      .findFirst().orElseThrow(() -> new AssertionError("transfer 0 missing"));
+    Assertions.assertEquals(500L, untouched.getAmountCents());
   }
 
   @Test

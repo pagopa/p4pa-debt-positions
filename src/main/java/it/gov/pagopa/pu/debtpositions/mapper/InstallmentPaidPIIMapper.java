@@ -40,6 +40,7 @@ public class InstallmentPaidPIIMapper {
             .feeCents(noPii.getFeeCents())
             .balance(noPii.getBalance())
             .companyName(noPii.getCompanyName())
+            .rtFilePath(noPii.getRtFilePath())
             .build();
   }
 }

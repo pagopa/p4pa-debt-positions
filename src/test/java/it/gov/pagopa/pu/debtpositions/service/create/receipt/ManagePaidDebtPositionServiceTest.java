@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -51,6 +52,8 @@ class ManagePaidDebtPositionServiceTest {
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapperMock;
   @Mock
   private PaymentsProducerService paymentsProducerServiceMock;
+  @Mock
+  private DebtPositionProcessorService debtPositionProcessorServiceMock;
 
   @InjectMocks
   private ManagePaidDebtPositionService managePaidDebtPositionService;
@@ -76,7 +79,8 @@ class ManagePaidDebtPositionServiceTest {
       debtPositionServiceMock,
       debtPositionHierarchyStatusAlignerServiceMock,
       receiptWithAdditionalInfoMapperMock,
-      paymentsProducerServiceMock
+      paymentsProducerServiceMock,
+      debtPositionProcessorServiceMock
     );
   }
 
@@ -105,6 +109,7 @@ class ManagePaidDebtPositionServiceTest {
     //verify
     Assertions.assertTrue(response);
 
+    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPosition);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPosition);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
   }

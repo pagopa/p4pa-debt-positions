@@ -20,6 +20,7 @@ public class Receipt implements FullPIIDTO<ReceiptNoPII, ReceiptPIIDTO> {
   private Long receiptId;
   private Long ingestionFlowFileId;
   private ReceiptOriginType receiptOrigin;
+  private String rtFilePath;
   private String paymentReceiptId;
   private String noticeNumber;
   private String paymentNote;

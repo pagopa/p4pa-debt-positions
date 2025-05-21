@@ -49,7 +49,7 @@ public class InstallmentUpdateService {
       .ifPresentOrElse(paidInstallment -> {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
-        updateInstallment(paidInstallment, InstallmentStatus.PAID, receiptDTO);
+        updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
       }, () -> {
         throw new NotFoundException("primary installment not found " + installment.getInstallmentId() + " on debt position " + debtPosition.getDebtPositionId());
       });
@@ -62,18 +62,28 @@ public class InstallmentUpdateService {
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
     paymentOption.getInstallments().forEach(anInstallment -> {
       if (InstallmentUtils.isInvalidable(anInstallment)) {
-        updateInstallment(anInstallment, InstallmentStatus.INVALID, null);
+        updateInstallmentStatusAndFeeOfDebtPosition(anInstallment, InstallmentStatus.INVALID, null);
       }
     });
   }
 
-  private void updateInstallment(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt){
+  private void updateInstallmentStatusAndFeeOfDebtPosition(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt){
     if (receipt != null) {
       installment.setReceiptId(receipt.getReceiptId());
       installment.setIur(receipt.getPaymentReceiptId());
+      long feeAmountCents = receipt.getPaymentAmountCents()-installment.getAmountCents();
+      if(feeAmountCents>0) {
+        log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
+        installment.setNotificationFeeCents(feeAmountCents);
+        log.debug("Update amounts");
+        installment.setAmountCents(installment.getAmountCents()+feeAmountCents);
+        installment.getTransfers()
+          .stream().filter(t -> t.getTransferIndex() == 1)
+          .findFirst()
+          .ifPresent(transfer -> transfer.setAmountCents(receipt.getPaymentAmountCents()));
+      }
     }
     InstallmentUtils.setStatus(installment, status);
-
   }
 
 }

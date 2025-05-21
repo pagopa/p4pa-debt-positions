@@ -207,7 +207,7 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionTypeOrgAndUnchangedReadOnlyFieldsWhenSaveDebtPositionTypeOrgThenValidationException(){
+  void givenExistingDebtPositionTypeOrgAndUnchangedReadOnlyFieldsWhenSaveDebtPositionTypeOrgThenOk(){
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
