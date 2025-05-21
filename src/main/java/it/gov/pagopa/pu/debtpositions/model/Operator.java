@@ -13,7 +13,7 @@ import java.io.Serializable;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class ValidOperator implements Serializable {
+public class Operator implements Serializable {
 
   private boolean grant;
 
