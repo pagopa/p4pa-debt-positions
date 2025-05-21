@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.model.ValidOperator;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
@@ -81,4 +82,17 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
 
   Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
+
+  @Query("""
+   SELECT new ValidOperator(
+     CASE WHEN COUNT(*) > 0 THEN TRUE ELSE FALSE end as grant
+   )
+   FROM DebtPosition d
+        JOIN DebtPositionTypeOrg dpto on d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+        JOIN DebtPositionTypeOrgOperators dptoo on d.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+     WHERE d.debtPositionId= :debtPositionId AND dptoo.operatorExternalUserId = :operatorExternalUserId
+   """)
+  ValidOperator validateOperator(@Parameter(required = true) @Param("debtPositionId")Long debtPositionId,
+                                 @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
+
 }
