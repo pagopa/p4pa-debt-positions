@@ -49,7 +49,7 @@ public class InstallmentSynchronizeFaker {
       .notificationFeeCents(1000L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")
-      .flagPagoPaPayment(Boolean.TRUE)
+      .flagPuPagoPaPayment(Boolean.TRUE)
       .balance("balance")
       .flagMultibeneficiary(Boolean.TRUE)
       .numberBeneficiary(2)

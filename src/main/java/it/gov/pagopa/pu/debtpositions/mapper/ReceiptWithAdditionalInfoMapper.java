@@ -32,7 +32,7 @@ public class ReceiptWithAdditionalInfoMapper {
       .validityDate(null)
       .flagIuvVolatile(false)
       .multiDebtor(false)
-      .flagPagoPaPayment(true)
+      .flagPuPagoPaPayment(true)
       .creationDate(receiptDTO.getPaymentDateTime())
       .updateDate(now)
       .paymentOptions(List.of(PaymentOptionDTO.builder()

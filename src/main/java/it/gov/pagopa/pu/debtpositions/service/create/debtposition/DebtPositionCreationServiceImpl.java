@@ -121,7 +121,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Override
   public void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO) {
-    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPagoPaPayment())) {
+    if (Boolean.TRUE.equals(debtPositionDTO.getFlagPuPagoPaPayment())) {
       String nav;
       if (installmentDTO.getIuv() != null) {
         nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), org);

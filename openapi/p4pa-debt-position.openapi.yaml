@@ -1032,7 +1032,7 @@ components:
         - organizationId
         - debtPositionTypeOrgId
         - paymentOptions
-        - flagPagoPaPayment
+        - flagPuPagoPaPayment
       type: object
       x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"]
       properties:
@@ -1060,7 +1060,7 @@ components:
           type: boolean
         multiDebtor:
           type: boolean
-        flagPagoPaPayment:
+        flagPuPagoPaPayment:
           type: boolean
         creationDate:
           type: string
@@ -1183,8 +1183,8 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
-        ingestionFlowFileGenerateAdvice:
-          type: boolean
+        sourceFlowName:
+          type: string
         receiptId:
           type: integer
           format: int64
@@ -1675,7 +1675,7 @@ components:
         - amountCents
         - debtPositionTypeCode
         - remittanceInformation
-        - flagPagoPaPayment
+        - flagPuPagoPaPayment
       type: object
       properties:
         ingestionFlowFileId:
@@ -1756,7 +1756,7 @@ components:
           type: string
         legacyPaymentMetadata:
           type: string
-        flagPagoPaPayment:
+        flagPuPagoPaPayment:
           type: boolean
         balance:
           type: string
