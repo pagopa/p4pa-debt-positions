@@ -14,6 +14,7 @@ public class InstallmentPaidViewFaker {
       .iuf("iuf")
       .iud("iud")
       .noticeNumber("123456")
+      .organizationId(0L)
       .orgFiscalCode("orgFiscalCode")
       .paymentReceiptId("paymentReceiptId")
       .paymentDateTime(OFFSET_DATE_TIME)

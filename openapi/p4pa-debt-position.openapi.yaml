@@ -1863,6 +1863,7 @@ components:
         - paymentReceiptId
         - creditorReferenceId
         - remittanceInformation
+        - organizationId
         - orgFiscalCode
       properties:
         receiptId:
@@ -1879,7 +1880,12 @@ components:
           type: string
         remittanceInformation:
           type: string
+        organizationId:
+          type: integer
+          format: int64
         orgFiscalCode:
+          type: string
+        rtFilePath:
           type: string
         debtor:
           $ref: "#/components/schemas/PersonDTO"

@@ -23,8 +23,10 @@ public interface ReceiptArchivingNoPIIViewRepository extends Repository<ReceiptA
       r.creditorReferenceId as creditorReferenceId,
       i.iuv as iuv,
       t.remittanceInformation as remittanceInformation,
+      dp.organizationId as organizationId,
       t.orgFiscalCode as orgFiscalCode,
-      r.personalDataId as receiptPersonalDataId
+      r.personalDataId as receiptPersonalDataId,
+      r.rtFilePath as rtFilePath
     )
     FROM ReceiptNoPII r
     JOIN InstallmentNoPII i ON r.receiptId = i.receiptId

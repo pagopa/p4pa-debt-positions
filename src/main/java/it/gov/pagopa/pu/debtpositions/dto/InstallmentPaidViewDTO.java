@@ -24,6 +24,8 @@ public class InstallmentPaidViewDTO {
   @NotNull
   private String noticeNumber;
   @NotNull
+  private Long organizationId;
+  @NotNull
   private String orgFiscalCode;
   @NotNull
   private String paymentReceiptId;

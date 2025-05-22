@@ -29,7 +29,10 @@ public class ReceiptArchivingNoPIIView implements Serializable {
   @NotNull
   private String remittanceInformation;
   @NotNull
+  private Long organizationId;
+  @NotNull
   private String orgFiscalCode;
   @NotNull
   private Long receiptPersonalDataId;
+  private String rtFilePath;
 }
