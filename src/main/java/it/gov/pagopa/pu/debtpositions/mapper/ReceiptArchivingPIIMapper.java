@@ -26,7 +26,9 @@ public class ReceiptArchivingPIIMapper {
       .creditorReferenceId(noPII.getCreditorReferenceId())
       .iuv(noPII.getIuv())
       .remittanceInformation(noPII.getRemittanceInformation())
+      .organizationId(noPII.getOrganizationId())
       .orgFiscalCode(noPII.getOrgFiscalCode())
+      .rtFilePath(noPII.getRtFilePath())
       .debtor(personMapper.mapToDto(pii.getDebtor()))
       .payer(pii.getPayer() != null ? personMapper.mapToDto(pii.getPayer()) : null)
       .build();

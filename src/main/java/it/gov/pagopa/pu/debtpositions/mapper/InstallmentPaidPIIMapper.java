@@ -23,6 +23,7 @@ public class InstallmentPaidPIIMapper {
             .iuf(noPii.getIuf())
             .iud(noPii.getIud())
             .noticeNumber(noPii.getNoticeNumber())
+            .organizationId(noPii.getOrganizationId())
             .orgFiscalCode(noPii.getOrgFiscalCode())
             .paymentReceiptId(noPii.getPaymentReceiptId())
             .paymentDateTime(noPii.getPaymentDateTime())

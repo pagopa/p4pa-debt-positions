@@ -81,4 +81,14 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
 
   Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
+
+  @Query("""
+   SELECT COUNT(dptoo)
+   FROM DebtPosition d
+        JOIN DebtPositionTypeOrg dpto on d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+        JOIN DebtPositionTypeOrgOperators dptoo on d.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+     WHERE d.debtPositionId= :debtPositionId AND dptoo.operatorExternalUserId = :operatorExternalUserId
+   """)
+  long validateOperator(@Parameter(required = true) @Param("debtPositionId") Long debtPositionId,
+                            @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 }
