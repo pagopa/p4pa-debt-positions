@@ -52,7 +52,7 @@ public class DebtPosition extends BaseEntity implements BaseDebtPosition, Serial
   private LocalDate validityDate;
   private boolean flagIuvVolatile;
   private boolean multiDebtor;
-  private boolean flagPagoPaPayment;
+  private boolean flagPuPagoPaPayment;
 
   @OneToMany(mappedBy = "debtPositionId")
   private SortedSet<PaymentOption> paymentOptions;

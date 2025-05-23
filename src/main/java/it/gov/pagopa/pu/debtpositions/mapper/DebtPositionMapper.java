@@ -37,10 +37,10 @@ public class DebtPositionMapper {
     debtPosition.setOrganizationId(dto.getOrganizationId());
     debtPosition.setDebtPositionTypeOrgId(dto.getDebtPositionTypeOrgId());
     debtPosition.setValidityDate(dto.getValidityDate());
-    debtPosition.setFlagIuvVolatile(dto.getFlagIuvVolatile());
+    debtPosition.setFlagIuvVolatile(Optional.ofNullable(dto.getFlagIuvVolatile()).orElse(false));
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
-    debtPosition.setMultiDebtor(dto.getMultiDebtor());
-    debtPosition.setFlagPagoPaPayment(dto.getFlagPagoPaPayment());
+    debtPosition.setMultiDebtor(Optional.ofNullable(dto.getMultiDebtor()).orElse(false));
+    debtPosition.setFlagPuPagoPaPayment(dto.getFlagPuPagoPaPayment());
 
     Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
 
@@ -68,7 +68,7 @@ public class DebtPositionMapper {
       .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
       .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
       .multiDebtor(debtPosition.isMultiDebtor())
-      .flagPagoPaPayment(debtPosition.isFlagPagoPaPayment())
+      .flagPuPagoPaPayment(debtPosition.isFlagPuPagoPaPayment())
       .paymentOptions(
         debtPosition.getPaymentOptions().stream()
           .map(paymentOptionMapper::mapToDto)

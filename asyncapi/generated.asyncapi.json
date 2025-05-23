@@ -53,7 +53,7 @@
           "flagIuvVolatile": {
             "type": "boolean"
           },
-          "flagPagoPaPayment": {
+          "flagPuPagoPaPayment": {
             "type": "boolean"
           },
           "iupdOrg": {
@@ -98,7 +98,7 @@
             "debtPositionTypeOrgId": 0,
             "description": "string",
             "flagIuvVolatile": true,
-            "flagPagoPaPayment": true,
+            "flagPuPagoPaPayment": true,
             "iupdOrg": "string",
             "multiDebtor": true,
             "organizationId": 0,
@@ -125,7 +125,6 @@
                       "province": "string"
                     },
                     "dueDate": "2015-07-20",
-                    "ingestionFlowFileGenerateAdvice": true,
                     "ingestionFlowFileId": 0,
                     "ingestionFlowFileLineNumber": 0,
                     "installmentId": 0,
@@ -142,6 +141,7 @@
                     "paymentOptionId": 0,
                     "receiptId": 0,
                     "remittanceInformation": "string",
+                    "sourceFlowName": "string",
                     "status": "TO_SYNC",
                     "syncStatus": {
                       "syncError": "string",
@@ -194,7 +194,7 @@
         "required": [
           "debtPositionOrigin",
           "debtPositionTypeOrgId",
-          "flagPagoPaPayment",
+          "flagPuPagoPaPayment",
           "organizationId",
           "paymentOptions"
         ]
@@ -274,9 +274,6 @@
             "type": "string",
             "format": "date"
           },
-          "ingestionFlowFileGenerateAdvice": {
-            "type": "boolean"
-          },
           "ingestionFlowFileId": {
             "type": "integer",
             "format": "int64"
@@ -332,6 +329,9 @@
           "remittanceInformation": {
             "type": "string"
           },
+          "sourceFlowName": {
+            "type": "string"
+          },
           "status": {
             "$ref": "#/components/schemas/InstallmentStatus"
           },
@@ -373,7 +373,6 @@
               "province": "string"
             },
             "dueDate": "2015-07-20",
-            "ingestionFlowFileGenerateAdvice": true,
             "ingestionFlowFileId": 0,
             "ingestionFlowFileLineNumber": 0,
             "installmentId": 0,
@@ -390,6 +389,7 @@
             "paymentOptionId": 0,
             "receiptId": 0,
             "remittanceInformation": "string",
+            "sourceFlowName": "string",
             "status": "TO_SYNC",
             "syncStatus": {
               "syncError": "string",
@@ -509,7 +509,7 @@
               "debtPositionTypeOrgId": 0,
               "description": "string",
               "flagIuvVolatile": true,
-              "flagPagoPaPayment": true,
+              "flagPuPagoPaPayment": true,
               "iupdOrg": "string",
               "multiDebtor": true,
               "organizationId": 0,
@@ -536,7 +536,6 @@
                         "province": "string"
                       },
                       "dueDate": "2015-07-20",
-                      "ingestionFlowFileGenerateAdvice": true,
                       "ingestionFlowFileId": 0,
                       "ingestionFlowFileLineNumber": 0,
                       "installmentId": 0,
@@ -553,6 +552,7 @@
                       "paymentOptionId": 0,
                       "receiptId": 0,
                       "remittanceInformation": "string",
+                      "sourceFlowName": "string",
                       "status": "TO_SYNC",
                       "syncStatus": {
                         "syncError": "string",
@@ -701,7 +701,6 @@
                   "province": "string"
                 },
                 "dueDate": "2015-07-20",
-                "ingestionFlowFileGenerateAdvice": true,
                 "ingestionFlowFileId": 0,
                 "ingestionFlowFileLineNumber": 0,
                 "installmentId": 0,
@@ -718,6 +717,7 @@
                 "paymentOptionId": 0,
                 "receiptId": 0,
                 "remittanceInformation": "string",
+                "sourceFlowName": "string",
                 "status": "TO_SYNC",
                 "syncStatus": {
                   "syncError": "string",

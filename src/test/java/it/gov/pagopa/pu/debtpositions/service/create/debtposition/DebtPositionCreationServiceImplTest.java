@@ -121,7 +121,7 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenDebtPositionOrdinarySilWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -159,7 +159,7 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenDebtPositionSpontaneousWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -194,7 +194,7 @@ class DebtPositionCreationServiceImplTest {
   void givenDebtPositionOtherOriginWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
-    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
 
@@ -250,7 +250,7 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenDebtPositionWhenGenerateIuvThenAssignIuvAndIupdToInstallments() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIud("");
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setBalance("");
