@@ -145,6 +145,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
     }
 
+    installmentDTO.setSourceFlowName("UNKNOWN"); //TODO TASK P4ADEV-2965
     populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
