@@ -21,6 +21,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       i.iuf as iuf,
       i.iud as iud,
       r.noticeNumber as noticeNumber,
+      dp.organizationId as organizationId,
       r.orgFiscalCode as orgFiscalCode,
       r.paymentReceiptId as paymentReceiptId,
       r.paymentDateTime as paymentDateTime,
