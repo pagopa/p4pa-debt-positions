@@ -91,7 +91,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
      AND dptoo.operatorExternalUserId = :operatorExternalUserId
      AND d.organizationId = :organizationId
    """)
-  long validateOperator(@Parameter(required = true) @Param("debtPositionId") Long debtPositionId,
-                        @Parameter(required = true) @Param("organizationId") Long organizationId,
+  long validateOperator(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
+                        @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 }
