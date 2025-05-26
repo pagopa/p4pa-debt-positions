@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -93,7 +94,7 @@ public class InstallmentSynchronizeApplierService {
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(debtPositionTypeOrg.getIban().isBlank() ? organization.getIban() : debtPositionTypeOrg.getIban())
+      .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
       .category(category)
       .amountCents(installmentSynchronizeDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
