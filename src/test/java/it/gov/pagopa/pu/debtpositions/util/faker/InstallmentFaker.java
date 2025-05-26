@@ -199,7 +199,6 @@ public class InstallmentFaker {
       .iud("iud")
       .iuv("iuv")
       .dueDate(DATE)
-      .notificationFeeCents(1000L)
       .amountCents(100L)
       .remittanceInformation("remittanceInformation")
       .legacyPaymentMetadata("legacyPaymentMetadata")

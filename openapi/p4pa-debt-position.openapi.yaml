@@ -1749,9 +1749,6 @@ components:
           format: int64
         debtPositionTypeCode:
           type: string
-        notificationFeeCents:
-          type: integer
-          format: int64
         remittanceInformation:
           type: string
         legacyPaymentMetadata:
