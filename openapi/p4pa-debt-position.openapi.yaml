@@ -1471,6 +1471,8 @@ components:
               type: object
               additionalProperties:
                 type: string
+            sourceFlowName:
+              type: string
     PersonDTO:
       required:
         - fullName
