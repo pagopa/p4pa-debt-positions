@@ -20,7 +20,7 @@ public class InstallmentSynchronizeDebtPositionApplierService {
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("debtPositionTypeOrgId", debtPositionTypeOrgId, debtPositionDTO.getDebtPositionTypeOrgId(), modifiedFields);
     checkImmutableField("multiDebtor", installmentSynchronizeDTO.getMultiDebtor(), debtPositionDTO.getMultiDebtor(), modifiedFields);
-    checkImmutableField("flagPagoPaPayment", installmentSynchronizeDTO.getFlagPagoPaPayment(), debtPositionDTO.getFlagPagoPaPayment(), modifiedFields);
+    checkImmutableField("flagPuPagoPaPayment", installmentSynchronizeDTO.getFlagPuPagoPaPayment(), debtPositionDTO.getFlagPuPagoPaPayment(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
       throw new ConflictErrorException(String.format("These fields for debt position with iupd %s are not mutable: %s", debtPositionDTO.getIupdOrg(), modifiedFields));

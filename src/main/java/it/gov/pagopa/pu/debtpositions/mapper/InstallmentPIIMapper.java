@@ -48,6 +48,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setNotificationDate(fullDTO.getNotificationDate());
     noPII.setIngestionFlowFileId(fullDTO.getIngestionFlowFileId());
     noPII.setIngestionFlowFileLineNumber(fullDTO.getIngestionFlowFileLineNumber());
+    noPII.setSourceFlowName(fullDTO.getSourceFlowName());
     noPII.setReceiptId(fullDTO.getReceiptId());
     noPII.setCreationDate(fullDTO.getCreationDate());
     noPII.setUpdateDate(fullDTO.getUpdateDate());
@@ -89,6 +90,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .notificationDate(noPii.getNotificationDate())
       .ingestionFlowFileId(noPii.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(noPii.getIngestionFlowFileLineNumber())
+      .sourceFlowName(noPii.getSourceFlowName())
       .receiptId(noPii.getReceiptId())
       .creationDate(noPii.getCreationDate())
       .updateDate(noPii.getUpdateDate())

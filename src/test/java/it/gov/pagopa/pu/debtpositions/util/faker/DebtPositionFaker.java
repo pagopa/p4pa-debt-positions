@@ -32,7 +32,7 @@ public class DebtPositionFaker {
     debtPosition.setValidityDate(DATE);
     debtPosition.setFlagIuvVolatile(true);
     debtPosition.setMultiDebtor(false);
-    debtPosition.setFlagPagoPaPayment(false);
+    debtPosition.setFlagPuPagoPaPayment(false);
     debtPosition.setCreationDate(DATETIME.toLocalDateTime());
     debtPosition.setUpdateDate(DATETIME.toLocalDateTime());
     debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
@@ -53,7 +53,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
-    debtPositionDTO.setFlagPagoPaPayment(false);
+    debtPositionDTO.setFlagPuPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATETIME);
     debtPositionDTO.setUpdateDate(DATETIME);
     debtPositionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
@@ -74,7 +74,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
-    debtPositionDTO.setFlagPagoPaPayment(false);
+    debtPositionDTO.setFlagPuPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATETIME);
     debtPositionDTO.setUpdateDate(DATETIME);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildGeneratedIuvPaymentOptionDTO())));
@@ -91,7 +91,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setOrganizationId(1L);
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setMultiDebtor(true);
-    debtPositionDTO.setFlagPagoPaPayment(true);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setFlagIuvVolatile(false);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildSyncPaymentOptionDTO())));
     return debtPositionDTO;
