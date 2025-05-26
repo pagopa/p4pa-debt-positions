@@ -24,7 +24,6 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setRemittanceInformation(installmentSynchronizeDTO.getRemittanceInformation());
     installmentDTO.setBalance(installmentSynchronizeDTO.getBalance());
     installmentDTO.setLegacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata());
-    installmentDTO.setNotificationFeeCents(installmentSynchronizeDTO.getNotificationFeeCents());
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());

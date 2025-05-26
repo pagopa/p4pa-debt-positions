@@ -41,7 +41,6 @@ public class InstallmentSynchronizeMapper {
       .iud(installmentSynchronizeDTO.getIud())
       .iuv(installmentSynchronizeDTO.getIuv())
       .dueDate(installmentSynchronizeDTO.getDueDate())
-      .notificationFeeCents(installmentSynchronizeDTO.getNotificationFeeCents())
       .amountCents(installmentSynchronizeDTO.getAmountCents())
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
       .balance(installmentSynchronizeDTO.getBalance())
