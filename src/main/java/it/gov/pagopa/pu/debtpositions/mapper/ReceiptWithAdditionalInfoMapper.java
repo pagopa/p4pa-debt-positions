@@ -61,7 +61,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .ingestionFlowFileId(null)
           .ingestionFlowFileLineNumber(null)
           .receiptId(receiptDTO.getReceiptId())
-          .sourceFlowName("UNKNOWN") //TODO task P4ADEV-2965
+          .sourceFlowName(receiptDTO.getSourceFlowName())
           .creationDate(receiptDTO.getPaymentDateTime())
           .updateDate(now)
           .transfers(receiptDTO.getTransfers().stream().map(this::mapTransfer).toList())
