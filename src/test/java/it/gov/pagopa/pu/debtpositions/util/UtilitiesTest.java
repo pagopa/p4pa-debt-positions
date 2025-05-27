@@ -39,7 +39,7 @@ public class UtilitiesTest {
   @ParameterizedTest
   @ValueSource(strings = {"", "12345", "12345abc123", "1234/abc123"})
   void testValidateEmptyPIVA(String piva){
-    boolean result = Utilities.isValidPIVA(piva);
+    boolean result = Utilities.isValidPIVA(piva, true);
     assertFalse(result);
   }
 

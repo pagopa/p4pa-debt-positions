@@ -201,3 +201,6 @@ cache:
   taxonomy:
     size: "\${CACHE_TAXONOMY_SIZE:100}"
     expire-in: "\${CACHE_TAXONOMY_MINUTES:60}"
+
+fiscal-code:
+  check-enabled: "\${FISCAL_CODE_CHECK_ENABLED:true}"
