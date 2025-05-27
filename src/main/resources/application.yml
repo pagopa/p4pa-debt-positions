@@ -201,3 +201,7 @@ cache:
   taxonomy:
     size: "\${CACHE_TAXONOMY_SIZE:100}"
     expire-in: "\${CACHE_TAXONOMY_MINUTES:60}"
+
+features:
+  organization:
+    piva-check: "\${FEATURE_ORGANIZATION_PIVA_CHECK:true}"

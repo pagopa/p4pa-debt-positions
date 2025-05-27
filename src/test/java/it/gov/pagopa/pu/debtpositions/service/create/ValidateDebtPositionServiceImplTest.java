@@ -46,7 +46,7 @@ class ValidateDebtPositionServiceImplTest {
 
   @BeforeEach
   void init() {
-    service = new ValidateDebtPositionServiceImpl(taxonomyService, debtPositionRepository, balanceServiceMock);
+    service = new ValidateDebtPositionServiceImpl(taxonomyService, debtPositionRepository, balanceServiceMock, false);
   }
 
   @Test
@@ -377,7 +377,7 @@ class ValidateDebtPositionServiceImplTest {
       .getInstallments()
       .getFirst()
       .getTransfers().getFirst();
-    transfer.setOrgFiscalCode("00000000001");
+    transfer.setOrgFiscalCode("111111");
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
