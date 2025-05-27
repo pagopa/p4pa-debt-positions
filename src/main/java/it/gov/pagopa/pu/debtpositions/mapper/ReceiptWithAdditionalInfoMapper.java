@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -14,18 +16,22 @@ import java.util.List;
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
   private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
-  public ReceiptWithAdditionalInfoMapper(UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
+  public ReceiptWithAdditionalInfoMapper(UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     this.unknownDebtPositionTypeOrgRetrieverService = unknownDebtPositionTypeOrgRetrieverService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptDTO.getDebtPositionTypeOrgCode())
+      .orElseGet(() -> unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()));
+
     OffsetDateTime now = OffsetDateTime.now();
     return DebtPositionDTO.builder()
       .organizationId(organization.getOrganizationId())
       .debtPositionOrigin(getDebtPositionOrigin(receiptDTO, organization))
-      .debtPositionTypeOrgId(unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId())
-        .getDebtPositionTypeOrgId())
+      .debtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId())
       .iupdOrg(getIupdOrg(receiptDTO))
       .description(receiptDTO.getDescription())
       .status(DebtPositionStatus.PAID)
@@ -45,7 +51,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .status(InstallmentStatus.PAID)
           .syncStatus(null)
           .iupdPagopa(Utilities.generateRandomIupd(organization.getOrgFiscalCode()))
-          .iud(Utilities.getRandomIUD())
+          .iud(receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD())
           .iuv(receiptDTO.getCreditorReferenceId())
           .iuf(null)
           .iur(receiptDTO.getPaymentReceiptId())
@@ -54,7 +60,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .notificationFeeCents(receiptDTO.getFeeCents())
           .amountCents(receiptDTO.getPaymentAmountCents())
           .remittanceInformation(getRemittanceInformation(receiptDTO))
-          .balance(null)
+          .balance(receiptDTO.getBalance())
           .legacyPaymentMetadata(getLegacyPaymentMetadata(receiptDTO))
           .debtor(receiptDTO.getDebtor())
           .notificationDate(null)
