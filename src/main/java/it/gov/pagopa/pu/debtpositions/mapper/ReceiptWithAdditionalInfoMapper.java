@@ -25,7 +25,7 @@ public class ReceiptWithAdditionalInfoMapper {
 
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptDTO.getDebtPositionTypeOrgCode())
-      .orElse(unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()));
+      .orElseGet(() -> unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()));
 
     OffsetDateTime now = OffsetDateTime.now();
     return DebtPositionDTO.builder()
@@ -51,7 +51,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .status(InstallmentStatus.PAID)
           .syncStatus(null)
           .iupdPagopa(Utilities.generateRandomIupd(organization.getOrgFiscalCode()))
-          .iud(receiptDTO.getIud())
+          .iud(receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD())
           .iuv(receiptDTO.getCreditorReferenceId())
           .iuf(null)
           .iur(receiptDTO.getPaymentReceiptId())
