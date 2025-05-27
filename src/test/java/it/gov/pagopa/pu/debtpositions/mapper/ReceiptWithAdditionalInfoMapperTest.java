@@ -34,7 +34,7 @@ class ReceiptWithAdditionalInfoMapperTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"RECEIPT_PAGOPA", "SECONDARY_ORG", "RECEIPT_FILE", "PAYMENTS_REPORTING"})
-  void test(String receiptOrigin){
+  void givenValidReceiptOriginWhenMapToDTOThenReturnDebtPosition(String receiptOrigin){
     //given
     ReceiptWithAdditionalNodeDataDTO receiptWithAdditionalNodeDataDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
@@ -44,6 +44,7 @@ class ReceiptWithAdditionalInfoMapperTest {
       receiptWithAdditionalNodeDataDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
       receiptWithAdditionalNodeDataDTO.setOrgFiscalCode(receiptWithAdditionalNodeDataDTO.getOrgFiscalCode()+"secondary");
     } else {
+      receiptWithAdditionalNodeDataDTO.setIud(null);
       receiptWithAdditionalNodeDataDTO.setReceiptOrigin(ReceiptOriginType.valueOf(receiptOrigin));
     }
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptWithAdditionalNodeDataDTO.getDebtPositionTypeOrgCode()))
