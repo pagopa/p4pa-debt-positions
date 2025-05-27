@@ -30,16 +30,16 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
-  private final boolean isCheckEnabled;
+  private final boolean isOrgPIvaCheckEnabled;
 
   public ValidateDebtPositionServiceImpl(TaxonomyService taxonomyService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
-                                         @Value("${features.organization.piva-check}") boolean isCheckEnabled) {
+                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
     this.taxonomyService = taxonomyService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
-    this.isCheckEnabled = isCheckEnabled;
+    this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -160,7 +160,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("The amount of transfer with index " + index + " must be greater than 0");
       }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
-        !isValidPIVA(transferDTO.getOrgFiscalCode(), isCheckEnabled)) {
+        !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
       if (!isValidIban(transferDTO.getIban())) {

@@ -36,7 +36,7 @@ public class Utilities {
     return iban != null && iban.length() == IBAN_LENGTH;
   }
 
-  public static boolean isValidPIVA(String pi, boolean isCheckEnabled) {
+  public static boolean isValidPIVA(String pi, boolean isOrgPIvaCheckEnabled) {
     int i;
     int c;
     int s;
@@ -48,7 +48,7 @@ public class Utilities {
       if (pi.charAt(i) < '0' || pi.charAt(i) > '9')
         return false;
     }
-    if(isCheckEnabled) {
+    if(isOrgPIvaCheckEnabled) {
       s = 0;
       for (i = 0; i <= 9; i += 2)
         s += pi.charAt(i) - '0';
