@@ -35,7 +35,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   public ValidateDebtPositionServiceImpl(TaxonomyService taxonomyService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
-                                         @Value("${fiscal-code.check-enabled}") boolean isCheckEnabled) {
+                                         @Value("${features.organization.piva-check}") boolean isCheckEnabled) {
     this.taxonomyService = taxonomyService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
