@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
@@ -29,12 +30,16 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
+  private final boolean isOrgPIvaCheckEnabled;
 
   public ValidateDebtPositionServiceImpl(TaxonomyService taxonomyService,
-                                         DebtPositionRepository debtPositionRepository, BalanceService balanceService) {
+                                         DebtPositionRepository debtPositionRepository,
+                                         BalanceService balanceService,
+                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
     this.taxonomyService = taxonomyService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
+    this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -155,7 +160,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("The amount of transfer with index " + index + " must be greater than 0");
       }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
-        !isValidPIVA(transferDTO.getOrgFiscalCode())) {
+        !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
       if (!isValidIban(transferDTO.getIban())) {

@@ -1262,8 +1262,6 @@ components:
         - companyName
         - idPsp
         - pspCompanyName
-        - idChannel
-        - channelDescription
         - debtor
       properties:
         receiptId:
@@ -1472,6 +1470,12 @@ components:
               additionalProperties:
                 type: string
             sourceFlowName:
+              type: string
+            iud:
+              type: string
+            debtPositionTypeOrgCode:
+              type: string
+            balance:
               type: string
     PersonDTO:
       required:

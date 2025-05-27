@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -16,11 +17,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.util.Optional;
+
 @ExtendWith(MockitoExtension.class)
 class ReceiptWithAdditionalInfoMapperTest {
 
   @Mock
   private UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   @InjectMocks
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
@@ -29,7 +34,7 @@ class ReceiptWithAdditionalInfoMapperTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"RECEIPT_PAGOPA", "SECONDARY_ORG", "RECEIPT_FILE", "PAYMENTS_REPORTING"})
-  void test(String receiptOrigin){
+  void givenValidReceiptOriginWhenMapToDTOThenReturnDebtPosition(String receiptOrigin){
     //given
     ReceiptWithAdditionalNodeDataDTO receiptWithAdditionalNodeDataDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
@@ -39,9 +44,13 @@ class ReceiptWithAdditionalInfoMapperTest {
       receiptWithAdditionalNodeDataDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
       receiptWithAdditionalNodeDataDTO.setOrgFiscalCode(receiptWithAdditionalNodeDataDTO.getOrgFiscalCode()+"secondary");
     } else {
+      receiptWithAdditionalNodeDataDTO.setIud(null);
       receiptWithAdditionalNodeDataDTO.setReceiptOrigin(ReceiptOriginType.valueOf(receiptOrigin));
     }
-    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(organization.getOrganizationId())).thenReturn(debtPositionTypeOrg);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptWithAdditionalNodeDataDTO.getDebtPositionTypeOrgCode()))
+        .thenReturn(Optional.empty());
+    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()))
+      .thenReturn(debtPositionTypeOrg);
 
     //when
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization);
@@ -63,7 +72,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().getFirst();
     TestUtils.checkNotNullFields(installmentDTO, "paymentOptionId", "installmentId", "dueDate",
       "syncStatus", "iuf", "iur", "iun", "paymentTypeCode", "balance", "legacyPaymentMetadata", "notificationDate",
-      "ingestionFlowFileId", "ingestionFlowFileLineNumber", "sourceFlowName", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+      "ingestionFlowFileId", "ingestionFlowFileLineNumber", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
     installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO,"transferId","installmentId", "postalIban", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"));
     Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock, Mockito.times(1)).getUnknownDebtPositionTypeOrg(organization.getOrganizationId());

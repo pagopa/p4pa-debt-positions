@@ -36,7 +36,7 @@ public class Utilities {
     return iban != null && iban.length() == IBAN_LENGTH;
   }
 
-  public static boolean isValidPIVA(String pi) {
+  public static boolean isValidPIVA(String pi, boolean isOrgPIvaCheckEnabled) {
     int i;
     int c;
     int s;
@@ -48,16 +48,19 @@ public class Utilities {
       if (pi.charAt(i) < '0' || pi.charAt(i) > '9')
         return false;
     }
-    s = 0;
-    for (i = 0; i <= 9; i += 2)
-      s += pi.charAt(i) - '0';
-    for (i = 1; i <= 9; i += 2) {
-      c = 2 * (pi.charAt(i) - '0');
-      if (c > 9)
-        c = c - 9;
-      s += c;
+    if(isOrgPIvaCheckEnabled) {
+      s = 0;
+      for (i = 0; i <= 9; i += 2)
+        s += pi.charAt(i) - '0';
+      for (i = 1; i <= 9; i += 2) {
+        c = 2 * (pi.charAt(i) - '0');
+        if (c > 9)
+          c = c - 9;
+        s += c;
+      }
+      return (10 - s % 10) % 10 == pi.charAt(10) - '0';
     }
-    return (10 - s % 10) % 10 == pi.charAt(10) - '0';
+    return true;
   }
 
   public static String getRandomIUD() {

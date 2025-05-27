@@ -60,9 +60,7 @@ public class ReceiptNoPII extends BaseEntity implements Serializable, NoPIIEntit
   private String pspPartitaIva;
   @NotNull
   private String pspCompanyName;
-  @NotNull
   private String idChannel;
-  @NotNull
   private String channelDescription;
   private String paymentMethod;
   private Long feeCents;
