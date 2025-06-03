@@ -145,7 +145,11 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
     }
 
-    installmentDTO.setSourceFlowName("UNKNOWN"); //TODO TASK P4ADEV-2965
+    if(debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY))
+      installmentDTO.setSourceFlowName(org.getIpaCode()+"_IMPORT-DOVUTO");
+    if(debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))
+      installmentDTO.setSourceFlowName(org.getIpaCode()+"_SPONTANEO");
+
     populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
