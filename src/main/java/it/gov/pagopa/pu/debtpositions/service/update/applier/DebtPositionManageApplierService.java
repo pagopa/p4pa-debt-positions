@@ -39,6 +39,7 @@ public class DebtPositionManageApplierService {
     checkImmutableField("receiptId", updatedInstallment.getReceiptId(), storedInstallment.getReceiptId(), modifiedFields);
     checkImmutableField("notificationDate", updatedInstallment.getNotificationDate(), storedInstallment.getNotificationDate(), modifiedFields);
     checkImmutableField("notificationFeeCents", updatedInstallment.getNotificationFeeCents(), storedInstallment.getNotificationFeeCents(), modifiedFields);
+    checkImmutableField("sourceFlowName", updatedInstallment.getSourceFlowName(), storedInstallment.getSourceFlowName(), modifiedFields);
 
     checkDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 
