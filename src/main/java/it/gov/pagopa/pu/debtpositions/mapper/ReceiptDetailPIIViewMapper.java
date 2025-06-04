@@ -31,6 +31,7 @@ public class ReceiptDetailPIIViewMapper {
       .pspCompanyName(receiptDetailNoPIIView.getPspCompanyName())
       .iud(receiptDetailNoPIIView.getIud())
       .iur(receiptDetailNoPIIView.getIur())
+      .feeCents(receiptDetailNoPIIView.getFeeCents())
       .debtor(pii.getDebtor()!=null?personMapper.mapToDto(pii.getDebtor()):null)
       .payer(pii.getPayer()!=null?personMapper.mapToDto(pii.getPayer()):null)
       .build();
