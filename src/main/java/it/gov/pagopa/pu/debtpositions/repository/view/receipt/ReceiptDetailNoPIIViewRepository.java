@@ -2,12 +2,13 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
-import java.util.Optional;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+
+import java.util.Optional;
 
 @RepositoryRestResource(path = "receipts-detail-view")
 public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDetailNoPIIView, Long> {
@@ -22,7 +23,8 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
       + "r.paymentDateTime as paymentDateTime, "
       + "r.pspCompanyName as pspCompanyName, "
       + "i.iud as iud, "
-      + "i.iur as iur "
+      + "i.iur as iur, "
+      + "r.feeCents as feeCents "
     + ") "
     + "FROM ReceiptDetailNoPIIView r "
     + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "

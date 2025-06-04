@@ -36,4 +36,5 @@ public class ReceiptDetailNoPIIView implements Serializable {
   @NotNull
   private String iud;
   private String iur;
+  private Long feeCents;
 }

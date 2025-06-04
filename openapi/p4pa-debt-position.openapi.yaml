@@ -1421,6 +1421,9 @@ components:
           type: string
         iur:
           type: string
+        feeCents:
+          type: integer
+          format: int64
     ReceiptTransferDTO:
       required:
         - idTransfer
