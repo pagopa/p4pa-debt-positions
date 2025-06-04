@@ -49,7 +49,7 @@ public class InstallmentSynchronizeMapper {
       .ingestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber())
       .notificationDate(installmentSynchronizeDTO.getNotificationDate())
-      .sourceFlowName("UNKNOWN") //TODO P4ADEV-2965
+      .sourceFlowName(installmentSynchronizeDTO.getIngestionFlowFileName())
       .status(Boolean.TRUE.equals(installmentSynchronizeDTO.getDraft()) ? InstallmentStatus.DRAFT : InstallmentStatus.UNPAID)
       .transfers(installmentSynchronizeDTO.getAdditionalTransfers()
         .stream().map(this::map2TransferDTO)
