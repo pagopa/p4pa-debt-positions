@@ -1421,6 +1421,9 @@ components:
           type: string
         iur:
           type: string
+        feeCents:
+          type: integer
+          format: int64
     ReceiptTransferDTO:
       required:
         - idTransfer
@@ -1682,6 +1685,7 @@ components:
         - debtPositionTypeCode
         - remittanceInformation
         - flagPuPagoPaPayment
+        - ingestionFlowFileName
       type: object
       properties:
         ingestionFlowFileId:
@@ -1774,6 +1778,8 @@ components:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
         executionConfig:
           type: object
+        ingestionFlowFileName:
+          type: string
     TransferSynchronizeDTO:
       required:
         - orgFiscalCode
