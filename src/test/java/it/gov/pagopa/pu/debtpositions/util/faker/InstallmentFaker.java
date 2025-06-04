@@ -208,7 +208,7 @@ public class InstallmentFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(101L)
       .status(InstallmentStatus.UNPAID)
-      .sourceFlowName("UNKNOWN")
+      .sourceFlowName("ingestionFlowFileName")
       .transfers(new ArrayList<>(List.of(buildSyncTransferDTO())))
       .build();
   }
