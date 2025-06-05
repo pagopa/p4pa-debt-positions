@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
 import org.springframework.stereotype.Service;
@@ -19,8 +19,8 @@ public class ReceiptDetailPIIViewMapper {
   }
 
   public ReceiptDetailDTO mapToReceiptDetailDTO(ReceiptDetailNoPIIView receiptDetailNoPIIView) {
-    ReceiptPIIDTO pii = personalDataService.get(
-      receiptDetailNoPIIView.getDebtorPersonalDataId(),ReceiptPIIDTO.class);
+    InstallmentPIIDTO pii = personalDataService.get(
+      receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class);
     return ReceiptDetailDTO.builder()
       .receiptId(receiptDetailNoPIIView.getReceiptId())
       .iuv(receiptDetailNoPIIView.getIuv())
@@ -33,7 +33,6 @@ public class ReceiptDetailPIIViewMapper {
       .iur(receiptDetailNoPIIView.getIur())
       .feeCents(receiptDetailNoPIIView.getFeeCents())
       .debtor(pii.getDebtor()!=null?personMapper.mapToDto(pii.getDebtor()):null)
-      .payer(pii.getPayer()!=null?personMapper.mapToDto(pii.getPayer()):null)
       .build();
   }
 }

@@ -1,10 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,12 +30,19 @@ class ReceiptDetailPIIViewMapperTest {
   @InjectMocks
   private ReceiptDetailPIIViewMapper receiptDetailPIIViewMapper;
 
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+            personalDataServiceMock
+    );
+  }
+
   @Test
   void givenValidReceiptNoPIIWhenMapToReceiptDTOThenReturnReceiptDTO() {
     //given
     ReceiptDetailNoPIIView receiptDetailNoPIIView = podamFactory.manufacturePojo(ReceiptDetailNoPIIView.class);
-    ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
-    Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    InstallmentPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(receiptPIIDTO);
     //when
     ReceiptDetailDTO response = receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
 
@@ -42,27 +50,23 @@ class ReceiptDetailPIIViewMapperTest {
     Assertions.assertNotNull(response);
     TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response, "debtor", "payer");
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), response.getDebtor());
-    TestUtils.reflectionEqualsByName(receiptPIIDTO.getPayer(), response.getPayer());
     TestUtils.checkNotNullFields(response);
-    Mockito.verify(personalDataServiceMock).get(receiptDetailNoPIIView.getDebtorPersonalDataId(),ReceiptPIIDTO.class);
     Mockito.verify(personMapperSpy).mapToDto(receiptPIIDTO.getDebtor());
-    Mockito.verify(personMapperSpy).mapToDto(receiptPIIDTO.getPayer());
   }
 
   @Test
-  void givenNoPayerAndDebtorWhenMapToReceiptDTOThenReturnReceiptDTOWithNoPayerAndDebtor() {
+  void givenNoDebtorWhenMapToReceiptDTOThenReturnReceiptDTOWithNoDebtor() {
     //given
     ReceiptDetailNoPIIView receiptDetailNoPIIView = podamFactory.manufacturePojo(ReceiptDetailNoPIIView.class);
-    ReceiptPIIDTO receiptPIIDTO = new ReceiptPIIDTO();
-    Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    InstallmentPIIDTO installmentPIIDTO = new InstallmentPIIDTO();
+    Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     //when
     ReceiptDetailDTO response = receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
 
     //verify
     Assertions.assertNotNull(response);
-    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response, "debtor", "payer");
-    TestUtils.checkNotNullFields(response, "payer", "debtor");
-    Mockito.verify(personalDataServiceMock).get(receiptDetailNoPIIView.getDebtorPersonalDataId(),ReceiptPIIDTO.class);
+    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response, "debtor");
+    TestUtils.checkNotNullFields(response, "debtor");
     Mockito.verifyNoInteractions(personMapperSpy);
   }
 }
