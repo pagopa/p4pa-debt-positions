@@ -7991,9 +7991,6 @@
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
           },
-          "payer" : {
-            "$ref" : "#/components/schemas/PersonDTO"
-          },
           "paymentDateTime" : {
             "type" : "string",
             "format" : "date-time"

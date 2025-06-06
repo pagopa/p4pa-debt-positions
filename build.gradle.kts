@@ -264,7 +264,9 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
       "IngestionFlowFileType" to "String",
       "WfExecutionConfig" to "com.fasterxml.jackson.databind.JsonNode",
       "ExportFileType" to "String",
-      "WorkflowTypeOrg" to "String"
+      "WorkflowTypeOrg" to "String",
+      "ScheduleEnum" to "String",
+      "WorkflowExecutionStatus" to "String"
     )
   )
   configOptions.set(
