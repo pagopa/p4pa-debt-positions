@@ -87,7 +87,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "  join DebtPosition dp" +
     "    on po.debtPositionId = dp.debtPositionId" +
     " where dp.organizationId = :organizationId" +
-    "   and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))" +
+    "   and (dp.debtPositionOrigin in (:debtPositionOrigins))" +
     "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 

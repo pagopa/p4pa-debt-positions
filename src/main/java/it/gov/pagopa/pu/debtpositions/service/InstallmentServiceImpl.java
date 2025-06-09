@@ -40,6 +40,10 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
 
+  public static final List<DebtPositionOrigin> ORDINARY_DEBT_POSITION_ORIGINS = List.of(
+    DebtPositionOrigin.ORDINARY, DebtPositionOrigin.ORDINARY_SIL, DebtPositionOrigin.SPONTANEOUS
+  );
+
   public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository,
     InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
     DebtPositionRepository debtPositionRepository,
@@ -102,7 +106,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   @Override
   public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, null).stream()
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .map(installmentMapper::mapToDto)
       .toList();

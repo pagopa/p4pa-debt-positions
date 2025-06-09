@@ -12,7 +12,6 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +45,10 @@ class InstallmentControllerTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
-  @NullSource
   void whenGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) throws Exception {
     //given
     List<InstallmentDTO> installmentDTOList = List.of(InstallmentFaker.buildInstallmentDTO());
-    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
     Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
 
