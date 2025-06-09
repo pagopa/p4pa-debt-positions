@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -147,7 +150,7 @@ class IuvServiceTest {
   @Test
   void givenIuvLengthNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG));
+      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG, DebtPositionOrigin.ORDINARY));
 
     Assertions.assertEquals("The iuv must be 17 characters long", exception.getMessage());
   }
@@ -155,23 +158,42 @@ class IuvServiceTest {
   @Test
   void givenIuvWithSegregationNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG));
+      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG, DebtPositionOrigin.ORDINARY));
 
     Assertions.assertEquals("The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL", "SPONTANEOUS"})
+  void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(String debtPositionOrigin) {
+    DebtPositionOrigin origin = DebtPositionOrigin.valueOf(debtPositionOrigin);
+
+    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
+      () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", IuvServiceTest.VALID_ORG, origin));
+
+    Assertions.assertEquals("The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
   }
 
   @Test
   void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG));
+      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG, DebtPositionOrigin.SECONDARY_ORG));
 
-    Assertions.assertEquals("The third and fourth characters cannot be equals to: 00", exception.getMessage());
+    Assertions.assertEquals("The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
   }
 
   @Test
-  void givenIuvValidWhenValidateIuvAndRetrieveNavThenException(){
+  void givenIuvValidWhenValidateIuvAndRetrieveNavThenOk(){
     String externalIuv = "01990000000004285";
-    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG);
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG, DebtPositionOrigin.SECONDARY_ORG);
+
+    Assertions.assertEquals(3+externalIuv , result);
+  }
+
+  @Test
+  void givenIuvValidAndOriginOrdinaryWhenValidateIuvAndRetrieveNavThenOk(){
+    String externalIuv = "01000000000004285";
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG, DebtPositionOrigin.ORDINARY);
 
     Assertions.assertEquals(3+externalIuv , result);
   }

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
@@ -123,17 +124,24 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-
-  public String validateIuvAndRetrieveNav(String iuv, Organization org) {
+  public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException("The iuv must be 17 characters long");
     }
     if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
       throw new InvalidValueException("The first two character of iuv must be the same of segregation code of organization");
     }
-    if (iuv.substring(3, 5).equals(informationSystemId)) {
-      throw new InvalidValueException("The third and fourth characters cannot be equals to: " + informationSystemId);
+
+    if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.ORDINARY_SIL) {
+      if (!iuv.startsWith("00", 3)) {
+        throw new InvalidValueException("The third and fourth characters must be '00' for the origin: " + origin);
+      }
+    } else {
+      if (iuv.startsWith("00", 3)) {
+        throw new InvalidValueException("The third and fourth characters cannot be '00' for the origin: " + origin);
+      }
     }
+
     return AUX_DIGIT + iuv;
   }
 }
