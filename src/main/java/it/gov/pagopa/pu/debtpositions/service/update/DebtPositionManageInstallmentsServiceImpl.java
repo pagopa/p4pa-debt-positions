@@ -126,15 +126,15 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(true).build();
 
-    if(!installmentsToAdd.isEmpty()){
+    if (!installmentsToAdd.isEmpty()) {
       WorkflowCreatedDTO workflowCreated = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId);
       checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
-    if(!installmentsToUpdate.isEmpty()){
+    if (!installmentsToUpdate.isEmpty()) {
       WorkflowCreatedDTO workflowCreated = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId);
       checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
-    if(!installmentsToCancel.isEmpty()){
+    if (!installmentsToCancel.isEmpty()) {
       WorkflowCreatedDTO workflowCreated = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
       checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
@@ -164,15 +164,11 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     return installment;
   }
 
-  private void checkWorkflowIsCompleted(WorkflowCreatedDTO workflowCreatedDTO, String accessToken){
-    if(workflowCreatedDTO != null) {
-      try {
-        String workflowStatus = workflowHubService.waitWorkflowCompletion(accessToken, workflowCreatedDTO.getWorkflowId(), maxAttempts, retryDelayMs);
-        if(!WORKFLOW_STATUS_COMPLETED_VALUE.equals(workflowStatus)){
-          throw new WorkflowErrorException("Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
-        }
-      } catch (Exception e) {
-        throw new WorkflowErrorException("Error retrieving status of workflow with id " + workflowCreatedDTO.getWorkflowId());
+  private void checkWorkflowIsCompleted(WorkflowCreatedDTO workflowCreatedDTO, String accessToken) {
+    if (workflowCreatedDTO != null) {
+      String workflowStatus = workflowHubService.waitWorkflowCompletion(accessToken, workflowCreatedDTO.getWorkflowId(), maxAttempts, retryDelayMs);
+      if (!WORKFLOW_STATUS_COMPLETED_VALUE.equals(workflowStatus)) {
+        throw new WorkflowErrorException("Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
       }
     }
   }
