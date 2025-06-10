@@ -32,7 +32,10 @@ public class InstallmentSynchronizeCancelService extends BaseInstallmentSynchron
 
     if(isInstallmentAlreadyElaborated(installmentDTO, installmentSynchronizeDTO)){ return null;}
 
+    checkIunPresence(result.getRight());
+
     validateStatus(installmentDTO, installmentSynchronizeDTO);
+
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
 

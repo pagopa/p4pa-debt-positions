@@ -45,8 +45,10 @@ class InstallmentSynchronizeCancelServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
     InstallmentDTO installmentDTO = buildInstallmentDTO();
     installmentDTO.setIngestionFlowFileLineNumber(101L);
+    installmentDTO.setIun(null);
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
@@ -113,6 +115,19 @@ class InstallmentSynchronizeCancelServiceImplTest {
   }
 
   @Test
+  void testInstallmentSyncCancelWithInstallmentNotifiedThenThrowException() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+      installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+    assertEquals("The installment with id 100 cannot be updated or cancelled because is been notified by SEND", conflictException.getMessage());
+  }
+
+  @Test
   void testInstallmentSyncCancelWithInstallmentPaidThenThrowException() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
@@ -120,6 +135,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
@@ -136,6 +152,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     installmentSynchronizeDTO.setIngestionFlowFileId(3L);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
@@ -153,6 +170,8 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(
       InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.PAID).build());
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
+
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
@@ -170,6 +189,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(null);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
@@ -191,6 +211,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()
       .setSyncStatus(InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.UNPAID).build());
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))

@@ -34,6 +34,8 @@ public class InstallmentSynchronizeUpdateService extends BaseInstallmentSynchron
 
     if(isInstallmentAlreadyElaborated(result.getRight(), installmentSynchronizeDTO)){ return null;}
 
+    checkIunPresence(result.getRight());
+
     validateStatus(result.getRight(), installmentSynchronizeDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, result.getLeft(), result.getRight(), accessToken);

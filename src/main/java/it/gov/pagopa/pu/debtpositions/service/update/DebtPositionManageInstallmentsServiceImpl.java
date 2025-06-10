@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
@@ -131,6 +132,11 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus())) {
       throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
     }
+
+    if (StringUtils.isNotBlank(installment.getIun())) {
+      throw new ConflictErrorException("The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
+    }
+
     return installment;
   }
 

@@ -153,6 +153,25 @@ class DebtPositionManageInstallmentsServiceImplTest {
   }
 
   @Test
+  void givenInstallmentAlreadyNotifiedWhenManageUpdateThenException() {
+    Long debtPositionId = 1L;
+    ManageDebtPositionDTO manageDebtPositionDTO = buildManageDebtPositionDTO();
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iun("iun")
+      .status(InstallmentStatus.UNPAID).syncStatus(null);
+    debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+
+    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+      () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
+
+    assertEquals("The installment with id 2 cannot be modified because is been notified by SEND", exception.getMessage());
+  }
+
+  @Test
   void givenValidActionOnDpWhenManageThenException() {
     Long debtPositionId = 1L;
     ManageDebtPositionDTO manageDebtPositionDTO = buildManageDebtPositionDTO();
@@ -165,10 +184,10 @@ class DebtPositionManageInstallmentsServiceImplTest {
     InstallmentDTO installment2insert = buildInstallmentDTO().installmentId(1L).iud("iud1")
       .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2insert);
-    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iud("iud2")
+    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iud("iud2").iun(null)
       .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
-    InstallmentDTO installment2cancel = buildInstallmentDTO().installmentId(3L).iud("iud3")
+    InstallmentDTO installment2cancel = buildInstallmentDTO().installmentId(3L).iud("iud3").iun(null)
       .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2cancel);
 
