@@ -42,5 +42,19 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   @RestResource(exported = false)
   @Override
   void deleteById(Long debtPositionTypeOrgId);
+
+  @Query("""
+          select dpto
+          from DebtPositionTypeOrg dpto
+          JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+          WHERE dpto.organizationId = :organizationId
+          AND dpto.code = :code
+          AND dptoo.operatorExternalUserId = :operatorExternalUserId
+          """)
+  DebtPositionTypeOrg findDebtPositionTypeOrg(
+          @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+          @Parameter(required = true) @Param("code") String code,
+          @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
+  );
 }
 
