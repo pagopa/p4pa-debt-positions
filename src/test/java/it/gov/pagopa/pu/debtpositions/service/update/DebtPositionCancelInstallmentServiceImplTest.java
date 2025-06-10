@@ -71,6 +71,7 @@ class DebtPositionCancelInstallmentServiceImplTest {
     InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
     installmentDTO.setSyncStatus(null);
+    installmentDTO.setIun(null);
     String iud = installmentDTO.getIud();
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
