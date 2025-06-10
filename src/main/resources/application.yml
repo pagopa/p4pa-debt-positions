@@ -206,3 +206,7 @@ cache:
 features:
   organization:
     piva-check: "\${FEATURE_ORGANIZATION_PIVA_CHECK:true}"
+
+wf-await:
+  max-waiting-minutes: 5
+  retry-delays-ms: 1000

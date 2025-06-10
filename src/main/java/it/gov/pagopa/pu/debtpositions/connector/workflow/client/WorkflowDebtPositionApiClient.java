@@ -9,11 +9,11 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.springframework.stereotype.Service;
 
 @Service
-public class WorkflowApiClient {
+public class WorkflowDebtPositionApiClient {
 
   private final WorkflowApisHolder workflowApisHolder;
 
-  public WorkflowApiClient(WorkflowApisHolder workflowApisHolder) {
+  public WorkflowDebtPositionApiClient(WorkflowApisHolder workflowApisHolder) {
     this.workflowApisHolder = workflowApisHolder;
   }
 

@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -53,6 +54,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
   private DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentServiceMock;
   @Mock
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentServiceMock;
+  @Mock
+  private WorkflowHubService workflowHubServiceMock;
 
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
 
@@ -62,13 +65,20 @@ class DebtPositionManageInstallmentsServiceImplTest {
   private static final WorkflowCreatedDTO WORKFLOW_ADD = new WorkflowCreatedDTO("workflowId_ADD", "runId");
   private static final WorkflowCreatedDTO WORKFLOW_UPDATE = new WorkflowCreatedDTO("workflowId_UPDATE", "runId");
   private static final WorkflowCreatedDTO WORKFLOW_CANCEL = new WorkflowCreatedDTO("workflowId_CANCEL", "runId");
+  private int retryDelayMs;
+  private int maxRetries;
 
   @BeforeEach
   void setUp() {
+    int maxWaitingMinutes = 1;
+    retryDelayMs = 10;
+    maxRetries = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
     debtPositionManageInstallmentsService = new DebtPositionManageInstallmentsServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
       organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionManageApplierServiceMock,
-      debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock);
+      debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock,
+      workflowHubServiceMock, maxWaitingMinutes, maxRetries
+      );
   }
 
   @Test

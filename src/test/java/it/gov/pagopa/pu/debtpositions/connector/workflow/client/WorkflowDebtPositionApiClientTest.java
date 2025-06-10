@@ -16,17 +16,17 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class WorflowApiClientTest {
+class WorkflowDebtPositionApiClientTest {
   @Mock
   private WorkflowApisHolder workflowApisHolderMock;
   @Mock
   private DebtPositionApi debtPositionApiMock;
 
-  private WorkflowApiClient workflowApiClient;
+  private WorkflowDebtPositionApiClient workflowApiClient;
 
   @BeforeEach
   void setUp() {
-    workflowApiClient = new WorkflowApiClient(workflowApisHolderMock);
+    workflowApiClient = new WorkflowDebtPositionApiClient(workflowApisHolderMock);
   }
 
   @AfterEach

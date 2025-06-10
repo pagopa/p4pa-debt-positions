@@ -331,4 +331,14 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
   }
 
+  @Test
+  void handleWorkflowErrorException() throws Exception {
+    doThrow(new WorkflowErrorException("Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"));
+  }
+
 }
