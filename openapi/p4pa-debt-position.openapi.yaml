@@ -1183,6 +1183,8 @@ components:
         ingestionFlowFileLineNumber:
           type: integer
           format: int64
+        ingestionFlowFileAction:
+          $ref: "#/components/schemas/Action"
         sourceFlowName:
           type: string
         receiptId:
@@ -1554,6 +1556,12 @@ components:
         - UNPAID
         - UNPAYABLE
         - DRAFT
+    Action:
+      type: string
+      enum:
+        - I
+        - M
+        - A
     SyncStatusUpdateRequestDTO:
       type: object
       required:
@@ -1696,11 +1704,7 @@ components:
           type: integer
           format: int64
         action:
-          type: string
-          enum:
-            - I
-            - M
-            - A
+          $ref: "#/components/schemas/Action"
         draft:
           type: boolean
         iupdOrg:
@@ -1957,11 +1961,7 @@ components:
         - installment
       properties:
         action:
-          type: string
-          enum:
-            - I
-            - M
-            - A
+          $ref: "#/components/schemas/Action"
         installment:
           $ref: "#/components/schemas/InstallmentDTO"
     SaveDebtPositionTypeOrgDTO:

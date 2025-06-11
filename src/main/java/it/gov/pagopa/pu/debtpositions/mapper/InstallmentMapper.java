@@ -50,6 +50,7 @@ public class InstallmentMapper {
     installment.setNotificationDate(dto.getNotificationDate());
     installment.setIngestionFlowFileId(dto.getIngestionFlowFileId());
     installment.setIngestionFlowFileLineNumber(dto.getIngestionFlowFileLineNumber());
+    installment.setIngestionFlowFileAction(dto.getIngestionFlowFileAction());
     installment.setSourceFlowName(dto.getSourceFlowName());
     installment.setReceiptId(dto.getReceiptId());
     installment.setCreationDate(dto.getCreationDate() != null ? dto.getCreationDate().toLocalDateTime() : null);
@@ -84,6 +85,7 @@ public class InstallmentMapper {
       .notificationDate(installment.getNotificationDate())
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
+      .ingestionFlowFileAction(installment.getIngestionFlowFileAction())
       .sourceFlowName(installment.getSourceFlowName())
       .receiptId(installment.getReceiptId())
       .build();
@@ -129,6 +131,7 @@ public class InstallmentMapper {
       .notificationDate(installment.getNotificationDate())
       .ingestionFlowFileId(installment.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installment.getIngestionFlowFileLineNumber())
+      .ingestionFlowFileAction(installment.getIngestionFlowFileAction())
       .sourceFlowName(installment.getSourceFlowName())
       .receiptId(installment.getReceiptId())
       .creationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()))

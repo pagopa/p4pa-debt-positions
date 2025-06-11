@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
@@ -46,6 +47,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
       .sourceFlowName("sourceFlowName")
       .receiptId(1L)
       .creationDate(DATETIME.toLocalDateTime())
@@ -83,6 +85,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
       .sourceFlowName("sourceFlowName")
       .receiptId(1L)
       .creationDate(DATETIME.toLocalDateTime())
@@ -123,6 +126,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
       .sourceFlowName("sourceFlowName")
       .receiptId(1L)
       .creationDate(DATETIME.toLocalDateTime())
@@ -153,6 +157,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
       .sourceFlowName("sourceFlowName")
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
@@ -186,6 +191,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
       .sourceFlowName("sourceFlowName")
       .receiptId(1L)
       .transfers(new ArrayList<>(List.of(buildTransferDTO())))
@@ -207,6 +213,7 @@ public class InstallmentFaker {
       .notificationDate(DATETIME)
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(101L)
+      .ingestionFlowFileAction(Action.I)
       .status(InstallmentStatus.UNPAID)
       .sourceFlowName("ingestionFlowFileName")
       .transfers(new ArrayList<>(List.of(buildSyncTransferDTO())))
