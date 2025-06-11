@@ -42,7 +42,7 @@ public class TransferFaker {
       .amountCents(1000L)
       .remittanceInformation("Payment Info")
       .iban("IT60X0542811101000000123456")
-      .postalIban("123456")
+      .postalIban("IT60X0542811101009000123456")
       .category("category")
       .transferIndex(1)
       .stampType("TYPE")

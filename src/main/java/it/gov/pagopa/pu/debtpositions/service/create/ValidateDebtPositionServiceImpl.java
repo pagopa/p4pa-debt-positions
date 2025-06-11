@@ -163,11 +163,20 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
-      if (!isValidIban(transferDTO.getIban())) {
-        throw new InvalidValueException("Iban of transfer with index " + index + " is not valid");
-      }
+      checkIban(transferDTO);
       checkTaxonomyCategory(transferDTO, accessToken);
     });
+  }
+
+  private void checkIban(TransferDTO transferDTO){
+    if (StringUtils.isBlank(transferDTO.getStampType())) {
+      if (!isValidIban(transferDTO.getIban())) {
+        throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+      if(StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())){
+        throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+    }
   }
 
   private void checkTaxonomyCategory(TransferDTO transferDTO, String accessToken) {
