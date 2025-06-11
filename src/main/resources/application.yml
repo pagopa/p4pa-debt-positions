@@ -208,5 +208,5 @@ features:
     piva-check: "\${FEATURE_ORGANIZATION_PIVA_CHECK:true}"
 
 wf-await:
-  max-waiting-minutes: 5
-  retry-delays-ms: 1000
+  max-waiting-minutes: "\${WORKFLOW_AWAIT_MAX_WAITING_MINUTES:5}"
+  retry-delays-ms: "\${WORKFLOW_AWAIT_RETRY_DELAYS_MS:1000}"

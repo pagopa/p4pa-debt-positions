@@ -10,6 +10,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowHubApiClientTest {
@@ -48,5 +50,22 @@ class WorkflowHubApiClientTest {
 
     // Then
     Assertions.assertSame("COMPLETED", result);
+  }
+
+  @Test
+  void whenWaitForWFCompletionWithWFNotFoundThenException() {
+    // Given
+    String accessToken = "ACCESSTOKEN";
+
+    Mockito.when(workflowApisHolderMock.getWorkflowApi(accessToken))
+      .thenReturn(workflowApiMock);
+    Mockito.when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
+      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+
+    // When
+    String result = client.waitWorkflowCompletion(accessToken, "workflowId", 1, 1);
+
+    // Then
+    Assertions.assertNull(result);
   }
 }
