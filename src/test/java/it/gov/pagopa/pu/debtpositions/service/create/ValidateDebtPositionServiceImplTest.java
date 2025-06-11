@@ -434,6 +434,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .getTransfers().getFirst();
     transfer.setCategory(null);
+    transfer.setPostalIban(null);
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
