@@ -57,6 +57,7 @@ public class InstallmentSynchronizeFaker {
       .additionalTransfers(new ArrayList<>(List.of(buildTransferSynchronizeDTO())))
       .executionConfig(NullNode.instance)
       .ingestionFlowFileName("ingestionFlowFileName")
+      .action(I)
       .build();
   }
 
