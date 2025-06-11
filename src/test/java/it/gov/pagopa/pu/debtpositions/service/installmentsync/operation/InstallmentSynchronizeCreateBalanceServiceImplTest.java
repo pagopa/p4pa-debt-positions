@@ -1,0 +1,409 @@
+package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
+
+import it.gov.pagopa.pu.classification.dto.generated.AssessmentsRegistry;
+import it.gov.pagopa.pu.classification.dto.generated.AssessmentsRegistryStatus;
+import it.gov.pagopa.pu.classification.dto.generated.PagedModelAssessmentsRegistry;
+import it.gov.pagopa.pu.classification.dto.generated.PagedModelAssessmentsRegistryEmbedded;
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.AssessmentsRegistryService;
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+@ExtendWith(MockitoExtension.class)
+class InstallmentSynchronizeCreateBalanceServiceImplTest {
+
+  @Mock
+  private AssessmentsRegistryService assessmentsRegistryServiceMock;
+  @Mock
+  private BalanceService balanceServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  private static final String OPERATING_YEAR = String.valueOf(LocalDate.now().getYear());
+  private static final AssessmentsRegistryStatus ASSESSMENTS_REGISTRY_STATUS = AssessmentsRegistryStatus.ACTIVE;
+
+  private InstallmentSynchronizeCreateBalanceService installmentSynchronizeCreateBalanceService;
+
+  @BeforeEach
+  void setUp() {
+    installmentSynchronizeCreateBalanceService = new InstallmentSynchronizeCreateBalanceService(debtPositionTypeOrgRepositoryMock,
+      assessmentsRegistryServiceMock, balanceServiceMock);
+  }
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock,
+      assessmentsRegistryServiceMock, balanceServiceMock
+    );
+  }
+
+  @Test
+  void givenBalanceAlreadyPresentWhenCreateBalanceThenReturnBalance() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setBalance("EXISTING_BALANCE");
+    String accessToken = "ACCESS_TOKEN";
+
+    // When
+    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+
+    // Then
+    assertEquals("EXISTING_BALANCE", result);
+  }
+
+  @Test
+  void givenNoBalanceInDTOWhenRetrieveFromDebtPositionTypeOrgThenReturnBalance() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+    debtPositionTypeOrg.setBalance("RETRIEVED_BALANCE");
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+
+    // When
+    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+
+    // Then
+    assertEquals("RETRIEVED_BALANCE", result);
+  }
+
+  @Test
+  void givenDebtPositionTypeOrgNotFoundWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("INVALID_CODE");
+    String accessToken = "ACCESS_TOKEN";
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "INVALID_CODE"))
+      .thenReturn(Optional.empty());
+
+    // When & Then
+    InvalidValueException exception = assertThrows(InvalidValueException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals("The debt position type code INVALID_CODE is not valid for this organizationId 1", exception.getMessage());
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryEmbeddedNullWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(1000L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+
+    // When & Then
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals("Cannot retrieve balance value, findAssessmentsRegistriesByFilters returns null embedded object.", exception.getMessage());
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryListNullWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(1000L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(null));
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+
+    // When & Then
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals("Cannot retrieve balance value, findAssessmentsRegistriesByFilters returns null embedded object.", exception.getMessage());
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryListEmptyWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(1000L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of()));
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+
+    // When & Then
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals(String.format("No Assessments registry results found with orgId [%s], debtPositionTypeCode [%s], operatingYear [%s], status [%s].", dto.getOrganizationId(), dto.getDebtPositionTypeCode(), OPERATING_YEAR, ASSESSMENTS_REGISTRY_STATUS), exception.getMessage());
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryListTooManyAssessmentsWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(1000L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(new AssessmentsRegistry(), new AssessmentsRegistry())));
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+
+    // When & Then
+    IllegalStateException exception = assertThrows(IllegalStateException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals("Expected exactly one Assessments registry result, but found 2.", exception.getMessage());
+  }
+
+  @Test
+  void givenIncorrectXmlWhenCreateBalanceThenThrowException() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(100L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    AssessmentsRegistry assessmentsRegistry = new AssessmentsRegistry();
+    assessmentsRegistry.sectionCode("sectionCode");
+    assessmentsRegistry.setOfficeCode("officeCode");
+    assessmentsRegistry.setAssessmentCode("codAccertamento");
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
+
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+    Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(false);
+
+    // When & Then
+    InvalidValueException exception = assertThrows(InvalidValueException.class,
+      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+
+    assertEquals("Balance is not formally valid", exception.getMessage());
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryWhenCreateBalanceThenGenerateXml() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(100L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    AssessmentsRegistry assessmentsRegistry = new AssessmentsRegistry();
+    assessmentsRegistry.sectionCode("sectionCode");
+    assessmentsRegistry.setOfficeCode("officeCode");
+    assessmentsRegistry.setAssessmentCode("codAccertamento");
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
+
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+    Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
+
+    // When & Then
+    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+
+    assertEquals(result, expectedResult);
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryNoOfficeCodeWhenCreateBalanceThenGenerateXml() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(100L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    AssessmentsRegistry assessmentsRegistry = new AssessmentsRegistry();
+    assessmentsRegistry.sectionCode("sectionCode");
+    assessmentsRegistry.setAssessmentCode("codAccertamento");
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
+
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+    Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
+
+    // When & Then
+    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+
+    assertEquals(result, expectedResult);
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryNoAssessmentCodeWhenCreateBalanceThenGenerateXml() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(100L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    AssessmentsRegistry assessmentsRegistry = new AssessmentsRegistry();
+    assessmentsRegistry.sectionCode("sectionCode");
+    assessmentsRegistry.setOfficeCode("officeCode");
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
+
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+    Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
+
+    // When & Then
+    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+
+    assertEquals(result, expectedResult);
+  }
+
+}
