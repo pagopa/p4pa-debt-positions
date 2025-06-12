@@ -2,10 +2,12 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
@@ -22,6 +24,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -53,6 +56,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
   private DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentServiceMock;
   @Mock
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentServiceMock;
+  @Mock
+  private WorkflowHubService workflowHubServiceMock;
 
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
 
@@ -62,13 +67,21 @@ class DebtPositionManageInstallmentsServiceImplTest {
   private static final WorkflowCreatedDTO WORKFLOW_ADD = new WorkflowCreatedDTO("workflowId_ADD", "runId");
   private static final WorkflowCreatedDTO WORKFLOW_UPDATE = new WorkflowCreatedDTO("workflowId_UPDATE", "runId");
   private static final WorkflowCreatedDTO WORKFLOW_CANCEL = new WorkflowCreatedDTO("workflowId_CANCEL", "runId");
+  private static final String WORKFLOW_STATUS_COMPLETED_VALUE = "WORKFLOW_EXECUTION_STATUS_COMPLETED";
+  private int retryDelayMs;
+  private int maxRetries;
 
   @BeforeEach
   void setUp() {
+    int maxWaitingMinutes = 5;
+    retryDelayMs = 1000;
+    maxRetries = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
     debtPositionManageInstallmentsService = new DebtPositionManageInstallmentsServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
       organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionManageApplierServiceMock,
-      debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock);
+      debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock,
+      workflowHubServiceMock, maxWaitingMinutes, retryDelayMs
+      );
   }
 
   @Test
@@ -172,6 +185,34 @@ class DebtPositionManageInstallmentsServiceImplTest {
   }
 
   @Test
+  void givenWorkflowNotCompletedWhenManageUpdateThenException() {
+    Long debtPositionId = 1L;
+    ManageDebtPositionDTO manageDebtPositionDTO = ManageDebtPositionDTO.builder()
+      .debtPositionDescription("debtPositionDescription")
+      .paymentOptionDescription("paymentOptionDescription")
+      .paymentOptionId(10L)
+      .installments(new ArrayList<>(List.of(buildManageUpdateInstallmentDTO())))
+      .build();
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    WfExecutionParameters wfExecutionParametersPartial = WfExecutionParameters.builder().massive(false).partialChange(true).build();
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iun(null).status(InstallmentStatus.UNPAID).syncStatus(null);
+    debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installment2update), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
+      .thenReturn(WORKFLOW_UPDATE);
+    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn("FAILED");
+
+    WorkflowErrorException exception = assertThrows(WorkflowErrorException.class,
+      () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
+
+    assertEquals("Workflow with id workflowId_UPDATE terminated with error", exception.getMessage());
+  }
+
+  @Test
   void givenValidActionOnDpWhenManageThenException() {
     Long debtPositionId = 1L;
     ManageDebtPositionDTO manageDebtPositionDTO = buildManageDebtPositionDTO();
@@ -196,10 +237,13 @@ class DebtPositionManageInstallmentsServiceImplTest {
     Mockito.doNothing().when(debtPositionManageApplierServiceMock).merge(buildManageUpdateInstallmentDTO().getInstallment(), installment2update);
     Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(installment2insert), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_ADD);
+    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_ADD.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
     Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installment2update), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_UPDATE);
+    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
     Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_CANCEL);
+    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_CANCEL.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
 
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_UPDATED, "IUD:iud1,iud2,iud3", ACCESS_TOKEN))
       .thenReturn(WORKFLOW);

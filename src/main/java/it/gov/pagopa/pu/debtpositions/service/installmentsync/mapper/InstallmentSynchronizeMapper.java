@@ -54,6 +54,7 @@ public class InstallmentSynchronizeMapper {
       .debtor(map2PersonDTO(installmentSynchronizeDTO))
       .ingestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId())
       .ingestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber())
+      .ingestionFlowFileAction(installmentSynchronizeDTO.getAction())
       .notificationDate(installmentSynchronizeDTO.getNotificationDate())
       .sourceFlowName(installmentSynchronizeDTO.getIngestionFlowFileName())
       .status(Boolean.TRUE.equals(installmentSynchronizeDTO.getDraft()) ? InstallmentStatus.DRAFT : InstallmentStatus.UNPAID)

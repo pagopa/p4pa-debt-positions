@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
@@ -43,6 +44,7 @@ public class Installment implements FullPIIDTO<InstallmentNoPII, InstallmentPIID
   private OffsetDateTime notificationDate;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;
+  private Action ingestionFlowFileAction;
   private String sourceFlowName;
   private Long receiptId;
   private LocalDateTime creationDate;

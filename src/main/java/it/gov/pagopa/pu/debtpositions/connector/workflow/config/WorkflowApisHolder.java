@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
 import it.gov.pagopa.pu.debtpositions.config.rest.RestTemplateConfig;
 import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowApi;
 import it.gov.pagopa.pu.workflowhub.generated.ApiClient;
 import it.gov.pagopa.pu.workflowhub.generated.BaseApi;
 import jakarta.annotation.PreDestroy;
@@ -13,6 +14,8 @@ import org.springframework.web.client.RestTemplate;
 public class WorkflowApisHolder {
 
   private final DebtPositionApi debtPositionApi;
+
+  private final WorkflowApi workflowApi;
 
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
@@ -31,6 +34,7 @@ public class WorkflowApisHolder {
     }
 
     this.debtPositionApi = new DebtPositionApi(apiClient);
+    this.workflowApi = new WorkflowApi(apiClient);
   }
 
   @PreDestroy
@@ -40,6 +44,10 @@ public class WorkflowApisHolder {
 
   public DebtPositionApi getDebtPositionApi(String accessToken) {
     return getApi(accessToken, debtPositionApi);
+  }
+
+  public WorkflowApi getWorkflowApi(String accessToken) {
+    return getApi(accessToken, workflowApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {

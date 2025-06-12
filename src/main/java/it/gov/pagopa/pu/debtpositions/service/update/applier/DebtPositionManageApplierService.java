@@ -24,8 +24,6 @@ public class DebtPositionManageApplierService {
     storedInstallment.setLegacyPaymentMetadata(updatedInstallment.getLegacyPaymentMetadata());
     storedInstallment.setAmountCents(updatedInstallment.getAmountCents());
 
-    // TODO task P4ADEV-2668: if IUN is present the fields are all unmodifiable
-
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionId", updatedInstallment.getPaymentOptionId(), storedInstallment.getPaymentOptionId(), modifiedFields);
     checkImmutableField("iupdPagopa", updatedInstallment.getIupdPagopa(), storedInstallment.getIupdPagopa(), modifiedFields);

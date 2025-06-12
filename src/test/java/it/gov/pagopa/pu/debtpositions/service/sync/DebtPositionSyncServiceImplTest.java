@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.sync;
 
-import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class DebtPositionSyncServiceImplTest {
 
   @Mock
-  private WorkflowService workflowService;
+  private WorkflowDebtPositionService workflowService;
 
   private DebtPositionSyncServiceImpl debtPositionSyncService;
 

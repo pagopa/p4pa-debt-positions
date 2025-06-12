@@ -72,7 +72,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().getFirst();
     TestUtils.checkNotNullFields(installmentDTO, "paymentOptionId", "installmentId", "dueDate",
       "syncStatus", "iuf", "iur", "iun", "paymentTypeCode", "balance", "legacyPaymentMetadata", "notificationDate",
-      "ingestionFlowFileId", "ingestionFlowFileLineNumber", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+      "ingestionFlowFileId", "ingestionFlowFileLineNumber", "ingestionFlowFileAction", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
     installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO,"transferId","installmentId", "postalIban", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"));
     Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock, Mockito.times(1)).getUnknownDebtPositionTypeOrg(organization.getOrganizationId());
