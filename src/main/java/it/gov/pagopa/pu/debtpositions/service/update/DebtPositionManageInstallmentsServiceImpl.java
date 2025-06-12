@@ -1,10 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -19,6 +22,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -33,14 +37,33 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
+  private final WorkflowHubService workflowHubService;
+  private final int maxAttempts;
+  private final int retryDelayMs;
 
-  protected DebtPositionManageInstallmentsServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, DebtPositionService debtPositionService, DebtPositionSyncService debtPositionSyncService, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionManageApplierService debtPositionManageApplierService, DebtPositionAddInstallmentService debtPositionAddInstallmentService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService, DebtPositionCancelInstallmentService debtPositionCancelInstallmentService) {
+  private static final String WORKFLOW_STATUS_COMPLETED_VALUE = "WORKFLOW_EXECUTION_STATUS_COMPLETED";
+
+  protected DebtPositionManageInstallmentsServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
+                                                      DebtPositionService debtPositionService,
+                                                      DebtPositionSyncService debtPositionSyncService,
+                                                      DebtPositionProcessorService debtPositionProcessorService,
+                                                      OrganizationService organizationService,
+                                                      DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+                                                      DebtPositionManageApplierService debtPositionManageApplierService,
+                                                      DebtPositionAddInstallmentService debtPositionAddInstallmentService,
+                                                      DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
+                                                      DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, WorkflowHubService workflowHubService,
+                                                      @Value("${wf-await.max-waiting-minutes}") int maxWaitingMinutes,
+                                                      @Value("${wf-await.retry-delays-ms}") int retryDelayMs) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.debtPositionService = debtPositionService;
     this.debtPositionManageApplierService = debtPositionManageApplierService;
     this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
+    this.workflowHubService = workflowHubService;
+    this.retryDelayMs = retryDelayMs;
+    this.maxAttempts = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
   }
 
   @Override
@@ -103,15 +126,17 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder().massive(false).partialChange(true).build();
 
-    // TODO task P4ADEV-2669: add check wait for workflow completion
-    if(!installmentsToAdd.isEmpty()){
-      debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId);
+    if (!installmentsToAdd.isEmpty()) {
+      WorkflowCreatedDTO workflowCreated = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installmentsToAdd, wfExecutionParameters, accessToken, operatorExternalUserId);
+      checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
-    if(!installmentsToUpdate.isEmpty()){
-      debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId);
+    if (!installmentsToUpdate.isEmpty()) {
+      WorkflowCreatedDTO workflowCreated = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installmentsToUpdate, wfExecutionParameters, accessToken, operatorExternalUserId);
+      checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
-    if(!installmentsToCancel.isEmpty()){
-      debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
+    if (!installmentsToCancel.isEmpty()) {
+      WorkflowCreatedDTO workflowCreated = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, installmentsToCancel, wfExecutionParameters, accessToken, operatorExternalUserId);
+      checkWorkflowIsCompleted(workflowCreated, accessToken);
     }
 
     List<InstallmentDTO> installments2operate = new ArrayList<>(manageInstallments.size());
@@ -131,7 +156,21 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus())) {
       throw new ConflictErrorException(String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
     }
+
+    if (StringUtils.isNotBlank(installment.getIun())) {
+      throw new ConflictErrorException("The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
+    }
+
     return installment;
+  }
+
+  private void checkWorkflowIsCompleted(WorkflowCreatedDTO workflowCreatedDTO, String accessToken) {
+    if (workflowCreatedDTO != null) {
+      String workflowStatus = workflowHubService.waitWorkflowCompletion(accessToken, workflowCreatedDTO.getWorkflowId(), maxAttempts, retryDelayMs);
+      if (!WORKFLOW_STATUS_COMPLETED_VALUE.equals(workflowStatus)) {
+        throw new WorkflowErrorException("Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
+      }
+    }
   }
 
   @Override

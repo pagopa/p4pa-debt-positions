@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
@@ -39,13 +40,13 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   public WorkflowCreatedDTO installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
-    InstallmentSynchronizeDTO.ActionEnum action = installmentSynchronizeDTO.getAction();
+    Action action = installmentSynchronizeDTO.getAction();
     return switch (action) {
-      case InstallmentSynchronizeDTO.ActionEnum.I ->
+      case I ->
         installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-      case InstallmentSynchronizeDTO.ActionEnum.M ->
+      case M ->
         installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-      case InstallmentSynchronizeDTO.ActionEnum.A ->
+      case A ->
         installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     };
   }

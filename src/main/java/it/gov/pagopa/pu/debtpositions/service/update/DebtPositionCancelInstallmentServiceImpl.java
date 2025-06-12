@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
@@ -58,6 +59,9 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       .map(installmentDTO -> {
         if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus())) {
           throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
+        }
+        if (StringUtils.isNotBlank(installmentDTO.getIun())) {
+          throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is been notified by SEND");
         }
         return installmentDTO;
       })

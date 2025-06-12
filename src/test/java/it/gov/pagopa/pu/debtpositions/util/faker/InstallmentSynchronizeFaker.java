@@ -11,6 +11,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
+import static it.gov.pagopa.pu.debtpositions.dto.generated.Action.I;
+
 public class InstallmentSynchronizeFaker {
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
@@ -21,7 +23,7 @@ public class InstallmentSynchronizeFaker {
       .ingestionFlowFileId(1L)
       .ingestionFlowFileLineNumber(101L)
       .organizationId(1L)
-      .action(InstallmentSynchronizeDTO.ActionEnum.I)
+      .action(I)
       .draft(Boolean.FALSE)
       .iupdOrg("IUPD_ORG")
       .description("Test Description")
@@ -55,6 +57,7 @@ public class InstallmentSynchronizeFaker {
       .additionalTransfers(new ArrayList<>(List.of(buildTransferSynchronizeDTO())))
       .executionConfig(NullNode.instance)
       .ingestionFlowFileName("ingestionFlowFileName")
+      .action(I)
       .build();
   }
 

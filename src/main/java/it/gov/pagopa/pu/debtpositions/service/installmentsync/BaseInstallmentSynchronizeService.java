@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -48,10 +49,16 @@ public abstract class BaseInstallmentSynchronizeService {
     return result;
   }
 
-  public boolean isInstallmentAlreadyElaborated(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO){
-    if(installmentDTO == null) return false;
+  public boolean isInstallmentAlreadyElaborated(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
+    if (installmentDTO == null) return false;
     return installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId()) &&
       installmentSynchronizeDTO.getIngestionFlowFileLineNumber().equals(installmentDTO.getIngestionFlowFileLineNumber());
+  }
+
+  public void checkIunPresence(InstallmentDTO installmentDTO) {
+    if (StringUtils.isNotBlank(installmentDTO.getIun())) {
+      throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be updated or cancelled because is been notified by SEND");
+    }
   }
 
   public void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {

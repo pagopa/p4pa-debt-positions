@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 
+import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.TO_SYNC;
+
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -7,10 +9,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
-
 import java.util.List;
-
-import static it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus.TO_SYNC;
 
 public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentStatus, BasePaymentOption, PaymentOptionStatus> {
 
@@ -71,6 +70,15 @@ public class PaymentOptionStatusChecker extends StatusRulesHandler<InstallmentSt
   protected boolean isPartiallyPaid(List<InstallmentStatus> childrenStatusList) {
     return (childrenStatusList.contains(InstallmentStatus.PAID) || childrenStatusList.contains(InstallmentStatus.REPORTED)) &&
       (childrenStatusList.contains(InstallmentStatus.UNPAID) || childrenStatusList.contains(InstallmentStatus.EXPIRED));
+  }
+
+  @Override
+  public boolean isPaid(List<InstallmentStatus> childrenStatusList) {
+    return childrenStatusList.stream().anyMatch(InstallmentStatus.PAID::equals) &&
+      childrenStatusList.stream().allMatch(
+        status -> InstallmentStatus.PAID.equals(status)
+          || InstallmentStatus.REPORTED.equals(status)
+          || super.allowedCancelledStatuses.contains(status));
   }
 
   private boolean isInvalid(List<InstallmentStatus> childrenStatusList) {
