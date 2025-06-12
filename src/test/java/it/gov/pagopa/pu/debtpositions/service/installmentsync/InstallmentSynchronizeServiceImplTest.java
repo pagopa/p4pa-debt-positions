@@ -19,6 +19,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static it.gov.pagopa.pu.debtpositions.dto.generated.Action.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
@@ -56,7 +57,7 @@ class InstallmentSynchronizeServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.A);
+    installmentSynchronizeDTO.setAction(A);
 
     DebtPosition debtPosition = buildDebtPosition();
     Mockito.when(debtPositionRepositoryMock.findByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
@@ -74,7 +75,7 @@ class InstallmentSynchronizeServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.A);
+    installmentSynchronizeDTO.setAction(A);
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
     DebtPosition debtPosition = buildDebtPosition();
@@ -101,7 +102,7 @@ class InstallmentSynchronizeServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.A);
+    installmentSynchronizeDTO.setAction(A);
 
     Mockito.when(debtPositionRepositoryMock.findByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(installmentSynchronizeCancelServiceMock.syncInstallment(installmentSynchronizeDTO, null,
@@ -119,7 +120,7 @@ class InstallmentSynchronizeServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.M);
+    installmentSynchronizeDTO.setAction(M);
 
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(debtPositionOrigin);
@@ -143,7 +144,7 @@ class InstallmentSynchronizeServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(InstallmentSynchronizeDTO.ActionEnum.I);
+    installmentSynchronizeDTO.setAction(I);
 
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setDebtPositionOrigin(debtPositionOrigin);

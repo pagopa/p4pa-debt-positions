@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 
-import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowApiClient;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowDebtPositionApiClient;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -15,16 +15,16 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class WorkflowServiceTest {
+class WorkflowDebtPositionServiceTest {
 
   @Mock
-  private WorkflowApiClient workflowApiClientMock;
+  private WorkflowDebtPositionApiClient workflowApiClientMock;
 
-  private WorkflowService workflowService;
+  private WorkflowDebtPositionService workflowService;
 
   @BeforeEach
   void init() {
-    workflowService = new WorkflowServiceImpl(
+    workflowService = new WorkflowDebtPositionServiceImpl(
       workflowApiClientMock
     );
   }

@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
 import jakarta.annotation.Nonnull;
@@ -65,6 +66,7 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private OffsetDateTime notificationDate;
   private Long ingestionFlowFileId;
   private Long ingestionFlowFileLineNumber;
+  private Action ingestionFlowFileAction;
   private String sourceFlowName;
   private Long receiptId;
 

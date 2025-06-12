@@ -1,11 +1,17 @@
 package it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import java.util.List;
+import java.util.TreeSet;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,13 +20,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.List;
-import java.util.TreeSet;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class PaymentOptionStatusCheckerTest {
@@ -141,10 +140,20 @@ class PaymentOptionStatusCheckerTest {
   }
 
   /**
-   * Test if the status is PAID when all installments are CANCELLED, with at least one PAID.
+   * Test if the status is PAID when at least one installment is PAID and the others are PAID or REPORTED.
    */
   @Test
   void testCalculateNewStatus_Paid2() {
+    List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.REPORTED, InstallmentStatus.PAID);
+    PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
+    assertEquals(PaymentOptionStatus.PAID, result);
+  }
+
+  /**
+   * Test if the status is PAID when all installments are CANCELLED, with at least one PAID.
+   */
+  @Test
+  void testCalculateNewStatus_Paid3() {
     List<InstallmentStatus> installmentStatusList = List.of(InstallmentStatus.PAID, InstallmentStatus.CANCELLED, InstallmentStatus.INVALID);
     PaymentOptionStatus result = checker.calculateNewStatus(installmentStatusList);
     assertEquals(PaymentOptionStatus.PAID, result);

@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Answers;
 import org.mockito.Mock;
@@ -209,10 +208,9 @@ class InstallmentPIIRepositoryImplTest {
 
   @ParameterizedTest
   @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
-  @NullSource
   void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     // Given
-    List<DebtPositionOrigin> originList = debtPositionOrigin==null?null:List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
     List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
     Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
     installmentDTOList.forEach(installmentNoPII -> Mockito.when(mapperMock.map(installmentNoPII)).thenReturn(Installment.builder().build()));

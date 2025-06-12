@@ -3,7 +3,7 @@ import java.util.*
 
 plugins {
   java
-  id("org.springframework.boot") version "3.4.5"
+  id("org.springframework.boot") version "3.5.0"
   id("io.spring.dependency-management") version "1.1.7"
   jacoco
   id("org.sonarqube") version "6.1.0.5360"
@@ -39,16 +39,16 @@ dependencyManagement {
   }
 }
 
-val springDocOpenApiVersion = "2.8.6"
+val springDocOpenApiVersion = "2.8.9"
 val openApiToolsVersion = "0.2.6"
 val springWolfAsyncApiVersion = "1.13.0"
-val micrometerVersion = "1.4.6"
-val postgresJdbcVersion = "42.7.5"
-val bouncycastleVersion = "1.80"
+val micrometerVersion = "1.5.1"
+val postgresJdbcVersion = "42.7.7"
+val bouncycastleVersion = "1.81"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.0"
-val httpClientVersion = "5.4.4"
+val httpClientVersion = "5.5"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter")
