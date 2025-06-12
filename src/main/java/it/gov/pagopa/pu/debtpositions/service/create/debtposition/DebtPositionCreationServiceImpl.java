@@ -124,7 +124,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPuPagoPaPayment())) {
       String nav;
       if (installmentDTO.getIuv() != null) {
-        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), org);
+        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), org, debtPositionDTO.getDebtPositionOrigin());
       } else {
         String generatedIuv = iuvService.generateIuv(org);
         nav = iuvService.iuv2Nav(generatedIuv);
