@@ -387,7 +387,7 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenTransferIbanNullThenThrowValidationException() {
+  void givenTransferIbanInvalidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO transfer = debtPositionDTO.getPaymentOptions()
@@ -396,12 +396,32 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .getTransfers().getFirst();
     transfer.setIban("ITkb");
+    transfer.setStampType(null);
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Iban of transfer with index 1 is not valid", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenTransferPostalIbanInvalidThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+    transfer.setPostalIban("ITkb");
+    transfer.setStampType(null);
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("Postal iban of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -414,6 +434,8 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .getTransfers().getFirst();
     transfer.setCategory(null);
+    transfer.setStampType(null);
+    transfer.setPostalIban(null);
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
