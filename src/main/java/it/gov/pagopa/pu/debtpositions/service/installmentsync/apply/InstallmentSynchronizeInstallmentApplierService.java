@@ -27,6 +27,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
+    installmentDTO.setIngestionFlowFileAction(installmentSynchronizeDTO.getAction());
     installmentDTO.setSourceFlowName(installmentSynchronizeDTO.getIngestionFlowFileName());
 
     List<String> modifiedFields = new ArrayList<>();

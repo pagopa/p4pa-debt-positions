@@ -1,1036 +1,1021 @@
 {
-  "info": {
-    "_postman_id": "cfdb9f2d-ffd4-4f12-bb7a-6aa366f1c767",
-    "name": "p4pa-debt-positions-E2E.postman_collection",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "17966353"
-  },
-  "item": [
-    {
-      "name": "00_login",
-      "item": [
-        {
-          "name": "00_getAuthToken",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPosition - 00_getAuthtoken - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
-                  "    let jsonResponse = pm.response.json();\r",
-                  "\r",
-                  "    pm.expect(jsonResponse).have.property(\"access_token\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"token_type\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"expires_in\")\r",
-                  "});\r",
-                  "\r",
-                  "let jsonResponse = pm.response.json();\r",
-                  "pm.collectionVariables.set(\"accessToken\", jsonResponse.access_token);\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "method": "POST",
-            "header": [],
-            "url": {
-              "raw": "{{p4paAuthBaseUrl}}/oauth/token?client_id=piattaforma-unitaria&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{tokenExchange_subjectToken}}&subject_issuer={{tokenExchange_issuer}}&scope=openid&subject_token_type=urn:ietf:params:oauth:token-type:jwt",
-              "host": [
-                "{{p4paAuthBaseUrl}}"
-              ],
-              "path": [
-                "oauth",
-                "token"
-              ],
-              "query": [
-                {
-                  "key": "client_id",
-                  "value": "piattaforma-unitaria"
-                },
-                {
-                  "key": "grant_type",
-                  "value": "urn:ietf:params:oauth:grant-type:token-exchange"
-                },
-                {
-                  "key": "subject_token",
-                  "value": "{{tokenExchange_subjectToken}}"
-                },
-                {
-                  "key": "subject_issuer",
-                  "value": "{{tokenExchange_issuer}}"
-                },
-                {
-                  "key": "scope",
-                  "value": "openid"
-                },
-                {
-                  "key": "subject_token_type",
-                  "value": "urn:ietf:params:oauth:token-type:jwt"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "00_getUserInfo",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm.test(\"Auth - getUserInfo - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"Auth - getUserInfo - Verify response body\", function () {\r",
-                  "    let jsonResponse = pm.response.json();\r",
-                  "\r",
-                  "    pm.expect(jsonResponse).have.property(\"userId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"mappedExternalUserId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"name\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"familyName\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"fiscalCode\").to.eq(\"DMEMPY15L21L736U\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"issuer\").to.eq(pm.environment.get(\"tokenExchange_issuer\"))\r",
-                  "    pm.expect(jsonResponse).have.property(\"organizationAccess\")\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"brokerId\").that.is.a(\"number\");\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"brokerFiscalCode\").that.is.a(\"string\");\r",
-                  "    pm.expect(jsonResponse).to.have.property(\"canManageUsers\").that.is.a(\"boolean\");\r",
-                  "    \r",
-                  "    pm.collectionVariables.set(\"mappedExternalUserId\",jsonResponse.mappedExternalUserId)\r",
-                  "    pm.collectionVariables.set(\"organizationIpaCode\",jsonResponse.organizationAccess)\r",
-                  "    var recognizedOrganizations = 0\r",
-                  "    const registeredOrganizations=[\r",
-                  "        \"IPA_TEST\",\r",
-                  "        \"IPA_TEST_2\",\r",
-                  "        \"DEMO\"\r",
-                  "    ]\r",
-                  "    jsonResponse.organizations.forEach(org => {\r",
-                  "        pm.expect(org).have.property(\"operatorId\")\r",
-                  "        pm.expect(org).have.property(\"organizationId\").that.is.a(\"number\");\r",
-                  "        if(registeredOrganizations.includes(org.organizationIpaCode)){\r",
-                  "            pm.expect(org.roles).have.property(\"length\").to.eq(1)\r",
-                  "            pm.expect(org).have.property(\"email\")\r",
-                  "            pm.expect(org.roles[0]).to.eq(\"ROLE_ADMIN\")\r",
-                  "            recognizedOrganizations++\r",
-                  "        }\r",
-                  "    });\r",
-                  "\r",
-                  "});"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{p4paAuthBaseUrl}}/oauth/userinfo",
-              "host": [
-                "{{p4paAuthBaseUrl}}"
-              ],
-              "path": [
-                "oauth",
-                "userinfo"
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "01_createDp",
-      "item": [
-        {
-          "name": "organizations",
-          "item": [
-            {
-              "name": "01_findOrganizationByIpaCode",
-              "event": [
-                {
-                  "listen": "test",
-                  "script": {
-                    "exec": [
-                      "pm=instrumentPmMethod(pm);\r",
-                      "\r",
-                      "pm.test(\"DebtPosition - 00_findOrganizationByIpaCode - Responses with 200\", function () {\r",
-                      "    pm.response.to.have.status(200);\r",
-                      "});\r",
-                      "\r",
-                      "pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
-                      "    let jsonResponse = pm.response.json();\r",
-                      "\r",
-                      "    pm.expect(jsonResponse).have.property(\"organizationId\")\r",
-                      "    pm.expect(jsonResponse).have.property(\"orgFiscalCode\")\r",
-                      "    pm.expect(jsonResponse).have.property(\"orgName\")\r",
-                      "});\r",
-                      "\r",
-                      "let jsonResponse = pm.response.json();\r",
-                      "pm.collectionVariables.set(\"organizationId\", jsonResponse.organizationId);\r",
-                      "pm.collectionVariables.set(\"orgFiscalCode\", jsonResponse.orgFiscalCode);\r",
-                      "pm.collectionVariables.set(\"orgName\", jsonResponse.orgName);\r",
-                      ""
-                    ],
-                    "type": "text/javascript",
-                    "packages": {}
-                  }
-                }
-              ],
-              "request": {
-                "auth": {
-                  "type": "bearer",
-                  "bearer": [
-                    {
-                      "key": "token",
-                      "value": "{{accessToken}}",
-                      "type": "string"
-                    }
-                  ]
-                },
-                "method": "GET",
-                "header": [],
-                "url": {
-                  "raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{ipaCode}}",
-                  "host": [
-                    "{{organizationBaseUrl}}"
-                  ],
-                  "path": [
-                    "crud",
-                    "organizations",
-                    "search",
-                    "findByIpaCode"
-                  ],
-                  "query": [
-                    {
-                      "key": "ipaCode",
-                      "value": "{{ipaCode}}"
-                    }
-                  ]
-                }
-              },
-              "response": []
-            }
-          ]
-        },
-        {
-          "name": "01_findDebtPositionTypeOrgByOrgIdAndCode",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPosition - 01_findDebtPositionTypeOrgByOrgIdAndCode - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "pm.test(\"DebtPosition - 01_findDebtPositionTypeOrgByOrgIdAndCode - Verify response body\", function () {\r",
-                  "    let jsonResponse = pm.response.json();\r",
-                  "\r",
-                  "    pm.expect(jsonResponse).have.property(\"debtPositionTypeOrgId\")\r",
-                  "    pm.expect(jsonResponse).have.property(\"code\")\r",
-                  "});\r",
-                  "\r",
-                  "let jsonResponse = pm.response.json();\r",
-                  "pm.collectionVariables.set(\"debtPositionTypeOrgId\", jsonResponse.debtPositionTypeOrgId);\r",
-                  "pm.collectionVariables.set(\"debtPositionTypeId\", jsonResponse.debtPositionTypeId);\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/crud/debt-position-type-orgs/search/findByOrganizationIdAndCode?organizationId={{organizationId}}&code={{debtPositionTypeOrgCode}}",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "crud",
-                "debt-position-type-orgs",
-                "search",
-                "findByOrganizationIdAndCode"
-              ],
-              "query": [
-                {
-                  "key": "organizationId",
-                  "value": "{{organizationId}}"
-                },
-                {
-                  "key": "code",
-                  "value": "{{debtPositionTypeOrgCode}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "01_createDebtPosition",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPositions - 01_create_dp - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "/*pm.test(\"DebtPositions - 01_create_dp - Verify response body\", function () {\r",
-                  "    let jsonResponse = pm.response.json();\r",
-                  "\r",
-                  "    pm.expect(jsonResponse).have.property(\"workflowId\")\r",
-                  "});\r",
-                  "\r",
-                  "let jsonResponse = pm.response.json();\r",
-                  "pm.collectionVariables.set(\"workflowId\", jsonResponse.workflowId);*/\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "let randomNumber = generateRandomNumber();\r",
-                  "\r",
-                  "pm.collectionVariables.set(\"randomNumber\", randomNumber);\r",
-                  "pm.collectionVariables.set(\"fiscalCode\", `AAAAAA69A45A602A`);\r",
-                  "pm.collectionVariables.set(\"debtPositionId\", `${randomNumber}`);\r",
-                  "pm.collectionVariables.set(\"currentDate\", new Date());"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"description\": \"description\",\r\n    \"status\": \"UNPAID\",\r\n    \"organizationId\": {{organizationId}},\r\n    \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n    \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n    \"flagIuvVolatile\": false,\r\n    \"multiDebtor\": false,\r\n    \"flagPuPagoPaPayment\": true,\r\n    \"paymentOptions\": [\r\n        {\r\n            \"totalAmountCents\": {{amountCents}},\r\n            \"status\": \"UNPAID\",\r\n            \"description\": \"description\",\r\n            \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n            \"paymentOptionIndex\": 1,\r\n            \"installments\": [\r\n                {\r\n                    \"status\": \"UNPAID\",\r\n                    \"dueDate\": \"{{currentDate}}\",\r\n                    \"amountCents\": {{amountCents}},\r\n                    \"remittanceInformation\": \"remittanceInformation\",\r\n                    \"debtor\": {\r\n                        \"entityType\": \"F\",\r\n                        \"fiscalCode\": \"RSSMRA92A12B123A\",\r\n                        \"fullName\": \"Mario Rossi\",\r\n                        \"address\": \"via San Gaetanino\",\r\n                        \"civic\": \"10\",\r\n                        \"postalCode\": \"12312\",\r\n                        \"location\": \"Roma\",\r\n                        \"province\": \"RM\",\r\n                        \"nation\": \"IT\",\r\n                        \"email\": \"mario.rossi@email.it\"\r\n                    },\r\n                    \"notificationDate\": \"{{currentDate}}\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/debt-positions?massive=false",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "debt-positions"
-              ],
-              "query": [
-                {
-                  "key": "massive",
-                  "value": "false"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "02_exportPaidInstallment",
-      "item": [
-        {
-          "name": "02_getPagedInstallmentPaidView",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "let jsonData= pm.response.json();\r",
-                  "\r",
-                  "pm.test(\"[INSTALLMENT_EXPORT], expected httpStatus: 200\", () => {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "})\r",
-                  "\r",
-                  "pm.test(\"[INSTALLMENT_EXPORT] - get paged installment export\", () => {\r",
-                  "    \r",
-                  "     if (jsonData && jsonData.content && Array.isArray(jsonData.content) && jsonData.content.length > 0) {\r",
-                  "        for (let item of jsonData.content) {\r",
-                  "            pm.expect(item).to.have.property(\"installmentId\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"iud\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"noticeNumber\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"orgFiscalCode\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"paymentReceiptId\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"idPsp\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"pspCompanyName\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"debtor\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"paymentAmountCents\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"creditorReferenceId\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"amountCents\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"remittanceInformation\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"category\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"code\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"transferIndex\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"companyName\").and.to.not.be.null;\r",
-                  "        }\r",
-                  "    } else {\r",
-                  "        pm.expect.fail(\"Content is not an array or is empty.\");\r",
-                  "    }\r",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "//date\r",
-                  "let moment = require('moment');\r",
-                  "let paymentDateFrom =  String(moment().utc().subtract(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
-                  "let paymentDateTo =  String(moment().utc().add(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
-                  "pm.collectionVariables.set(\"paymentDateFrom\", paymentDateFrom);\r",
-                  "pm.collectionVariables.set(\"paymentDateTo\", paymentDateTo);\r",
-                  "\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "export",
-                "organization",
-                "{{organizationId}}",
-                "installments",
-                "paid"
-              ],
-              "query": [
-                {
-                  "key": "operatorExternalUserId",
-                  "value": "{{mappedExternalUserId}}"
-                },
-                {
-                  "key": "paymentDateFrom",
-                  "value": "{{paymentDateFrom}}"
-                },
-                {
-                  "key": "paymentDateTo",
-                  "value": "{{paymentDateTo}}"
-                },
-                {
-                  "key": "debtPositionTypeOrgId",
-                  "value": "{{debtPositionTypeOrgId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "03_exportArchivingReceipt",
-      "item": [
-        {
-          "name": "03_getPagedReceiptArchivingView",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "let jsonData= pm.response.json();\r",
-                  "\r",
-                  "pm.test(\"[RECEIPTS_ARCHIVING_EXPORT], expected httpStatus: 200\", () => {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "})\r",
-                  "\r",
-                  "pm.test(\"[RECEIPTS_ARCHIVING_EXPORT] - get paged receipts archiving export\", () => {\r",
-                  "    \r",
-                  "     if (jsonData && jsonData.content && Array.isArray(jsonData.content) && jsonData.content.length > 0) {\r",
-                  "        for (let item of jsonData.content) {\r",
-                  "            pm.expect(item).to.have.property(\"paymentReceiptId\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"creditorReferenceId\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"remittanceInformation\").and.to.not.be.null;\r",
-                  "            pm.expect(item).to.have.property(\"orgFiscalCode\").and.to.not.be.null;\r",
-                  "\r",
-                  "        }\r",
-                  "    } else {\r",
-                  "        pm.expect.fail(\"Content is not an array or is empty.\");\r",
-                  "    }\r",
-                  "})"
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  "//date\r",
-                  "let moment = require('moment');\r",
-                  "let paymentDateFrom =  String(moment().utc().subtract(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
-                  "let paymentDateTo =  String(moment().utc().add(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
-                  "pm.collectionVariables.set(\"paymentDateFrom\", paymentDateFrom);\r",
-                  "pm.collectionVariables.set(\"paymentDateTo\", paymentDateTo);\r",
-                  "\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/receipts/archiving?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "export",
-                "organization",
-                "{{organizationId}}",
-                "receipts",
-                "archiving"
-              ],
-              "query": [
-                {
-                  "key": "operatorExternalUserId",
-                  "value": "{{mappedExternalUserId}}"
-                },
-                {
-                  "key": "paymentDateFrom",
-                  "value": "{{paymentDateFrom}}"
-                },
-                {
-                  "key": "paymentDateTo",
-                  "value": "{{paymentDateTo}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    },
-    {
-      "name": "04_createDpto",
-      "item": [
-        {
-          "name": "01_createDebtPositionTypeOrg",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPositions - 01_create_dpto - create dpto - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  "\r",
-                  "let jsonResponse = pm.response.json();\r",
-                  "pm.collectionVariables.set(\"createdDebtPositionTypeOrgId\", jsonResponse.debtPositionTypeOrgId);\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n        \"testOperator2\",\r\n        \"testOperator\",\r\n        \"testOperator3\"\r\n    ],\r\n    \"disabledOperators\":[],\r\n    \"removeEnabledOperators\": false\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "debt-position-type-org"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "01_updateDebtPositionTypeOrg - removing some operators",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPositions - 01_create_dpto - update dpto removing some of the previous operators - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeOrgId\": {{createdDebtPositionTypeOrgId}},\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n        \"testOperator2\",\r\n        \"testOperator3\",\r\n        \"testOperator4\"\r\n    ],\r\n    \"disabledOperators\":[\r\n        \"testOperator\",\r\n        \"testOperator2\"\r\n    ],\r\n    \"removeEnabledOperators\": false\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "debt-position-type-org"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "01_updateDebtPositionTypeOrg removing all operators",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "exec": [
-                  "pm=instrumentPmMethod(pm);\r",
-                  "\r",
-                  "pm.test(\"DebtPositions - 01_create_dpto - update dpto removing all of the previous operators - Responses with 200\", function () {\r",
-                  "    pm.response.to.have.status(200);\r",
-                  "});\r",
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            },
-            {
-              "listen": "prerequest",
-              "script": {
-                "exec": [
-                  ""
-                ],
-                "type": "text/javascript",
-                "packages": {}
-              }
-            }
-          ],
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "POST",
-            "header": [],
-            "body": {
-              "mode": "raw",
-              "raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeOrgId\": {{createdDebtPositionTypeOrgId}},\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n    ],\r\n    \"disabledOperators\":[\r\n    ],\r\n    \"removeEnabledOperators\": true\r\n}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
-              }
-            },
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "debt-position-type-org"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "crud-deleteDebtPositionTypeOrg",
-          "request": {
-            "auth": {
-              "type": "bearer",
-              "bearer": [
-                {
-                  "key": "token",
-                  "value": "{{accessToken}}",
-                  "type": "string"
-                }
-              ]
-            },
-            "method": "DELETE",
-            "header": [
-              {
-                "key": "Accept",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{debtPositionBaseUrl}}/debt-position-type-org/:debtPositionTypeOrgId",
-              "host": [
-                "{{debtPositionBaseUrl}}"
-              ],
-              "path": [
-                "debt-position-type-org",
-                ":debtPositionTypeOrgId"
-              ],
-              "variable": [
-                {
-                  "key": "debtPositionTypeOrgId",
-                  "value": "{{createdDebtPositionTypeOrgId}}"
-                }
-              ]
-            }
-          },
-          "response": []
-        }
-      ]
-    }
-  ],
-  "event": [
-    {
-      "listen": "prerequest",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "exec": [
-          "generateRandomNumber = generateRandomNumber => {",
-          "    let randomNumber = '';",
-          "    for (let i = 0; i < 10; i++) {",
-          "        randomNumber += Math.floor(Math.random() * 10).toString();",
-          "    }",
-          "    return randomNumber;",
-          "}"
-        ]
-      }
-    },
-    {
-      "listen": "test",
-      "script": {
-        "type": "text/javascript",
-        "packages": {},
-        "exec": [
-          "// START COMMON UTILITIES\r",
-          "\r",
-          "// global variable to use in order to skip tests\r",
-          "skipTests=false;\r",
-          "\r",
-          "// method to be invoked as first thing inside tests in order to instrument the \"pm\" variable:\r",
-          "// eg: pm = pm=instrumentPmMethod(pm);\r",
-          "instrumentPmMethod = (pm) => {\r",
-          "    const pmProxy = {\r",
-          "        get: function(pm, key) {\r",
-          "            if (key == 'test') {\r",
-          "                return (skipTests ? pm.test.skip : pm.test);\r",
-          "            }\r",
-          "            return pm[key];\r",
-          "        }\r",
-          "    };\r",
-          "\r",
-          "    return new Proxy(pm, pmProxy);\r",
-          "}\r",
-          "\r",
-          "// function to be used in order to retry the current request, configuring a maximum number of attempts and a fixed delay between each invoke\r",
-          "retryRequest = (pm, setTimeout, waitingMillis = 1000, maxAttempts = 30) => {\r",
-          "    if(!pm || !setTimeout){\r",
-          "        throw new Error(\"Invalid invoke to retryRequest function! Some required parameters are undefined: pm=\" + pm + \", setTimeout=\" + setTimeout)\r",
-          "    }\r",
-          "\r",
-          "    const retryVariableName = \"retry_\" + pm.info.requestId\r",
-          "    const attempt = (pm.variables.get(retryVariableName) ?? 0) + 1;\r",
-          "    if(attempt < maxAttempts) {\r",
-          "        console.info(pm.info.requestName + \" not ready, retrying [attempt \" + attempt + \"/\" + maxAttempts + \"] after \" + waitingMillis + \" ms\");\r",
-          "        pm.variables.set(retryVariableName, attempt)\r",
-          "        pm.execution.setNextRequest(pm.info.requestId);\r",
-          "        return setTimeout(()=>{}, waitingMillis);\r",
-          "    } else {\r",
-          "        pm.test(pm.info.requestName + \" not ready\", () => pm.expect.fail(attempt + \" attempts\"));\r",
-          "    }\r",
-          "}\r",
-          "\r",
-          "// function to be used in order to retry the current request until it returns a known response HTTP status code\r",
-          "retryWhenStatusCode = (pm, setTimeout, statusCode, waitingMillis, maxAttempts) => {\r",
-          "    if(pm.response.code == statusCode){\r",
-          "        console.log(\"Obtained \" + statusCode + \"! Performing retry...\")\r",
-          "        skipTests=true;\r",
-          "        return retryRequest(pm, setTimeout, waitingMillis, maxAttempts)\r",
-          "    }\r",
-          "}\r",
-          "\r",
-          "// XML utilities\r",
-          "xml2js = require('xml2js');\r",
-          "\r",
-          "parseXmlResponse = (response) => {\r",
-          "    let body;\r",
-          "    xml2js.parseString(response.text(), {\r",
-          "            ignoreAttrs: true, \r",
-          "            explicitArray: false,\r",
-          "        }, function (err, result) {\r",
-          "            if(err){\r",
-          "                console.error(err)\r",
-          "            }\r",
-          "        body = result;\r",
-          "    });\r",
-          "    return body;\r",
-          "};"
-        ]
-      }
-    }
-  ],
-  "variable": [
-    {
-      "key": "accessToken",
-      "value": ""
-    },
-    {
-      "key": "randomNumber",
-      "value": ""
-    },
-    {
-      "key": "fiscalCode",
-      "value": ""
-    },
-    {
-      "key": "debtPositionId",
-      "value": ""
-    },
-    {
-      "key": "organizationId",
-      "value": ""
-    },
-    {
-      "key": "debtPositionTypeOrgId",
-      "value": ""
-    },
-    {
-      "key": "debtPositionTypeOrgCode",
-      "value": "CODE001",
-      "type": "string"
-    },
-    {
-      "key": "orgFiscalCode",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "amountCents",
-      "value": "10000",
-      "type": "string"
-    },
-    {
-      "key": "orgName",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "currentDate",
-      "value": "",
-      "type": "string"
-    },
-    {
-      "key": "ipaCode",
-      "value": "ELOC_A",
-      "type": "string"
-    },
-    {
-      "key": "paymentDateFrom",
-      "value": ""
-    },
-    {
-      "key": "paymentDateTo",
-      "value": ""
-    },
-    {
-      "key": "operatorExternalUserId",
-      "value": ""
-    },
-    {
-      "key": "dueDate",
-      "value": ""
-    },
-    {
-      "key": "mappedExternalUserId",
-      "value": ""
-    },
-    {
-      "key": "organizationIpaCode",
-      "value": ""
-    },
-    {
-      "key": "debtPositionTypeId",
-      "value": ""
-    },
-    {
-      "key": "createdDebtPositionTypeOrgId",
-      "value": ""
-    }
-  ]
+	"info": {
+		"_postman_id": "daa97bbf-8b84-4791-ac2a-26eb62cb44a4",
+		"name": "p4pa-debt-positions-E2E.postman_collection",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "15747968",
+		"_collection_link": "https://warped-astronaut-141685.postman.co/workspace/P4PA~9a8b7dd5-97b6-4dd0-b3f5-95f25fd0b455/collection/15747968-daa97bbf-8b84-4791-ac2a-26eb62cb44a4?action=share&source=collection_link&creator=15747968"
+	},
+	"item": [
+		{
+			"name": "00_login",
+			"item": [
+				{
+					"name": "00_getAuthToken",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPosition - 00_getAuthtoken - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
+									"    let jsonResponse = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonResponse).have.property(\"access_token\")\r",
+									"    pm.expect(jsonResponse).have.property(\"token_type\")\r",
+									"    pm.expect(jsonResponse).have.property(\"expires_in\")\r",
+									"});\r",
+									"\r",
+									"let jsonResponse = pm.response.json();\r",
+									"pm.collectionVariables.set(\"accessToken\", jsonResponse.access_token);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{p4paAuthBaseUrl}}/oauth/token?client_id=piattaforma-unitaria&grant_type=urn:ietf:params:oauth:grant-type:token-exchange&subject_token={{tokenExchange_subjectToken}}&subject_issuer={{tokenExchange_issuer}}&scope=openid&subject_token_type=urn:ietf:params:oauth:token-type:jwt",
+							"host": [
+								"{{p4paAuthBaseUrl}}"
+							],
+							"path": [
+								"oauth",
+								"token"
+							],
+							"query": [
+								{
+									"key": "client_id",
+									"value": "piattaforma-unitaria"
+								},
+								{
+									"key": "grant_type",
+									"value": "urn:ietf:params:oauth:grant-type:token-exchange"
+								},
+								{
+									"key": "subject_token",
+									"value": "{{tokenExchange_subjectToken}}"
+								},
+								{
+									"key": "subject_issuer",
+									"value": "{{tokenExchange_issuer}}"
+								},
+								{
+									"key": "scope",
+									"value": "openid"
+								},
+								{
+									"key": "subject_token_type",
+									"value": "urn:ietf:params:oauth:token-type:jwt"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "00_getUserInfo",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Auth - getUserInfo - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Auth - getUserInfo - Verify response body\", function () {\r",
+									"    let jsonResponse = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonResponse).have.property(\"userId\")\r",
+									"    pm.expect(jsonResponse).have.property(\"mappedExternalUserId\")\r",
+									"    pm.expect(jsonResponse).have.property(\"name\")\r",
+									"    pm.expect(jsonResponse).have.property(\"familyName\")\r",
+									"    pm.expect(jsonResponse).have.property(\"fiscalCode\").to.eq(\"DMEMPY15L21L736U\")\r",
+									"    pm.expect(jsonResponse).have.property(\"issuer\").to.eq(pm.environment.get(\"tokenExchange_issuer\"))\r",
+									"    pm.expect(jsonResponse).have.property(\"organizationAccess\")\r",
+									"    pm.expect(jsonResponse).to.have.property(\"brokerId\").that.is.a(\"number\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"brokerFiscalCode\").that.is.a(\"string\");\r",
+									"    pm.expect(jsonResponse).to.have.property(\"canManageUsers\").that.is.a(\"boolean\");\r",
+									"    \r",
+									"    pm.collectionVariables.set(\"mappedExternalUserId\",jsonResponse.mappedExternalUserId)\r",
+									"    pm.collectionVariables.set(\"organizationIpaCode\",jsonResponse.organizationAccess)\r",
+									"    var recognizedOrganizations = 0\r",
+									"    const registeredOrganizations=[\r",
+									"        \"IPA_TEST\",\r",
+									"        \"IPA_TEST_2\",\r",
+									"        \"DEMO\"\r",
+									"    ]\r",
+									"    jsonResponse.organizations.forEach(org => {\r",
+									"        pm.expect(org).have.property(\"operatorId\")\r",
+									"        pm.expect(org).have.property(\"organizationId\").that.is.a(\"number\");\r",
+									"        if(registeredOrganizations.includes(org.organizationIpaCode)){\r",
+									"            pm.expect(org.roles).have.property(\"length\").to.eq(1)\r",
+									"            pm.expect(org).have.property(\"email\")\r",
+									"            pm.expect(org.roles[0]).to.eq(\"ROLE_ADMIN\")\r",
+									"            recognizedOrganizations++\r",
+									"        }\r",
+									"    });\r",
+									"\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{p4paAuthBaseUrl}}/oauth/userinfo",
+							"host": [
+								"{{p4paAuthBaseUrl}}"
+							],
+							"path": [
+								"oauth",
+								"userinfo"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "01_createDp",
+			"item": [
+				{
+					"name": "organizations",
+					"item": [
+						{
+							"name": "01_findOrganizationByIpaCode",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"pm=instrumentPmMethod(pm);\r",
+											"\r",
+											"pm.test(\"DebtPosition - 00_findOrganizationByIpaCode - Responses with 200\", function () {\r",
+											"    pm.response.to.have.status(200);\r",
+											"});\r",
+											"\r",
+											"pm.test(\"DebtPosition - 00_getAuthtoken - Verify response body\", function () {\r",
+											"    let jsonResponse = pm.response.json();\r",
+											"\r",
+											"    pm.expect(jsonResponse).have.property(\"organizationId\")\r",
+											"    pm.expect(jsonResponse).have.property(\"orgFiscalCode\")\r",
+											"    pm.expect(jsonResponse).have.property(\"orgName\")\r",
+											"});\r",
+											"\r",
+											"let jsonResponse = pm.response.json();\r",
+											"pm.collectionVariables.set(\"organizationId\", jsonResponse.organizationId);\r",
+											"pm.collectionVariables.set(\"orgFiscalCode\", jsonResponse.orgFiscalCode);\r",
+											"pm.collectionVariables.set(\"orgName\", jsonResponse.orgName);\r",
+											""
+										],
+										"type": "text/javascript",
+										"packages": {}
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{accessToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{organizationBaseUrl}}/crud/organizations/search/findByIpaCode?ipaCode={{codIpaEnte}}",
+									"host": [
+										"{{organizationBaseUrl}}"
+									],
+									"path": [
+										"crud",
+										"organizations",
+										"search",
+										"findByIpaCode"
+									],
+									"query": [
+										{
+											"key": "ipaCode",
+											"value": "{{codIpaEnte}}"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "01_findDebtPositionTypeOrgByOrgIdAndCode",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPosition - 01_findDebtPositionTypeOrgByOrgIdAndCode - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"DebtPosition - 01_findDebtPositionTypeOrgByOrgIdAndCode - Verify response body\", function () {\r",
+									"    let jsonResponse = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonResponse).have.property(\"debtPositionTypeOrgId\")\r",
+									"    pm.expect(jsonResponse).have.property(\"code\")\r",
+									"});\r",
+									"\r",
+									"let jsonResponse = pm.response.json();\r",
+									"pm.collectionVariables.set(\"debtPositionTypeOrgId\", jsonResponse.debtPositionTypeOrgId);\r",
+									"pm.collectionVariables.set(\"debtPositionTypeId\", jsonResponse.debtPositionTypeId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/crud/debt-position-type-orgs/search/findByOrganizationIdAndCode?organizationId={{organizationId}}&code={{debtPositionTypeOrgCode}}",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"crud",
+								"debt-position-type-orgs",
+								"search",
+								"findByOrganizationIdAndCode"
+							],
+							"query": [
+								{
+									"key": "organizationId",
+									"value": "{{organizationId}}"
+								},
+								{
+									"key": "code",
+									"value": "{{debtPositionTypeOrgCode}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "01_createDebtPosition",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPositions - 01_create_dp - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"/*pm.test(\"DebtPositions - 01_create_dp - Verify response body\", function () {\r",
+									"    let jsonResponse = pm.response.json();\r",
+									"\r",
+									"    pm.expect(jsonResponse).have.property(\"workflowId\")\r",
+									"});\r",
+									"\r",
+									"let jsonResponse = pm.response.json();\r",
+									"pm.collectionVariables.set(\"workflowId\", jsonResponse.workflowId);*/\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"let randomNumber = generateRandomNumber();\r",
+									"\r",
+									"pm.collectionVariables.set(\"randomNumber\", randomNumber);\r",
+									"pm.collectionVariables.set(\"fiscalCode\", `AAAAAA69A45A602A`);\r",
+									"pm.collectionVariables.set(\"debtPositionId\", `${randomNumber}`);\r",
+									"pm.collectionVariables.set(\"currentDate\", new Date());"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"description\": \"description\",\r\n    \"status\": \"UNPAID\",\r\n    \"organizationId\": {{organizationId}},\r\n    \"debtPositionTypeOrgId\": {{debtPositionTypeOrgId}},\r\n    \"debtPositionOrigin\": \"SPONTANEOUS\",\r\n    \"flagIuvVolatile\": false,\r\n    \"multiDebtor\": false,\r\n    \"flagPuPagoPaPayment\": true,\r\n    \"paymentOptions\": [\r\n        {\r\n            \"totalAmountCents\": {{amountCents}},\r\n            \"status\": \"UNPAID\",\r\n            \"description\": \"description\",\r\n            \"paymentOptionType\": \"DOWN_PAYMENT\",\r\n            \"paymentOptionIndex\": 1,\r\n            \"installments\": [\r\n                {\r\n                    \"status\": \"UNPAID\",\r\n                    \"dueDate\": \"{{currentDate}}\",\r\n                    \"amountCents\": {{amountCents}},\r\n                    \"remittanceInformation\": \"remittanceInformation\",\r\n                    \"debtor\": {\r\n                        \"entityType\": \"F\",\r\n                        \"fiscalCode\": \"RSSMRA92A12B123A\",\r\n                        \"fullName\": \"Mario Rossi\",\r\n                        \"address\": \"via San Gaetanino\",\r\n                        \"civic\": \"10\",\r\n                        \"postalCode\": \"12312\",\r\n                        \"location\": \"Roma\",\r\n                        \"province\": \"RM\",\r\n                        \"nation\": \"IT\",\r\n                        \"email\": \"mario.rossi@email.it\"\r\n                    },\r\n                    \"notificationDate\": \"{{currentDate}}\"\r\n                }\r\n            ]\r\n        }\r\n    ]\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/debt-positions?massive=false",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"debt-positions"
+							],
+							"query": [
+								{
+									"key": "massive",
+									"value": "false"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "02_exportPaidInstallment",
+			"item": [
+				{
+					"name": "02_getPagedInstallmentPaidView",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData= pm.response.json();\r",
+									"\r",
+									"pm.test(\"[INSTALLMENT_EXPORT], expected httpStatus: 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"[INSTALLMENT_EXPORT] - get paged installment export\", () => {\r",
+									"    \r",
+									"     if (jsonData && jsonData.content && Array.isArray(jsonData.content) && jsonData.content.length > 0) {\r",
+									"        for (let item of jsonData.content) {\r",
+									"            pm.expect(item).to.have.property(\"installmentId\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"iud\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"noticeNumber\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"orgFiscalCode\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"paymentReceiptId\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"idPsp\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"pspCompanyName\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"debtor\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"paymentAmountCents\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"creditorReferenceId\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"amountCents\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"remittanceInformation\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"category\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"code\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"transferIndex\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"companyName\").and.to.not.be.null;\r",
+									"        }\r",
+									"    } else {\r",
+									"        pm.expect.fail(\"Content is not an array or is empty.\");\r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//date\r",
+									"let moment = require('moment');\r",
+									"let paymentDateFrom =  String(moment().utc().subtract(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
+									"let paymentDateTo =  String(moment().utc().add(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
+									"pm.collectionVariables.set(\"paymentDateFrom\", paymentDateFrom);\r",
+									"pm.collectionVariables.set(\"paymentDateTo\", paymentDateTo);\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"export",
+								"organization",
+								"{{organizationId}}",
+								"installments",
+								"paid"
+							],
+							"query": [
+								{
+									"key": "operatorExternalUserId",
+									"value": "{{mappedExternalUserId}}"
+								},
+								{
+									"key": "paymentDateFrom",
+									"value": "{{paymentDateFrom}}"
+								},
+								{
+									"key": "paymentDateTo",
+									"value": "{{paymentDateTo}}"
+								},
+								{
+									"key": "debtPositionTypeOrgId",
+									"value": "{{debtPositionTypeOrgId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "03_exportArchivingReceipt",
+			"item": [
+				{
+					"name": "03_getPagedReceiptArchivingView",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"let jsonData= pm.response.json();\r",
+									"\r",
+									"pm.test(\"[RECEIPTS_ARCHIVING_EXPORT], expected httpStatus: 200\", () => {\r",
+									"    pm.response.to.have.status(200);\r",
+									"})\r",
+									"\r",
+									"pm.test(\"[RECEIPTS_ARCHIVING_EXPORT] - get paged receipts archiving export\", () => {\r",
+									"    \r",
+									"     if (jsonData && jsonData.content && Array.isArray(jsonData.content) && jsonData.content.length > 0) {\r",
+									"        for (let item of jsonData.content) {\r",
+									"            pm.expect(item).to.have.property(\"paymentReceiptId\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"creditorReferenceId\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"remittanceInformation\").and.to.not.be.null;\r",
+									"            pm.expect(item).to.have.property(\"orgFiscalCode\").and.to.not.be.null;\r",
+									"\r",
+									"        }\r",
+									"    } else {\r",
+									"        pm.expect.fail(\"Content is not an array or is empty.\");\r",
+									"    }\r",
+									"})"
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"//date\r",
+									"let moment = require('moment');\r",
+									"let paymentDateFrom =  String(moment().utc().subtract(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
+									"let paymentDateTo =  String(moment().utc().add(3, 'months').format('YYYY-MM-DDTHH:mm:ss[Z]'));\r",
+									"pm.collectionVariables.set(\"paymentDateFrom\", paymentDateFrom);\r",
+									"pm.collectionVariables.set(\"paymentDateTo\", paymentDateTo);\r",
+									"\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/receipts/archiving?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"export",
+								"organization",
+								"{{organizationId}}",
+								"receipts",
+								"archiving"
+							],
+							"query": [
+								{
+									"key": "operatorExternalUserId",
+									"value": "{{mappedExternalUserId}}"
+								},
+								{
+									"key": "paymentDateFrom",
+									"value": "{{paymentDateFrom}}"
+								},
+								{
+									"key": "paymentDateTo",
+									"value": "{{paymentDateTo}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "04_createDpto",
+			"item": [
+				{
+					"name": "01_createDebtPositionTypeOrg",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPositions - 01_create_dpto - create dpto - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"let jsonResponse = pm.response.json();\r",
+									"pm.collectionVariables.set(\"createdDebtPositionTypeOrgId\", jsonResponse.debtPositionTypeOrgId);\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n        \"testOperator2\",\r\n        \"testOperator\",\r\n        \"testOperator3\"\r\n    ],\r\n    \"disabledOperators\":[],\r\n    \"removeEnabledOperators\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"debt-position-type-org"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "01_updateDebtPositionTypeOrg - removing some operators",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPositions - 01_create_dpto - update dpto removing some of the previous operators - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeOrgId\": {{createdDebtPositionTypeOrgId}},\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n        \"testOperator2\",\r\n        \"testOperator3\",\r\n        \"testOperator4\"\r\n    ],\r\n    \"disabledOperators\":[\r\n        \"testOperator\",\r\n        \"testOperator2\"\r\n    ],\r\n    \"removeEnabledOperators\": false\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"debt-position-type-org"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "01_updateDebtPositionTypeOrg removing all operators",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm=instrumentPmMethod(pm);\r",
+									"\r",
+									"pm.test(\"DebtPositions - 01_create_dpto - update dpto removing all of the previous operators - Responses with 200\", function () {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"debtPositionTypeOrg\":{\r\n        \"debtPositionTypeOrgId\": {{createdDebtPositionTypeOrgId}},\r\n        \"debtPositionTypeId\": {{debtPositionTypeId}},\r\n        \"organizationId\": {{organizationId}},\r\n        \"balance\": \"\",\r\n        \"code\": \"CODE003\",\r\n        \"description\": \"Test for Save Debt Position Type Org\",\r\n        \"iban\": \"IT60X0542811101000000123456\",\r\n        \"postalIban\": \"IT60X0542811101000000123457\",\r\n        \"postalAccountCode\": \"1234567890\",\r\n        \"holderPostalCc\": \"Holder Postal CC\",\r\n        \"orgSector\": \"Public Sector\",\r\n        \"xsdDefinitionRef\": \"definitionRef123\",\r\n        \"amountCents\": 10000,\r\n        \"externalPaymentUrl\": \"https://example.com/payment\",\r\n        \"flagAnonymousFiscalCode\": false,\r\n        \"flagMandatoryDueDate\": false,\r\n        \"flagSpontaneous\": false,\r\n        \"flagNotifyIo\": true,\r\n        \"ioTemplateMessage\": \"Test IO Message Template\",\r\n        \"flagActive\": true,\r\n        \"flagNotifyOutcomePush\": false,\r\n        \"flagAmountActualization\": false,\r\n        \"flagExternal\": false\r\n    },\r\n    \"enabledOperators\":[\r\n    ],\r\n    \"disabledOperators\":[\r\n    ],\r\n    \"removeEnabledOperators\": true\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/debt-position-type-org",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"debt-position-type-org"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "crud-deleteDebtPositionTypeOrg",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{debtPositionBaseUrl}}/debt-position-type-org/:debtPositionTypeOrgId",
+							"host": [
+								"{{debtPositionBaseUrl}}"
+							],
+							"path": [
+								"debt-position-type-org",
+								":debtPositionTypeOrgId"
+							],
+							"variable": [
+								{
+									"key": "debtPositionTypeOrgId",
+									"value": "{{createdDebtPositionTypeOrgId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"generateRandomNumber = generateRandomNumber => {",
+					"    let randomNumber = '';",
+					"    for (let i = 0; i < 10; i++) {",
+					"        randomNumber += Math.floor(Math.random() * 10).toString();",
+					"    }",
+					"    return randomNumber;",
+					"}"
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					"// START COMMON UTILITIES\r",
+					"\r",
+					"// global variable to use in order to skip tests\r",
+					"skipTests=false;\r",
+					"\r",
+					"// method to be invoked as first thing inside tests in order to instrument the \"pm\" variable:\r",
+					"// eg: pm = pm=instrumentPmMethod(pm);\r",
+					"instrumentPmMethod = (pm) => {\r",
+					"    const pmProxy = {\r",
+					"        get: function(pm, key) {\r",
+					"            if (key == 'test') {\r",
+					"                return (skipTests ? pm.test.skip : pm.test);\r",
+					"            }\r",
+					"            return pm[key];\r",
+					"        }\r",
+					"    };\r",
+					"\r",
+					"    return new Proxy(pm, pmProxy);\r",
+					"}\r",
+					"\r",
+					"// function to be used in order to retry the current request, configuring a maximum number of attempts and a fixed delay between each invoke\r",
+					"retryRequest = (pm, setTimeout, waitingMillis = 1000, maxAttempts = 30) => {\r",
+					"    if(!pm || !setTimeout){\r",
+					"        throw new Error(\"Invalid invoke to retryRequest function! Some required parameters are undefined: pm=\" + pm + \", setTimeout=\" + setTimeout)\r",
+					"    }\r",
+					"\r",
+					"    const retryVariableName = \"retry_\" + pm.info.requestId\r",
+					"    const attempt = (pm.variables.get(retryVariableName) ?? 0) + 1;\r",
+					"    if(attempt < maxAttempts) {\r",
+					"        console.info(pm.info.requestName + \" not ready, retrying [attempt \" + attempt + \"/\" + maxAttempts + \"] after \" + waitingMillis + \" ms\");\r",
+					"        pm.variables.set(retryVariableName, attempt)\r",
+					"        pm.execution.setNextRequest(pm.info.requestId);\r",
+					"        return setTimeout(()=>{}, waitingMillis);\r",
+					"    } else {\r",
+					"        pm.test(pm.info.requestName + \" not ready\", () => pm.expect.fail(attempt + \" attempts\"));\r",
+					"    }\r",
+					"}\r",
+					"\r",
+					"// function to be used in order to retry the current request until it returns a known response HTTP status code\r",
+					"retryWhenStatusCode = (pm, setTimeout, statusCode, waitingMillis, maxAttempts) => {\r",
+					"    if(pm.response.code == statusCode){\r",
+					"        console.log(\"Obtained \" + statusCode + \"! Performing retry...\")\r",
+					"        skipTests=true;\r",
+					"        return retryRequest(pm, setTimeout, waitingMillis, maxAttempts)\r",
+					"    }\r",
+					"}\r",
+					"\r",
+					"// XML utilities\r",
+					"xml2js = require('xml2js');\r",
+					"\r",
+					"parseXmlResponse = (response) => {\r",
+					"    let body;\r",
+					"    xml2js.parseString(response.text(), {\r",
+					"            ignoreAttrs: true, \r",
+					"            explicitArray: false,\r",
+					"        }, function (err, result) {\r",
+					"            if(err){\r",
+					"                console.error(err)\r",
+					"            }\r",
+					"        body = result;\r",
+					"    });\r",
+					"    return body;\r",
+					"};"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "debtPositionTypeOrgCode",
+			"value": "CODE001",
+			"type": "string"
+		},
+		{
+			"key": "amountCents",
+			"value": "10000",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "mappedExternalUserId",
+			"value": ""
+		},
+		{
+			"key": "organizationIpaCode",
+			"value": ""
+		},
+		{
+			"key": "organizationId",
+			"value": ""
+		},
+		{
+			"key": "orgFiscalCode",
+			"value": ""
+		},
+		{
+			"key": "orgName",
+			"value": ""
+		},
+		{
+			"key": "debtPositionTypeOrgId",
+			"value": ""
+		},
+		{
+			"key": "debtPositionTypeId",
+			"value": ""
+		},
+		{
+			"key": "randomNumber",
+			"value": ""
+		},
+		{
+			"key": "fiscalCode",
+			"value": ""
+		},
+		{
+			"key": "debtPositionId",
+			"value": ""
+		},
+		{
+			"key": "currentDate",
+			"value": ""
+		},
+		{
+			"key": "paymentDateFrom",
+			"value": ""
+		},
+		{
+			"key": "paymentDateTo",
+			"value": ""
+		},
+		{
+			"key": "createdDebtPositionTypeOrgId",
+			"value": ""
+		}
+	]
 }
