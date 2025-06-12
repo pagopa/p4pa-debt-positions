@@ -132,7 +132,7 @@ public class IuvServiceImpl implements IuvService {
       throw new InvalidValueException("The first two character of iuv must be the same of segregation code of organization");
     }
 
-    if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.ORDINARY_SIL) {
+    if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
       if (!iuv.startsWith("00", 3)) {
         throw new InvalidValueException("The third and fourth characters must be '00' for the origin: " + origin);
       }

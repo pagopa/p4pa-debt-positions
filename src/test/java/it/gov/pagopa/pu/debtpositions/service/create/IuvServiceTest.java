@@ -164,7 +164,7 @@ class IuvServiceTest {
   }
 
   @ParameterizedTest
-  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL", "SPONTANEOUS"})
+  @ValueSource(strings = {"ORDINARY", "SPONTANEOUS", "SPONTANEOUS_SIL"})
   void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(String debtPositionOrigin) {
     DebtPositionOrigin origin = DebtPositionOrigin.valueOf(debtPositionOrigin);
 
