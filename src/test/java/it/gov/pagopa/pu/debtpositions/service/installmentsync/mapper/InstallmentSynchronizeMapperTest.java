@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCreateBalanceService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeFetchBalanceService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,22 +18,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeMapperTest {
   @Mock
-  private InstallmentSynchronizeCreateBalanceService installmentSynchronizeCreateBalanceServiceMock;
+  private InstallmentSynchronizeFetchBalanceService installmentSynchronizeFetchBalanceServiceMock;
 
   private InstallmentSynchronizeMapper installmentSynchronizeMapper;
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeMapper = new InstallmentSynchronizeMapper(installmentSynchronizeCreateBalanceServiceMock);
+    installmentSynchronizeMapper = new InstallmentSynchronizeMapper(installmentSynchronizeFetchBalanceServiceMock);
   }
 
   @Test
   void testSyncMapper(){
     String accessToken = "ACCESSTOKEN";
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setBalance(null);
     DebtPositionDTO expectedDebtPositionDTO = buildSyncDebtPositionDTO();
 
-    Mockito.when(installmentSynchronizeCreateBalanceServiceMock.createBalance(installmentSynchronizeDTO, accessToken))
+    Mockito.when(installmentSynchronizeFetchBalanceServiceMock.getDebtPositionTypeDefaultBalance(installmentSynchronizeDTO, accessToken))
       .thenReturn("balance");
 
     DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, 1L, accessToken);
@@ -52,9 +53,6 @@ class InstallmentSynchronizeMapperTest {
     expectedDebtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     expectedDebtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.DRAFT);
     expectedDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.DRAFT);
-
-    Mockito.when(installmentSynchronizeCreateBalanceServiceMock.createBalance(installmentSynchronizeDTO, accessToken))
-      .thenReturn("balance");
 
     DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, 1L, accessToken);
 

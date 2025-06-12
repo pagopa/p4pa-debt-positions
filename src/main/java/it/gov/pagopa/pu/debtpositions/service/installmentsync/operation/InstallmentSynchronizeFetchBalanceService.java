@@ -19,7 +19,7 @@ import java.util.Set;
 
 @Service
 @Slf4j
-public class InstallmentSynchronizeCreateBalanceService {
+public class InstallmentSynchronizeFetchBalanceService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final AssessmentsRegistryService assessmentsRegistryService;
   private final BalanceService balanceService;
@@ -27,17 +27,13 @@ public class InstallmentSynchronizeCreateBalanceService {
   private static final String OPERATING_YEAR = String.valueOf(LocalDate.now().getYear());
   private static final AssessmentsRegistryStatus ASSESSMENTS_REGISTRY_STATUS = AssessmentsRegistryStatus.ACTIVE;
 
-  public InstallmentSynchronizeCreateBalanceService(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, AssessmentsRegistryService assessmentsRegistryService, BalanceService balanceService) {
+  public InstallmentSynchronizeFetchBalanceService(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, AssessmentsRegistryService assessmentsRegistryService, BalanceService balanceService) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.assessmentsRegistryService = assessmentsRegistryService;
     this.balanceService = balanceService;
   }
 
-  public String createBalance(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken) {
-    if (StringUtils.isNotBlank(installmentSynchronizeDTO.getBalance())) {
-      return installmentSynchronizeDTO.getBalance();
-    }
-
+  public String getDebtPositionTypeDefaultBalance(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken) {
     log.info("Retrieving balance from DebtPositionTypeOrg with orgId[{}] and debtPositionTypeCode[{}]", installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode());
     DebtPositionTypeOrg debtPositionTypeOrg = retrieveDebtPositionTypeOrg(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode());
     if (StringUtils.isNotBlank(debtPositionTypeOrg.getBalance())) {

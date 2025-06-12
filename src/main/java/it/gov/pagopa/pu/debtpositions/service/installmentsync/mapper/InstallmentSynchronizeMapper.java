@@ -1,7 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCreateBalanceService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeFetchBalanceService;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -10,10 +11,10 @@ import java.util.stream.Collectors;
 
 @Service
 public class InstallmentSynchronizeMapper {
-  private final InstallmentSynchronizeCreateBalanceService installmentSynchronizeCreateBalanceService;
+  private final InstallmentSynchronizeFetchBalanceService installmentSynchronizeFetchBalanceService;
 
-  public InstallmentSynchronizeMapper(InstallmentSynchronizeCreateBalanceService installmentSynchronizeCreateBalanceService) {
-    this.installmentSynchronizeCreateBalanceService = installmentSynchronizeCreateBalanceService;
+  public InstallmentSynchronizeMapper(InstallmentSynchronizeFetchBalanceService installmentSynchronizeFetchBalanceService) {
+    this.installmentSynchronizeFetchBalanceService = installmentSynchronizeFetchBalanceService;
   }
 
   public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, Long debtPositionTypeOrgId, String accessToken) {
@@ -43,13 +44,15 @@ public class InstallmentSynchronizeMapper {
   }
 
   public InstallmentDTO map2Installment(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken){
+    String balance = StringUtils.isNotBlank(installmentSynchronizeDTO.getBalance()) ? installmentSynchronizeDTO.getBalance() : installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(installmentSynchronizeDTO, accessToken);
+
     return InstallmentDTO.builder()
       .iud(installmentSynchronizeDTO.getIud())
       .iuv(installmentSynchronizeDTO.getIuv())
       .dueDate(installmentSynchronizeDTO.getDueDate())
       .amountCents(installmentSynchronizeDTO.getAmountCents())
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
-      .balance(installmentSynchronizeCreateBalanceService.createBalance(installmentSynchronizeDTO, accessToken))
+      .balance(balance)
       .legacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata())
       .debtor(map2PersonDTO(installmentSynchronizeDTO))
       .ingestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId())

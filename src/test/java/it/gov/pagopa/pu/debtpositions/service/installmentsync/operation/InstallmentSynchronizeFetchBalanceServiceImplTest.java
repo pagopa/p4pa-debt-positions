@@ -26,7 +26,7 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class InstallmentSynchronizeCreateBalanceServiceImplTest {
+class InstallmentSynchronizeFetchBalanceServiceImplTest {
 
   @Mock
   private AssessmentsRegistryService assessmentsRegistryServiceMock;
@@ -37,11 +37,11 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
   private static final String OPERATING_YEAR = String.valueOf(LocalDate.now().getYear());
   private static final AssessmentsRegistryStatus ASSESSMENTS_REGISTRY_STATUS = AssessmentsRegistryStatus.ACTIVE;
 
-  private InstallmentSynchronizeCreateBalanceService installmentSynchronizeCreateBalanceService;
+  private InstallmentSynchronizeFetchBalanceService installmentSynchronizeFetchBalanceService;
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeCreateBalanceService = new InstallmentSynchronizeCreateBalanceService(debtPositionTypeOrgRepositoryMock,
+    installmentSynchronizeFetchBalanceService = new InstallmentSynchronizeFetchBalanceService(debtPositionTypeOrgRepositoryMock,
       assessmentsRegistryServiceMock, balanceServiceMock);
   }
   @AfterEach
@@ -49,20 +49,6 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock,
       assessmentsRegistryServiceMock, balanceServiceMock
     );
-  }
-
-  @Test
-  void givenBalanceAlreadyPresentWhenCreateBalanceThenReturnBalance() {
-    // Given
-    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
-    dto.setBalance("EXISTING_BALANCE");
-    String accessToken = "ACCESS_TOKEN";
-
-    // When
-    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
-
-    // Then
-    assertEquals("EXISTING_BALANCE", result);
   }
 
   @Test
@@ -80,14 +66,14 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
       .thenReturn(Optional.of(debtPositionTypeOrg));
 
     // When
-    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+    String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     // Then
     assertEquals("RETRIEVED_BALANCE", result);
   }
 
   @Test
-  void givenDebtPositionTypeOrgNotFoundWhenCreateBalanceThenThrowException() {
+  void givenDebtPositionTypeOrgNotFoundWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -99,13 +85,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     InvalidValueException exception = assertThrows(InvalidValueException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals("The debt position type code INVALID_CODE is not valid for this organizationId 1", exception.getMessage());
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryEmbeddedNullWhenCreateBalanceThenThrowException() {
+  void givenPagedModelAssessmentsRegistryEmbeddedNullWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -133,13 +119,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     IllegalStateException exception = assertThrows(IllegalStateException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals("Cannot retrieve balance value, findAssessmentsRegistriesByFilters returns null embedded object.", exception.getMessage());
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryListNullWhenCreateBalanceThenThrowException() {
+  void givenPagedModelAssessmentsRegistryListNullWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -168,13 +154,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     IllegalStateException exception = assertThrows(IllegalStateException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals("Cannot retrieve balance value, findAssessmentsRegistriesByFilters returns null embedded object.", exception.getMessage());
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryListEmptyWhenCreateBalanceThenThrowException() {
+  void givenPagedModelAssessmentsRegistryListEmptyWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -203,13 +189,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     IllegalStateException exception = assertThrows(IllegalStateException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals(String.format("No Assessments registry results found with orgId [%s], debtPositionTypeCode [%s], operatingYear [%s], status [%s].", dto.getOrganizationId(), dto.getDebtPositionTypeCode(), OPERATING_YEAR, ASSESSMENTS_REGISTRY_STATUS), exception.getMessage());
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryListTooManyAssessmentsWhenCreateBalanceThenThrowException() {
+  void givenPagedModelAssessmentsRegistryListTooManyAssessmentsWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -238,13 +224,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     IllegalStateException exception = assertThrows(IllegalStateException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals("Expected exactly one Assessments registry result, but found 2.", exception.getMessage());
   }
 
   @Test
-  void givenIncorrectXmlWhenCreateBalanceThenThrowException() {
+  void givenIncorrectXmlWhenGetDebtPositionTypeDefaultBalanceThenThrowException() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -280,13 +266,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
 
     // When & Then
     InvalidValueException exception = assertThrows(InvalidValueException.class,
-      () -> installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken));
+      () -> installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken));
 
     assertEquals("Balance is not formally valid", exception.getMessage());
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryWhenCreateBalanceThenGenerateXml() {
+  void givenPagedModelAssessmentsRegistryWhenGetDebtPositionTypeDefaultBalanceThenGenerateXml() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -321,13 +307,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
 
     // When & Then
-    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+    String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     assertEquals(result, expectedResult);
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryNoOfficeCodeWhenCreateBalanceThenGenerateXml() {
+  void givenPagedModelAssessmentsRegistryNoOfficeCodeWhenGetDebtPositionTypeDefaultBalanceThenGenerateXml() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -361,13 +347,13 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
 
     // When & Then
-    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+    String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     assertEquals(result, expectedResult);
   }
 
   @Test
-  void givenPagedModelAssessmentsRegistryNoAssessmentCodeWhenCreateBalanceThenGenerateXml() {
+  void givenPagedModelAssessmentsRegistryNoAssessmentCodeWhenGetDebtPositionTypeDefaultBalanceThenGenerateXml() {
     // Given
     InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
     dto.setOrganizationId(1L);
@@ -401,7 +387,7 @@ class InstallmentSynchronizeCreateBalanceServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(expectedResult, accessToken)).thenReturn(true);
 
     // When & Then
-    String result = installmentSynchronizeCreateBalanceService.createBalance(dto, accessToken);
+    String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     assertEquals(result, expectedResult);
   }
