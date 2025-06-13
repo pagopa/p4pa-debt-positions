@@ -247,7 +247,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
     registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
 
-    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>1.00</importo></accertamento></capitolo></bilancio>";
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
       .thenReturn(Optional.of(debtPositionTypeOrg));
@@ -289,7 +289,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
     registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
 
-    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>1.00</importo></accertamento></capitolo></bilancio>";
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
       .thenReturn(Optional.of(debtPositionTypeOrg));
@@ -329,7 +329,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
     registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
 
-    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><accertamento><codAccertamento>codAccertamento</codAccertamento><importo>1.00</importo></accertamento></capitolo></bilancio>";
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
       .thenReturn(Optional.of(debtPositionTypeOrg));
@@ -369,7 +369,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
     registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(List.of(assessmentsRegistry)));
 
-    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><importo>100</importo></accertamento></capitolo></bilancio>";
+    String expectedResult = "<bilancio><capitolo><codCapitolo>sectionCode</codCapitolo><codUfficio>officeCode</codUfficio><accertamento><importo>1.00</importo></accertamento></capitolo></bilancio>";
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
       .thenReturn(Optional.of(debtPositionTypeOrg));

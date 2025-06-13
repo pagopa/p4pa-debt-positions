@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.stereotype.Service;
@@ -100,7 +101,7 @@ public class InstallmentSynchronizeFetchBalanceService {
         .append("</codAccertamento>");
     }
     xmlBuilder.append("<importo>")
-      .append(amountCents)
+      .append(Utilities.longCentsToBigDecimalEuro(amountCents))
       .append("</importo>");
     xmlBuilder.append("</accertamento>");
 
