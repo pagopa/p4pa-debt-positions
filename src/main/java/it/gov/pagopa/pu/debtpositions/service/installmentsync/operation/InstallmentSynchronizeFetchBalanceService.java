@@ -78,6 +78,7 @@ public class InstallmentSynchronizeFetchBalanceService {
   }
 
   private String generateXmlFromAssessmentsRegistry(AssessmentsRegistry assessmentsRegistry, Long amountCents) {
+    //TODO: see task https://pagopa.atlassian.net/browse/P4ADEV-3171
     StringBuilder xmlBuilder = new StringBuilder();
 
     xmlBuilder.append("<bilancio>");
