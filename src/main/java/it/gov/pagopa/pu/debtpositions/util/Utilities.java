@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.util;
 
 import org.slf4j.MDC;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
@@ -99,5 +101,9 @@ public class Utilities {
 
   public static String getTraceId(){
     return MDC.get("traceId");
+  }
+
+  public static BigDecimal longCentsToBigDecimalEuro(Long centsAmount) {
+    return centsAmount != null ? BigDecimal.valueOf(centsAmount).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN) : null;
   }
 }
