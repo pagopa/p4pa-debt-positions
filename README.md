@@ -60,7 +60,6 @@ See [log configured pattern](/src/main/resources/logback-spring.xml).
 ### 🗄️ Resources
 * PostgreSQL
 * PostgreSQL (citizen)
-* Redis
 * Kafka
 
 ### 🧩 Microservices
