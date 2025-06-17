@@ -35,7 +35,11 @@ See [Postman collection](/postman/p4pa-debt-positions-E2E.postman_collection.jso
 * `GET /export/organization/{organizationId}/installments/paid`: To export paid installments;
 * `GET /export/organization/{organizationId}/receipts/archiving`: To export receipts for archiving purposes;
 
-## AsyncAPIs
+### 📌 Common HTTP status returned:
+* `401`: Invalid access token provided, thus a new login is required;
+* `403`: Trying to access a not authorized resource.
+
+## 🌐 AsyncAPIs
 See [AsyncAPI](asyncapi/generated.asyncapi.json), exposed through the following path:
 * `/springwolf/asyncapi-ui.html`
 
