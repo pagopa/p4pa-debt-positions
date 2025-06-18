@@ -182,14 +182,14 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 | KAFKA_CONFIG_MAX_REQUEST_SIZE                    | Max request size                                                   | 1000000                    |
 
 ###### 📤 KAFKA PRODUCERS
-| ENV                                              | DESCRIPTION                                                        | DEFAULT                    |
-|--------------------------------------------------|--------------------------------------------------------------------|----------------------------|
-| KAFKA_TOPIC_PAYMENTS                             | Topic where to publish payment event                               | p4pa-payhub-payments-evh   |
-| KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG         | JAAS Config string used to perform authentication                  |                            |
-| KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME | Max producer idle time (milliseconds)                              | 180000                     |
-| KAFKA_PAYMENTS_PRODUCER_RETRY_MS                 | Producer retry waiting time (milliseconds)                         | \${KAFKA_RETRY_MS:10000}   |
-| KAFKA_PAYMENTS_PRODUCER_LINGER_MS                | Producer linger time (milliseconds)                                | \${KAFKA_LINGER_MS:2}      |
-| KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE               | Producer batch size                                                | \${KAFKA_BATCH_SIZE:16384} |
+| ENV                                              | DESCRIPTION                                                        | DEFAULT                  |
+|--------------------------------------------------|--------------------------------------------------------------------|--------------------------|
+| KAFKA_TOPIC_PAYMENTS                             | Topic where to publish payment event                               | p4pa-payhub-payments-evh |
+| KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG         | JAAS Config string used to perform authentication                  |                          |
+| KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME | Max producer idle time (milliseconds)                              | 180000                   |
+| KAFKA_PAYMENTS_PRODUCER_RETRY_MS                 | Producer retry waiting time (milliseconds)                         | 10000                    |
+| KAFKA_PAYMENTS_PRODUCER_LINGER_MS                | Producer linger time (milliseconds)                                | 2                        |
+| KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE               | Producer batch size                                                | 16384                    |
 
 #### 💼 Business logic
 | ENV                                        | DESCRIPTION                                                          | DEFAULT                            |
