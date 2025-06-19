@@ -170,16 +170,16 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 | CLASSIFICATION_PRINT_BODY_WHEN_ERROR | To print body when an error occurs                                                | true    |
 
 ##### 🌀 KAFKA
-| ENV                                              | DESCRIPTION                                                        | DEFAULT                    |
-|--------------------------------------------------|--------------------------------------------------------------------|----------------------------|
-| KAFKA_BINDER_BROKER                              | Comma separated list of brokers to which the Kafka binder connects |                            |
-| KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS               | Hearth beat interval (milliseconds)                                | 3000                       |
-| KAFKA_CONFIG_SESSION_TIMEOUT_MS                  | Session timeout (milliseconds)                                     | 30000                      |
-| KAFKA_CONFIG_REQUEST_TIMEOUT_MS                  | Request timeout (milliseconds)                                     | 60000                      |
-| KAFKA_CONFIG_METADATA_MAX_AGE                    | Metadata max age (milliseconds)                                    | 180000                     |
-| KAFKA_CONFIG_SASL_MECHANISM                      | SASL mechanism                                                     |                            |
-| KAFKA_CONFIG_SECURITY_PROTOCOL                   | Security protocol                                                  |                            |
-| KAFKA_CONFIG_MAX_REQUEST_SIZE                    | Max request size                                                   | 1000000                    |
+| ENV                                              | DESCRIPTION                                                        | DEFAULT  |
+|--------------------------------------------------|--------------------------------------------------------------------|----------|
+| KAFKA_BINDER_BROKER                              | Comma separated list of brokers to which the Kafka binder connects |          |
+| KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS               | Hearth beat interval (milliseconds)                                | 3000     |
+| KAFKA_CONFIG_SESSION_TIMEOUT_MS                  | Session timeout (milliseconds)                                     | 30000    |
+| KAFKA_CONFIG_REQUEST_TIMEOUT_MS                  | Request timeout (milliseconds)                                     | 60000    |
+| KAFKA_CONFIG_METADATA_MAX_AGE                    | Metadata max age (milliseconds)                                    | 180000   |
+| KAFKA_CONFIG_SASL_MECHANISM                      | SASL mechanism                                                     | PLAIN    |
+| KAFKA_CONFIG_SECURITY_PROTOCOL                   | Security protocol                                                  | SASL_SSL |
+| KAFKA_CONFIG_MAX_REQUEST_SIZE                    | Max request size                                                   | 1000000  |
 
 ###### 📤 KAFKA PRODUCERS
 | ENV                                              | DESCRIPTION                                                        | DEFAULT                  |
