@@ -18,7 +18,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
   @Query("""
     SELECT new InstallmentPaidViewNoPII(
       i.installmentId as installmentId,
-      i.iuf as iuf,
+      i.sourceFlowName as iuf,
       i.iud as iud,
       r.noticeNumber as noticeNumber,
       dp.organizationId as organizationId,
