@@ -27,6 +27,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -65,6 +66,7 @@ class InstallmentDeletionServiceTest {
     installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
 
     verify(debtPositionServiceMock).delete(debtPositionMapperMock.mapToModel(debtPositionDTO).getFirst());
+    assertTrue(debtPositionDTO.getPaymentOptions().isEmpty());
   }
 
   @Test

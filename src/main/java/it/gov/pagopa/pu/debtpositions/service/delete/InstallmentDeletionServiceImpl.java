@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +47,7 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
 
     if (allInstallmentsToBeDeleted) {
       debtPositionService.delete(modelPair.getFirst());
+      debtPositionDTO.setPaymentOptions(new ArrayList<>());
     } else {
       List<Long> emptyPoIds = debtPositionDTO.getPaymentOptions().stream()
         .flatMap(po -> {
