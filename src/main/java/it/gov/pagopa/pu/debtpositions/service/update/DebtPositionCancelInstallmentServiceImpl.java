@@ -12,7 +12,6 @@ import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTyp
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
-import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.delete.InstallmentDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -33,7 +32,6 @@ import java.util.stream.Collectors;
 public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOperationService implements DebtPositionCancelInstallmentService {
 
   private final InstallmentDeletionService installmentDeletionService;
-  private final DebtPositionDeletionService debtPositionDeletionService;
 
   protected DebtPositionCancelInstallmentServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                                      DebtPositionService debtPositionService,
@@ -41,10 +39,9 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
                                                      DebtPositionProcessorService debtPositionProcessorService,
                                                      OrganizationService organizationService,
                                                      DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                                     InstallmentDeletionService installmentDeletionService, DebtPositionDeletionService debtPositionDeletionService) {
+                                                     InstallmentDeletionService installmentDeletionService) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.installmentDeletionService = installmentDeletionService;
-    this.debtPositionDeletionService = debtPositionDeletionService;
   }
 
   @Transactional
@@ -54,17 +51,6 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
     if (log.isDebugEnabled()) {
       log.debug("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
-    }
-
-    if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      boolean allInstallmentsToBeDeleted = installmentIds.size() ==
-        debtPositionDTO.getPaymentOptions().stream()
-          .mapToLong(po -> po.getInstallments().size())
-          .sum();
-
-      if (allInstallmentsToBeDeleted) {
-        return debtPositionDeletionService.deleteDebtPosition(debtPositionDTO.getDebtPositionId(), accessToken, operatorExternalUserId);
-      }
     }
 
     WorkflowCreatedDTO workflow = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, accessToken, operatorExternalUserId);
@@ -103,18 +89,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
     }
   }
 
-
   @Override
-  protected void saveDebtPosition(DebtPositionDTO debtPositionDTO) {
+  protected void saveAndAlignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      super.saveDebtPosition(debtPositionDTO);
-    }
-  }
-
-  @Override
-  protected void alignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
-    if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      super.alignHierarchyStatus(debtPositionDTO);
+      super.saveAndAlignHierarchyStatus(debtPositionDTO);
     }
   }
 }

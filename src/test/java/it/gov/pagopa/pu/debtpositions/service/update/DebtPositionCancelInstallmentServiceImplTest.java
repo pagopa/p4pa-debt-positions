@@ -9,7 +9,6 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
-import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.delete.InstallmentDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -53,8 +52,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerServiceMock;
   @Mock
   private InstallmentDeletionService installmentDeletionServiceMock;
-  @Mock
-  private DebtPositionDeletionService debtPositionDeletionServiceMock;
 
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
 
@@ -62,7 +59,7 @@ class DebtPositionCancelInstallmentServiceImplTest {
   void setUp() {
     debtPositionCancelInstallmentService = new DebtPositionCancelInstallmentServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
-      organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, installmentDeletionServiceMock, debtPositionDeletionServiceMock);
+      organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, installmentDeletionServiceMock);
   }
 
   @Test
@@ -102,27 +99,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
-  }
-
-  @Test
-  void givenAllInstallmentsToBeDeletedFromDraftDebtPositionWhenCancelInstallmentThenDeleteDebtPosition(){
-    String accessToken = "ACCESSTOKEN";
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    String operatorExternalId = "OPERATOREXTERNALID";
-    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
-
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
-    debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.DRAFT);
-    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
-    installmentDTO.setStatus(InstallmentStatus.DRAFT);
-
-    Mockito.when(debtPositionDeletionServiceMock.deleteDebtPosition(debtPositionDTO.getDebtPositionId(),accessToken, operatorExternalId))
-      .thenReturn(workflow);
-
-    WorkflowCreatedDTO result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalId);
-
-    assertSame(workflow, result);
   }
 
   @Test

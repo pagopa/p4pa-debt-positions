@@ -81,17 +81,13 @@ public abstract class BaseDebtPositionOperationService {
 
     debtPositionProcessorService.updateAmounts(debtPositionDTO);
 
-    saveDebtPosition(debtPositionDTO);
-    alignHierarchyStatus(debtPositionDTO);
+    saveAndAlignHierarchyStatus(debtPositionDTO);
 
     return invokeWorkflow(debtPositionDTO, eventType, installments2operate, accessToken, wfExecutionParameters);
   }
 
-  protected void saveDebtPosition(DebtPositionDTO debtPositionDTO) {
+  protected void saveAndAlignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
     debtPositionService.saveDebtPosition(debtPositionDTO);
-  }
-
-  protected void alignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
     debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
   }
 
