@@ -10,7 +10,7 @@ See [PU Microservice Architecture](https://pagopa.atlassian.net/wiki/spaces/SPAC
 * To handle debt position type relationship toward organizations:
   * To handle their relationships with operators; 
 * To handle debt positions:
-  * Creation, validazione and notify; 
+  * Creation, validation and notify; 
   * Receipt handling.
 
 ## 🌐 APIs
