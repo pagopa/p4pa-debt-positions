@@ -80,11 +80,15 @@ public abstract class BaseDebtPositionOperationService {
     applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
     debtPositionProcessorService.updateAmounts(debtPositionDTO);
-    debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
+    saveAndAlignHierarchyStatus(debtPositionDTO);
 
     return invokeWorkflow(debtPositionDTO, eventType, installments2operate, accessToken, wfExecutionParameters);
+  }
+
+  protected void saveAndAlignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
+    debtPositionService.saveDebtPosition(debtPositionDTO);
+    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
   }
 
   protected WorkflowCreatedDTO invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
