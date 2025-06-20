@@ -147,6 +147,27 @@ public class UtilitiesTest {
     clearTraceIdContext();
   }
 
+  @Test
+  void givenValidLongWhenLongCentsToBigDecimalEuroThenOk() {
+    // Given
+    Long centsAmount = 7500L;
+    BigDecimal expectedEuro = new BigDecimal("75.00");
+
+    // When
+    BigDecimal result = Utilities.longCentsToBigDecimalEuro(centsAmount);
+
+    // Then
+    assertEquals(expectedEuro, result);
+  }
+
+  @Test
+  void givenNullWhenLongCentsToBigDecimalEuroThenNull() {
+    // Given
+    Long centsAmount = null;
+    // When & Then
+    assertNull(Utilities.longCentsToBigDecimalEuro(centsAmount));
+  }
+
   public static void setTraceId(String traceId) {
     MDC.put("traceId", traceId);
   }
