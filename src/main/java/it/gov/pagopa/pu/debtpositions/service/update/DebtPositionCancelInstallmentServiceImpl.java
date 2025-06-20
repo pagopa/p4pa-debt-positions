@@ -4,6 +4,7 @@ import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -11,6 +12,8 @@ import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTyp
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
+import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
+import it.gov.pagopa.pu.debtpositions.service.delete.InstallmentDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -29,21 +32,39 @@ import java.util.stream.Collectors;
 @Slf4j
 public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOperationService implements DebtPositionCancelInstallmentService {
 
+  private final InstallmentDeletionService installmentDeletionService;
+  private final DebtPositionDeletionService debtPositionDeletionService;
+
   protected DebtPositionCancelInstallmentServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                                      DebtPositionService debtPositionService,
                                                      DebtPositionSyncService debtPositionSyncService,
                                                      DebtPositionProcessorService debtPositionProcessorService,
                                                      OrganizationService organizationService,
-                                                     DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+                                                     DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+                                                     InstallmentDeletionService installmentDeletionService, DebtPositionDeletionService debtPositionDeletionService) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
+    this.installmentDeletionService = installmentDeletionService;
+    this.debtPositionDeletionService = debtPositionDeletionService;
   }
 
   @Transactional
   @Override
   public WorkflowCreatedDTO cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
+    Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
+
     if (log.isDebugEnabled()) {
-      Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
       log.debug("Cancelling installments with ids {} for debt position with id {}", installmentIds, debtPositionDTO.getDebtPositionId());
+    }
+
+    if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
+      boolean allInstallmentsToBeDeleted = installmentIds.size() ==
+        debtPositionDTO.getPaymentOptions().stream()
+          .mapToLong(po -> po.getInstallments().size())
+          .sum();
+
+      if (allInstallmentsToBeDeleted) {
+        return debtPositionDeletionService.deleteDebtPosition(debtPositionDTO.getDebtPositionId(), accessToken, operatorExternalUserId);
+      }
     }
 
     WorkflowCreatedDTO workflow = execute(debtPositionDTO, installments2operate, wfExecutionParameters, PaymentEventType.DPI_CANCELLED, accessToken, operatorExternalUserId);
@@ -68,13 +89,32 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       .toList();
 
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
-    log.debug("Updating status cancelled for installments with ids {}", installmentIds);
 
-    debtPositionDTO.getPaymentOptions()
-      .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
-        .forEach(installmentDTO -> InstallmentUtils.setStatus(installmentDTO, InstallmentStatus.CANCELLED))
-      );
+    if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
+      log.debug("Deleting draft installments with ids {}", installmentIds);
+      installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIds);
+    } else {
+      log.debug("Updating status cancelled for installments with ids {}", installmentIds);
+      debtPositionDTO.getPaymentOptions()
+        .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
+          .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
+          .forEach(installmentDTO -> InstallmentUtils.setStatus(installmentDTO, InstallmentStatus.CANCELLED))
+        );
+    }
   }
 
+
+  @Override
+  protected void saveDebtPosition(DebtPositionDTO debtPositionDTO) {
+    if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
+      super.saveDebtPosition(debtPositionDTO);
+    }
+  }
+
+  @Override
+  protected void alignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
+    if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
+      super.alignHierarchyStatus(debtPositionDTO);
+    }
+  }
 }
