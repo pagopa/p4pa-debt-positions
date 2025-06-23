@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -35,8 +36,8 @@ public class InstallmentPaidViewDTO {
   @NotNull
   private String pspCompanyName;
   @NotNull
-  private Person debtor;
-  private Person payer;
+  private PersonDTO debtor;
+  private PersonDTO payer;
   @NotNull
   private Long paymentAmountCents;
   @NotNull

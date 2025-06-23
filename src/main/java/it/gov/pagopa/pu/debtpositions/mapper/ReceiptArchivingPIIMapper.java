@@ -9,11 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReceiptArchivingPIIMapper {
   private final PersonalDataService personalDataService;
-  private final PersonMapper personMapper;
 
-  public ReceiptArchivingPIIMapper(PersonalDataService personalDataService, PersonMapper personMapper) {
+  public ReceiptArchivingPIIMapper(PersonalDataService personalDataService) {
     this.personalDataService = personalDataService;
-    this.personMapper = personMapper;
   }
 
   public ReceiptArchivingView map(ReceiptArchivingNoPIIView noPII){
@@ -29,8 +27,8 @@ public class ReceiptArchivingPIIMapper {
       .organizationId(noPII.getOrganizationId())
       .orgFiscalCode(noPII.getOrgFiscalCode())
       .rtFilePath(noPII.getRtFilePath())
-      .debtor(personMapper.mapToDto(pii.getDebtor()))
-      .payer(pii.getPayer() != null ? personMapper.mapToDto(pii.getPayer()) : null)
+      .debtor(pii.getDebtor())
+      .payer(pii.getPayer())
       .build();
   }
 }

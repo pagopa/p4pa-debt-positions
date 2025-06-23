@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import lombok.AllArgsConstructor;
@@ -43,8 +44,8 @@ public class Receipt implements FullPIIDTO<ReceiptNoPII, ReceiptPIIDTO> {
   private OffsetDateTime applicationDate;
   private OffsetDateTime transferDate;
   private boolean standin;
-  private Person debtor;
-  private Person payer;
+  private PersonDTO debtor;
+  private PersonDTO payer;
   private LocalDateTime creationDate;
   private LocalDateTime updateDate;
   private String updateOperatorExternalId;

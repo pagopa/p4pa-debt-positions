@@ -1,8 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.delete;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -10,13 +8,9 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Service
@@ -37,8 +31,7 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
 
   @Override
   public void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIdsToDelete) {
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> modelPair = debtPositionMapper.mapToModel(debtPositionDTO);
-    Map<InstallmentNoPII, Installment> modelMap = modelPair.getSecond();
+    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
     boolean allInstallmentsToBeDeleted = installmentIdsToDelete.size() ==
       debtPositionDTO.getPaymentOptions().stream()
@@ -46,31 +39,29 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
         .sum();
 
     if (allInstallmentsToBeDeleted) {
-      debtPositionService.delete(modelPair.getFirst());
+      debtPositionService.delete(debtPosition);
       debtPositionDTO.setPaymentOptions(new ArrayList<>());
     } else {
-      List<Long> emptyPoIds = debtPositionDTO.getPaymentOptions().stream()
+      List<Long> emptyPoIds = debtPosition.getPaymentOptions().stream()
         .flatMap(po -> {
-          List<InstallmentDTO> allInstallments = po.getInstallments();
-          List<InstallmentDTO> installmentsToRemove = allInstallments.stream()
+          Collection<InstallmentNoPII> allInstallments = po.getInstallments();
+          List<InstallmentNoPII> installmentsToRemove = allInstallments.stream()
             .filter(inst -> installmentIdsToDelete.contains(inst.getInstallmentId()))
             .toList();
 
-          installmentsToRemove.forEach(inst ->
-            modelMap.entrySet().stream()
-              .filter(e -> e.getValue().getInstallmentId().equals(inst.getInstallmentId()))
-              .map(Map.Entry::getKey)
-              .findFirst()
-              .ifPresent(installmentPIIRepository::delete)
-          );
+          installmentsToRemove.forEach(installmentPIIRepository::delete);
 
           if (installmentsToRemove.size() == allInstallments.size()) {
             return Stream.of(po.getPaymentOptionId());
           } else {
-            List<InstallmentDTO> keptInstallments = allInstallments.stream()
-              .filter(inst -> !installmentIdsToDelete.contains(inst.getInstallmentId()))
-              .toList();
-            po.setInstallments(keptInstallments);
+            debtPositionDTO.getPaymentOptions().stream()
+              .filter(p -> Objects.equals(p.getPaymentOptionIndex(), po.getPaymentOptionIndex()))
+              .findFirst()
+              .ifPresent(p ->
+                p.setInstallments(
+                  p.getInstallments().stream()
+                    .filter(i -> !installmentIdsToDelete.contains(i.getInstallmentId()))
+                    .toList()));
             return Stream.empty();
           }
         })

@@ -12,7 +12,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
@@ -23,9 +22,6 @@ class ReceiptDetailPIIViewMapperTest {
 
   @Mock
   private PersonalDataService personalDataServiceMock;
-
-  @Spy
-  private PersonMapper personMapperSpy;
 
   @InjectMocks
   private ReceiptDetailPIIViewMapper receiptDetailPIIViewMapper;
@@ -48,10 +44,8 @@ class ReceiptDetailPIIViewMapperTest {
 
     //verify
     Assertions.assertNotNull(response);
-    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response, "debtor", "payer");
-    TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), response.getDebtor());
+    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response);
     TestUtils.checkNotNullFields(response);
-    Mockito.verify(personMapperSpy).mapToDto(receiptPIIDTO.getDebtor());
   }
 
   @Test
@@ -65,8 +59,7 @@ class ReceiptDetailPIIViewMapperTest {
 
     //verify
     Assertions.assertNotNull(response);
-    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response, "debtor");
+    TestUtils.reflectionEqualsByName(receiptDetailNoPIIView, response);
     TestUtils.checkNotNullFields(response, "debtor");
-    Mockito.verifyNoInteractions(personMapperSpy);
   }
 }

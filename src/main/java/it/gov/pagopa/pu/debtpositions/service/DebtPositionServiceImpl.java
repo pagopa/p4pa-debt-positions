@@ -45,7 +45,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public DebtPositionDTO getDebtPosition(Long debtPositionId) {
     DebtPosition debtPosition = getDebtPositionNoPII(debtPositionId);
-    return debtPositionMapper.mapToDto(debtPosition);
+    return mapDebtPosition(debtPosition);
   }
 
   @Override

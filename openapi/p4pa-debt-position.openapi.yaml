@@ -1127,7 +1127,10 @@ components:
         - debtor
         - remittanceInformation
       type: object
-      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseInstallment"]
+      x-implements: [
+        "it.gov.pagopa.pu.debtpositions.dto.BaseInstallment",
+        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO>"
+      ]
       properties:
         installmentId:
           type: integer
@@ -1200,6 +1203,10 @@ components:
           type: string
         updateTraceId:
           type: string
+        noPII:
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          type: 'InstallmentNoPII'
     TransferDTO:
       required:
         - amountCents
@@ -1488,10 +1495,7 @@ components:
       type: object
       properties:
         entityType:
-          type: string
-          enum:
-            - F
-            - G
+          $ref: "#/components/schemas/PersonEntityType"
         fiscalCode:
           type: string
         fullName:
@@ -1557,6 +1561,11 @@ components:
         - UNPAID
         - UNPAYABLE
         - DRAFT
+    PersonEntityType:
+      type: string
+      enum:
+        - F
+        - G
     Action:
       type: string
       enum:
@@ -1732,10 +1741,7 @@ components:
         iuv:
           type: string
         entityType:
-          type: string
-          enum:
-            - F
-            - G
+          $ref: "#/components/schemas/PersonEntityType"
         fiscalCode:
           type: string
         fullName:
