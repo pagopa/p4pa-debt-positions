@@ -53,14 +53,12 @@ public class InstallmentSynchronizeFetchBalanceService {
       null,
       accessToken);
 
-    if (assessmentsRegistry.getEmbedded() == null || assessmentsRegistry.getEmbedded().getAssessmentsRegistries() == null) {
-      throw new IllegalStateException("Cannot retrieve balance value, findAssessmentsRegistriesByFilters returns null embedded object.");
+    if (isAssessmentsRegistryEmpty(assessmentsRegistry)) {
+      return "";
     }
 
     int size = assessmentsRegistry.getEmbedded().getAssessmentsRegistries().size();
-    if (size == 0) {
-      throw new IllegalStateException(String.format("No Assessments registry results found with orgId [%s], debtPositionTypeCode [%s], operatingYear [%s], status [%s].", installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode(), OPERATING_YEAR, ASSESSMENTS_REGISTRY_STATUS));
-    } else if (size > 1) {
+    if (size > 1) {
       throw new IllegalStateException("Expected exactly one Assessments registry result, but found " + size + ".");
     }
 
@@ -70,6 +68,13 @@ public class InstallmentSynchronizeFetchBalanceService {
     }
 
     return balanceXml;
+  }
+
+  private boolean isAssessmentsRegistryEmpty(PagedModelAssessmentsRegistry registry) {
+    return registry == null ||
+      registry.getEmbedded() == null ||
+      registry.getEmbedded().getAssessmentsRegistries() == null ||
+      registry.getEmbedded().getAssessmentsRegistries().isEmpty();
   }
 
   private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
