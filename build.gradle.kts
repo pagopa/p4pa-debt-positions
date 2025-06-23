@@ -217,6 +217,10 @@ tasks.register<GenerateTask>("openApiGenerateORGANIZATION") {
       "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
     )
   )
+  schemaMappings.set(mapOf(
+    "SilServiceLegacyJwtAuthConfig" to "it.gov.pagopa.pu.organization.dto.generated.SilServiceAuthConfig",
+    "SilServiceLegacyBasicAuthConfig" to "it.gov.pagopa.pu.organization.dto.generated.SilServiceAuthConfig"
+  ))
   library.set("resttemplate")
 }
 
