@@ -21,6 +21,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     i.paymentOptionId as paymentOptionId,
     i.iuv as iuv,
     i.status as status,
+    i.nav as nav,
     i.dueDate as dueDate,
     i.amountCents as amountCents,
     i.remittanceInformation as remittanceInformation,
