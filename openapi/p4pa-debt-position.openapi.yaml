@@ -1131,6 +1131,7 @@ components:
         "it.gov.pagopa.pu.debtpositions.dto.BaseInstallment",
         "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO>"
       ]
+      x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       properties:
         installmentId:
           type: integer
