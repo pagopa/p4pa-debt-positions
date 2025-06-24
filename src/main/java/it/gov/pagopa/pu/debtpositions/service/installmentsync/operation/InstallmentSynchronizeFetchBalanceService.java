@@ -54,7 +54,7 @@ public class InstallmentSynchronizeFetchBalanceService {
       accessToken);
 
     if (isAssessmentsRegistryEmpty(assessmentsRegistry)) {
-      return "";
+      return null;
     }
 
     int size = assessmentsRegistry.getEmbedded().getAssessmentsRegistries().size();

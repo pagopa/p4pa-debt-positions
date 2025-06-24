@@ -101,7 +101,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     //Then
-    assertEquals("", result);
+    assertNull(result);
   }
 
   @Test
@@ -136,7 +136,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     //Then
-    assertEquals("", result);
+    assertNull(result);
   }
 
   @Test
@@ -171,7 +171,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     //Then
-    assertEquals("", result);
+    assertNull(result);
   }
 
   @Test
@@ -206,7 +206,7 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
 
     //Then
-    assertEquals("", result);
+    assertNull(result);
   }
 
   @Test
