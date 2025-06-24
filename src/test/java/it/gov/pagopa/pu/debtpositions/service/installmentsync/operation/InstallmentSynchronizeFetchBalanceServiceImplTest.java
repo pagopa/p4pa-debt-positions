@@ -151,6 +151,41 @@ class InstallmentSynchronizeFetchBalanceServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
 
     PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
+    registryResponse.setEmbedded(new PagedModelAssessmentsRegistryEmbedded(null));
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(assessmentsRegistryServiceMock.findAssessmentsRegistriesByFilters(
+      dto.getOrganizationId(),
+      Set.of(dto.getDebtPositionTypeCode()),
+      null, null, null, null, null, null,
+      OPERATING_YEAR,
+      ASSESSMENTS_REGISTRY_STATUS,
+      0,
+      1,
+      null,
+      accessToken
+    )).thenReturn(registryResponse);
+
+    // When
+    String result = installmentSynchronizeFetchBalanceService.getDebtPositionTypeDefaultBalance(dto, accessToken);
+
+    //Then
+    assertEquals("", result);
+  }
+
+  @Test
+  void givenPagedModelAssessmentsRegistryEmbeddedAssRegNullWhenGetDebtPositionTypeDefaultBalanceThenEmptyString() {
+    // Given
+    InstallmentSynchronizeDTO dto = new InstallmentSynchronizeDTO();
+    dto.setOrganizationId(1L);
+    dto.setDebtPositionTypeCode("DPT_CODE");
+    dto.setAmountCents(1000L);
+    String accessToken = "ACCESS_TOKEN";
+
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+
+    PagedModelAssessmentsRegistry registryResponse = new PagedModelAssessmentsRegistry();
     registryResponse.setEmbedded(null);
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "DPT_CODE"))
