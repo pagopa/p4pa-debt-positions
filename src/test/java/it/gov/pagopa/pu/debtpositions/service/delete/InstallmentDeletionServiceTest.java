@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,6 +39,8 @@ class InstallmentDeletionServiceTest {
   @Mock
   private InstallmentPIIRepository installmentPIIRepository;
   @Mock
+  private TransferRepository transferRepository;
+  @Mock
   private DebtPositionService debtPositionServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
@@ -49,6 +52,7 @@ class InstallmentDeletionServiceTest {
     installmentDeletionService = new InstallmentDeletionServiceImpl(
       paymentOptionRepositoryMock,
       installmentPIIRepository,
+      transferRepository,
       debtPositionServiceMock,
       debtPositionMapperMock);
   }
@@ -114,6 +118,7 @@ class InstallmentDeletionServiceTest {
 
     installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
 
+    verify(transferRepository).delete(installmentNoPII2.getTransfers().getFirst());
     verify(installmentPIIRepository).delete(installmentNoPII2);
 
     assertEquals(2, debtPositionDTO.getPaymentOptions().size());

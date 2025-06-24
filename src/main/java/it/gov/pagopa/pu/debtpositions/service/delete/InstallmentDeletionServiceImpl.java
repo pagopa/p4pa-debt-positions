@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,13 +19,15 @@ import java.util.stream.Stream;
 public class InstallmentDeletionServiceImpl implements InstallmentDeletionService {
   private final PaymentOptionRepository paymentOptionRepository;
   private final InstallmentPIIRepository installmentPIIRepository;
+  private final TransferRepository transferRepository;
   private final DebtPositionService debtPositionService;
   private final DebtPositionMapper debtPositionMapper;
 
   public InstallmentDeletionServiceImpl(PaymentOptionRepository paymentOptionRepository,
-                                        InstallmentPIIRepository installmentPIIRepository, DebtPositionService debtPositionService, DebtPositionMapper debtPositionMapper) {
+                                        InstallmentPIIRepository installmentPIIRepository, TransferRepository transferRepository, DebtPositionService debtPositionService, DebtPositionMapper debtPositionMapper) {
     this.paymentOptionRepository = paymentOptionRepository;
     this.installmentPIIRepository = installmentPIIRepository;
+    this.transferRepository = transferRepository;
     this.debtPositionService = debtPositionService;
     this.debtPositionMapper = debtPositionMapper;
   }
@@ -49,7 +52,10 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
             .filter(inst -> installmentIdsToDelete.contains(inst.getInstallmentId()))
             .toList();
 
-          installmentsToRemove.forEach(installmentPIIRepository::delete);
+          installmentsToRemove.forEach(installment -> {
+              installment.getTransfers().forEach(transferRepository::delete);
+              installmentPIIRepository.delete(installment);
+          });
 
           if (installmentsToRemove.size() == allInstallments.size()) {
             return Stream.of(po.getPaymentOptionId());
