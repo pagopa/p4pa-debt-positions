@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +33,7 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
     this.debtPositionMapper = debtPositionMapper;
   }
 
+  @Transactional
   @Override
   public void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIdsToDelete) {
     DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
