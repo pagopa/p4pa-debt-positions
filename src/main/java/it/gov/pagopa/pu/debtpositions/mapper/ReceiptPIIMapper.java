@@ -8,8 +8,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
@@ -17,13 +15,10 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
 
   private final DataCipherService dataCipherService;
   private final PersonalDataService personalDataService;
-  private final PersonMapper personMapper;
 
-  public ReceiptPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService,
-    PersonMapper personMapper) {
+  public ReceiptPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService) {
     this.dataCipherService = dataCipherService;
     this.personalDataService = personalDataService;
-    this.personMapper = personMapper;
   }
 
   @Override
@@ -145,8 +140,8 @@ public class ReceiptPIIMapper extends BasePIIMapper<Receipt, ReceiptNoPII, Recei
       .applicationDate(receipt.getApplicationDate())
       .transferDate(receipt.getTransferDate())
       .standin(receipt.isStandin())
-      .debtor(personMapper.mapToDto(receipt.getDebtor()))
-      .payer(Optional.ofNullable(receipt.getPayer()).map(personMapper::mapToDto).orElse(null))
+      .debtor(receipt.getDebtor())
+      .payer(receipt.getPayer())
       .creationDate(localDatetimeToOffsetDateTime(receipt.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(receipt.getUpdateDate()))
       .build();

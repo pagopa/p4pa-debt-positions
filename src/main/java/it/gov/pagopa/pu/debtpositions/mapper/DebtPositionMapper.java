@@ -1,14 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.domain.Page;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,7 +25,7 @@ public class DebtPositionMapper {
     this.paymentOptionMapper = paymentOptionMapper;
   }
 
-  public Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mapToModel(DebtPositionDTO dto) {
+  public DebtPosition mapToModel(DebtPositionDTO dto) {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(dto.getDebtPositionId());
     debtPosition.setIupdOrg(dto.getIupdOrg());
@@ -42,19 +39,13 @@ public class DebtPositionMapper {
     debtPosition.setMultiDebtor(Optional.ofNullable(dto.getMultiDebtor()).orElse(false));
     debtPosition.setFlagPuPagoPaPayment(dto.getFlagPuPagoPaPayment());
 
-    Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
-
     SortedSet<PaymentOption> paymentOptions = dto.getPaymentOptions().stream()
-      .map(paymentOptionDTO -> {
-        Pair<PaymentOption, Map<InstallmentNoPII, Installment>> paymentOptionWithInstallments = paymentOptionMapper.mapToModel(paymentOptionDTO);
-        installmentMapping.putAll(paymentOptionWithInstallments.getSecond());
-        return paymentOptionWithInstallments.getFirst();
-      })
+      .map(paymentOptionMapper::mapToModel)
       .collect(toPaymentOptionTreeSet);
 
     debtPosition.setPaymentOptions(paymentOptions);
 
-    return Pair.of(debtPosition, installmentMapping);
+    return debtPosition;
   }
 
   public DebtPositionDTO mapToDto(DebtPosition debtPosition) {

@@ -12,13 +12,9 @@ import org.springframework.stereotype.Component;
 public class InstallmentDetailPIIViewMapper {
 
   private final PersonalDataService personalDataService;
-  private final PersonMapper personMapper;
 
-  public InstallmentDetailPIIViewMapper(
-    PersonalDataService personalDataService,
-    PersonMapper personMapper) {
+  public InstallmentDetailPIIViewMapper(PersonalDataService personalDataService) {
     this.personalDataService = personalDataService;
-    this.personMapper = personMapper;
   }
 
   public InstallmentDetailDTO mapToInstallmentDetailDTO(InstallmentDetailNoPIIView installmentDetailNoPIIView) {
@@ -32,7 +28,7 @@ public class InstallmentDetailPIIViewMapper {
       .iuv(installmentDetailNoPIIView.getIuv())
       .amountCents(installmentDetailNoPIIView.getAmountCents())
       .dueDate(installmentDetailNoPIIView.getDueDate())
-      .debtor(personMapper.mapToDto(installmentPii.getDebtor()))
+      .debtor(installmentPii.getDebtor())
       .debtPositionTypeOrgDescription(installmentDetailNoPIIView.getDebtPositionTypeOrgDescription())
       .debtPositionDescription(installmentDetailNoPIIView.getDebtPositionDescription())
       .debtPositionId(installmentDetailNoPIIView.getDebtPositionId())
@@ -47,8 +43,8 @@ public class InstallmentDetailPIIViewMapper {
   private PersonDTO getPayer(Long receiptPersonalDataId) {
     if (receiptPersonalDataId != null) {
       ReceiptPIIDTO receiptPii = personalDataService.get(receiptPersonalDataId, ReceiptPIIDTO.class);
-      if (receiptPii != null && receiptPii.getPayer() != null) {
-        return personMapper.mapToDto(receiptPii.getPayer());
+      if (receiptPii != null) {
+        return receiptPii.getPayer();
       }
     }
     return null;

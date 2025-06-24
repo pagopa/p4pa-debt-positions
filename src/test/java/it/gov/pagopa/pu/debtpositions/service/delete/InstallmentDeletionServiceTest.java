@@ -1,30 +1,31 @@
 package it.gov.pagopa.pu.debtpositions.service.delete;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.util.Pair;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,6 +39,8 @@ class InstallmentDeletionServiceTest {
   @Mock
   private InstallmentPIIRepository installmentPIIRepository;
   @Mock
+  private TransferRepository transferRepository;
+  @Mock
   private DebtPositionService debtPositionServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
@@ -49,6 +52,7 @@ class InstallmentDeletionServiceTest {
     installmentDeletionService = new InstallmentDeletionServiceImpl(
       paymentOptionRepositoryMock,
       installmentPIIRepository,
+      transferRepository,
       debtPositionServiceMock,
       debtPositionMapperMock);
   }
@@ -57,15 +61,13 @@ class InstallmentDeletionServiceTest {
   void givenDeleteAllInstallmentsWhenDeleteDraftInstallmentsThenDeleteDebtPosition() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPosition debtPosition = buildDebtPosition();
-    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
-    Map<InstallmentNoPII, Installment> map = Map.of(installmentNoPII, buildInstallment());
     Set<Long> installmentIdsToDelete = Set.of(100L);
 
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, map));
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
 
     installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
 
-    verify(debtPositionServiceMock).delete(debtPositionMapperMock.mapToModel(debtPositionDTO).getFirst());
+    verify(debtPositionServiceMock).delete(debtPositionMapperMock.mapToModel(debtPositionDTO));
     assertTrue(debtPositionDTO.getPaymentOptions().isEmpty());
   }
 
@@ -79,17 +81,11 @@ class InstallmentDeletionServiceTest {
     InstallmentNoPII installmentNoPII2 = buildInstallmentNoPII();
     installmentNoPII2.setInstallmentId(400L);
 
-    Installment inst1 = new Installment();
-    inst1.setInstallmentId(300L);
-    Installment inst2 = new Installment();
-    inst2.setInstallmentId(400L);
+    PaymentOption po = debtPosition.getPaymentOptions().getFirst();
+    po.setPaymentOptionId(20L);
+    po.setInstallments(new TreeSet<>(List.of(installmentNoPII1, installmentNoPII2)));
 
-    Map<InstallmentNoPII, Installment> modelMap = Map.of(
-      installmentNoPII1, inst1,
-      installmentNoPII2, inst2
-    );
-
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, modelMap));
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
 
     Set<Long> installmentIdsToDelete = Set.of(300L, 400L);
 
@@ -112,22 +108,17 @@ class InstallmentDeletionServiceTest {
     InstallmentNoPII installmentNoPII2 = buildInstallmentNoPII();
     installmentNoPII2.setInstallmentId(400L);
 
-    Installment inst1 = new Installment();
-    inst1.setInstallmentId(300L);
-    Installment inst2 = new Installment();
-    inst2.setInstallmentId(400L);
+    PaymentOption po = debtPosition.getPaymentOptions().getFirst();
+    po.setPaymentOptionId(20L);
+    po.setInstallments(new TreeSet<>(List.of(installmentNoPII1, installmentNoPII2)));
 
-    Map<InstallmentNoPII, Installment> modelMap = Map.of(
-      installmentNoPII1, inst1,
-      installmentNoPII2, inst2
-    );
-
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(Pair.of(debtPosition, modelMap));
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
 
     Set<Long> installmentIdsToDelete = Set.of(400L);
 
     installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
 
+    verify(transferRepository).delete(installmentNoPII2.getTransfers().getFirst());
     verify(installmentPIIRepository).delete(installmentNoPII2);
 
     assertEquals(2, debtPositionDTO.getPaymentOptions().size());

@@ -1,12 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -48,8 +46,6 @@ class InstallmentServiceImplTest {
   @Mock
   private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
   @Mock
-  private InstallmentMapper installmentMapperMock;
-  @Mock
   private InstallmentDetailPIIViewRepository installmentDetailPIIViewRepositoryMock;
   @Mock
   private InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepositoryMock;
@@ -79,7 +75,6 @@ class InstallmentServiceImplTest {
     installmentService = new InstallmentServiceImpl(
       installmentPIIRepositoryMock,
       installmentNoPIIRepositoryMock,
-      installmentMapperMock,
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,
       debtPositionServiceMock,
@@ -98,7 +93,6 @@ class InstallmentServiceImplTest {
     Mockito.verifyNoMoreInteractions(
       installmentPIIRepositoryMock,
       installmentNoPIIRepositoryMock,
-      installmentMapperMock,
       installmentDetailPIIViewRepositoryMock,
       installmentPaidViewPIIViewRepositoryMock,
       debtPositionServiceMock,
@@ -111,16 +105,10 @@ class InstallmentServiceImplTest {
   @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
   void givenValidOrganizationAndNavWhGetInstallmentsByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     //given
-    List<Installment> installmentList = TestUtils.getPodamFactory().manufacturePojo(List.class, Installment.class);
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentList);
-    installmentList.forEach(installment -> {
-      InstallmentDTO installmentDTO = podamFactory.manufacturePojo(InstallmentDTO.class);
-      installmentDTOList.add(installmentDTO);
-      Mockito.when(installmentMapperMock.mapToDto(installment)).thenReturn(installmentDTO);
-    });
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
 
     //when
     List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
@@ -271,8 +259,6 @@ class InstallmentServiceImplTest {
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
-    Installment installment = new Installment();
-    installment.setStatus(InstallmentStatus.UNPAID);
     DebtPosition debtPosition = new DebtPosition();
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
@@ -281,9 +267,7 @@ class InstallmentServiceImplTest {
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installment));
-    Mockito.when(installmentMapperMock.mapToDto(installment))
-      .thenReturn(installmentDTO);
+      .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
@@ -330,13 +314,8 @@ class InstallmentServiceImplTest {
     long newNotificationFee = 200L;
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
-    Installment installment = new Installment();
-    installment.setStatus(InstallmentStatus.UNPAID);
-
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installment, installment));
-    Mockito.when(installmentMapperMock.mapToDto(installment))
-      .thenReturn(installmentDTO);
+      .thenReturn(List.of(installmentDTO, installmentDTO));
 
     // When Then
     assertThrows(ConflictErrorException.class, () ->
@@ -351,7 +330,7 @@ class InstallmentServiceImplTest {
     Long orgId = 1L;
     long newNotificationFee = 200L;
 
-    Installment paidInstallment = new Installment();
+    InstallmentDTO paidInstallment = new InstallmentDTO();
     paidInstallment.setStatus(InstallmentStatus.PAID);
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, ORDINARY_DEBT_POSITION_ORIGINS))
@@ -377,13 +356,9 @@ class InstallmentServiceImplTest {
     taxTransfer.setAmountCents(100L);
     installmentDTO.getTransfers().add(taxTransfer);
 
-    Installment installment = new Installment();
-    installment.setStatus(InstallmentStatus.EXPIRED);
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installment));
-    Mockito.when(installmentMapperMock.mapToDto(installment))
-      .thenReturn(installmentDTO);
+      .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
 
     // When Then
@@ -401,10 +376,9 @@ class InstallmentServiceImplTest {
     long alreadyPaidFee = 50L;
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
+    installmentDTO.setStatus(InstallmentStatus.UNPAID);
+    installmentDTO.setIun(installmentDTO.getIun());
 
-    Installment installment = new Installment();
-    installment.setStatus(InstallmentStatus.UNPAID);
-    installment.setIun(installmentDTO.getIun());
     DebtPosition debtPosition = new DebtPosition();
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
@@ -413,9 +387,7 @@ class InstallmentServiceImplTest {
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installment));
-    Mockito.when(installmentMapperMock.mapToDto(installment))
-      .thenReturn(installmentDTO);
+      .thenReturn(List.of(installmentDTO));
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId()))
       .thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);

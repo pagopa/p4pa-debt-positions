@@ -2,28 +2,35 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
-public class InstallmentPIIMapper extends BasePIIMapper<Installment, InstallmentNoPII, InstallmentPIIDTO> {
+public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, InstallmentNoPII, InstallmentPIIDTO> {
 
   private final DataCipherService dataCipherService;
   private final PersonalDataService personalDataService;
 
-  public InstallmentPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService) {
+  private final TransferMapper transferMapper;
+
+  public InstallmentPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService, TransferMapper transferMapper) {
     this.dataCipherService = dataCipherService;
     this.personalDataService = personalDataService;
+    this.transferMapper = transferMapper;
   }
 
   @Override
-  protected InstallmentNoPII extractNoPiiEntity(Installment fullDTO) {
+  protected InstallmentNoPII extractNoPiiEntity(InstallmentDTO fullDTO) {
     InstallmentNoPII noPII = new InstallmentNoPII();
 
     noPII.setInstallmentId(fullDTO.getInstallmentId());
@@ -51,26 +58,26 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
     noPII.setIngestionFlowFileAction(fullDTO.getIngestionFlowFileAction());
     noPII.setSourceFlowName(fullDTO.getSourceFlowName());
     noPII.setReceiptId(fullDTO.getReceiptId());
-    noPII.setCreationDate(fullDTO.getCreationDate());
-    noPII.setUpdateDate(fullDTO.getUpdateDate());
+    noPII.setCreationDate(fullDTO.getCreationDate() != null ? fullDTO.getCreationDate().toLocalDateTime() : null);
+    noPII.setUpdateDate(fullDTO.getUpdateDate() != null ? fullDTO.getUpdateDate().toLocalDateTime() : null);
     noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
     noPII.setUpdateTraceId(fullDTO.getUpdateTraceId());
-    noPII.setTransfers(new TreeSet<>(fullDTO.getTransfers()));
+    noPII.setTransfers(fullDTO.getTransfers().stream().map(transferMapper::mapToModel).collect(Collectors.toCollection(TreeSet::new)));
 
     return noPII;
   }
 
   @Override
-  protected InstallmentPIIDTO extractPiiDto(Installment fullDTO) {
+  protected InstallmentPIIDTO extractPiiDto(InstallmentDTO fullDTO) {
     return InstallmentPIIDTO.builder()
       .debtor(fullDTO.getDebtor())
       .build();
   }
 
   @Override
-  public Installment map(InstallmentNoPII noPii) {
+  public InstallmentDTO map(InstallmentNoPII noPii) {
     InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
-    return Installment.builder()
+    return InstallmentDTO.builder()
       .installmentId(noPii.getInstallmentId())
       .paymentOptionId(noPii.getPaymentOptionId())
       .status(noPii.getStatus())
@@ -94,13 +101,23 @@ public class InstallmentPIIMapper extends BasePIIMapper<Installment, Installment
       .ingestionFlowFileAction(noPii.getIngestionFlowFileAction())
       .sourceFlowName(noPii.getSourceFlowName())
       .receiptId(noPii.getReceiptId())
-      .creationDate(noPii.getCreationDate())
-      .updateDate(noPii.getUpdateDate())
+      .creationDate(Utilities.localDatetimeToOffsetDateTime(noPii.getCreationDate()))
+      .updateDate(Utilities.localDatetimeToOffsetDateTime(noPii.getUpdateDate()))
       .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
       .updateTraceId(noPii.getUpdateTraceId())
       .debtor(pii.getDebtor())
-      .transfers(Optional.ofNullable(noPii.getTransfers()).map(List::copyOf).orElse(List.of()))
+      .transfers(Optional.ofNullable(noPii.getTransfers())
+        .map(ts -> ts.stream().map(transferMapper::mapToDto).toList())
+        .orElse(List.of()))
       .noPII(noPii)
       .build();
+  }
+
+  public static void setToDtoAutoDbFields(InstallmentDTO installmentDTO, InstallmentNoPII installment){
+    installmentDTO.setInstallmentId(installment.getInstallmentId());
+    installmentDTO.setCreationDate(localDatetimeToOffsetDateTime(installment.getCreationDate()));
+    installmentDTO.setUpdateDate(localDatetimeToOffsetDateTime(installment.getUpdateDate()));
+    installmentDTO.setUpdateOperatorExternalId(installment.getUpdateOperatorExternalId());
+    installmentDTO.setUpdateTraceId(installment.getUpdateTraceId());
   }
 }

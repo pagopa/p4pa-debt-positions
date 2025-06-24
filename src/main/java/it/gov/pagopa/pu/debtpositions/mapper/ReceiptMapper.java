@@ -13,12 +13,6 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffse
 @Service
 public class ReceiptMapper {
 
-  private final PersonMapper personMapper;
-
-  public ReceiptMapper(PersonMapper personMapper) {
-    this.personMapper = personMapper;
-  }
-
   public Receipt mapToModel(ReceiptDTO dto) {
     return Receipt.builder()
       .receiptId(dto.getReceiptId())
@@ -47,8 +41,8 @@ public class ReceiptMapper {
       .applicationDate(dto.getApplicationDate())
       .transferDate(dto.getTransferDate())
       .standin(BooleanUtils.isTrue(dto.getStandin()))
-      .debtor(personMapper.mapToModel(dto.getDebtor()))
-      .payer(Optional.ofNullable(dto.getPayer()).map(personMapper::mapToModel).orElse(null))
+      .debtor(dto.getDebtor())
+      .payer(dto.getPayer())
       .creationDate(Optional.ofNullable(dto.getCreationDate()).map(OffsetDateTime::toLocalDateTime).orElse(null))
       .updateDate(Optional.ofNullable(dto.getUpdateDate()).map(OffsetDateTime::toLocalDateTime).orElse(null))
       .build();
@@ -82,8 +76,8 @@ public class ReceiptMapper {
       .applicationDate(receipt.getApplicationDate())
       .transferDate(receipt.getTransferDate())
       .standin(receipt.isStandin())
-      .debtor(personMapper.mapToDto(receipt.getDebtor()))
-      .payer(Optional.ofNullable(receipt.getPayer()).map(personMapper::mapToDto).orElse(null))
+      .debtor(receipt.getDebtor())
+      .payer(receipt.getPayer())
       .creationDate(localDatetimeToOffsetDateTime(receipt.getCreationDate()))
       .updateDate(localDatetimeToOffsetDateTime(receipt.getUpdateDate()))
       .build();
