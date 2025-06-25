@@ -8,7 +8,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
@@ -27,11 +26,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageUpdateInstallmentDTO;
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,8 +57,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
   @Mock
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentServiceMock;
   @Mock
-  private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
-  @Mock
   private WorkflowHubService workflowHubServiceMock;
 
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
@@ -85,7 +80,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
       debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
       organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionManageApplierServiceMock,
       debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock,
-      installmentNoPIIRepositoryMock, workflowHubServiceMock, maxWaitingMinutes, retryDelayMs
+      workflowHubServiceMock, maxWaitingMinutes, retryDelayMs
       );
   }
 
@@ -154,23 +149,6 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     assertEquals("Installment having id 2 cannot be modified because is not in allowed status: PAID", exception.getMessage());
   }
-
-  @Test
-  void givenInstallmentAlreadyExistentWhenManageInsertThenException() {
-    Long debtPositionId = 1L;
-    ManageDebtPositionDTO manageDebtPositionDTO = buildManageDebtPositionDTO();
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
-    Mockito.when(installmentNoPIIRepositoryMock.findById(1L)).thenReturn(Optional.of(buildInstallmentNoPII()));
-
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
-      () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
-
-    assertEquals("The installment cannot be created because already exists", exception.getMessage());
-  }
-
 
   @Test
   void givenInstallmentNotFoundWhenManageUpdateThenException() {
