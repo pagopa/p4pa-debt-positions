@@ -8,6 +8,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -37,6 +40,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
+  private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final WorkflowHubService workflowHubService;
   private final int maxAttempts;
   private final int retryDelayMs;
@@ -52,7 +56,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                                                       DebtPositionManageApplierService debtPositionManageApplierService,
                                                       DebtPositionAddInstallmentService debtPositionAddInstallmentService,
                                                       DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
-                                                      DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, WorkflowHubService workflowHubService,
+                                                      DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, InstallmentNoPIIRepository installmentNoPIIRepository, WorkflowHubService workflowHubService,
                                                       @Value("${wf-await.max-waiting-minutes}") int maxWaitingMinutes,
                                                       @Value("${wf-await.retry-delays-ms}") int retryDelayMs) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -61,6 +65,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
+    this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.workflowHubService = workflowHubService;
     this.retryDelayMs = retryDelayMs;
     this.maxAttempts = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
@@ -108,6 +113,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
         InstallmentDTO manageInstallment = manageInstallmentDTO.getInstallment();
         switch (manageInstallmentDTO.getAction()) {
           case I -> {
+            checkInstallmentAlreadyExists(manageInstallment);
             paymentOptionDTO.addInstallmentsItem(manageInstallment);
             installmentsToAdd.add(manageInstallment);
           }
@@ -145,6 +151,15 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     installments2operate.addAll(installmentsToCancel);
 
     return installments2operate;
+  }
+
+  private void checkInstallmentAlreadyExists(InstallmentDTO manageInstallment) {
+    if(manageInstallment.getInstallmentId() != null) {
+      InstallmentNoPII installment = installmentNoPIIRepository.findById(manageInstallment.getInstallmentId()).orElse(null);
+      if(installment != null){
+        throw new ConflictErrorException("The installment cannot be created because already exists");
+      }
+    }
   }
 
   private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {
