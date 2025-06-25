@@ -150,9 +150,9 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     if(debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))
       installmentDTO.setSourceFlowName(org.getIpaCode()+"_SPONTANEO");
 
-    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
-
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
+
+    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
   }
 
   private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
