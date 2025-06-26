@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
+import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;
@@ -8,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -58,16 +61,18 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
     OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
     Long debtPositionTypeOrgId = 1L;
 
+    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, null, debtPositionTypeOrgId );
     List<InstallmentPaidViewNoPII> content = podamFactory.manufacturePojo(List.class, InstallmentPaidViewNoPII.class);
     Pageable pageable = PageRequest.of(0, 10);
     Page<InstallmentPaidViewNoPII> installmentPaidViewNoPIIS = new PageImpl<>(content, pageable, 10);
 
     PagedInstallmentsPaidView pagedInstallmentsPaidView = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
+    Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
     Mockito.when(pagedInstallmentsPaidViewMapperMock.mapToPagedInstallmentsPaidView(installmentPaidViewNoPIIS)).thenReturn(pagedInstallmentsPaidView);
     //when
-    PagedInstallmentsPaidView result = installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1));
+    PagedInstallmentsPaidView result = installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
     //then
     assertNotNull(result);
     assertEquals(pagedInstallmentsPaidView, result);
@@ -92,11 +97,14 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
 
     Page<InstallmentPaidViewNoPII> installmentPaidViewNoPIIS = new PageImpl<>(content, pageable, 12);
 
-    Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
+    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, null, debtPositionTypeOrgId );
+    Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
     //when
+    Executable executable = () -> installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
     ExportTooManyRecordsException ex = assertThrows(
             ExportTooManyRecordsException.class,
-            () -> installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, Pageable.ofSize(1))
+            executable
     );
     //then
     assertEquals("The number of InstallmentPaidViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
