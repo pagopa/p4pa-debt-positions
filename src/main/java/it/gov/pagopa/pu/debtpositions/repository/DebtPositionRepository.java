@@ -90,7 +90,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       SELECT 1
         FROM PaymentOption p
         JOIN p.installments i
-       WHERE d.organizationId = :organizationId
+       WHERE p.debtPositionId = d.debtPositionId
+         AND d.organizationId = :organizationId
          AND i.iuv = :iuv
          AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
        )
@@ -106,7 +107,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       SELECT 1
         FROM PaymentOption p
         JOIN p.installments i
-       WHERE d.organizationId = :organizationId
+       WHERE p.debtPositionId = d.debtPositionId
+         AND d.organizationId = :organizationId
          AND i.iud = :iud
          AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
        )
