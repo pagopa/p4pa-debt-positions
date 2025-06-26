@@ -83,18 +83,19 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
 
+  @RestResource(exported = false)
   @Query("""
    SELECT d
      FROM DebtPosition d
-    WHERE EXISTS (
-      SELECT 1
-        FROM PaymentOption p
-        JOIN p.installments i
-       WHERE p.debtPositionId = d.debtPositionId
-         AND d.organizationId = :organizationId
-         AND i.iuv = :iuv
-         AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
-       )
+    WHERE d.organizationId = :organizationId
+      AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND EXISTS (
+        SELECT 1
+          FROM PaymentOption p
+          JOIN p.installments i
+         WHERE p.debtPositionId = d.debtPositionId
+           AND i.iuv = :iuv
+      )
   """)
   @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
@@ -103,15 +104,15 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Query("""
    SELECT d
      FROM DebtPosition d
-    WHERE EXISTS (
-      SELECT 1
-        FROM PaymentOption p
-        JOIN p.installments i
-       WHERE p.debtPositionId = d.debtPositionId
-         AND d.organizationId = :organizationId
-         AND i.iud = :iud
-         AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
-       )
+    WHERE d.organizationId = :organizationId
+      AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND EXISTS (
+        SELECT 1
+          FROM PaymentOption p
+          JOIN p.installments i
+         WHERE p.debtPositionId = d.debtPositionId
+           AND i.iud = :iud
+      )
   """)
   @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findByOrganizationIdAndInstallmentIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigins);
