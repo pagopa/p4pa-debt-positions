@@ -36,7 +36,7 @@ public class InstallmentSynchronizeFaker {
       .paymentOptionDescription("Payment description")
       .iud("iud")
       .iuv("iuv")
-      .fiscalCode("uniqueIdentifierCode")
+      .fiscalCode("AAAAAA00B00C000D")
       .entityType(PersonEntityType.F)
       .fullName("fullName")
       .address("address")
