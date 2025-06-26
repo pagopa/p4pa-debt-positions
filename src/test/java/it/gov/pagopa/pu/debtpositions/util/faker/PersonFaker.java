@@ -8,7 +8,7 @@ public class PersonFaker {
   public static PersonDTO buildPerson(){
     return PersonDTO.builder()
       .entityType(PersonEntityType.F)
-      .fiscalCode("uniqueIdentifierCode")
+      .fiscalCode("AAAAAA00B00C000D")
       .fullName("fullName")
       .address("address")
       .civic("civic")

@@ -20,8 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidIban;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.isValidPIVA;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 
 @Service
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
@@ -127,8 +126,17 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(personDTO.getFiscalCode())) {
       throw new InvalidValueException("Fiscal code is mandatory");
     }
-    if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals("ANONIMO")) {
-      throw new InvalidValueException("This organization installment type or installment does not allow an anonymous unique identification code");
+    if(PersonEntityType.F.equals(personDTO.getEntityType())){
+      if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals("ANONIMO")) {
+        throw new InvalidValueException("The debt position type org does not allow an anonymous unique identification code");
+      }
+      if (!personDTO.getFiscalCode().equals("ANONIMO") && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)){
+        throw new InvalidValueException("Fiscal code of person is not valid");
+      }
+    } else {
+      if(!isValidPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
+        throw new InvalidValueException("P. iva of legal person is not valid");
+      }
     }
     if (StringUtils.isBlank(personDTO.getFullName())) {
       throw new InvalidValueException("Beneficiary name is mandatory");
