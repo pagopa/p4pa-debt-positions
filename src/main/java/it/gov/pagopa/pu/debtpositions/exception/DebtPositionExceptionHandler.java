@@ -85,6 +85,11 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
+  @ExceptionHandler({InvalidParamException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleInvalidParamException(Exception ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+  }
+
 
   @ExceptionHandler({ServletException.class, ErrorResponseException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleServletException(Exception ex, HttpServletRequest request) {
