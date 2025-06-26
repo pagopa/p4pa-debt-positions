@@ -44,6 +44,26 @@ public class UtilitiesTest {
   }
 
   @Test
+  void testValidateFiscalCode(){
+    boolean result = Utilities.isValidFiscalCode("AAAAAA");
+    assertFalse(result);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"AAAAAA", "000001"})
+  void testValidateFiscalCodeOrPiva(String fiscalCode){
+    boolean result = Utilities.isValidFiscalCodeOrPIVA(fiscalCode, false);
+    assertFalse(result);
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"AAAAAA00B00C000D", "01234567890"})
+  void testPositiveValidateFiscalCodeOrPiva(String fiscalCode){
+    boolean result = Utilities.isValidFiscalCodeOrPIVA(fiscalCode, false);
+    assertTrue(result);
+  }
+
+  @Test
   void testLocalDatetimeToOffsetDateTimeWithNull() {
     assertNull(Utilities.localDatetimeToOffsetDateTime(null), "The result should be null for a null input.");
   }
