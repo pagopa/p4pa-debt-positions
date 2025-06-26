@@ -116,6 +116,42 @@ class DebtPositionAddInstallmentServiceImplTest {
   }
 
   @Test
+  void whenAddInstallmentDraftThenOK(){
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String operatorExternalId = "OPERATOREXTERNALID";
+
+    Organization organization = buildOrganization();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
+    debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.DRAFT);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.DRAFT);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(null);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
+      .thenReturn(debtPositionTypeOrg);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+    Mockito.doNothing().when(debtPositionCreationServiceMock).checkInstallment(debtPositionDTO, organization, debtPositionTypeOrg, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+
+    WorkflowCreatedDTO result = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
+
+    assertNull(result);
+    assertEquals(DebtPositionStatus.DRAFT, debtPositionDTO.getStatus());
+    assertEquals(PaymentOptionStatus.DRAFT, debtPositionDTO.getPaymentOptions().getFirst().getStatus());
+    assertNull(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
+    assertEquals(InstallmentStatus.DRAFT, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+
+    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
+  }
+
+  @Test
   void givenDuplicatePaymentOptionIndexWhenAddInstallmentThenThrowInvalidValueException(){
     String accessToken = "ACCESSTOKEN";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
