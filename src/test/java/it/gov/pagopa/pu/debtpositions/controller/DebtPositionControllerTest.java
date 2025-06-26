@@ -265,7 +265,7 @@ class DebtPositionControllerTest {
     Long ingestionFlowFileId = 1L;
 
     PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder().size(1L).build();
-    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
+    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/ingestion-flow-file/" + ingestionFlowFileId)

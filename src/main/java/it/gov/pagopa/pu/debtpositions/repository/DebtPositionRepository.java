@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -14,6 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+
+import java.util.List;
 
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
@@ -64,12 +67,15 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       SELECT 1
       FROM PaymentOption p
          JOIN p.installments i
-      WHERE p.debtPositionId = d.debtPositionId AND i.ingestionFlowFileId = :ingestionFlowFileId
+      WHERE p.debtPositionId = d.debtPositionId
+        AND i.ingestionFlowFileId = :ingestionFlowFileId
+        AND (:statusToExclude IS NULL OR i.status NOT IN :statusToExclude)
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  Page<DebtPosition> findByIngestionFlowFileId(Long ingestionFlowFileId,
-                                               Pageable pageable);
+  Page<DebtPosition> findByIngestionFlowFileIdAndStatusToExclude(Long ingestionFlowFileId,
+                                                                 List<InstallmentStatus> statusToExclude,
+                                                                 Pageable pageable);
 
   @Query("""
    SELECT d
