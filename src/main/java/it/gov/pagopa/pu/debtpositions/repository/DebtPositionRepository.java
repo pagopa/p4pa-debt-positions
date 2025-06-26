@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
@@ -14,6 +15,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+
+import java.util.List;
 
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
@@ -79,6 +82,29 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    WHERE d.organizationId = :organizationId AND i.nav = :nav
    """)
   DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
+
+  @Query("""
+   SELECT d
+   FROM DebtPosition d
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+   WHERE d.organizationId = :organizationId
+     AND i.iuv = :iuv
+     AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+   """)
+  List<DebtPosition> findByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
+
+  @RestResource(exported = false)
+  @Query("""
+   SELECT d
+   FROM DebtPosition d
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+   WHERE d.organizationId = :organizationId
+     AND i.iud = :iud
+     AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+   """)
+  List<DebtPosition> findByOrganizationIdAndInstallmentIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigins);
 
   Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
 
