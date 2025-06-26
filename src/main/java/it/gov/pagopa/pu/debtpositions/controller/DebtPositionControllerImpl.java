@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 public class DebtPositionControllerImpl implements DebtPositionApi {
@@ -91,6 +93,24 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<DebtPositionDTO> getDebtPosition(Long debtPositionId) {
     log.info("Retrieving DebtPosition {}", debtPositionId);
     return ResponseEntity.ok(debtPositionService.getDebtPosition(debtPositionId));
+  }
+
+  @Override
+  public ResponseEntity<DebtPositionDTO> getDebtPositionByInstallmentId(Long installmentId) {
+    log.info("Retrieving DebtPosition by installmentId {}", installmentId);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionByInstallmentId(installmentId));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iud [{}]", organizationId, iud);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, debtPositionOrigin));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iuv [{}]", organizationId, iuv);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, debtPositionOrigin));
   }
 
   @Override

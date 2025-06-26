@@ -129,6 +129,134 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-installmentId/{installmentId}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionByInstallmentId
+      parameters:
+        - name: installmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the installment
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-iuv/{organizationId}/{iuv}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionsByOrganizationIdAndIuv
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: iuv
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The iuv of the installments
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-iud/{organizationId}/{iud}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionsByOrganizationIdAndIud
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: iud
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The iud of the installments
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/publish:
     put:
       tags:
