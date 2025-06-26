@@ -85,25 +85,33 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
 
   @Query("""
    SELECT d
-   FROM DebtPosition d
-      JOIN d.paymentOptions p
-      JOIN p.installments i
-   WHERE d.organizationId = :organizationId
-     AND i.iuv = :iuv
-     AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
-   """)
+     FROM DebtPosition d
+    WHERE EXISTS (
+      SELECT 1
+        FROM PaymentOption p
+        JOIN p.installments i
+       WHERE d.organizationId = :organizationId
+         AND i.iuv = :iuv
+         AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+       )
+  """)
+  @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""
    SELECT d
-   FROM DebtPosition d
-      JOIN d.paymentOptions p
-      JOIN p.installments i
-   WHERE d.organizationId = :organizationId
-     AND i.iud = :iud
-     AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
-   """)
+     FROM DebtPosition d
+    WHERE EXISTS (
+      SELECT 1
+        FROM PaymentOption p
+        JOIN p.installments i
+       WHERE d.organizationId = :organizationId
+         AND i.iud = :iud
+         AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+       )
+  """)
+  @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findByOrganizationIdAndInstallmentIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigins);
 
   Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
