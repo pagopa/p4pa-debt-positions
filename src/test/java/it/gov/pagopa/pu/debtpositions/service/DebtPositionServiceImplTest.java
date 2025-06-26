@@ -116,6 +116,72 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
+  void givenExistingDebtPositionWhenGetDebtPositionByInstallmentIdThenOk() {
+    Long installmentId = 1L;
+    DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
+    DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
+
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
+
+    DebtPositionDTO result = debtPositionService.getDebtPositionByInstallmentId(
+      installmentId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(expectedResult, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock, debtPositionMapperMock);
+  }
+
+  @Test
+  void givenNonExistingDebtPositionDetailWhenGetDebtPositionByInstallmentIdThenThrowNotFoundException() {
+    Long installmentId = 1L;
+
+    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentId)).thenReturn(null);
+
+    Assertions.assertThrows(NotFoundException.class, () -> debtPositionService.getDebtPositionByInstallmentId(
+      installmentId));
+
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock);
+    Mockito.verifyNoInteractions(debtPositionMapperMock);
+  }
+
+  @Test
+  void givenExistingDebtPositionWhenGetDebtPositionsByOrganizationIdAndIuvThenOk() {
+    Long organizationId = 1L;
+    String iuv = "12345678901234567";
+    List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
+    List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
+
+    Mockito.when(debtPositionRepositoryMock.findByOrganizationIdAndInstallmentIuv(organizationId, iuv, null)).thenReturn(debtPositions);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPositions.getFirst())).thenReturn(expectedResult.getFirst());
+
+    List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndIuv(
+      organizationId, iuv, null);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertIterableEquals(expectedResult, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock, debtPositionMapperMock);
+  }
+
+  @Test
+  void givenExistingDebtPositionWhenGetDebtPositionsByOrganizationIdAndIudThenOk() {
+    Long organizationId = 1L;
+    String iud = "123456789012345678";
+    List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
+    List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
+
+    Mockito.when(debtPositionRepositoryMock.findByOrganizationIdAndInstallmentIud(organizationId, iud, null)).thenReturn(debtPositions);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPositions.getFirst())).thenReturn(expectedResult.getFirst());
+
+    List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndIud(
+      organizationId, iud, null);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertIterableEquals(expectedResult, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock, debtPositionMapperMock);
+  }
+
+  @Test
   void givenPagedDebtPositionWhenGetPagedDebtPositionsThenSuccess() {
     Long ingestionFlowFileId = 1L;
     Pageable pageable = Pageable.ofSize(5);

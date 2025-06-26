@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -9,6 +10,8 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -46,6 +49,27 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public DebtPositionDTO getDebtPosition(Long debtPositionId) {
     DebtPosition debtPosition = getDebtPositionNoPII(debtPositionId);
     return mapDebtPosition(debtPosition);
+  }
+
+  @Override
+  public DebtPositionDTO getDebtPositionByInstallmentId(Long installmentId) {
+    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installmentId);
+    if (debtPosition == null) {
+      throw new NotFoundException("DebtPosition having installmentId %d not found".formatted(installmentId));
+    }
+    return mapDebtPosition(debtPosition);
+  }
+
+  @Override
+  public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
+    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndInstallmentIuv(organizationId, iuv, debtPositionOrigin);
+    return debtPositions.stream().map(this::mapDebtPosition).toList();
+  }
+
+  @Override
+  public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
+    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndInstallmentIud(organizationId, iud, debtPositionOrigin);
+    return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 
   @Override
