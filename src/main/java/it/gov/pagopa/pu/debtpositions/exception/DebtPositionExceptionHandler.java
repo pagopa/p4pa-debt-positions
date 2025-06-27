@@ -16,6 +16,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.transaction.TransactionException;
@@ -128,6 +129,7 @@ public class DebtPositionExceptionHandler {
 
     return ResponseEntity
       .status(httpStatus)
+      .contentType(MediaType.APPLICATION_JSON)
       .body(new DebtPositionErrorDTO(errorEnum, message));
   }
 
