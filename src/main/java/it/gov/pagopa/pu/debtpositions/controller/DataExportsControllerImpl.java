@@ -1,9 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DataExportsApi;
+import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidDateTimeIntervalException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -33,12 +36,37 @@ public class DataExportsControllerImpl implements DataExportsApi {
   }
 
   @Override
-  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
-    if (!Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException("The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, exportPaidMaxMonthsInterval));
+  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, Pageable pageable) {
+    String invalidDateTimeIntervalErrorMessage = "The date interval between %s and %s cannot exceed %d months";
+    boolean hasPaymentDates = paymentDateFrom != null && paymentDateTo != null;
+    boolean hasInstallmentDates = installmentUpdateDateTimeFrom != null && installmentUpdateDateTimeTo != null;
+
+    if (hasPaymentDates == hasInstallmentDates) {
+      throw new InvalidParamException(
+        "You must provide only one of the following date ranges: either the payment date range (paymentDateFrom and paymentDateTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
+      );
     }
 
-    return ResponseEntity.ok(installmentService.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable));
+    if (hasPaymentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
+      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(paymentDateFrom, paymentDateTo, exportPaidMaxMonthsInterval));
+    }
+
+    if (hasInstallmentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
+      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, exportPaidMaxMonthsInterval));
+    }
+
+    OffsetDateTimeIntervalFilter paymentDateTime = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    OffsetDateTimeIntervalFilter installmentUpdateDateTime = new OffsetDateTimeIntervalFilter(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo);
+
+    return ResponseEntity.ok(installmentService.getPagedInstallmentPaidView(
+      ExportPaidInstallmentsFiltersDTO.builder()
+        .organizationId(organizationId)
+        .operatorExternalUserId(operatorExternalUserId)
+        .paymentDateTime(paymentDateTime)
+        .installmentUpdateDateTime(installmentUpdateDateTime)
+        .debtPositionTypeOrgId(debtPositionTypeOrgId)
+        .build(),
+     pageable));
   }
 
   @Override

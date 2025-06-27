@@ -395,6 +395,7 @@ paths:
       operationId: exportPaidInstallments
       description: "|
       The API returns a list of paid installments.
+      **Note:** At least one of `paymentDate` or `installmentUpdateDateTime` must be provided.
       **Error:** If the size of the requested export is too large, the API will return an error."
       parameters:
         - name: organizationId
@@ -411,13 +412,21 @@ paths:
             type: string
         - name: paymentDateFrom
           in: query
-          required: true
           schema:
             type: string
             format: date-time
         - name: paymentDateTo
           in: query
-          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: installmentUpdateDateTimeFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: installmentUpdateDateTimeTo
+          in: query
           schema:
             type: string
             format: date-time

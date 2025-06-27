@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
+import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;
@@ -8,8 +9,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.time.OffsetDateTime;
 
 @Service
 public class InstallmentPaidViewPIIViewRepositoryImpl implements InstallmentPaidViewPIIViewRepository{
@@ -28,9 +27,9 @@ public class InstallmentPaidViewPIIViewRepositoryImpl implements InstallmentPaid
 
 
   @Override
-  public PagedInstallmentsPaidView getPagedInstallmentPaidView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
+  public PagedInstallmentsPaidView getPagedInstallmentPaidView(ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO, Pageable pageable) {
 
-    Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO = installmentPaidViewNoPIIDTORepository.findInstallmentPaidViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable);
+    Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO = installmentPaidViewNoPIIDTORepository.findInstallmentPaidViewNoPIIDTO(exportPaidInstallmentsFiltersDTO, pageable);
 
     if(pagedInstallmentPaidViewNoPIIDTO.getTotalElements() > maxTotalElements){
       throw new ExportTooManyRecordsException("The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(pagedInstallmentPaidViewNoPIIDTO.getTotalElements(), maxTotalElements));
