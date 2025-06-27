@@ -314,6 +314,14 @@ paths:
             type: integer
             format: int64
           description: The ID of the ingestion flow file
+        - name: statusToExclude
+          in: query
+          description: Indicates the list of status to be excluded
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/InstallmentStatus"
       responses:
         "200":
           description: Ok
