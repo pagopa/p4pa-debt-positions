@@ -191,10 +191,10 @@ class DebtPositionServiceImplTest {
 
     Page<DebtPosition> pageDebtPosition = new PageImpl<>(List.of(buildDebtPosition()), pageable, 1);
 
-    Mockito.when(debtPositionRepositoryMock.findByIngestionFlowFileId(ingestionFlowFileId, pageable)).thenReturn(pageDebtPosition);
+    Mockito.when(debtPositionRepositoryMock.findByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, null, pageable)).thenReturn(pageDebtPosition);
     Mockito.when(debtPositionMapperMock.mapToPagedDebtPositions(pageDebtPosition)).thenReturn(expectedPagedDebtPositions);
 
-    PagedDebtPositions result = debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable);
+    PagedDebtPositions result = debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, pageable);
 
     assertEquals(result, expectedPagedDebtPositions);
   }
