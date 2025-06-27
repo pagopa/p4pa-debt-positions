@@ -96,6 +96,24 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
+  public ResponseEntity<DebtPositionDTO> getDebtPositionByInstallmentId(Long installmentId) {
+    log.info("Retrieving DebtPosition by installmentId {}", installmentId);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionByInstallmentId(installmentId));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iud [{}]", organizationId, iud);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, debtPositionOrigin));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iuv [{}]", organizationId, iuv);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, debtPositionOrigin));
+  }
+
+  @Override
   public ResponseEntity<Void> installmentSynchronize(DebtPositionOrigin origin, InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive, Boolean partialChange){
     log.info("Synchronizing installment having IUD {} of debtPosition having iupdOrg {} (origin: {}, organizationId: {})",
       installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getIupdOrg(), origin, installmentSynchronizeDTO.getOrganizationId());

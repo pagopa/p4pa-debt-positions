@@ -20,6 +20,7 @@ public class Utilities {
   private Utilities() {
   }
 
+  public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
   public static final int IBAN_LENGTH = 27;
 
@@ -63,6 +64,15 @@ public class Utilities {
       return (10 - s % 10) % 10 == pi.charAt(10) - '0';
     }
     return true;
+  }
+
+  public static boolean isValidFiscalCode(String fiscalCode){
+    Matcher matcher = FISCAL_CODE_STRUCTURE_REGEX.matcher(fiscalCode.toUpperCase());
+    return matcher.matches();
+  }
+
+  public static boolean isValidFiscalCodeOrPIVA(String fiscalCode, boolean isOrgPIvaCheckEnabled){
+    return isValidFiscalCode(fiscalCode) || isValidPIVA(fiscalCode, isOrgPIvaCheckEnabled);
   }
 
   public static String getRandomIUD() {
