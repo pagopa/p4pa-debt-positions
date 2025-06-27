@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptArchivingPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -22,6 +24,8 @@ import java.time.ZoneOffset;
 class ReceiptServiceImplTest {
 
   @Mock
+  private ReceiptPIIRepository receiptPIIRepositoryMock;
+  @Mock
   private ReceiptDetailPIIViewRepository receiptDetailPIIViewRepositoryMock;
   @Mock
   private ReceiptArchivingPIIViewRepository receiptArchivingPIIViewRepositoryMock;
@@ -30,6 +34,24 @@ class ReceiptServiceImplTest {
   private ReceiptServiceImpl receiptService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
+  @Test
+  void whenGetReceiptThenOk() {
+    //given
+    Long receiptId = 1L;
+    ReceiptDTO receipt = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptPIIRepositoryMock.getReceiptDetail(receiptId)).thenReturn(receipt);
+
+    //when
+    ReceiptDTO response = receiptService.getReceipt(receiptId);
+
+    //verify
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(receipt, response);
+
+    Mockito.verify(receiptPIIRepositoryMock).getReceiptDetail(receiptId);
+  }
 
   @Test
   void whenGetReceiptDetailThenOk() {
