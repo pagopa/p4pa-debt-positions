@@ -2,12 +2,14 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,13 +56,13 @@ class DataExportsControllerImplTest {
   void givenValidParamsWithPaymentDate_whenGetInstallmentExport_thenOk() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
-    OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
-    OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
+    OffsetDateTime paymentDateTimeFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    OffsetDateTime paymentDateTimeTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
 
     Long debtPositionTypeOrgId = 1L;
 
-    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
-    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, new OffsetDateTimeIntervalFilter(), debtPositionTypeOrgId );
+    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateTimeFrom, paymentDateTimeTo);
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, new LocalDateTimeIntervalFilter(), debtPositionTypeOrgId);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
     Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
@@ -69,8 +71,8 @@ class DataExportsControllerImplTest {
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/export/organization/{organizationId}/installments/paid", organizationId)
           .param("operatorExternalUserId",operatorExternalUserId)
-          .param("paymentDateFrom", String.valueOf(paymentDateFrom))
-          .param("paymentDateTo", String.valueOf(paymentDateTo))
+          .param("paymentDateTimeFrom", String.valueOf(paymentDateTimeFrom))
+          .param("paymentDateTimeTo", String.valueOf(paymentDateTimeTo))
           .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
           .param("size", "1"))
       .andExpect(status().isOk())
@@ -91,8 +93,8 @@ class DataExportsControllerImplTest {
 
     Long debtPositionTypeOrgId = 1L;
 
-    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo);
-    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), offsetDateTimeIntervalFilter, debtPositionTypeOrgId );
+    LocalDateTimeIntervalFilter localDateTimeIntervalFilter = new LocalDateTimeIntervalFilter(Utilities.toLocalDateTime(installmentUpdateDateTimeFrom), Utilities.toLocalDateTime(installmentUpdateDateTimeTo));
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), localDateTimeIntervalFilter, debtPositionTypeOrgId );
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
     Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
@@ -126,8 +128,8 @@ class DataExportsControllerImplTest {
     Long debtPositionTypeOrgId = 1L;
 
     OffsetDateTimeIntervalFilter paymentDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
-    OffsetDateTimeIntervalFilter installmentDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo);
-    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, paymentDateTimeIntervalFilter, installmentDateTimeIntervalFilter, debtPositionTypeOrgId );
+    LocalDateTimeIntervalFilter localDateTimeIntervalFilter = new LocalDateTimeIntervalFilter(Utilities.toLocalDateTime(installmentUpdateDateTimeFrom), Utilities.toLocalDateTime(installmentUpdateDateTimeTo));
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, paymentDateTimeIntervalFilter, localDateTimeIntervalFilter, debtPositionTypeOrgId );
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
     Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
@@ -136,8 +138,8 @@ class DataExportsControllerImplTest {
     mockMvc.perform(
         MockMvcRequestBuilders.get("/export/organization/{organizationId}/installments/paid", organizationId)
           .param("operatorExternalUserId",operatorExternalUserId)
-          .param("paymentDateFrom", String.valueOf(paymentDateFrom))
-          .param("paymentDateTo", String.valueOf(paymentDateTo))
+          .param("paymentDateTimeFrom", String.valueOf(paymentDateFrom))
+          .param("paymentDateTimeTo", String.valueOf(paymentDateTo))
           .param("installmentUpdateDateTimeFrom", String.valueOf(installmentUpdateDateTimeFrom))
           .param("installmentUpdateDateTimeTo", String.valueOf(installmentUpdateDateTimeTo))
           .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
@@ -154,11 +156,11 @@ class DataExportsControllerImplTest {
   void givenWrongPaymentDateTimeInterval_whenGetInstallmentExport_thenThrowException() throws Exception {
     Long organizationId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
-    OffsetDateTime paymentDateFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
-    OffsetDateTime paymentDateTo = OffsetDateTime.parse("2025-11-06T17:05:04.686949700Z");
+    OffsetDateTime paymentDateTimeFrom = OffsetDateTime.parse("2025-03-06T17:05:04.685811Z");
+    OffsetDateTime paymentDateTimeTo = OffsetDateTime.parse("2025-11-06T17:05:04.686949700Z");
     Long debtPositionTypeOrgId = 1L;
 
-    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateTimeFrom, paymentDateTimeTo);
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, null, debtPositionTypeOrgId );
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
@@ -168,8 +170,8 @@ class DataExportsControllerImplTest {
     mockMvc.perform(
         MockMvcRequestBuilders.get("/export/organization/{organizationId}/installments/paid", organizationId)
           .param("operatorExternalUserId",operatorExternalUserId)
-          .param("paymentDateFrom", String.valueOf(paymentDateFrom))
-          .param("paymentDateTo", String.valueOf(paymentDateTo))
+          .param("paymentDateTimeFrom", String.valueOf(paymentDateTimeFrom))
+          .param("paymentDateTimeTo", String.valueOf(paymentDateTimeTo))
           .param("debtPositionTypeOrgId", String.valueOf(debtPositionTypeOrgId))
           .param("size", "1"))
       .andExpect(status().isBadRequest())
@@ -188,8 +190,8 @@ class DataExportsControllerImplTest {
     OffsetDateTime installmentUpdateDateTimeTo = OffsetDateTime.parse("2025-11-06T17:05:04.686949700Z");
     Long debtPositionTypeOrgId = 1L;
 
-    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo);
-    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), offsetDateTimeIntervalFilter, debtPositionTypeOrgId );
+    LocalDateTimeIntervalFilter localDateTimeIntervalFilter = new LocalDateTimeIntervalFilter(Utilities.toLocalDateTime(installmentUpdateDateTimeFrom), Utilities.toLocalDateTime(installmentUpdateDateTimeTo));
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), localDateTimeIntervalFilter, debtPositionTypeOrgId );
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
     Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),

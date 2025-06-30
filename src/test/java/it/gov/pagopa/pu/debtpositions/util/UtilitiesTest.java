@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
@@ -193,5 +194,28 @@ public class UtilitiesTest {
   }
   public static void clearTraceIdContext(){
     MDC.clear();
+  }
+
+  @Test
+  void givenValidDateWhenToLocalDateTimeThenOk() {
+    OffsetDateTime offsetDateTime = OffsetDateTime.now();
+    LocalDateTime expectedDate = offsetDateTime.toLocalDateTime();
+
+    LocalDateTime result = Utilities.toLocalDateTime(offsetDateTime);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(expectedDate.getYear(), result.getYear());
+    Assertions.assertEquals(expectedDate.getMonth(), result.getMonth());
+    Assertions.assertEquals(expectedDate.getDayOfMonth(), result.getDayOfMonth());
+    Assertions.assertEquals(expectedDate.getHour(), result.getHour());
+    Assertions.assertEquals(expectedDate.getMinute(), result.getMinute());
+    Assertions.assertEquals(expectedDate.getSecond(), result.getSecond());
+  }
+
+  @Test
+  void givenNullDateWhenToLocalDateTimeThenNullResult() {
+    LocalDateTime result = Utilities.toLocalDateTime(null);
+
+    Assertions.assertNull(result);
   }
 }

@@ -116,4 +116,8 @@ public class Utilities {
   public static BigDecimal longCentsToBigDecimalEuro(Long centsAmount) {
     return centsAmount != null ? BigDecimal.valueOf(centsAmount).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_DOWN) : null;
   }
+
+  public static LocalDateTime toLocalDateTime(OffsetDateTime date) {
+    return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
+  }
 }
