@@ -2,8 +2,8 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -23,22 +23,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class InstallmentPIIMapperTest {
 
-  private InstallmentPIIMapper mapper;
-
   @Mock
   private DataCipherService dataCipherServiceMock;
-
   @Mock
   private PersonalDataService personalDataServiceMock;
 
+  private InstallmentPIIMapper mapper;
+
   @BeforeEach
   void init() {
-    mapper = new InstallmentPIIMapper(dataCipherServiceMock, personalDataServiceMock);
+    mapper = new InstallmentPIIMapper(dataCipherServiceMock, personalDataServiceMock, new TransferMapper());
   }
 
   @AfterEach
   void verifyNotMoreInvocation() {
-    Mockito.verifyNoMoreInteractions(dataCipherServiceMock);
+    Mockito.verifyNoMoreInteractions(
+      dataCipherServiceMock,
+      personalDataServiceMock);
   }
 
   //region map(it.gov.pagopa.pu.debtpositions.dto.Installment)
@@ -48,7 +49,8 @@ class InstallmentPIIMapperTest {
     InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
 
-    Installment installment = buildInstallment();
+    InstallmentDTO installment = buildInstallmentDTO();
+    installment.setNoPII(installmentNoPIIExpected);
     byte[] expectedHashedCF = {};
     Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
 
@@ -65,7 +67,7 @@ class InstallmentPIIMapperTest {
     InstallmentNoPII installmentNoPIIExpected = buildInstallmentNoPII();
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
 
-    Installment installment = buildInstallment();
+    InstallmentDTO installment = buildInstallmentDTO();
     installment.setNoPII(installmentNoPIIExpected);
     byte[] expectedHashedCF = {};
     Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
@@ -90,7 +92,7 @@ class InstallmentPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
 
     //when
-    Installment result = mapper.map(installmentNoPII);
+    InstallmentDTO result = mapper.map(installmentNoPII);
     //then
     TestUtils.checkNotNullFields(result);
     TestUtils.checkNotNullFields(result.getSyncStatus());
@@ -104,7 +106,8 @@ class InstallmentPIIMapperTest {
     InstallmentPIIDTO installmentPIIDTOExpected = buildInstallmentPIIDTO();
     installmentNoPIIExpected.setSyncStatus(null);
 
-    Installment installment = buildInstallment();
+    InstallmentDTO installment = buildInstallmentDTO();
+    installment.setNoPII(installmentNoPIIExpected);
     installment.setSyncStatus(null);
     byte[] expectedHashedCF = {};
     Mockito.when(dataCipherServiceMock.hash(installment.getDebtor().getFiscalCode())).thenReturn(expectedHashedCF);
@@ -127,7 +130,7 @@ class InstallmentPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
 
     //when
-    Installment result = mapper.map(installmentNoPII);
+    InstallmentDTO result = mapper.map(installmentNoPII);
     //then
     TestUtils.checkNotNullFields(result, "syncStatus");
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);

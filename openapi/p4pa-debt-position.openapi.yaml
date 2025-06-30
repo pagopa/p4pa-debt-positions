@@ -129,6 +129,134 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-installmentId/{installmentId}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionByInstallmentId
+      parameters:
+        - name: installmentId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the installment
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-iuv/{organizationId}/{iuv}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionsByOrganizationIdAndIuv
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: iuv
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The iuv of the installments
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /debt-positions/by-iud/{organizationId}/{iud}:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtPositionsByOrganizationIdAndIud
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: iud
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The iud of the installments
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
   /debt-positions/{debtPositionId}/publish:
     put:
       tags:
@@ -186,6 +314,14 @@ paths:
             type: integer
             format: int64
           description: The ID of the ingestion flow file
+        - name: statusToExclude
+          in: query
+          description: Indicates the list of status to be excluded
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/InstallmentStatus"
       responses:
         "200":
           description: Ok
@@ -259,6 +395,7 @@ paths:
       operationId: exportPaidInstallments
       description: "|
       The API returns a list of paid installments.
+      **Note:** At least one of `paymentDate` or `installmentUpdateDateTime` must be provided.
       **Error:** If the size of the requested export is too large, the API will return an error."
       parameters:
         - name: organizationId
@@ -275,13 +412,21 @@ paths:
             type: string
         - name: paymentDateFrom
           in: query
-          required: true
           schema:
             type: string
             format: date-time
         - name: paymentDateTo
           in: query
-          required: true
+          schema:
+            type: string
+            format: date-time
+        - name: installmentUpdateDateTimeFrom
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: installmentUpdateDateTimeTo
+          in: query
           schema:
             type: string
             format: date-time
@@ -407,6 +552,44 @@ paths:
         "500":
           description: Internal server error
   /receipts/{receiptId}:
+    get:
+      tags:
+        - receipt
+      operationId: getReceipt
+      parameters:
+        - name: receiptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the receipt
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ReceiptDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /receipts/{receiptId}/detail:
     get:
       tags:
         - receipt
@@ -842,6 +1025,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
         '500':
           description: Server Error
           content:
@@ -1127,7 +1316,11 @@ components:
         - debtor
         - remittanceInformation
       type: object
-      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseInstallment"]
+      x-implements: [
+        "it.gov.pagopa.pu.debtpositions.dto.BaseInstallment",
+        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO>"
+      ]
+      x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       properties:
         installmentId:
           type: integer
@@ -1200,6 +1393,10 @@ components:
           type: string
         updateTraceId:
           type: string
+        noPII:
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          type: 'InstallmentNoPII'
     TransferDTO:
       required:
         - amountCents
@@ -1488,10 +1685,7 @@ components:
       type: object
       properties:
         entityType:
-          type: string
-          enum:
-            - F
-            - G
+          $ref: "#/components/schemas/PersonEntityType"
         fiscalCode:
           type: string
         fullName:
@@ -1557,6 +1751,11 @@ components:
         - UNPAID
         - UNPAYABLE
         - DRAFT
+    PersonEntityType:
+      type: string
+      enum:
+        - F
+        - G
     Action:
       type: string
       enum:
@@ -1732,10 +1931,7 @@ components:
         iuv:
           type: string
         entityType:
-          type: string
-          enum:
-            - F
-            - G
+          $ref: "#/components/schemas/PersonEntityType"
         fiscalCode:
           type: string
         fullName:

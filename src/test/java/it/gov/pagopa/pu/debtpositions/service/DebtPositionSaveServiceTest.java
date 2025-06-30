@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
@@ -21,16 +20,11 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.util.Pair;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionSaveServiceTest {
@@ -90,32 +84,14 @@ class DebtPositionSaveServiceTest {
     Transfer mappedTransfer = mappedInstallmentNoPII.getTransfers().getFirst();
     mappedInstallmentNoPII.getTransfers().getFirst().setTransferIndex(1);
 
-    InstallmentNoPII installmentNoPIINoIud = buildInstallmentNoPII();
-    installmentNoPIINoIud.setInstallmentId(-1L);
-    Installment installmentNoIud = buildInstallment();
-    installmentNoIud.setInstallmentId(-1L);
-    installmentNoIud.setIud("");
-
-    Installment mappedInstallment = buildInstallment();
-    mappedInstallment.setIud(mappedInstallmentNoPII.getIud());
-    mappedInstallment.setTransfers(new ArrayList<>(mappedInstallmentNoPII.getTransfers()));
-    mappedInstallment.setNoPII(mappedInstallmentNoPII);
-
     DebtPosition savedDebtPosition = mockSavedDebtPosition(mappedDebtPosition);
     PaymentOption savedPaymentOption = mockSavedPaymentOption(mappedPaymentOption);
 
-    Installment savedInstallment = mockSavedInstallment(mappedInstallment);
+    InstallmentDTO savedInstallment = mockSavedInstallment(installmentDTO);
 
     Transfer savedTransfer = mockSavedTransfer(mappedTransfer);
 
-    Map<InstallmentNoPII, Installment> installmentMap = Map.of(
-      installmentNoPIINoIud, installmentNoIud,
-      mappedInstallmentNoPII, mappedInstallment
-    );
-
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedPair = Pair.of(mappedDebtPosition, installmentMap);
-
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedPair);
+    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedDebtPosition);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
@@ -131,7 +107,7 @@ class DebtPositionSaveServiceTest {
 
       assertInstallmentDtoAlign(savedInstallment, installmentDTO);
 
-      Assertions.assertSame(savedTransfer.getInstallmentId(), mappedInstallment.getTransfers().getFirst().getInstallmentId());
+      Assertions.assertSame(savedTransfer.getInstallmentId(), installmentDTO.getTransfers().getFirst().getInstallmentId());
       assertTransferDtoAlign(savedTransfer, transferDTO);
     }
   }
@@ -157,11 +133,11 @@ class DebtPositionSaveServiceTest {
     return savedPaymentOption;
   }
 
-  private Installment mockSavedInstallment(Installment mappedInstallment) {
-    Installment savedInstallment = Mockito.mock(Installment.class, Mockito.RETURNS_DEEP_STUBS);
+  private InstallmentDTO mockSavedInstallment(InstallmentDTO mappedInstallment) {
+    InstallmentDTO savedInstallment = Mockito.mock(InstallmentDTO.class, Mockito.RETURNS_DEEP_STUBS);
     Mockito.lenient().when(savedInstallment.getNoPII().getIud()).thenReturn(mappedInstallment.getIud());
-    Mockito.when(savedInstallment.getCreationDate()).thenReturn(LocalDateTime.now().minusDays(21));
-    Mockito.when(savedInstallment.getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(20));
+    Mockito.when(savedInstallment.getNoPII().getCreationDate()).thenReturn(LocalDateTime.now().minusDays(21));
+    Mockito.when(savedInstallment.getNoPII().getUpdateDate()).thenReturn(LocalDateTime.now().minusDays(20));
     Mockito.when(installmentRepositoryMock.save(Mockito.same(mappedInstallment))).thenReturn(savedInstallment);
     return savedInstallment;
   }
@@ -192,11 +168,11 @@ class DebtPositionSaveServiceTest {
     Assertions.assertSame(savedPaymentOption.getUpdateOperatorExternalId(), paymentOptionDTO.getUpdateOperatorExternalId());
   }
 
-  private void assertInstallmentDtoAlign(Installment savedInstallment, InstallmentDTO installmentDTO) {
+  private void assertInstallmentDtoAlign(InstallmentDTO savedInstallment, InstallmentDTO installmentDTO) {
     Assertions.assertSame(savedInstallment.getPaymentOptionId(), installmentDTO.getPaymentOptionId());
     Assertions.assertSame(savedInstallment.getInstallmentId(), installmentDTO.getInstallmentId());
-    Assertions.assertEquals(Utilities.localDatetimeToOffsetDateTime(savedInstallment.getCreationDate()), installmentDTO.getCreationDate());
-    Assertions.assertEquals(Utilities.localDatetimeToOffsetDateTime(savedInstallment.getUpdateDate()), installmentDTO.getUpdateDate());
+    Assertions.assertEquals(Utilities.localDatetimeToOffsetDateTime(savedInstallment.getNoPII().getCreationDate()), installmentDTO.getCreationDate());
+    Assertions.assertEquals(Utilities.localDatetimeToOffsetDateTime(savedInstallment.getNoPII().getUpdateDate()), installmentDTO.getUpdateDate());
     Assertions.assertSame(savedInstallment.getUpdateOperatorExternalId(), installmentDTO.getUpdateOperatorExternalId());
   }
 

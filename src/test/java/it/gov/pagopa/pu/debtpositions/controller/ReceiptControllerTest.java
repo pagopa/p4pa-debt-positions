@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
@@ -21,6 +19,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReceiptControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -65,6 +65,25 @@ class ReceiptControllerTest {
   }
 
   @Test
+  void whenGetReceiptThenOk() throws Exception {
+    //given
+    Long receiptId = 1L;
+    ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
+
+    Mockito.when(receiptServiceMock.getReceipt(receiptId)).thenReturn(expectedResponse);
+
+    MvcResult result = mockMvc.perform(
+        MockMvcRequestBuilders.get("/receipts/"+receiptId))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
+    TestUtils.reflectionEqualsByName(expectedResponse,response);
+
+    Mockito.verify(receiptServiceMock).getReceipt(receiptId);
+  }
+
+  @Test
   void whenGetReceiptDetailThenOk() throws Exception {
     //given
     Long receiptId = 1L;
@@ -74,7 +93,7 @@ class ReceiptControllerTest {
     Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/receipts/"+receiptId)
+        MockMvcRequestBuilders.get("/receipts/"+receiptId+"/detail")
           .param("operatorExternalUserId",operatorExternalUserId))
       .andExpect(status().isOk())
       .andReturn();

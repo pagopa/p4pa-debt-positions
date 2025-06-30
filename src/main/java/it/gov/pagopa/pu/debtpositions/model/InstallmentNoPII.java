@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.enums.PersonEntityType;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import jakarta.annotation.Nonnull;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;

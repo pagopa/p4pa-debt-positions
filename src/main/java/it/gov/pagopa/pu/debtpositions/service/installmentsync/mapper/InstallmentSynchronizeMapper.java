@@ -81,7 +81,7 @@ public class InstallmentSynchronizeMapper {
 
   private PersonDTO map2PersonDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     return PersonDTO.builder()
-      .entityType(PersonDTO.EntityTypeEnum.valueOf(installmentSynchronizeDTO.getEntityType().getValue()))
+      .entityType(installmentSynchronizeDTO.getEntityType())
       .fiscalCode(installmentSynchronizeDTO.getFiscalCode())
       .fullName(installmentSynchronizeDTO.getFullName())
       .address(installmentSynchronizeDTO.getAddress())

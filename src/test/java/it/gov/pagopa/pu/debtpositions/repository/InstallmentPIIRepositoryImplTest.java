@@ -2,10 +2,10 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.Person;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -26,7 +26,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.util.List;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,7 +59,7 @@ class InstallmentPIIRepositoryImplTest {
   @Test
   void givenNewInstallmentWhenSaveThenOk() {
     // Given
-    Installment installment = new Installment();
+    InstallmentDTO installment = new InstallmentDTO();
     InstallmentNoPII newNoPII = new InstallmentNoPII();
     Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(newNoPII, new InstallmentPIIDTO());
     Mockito.when(mapperMock.map(installment)).thenReturn(p);
@@ -75,7 +75,7 @@ class InstallmentPIIRepositoryImplTest {
     });
 
     // When
-    Installment insert = installmentPIIRepository.save(installment);
+    InstallmentDTO insert = installmentPIIRepository.save(installment);
 
     // Then
     Assertions.assertSame(installment, insert);
@@ -91,7 +91,7 @@ class InstallmentPIIRepositoryImplTest {
   void givenAlreadyExistentInstallmentAndNoNewPIIWhenSaveThenSkipPIISave() {
     // Given
     long piiId = -1L;
-    Installment installment = new Installment();
+    InstallmentDTO installment = new InstallmentDTO();
     InstallmentNoPII newNoPII = new InstallmentNoPII();
     newNoPII.setPersonalDataId(piiId);
     Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(newNoPII, new InstallmentPIIDTO());
@@ -107,7 +107,7 @@ class InstallmentPIIRepositoryImplTest {
     });
 
     // When
-    Installment insert = installmentPIIRepository.save(installment);
+    InstallmentDTO insert = installmentPIIRepository.save(installment);
 
     // Then
     Assertions.assertSame(installment, insert);
@@ -123,11 +123,11 @@ class InstallmentPIIRepositoryImplTest {
   void givenAlreadyExistentInstallmentAndNewPIIWhenSaveThenSkipPIISave() {
     // Given
     long oldPiiId = -1L;
-    Installment installment = new Installment();
+    InstallmentDTO installment = new InstallmentDTO();
     InstallmentNoPII newNoPII = new InstallmentNoPII();
     newNoPII.setPersonalDataId(oldPiiId);
     InstallmentPIIDTO newPii = new InstallmentPIIDTO();
-    newPii.setDebtor(new Person());
+    newPii.setDebtor(new PersonDTO());
     Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(newNoPII, newPii);
     Mockito.when(mapperMock.map(installment)).thenReturn(p);
 
@@ -144,7 +144,7 @@ class InstallmentPIIRepositoryImplTest {
     });
 
     // When
-    Installment insert = installmentPIIRepository.save(installment);
+    InstallmentDTO insert = installmentPIIRepository.save(installment);
 
     // Then
     Assertions.assertSame(installment, insert);
@@ -164,11 +164,11 @@ class InstallmentPIIRepositoryImplTest {
   void givenAlreadyExistentInstallmentNotFetchedAndNewPIIWhenSaveThenSkipPIISave() {
     // Given
     long oldPiiId = -1L;
-    Installment installment = new Installment();
+    InstallmentDTO installment = new InstallmentDTO();
     InstallmentNoPII newNoPII = new InstallmentNoPII();
     newNoPII.setInstallmentId(0L);
     InstallmentPIIDTO newPii = new InstallmentPIIDTO();
-    newPii.setDebtor(new Person());
+    newPii.setDebtor(new PersonDTO());
     Pair<InstallmentNoPII, InstallmentPIIDTO> p = Pair.of(newNoPII, newPii);
     Mockito.when(mapperMock.map(installment)).thenReturn(p);
 
@@ -191,7 +191,7 @@ class InstallmentPIIRepositoryImplTest {
     });
 
     // When
-    Installment insert = installmentPIIRepository.save(installment);
+    InstallmentDTO insert = installmentPIIRepository.save(installment);
 
     // Then
     Assertions.assertSame(installment, insert);
@@ -213,10 +213,9 @@ class InstallmentPIIRepositoryImplTest {
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
     List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
     Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
-    installmentDTOList.forEach(installmentNoPII -> Mockito.when(mapperMock.map(installmentNoPII)).thenReturn(Installment.builder().build()));
 
     // When
-    List<Installment> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList);
+    List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList);
 
     // Then
     Assertions.assertNotNull(result);

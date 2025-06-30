@@ -1,15 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.dto;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.time.OffsetDateTime;
+
 @Data
-@Builder(toBuilder = true)
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentPIIDTO implements PIIDTO {
-    private PersonDTO debtor;
+public class OffsetDateTimeIntervalFilter implements Serializable {
+
+  private OffsetDateTime from;
+  private OffsetDateTime to;
+
 }

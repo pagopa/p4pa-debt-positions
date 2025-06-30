@@ -7,17 +7,18 @@ import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import java.nio.charset.StandardCharsets;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.nio.charset.StandardCharsets;
 
 @ExtendWith(MockitoExtension.class)
 class ReceiptPIIMapperTest {
@@ -30,11 +31,15 @@ class ReceiptPIIMapperTest {
   @Mock
   private PersonalDataService personalDataServiceMock;
 
-  @Spy
-  private PersonMapper personMapperSpy;
-
   @InjectMocks
   private ReceiptPIIMapper receiptPIIMapper;
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(
+      dataCipherServiceMock,
+      personalDataServiceMock);
+  }
 
   @Test
   void givenValidReceiptWhenMapThenReturnPairReceiptNoPIIandPII() {
@@ -73,7 +78,6 @@ class ReceiptPIIMapperTest {
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), response.getDebtor());
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getPayer(), response.getPayer());
     TestUtils.checkNotNullFields(response);
-    Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(receipt.getPersonalDataId(),ReceiptPIIDTO.class);
   }
 
   @Test
@@ -91,9 +95,6 @@ class ReceiptPIIMapperTest {
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), response.getDebtor());
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getPayer(), response.getPayer());
     TestUtils.checkNotNullFields(response);
-    Mockito.verify(personalDataServiceMock).get(receipt.getPersonalDataId(),ReceiptPIIDTO.class);
-    Mockito.verify(personMapperSpy).mapToDto(receiptPIIDTO.getDebtor());
-    Mockito.verify(personMapperSpy).mapToDto(receiptPIIDTO.getPayer());
   }
 
 }

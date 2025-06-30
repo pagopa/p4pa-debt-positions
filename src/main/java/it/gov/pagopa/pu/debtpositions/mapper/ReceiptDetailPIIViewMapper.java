@@ -10,12 +10,9 @@ import org.springframework.stereotype.Service;
 public class ReceiptDetailPIIViewMapper {
 
   private final PersonalDataService personalDataService;
-  private final PersonMapper personMapper;
 
-  public ReceiptDetailPIIViewMapper(PersonalDataService personalDataService,
-    PersonMapper personMapper) {
+  public ReceiptDetailPIIViewMapper(PersonalDataService personalDataService) {
     this.personalDataService = personalDataService;
-    this.personMapper = personMapper;
   }
 
   public ReceiptDetailDTO mapToReceiptDetailDTO(ReceiptDetailNoPIIView receiptDetailNoPIIView) {
@@ -32,7 +29,7 @@ public class ReceiptDetailPIIViewMapper {
       .iud(receiptDetailNoPIIView.getIud())
       .iur(receiptDetailNoPIIView.getIur())
       .feeCents(receiptDetailNoPIIView.getFeeCents())
-      .debtor(pii.getDebtor()!=null?personMapper.mapToDto(pii.getDebtor()):null)
+      .debtor(pii.getDebtor())
       .build();
   }
 }

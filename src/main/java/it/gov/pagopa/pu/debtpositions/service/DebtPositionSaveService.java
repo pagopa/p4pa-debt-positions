@@ -1,12 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.TransferMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -15,10 +14,9 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.*;
 import jakarta.transaction.Transactional;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.Map;
+import java.util.Objects;
 
 @Service
 public class DebtPositionSaveService {
@@ -43,24 +41,26 @@ public class DebtPositionSaveService {
 
   @Transactional
   public void saveDebtPositionDTO(DebtPositionDTO debtPositionDTO) {
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+    DebtPosition mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
 
-    DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition.getFirst());
+    DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition);
     alignDebtPositionDTO(debtPositionDTO, savedDebtPosition);
 
-    mappedDebtPosition.getFirst().getPaymentOptions().forEach(paymentOption -> {
+    mappedDebtPosition.getPaymentOptions().forEach(paymentOption -> {
       paymentOption.setDebtPositionId(savedDebtPosition.getDebtPositionId());
       PaymentOption savedPaymentOption = paymentOptionRepository.save(paymentOption);
       PaymentOptionDTO paymentOptionDTO = alignPaymentOptionDTO(debtPositionDTO, savedPaymentOption);
 
       paymentOption.getInstallments().forEach(installmentNoPII -> {
-        Installment mappedInstallment = mappedDebtPosition.getSecond().get(installmentNoPII);
+        InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().stream()
+          .filter(i -> Objects.equals(i.getIud(), installmentNoPII.getIud()))
+          .findFirst().orElseThrow();
 
-        mappedInstallment.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
-        InstallmentNoPII savedInstallment = installmentRepository.save(mappedInstallment).getNoPII();
-        InstallmentDTO installmentDTO = alignInstallmentDTO(paymentOptionDTO, savedInstallment);
+        installmentDTO.setPaymentOptionId(savedPaymentOption.getPaymentOptionId());
+        InstallmentNoPII savedInstallment = installmentRepository.save(installmentDTO).getNoPII();
+        alignInstallmentDTO(installmentDTO, savedInstallment);
 
-        mappedInstallment.getTransfers().forEach(transfer -> {
+        installmentNoPII.getTransfers().forEach(transfer -> {
           transfer.setInstallmentId(savedInstallment.getInstallmentId());
           Transfer savedTransfer = transferRepository.save(transfer);
           alignTransferDTO(installmentDTO, savedTransfer);
@@ -75,7 +75,7 @@ public class DebtPositionSaveService {
 
   private PaymentOptionDTO alignPaymentOptionDTO(DebtPositionDTO debtPositionDTO, PaymentOption savedPaymentOption) {
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionIndex().equals(savedPaymentOption.getPaymentOptionIndex()))
+      .filter(po -> Objects.equals(po.getPaymentOptionIndex(), savedPaymentOption.getPaymentOptionIndex()))
       .findFirst().orElseThrow();
     paymentOptionDTO.setDebtPositionId(savedPaymentOption.getDebtPositionId());
 
@@ -83,14 +83,8 @@ public class DebtPositionSaveService {
     return paymentOptionDTO;
   }
 
-  private InstallmentDTO alignInstallmentDTO(PaymentOptionDTO paymentOptionDTO, InstallmentNoPII savedInstallment) {
-    InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().stream()
-      .filter(i -> i.getIud().equals(savedInstallment.getIud()))
-      .findFirst().orElseThrow();
-    installmentDTO.setPaymentOptionId(savedInstallment.getPaymentOptionId());
-
-    InstallmentMapper.setToDtoAutoDbFields(installmentDTO, savedInstallment);
-    return installmentDTO;
+  private void alignInstallmentDTO(InstallmentDTO installmentDTO, InstallmentNoPII savedInstallment) {
+    InstallmentPIIMapper.setToDtoAutoDbFields(installmentDTO, savedInstallment);
   }
 
   private void alignTransferDTO(InstallmentDTO installmentDTO, Transfer savedTransfer) {

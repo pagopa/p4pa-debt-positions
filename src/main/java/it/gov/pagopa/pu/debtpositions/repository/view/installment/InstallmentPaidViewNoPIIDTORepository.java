@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -9,8 +10,6 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-
-import java.time.OffsetDateTime;
 
 @RepositoryRestResource(path = "installment-paid-export-view")
 public interface InstallmentPaidViewNoPIIDTORepository extends Repository<InstallmentPaidViewNoPII, Long> {
@@ -49,19 +48,16 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
     JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
     WHERE
       i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAID_STATUSES})
-      AND dp.organizationId = :organizationId
-      AND r.paymentDateTime BETWEEN :paymentDateTimeFrom AND :paymentDateTimeTo
-      AND dptoo.operatorExternalUserId = :operatorExternalUserId
-      AND (:debtPositionTypeOrgId IS NULL OR dptoo.debtPositionTypeOrgId = :debtPositionTypeOrgId)
+      AND dp.organizationId = :#{#filter.organizationId}
+      AND ((:#{#filter.paymentDateTime.from} IS NULL OR :#{#filter.paymentDateTime.to} IS NULL) OR r.paymentDateTime BETWEEN :#{#filter.paymentDateTime.from} AND :#{#filter.paymentDateTime.to})
+      AND ((:#{#filter.installmentUpdateDateTime.from} IS NULL OR :#{#filter.installmentUpdateDateTime.to} IS NULL) OR i.updateDate BETWEEN :#{#filter.installmentUpdateDateTime.from} AND :#{#filter.installmentUpdateDateTime.to})
+      AND dptoo.operatorExternalUserId = :#{#filter.operatorExternalUserId}
+      AND (:#{#filter.debtPositionTypeOrgId} IS NULL OR dptoo.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId})
       AND t.transferIndex = 1
   """
   )
   Page<InstallmentPaidViewNoPII> findInstallmentPaidViewNoPIIDTO(
-    @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true) @Param("paymentDateTimeFrom") OffsetDateTime paymentDateTimeFrom,
-    @Parameter(required = true) @Param("paymentDateTimeTo") OffsetDateTime paymentDateTimeTo,
-    @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
+    @Parameter(required = true) @Param("filter") ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO,
     Pageable pageable
   );
 }

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
@@ -32,7 +33,9 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -206,6 +209,59 @@ class DebtPositionControllerTest {
   }
 
   @Test
+  void whenGetDebtPositionByInstallmentIdThenOk() throws Exception {
+    Long installmentId = 1L;
+
+    DebtPositionDTO expectedResult = new DebtPositionDTO();
+    Mockito.when(debtPositionService.getDebtPositionByInstallmentId(installmentId)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-installmentId/" + installmentId)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void whenGetDebtPositionsByOrganizationIdAndIuvThenOk() throws Exception {
+    Long organizationId = 1L;
+    String iuv = "12345678901234567";
+
+    List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
+    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, null)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-iuv/" + organizationId + "/" + iuv)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void whenGetDebtPositionsByOrganizationIdAndIudThenOk() throws Exception {
+    Long organizationId = 1L;
+    String iud = "123456789012345678";
+
+    List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
+    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, null)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-iud/" + organizationId + "/" + iud)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
   void whenInstallmentSynchronizeThenOk() throws Exception {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     Boolean massive = true;
@@ -265,7 +321,7 @@ class DebtPositionControllerTest {
     Long ingestionFlowFileId = 1L;
 
     PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder().size(1L).build();
-    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
+    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/ingestion-flow-file/" + ingestionFlowFileId)

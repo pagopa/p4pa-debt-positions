@@ -26,6 +26,7 @@ public class InstallmentView {
   @Enumerated(EnumType.STRING)
   @NotNull
   private InstallmentStatus status;
+  private String nav;
   private OffsetDateTime dueDate;
   @NotNull
   private Long amountCents;

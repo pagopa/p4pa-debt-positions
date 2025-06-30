@@ -20,6 +20,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @Slf4j
 public class DebtPositionControllerImpl implements DebtPositionApi {
@@ -94,6 +96,24 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
+  public ResponseEntity<DebtPositionDTO> getDebtPositionByInstallmentId(Long installmentId) {
+    log.info("Retrieving DebtPosition by installmentId {}", installmentId);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionByInstallmentId(installmentId));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iud [{}]", organizationId, iud);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, debtPositionOrigin));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPosition by orgId[{}] and iuv [{}]", organizationId, iuv);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, debtPositionOrigin));
+  }
+
+  @Override
   public ResponseEntity<Void> installmentSynchronize(DebtPositionOrigin origin, InstallmentSynchronizeDTO installmentSynchronizeDTO, Boolean massive, Boolean partialChange){
     log.info("Synchronizing installment having IUD {} of debtPosition having iupdOrg {} (origin: {}, organizationId: {})",
       installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getIupdOrg(), origin, installmentSynchronizeDTO.getOrganizationId());
@@ -119,9 +139,9 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<PagedDebtPositions> getDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, Pageable pageable) {
+  public ResponseEntity<PagedDebtPositions> getDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, List<InstallmentStatus> statusToExclude, Pageable pageable) {
     log.info("Retrieving debtPositions related to ingestionFlowFile {} (pageNumber: {})", ingestionFlowFileId, pageable.getPageNumber());
-    return ResponseEntity.ok(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, pageable));
+    return ResponseEntity.ok(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, statusToExclude, pageable));
   }
 
   @Override

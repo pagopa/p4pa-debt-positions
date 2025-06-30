@@ -1,11 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.InstallmentMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -16,23 +16,21 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPai
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @Service
 public class InstallmentServiceImpl implements InstallmentService {
   private final InstallmentPIIRepository installmentPIIRepository;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
-  private final InstallmentMapper installmentMapper;
   private final InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository;
   private final InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository;
   private final DebtPositionService debtPositionService;
@@ -44,13 +42,17 @@ public class InstallmentServiceImpl implements InstallmentService {
     DebtPositionOrigin.ORDINARY, DebtPositionOrigin.ORDINARY_SIL, DebtPositionOrigin.SPONTANEOUS
   );
 
-  public InstallmentServiceImpl(InstallmentPIIRepository installmentPIIRepository,
-    InstallmentNoPIIRepository installmentNoPIIRepository, InstallmentMapper installmentMapper, InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository, InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository, DebtPositionService debtPositionService, DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
+  public InstallmentServiceImpl(
+    InstallmentPIIRepository installmentPIIRepository,
+    InstallmentNoPIIRepository installmentNoPIIRepository,
+    InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository,
+    InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository,
+    DebtPositionService debtPositionService,
+    DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
     DebtPositionRepository debtPositionRepository,
     DebtPositionMapper debtPositionMapper) {
     this.installmentPIIRepository = installmentPIIRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
-    this.installmentMapper = installmentMapper;
     this.installmentDetailPIIViewRepository = installmentDetailPIIViewRepository;
     this.installmentPaidViewPIIViewRepository = installmentPaidViewPIIViewRepository;
     this.debtPositionService = debtPositionService;
@@ -61,9 +63,7 @@ public class InstallmentServiceImpl implements InstallmentService {
 
   @Override
   public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
-    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin).stream()
-            .map(installmentMapper::mapToDto)
-            .toList();
+    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin);
   }
 
   @Override
@@ -72,8 +72,8 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public PagedInstallmentsPaidView getPagedInstallmentPaidView(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Long debtPositionTypeOrgId, Pageable pageable) {
-    return installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, debtPositionTypeOrgId, pageable);
+  public PagedInstallmentsPaidView getPagedInstallmentPaidView(ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO, Pageable pageable) {
+    return installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, pageable);
   }
 
   @Override
@@ -108,7 +108,6 @@ public class InstallmentServiceImpl implements InstallmentService {
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
-      .map(installmentMapper::mapToDto)
       .toList();
 
     if(installments.isEmpty())
@@ -126,7 +125,7 @@ public class InstallmentServiceImpl implements InstallmentService {
       .forEach(paymentOptionDTO -> {
         List<InstallmentDTO> updatedInstallmentsList = paymentOptionDTO.getInstallments().stream()
           .map(installmentDTO ->
-            installmentDTO.getInstallmentId().equals(installment.getInstallmentId()) ? installment : installmentDTO
+            Objects.equals(installmentDTO.getInstallmentId(), installment.getInstallmentId()) ? installment : installmentDTO
           ).toList();
         paymentOptionDTO.setInstallments(updatedInstallmentsList);
       });

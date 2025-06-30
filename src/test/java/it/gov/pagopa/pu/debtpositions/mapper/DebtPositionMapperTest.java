@@ -1,11 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,18 +14,13 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.util.Pair;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallment;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
 import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -51,18 +44,14 @@ class DebtPositionMapperTest {
     debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    Map<InstallmentNoPII, Installment> installmentMap = new HashMap<>();
-    installmentMap.put(buildInstallmentNoPII(), buildInstallment());
-
     PaymentOption paymentOption = buildPaymentOption();
-    Pair<PaymentOption, Map<InstallmentNoPII, Installment>> paymentOptionPair = Pair.of(paymentOption, installmentMap);
 
-    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOptionPair);
+    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
 
-    Pair<DebtPosition, Map<InstallmentNoPII, Installment>> result = debtPositionMapper.mapToModel(debtPositionDTO);
+    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO);
 
-    reflectionEqualsByName(debtPositionExpected, result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
-    checkNotNullFields(result.getFirst(), "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 
   @Test

@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
 
 import java.time.LocalDate;
@@ -35,8 +36,8 @@ public class InstallmentSynchronizeFaker {
       .paymentOptionDescription("Payment description")
       .iud("iud")
       .iuv("iuv")
-      .entityType(InstallmentSynchronizeDTO.EntityTypeEnum.F)
-      .fiscalCode("uniqueIdentifierCode")
+      .fiscalCode("AAAAAA00B00C000D")
+      .entityType(PersonEntityType.F)
       .fullName("fullName")
       .address("address")
       .civic("civic")

@@ -1,16 +1,15 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -19,30 +18,19 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffse
 @Service
 public class PaymentOptionMapper {
 
-  private final InstallmentMapper installmentMapper;
+  private final InstallmentPIIMapper installmentMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
 
   private static final Collector<InstallmentNoPII, ?, SortedSet<InstallmentNoPII>> toInstallmentTreeSet = Collectors.toCollection(TreeSet::new);
 
-  public PaymentOptionMapper(InstallmentMapper installmentMapper, InstallmentPIIMapper installmentPIIMapper) {
+  public PaymentOptionMapper(InstallmentPIIMapper installmentMapper, InstallmentPIIMapper installmentPIIMapper) {
     this.installmentMapper = installmentMapper;
     this.installmentPIIMapper = installmentPIIMapper;
   }
 
-  public Pair<PaymentOption, Map<InstallmentNoPII, Installment>> mapToModel(PaymentOptionDTO dto) {
-    Map<InstallmentNoPII, Installment> installmentMapping = new HashMap<>();
-
-    List<Installment> installments = dto.getInstallments().stream()
-      .map(installmentMapper::mapToModel)
-      .toList();
-
-    SortedSet<InstallmentNoPII> installmentNoPIIs = installments.stream()
-      .map(installment -> {
-        Pair<InstallmentNoPII, InstallmentPIIDTO> result = installmentPIIMapper.map(installment);
-        InstallmentNoPII installmentNoPII = result.getFirst();
-        installmentMapping.put(installmentNoPII, installment);
-        return installmentNoPII;
-      })
+  public PaymentOption mapToModel(PaymentOptionDTO dto) {
+    SortedSet<InstallmentNoPII> installmentNoPIIs = dto.getInstallments().stream()
+      .map(installment -> installmentPIIMapper.map(installment).getFirst())
       .collect(toInstallmentTreeSet);
 
     PaymentOption paymentOption = new PaymentOption();
@@ -55,7 +43,7 @@ public class PaymentOptionMapper {
     paymentOption.setPaymentOptionIndex(dto.getPaymentOptionIndex());
     paymentOption.setInstallments(installmentNoPIIs);
 
-    return Pair.of(paymentOption, installmentMapping);
+    return paymentOption;
   }
 
   public PaymentOptionDTO mapToDto(PaymentOption paymentOption) {
@@ -68,7 +56,7 @@ public class PaymentOptionMapper {
       .paymentOptionIndex(paymentOption.getPaymentOptionIndex())
       .installments(
         paymentOption.getInstallments().stream()
-          .map(installmentMapper::mapToDto)
+          .map(installmentMapper::map)
           .collect(Collectors.toCollection(ArrayList<InstallmentDTO>::new))
       )
       .build();

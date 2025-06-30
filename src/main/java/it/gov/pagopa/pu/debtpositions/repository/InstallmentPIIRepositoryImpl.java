@@ -2,9 +2,9 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Installment;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import org.springframework.stereotype.Service;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class InstallmentPIIRepositoryImpl extends BasePIIRepository<Installment, InstallmentNoPII, InstallmentPIIDTO, Long> implements InstallmentPIIRepository {
+public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentDTO, InstallmentNoPII, InstallmentPIIDTO, Long> implements InstallmentPIIRepository {
 
   private final InstallmentPIIMapper installmentPIIMapper;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
@@ -24,13 +24,13 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<Installment,
   }
 
   @Override
-  public List<Installment> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
+  public List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
     return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin)
       .stream().map(installmentPIIMapper::map).toList();
   }
 
   @Override
-  void setId(Installment fullDTO, Long id) {
+  void setId(InstallmentDTO fullDTO, Long id) {
     fullDTO.setInstallmentId(id);
   }
 
