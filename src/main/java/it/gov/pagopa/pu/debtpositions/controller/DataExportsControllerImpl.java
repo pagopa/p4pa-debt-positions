@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DataExportsApi;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
@@ -56,7 +57,7 @@ public class DataExportsControllerImpl implements DataExportsApi {
     }
 
     OffsetDateTimeIntervalFilter paymentDateTime = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
-    OffsetDateTimeIntervalFilter installmentUpdateDateTime = new OffsetDateTimeIntervalFilter(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo);
+    LocalDateTimeIntervalFilter installmentUpdateDateTime = new LocalDateTimeIntervalFilter(Utilities.toLocalDateTime(installmentUpdateDateTimeFrom), Utilities.toLocalDateTime(installmentUpdateDateTimeTo));
 
     return ResponseEntity.ok(installmentService.getPagedInstallmentPaidView(
       ExportPaidInstallmentsFiltersDTO.builder()

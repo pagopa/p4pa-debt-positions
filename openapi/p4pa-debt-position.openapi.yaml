@@ -410,12 +410,12 @@ paths:
           required: true
           schema:
             type: string
-        - name: paymentDateFrom
+        - name: paymentDateTimeFrom
           in: query
           schema:
             type: string
             format: date-time
-        - name: paymentDateTo
+        - name: paymentDateTimeTo
           in: query
           schema:
             type: string
