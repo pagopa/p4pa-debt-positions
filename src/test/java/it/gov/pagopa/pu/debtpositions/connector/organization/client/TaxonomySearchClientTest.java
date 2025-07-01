@@ -2,7 +2,8 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.client.generated.TaxonomySearchControllerApi;
-import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomyEmbedded;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,66 +12,60 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.List;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
 
 @ExtendWith(MockitoExtension.class)
 class TaxonomySearchClientTest {
 
-    @Mock
-    private OrganizationApisHolder organizationApisHolderMock;
-    @Mock
-    private TaxonomySearchControllerApi taxonomySearchControllerApiMock;
+  @Mock
+  private OrganizationApisHolder organizationApisHolderMock;
+  @Mock
+  private TaxonomySearchControllerApi taxonomySearchControllerApiMock;
 
-    private TaxonomySearchClient taxonomySearchClient;
+  private TaxonomySearchClient taxonomySearchClient;
 
-    @BeforeEach
-    void setUp() {
-        taxonomySearchClient = new TaxonomySearchClient(organizationApisHolderMock);
-    }
+  @BeforeEach
+  void setUp() {
+    taxonomySearchClient = new TaxonomySearchClient(organizationApisHolderMock);
+  }
 
-    @AfterEach
-    void verifyNoMoreInteractions(){
-        Mockito.verifyNoMoreInteractions(
-          organizationApisHolderMock,
-          taxonomySearchControllerApiMock
-        );
-    }
-
-    @Test
-    void whenFindByTaxonomyCodeThenInvokeWithAccessToken(){
-        // Given
-        String accessToken = "ACCESSTOKEN";
-        String taxonomyCode = "TAXONOMYCODE";
-        Taxonomy expectedResult = new Taxonomy();
-
-        Mockito.when(organizationApisHolderMock.getTaxonomyCodeDtoSearchControllerApi(accessToken))
-                .thenReturn(taxonomySearchControllerApiMock);
-        Mockito.when(taxonomySearchControllerApiMock.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
-                .thenReturn(expectedResult);
-
-        // When
-        Taxonomy result = taxonomySearchClient.findByTaxonomyCode(taxonomyCode, accessToken);
-
-        // Then
-        Assertions.assertSame(expectedResult, result);
-    }
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      organizationApisHolderMock,
+      taxonomySearchControllerApiMock
+    );
+  }
 
   @Test
-  void givenNotExistentTaxonomyCodeWhenFindByTaxonomyCodeThenNull(){
+  void whenFindTaxonomiesThenInvokeWithAccessToken() {
     // Given
+    String organizationType = "00";
+    String macroAreaCode = "11";
+    String serviceTypeCode = "222";
+    String collectionReason = "33";
     String accessToken = "ACCESSTOKEN";
-    String taxonomyCode = "TAXONOMYCODE";
 
-    Mockito.when(organizationApisHolderMock.getTaxonomyCodeDtoSearchControllerApi(accessToken))
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
+    Mockito.when(organizationApisHolderMock.getTaxonomySearchControllerApi(accessToken))
       .thenReturn(taxonomySearchControllerApiMock);
-    Mockito.when(taxonomySearchControllerApiMock.crudTaxonomiesFindByTaxonomyCode(taxonomyCode))
-      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+    Mockito.when(taxonomySearchControllerApiMock.crudTaxonomiesFindTaxonomies(organizationType, macroAreaCode,
+        serviceTypeCode, collectionReason, 0, 1, null))
+      .thenReturn(pagedModelTaxonomy);
 
     // When
-    Taxonomy result = taxonomySearchClient.findByTaxonomyCode(taxonomyCode, accessToken);
+    PagedModelTaxonomy result = taxonomySearchClient.findTaxonomies(organizationType, macroAreaCode,
+      serviceTypeCode, collectionReason, 0, 1, null, accessToken);
 
     // Then
-    Assertions.assertNull(result);
+    Assertions.assertSame(pagedModelTaxonomy, result);
   }
 }

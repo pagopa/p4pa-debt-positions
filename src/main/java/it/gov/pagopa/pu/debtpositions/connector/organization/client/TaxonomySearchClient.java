@@ -1,10 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
-import it.gov.pagopa.pu.organization.dto.generated.Taxonomy;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
+
+import java.util.List;
 
 @Slf4j
 @Service
@@ -16,13 +17,11 @@ public class TaxonomySearchClient {
     this.organizationApisHolder = organizationApisHolder;
   }
 
-  public Taxonomy findByTaxonomyCode(String taxonomyCode, String accessToken) {
-    try{
-      return organizationApisHolder.getTaxonomyCodeDtoSearchControllerApi(accessToken)
-        .crudTaxonomiesFindByTaxonomyCode(taxonomyCode);
-    } catch (HttpClientErrorException.NotFound e){
-      log.info("Cannot find Taxonomy having taxonomyCode {}", taxonomyCode);
-      return null;
-    }
+  public PagedModelTaxonomy findTaxonomies(String organizationType, String macroAreaCode,
+                                           String serviceTypeCode, String collectionReason,
+                                           Integer page, Integer size, List<String> sort, String accessToken) {
+    return organizationApisHolder.getTaxonomySearchControllerApi(accessToken)
+      .crudTaxonomiesFindTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, page, size, sort);
   }
+
 }

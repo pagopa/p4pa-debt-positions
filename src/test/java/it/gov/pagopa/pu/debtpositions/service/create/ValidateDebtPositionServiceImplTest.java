@@ -8,6 +8,8 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomyEmbedded;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +24,7 @@ import java.util.List;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -95,9 +98,16 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     debtPositionDTO.setPaymentOptions(List.of(PaymentOptionFaker.buildPaymentOptionDTO(), PaymentOptionFaker.buildPaymentOptionDTO()));
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
+
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("PaymentOption index duplicated: 1", invalidValueException.getMessage());
@@ -473,25 +483,68 @@ class ValidateDebtPositionServiceImplTest {
     assertEquals("Category of transfer with index 1 is mandatory", invalidValueException.getMessage());
   }
 
-//  @Test
-//  void givenTransferCategoryNotFoundThenThrowValidationException() {
-//    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-//    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-//    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
-//      .getFirst()
-//      .getInstallments()
-//      .getFirst()
-//      .getTransfers().getFirst();
-//    transfer.setCategory("category");
-//
-//    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
-//    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-//
-//    when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.empty());
-//
-//    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-//    assertEquals("The category code category does not exist in the archive", invalidValueException.getMessage());
-//  }
+  @Test
+  void givenPagedTaxonomiesNullThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(null);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("The category code 001122233 does not exist in the archive", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenPagedTaxonomiesEmbeddedNullThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(null).build();
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("The category code 001122233 does not exist in the archive", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenPagedTaxonomiesEmbeddedEmptyThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of()).build()).build();
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("The category code 001122233 does not exist in the archive", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenTransferCategoryInvalidEmptyThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst().setCategory("0011223");
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("The category code 0011223 does not meet the required length or format", invalidValueException.getMessage());
+  }
 
   @Test
   void givenTransferAmountNegativeThenThrowValidationException() {
@@ -502,7 +555,6 @@ class ValidateDebtPositionServiceImplTest {
       .getInstallments()
       .getFirst()
       .getTransfers().getFirst();
-    transfer.setCategory("category");
     transfer.setAmountCents(-12L);
 
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
@@ -527,10 +579,15 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
 
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-
-    //when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.of(new Taxonomy()));
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
   }
@@ -541,9 +598,15 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
     Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    //when(taxonomyService.getTaxonomyByTaxonomyCode("category", accessToken)).thenReturn(Optional.of(new Taxonomy()));
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
   }
