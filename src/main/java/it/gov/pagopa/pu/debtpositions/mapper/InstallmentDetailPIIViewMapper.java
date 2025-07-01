@@ -26,6 +26,7 @@ public class InstallmentDetailPIIViewMapper {
       .paymentOptionId(installmentDetailNoPIIView.getPaymentOptionId())
       .status(installmentDetailNoPIIView.getStatus())
       .iuv(installmentDetailNoPIIView.getIuv())
+      .nav(installmentDetailNoPIIView.getNav())
       .amountCents(installmentDetailNoPIIView.getAmountCents())
       .dueDate(installmentDetailNoPIIView.getDueDate())
       .debtor(installmentPii.getDebtor())

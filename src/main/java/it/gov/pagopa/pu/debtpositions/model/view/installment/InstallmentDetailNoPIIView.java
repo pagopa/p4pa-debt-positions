@@ -29,6 +29,7 @@ public class InstallmentDetailNoPIIView implements Serializable {
   @Enumerated(EnumType.STRING)
   private InstallmentStatus status;
   private String iuv;
+  private String nav;
   @NotNull
   private Long amountCents;
   private LocalDate dueDate;

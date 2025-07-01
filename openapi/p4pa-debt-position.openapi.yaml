@@ -1558,6 +1558,8 @@ components:
           $ref: "#/components/schemas/InstallmentStatus"
         iuv:
           type: string
+        nav:
+          type: string
         amountCents:
           type: integer
           format: int64

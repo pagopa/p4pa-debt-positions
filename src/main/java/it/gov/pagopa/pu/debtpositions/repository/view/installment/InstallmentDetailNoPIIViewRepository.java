@@ -22,6 +22,7 @@ public interface InstallmentDetailNoPIIViewRepository extends Repository<Install
     i.paymentOptionId as paymentOptionId,
     i.status as status,
     i.iuv as iuv,
+    i.nav as nav,
     i.amountCents as amountCents,
     i.dueDate as dueDate,
     i.personalDataId as personalDataId,
