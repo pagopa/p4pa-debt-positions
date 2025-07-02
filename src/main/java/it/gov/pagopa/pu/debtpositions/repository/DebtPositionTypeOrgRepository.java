@@ -64,8 +64,12 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
       JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
       WHERE i.nav = :nav
-      AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN :debtPositionOrigins)
+      AND dpto.organizationId = :organizationId
+      AND dp.debtPositionOrigin IN :debtPositionOrigins
       """)
-  DebtPositionTypeOrg findDebtPositionTypeOrgByNavAndOrigins(String nav, List<DebtPositionOrigin> debtPositionOrigins);
+  DebtPositionTypeOrg findDebtPositionTypeOrgByNavAndOrigins(
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("nav") String nav,
+    @Parameter(required = true) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 }
 
