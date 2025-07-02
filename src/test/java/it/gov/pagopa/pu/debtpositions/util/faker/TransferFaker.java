@@ -23,7 +23,7 @@ public class TransferFaker {
     transfer.setRemittanceInformation("Payment Info");
     transfer.setIban("IT60X0542811101000000123456");
     transfer.setPostalIban("IT60X0542811101009000123456");
-    transfer.setCategory("category");
+    transfer.setCategory("001122233");
     transfer.setTransferIndex(1);
     transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
     transfer.setCreationDate(DATETIME.toLocalDateTime());
@@ -43,7 +43,7 @@ public class TransferFaker {
       .remittanceInformation("Payment Info")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101009000123456")
-      .category("category")
+      .category("001122233")
       .transferIndex(1)
       .stampType("TYPE")
       .stampHashDocument("HASH")

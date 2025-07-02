@@ -53,7 +53,7 @@ public class OrganizationApisHolder {
     return getApi(accessToken, organizationSearchControllerApi);
   }
 
-  public TaxonomySearchControllerApi getTaxonomyCodeDtoSearchControllerApi(String accessToken) {
+  public TaxonomySearchControllerApi getTaxonomySearchControllerApi(String accessToken) {
     return getApi(accessToken, taxonomySearchControllerApi);
   }
 

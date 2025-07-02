@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,5 +57,20 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
           @Parameter(required = true) @Param("code") String code,
           @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
   );
+
+  @Query("""
+      SELECT dpto from InstallmentNoPII i
+      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+      WHERE i.nav = :nav
+      AND dp.organizationId = :organizationId
+      AND dp.debtPositionOrigin IN :debtPositionOrigins
+      AND i.status != 'CANCELLED'
+      """)
+  DebtPositionTypeOrg findDebtPositionTypeOrgByOrgIdAndNavAndOrigins(
+    Long organizationId,
+    String nav,
+    List<DebtPositionOrigin> debtPositionOrigins);
 }
 

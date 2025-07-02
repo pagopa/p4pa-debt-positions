@@ -14,7 +14,7 @@ public class ExportPaidInstallmentsFiltersDTO {
   private Long organizationId;
   private String operatorExternalUserId;
   private OffsetDateTimeIntervalFilter paymentDateTime;
-  private OffsetDateTimeIntervalFilter installmentUpdateDateTime;
+  private LocalDateTimeIntervalFilter installmentUpdateDateTime;
   private Long debtPositionTypeOrgId;
 
 }

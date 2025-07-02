@@ -49,8 +49,10 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
     WHERE
       i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAID_STATUSES})
       AND dp.organizationId = :#{#filter.organizationId}
-      AND ((:#{#filter.paymentDateTime.from} IS NULL OR :#{#filter.paymentDateTime.to} IS NULL) OR r.paymentDateTime BETWEEN :#{#filter.paymentDateTime.from} AND :#{#filter.paymentDateTime.to})
-      AND ((:#{#filter.installmentUpdateDateTime.from} IS NULL OR :#{#filter.installmentUpdateDateTime.to} IS NULL) OR i.updateDate BETWEEN :#{#filter.installmentUpdateDateTime.from} AND :#{#filter.installmentUpdateDateTime.to})
+      AND (CAST(:#{#filter.paymentDateTime.from} AS STRING) IS NULL OR r.paymentDateTime >= :#{#filter.paymentDateTime.from})
+      AND (CAST(:#{#filter.paymentDateTime.to} AS STRING) IS NULL OR r.paymentDateTime <= :#{#filter.paymentDateTime.to})
+      AND (CAST(:#{#filter.installmentUpdateDateTime.from} AS STRING) IS NULL OR i.updateDate >= :#{#filter.installmentUpdateDateTime.from})
+      AND (CAST(:#{#filter.installmentUpdateDateTime.to} AS STRING) IS NULL OR i.updateDate <= :#{#filter.installmentUpdateDateTime.to})
       AND dptoo.operatorExternalUserId = :#{#filter.operatorExternalUserId}
       AND (:#{#filter.debtPositionTypeOrgId} IS NULL OR dptoo.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId})
       AND t.transferIndex = 1

@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
   public static final int TRANSFER_INDEX_MAX_SIZE = 5;
+  public static final String ANONIMO = "ANONIMO";
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
@@ -62,7 +64,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
-      if(!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())){
+      if (!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())) {
         throw new InvalidValueException("PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
       }
       if (CollectionUtils.isEmpty(paymentOptionDTO.getInstallments())) {
@@ -110,9 +112,9 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
       throw new InvalidValueException("Amount is not valid for this debt position type org");
     }
-    if(StringUtils.isNotBlank(installmentDTO.getBalance()) &&
-      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), accessToken))){
-        throw new InvalidValueException("Balance is not formally valid");
+    if (StringUtils.isNotBlank(installmentDTO.getBalance()) &&
+      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), accessToken))) {
+      throw new InvalidValueException("Balance is not formally valid");
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
@@ -126,15 +128,15 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(personDTO.getFiscalCode())) {
       throw new InvalidValueException("Fiscal code is mandatory");
     }
-    if(PersonEntityType.F.equals(personDTO.getEntityType())){
-      if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals("ANONIMO")) {
+    if (PersonEntityType.F.equals(personDTO.getEntityType())) {
+      if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals(ANONIMO)) {
         throw new InvalidValueException("The debt position type org does not allow an anonymous unique identification code");
       }
-      if (!personDTO.getFiscalCode().equals("ANONIMO") && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)){
+      if (!personDTO.getFiscalCode().equals(ANONIMO) && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of person is not valid");
       }
     } else {
-      if(!isValidPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
+      if (!isValidPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("P. iva of legal person is not valid");
       }
     }
@@ -151,20 +153,20 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("At least one transfer is mandatory for installment");
     }
 
-    if(transferDTOList.size() > TRANSFER_INDEX_MAX_SIZE){
+    if (transferDTOList.size() > TRANSFER_INDEX_MAX_SIZE) {
       throw new InvalidValueException("At most 5 transfers is allowed for installment");
     }
 
     Set<Integer> transferIndexes = HashSet.newHashSet(transferDTOList.size());
     transferDTOList.forEach(transferDTO -> {
       Integer index = transferDTO.getTransferIndex();
-      if(!transferIndexes.add(index)){
+      if (!transferIndexes.add(index)) {
         throw new InvalidValueException("Transfer index duplicated: " + index);
       }
-      if(index < 1 || index > TRANSFER_INDEX_MAX_SIZE){
+      if (index < 1 || index > TRANSFER_INDEX_MAX_SIZE) {
         throw new InvalidValueException("Transfer index should be between 1 and " + TRANSFER_INDEX_MAX_SIZE + ", provided: " + index);
       }
-      if(transferDTO.getAmountCents() <= 0) {
+      if (transferDTO.getAmountCents() <= 0) {
         throw new InvalidValueException("The amount of transfer with index " + index + " must be greater than 0");
       }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
@@ -176,12 +178,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     });
   }
 
-  private void checkIban(TransferDTO transferDTO){
+  private void checkIban(TransferDTO transferDTO) {
     if (StringUtils.isBlank(transferDTO.getStampType())) {
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
-      if(StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())){
+      if (StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())) {
         throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     }
@@ -190,13 +192,23 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private void checkTaxonomyCategory(TransferDTO transferDTO, String accessToken) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
+    } else {
+      String category = transferDTO.getCategory();
+      try {
+        String organizationType = category.substring(0, 2);
+        String macroAreaCode = category.substring(2, 4);
+        String serviceTypeCode = category.substring(4, 7);
+        String collectionReason = category.substring(7, 9);
+        PagedModelTaxonomy pagedModelTaxonomy = taxonomyService.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason,
+          0, 5, null, accessToken);
+
+        if (pagedModelTaxonomy == null || pagedModelTaxonomy.getEmbedded() == null || CollectionUtils.isEmpty(pagedModelTaxonomy.getEmbedded().getTaxonomies())) {
+          throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not exist in the archive");
+        }
+
+      } catch (IndexOutOfBoundsException exception) {
+        throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not meet the required length or format");
+      }
     }
-    // TODO fix with task P4ADEV-2379
-//    else {
-//      Optional<Taxonomy> taxonomy = taxonomyService.getTaxonomyByTaxonomyCode(transferDTO.getCategory(), accessToken);
-//      if (taxonomy.isEmpty()) {
-//        throw new InvalidValueException("The category code " + transferDTO.getCategory() + " does not exist in the archive");
-//      }
-//    }
   }
 }
