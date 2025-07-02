@@ -120,4 +120,8 @@ public class Utilities {
   public static LocalDateTime toLocalDateTime(OffsetDateTime date) {
     return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
   }
+
+  public static String taxonomyCodeToTransferCategory(String taxonomyCode){
+    return taxonomyCode.replace("9/", "").replace("/", "");
+  }
 }

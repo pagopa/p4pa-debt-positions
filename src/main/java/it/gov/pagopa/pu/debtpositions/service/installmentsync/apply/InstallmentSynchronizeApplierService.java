@@ -13,6 +13,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
+
 @Service
 public class InstallmentSynchronizeApplierService {
 
@@ -83,7 +85,7 @@ public class InstallmentSynchronizeApplierService {
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
-    String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
+    String taxonomyCode = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
       .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
       .getTaxonomyCode();
 
@@ -95,7 +97,7 @@ public class InstallmentSynchronizeApplierService {
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
       .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
-      .category(category)
+      .category(taxonomyCodeToTransferCategory(taxonomyCode))
       .amountCents(installmentSynchronizeDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
       .build();
