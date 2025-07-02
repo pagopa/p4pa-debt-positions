@@ -64,7 +64,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
       JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
       WHERE i.nav = :nav
-      AND dpto.organizationId = :organizationId
+      AND dp.organizationId = :organizationId
       AND dp.debtPositionOrigin IN :debtPositionOrigins
       AND i.status != 'CANCELLED'
       """)
