@@ -14,7 +14,7 @@ public class DebtPositionTypeFaker {
     debtPositionType.setMacroArea("MacroArea");
     debtPositionType.setServiceType("ServiceType");
     debtPositionType.setCollectingReason("CollectingReason");
-    debtPositionType.setTaxonomyCode("category");
+    debtPositionType.setTaxonomyCode("9/001122233/");
     debtPositionType.setFlagAnonymousFiscalCode(false);
     debtPositionType.setFlagMandatoryDueDate(false);
     debtPositionType.setFlagNotifyIo(false);

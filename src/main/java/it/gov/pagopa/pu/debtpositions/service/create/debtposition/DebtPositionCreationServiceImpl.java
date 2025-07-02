@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
 @Slf4j
@@ -170,7 +171,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
-    String category = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
+    String taxonomyCode = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
       .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
       .getTaxonomyCode();
 
@@ -182,7 +183,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
       .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
-      .category(category)
+      .category(taxonomyCodeToTransferCategory(taxonomyCode))
       .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentDTO.getRemittanceInformation())
       .build();
