@@ -69,8 +69,8 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       AND i.status != 'CANCELLED'
       """)
   DebtPositionTypeOrg findDebtPositionTypeOrgByOrgIdAndNavAndOrigins(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-    @Parameter(required = true) @Param("nav") String nav,
-    @Parameter(required = true) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+    Long organizationId,
+    String nav,
+    List<DebtPositionOrigin> debtPositionOrigins);
 }
 
