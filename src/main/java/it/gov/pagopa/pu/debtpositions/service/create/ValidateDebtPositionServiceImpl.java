@@ -27,6 +27,7 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
   public static final int TRANSFER_INDEX_MAX_SIZE = 5;
+  public static final String ANONIMO = "ANONIMO";
   private final TaxonomyService taxonomyService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
@@ -128,10 +129,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("Fiscal code is mandatory");
     }
     if (PersonEntityType.F.equals(personDTO.getEntityType())) {
-      if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals("ANONIMO")) {
+      if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals(ANONIMO)) {
         throw new InvalidValueException("The debt position type org does not allow an anonymous unique identification code");
       }
-      if (!personDTO.getFiscalCode().equals("ANONIMO") && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
+      if (!personDTO.getFiscalCode().equals(ANONIMO) && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of person is not valid");
       }
     } else {
