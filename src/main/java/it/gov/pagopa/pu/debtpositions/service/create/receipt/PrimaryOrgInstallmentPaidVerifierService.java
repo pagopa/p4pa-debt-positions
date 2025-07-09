@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -16,10 +16,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class PrimaryOrgInstallmentPaidVerifierService {
-
-  public static final List<DebtPositionOrigin> ORDINARY_DEBT_POSITION_ORIGINS = List.of(
-    DebtPositionOrigin.ORDINARY, DebtPositionOrigin.ORDINARY_SIL, DebtPositionOrigin.SPONTANEOUS
-  );
 
   private enum CHECK_MODE {EXACTLY_ONE, MOST_RECENT}
 
@@ -36,7 +32,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    */
   public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber) {
     // check installments by orgId/noticeNumber
-    List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, ORDINARY_DEBT_POSITION_ORIGINS);
+    List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
 
 
     //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer
