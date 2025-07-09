@@ -119,6 +119,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
     validateTransfers(installmentDTO.getTransfers(), accessToken);
+
+    Long totalAmountTransfers = installmentDTO.getTransfers().stream()
+      .mapToLong(TransferDTO::getAmountCents).sum();
+
+    if(!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
+      throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
+    }
   }
 
   private void validatePersonData(PersonDTO personDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {
@@ -185,6 +192,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       }
       if (StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())) {
         throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+    } else {
+      if(StringUtils.isBlank(transferDTO.getStampProvincialResidence()) || StringUtils.isBlank(transferDTO.getStampHashDocument())) {
+        throw new InvalidValueException("Stamp fields has to be all valued");
       }
     }
   }

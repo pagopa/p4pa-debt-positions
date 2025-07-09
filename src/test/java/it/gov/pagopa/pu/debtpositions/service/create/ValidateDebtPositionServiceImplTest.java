@@ -578,6 +578,9 @@ class ValidateDebtPositionServiceImplTest {
       .getInstallments()
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
+    debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments().getFirst().setAmountCents(200L);
 
     PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
       .embedded(PagedModelTaxonomyEmbedded.builder()
