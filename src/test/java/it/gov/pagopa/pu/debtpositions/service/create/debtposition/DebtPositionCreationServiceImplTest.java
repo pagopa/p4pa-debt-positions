@@ -31,10 +31,12 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.ArrayList;
 import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
@@ -110,6 +112,49 @@ class DebtPositionCreationServiceImplTest {
     assertEquals(PaymentOptionStatus.TO_SYNC, debtPosition.getPaymentOptions().getFirst().getStatus());
     assertEquals(new InstallmentSyncStatus(InstallmentStatus.DRAFT, InstallmentStatus.UNPAID), debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
     assertEquals(InstallmentStatus.TO_SYNC, debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+
+    Mockito.verify(debtPositionProcessorServiceMock, Mockito.times(2)).updateAmounts(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
+  }
+
+  @Test
+  void givenDebtPositionWithNoTransferWhenCreateThenPopulateFirstTransfer() {
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    String operatorExternalId = "OPERATOREXTERNALID";
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Organization organization = buildOrganization();
+    DebtPosition debtPosition = buildDebtPosition();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new ArrayList<>());
+    TransferDTO expectedTransferDTO = TransferDTO.builder()
+      .transferIndex(1)
+      .orgFiscalCode(organization.getOrgFiscalCode())
+      .orgName(organization.getOrgName())
+      .category("001122233")
+      .iban(debtPositionTypeOrg.getIban())
+      .amountCents(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents())
+      .remittanceInformation(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getRemittanceInformation())
+      .build();
+    String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeOrg.getDebtPositionTypeId())).thenReturn(Optional.of(buildDebtPositionType()));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.countExistingInstallments(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav())).thenReturn(0L);
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:" + iud, accessToken))
+      .thenReturn(workflow);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalId);
+
+    assertSame(workflow, result);
+    assertEquals(expectedTransferDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst());
 
     Mockito.verify(debtPositionProcessorServiceMock, Mockito.times(2)).updateAmounts(debtPositionDTO);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
