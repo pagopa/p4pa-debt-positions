@@ -1,11 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import org.springframework.stereotype.Service;
-
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
 public class TransferMapper {
@@ -23,6 +23,7 @@ public class TransferMapper {
     transfer.setPostalIban(dto.getPostalIban());
     transfer.setCategory(dto.getCategory());
     transfer.setTransferIndex(dto.getTransferIndex());
+    transfer.setMbdAttachment(dto.getMbdAttachment());
     return transfer;
   }
 
@@ -37,9 +38,10 @@ public class TransferMapper {
       .postalIban(transfer.getPostalIban())
       .category(transfer.getCategory())
       .transferIndex(transfer.getTransferIndex())
+      .mbdAttachment(transfer.getMbdAttachment())
       .build();
 
-    if( transfer.getStamp() != null) {
+    if (transfer.getStamp() != null) {
       transferDTO.setStampType(transfer.getStamp().getStampType());
       transferDTO.setStampHashDocument(transfer.getStamp().getStampHashDocument());
       transferDTO.setStampProvincialResidence(transfer.getStamp().getStampProvincialResidence());

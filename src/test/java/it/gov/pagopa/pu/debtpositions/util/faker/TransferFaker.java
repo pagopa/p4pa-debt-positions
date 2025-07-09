@@ -8,10 +8,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import org.apache.commons.lang3.RandomUtils;
 
 public class TransferFaker {
   private static final LocalDate DATE = LocalDate.of(2099, 1, 3);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
+  private static final byte[] MBD_ATTACHMENT = RandomUtils.secure().randomBytes(3);
 
   public static Transfer buildTransfer() {
     Transfer transfer = new Transfer();
@@ -30,6 +32,7 @@ public class TransferFaker {
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     transfer.setUpdateTraceId("TRACEID");
+    transfer.setMbdAttachment(MBD_ATTACHMENT);
     return transfer;
   }
 
@@ -52,10 +55,11 @@ public class TransferFaker {
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .updateTraceId("TRACEID")
+      .mbdAttachment(MBD_ATTACHMENT)
       .build();
   }
 
-  public static TransferDTO buildSyncTransferDTO(){
+  public static TransferDTO buildSyncTransferDTO() {
     return TransferDTO.builder()
       .orgFiscalCode("orgFiscalCode2")
       .orgName("orgName2")

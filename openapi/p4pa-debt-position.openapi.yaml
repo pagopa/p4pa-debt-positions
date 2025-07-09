@@ -1447,6 +1447,9 @@ components:
           type: string
         updateTraceId:
           type: string
+        mbdAttachment:
+          type: string
+          format: byte
     ReceiptDTO:
       type: object
       required:

@@ -38,6 +38,7 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
   private String category;
   @NotNull
   private Integer transferIndex;
+  private byte[] mbdAttachment;
 
   @Override
   public int compareTo(@Nonnull Transfer o) {

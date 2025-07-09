@@ -168,6 +168,7 @@
                         "creationDate": "2015-07-20T15:49:04-07:00",
                         "iban": "string",
                         "installmentId": 0,
+                        "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
                         "orgFiscalCode": "string",
                         "orgName": "string",
                         "postalIban": "string",
@@ -410,6 +411,7 @@
                 "creationDate": "2015-07-20T15:49:04-07:00",
                 "iban": "string",
                 "installmentId": 0,
+                "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
                 "orgFiscalCode": "string",
                 "orgName": "string",
                 "postalIban": "string",
@@ -574,6 +576,7 @@
                           "creationDate": "2015-07-20T15:49:04-07:00",
                           "iban": "string",
                           "installmentId": 0,
+                          "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
                           "orgFiscalCode": "string",
                           "orgName": "string",
                           "postalIban": "string",
@@ -740,6 +743,7 @@
                     "creationDate": "2015-07-20T15:49:04-07:00",
                     "iban": "string",
                     "installmentId": 0,
+                    "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
                     "orgFiscalCode": "string",
                     "orgName": "string",
                     "postalIban": "string",
@@ -895,6 +899,10 @@
             "type": "integer",
             "format": "int64"
           },
+          "mbdAttachment": {
+            "type": "string",
+            "format": "byte"
+          },
           "orgFiscalCode": {
             "type": "string"
           },
@@ -942,6 +950,7 @@
             "creationDate": "2015-07-20T15:49:04-07:00",
             "iban": "string",
             "installmentId": 0,
+            "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
             "orgFiscalCode": "string",
             "orgName": "string",
             "postalIban": "string",

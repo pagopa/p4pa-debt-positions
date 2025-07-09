@@ -118,6 +118,7 @@ public class ReceiptWithAdditionalInfoMapper {
       .postalIban(null) //it's not possible to understand from receipt if it's postal or not
       .category(transfer.getTransferCategory())
       .transferIndex(transfer.getIdTransfer())
+      .mbdAttachment(transfer.getMbdAttachment())
       .build();
   }
 }
