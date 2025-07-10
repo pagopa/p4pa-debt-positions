@@ -436,4 +436,52 @@ class InstallmentServiceImplTest {
     installmentDTO.setTransfers(transfers);
     return installmentDTO;
   }
+
+  @Test
+  void givenNullNotificationDateWhenUpdateInstallmentNotificationDateThenNoUpdate() {
+    // Given
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    OffsetDateTime originalNotificationDate = installmentDTO.getNotificationDate();
+
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(debtPositionDTO.getDebtPositionId())
+      .nav(Collections.singletonList(installmentDTO.getNav()))
+      .notificationDate(null)
+      .build();
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+
+    // When
+    WorkflowCreatedDTO result = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, operatorExternalUserId, accessToken);
+
+    // Then
+    assertNull(result);
+    assertEquals(originalNotificationDate, installmentDTO.getNotificationDate());
+  }
+
+  @Test
+  void givenSameNotificationDateWhenUpdateInstallmentNotificationDateThenNoUpdate() {
+    // Given
+    OffsetDateTime dateTime = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    installmentDTO.setNotificationDate(dateTime);
+
+    UpdateInstallmentNotificationDateRequest request = UpdateInstallmentNotificationDateRequest.builder()
+      .debtPositionId(debtPositionDTO.getDebtPositionId())
+      .nav(Collections.singletonList(installmentDTO.getNav()))
+      .notificationDate(dateTime)
+      .build();
+
+    Mockito.when(debtPositionServiceMock.getDebtPosition(request.getDebtPositionId())).thenReturn(debtPositionDTO);
+
+    // When
+    WorkflowCreatedDTO result = installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, operatorExternalUserId, accessToken);
+
+    // Then
+    assertNull(result);
+    assertEquals(dateTime, installmentDTO.getNotificationDate());
+  }
+
 }
