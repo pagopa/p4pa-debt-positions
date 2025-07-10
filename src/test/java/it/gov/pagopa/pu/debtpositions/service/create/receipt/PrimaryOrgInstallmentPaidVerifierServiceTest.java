@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.tuple.Pair;
@@ -41,7 +42,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     String noticeNumber = "noticeNumber";
 
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
-      PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of());
+      InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of());
 
     //when
     Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
@@ -51,7 +52,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
     Assertions.assertEquals(false, primaryOrgInstallment.getRight());
     Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
-      organization.getOrganizationId(), noticeNumber, PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS);
+      organization.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
   }
 
   @Test
@@ -160,7 +161,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
 
 
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
-      PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(installments);
+      InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(installments);
 
     //when
     if(expectedOutcome == ExptectedOutcome.EXCEPTION){
@@ -179,6 +180,6 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
 
     //verify
     Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
-      organization.getOrganizationId(), noticeNumber, PrimaryOrgInstallmentPaidVerifierService.ORDINARY_DEBT_POSITION_ORIGINS);
+      organization.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
   }
 }

@@ -1,12 +1,14 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -62,6 +64,13 @@ public class InstallmentUtils {
     PAYABLE_STATUSES.stream(),
     Stream.of(InstallmentStatus.UNPAYABLE)
   ).collect(Collectors.toSet());
+
+  public static final List<DebtPositionOrigin> ORDINARY_DEBT_POSITION_ORIGINS = List.of(
+    DebtPositionOrigin.ORDINARY,
+    DebtPositionOrigin.ORDINARY_SIL,
+    DebtPositionOrigin.SPONTANEOUS,
+    DebtPositionOrigin.SPONTANEOUS_SIL
+  );
 
   /**
    * It will check if the Installment is in a payable status
