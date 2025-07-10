@@ -82,7 +82,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
-                                        String accessToken, Organization org) {
+                                String accessToken, Organization org) {
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId()).orElse(null);
     checkDebtPosition(debtPositionDTO, org);
@@ -146,10 +146,10 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(debtPositionTypeOrg.getBalance());
     }
 
-    if(debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY))
-      installmentDTO.setSourceFlowName(org.getIpaCode()+"_IMPORT-DOVUTO");
-    if(debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))
-      installmentDTO.setSourceFlowName(org.getIpaCode()+"_SPONTANEO");
+    if (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY))
+      installmentDTO.setSourceFlowName(org.getIpaCode() + "_IMPORT-DOVUTO");
+    if (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))
+      installmentDTO.setSourceFlowName(org.getIpaCode() + "_SPONTANEO");
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
 
@@ -171,6 +171,11 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
+    if (installmentDTO.getTransfers().stream()
+      .anyMatch(transferDTO -> transferDTO.getTransferIndex() == 1)) {
+      return;
+    }
+
     String taxonomyCode = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
       .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
       .getTaxonomyCode();
