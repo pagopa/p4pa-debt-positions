@@ -502,6 +502,9 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .getTransfers().getFirst();
     transfer.setIban(null);
+    transfer.setStampType("stampType");
+    transfer.setStampHashDocument("stampHash");
+    transfer.setStampProvincialResidence("stampProvRes");
 
     switch (stampField) {
       case "stampType" -> transfer.setStampType(null);
