@@ -80,7 +80,8 @@ public class InstallmentServiceImpl implements InstallmentService {
 
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
-        .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()) && request.getNav().contains(installmentDTO.getNav()))
+        .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()) && request.getNav().contains(installmentDTO.getNav()) &&
+          request.getNotificationDate() != null && installmentDTO.getNotificationDate() != request.getNotificationDate())
         .forEach(installmentDTO -> {
           log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
           installmentDTO.setNotificationDate(request.getNotificationDate());
