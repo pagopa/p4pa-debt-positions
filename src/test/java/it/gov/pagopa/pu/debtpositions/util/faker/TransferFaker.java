@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 
 import java.time.LocalDate;
@@ -25,7 +24,6 @@ public class TransferFaker {
     transfer.setPostalIban("IT60X0542811101009000123456");
     transfer.setCategory("001122233");
     transfer.setTransferIndex(1);
-    transfer.setStamp(new Stamp("TYPE", "HASH", "PR"));
     transfer.setCreationDate(DATETIME.toLocalDateTime());
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
@@ -45,9 +43,6 @@ public class TransferFaker {
       .postalIban("IT60X0542811101009000123456")
       .category("001122233")
       .transferIndex(1)
-      .stampType("TYPE")
-      .stampHashDocument("HASH")
-      .stampProvincialResidence("PR")
       .creationDate(DATETIME)
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")

@@ -123,7 +123,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     Long totalAmountTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
 
-    if(!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
+    if (!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
       throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
     }
   }
@@ -180,13 +180,20 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
-      checkIban(transferDTO);
+      checkIbanOrStamp(transferDTO);
       checkTaxonomyCategory(transferDTO, accessToken);
     });
   }
 
-  private void checkIban(TransferDTO transferDTO) {
-    if (StringUtils.isBlank(transferDTO.getStampType())) {
+  private void checkIbanOrStamp(TransferDTO transferDTO) {
+    boolean stampFieldsValued = StringUtils.isNotBlank(transferDTO.getStampType()) &&
+      StringUtils.isNotBlank(transferDTO.getStampHashDocument()) &&
+      StringUtils.isNotBlank(transferDTO.getStampProvincialResidence());
+
+    if(StringUtils.isNotBlank(transferDTO.getIban())) {
+      if (stampFieldsValued) {
+        throw new InvalidValueException("Stamp fields has to be null when iban is valued");
+      }
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
@@ -194,8 +201,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     } else {
-      if(StringUtils.isBlank(transferDTO.getStampProvincialResidence()) || StringUtils.isBlank(transferDTO.getStampHashDocument())) {
-        throw new InvalidValueException("Stamp fields has to be all valued");
+      if (!stampFieldsValued) {
+        throw new InvalidValueException("Stamp fields has to be all valued when iban is null");
       }
     }
   }
