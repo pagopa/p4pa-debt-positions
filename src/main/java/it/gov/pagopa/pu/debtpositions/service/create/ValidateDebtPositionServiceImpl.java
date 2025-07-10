@@ -190,7 +190,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (StringUtils.isNotBlank(transferDTO.getStampType()) ||
         StringUtils.isNotBlank(transferDTO.getStampHashDocument()) ||
         StringUtils.isNotBlank(transferDTO.getStampProvincialResidence())) {
-        throw new InvalidValueException("Stamp fields of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
+        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
       }
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
@@ -202,7 +202,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (StringUtils.isBlank(transferDTO.getStampType()) ||
         StringUtils.isBlank(transferDTO.getStampHashDocument()) ||
         StringUtils.isBlank(transferDTO.getStampProvincialResidence())) {
-        throw new InvalidValueException("Stamp fields of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
+        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
       }
     }
   }
