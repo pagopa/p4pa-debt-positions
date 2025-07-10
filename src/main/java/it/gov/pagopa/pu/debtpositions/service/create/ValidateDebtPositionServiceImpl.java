@@ -119,6 +119,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
     validateTransfers(installmentDTO.getTransfers(), accessToken);
+
+    Long totalAmountTransfers = installmentDTO.getTransfers().stream()
+      .mapToLong(TransferDTO::getAmountCents).sum();
+
+    if (!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
+      throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
+    }
   }
 
   private void validatePersonData(PersonDTO personDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {
@@ -173,18 +180,29 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("Fiscal code of transfer with index " + index + " is not valid");
       }
-      checkIban(transferDTO);
+      checkIbanOrStamp(transferDTO);
       checkTaxonomyCategory(transferDTO, accessToken);
     });
   }
 
-  private void checkIban(TransferDTO transferDTO) {
-    if (StringUtils.isBlank(transferDTO.getStampType())) {
+  private void checkIbanOrStamp(TransferDTO transferDTO) {
+    if (StringUtils.isNotBlank(transferDTO.getIban())) {
+      if (StringUtils.isNotBlank(transferDTO.getStampType()) ||
+        StringUtils.isNotBlank(transferDTO.getStampHashDocument()) ||
+        StringUtils.isNotBlank(transferDTO.getStampProvincialResidence())) {
+        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
+      }
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
       if (StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())) {
         throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
+    } else {
+      if (StringUtils.isBlank(transferDTO.getStampType()) ||
+        StringUtils.isBlank(transferDTO.getStampHashDocument()) ||
+        StringUtils.isBlank(transferDTO.getStampProvincialResidence())) {
+        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
       }
     }
   }
