@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -14,7 +14,10 @@ import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
 import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,10 +27,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
-
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +43,7 @@ class InstallmentUpdateServiceTest {
   @Test
   void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk() {
     //given
-    ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
       InstallmentStatus.UNPAID);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
@@ -159,7 +158,7 @@ class InstallmentUpdateServiceTest {
     long paymentAmount = 1200L;
     long feeAmount = paymentAmount - installmentAmount; // = 200
 
-    ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setPaymentReceiptId("RECEIPTID");
     receiptDTO.setPaymentAmountCents(paymentAmount);
 
@@ -238,7 +237,7 @@ class InstallmentUpdateServiceTest {
   void givenNotFoundFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
-    ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
     //when
@@ -252,7 +251,7 @@ class InstallmentUpdateServiceTest {
   void givenNotFoundFoundInstallmentWhenUpdateInstallmentStatusOfDebtPositionThenException(){
     //given
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
-    ReceiptDTO receiptDTO = podamFactory.manufacturePojo(ReceiptDTO.class);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
     //align entities id
     debtPosition.getPaymentOptions().forEach(paymentOption -> {

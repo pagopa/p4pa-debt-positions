@@ -168,7 +168,7 @@
                         "creationDate": "2015-07-20T15:49:04-07:00",
                         "iban": "string",
                         "installmentId": 0,
-                        "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
+                        "mbdAttachment": "string",
                         "orgFiscalCode": "string",
                         "orgName": "string",
                         "postalIban": "string",
@@ -411,7 +411,7 @@
                 "creationDate": "2015-07-20T15:49:04-07:00",
                 "iban": "string",
                 "installmentId": 0,
-                "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
+                "mbdAttachment": "string",
                 "orgFiscalCode": "string",
                 "orgName": "string",
                 "postalIban": "string",
@@ -576,7 +576,7 @@
                           "creationDate": "2015-07-20T15:49:04-07:00",
                           "iban": "string",
                           "installmentId": 0,
-                          "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
+                          "mbdAttachment": "string",
                           "orgFiscalCode": "string",
                           "orgName": "string",
                           "postalIban": "string",
@@ -743,7 +743,7 @@
                     "creationDate": "2015-07-20T15:49:04-07:00",
                     "iban": "string",
                     "installmentId": 0,
-                    "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
+                    "mbdAttachment": "string",
                     "orgFiscalCode": "string",
                     "orgName": "string",
                     "postalIban": "string",
@@ -900,8 +900,7 @@
             "format": "int64"
           },
           "mbdAttachment": {
-            "type": "string",
-            "format": "byte"
+            "type": "string"
           },
           "orgFiscalCode": {
             "type": "string"
@@ -950,7 +949,7 @@
             "creationDate": "2015-07-20T15:49:04-07:00",
             "iban": "string",
             "installmentId": 0,
-            "mbdAttachment": "YmFzZTY0LWV4YW1wbGU=",
+            "mbdAttachment": "string",
             "orgFiscalCode": "string",
             "orgName": "string",
             "postalIban": "string",

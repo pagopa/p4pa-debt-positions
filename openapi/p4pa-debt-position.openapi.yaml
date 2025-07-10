@@ -1449,7 +1449,6 @@ components:
           type: string
         mbdAttachment:
           type: string
-          format: byte
     ReceiptDTO:
       type: object
       required:
@@ -1647,7 +1646,6 @@ components:
           type: string
         mbdAttachment:
           type: string
-          format: byte
         iban:
           type: string
         remittanceInformation:
