@@ -426,6 +426,24 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenTransferIbanWithStampValuedThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+    transfer.setStampType("stamp");
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("Stamp fields of transfer with index 1 has to be null when iban is valued", invalidValueException.getMessage());
+  }
+
+  @Test
   void givenTransferIbanInvalidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
@@ -480,7 +498,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Stamp fields has to be all valued when iban is null", invalidValueException.getMessage());
+    assertEquals("Stamp fields of transfer with index 1 has to be all valued when iban is null", invalidValueException.getMessage());
   }
 
   @Test

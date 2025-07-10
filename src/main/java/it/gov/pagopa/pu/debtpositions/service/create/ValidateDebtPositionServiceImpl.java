@@ -186,13 +186,11 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   }
 
   private void checkIbanOrStamp(TransferDTO transferDTO) {
-    boolean stampFieldsValued = StringUtils.isNotBlank(transferDTO.getStampType()) &&
-      StringUtils.isNotBlank(transferDTO.getStampHashDocument()) &&
-      StringUtils.isNotBlank(transferDTO.getStampProvincialResidence());
-
-    if(StringUtils.isNotBlank(transferDTO.getIban())) {
-      if (stampFieldsValued) {
-        throw new InvalidValueException("Stamp fields has to be null when iban is valued");
+    if (StringUtils.isNotBlank(transferDTO.getIban())) {
+      if (StringUtils.isNotBlank(transferDTO.getStampType()) ||
+        StringUtils.isNotBlank(transferDTO.getStampHashDocument()) ||
+        StringUtils.isNotBlank(transferDTO.getStampProvincialResidence())) {
+        throw new InvalidValueException("Stamp fields of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
       }
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException("Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
@@ -201,8 +199,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     } else {
-      if (!stampFieldsValued) {
-        throw new InvalidValueException("Stamp fields has to be all valued when iban is null");
+      if (StringUtils.isBlank(transferDTO.getStampType()) ||
+        StringUtils.isBlank(transferDTO.getStampHashDocument()) ||
+        StringUtils.isBlank(transferDTO.getStampProvincialResidence())) {
+        throw new InvalidValueException("Stamp fields of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
       }
     }
   }
