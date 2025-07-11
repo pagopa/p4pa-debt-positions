@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -28,6 +27,7 @@ public class TransferFaker {
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     transfer.setUpdateTraceId("TRACEID");
+    transfer.setMbdAttachment("MBD_ATTACHMENT");
     return transfer;
   }
 
@@ -47,10 +47,11 @@ public class TransferFaker {
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .updateTraceId("TRACEID")
+      .mbdAttachment("MBD_ATTACHMENT")
       .build();
   }
 
-  public static TransferDTO buildSyncTransferDTO(){
+  public static TransferDTO buildSyncTransferDTO() {
     return TransferDTO.builder()
       .orgFiscalCode("orgFiscalCode2")
       .orgName("orgName2")

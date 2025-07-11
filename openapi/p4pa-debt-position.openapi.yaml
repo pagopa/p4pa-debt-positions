@@ -1447,6 +1447,8 @@ components:
           type: string
         updateTraceId:
           type: string
+        mbdAttachment:
+          type: string
     ReceiptDTO:
       type: object
       required:
@@ -1644,7 +1646,6 @@ components:
           type: string
         mbdAttachment:
           type: string
-          format: byte
         iban:
           type: string
         remittanceInformation:
