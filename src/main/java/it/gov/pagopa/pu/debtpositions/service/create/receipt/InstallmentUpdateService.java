@@ -52,12 +52,7 @@ public class InstallmentUpdateService {
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
 
         // update mbdAttachment of transfer entity if present in input ReceiptDTO
-        receiptDTO.getTransfers().stream()
-          .filter(receiptTransferDTO -> receiptTransferDTO.getMbdAttachment() != null)
-          .findFirst()
-          .flatMap(receiptTransferDTO -> paidInstallment.getTransfers().stream()
-            .filter(transfer -> receiptTransferDTO.getIdTransfer().equals(transfer.getTransferIndex()))
-            .findFirst()).ifPresent(transfer -> transfer.setMbdAttachment(transfer.getMbdAttachment()));
+        updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {
         throw new NotFoundException("primary installment not found " + installment.getInstallmentId() + " on debt position " + debtPosition.getDebtPositionId());
       });
@@ -65,6 +60,15 @@ public class InstallmentUpdateService {
     return debtPosition;
   }
 
+  private static void updateMbdAttachment(ReceiptWithAdditionalNodeDataDTO receiptDTO,
+    InstallmentNoPII paidInstallment) {
+    receiptDTO.getTransfers().stream()
+      .filter(receiptTransferDTO -> receiptTransferDTO.getMbdAttachment() != null)
+      .findFirst()
+      .flatMap(receiptTransferDTO -> paidInstallment.getTransfers().stream()
+        .filter(transfer -> receiptTransferDTO.getIdTransfer().equals(transfer.getTransferIndex()))
+        .findFirst()).ifPresent(transfer -> transfer.setMbdAttachment(transfer.getMbdAttachment()));
+  }
 
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {
