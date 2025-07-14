@@ -40,12 +40,13 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     // given
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     String noticeNumber = "noticeNumber";
+    String iud = "iud";
 
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
       InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of());
 
     //when
-    Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
+    Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
 
     //verify
     Assertions.assertNotNull(primaryOrgInstallment);
@@ -137,6 +138,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     if(dueDate != null){
       installment.setDueDate(dueDate);
     }
+    installment.setIud("iud");
     return installment;
   }
 
@@ -144,6 +146,7 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     // given
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     String noticeNumber = "noticeNumber";
+    String iud = "iud";
 
     List<InstallmentNoPII> installments = new ArrayList<>();
     installments.add(targetInstallment);
@@ -165,9 +168,9 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
 
     //when
     if(expectedOutcome == ExptectedOutcome.EXCEPTION){
-      Assertions.assertThrows(InvalidInstallmentStatusException.class, () -> primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber));
+      Assertions.assertThrows(InvalidInstallmentStatusException.class, () -> primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud));
     } else {
-      Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber);
+      Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
       Assertions.assertNotNull(primaryOrgInstallment);
       Assertions.assertEquals(true, primaryOrgInstallment.getRight());
       //verify

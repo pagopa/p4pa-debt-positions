@@ -30,7 +30,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    * - the valid installment associated to the receipt, if found
    * - a boolean indicating if the primary org has a valid installment associated to the receipt
    */
-  public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber) {
+  public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber, String iud) {
     // check installments by orgId/noticeNumber
     List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
 
@@ -40,7 +40,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
     if (!fullInstallmentList.isEmpty()) {
 
       //filter out installments with status PAID and REPORTED
-      List<InstallmentNoPII> installmentList = filterAlreadyProcessed(fullInstallmentList);
+      List<InstallmentNoPII> installmentList = filterAlreadyProcessed(fullInstallmentList, iud);
 
       //validate related installments
       Optional<InstallmentNoPII> primaryOrgInstallment = validateRelatedInstallments(installmentList);
@@ -72,10 +72,11 @@ public class PrimaryOrgInstallmentPaidVerifierService {
       });
   }
 
-  private List<InstallmentNoPII> filterAlreadyProcessed(List<InstallmentNoPII> fullInstallmentList) {
+  private List<InstallmentNoPII> filterAlreadyProcessed(List<InstallmentNoPII> fullInstallmentList, String iud) {
     return fullInstallmentList.stream()
       .filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
-        && !anInstallment.getStatus().equals(InstallmentStatus.PAID)).toList();
+        && !anInstallment.getStatus().equals(InstallmentStatus.PAID)
+        && (iud == null || anInstallment.getIud().equals(iud))).toList();
   }
 
   /**

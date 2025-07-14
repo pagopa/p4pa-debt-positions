@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
@@ -40,8 +41,9 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
     //check if the same receipt is already present on DB
     Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
-    if (receiptInDb.isPresent())
+    if (receiptInDb.isPresent() && StringUtils.isBlank(receiptDTO.getIud())) {
       return receiptInDb.get();
+    }
 
     //persist receipt
     saveReceipt(receiptDTO);
