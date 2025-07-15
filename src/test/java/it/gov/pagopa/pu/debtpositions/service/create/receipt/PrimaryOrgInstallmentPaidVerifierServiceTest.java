@@ -119,6 +119,14 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_INVALID);
   }
 
+  @Test
+  void givenNonMatchingIudThenInstallmentFilteredOut() {
+    InstallmentNoPII mismatching = getInstallment(InstallmentStatus.UNPAID);
+    mismatching.setIud("another-iud");
+
+    handleTest(mismatching, null, ExptectedOutcome.FOUND_INVALID);
+  }
+
   static InstallmentNoPII getInstallment(InstallmentStatus status) {
     return getInstallment(status, null, null, null);
   }

@@ -58,7 +58,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .nav(receiptDTO.getNoticeNumber())
           .dueDate(null)
           .notificationFeeCents(receiptDTO.getFeeCents())
-          .amountCents(receiptDTO.getPaymentAmountCents())
+          .amountCents(receiptDTO.getSinglePaymentAmount())
           .remittanceInformation(getRemittanceInformation(receiptDTO))
           .balance(receiptDTO.getBalance())
           .legacyPaymentMetadata(getLegacyPaymentMetadata(receiptDTO))

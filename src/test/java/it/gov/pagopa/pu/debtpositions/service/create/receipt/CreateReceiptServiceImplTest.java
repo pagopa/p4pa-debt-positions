@@ -81,6 +81,7 @@ class CreateReceiptServiceImplTest {
   void givenValidReceiptWhenCreateReceiptThenOk() {
     //given
     boolean primaryOrgFound = true;
+    receipt.setIud("iud");
     Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
     Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
 
@@ -96,6 +97,28 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(managePaidDebtPositionServiceMock, Mockito.times(1)).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
     Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
+  }
+
+  @Test
+  void givenPrimaryOrgNotFoundWhenCreateReceiptThenCreateTechnicalPositionsWithTrue() {
+    // given
+    boolean primaryOrgFound = false;
+    receipt.setIud("VALID_IUD");
+
+    Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
+
+    // when
+    ReceiptDTO result = receiptService.createReceipt(receipt, accessToken);
+
+    // then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(receiptId, result.getReceiptId());
+
+    Mockito.verify(receiptMapperMock).mapToModel(receipt);
+    Mockito.verify(receiptPIIRepositoryMock).save(receiptModel);
+    Mockito.verify(managePaidDebtPositionServiceMock).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
   }
 
 }
