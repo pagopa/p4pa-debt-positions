@@ -61,6 +61,7 @@ class CreateReceiptServiceImplTest {
   void givenReceiptAlreadyHandledWhenCreateReceiptThenOk() {
     //given
     receipt.setPaymentReceiptId("NEW_PAYMENT_RECEIPT_ID");
+    receipt.setIud(null);
     ReceiptNoPII receiptNoPII = podamFactory.manufacturePojo(ReceiptNoPII.class);
     receiptNoPII.setPaymentReceiptId(receipt.getPaymentReceiptId());
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receipt.getPaymentReceiptId())).thenReturn(receiptNoPII);
