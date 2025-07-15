@@ -50,4 +50,25 @@ class BalanceClientTest {
     // Then
     Assertions.assertSame(Boolean.TRUE, result);
   }
+
+  @Test
+  void givenBalanceWhenGetByAssessmentThenTrue() {
+    // Given
+    String balance = "balance";
+    Long orgId = 1L;
+    String debtPositionTypeOrgCode = "CODE";
+    String accessToken = "ACCESSTOKEN";
+
+    Mockito.when(classificationApisHolder.getBalanceApi(accessToken))
+      .thenReturn(balanceApiMock);
+
+    Mockito.when(balanceApiMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode))
+      .thenReturn(balance);
+
+    // When
+    String result = balanceClient.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);
+
+    // Then
+    Assertions.assertEquals(balance, result);
+  }
 }

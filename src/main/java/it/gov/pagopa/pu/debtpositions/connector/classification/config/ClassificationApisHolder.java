@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.config;
 
-import it.gov.pagopa.pu.classification.controller.generated.AssessmentsRegistrySearchControllerApi;
 import it.gov.pagopa.pu.classification.controller.generated.BalanceApi;
 import it.gov.pagopa.pu.classification.generated.ApiClient;
 import it.gov.pagopa.pu.classification.generated.BaseApi;
@@ -16,7 +15,6 @@ public class ClassificationApisHolder {
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
   private final BalanceApi balanceApi;
-  private final AssessmentsRegistrySearchControllerApi assessmentsRegistrySearchControllerApi;
 
   public ClassificationApisHolder (
     ClassificationApiClientConfig clientConfig,
@@ -32,7 +30,6 @@ public class ClassificationApisHolder {
     }
 
     this.balanceApi = new BalanceApi(apiClient);
-    this.assessmentsRegistrySearchControllerApi = new AssessmentsRegistrySearchControllerApi(apiClient);
   }
 
   @PreDestroy
@@ -42,10 +39,6 @@ public class ClassificationApisHolder {
 
   public BalanceApi getBalanceApi(String accessToken){
     return getApi(accessToken, balanceApi);
-  }
-
-  public AssessmentsRegistrySearchControllerApi getAssessmentsRegistrySearchControllerApi(String accessToken){
-    return getApi(accessToken, assessmentsRegistrySearchControllerApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {

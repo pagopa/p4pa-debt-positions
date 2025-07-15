@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.config;
 
-import it.gov.pagopa.pu.classification.dto.generated.AssessmentsRegistryStatus;
 import it.gov.pagopa.pu.classification.dto.generated.ValidateBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import org.junit.jupiter.api.AfterEach;
@@ -13,8 +12,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.util.DefaultUriBuilderFactory;
-
-import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class ClassificationApisHolderTest extends BaseApiHolderTest {
@@ -47,24 +44,6 @@ class ClassificationApisHolderTest extends BaseApiHolderTest {
         assertAuthenticationShouldBeSetInThreadSafeMode(
                 accessToken -> classificationApisHolder.getBalanceApi(accessToken)
                         .validateBalance(new ValidateBalanceRequest()),
-                new ParameterizedTypeReference<>() {},
-                classificationApisHolder::unload);
-    }
-
-    @Test
-    void whenAssessmentsRegistrySearchControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
-        assertAuthenticationShouldBeSetInThreadSafeMode(
-                accessToken -> classificationApisHolder.getAssessmentsRegistrySearchControllerApi(accessToken)
-                        .crudAssessmentsRegistriesFindAssessmentsRegistriesByFilters(
-                          1L,
-                          Set.of("typCode"),
-                          null, null, null, null, null, null,
-                          "2025",
-                          AssessmentsRegistryStatus.ACTIVE,
-                          0,
-                          1,
-                          null
-                        ),
                 new ParameterizedTypeReference<>() {},
                 classificationApisHolder::unload);
     }

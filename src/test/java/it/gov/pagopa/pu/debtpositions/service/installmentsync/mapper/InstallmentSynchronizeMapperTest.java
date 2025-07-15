@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeFetchBalanceService;
+import it.gov.pagopa.pu.debtpositions.service.BalanceFetchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,13 +18,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeMapperTest {
   @Mock
-  private InstallmentSynchronizeFetchBalanceService installmentSynchronizeFetchBalanceServiceMock;
+  private BalanceFetchService balanceFetchServiceMock;
 
   private InstallmentSynchronizeMapper installmentSynchronizeMapper;
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeMapper = new InstallmentSynchronizeMapper(installmentSynchronizeFetchBalanceServiceMock);
+    installmentSynchronizeMapper = new InstallmentSynchronizeMapper(balanceFetchServiceMock);
   }
 
   @Test
@@ -34,7 +34,7 @@ class InstallmentSynchronizeMapperTest {
     installmentSynchronizeDTO.setBalance(null);
     DebtPositionDTO expectedDebtPositionDTO = buildSyncDebtPositionDTO();
 
-    Mockito.when(installmentSynchronizeFetchBalanceServiceMock.getDebtPositionTypeDefaultBalance(installmentSynchronizeDTO, accessToken))
+    Mockito.when(balanceFetchServiceMock.getBalanceDefault(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode(), accessToken))
       .thenReturn("balance");
 
     DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, 1L, accessToken);

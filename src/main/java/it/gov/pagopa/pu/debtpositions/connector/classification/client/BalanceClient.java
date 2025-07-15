@@ -18,4 +18,8 @@ public class BalanceClient {
       .balance(balance).build();
     return classificationApisHolder.getBalanceApi(accessToken).validateBalance(validateBalanceRequest);
   }
+
+  public String getBalanceByAssessmentRegistry(Long organizationId, String debtPositionTypeOrgCode, String accessToken){
+    return classificationApisHolder.getBalanceApi(accessToken).getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrgCode);
+  }
 }
