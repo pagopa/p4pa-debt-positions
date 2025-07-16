@@ -39,7 +39,10 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.info("createReceipt paymentReceiptId[{}} org/nav[{}/{}]", receiptDTO.getPaymentReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber());
 
-    //check if the same receipt is already present on DB
+    // if the receipt already exists, we should continue only if the input IUD exists,
+    // in order to check the existence of a DP having an Installment with the requested IUD:
+    // if it doesn't exist, we should create a new technical DP with the requested Installment
+    // (use case heterogeneous IUV: many DP on same org having same IUV)
     Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
     if (receiptInDb.isPresent() && StringUtils.isBlank(receiptDTO.getIud())) {
       return receiptInDb.get();

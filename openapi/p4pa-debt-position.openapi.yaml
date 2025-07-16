@@ -1680,9 +1680,6 @@ components:
               type: string
             balance:
               type: string
-            singlePaymentAmount:
-              type: integer
-              format: int64
     PersonDTO:
       required:
         - fullName
