@@ -1,8 +1,27 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -13,6 +32,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.service.BalanceFetchService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
@@ -23,6 +43,9 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,21 +53,6 @@ import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
-import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionCreationServiceImplTest {
@@ -71,6 +79,8 @@ class DebtPositionCreationServiceImplTest {
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
   private DebtPositionTypeRepository debtPositionTypeRepositoryMock;
+  @Mock
+  private BalanceFetchService balanceFetchServiceMock;
 
   private DebtPositionCreationService createDebtPositionService;
 
@@ -81,7 +91,7 @@ class DebtPositionCreationServiceImplTest {
     createDebtPositionService = new DebtPositionCreationServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
       validateDebtPositionServiceMock, debtPositionServiceMock, iuvServiceMock, debtPositionSyncServiceMock, installmentNoPIIRepositoryMock,
       debtPositionProcessorServiceMock, organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock,
-      debtPositionTypeOrgRepositoryMock, debtPositionTypeRepositoryMock);
+      debtPositionTypeOrgRepositoryMock, debtPositionTypeRepositoryMock, balanceFetchServiceMock);
   }
 
   @Test
