@@ -1208,7 +1208,7 @@ paths:
         "500":
           description: Internal server error
 security:
-  - BearerAuth: []
+  - BearerAuth: [ ]
 components:
   securitySchemes:
     BearerAuth:
@@ -1223,7 +1223,7 @@ components:
         - paymentOptions
         - flagPuPagoPaPayment
       type: object
-      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"]
+      x-implements: [ "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition" ]
       properties:
         debtPositionId:
           type: integer
@@ -1271,7 +1271,7 @@ components:
         - totalAmountCents
         - paymentOptionType
       type: object
-      x-implements: ["it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption"]
+      x-implements: [ "it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption" ]
       properties:
         paymentOptionId:
           type: integer
