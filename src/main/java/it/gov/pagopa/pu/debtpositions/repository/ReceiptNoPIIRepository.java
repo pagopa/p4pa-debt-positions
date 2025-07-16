@@ -24,4 +24,16 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
     WHERE t.transferId = :transferId
   """)
   ReceiptNoPII getByTransferId(Long transferId);
+
+  @Query("""
+    SELECT r
+    FROM ReceiptNoPII r
+    JOIN InstallmentNoPII i ON r.receiptId = i.receiptId
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+    WHERE r.receiptId = :receiptId
+    AND dpto.code = :debtPositionTypeOrgCode
+  """)
+  ReceiptNoPII getByReceiptIdAndDebtPositionTypeOrgCode(Long receiptId, String debtPositionTypeOrgCode);
 }
