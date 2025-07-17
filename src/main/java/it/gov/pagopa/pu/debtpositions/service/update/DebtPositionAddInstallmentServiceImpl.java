@@ -21,14 +21,13 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -74,7 +73,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
           paymentOptionDTO.getInstallments().stream()
             .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
             .forEach(installmentDTO -> {
-              debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO);
+              debtPositionCreationService.checkInstallment(debtPositionDTO, org, debtPositionTypeOrg, installmentDTO, accessToken);
               validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
               if(!InstallmentStatus.DRAFT.equals(installmentDTO.getStatus())) {
                 installmentDTO.setStatus(InstallmentStatus.TO_SYNC);

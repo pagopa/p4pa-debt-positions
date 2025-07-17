@@ -11,6 +11,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpClientErrorException;
 
 @ExtendWith(MockitoExtension.class)
 class BalanceClientTest {
@@ -49,5 +51,46 @@ class BalanceClientTest {
 
     // Then
     Assertions.assertSame(Boolean.TRUE, result);
+  }
+
+  @Test
+  void givenBalanceWhenGetByAssessmentThenTrue() {
+    // Given
+    String balance = "balance";
+    Long orgId = 1L;
+    String debtPositionTypeOrgCode = "CODE";
+    String accessToken = "ACCESSTOKEN";
+
+    Mockito.when(classificationApisHolder.getBalanceApi(accessToken))
+      .thenReturn(balanceApiMock);
+
+    Mockito.when(balanceApiMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode))
+      .thenReturn(balance);
+
+    // When
+    String result = balanceClient.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);
+
+    // Then
+    Assertions.assertEquals(balance, result);
+  }
+
+  @Test
+  void givenBalanceNotFoundWhenGetByAssessmentThenNull() {
+    // Given
+    Long orgId = 1L;
+    String debtPositionTypeOrgCode = "CODE";
+    String accessToken = "ACCESSTOKEN";
+
+    Mockito.when(classificationApisHolder.getBalanceApi(accessToken))
+      .thenReturn(balanceApiMock);
+
+    Mockito.when(balanceApiMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode))
+      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+
+    // When
+    String result = balanceClient.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);
+
+    // Then
+    Assertions.assertNull(result);
   }
 }

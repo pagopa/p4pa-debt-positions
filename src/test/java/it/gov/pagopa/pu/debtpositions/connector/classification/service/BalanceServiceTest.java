@@ -43,4 +43,22 @@ class BalanceServiceTest {
     // Then
     Assertions.assertEquals(Boolean.TRUE, result);
   }
+
+  @Test
+  void givenBalanceWhenGetByAssessmentThenTrue() {
+    // Given
+    String balance = "balance";
+    Long orgId = 1L;
+    String debtPositionTypeOrgCode = "CODE";
+    String accessToken = "ACCESSTOKEN";
+
+    Mockito.when(balanceClientMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken))
+      .thenReturn(balance);
+
+    // When
+    String result = balanceService.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);
+
+    // Then
+    Assertions.assertEquals(balance, result);
+  }
 }

@@ -13,6 +13,8 @@ import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomyEmbedded;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -425,6 +427,31 @@ class ValidateDebtPositionServiceImplTest {
     assertEquals("Fiscal code of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"stampType", "stampHashDocument", "stampProvincialResidence"})
+  void givenTransferIbanWithStampValuedThenThrowValidationException(String stampField) {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+
+    switch (stampField) {
+      case "stampType" -> transfer.setStampType("test");
+      case "stampHashDocument" -> transfer.setStampHashDocument("test");
+      case "stampProvincialResidence" -> transfer.setStampProvincialResidence("test");
+      default -> { return; }
+    }
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("Stamp attributes of transfer with index 1 has to be null when iban is valued", invalidValueException.getMessage());
+  }
+
   @Test
   void givenTransferIbanInvalidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -461,6 +488,36 @@ class ValidateDebtPositionServiceImplTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Postal iban of transfer with index 1 is not valid", invalidValueException.getMessage());
+  }
+
+
+  @ParameterizedTest
+  @ValueSource(strings = {"stampType", "stampHashDocument", "stampProvincialResidence"})
+  void givenTransferStampFieldsNotAllValuedThenThrowValidationException(String stampField) {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+    transfer.setIban(null);
+    transfer.setStampType("stampType");
+    transfer.setStampHashDocument("stampHash");
+    transfer.setStampProvincialResidence("stampProvRes");
+
+    switch (stampField) {
+      case "stampType" -> transfer.setStampType(null);
+      case "stampHashDocument" -> transfer.setStampHashDocument(null);
+      case "stampProvincialResidence" -> transfer.setStampProvincialResidence(null);
+      default -> { return; }
+    }
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("Stamp attributes of transfer with index 1 has to be all valued when iban is null", invalidValueException.getMessage());
   }
 
   @Test
@@ -565,6 +622,31 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenTransfersAmountsDifferentToInstallmentAmountThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+    transfer.setAmountCents(120L);
+
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
+    Mockito.when(debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("The sum of transfers amounts has to be equal to installment amount", invalidValueException.getMessage());
+  }
+
+  @Test
   void givenSecondTransferThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
@@ -578,6 +660,9 @@ class ValidateDebtPositionServiceImplTest {
       .getInstallments()
       .getFirst()
       .setTransfers(new ArrayList<>(transfers));
+    debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments().getFirst().setAmountCents(200L);
 
     PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
       .embedded(PagedModelTaxonomyEmbedded.builder()

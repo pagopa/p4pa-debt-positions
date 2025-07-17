@@ -58,7 +58,10 @@ public class ReceiptWithAdditionalInfoMapper {
           .nav(receiptDTO.getNoticeNumber())
           .dueDate(null)
           .notificationFeeCents(receiptDTO.getFeeCents())
-          .amountCents(receiptDTO.getPaymentAmountCents())
+          .amountCents(receiptDTO.getTransfers().stream()
+            .map(this::mapTransfer)
+            .mapToLong(TransferDTO::getAmountCents)
+            .sum())
           .remittanceInformation(getRemittanceInformation(receiptDTO))
           .balance(receiptDTO.getBalance())
           .legacyPaymentMetadata(getLegacyPaymentMetadata(receiptDTO))
@@ -93,7 +96,7 @@ public class ReceiptWithAdditionalInfoMapper {
   }
 
   private String getIupdOrg(ReceiptWithAdditionalNodeDataDTO receipt) {
-    return "PPR-"+receipt.getPaymentReceiptId();
+    return "PPR-" + receipt.getPaymentReceiptId();
   }
 
   private String getRemittanceInformation(ReceiptWithAdditionalNodeDataDTO receipt) {
@@ -118,6 +121,7 @@ public class ReceiptWithAdditionalInfoMapper {
       .postalIban(null) //it's not possible to understand from receipt if it's postal or not
       .category(transfer.getTransferCategory())
       .transferIndex(transfer.getIdTransfer())
+      .mbdAttachment(transfer.getMbdAttachment())
       .build();
   }
 }

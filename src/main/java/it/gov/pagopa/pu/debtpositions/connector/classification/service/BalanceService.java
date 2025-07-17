@@ -12,4 +12,13 @@ public interface BalanceService {
    * @return a Boolean based on whether the value is formally valid or not
    */
   Boolean isValidBalance(String balance, String accessToken);
+
+  /***
+   *
+   * @param organizationId the id of organization
+   * @param debtPositionTypeOrgCode the debt position type org code
+   * @param accessToken the access token
+   * @return the balance as a string
+   */
+  String getBalanceByAssessmentRegistry(Long organizationId, String debtPositionTypeOrgCode, String accessToken);
 }

@@ -14,6 +14,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @RepositoryRestResource(path = "debt-position-type-orgs")
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg, Long> {
@@ -72,5 +73,18 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     Long organizationId,
     String nav,
     List<DebtPositionOrigin> debtPositionOrigins);
+
+  @Query("""
+      SELECT distinct dpto
+      from InstallmentNoPII i
+      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+      WHERE dp.organizationId = :organizationId
+      AND i.iud IN :iuds
+      """)
+  List<DebtPositionTypeOrg> findDebtPositionTypeOrgByOrganizationIdAndIuds(
+    Long organizationId,
+    Set<String> iuds);
 }
 

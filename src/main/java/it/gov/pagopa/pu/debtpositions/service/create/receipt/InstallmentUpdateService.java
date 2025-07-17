@@ -2,17 +2,17 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import java.util.stream.Stream;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.stream.Stream;
 
 @Service
 @Slf4j
@@ -25,7 +25,7 @@ public class InstallmentUpdateService {
   }
 
   @Transactional
-  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptDTO receiptDTO) {
+  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     //retrieve debt position
     DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
     if (debtPosition == null) {
@@ -50,6 +50,9 @@ public class InstallmentUpdateService {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
+
+        // update mbdAttachment of transfer entity if present in input ReceiptDTO
+        updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {
         throw new NotFoundException("primary installment not found " + installment.getInstallmentId() + " on debt position " + debtPosition.getDebtPositionId());
       });
@@ -57,6 +60,15 @@ public class InstallmentUpdateService {
     return debtPosition;
   }
 
+  private static void updateMbdAttachment(ReceiptWithAdditionalNodeDataDTO receiptDTO,
+    InstallmentNoPII paidInstallment) {
+    receiptDTO.getTransfers().stream()
+      .filter(receiptTransferDTO -> receiptTransferDTO.getMbdAttachment() != null)
+      .findFirst()
+      .flatMap(receiptTransferDTO -> paidInstallment.getTransfers().stream()
+        .filter(transfer -> receiptTransferDTO.getIdTransfer().equals(transfer.getTransferIndex()))
+        .findFirst()).ifPresent(transfer -> transfer.setMbdAttachment(transfer.getMbdAttachment()));
+  }
 
 
   private void invalidOtherPaymentOptions(PaymentOption paymentOption) {

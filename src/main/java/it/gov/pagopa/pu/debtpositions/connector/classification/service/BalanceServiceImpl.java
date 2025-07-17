@@ -16,4 +16,9 @@ public class BalanceServiceImpl implements BalanceService {
   public Boolean isValidBalance(String balance, String accessToken) {
     return balanceClient.validateBalance(balance, accessToken);
   }
+
+  @Override
+  public String getBalanceByAssessmentRegistry(Long organizationId, String debtPositionTypeOrgCode, String accessToken) {
+    return balanceClient.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrgCode, accessToken);
+  }
 }
