@@ -153,7 +153,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     }
 
     if (StringUtils.isBlank(installmentDTO.getBalance())) {
-      balanceFetchService.getBalanceDefault(org.getOrganizationId(), debtPositionTypeOrg, accessToken);
+      installmentDTO.setBalance(balanceFetchService.getBalanceDefault(org.getOrganizationId(), debtPositionTypeOrg, accessToken));
     }
 
     if (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY))
