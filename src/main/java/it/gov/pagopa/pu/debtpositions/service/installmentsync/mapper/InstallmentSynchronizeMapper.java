@@ -1,13 +1,23 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.BalanceFetchService;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 @Service
 public class InstallmentSynchronizeMapper {
@@ -17,34 +27,34 @@ public class InstallmentSynchronizeMapper {
     this.balanceFetchService = balanceFetchService;
   }
 
-  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, Long debtPositionTypeOrgId, String accessToken) {
+  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
     return DebtPositionDTO.builder()
       .iupdOrg(installmentSynchronizeDTO.getIupdOrg())
       .description(installmentSynchronizeDTO.getDescription())
       .debtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL)
-      .debtPositionTypeOrgId(debtPositionTypeOrgId)
+      .debtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId())
       .organizationId(installmentSynchronizeDTO.getOrganizationId())
       .validityDate(installmentSynchronizeDTO.getValidityDate())
       .multiDebtor(installmentSynchronizeDTO.getMultiDebtor())
       .flagPuPagoPaPayment(installmentSynchronizeDTO.getFlagPuPagoPaPayment())
       .flagIuvVolatile(Boolean.FALSE)
       .status((Boolean.TRUE).equals(installmentSynchronizeDTO.getDraft()) ? DebtPositionStatus.DRAFT : DebtPositionStatus.UNPAID)
-      .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO, accessToken)))
+      .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken)))
       .build();
   }
 
-  public PaymentOptionDTO map2PaymentOptionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken){
+  public PaymentOptionDTO map2PaymentOptionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken){
     return PaymentOptionDTO.builder()
       .paymentOptionIndex(installmentSynchronizeDTO.getPaymentOptionIndex())
       .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
       .description(installmentSynchronizeDTO.getPaymentOptionDescription())
       .status(Boolean.TRUE.equals(installmentSynchronizeDTO.getDraft()) ? PaymentOptionStatus.DRAFT :PaymentOptionStatus.UNPAID)
-      .installments(List.of(map2Installment(installmentSynchronizeDTO, accessToken)))
+      .installments(List.of(map2Installment(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken)))
       .build();
   }
 
-  public InstallmentDTO map2Installment(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken){
-    String balance = StringUtils.isNotBlank(installmentSynchronizeDTO.getBalance()) ? installmentSynchronizeDTO.getBalance() : balanceFetchService.getBalanceDefault(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode(), accessToken);
+  public InstallmentDTO map2Installment(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken){
+    String balance = StringUtils.isNotBlank(installmentSynchronizeDTO.getBalance()) ? installmentSynchronizeDTO.getBalance() : balanceFetchService.getBalanceDefault(installmentSynchronizeDTO.getOrganizationId(), debtPositionTypeOrg, accessToken);
 
     return InstallmentDTO.builder()
       .iud(installmentSynchronizeDTO.getIud())
