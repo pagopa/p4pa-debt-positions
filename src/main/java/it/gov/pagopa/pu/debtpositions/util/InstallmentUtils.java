@@ -69,7 +69,8 @@ public class InstallmentUtils {
     DebtPositionOrigin.ORDINARY,
     DebtPositionOrigin.ORDINARY_SIL,
     DebtPositionOrigin.SPONTANEOUS,
-    DebtPositionOrigin.SPONTANEOUS_SIL
+    DebtPositionOrigin.SPONTANEOUS_SIL,
+    DebtPositionOrigin.RECEIPT_FILE
   );
 
   /**
