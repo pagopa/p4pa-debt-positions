@@ -317,4 +317,7 @@ tasks.register<GenerateTask>("openApiGenerateCLASSIFICATION") {
     "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
   ))
   library.set("resttemplate")
+  typeMappings.set(mapOf(
+    "LocalDateTime" to "java.time.LocalDateTime"
+  ))
 }
