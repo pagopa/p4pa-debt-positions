@@ -58,8 +58,8 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
-    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin);
+  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, String iud) {
+    return installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin, iud);
   }
 
   @Override
@@ -103,7 +103,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   @Override
   public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud").stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
 

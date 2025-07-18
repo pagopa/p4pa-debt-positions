@@ -24,8 +24,8 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentD
   }
 
   @Override
-  public List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
-    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin)
+  public List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, String iud) {
+    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin, iud)
       .stream().map(installmentPIIMapper::map).toList();
   }
 

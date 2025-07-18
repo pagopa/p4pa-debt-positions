@@ -348,7 +348,7 @@ paths:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
       x-spring-paginated: true
-  /installments/{organizationId}/{nav}:
+  /installments/{organizationId}/{nav}/{iud}:
     get:
       tags:
         - installment
@@ -375,6 +375,11 @@ paths:
             items:
               $ref: "#/components/schemas/DebtPositionOrigin"
             description: An array of debt position origins to filter by; if null, no filter is applied
+        - name: iud
+          in: path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Ok

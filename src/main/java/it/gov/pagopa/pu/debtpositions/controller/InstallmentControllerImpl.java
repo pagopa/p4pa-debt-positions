@@ -19,8 +19,8 @@ public class InstallmentControllerImpl implements InstallmentApi {
   }
 
   @Override
-  public ResponseEntity<List<InstallmentDTO>> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
-    return ResponseEntity.ok(installmentService.getInstallmentsByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin));
+  public ResponseEntity<List<InstallmentDTO>> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
+    return ResponseEntity.ok(installmentService.getInstallmentsByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin, iud));
   }
 
   @Override

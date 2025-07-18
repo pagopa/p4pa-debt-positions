@@ -107,10 +107,10 @@ class InstallmentServiceImplTest {
     List<InstallmentDTO> installmentDTOList = new ArrayList<>();
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(1L, "NAV", originList, "iud")).thenReturn(installmentDTOList);
 
     //when
-    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
+    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList, "iud");
 
     //verify
     assertNotNull(response);
@@ -268,7 +268,7 @@ class InstallmentServiceImplTest {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
@@ -299,7 +299,7 @@ class InstallmentServiceImplTest {
     Long orgId = 1L;
     long newNotificationFee = 200L;
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(Collections.emptyList());
 
     // When Then
@@ -316,7 +316,7 @@ class InstallmentServiceImplTest {
     long newNotificationFee = 200L;
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(List.of(installmentDTO, installmentDTO));
 
     // When Then
@@ -335,7 +335,7 @@ class InstallmentServiceImplTest {
     InstallmentDTO paidInstallment = new InstallmentDTO();
     paidInstallment.setStatus(InstallmentStatus.PAID);
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(List.of(paidInstallment));
 
     // When Then
@@ -359,7 +359,7 @@ class InstallmentServiceImplTest {
     installmentDTO.getTransfers().add(taxTransfer);
 
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
 
@@ -388,7 +388,7 @@ class InstallmentServiceImplTest {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, "iud"))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId()))
       .thenReturn(debtPosition);

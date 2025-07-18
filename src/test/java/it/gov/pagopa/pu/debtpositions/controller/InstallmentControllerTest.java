@@ -50,9 +50,9 @@ class InstallmentControllerTest {
     List<InstallmentDTO> installmentDTOList = List.of(InstallmentFaker.buildInstallmentDTO());
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
+    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList, "iud")).thenReturn(installmentDTOList);
 
-    var builder = MockMvcRequestBuilders.get("/installments/{organizationId}/{nav}",1L,"NAV")
+    var builder = MockMvcRequestBuilders.get("/installments/{organizationId}/{nav}/{iud}",1L,"NAV","iud")
       .contentType(MediaType.APPLICATION_JSON_VALUE);
     if(debtPositionOrigin!=null)
       builder = builder.queryParam("debtPositionOrigin", originList.stream().map(Enum::name).toArray(String[]::new));
@@ -73,7 +73,7 @@ class InstallmentControllerTest {
       Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());
       Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
     }
-    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
+    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList, "iud");
   }
 
   @Test
