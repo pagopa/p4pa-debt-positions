@@ -1,31 +1,43 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
-import java.util.stream.Stream;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.stream.Stream;
 
 @Service
 @Slf4j
 public class InstallmentUpdateService {
 
   private final DebtPositionRepository debtPositionRepository;
+  private final OrganizationService organizationService;
+  private final BalanceService balanceService;
 
-  InstallmentUpdateService(DebtPositionRepository debtPositionRepository) {
+  InstallmentUpdateService(DebtPositionRepository debtPositionRepository, OrganizationService organizationService, BalanceService balanceService) {
     this.debtPositionRepository = debtPositionRepository;
+    this.organizationService = organizationService;
+    this.balanceService = balanceService;
   }
 
   @Transactional
-  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+  public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     //retrieve debt position
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     if (debtPosition == null) {
@@ -50,7 +62,7 @@ public class InstallmentUpdateService {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
-
+        updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), accessToken);
         // update mbdAttachment of transfer entity if present in input ReceiptDTO
         updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {
@@ -61,7 +73,7 @@ public class InstallmentUpdateService {
   }
 
   private static void updateMbdAttachment(ReceiptWithAdditionalNodeDataDTO receiptDTO,
-    InstallmentNoPII paidInstallment) {
+                                          InstallmentNoPII paidInstallment) {
     receiptDTO.getTransfers().stream()
       .filter(receiptTransferDTO -> receiptTransferDTO.getMbdAttachment() != null)
       .findFirst()
@@ -79,16 +91,16 @@ public class InstallmentUpdateService {
     });
   }
 
-  private void updateInstallmentStatusAndFeeOfDebtPosition(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt){
+  private void updateInstallmentStatusAndFeeOfDebtPosition(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt) {
     if (receipt != null) {
       installment.setReceiptId(receipt.getReceiptId());
       installment.setIur(receipt.getPaymentReceiptId());
-      long feeAmountCents = receipt.getPaymentAmountCents()-installment.getAmountCents();
-      if(feeAmountCents>0) {
+      long feeAmountCents = receipt.getPaymentAmountCents() - installment.getAmountCents();
+      if (feeAmountCents > 0) {
         log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
         installment.setNotificationFeeCents(feeAmountCents);
         log.debug("Update amounts");
-        installment.setAmountCents(installment.getAmountCents()+feeAmountCents);
+        installment.setAmountCents(installment.getAmountCents() + feeAmountCents);
         installment.getTransfers()
           .stream().filter(t -> t.getTransferIndex() == 1)
           .findFirst()
@@ -98,4 +110,23 @@ public class InstallmentUpdateService {
     InstallmentUtils.setStatus(installment, status);
   }
 
+  private void updateBalanceResolvingAmount(InstallmentNoPII installment, Long organizationId, String accessToken) {
+    if (StringUtils.isNotBlank(installment.getBalance())) {
+      Organization org = organizationService.getOrganizationById(organizationId, accessToken)
+        .orElseThrow(() -> new InvalidValueException("Provided organization id not found on db"));
+
+      Long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
+        .filter(transfer -> transfer.getOrgFiscalCode().equals(org.getOrgFiscalCode()))
+        .mapToLong(Transfer::getAmountCents).sum();
+
+      CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+        .balance(installment.getBalance())
+        .amountCents(totalAmountCentsPrimaryOrg)
+        .remittanceInformation(installment.getRemittanceInformation())
+        .build();
+
+      String balanceResolved = balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
+      installment.setBalance(balanceResolved);
+    }
+  }
 }

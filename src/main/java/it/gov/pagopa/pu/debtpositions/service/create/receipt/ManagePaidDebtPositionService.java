@@ -78,7 +78,7 @@ public class ManagePaidDebtPositionService {
   private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
-    DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
+    DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO, accessToken);
     //update amounts
     debtPositionProcessorService.updateAmounts(debtPosition);
     //align debt position status
