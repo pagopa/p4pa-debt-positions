@@ -85,7 +85,7 @@ public class InstallmentServiceImpl implements InstallmentService {
         .forEach(installmentDTO -> {
           log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
           installmentDTO.setNotificationDate(request.getNotificationDate());
-          if(installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+          if(installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
             log.info("Obtained a notificationDate on an already expired Installment: installmentId:{} dueDate:{} status:{}",
               installmentDTO.getInstallmentId(), installmentDTO.getDueDate(), installmentDTO.getStatus());
             installmentDTO.setDueDate(LocalDate.now());
@@ -116,7 +116,7 @@ public class InstallmentServiceImpl implements InstallmentService {
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
 
-    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> {

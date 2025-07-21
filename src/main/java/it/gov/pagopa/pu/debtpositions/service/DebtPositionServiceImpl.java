@@ -54,7 +54,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public DebtPositionDTO getDebtPositionByInstallmentId(Long installmentId) {
-    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installmentId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installmentId);
     if (debtPosition == null) {
       throw new NotFoundException("DebtPosition having installmentId %d not found".formatted(installmentId));
     }
