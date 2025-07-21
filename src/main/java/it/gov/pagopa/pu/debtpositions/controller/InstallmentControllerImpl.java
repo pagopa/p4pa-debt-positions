@@ -28,4 +28,10 @@ public class InstallmentControllerImpl implements InstallmentApi {
     return ResponseEntity.ok(installmentService.getInstallmentDetail(installmentId, operatorExternalUserId));
   }
 
+  @Override
+  public ResponseEntity<List<InstallmentDTO>> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
+    return ResponseEntity.ok(installmentService.getInstallmentsByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin));
+  }
+
+
 }

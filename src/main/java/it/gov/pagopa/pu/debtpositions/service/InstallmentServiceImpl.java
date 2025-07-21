@@ -63,6 +63,11 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
+  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
+    return installmentPIIRepository.getByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin);
+  }
+
+  @Override
   public InstallmentDetailDTO getInstallmentDetail(Long installmentId, String operatorExternalUserId) {
     return installmentDetailPIIViewRepository.getInstallmentDetail(installmentId, operatorExternalUserId);
   }

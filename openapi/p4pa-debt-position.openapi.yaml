@@ -388,6 +388,47 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /installments/by-organizationId-and-receiptId:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsByOrganizationIdAndReceiptId
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: receiptId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: receipt id
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InstallmentDTO"
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
   /export/organization/{organizationId}/installments/paid:
     get:
       tags:

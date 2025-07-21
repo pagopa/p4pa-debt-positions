@@ -18,4 +18,6 @@ public interface InstallmentService {
   WorkflowCreatedDTO updateInstallmentNotificationDate(UpdateInstallmentNotificationDateRequest updateInstallmentNotificationDateRequest, WfExecutionParameters wfExecutionParameters, String operatorExternalUserId, String accessToken);
 
   InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long newFeeCents, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
+
+  List<InstallmentDTO> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin);
 }

@@ -131,6 +131,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   List<InstallmentNoPII> findByOrganizationIdAndIuds(Long organizationId, Set<String> iuds);
 
 
+  @RestResource(exported = false)
   @Query(" select i" +
     "  from InstallmentNoPII i" +
     "  join PaymentOption po" +
@@ -140,9 +141,9 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     " where i.receiptId = :receiptId" +
     " and dp.organizationId = :organizationId" +
     " and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))")
-  List<InstallmentNoPII> findByReceiptIdAndOrganizationId(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
+  List<InstallmentNoPII> getByOrganizationIdAndReceiptId(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
 }
