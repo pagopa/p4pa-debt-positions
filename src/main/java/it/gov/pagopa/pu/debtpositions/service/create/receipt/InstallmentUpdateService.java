@@ -27,7 +27,7 @@ public class InstallmentUpdateService {
   @Transactional
   public DebtPosition updateInstallmentStatusOfDebtPosition(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     //retrieve debt position
-    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     if (debtPosition == null) {
       throw new NotFoundException("debt position not found for installment " + installment.getInstallmentId());
     }

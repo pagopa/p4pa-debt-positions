@@ -121,7 +121,7 @@ class DebtPositionServiceImplTest {
     DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
 
     DebtPositionDTO result = debtPositionService.getDebtPositionByInstallmentId(
@@ -136,7 +136,7 @@ class DebtPositionServiceImplTest {
   void givenNonExistingDebtPositionDetailWhenGetDebtPositionByInstallmentIdThenThrowNotFoundException() {
     Long installmentId = 1L;
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentId)).thenReturn(null);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(null);
 
     Assertions.assertThrows(NotFoundException.class, () -> debtPositionService.getDebtPositionByInstallmentId(
       installmentId));

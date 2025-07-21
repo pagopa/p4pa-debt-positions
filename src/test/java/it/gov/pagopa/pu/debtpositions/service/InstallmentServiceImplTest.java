@@ -271,7 +271,7 @@ class InstallmentServiceImplTest {
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
 
@@ -390,7 +390,7 @@ class InstallmentServiceImplTest {
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO));
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId()))
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId()))
       .thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 

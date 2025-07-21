@@ -106,7 +106,7 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(
       targetInstallment.getInstallmentId())).thenReturn(debtPosition);
 
     //when
@@ -147,7 +147,7 @@ class InstallmentUpdateServiceTest {
       idxPo[0]++;
     });
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
-      .findByInstallmentId(targetInstallment.getInstallmentId());
+      .findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
 
   }
 
@@ -204,7 +204,7 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId()))
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId()))
       .thenReturn(debtPosition);
 
     // When
@@ -239,12 +239,12 @@ class InstallmentUpdateServiceTest {
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
     //when
     NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
     //verify
     Assertions.assertTrue(response.getMessage().startsWith("debt position not found"));
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
   }
 
   @Test
@@ -263,11 +263,11 @@ class InstallmentUpdateServiceTest {
         }
       });
     });
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
     //when
     NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
     //verify
     Assertions.assertTrue(response.getMessage().startsWith("primary installment not found"));
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
   }
 }

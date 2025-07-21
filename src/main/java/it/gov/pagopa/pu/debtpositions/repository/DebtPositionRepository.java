@@ -56,6 +56,15 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
+  DebtPosition findEntityGraphByInstallmentId(Long installmentId);
+
+  @Query("""
+   SELECT d
+   FROM DebtPosition d
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+   WHERE i.installmentId = :installmentId
+   """)
   DebtPosition findByInstallmentId(Long installmentId);
 
   @EntityGraph(value = "completeDebtPosition")
@@ -135,13 +144,4 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   long validateOperator(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
                         @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
-
-  @Query("""
-   SELECT d
-   FROM DebtPosition d
-      JOIN d.paymentOptions p
-      JOIN p.installments i
-   WHERE i.installmentId = :installmentId
-   """)
-  DebtPosition findByInstallmentId(String installmentId);
 }
