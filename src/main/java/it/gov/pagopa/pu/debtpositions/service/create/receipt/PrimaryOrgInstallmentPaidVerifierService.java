@@ -66,11 +66,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
     } else {
       fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null);
 
-      if (fullInstallmentList.isEmpty()) {
-        throw new InvalidValueException("No Installment found for IUD [%s] and organization [%s]".formatted(
-          iud, primaryOrg.getOrgFiscalCode()));
-      }
-      if (fullInstallmentList.size() > 1 || !noticeNumber.equals(fullInstallmentList.getFirst().getNav())) {
+      if (fullInstallmentList.size() > 1 || (!fullInstallmentList.isEmpty() && !noticeNumber.equals(fullInstallmentList.getFirst().getNav()))) {
         throw new InvalidValueException("The requested IUD [%s] of organization [%s] is not unique or its related to a different NAV: requested/obtained [%s/%s]".formatted(
           iud,
           primaryOrg.getOrgFiscalCode(),
