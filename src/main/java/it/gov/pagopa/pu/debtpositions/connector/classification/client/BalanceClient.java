@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.client;
 
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
 import it.gov.pagopa.pu.classification.dto.generated.ValidateBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.classification.config.ClassificationApisHolder;
 import lombok.extern.slf4j.Slf4j;
@@ -31,5 +32,7 @@ public class BalanceClient {
     }
   }
 
-
+  public String calculateAmountBalance(CalculateAmountBalanceRequest request, String accessToken) {
+    return classificationApisHolder.getBalanceApi(accessToken).calculateAmountBalance(request);
+  }
 }
