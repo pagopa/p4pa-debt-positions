@@ -2,11 +2,13 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -31,16 +33,28 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    * - a boolean indicating if the primary org has a valid installment associated to the receipt
    */
   public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber, String iud) {
-    // check installments by orgId/noticeNumber
-    List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
-
+    List<InstallmentNoPII> fullInstallmentList;
+    if(StringUtils.isEmpty(iud)) {
+      // check installments by orgId/noticeNumber
+      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
+    } else {
+      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null);
+      if(fullInstallmentList.size() > 1 || !noticeNumber.equals(fullInstallmentList.getFirst().getNav())) {
+        throw new InvalidValueException("The requested IUD [%s] of organization [%s] is not unique or its related to a different NAV: requested/obtained [%s/%s]".formatted(
+          iud,
+          primaryOrg.getOrgFiscalCode(),
+          noticeNumber,
+          fullInstallmentList.getFirst().getNav()
+        ));
+      }
+    }
 
     //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer
     //(see CreatePaidTechnicalDebtPositionsService class)
     if (!fullInstallmentList.isEmpty()) {
 
-      //filter out installments with status PAID and REPORTED
-      List<InstallmentNoPII> installmentList = filterAlreadyProcessed(fullInstallmentList, iud);
+      //filter out installments with InstallmentUtils.PAID_STATUSES status
+      List<InstallmentNoPII> installmentList = filterAlreadyProcessed(fullInstallmentList);
 
       //validate related installments
       Optional<InstallmentNoPII> primaryOrgInstallment = validateRelatedInstallments(installmentList);
@@ -72,11 +86,10 @@ public class PrimaryOrgInstallmentPaidVerifierService {
       });
   }
 
-  private List<InstallmentNoPII> filterAlreadyProcessed(List<InstallmentNoPII> fullInstallmentList, String iud) {
+  private List<InstallmentNoPII> filterAlreadyProcessed(List<InstallmentNoPII> fullInstallmentList) {
     return fullInstallmentList.stream()
-      .filter(anInstallment -> !anInstallment.getStatus().equals(InstallmentStatus.REPORTED)
-        && !anInstallment.getStatus().equals(InstallmentStatus.PAID)
-        && (iud == null || anInstallment.getIud().equals(iud))).toList();
+      .filter(anInstallment -> !InstallmentUtils.PAID_STATUSES.contains(anInstallment.getStatus()))
+      .toList();
   }
 
   /**

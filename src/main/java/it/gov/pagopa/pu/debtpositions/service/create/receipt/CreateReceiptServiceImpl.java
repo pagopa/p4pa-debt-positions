@@ -37,7 +37,11 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    log.info("createReceipt paymentReceiptId[{}} org/nav[{}/{}]", receiptDTO.getPaymentReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber());
+    log.info("createReceipt paymentReceiptId[{}} org/nav/iud[{}/{}/{}]",
+      receiptDTO.getPaymentReceiptId(),
+      receiptDTO.getOrgFiscalCode(),
+      receiptDTO.getNoticeNumber(),
+      receiptDTO.getIud());
 
     // if the receipt already exists, we should continue only if the input IUD exists,
     // in order to check the existence of a DP having an Installment with the requested IUD:
