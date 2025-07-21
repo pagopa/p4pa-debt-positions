@@ -92,10 +92,6 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "   and i.nav = :nav")
   List<InstallmentNoPII> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
-  // region API CRUD
-  List<InstallmentNoPII> findByReceiptId(long receiptId);
-  //endregion
-
   @Query(" select i" +
     "  from InstallmentNoPII i" +
     "  join PaymentOption po" +
@@ -141,9 +137,12 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "    on i.paymentOptionId = po.paymentOptionId" +
     "  join DebtPosition dp" +
     "    on po.debtPositionId = dp.debtPositionId" +
-    " where i.receiptId = :receiptId and i.nav = :nav" +
+    " where i.receiptId = :receiptId" +
     " and dp.organizationId = :organizationId" +
-    " and dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).ORDINARY_DEBT_POSITION_ORIGINS})")
-  List<InstallmentNoPII> findByReceiptIdAndOrgIdAndNavAndOrdinaryOrigin(Long receiptId, Long organizationId, String nav);
+    " and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))")
+  List<InstallmentNoPII> findByReceiptIdAndOrganizationId(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
 }
