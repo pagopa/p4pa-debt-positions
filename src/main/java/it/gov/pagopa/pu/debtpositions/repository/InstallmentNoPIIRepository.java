@@ -134,4 +134,16 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "   and i.iud in :iuds")
   List<InstallmentNoPII> findByOrganizationIdAndIuds(Long organizationId, Set<String> iuds);
 
+
+  @Query(" select i" +
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "    on i.paymentOptionId = po.paymentOptionId" +
+    "  join DebtPosition dp" +
+    "    on po.debtPositionId = dp.debtPositionId" +
+    " where i.receiptId = :receiptId and i.nav = :nav" +
+    " and dp.organizationId = :organizationId" +
+    " and dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).ORDINARY_DEBT_POSITION_ORIGINS})")
+  List<InstallmentNoPII> findByReceiptIdAndOrgIdAndNavAndOrdinaryOrigin(Long receiptId, Long organizationId, String nav);
+
 }
