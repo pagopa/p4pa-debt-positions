@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.service;
 
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.classification.client.BalanceClient;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -45,7 +46,7 @@ class BalanceServiceTest {
   }
 
   @Test
-  void givenBalanceWhenGetByAssessmentThenTrue() {
+  void givenBalanceWhenGetByAssessmentThenBalance() {
     // Given
     String balance = "balance";
     Long orgId = 1L;
@@ -60,5 +61,26 @@ class BalanceServiceTest {
 
     // Then
     Assertions.assertEquals(balance, result);
+  }
+
+  @Test
+  void givenBalanceWithPlaceholderWhenCalculateAmountThenBalanceResolved() {
+    // Given
+    CalculateAmountBalanceRequest request = CalculateAmountBalanceRequest.builder()
+      .balance("<accertamento><importo>TOTALE</importo></accertamento>")
+      .amountCents(100L)
+      .remittanceInformation("info")
+      .build();
+    String accessToken = "ACCESSTOKEN";
+    String balanceResolved = "<accertamento><importo>1.00</importo></accertamento>";
+
+    Mockito.when(balanceClientMock.calculateAmountBalance(request, accessToken))
+      .thenReturn(balanceResolved);
+
+    // When
+    String result = balanceService.calculateAmountBalance(request, accessToken);
+
+    // Then
+    Assertions.assertEquals(balanceResolved, result);
   }
 }

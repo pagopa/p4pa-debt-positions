@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.service;
 
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.classification.client.BalanceClient;
 import org.springframework.stereotype.Service;
 
@@ -20,5 +21,10 @@ public class BalanceServiceImpl implements BalanceService {
   @Override
   public String getBalanceByAssessmentRegistry(Long organizationId, String debtPositionTypeOrgCode, String accessToken) {
     return balanceClient.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrgCode, accessToken);
+  }
+
+  @Override
+  public String calculateAmountBalance(CalculateAmountBalanceRequest calculateAmountBalanceRequest, String accessToken) {
+    return balanceClient.calculateAmountBalance(calculateAmountBalanceRequest, accessToken);
   }
 }

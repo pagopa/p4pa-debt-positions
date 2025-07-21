@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.client;
 
 import it.gov.pagopa.pu.classification.controller.generated.BalanceApi;
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
 import it.gov.pagopa.pu.classification.dto.generated.ValidateBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.classification.config.ClassificationApisHolder;
 import org.junit.jupiter.api.AfterEach;
@@ -92,5 +93,28 @@ class BalanceClientTest {
 
     // Then
     Assertions.assertNull(result);
+  }
+
+  @Test
+  void givenBalanceWhenCalculateAmountThenBalanceResolved() {
+    // Given
+    CalculateAmountBalanceRequest request = CalculateAmountBalanceRequest.builder()
+      .balance("<accertamento><importo>TOTALE</importo></accertamento>")
+      .amountCents(100L)
+      .remittanceInformation("info")
+      .build();
+    String accessToken = "ACCESSTOKEN";
+    String balanceResolved = "<accertamento><importo>1.00</importo></accertamento>";
+
+    Mockito.when(classificationApisHolder.getBalanceApi(accessToken))
+      .thenReturn(balanceApiMock);
+
+    Mockito.when(balanceApiMock.calculateAmountBalance(request)).thenReturn(balanceResolved);
+
+    // When
+    String result = balanceClient.calculateAmountBalance(request, accessToken);
+
+    // Then
+    Assertions.assertEquals(balanceResolved, result);
   }
 }

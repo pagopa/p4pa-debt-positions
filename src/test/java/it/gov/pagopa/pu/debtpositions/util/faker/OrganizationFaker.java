@@ -8,6 +8,7 @@ public class OrganizationFaker {
 
   public static Organization buildOrganization(){
     return TestUtils.getPodamFactory().manufacturePojo(Organization.class)
+      .orgFiscalCode("12345678901")
       .status(OrganizationStatus.ACTIVE);
   }
 }
