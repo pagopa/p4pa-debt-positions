@@ -484,4 +484,21 @@ class InstallmentServiceImplTest {
     assertEquals(dateTime, installmentDTO.getNotificationDate());
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  void givenValidOrganizationAndReceiptIdWhGetInstallmentsByOrganizationIdAndReceiptIdThenOk(String debtPositionOrigin) {
+    //given
+    List<InstallmentDTO> installmentDTOList = new ArrayList<>();
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+
+    //when
+    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList);
+
+    //verify
+    assertNotNull(response);
+    Assertions.assertIterableEquals(installmentDTOList, response);
+  }
+
 }

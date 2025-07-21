@@ -5,11 +5,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 public class InstallmentControllerImpl implements InstallmentApi {
   private final InstallmentService installmentService;
@@ -30,6 +32,7 @@ public class InstallmentControllerImpl implements InstallmentApi {
 
   @Override
   public ResponseEntity<List<InstallmentDTO>> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieve installments by organizationId {} and receiptId {} and debtPositionOrigin {}", organizationId, receiptId, debtPositionOrigin);
     return ResponseEntity.ok(installmentService.getInstallmentsByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin));
   }
 

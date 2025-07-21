@@ -130,8 +130,6 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
           "   and i.iud in :iuds")
   List<InstallmentNoPII> findByOrganizationIdAndIuds(Long organizationId, Set<String> iuds);
 
-
-  @RestResource(exported = false)
   @Query(" select i" +
     "  from InstallmentNoPII i" +
     "  join PaymentOption po" +

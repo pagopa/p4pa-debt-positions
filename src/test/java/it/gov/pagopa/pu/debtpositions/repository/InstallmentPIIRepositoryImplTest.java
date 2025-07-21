@@ -235,4 +235,21 @@ class InstallmentPIIRepositoryImplTest {
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).delete(123L);
     Mockito.verify(installmentNoPIIRepository, Mockito.times(1)).delete(noPII);
   }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  void givenValidOrganizationAndReceiptIdWhenGetByOrganizationIdAndReceiptIdThenOk(String debtPositionOrigin) {
+    // Given
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+    List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+
+    // When
+    List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndReceiptId(1L, 999L, originList);
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(installmentDTOList.size(), result.size());
+    installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
+  }
 }
