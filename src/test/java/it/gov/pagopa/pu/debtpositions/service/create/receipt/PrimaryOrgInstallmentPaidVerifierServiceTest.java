@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidInstallmentStatusException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -36,24 +37,82 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
   private static final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @Test
-  void givenEmptyInstallmentListWhenFindAndValidatePrimaryOrgInstallmentThenOk() {
+  void givenIudAndInstallmentMismatchNoticeNumberThenException() {
     // given
     Organization organization = podamFactory.manufacturePojo(Organization.class);
-    String noticeNumber = "noticeNumber";
     String iud = "iud";
+    String noticeNumber = "expected-nav";
 
-    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
-      InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of());
+    InstallmentNoPII installment = getInstallment(InstallmentStatus.UNPAID);
+    installment.setNav("different-nav");
 
-    //when
-    Pair<Optional<InstallmentNoPII>,Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndIudAndStatus(organization.getOrganizationId(), iud, null))
+      .thenReturn(List.of(installment));
 
-    //verify
-    Assertions.assertNotNull(primaryOrgInstallment);
-    Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
-    Assertions.assertEquals(false, primaryOrgInstallment.getRight());
-    Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
-      organization.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
+    // when then
+    Assertions.assertThrows(InvalidValueException.class, () ->
+      primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud));
+  }
+
+  @Test
+  void givenIudAndMultipleInstallmentsThenException() {
+    // given
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    String iud = "iud";
+    String noticeNumber = "noticeNumber";
+
+    InstallmentNoPII i1 = getInstallment(InstallmentStatus.UNPAID);
+    i1.setNav(noticeNumber);
+    InstallmentNoPII i2 = getInstallment(InstallmentStatus.UNPAID);
+    i2.setNav(noticeNumber);
+
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndIudAndStatus(organization.getOrganizationId(), iud, null))
+      .thenReturn(List.of(i1, i2));
+
+    // when then
+    Assertions.assertThrows(InvalidValueException.class, () ->
+      primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud));
+  }
+
+  @Test
+  void givenIudAndValidSingleInstallmentThenFound() {
+    // given
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    String iud = "iud";
+    String noticeNumber = "noticeNumber";
+
+    InstallmentNoPII installment = getInstallment(InstallmentStatus.UNPAID);
+    installment.setNav(noticeNumber);
+
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndIudAndStatus(organization.getOrganizationId(), iud, null))
+      .thenReturn(List.of(installment));
+
+    // when
+    Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment =
+      primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
+
+    // then
+    Assertions.assertEquals(true, primaryOrgInstallment.getRight());
+    Assertions.assertEquals(Optional.of(installment), primaryOrgInstallment.getLeft());
+  }
+
+  @Test
+  void givenIudAndNoInstallmentsThenNotFound() {
+    // given
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    String iud = "iud";
+    String noticeNumber = "noticeNumber";
+
+    Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndIudAndStatus(organization.getOrganizationId(), iud, null))
+      .thenReturn(List.of());
+
+    // when
+    Pair<Optional<InstallmentNoPII>, Boolean> result =
+      primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
+
+    // then
+    Assertions.assertEquals(false, result.getRight());
+    Assertions.assertEquals(Optional.empty(), result.getLeft());
   }
 
   @Test
@@ -119,31 +178,26 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     handleTest(targetInstallment, additionalInstallments, ExptectedOutcome.FOUND_INVALID);
   }
 
-  @Test
-  void givenNonMatchingIudThenInstallmentFilteredOut() {
-    InstallmentNoPII mismatching = getInstallment(InstallmentStatus.UNPAID);
-    mismatching.setIud("another-iud");
-
-    handleTest(mismatching, null, ExptectedOutcome.FOUND_INVALID);
-  }
-
   static InstallmentNoPII getInstallment(InstallmentStatus status) {
     return getInstallment(status, null, null, null);
   }
+
   static InstallmentNoPII getInstallmentToSync(InstallmentStatus statusFrom, InstallmentStatus statusTo) {
     return getInstallment(InstallmentStatus.TO_SYNC, statusFrom, statusTo, null);
   }
+
   static InstallmentNoPII getInstallmentExpired(LocalDate dueDate) {
     return getInstallment(InstallmentStatus.EXPIRED, null, null, dueDate);
   }
+
   private static InstallmentNoPII getInstallment(InstallmentStatus status, InstallmentStatus statusFrom, InstallmentStatus statusTo, LocalDate dueDate) {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     installment.setStatus(status);
-    if(status == InstallmentStatus.TO_SYNC){
+    if (status == InstallmentStatus.TO_SYNC) {
       installment.getSyncStatus().setSyncStatusFrom(statusFrom);
       installment.getSyncStatus().setSyncStatusTo(statusTo);
     }
-    if(dueDate != null){
+    if (dueDate != null) {
       installment.setDueDate(dueDate);
     }
     installment.setIud("iud");
@@ -154,42 +208,39 @@ class PrimaryOrgInstallmentPaidVerifierServiceTest {
     // given
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     String noticeNumber = "noticeNumber";
-    String iud = "iud";
+    String iud = "";
 
     List<InstallmentNoPII> installments = new ArrayList<>();
     installments.add(targetInstallment);
-    //add a paid installment
     InstallmentNoPII otherInstallment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     otherInstallment.setStatus(InstallmentStatus.PAID);
     installments.add(otherInstallment);
-    //add a reported installment
     otherInstallment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     otherInstallment.setStatus(InstallmentStatus.REPORTED);
     installments.add(otherInstallment);
-    //add other test-case related installments
     if (additionalInstallments != null)
       installments.addAll(additionalInstallments);
-
 
     Mockito.when(installmentNoPIIRepositoryMock.getByOrganizationIdAndNav(organization.getOrganizationId(), noticeNumber,
       InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(installments);
 
-    //when
-    if(expectedOutcome == ExptectedOutcome.EXCEPTION){
-      Assertions.assertThrows(InvalidInstallmentStatusException.class, () -> primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud));
+    // when
+    if (expectedOutcome == ExptectedOutcome.EXCEPTION) {
+      Assertions.assertThrows(InvalidInstallmentStatusException.class, () ->
+        primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud));
     } else {
-      Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment = primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
+      Pair<Optional<InstallmentNoPII>, Boolean> primaryOrgInstallment =
+        primaryOrgInstallmentPaidVerifierService.findAndValidatePrimaryOrgInstallment(organization, noticeNumber, iud);
       Assertions.assertNotNull(primaryOrgInstallment);
       Assertions.assertEquals(true, primaryOrgInstallment.getRight());
-      //verify
-      if(expectedOutcome == ExptectedOutcome.FOUND_VALID){
+      if (expectedOutcome == ExptectedOutcome.FOUND_VALID) {
         Assertions.assertEquals(Optional.of(targetInstallment), primaryOrgInstallment.getLeft());
       } else {
         Assertions.assertEquals(Optional.empty(), primaryOrgInstallment.getLeft());
       }
     }
 
-    //verify
+    // then
     Mockito.verify(installmentNoPIIRepositoryMock, Mockito.times(1)).getByOrganizationIdAndNav(
       organization.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
   }
