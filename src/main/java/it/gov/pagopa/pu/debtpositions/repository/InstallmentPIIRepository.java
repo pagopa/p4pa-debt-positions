@@ -10,7 +10,7 @@ public interface InstallmentPIIRepository {
 
   InstallmentDTO save(InstallmentDTO installment);
 
-  List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin, String iud);
+  List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin);
 
   void delete(InstallmentNoPII installmentNoPII);
 }

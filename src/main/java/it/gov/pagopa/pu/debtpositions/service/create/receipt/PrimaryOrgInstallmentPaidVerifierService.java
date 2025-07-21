@@ -32,7 +32,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    */
   public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber, String iud) {
     // check installments by orgId/noticeNumber
-    List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS, iud);
+    List<InstallmentNoPII> fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
 
 
     //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer

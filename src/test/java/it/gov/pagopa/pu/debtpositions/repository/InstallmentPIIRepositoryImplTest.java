@@ -212,10 +212,10 @@ class InstallmentPIIRepositoryImplTest {
     // Given
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
     List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
-    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList, "iud")).thenReturn(installmentDTOList);
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
 
     // When
-    List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList, "iud");
+    List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList);
 
     // Then
     Assertions.assertNotNull(result);
