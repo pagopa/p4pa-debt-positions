@@ -13,4 +13,6 @@ public interface InstallmentPIIRepository {
   List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin);
 
   void delete(InstallmentNoPII installmentNoPII);
+
+  List<InstallmentDTO> getByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin);
 }

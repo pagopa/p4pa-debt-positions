@@ -76,6 +76,43 @@ class InstallmentControllerTest {
     Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
   }
 
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  void whenGetInstallmentsByOrganizationIdAndReceiptIdThenOk(String debtPositionOrigin) throws Exception {
+    //given
+    List<InstallmentDTO> installmentDTOList = List.of(InstallmentFaker.buildInstallmentDTO());
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+
+    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+
+    var builder = MockMvcRequestBuilders.get("/installments/by-organizationId-and-receiptId")
+      .contentType(MediaType.APPLICATION_JSON_VALUE);
+    builder.queryParam("organizationId", String.valueOf(1L));
+    builder.queryParam("receiptId", String.valueOf(999L));
+    if(debtPositionOrigin!=null)
+      builder = builder.queryParam("debtPositionOrigin", originList.stream().map(Enum::name).toArray(String[]::new));
+    MvcResult result = mockMvc.perform(builder)
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<InstallmentDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+    });
+
+
+    for(int idx = 0; idx < installmentDTOList.size(); idx++) {
+      InstallmentDTO resultElem = resultResponse.get(idx);
+      InstallmentDTO expectedElem = installmentDTOList.get(idx);
+      Assertions.assertTrue(EqualsBuilder.reflectionEquals(expectedElem, resultElem, false, null, true,
+        "transfers", "notificationDate","dueDate", "creationDate", "updateDate"), "Error on element " + idx);
+      Assertions.assertEquals(expectedElem.getDueDate(), resultElem.getDueDate());
+      Assertions.assertEquals(expectedElem.getNotificationDate().toInstant(), resultElem.getNotificationDate().toInstant());
+      Assertions.assertEquals(expectedElem.getCreationDate().toInstant(), resultElem.getCreationDate().toInstant());
+      Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());
+      Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
+    }
+    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList);
+  }
+
   @Test
   void whenGetInstallmentDetailThenOk() throws Exception {
     Long installmentId = 1L;

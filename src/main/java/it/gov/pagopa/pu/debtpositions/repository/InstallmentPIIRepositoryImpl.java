@@ -30,6 +30,12 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentD
   }
 
   @Override
+  public List<InstallmentDTO> getByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
+    return installmentNoPIIRepository.getByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin)
+      .stream().map(installmentPIIMapper::map).toList();
+  }
+
+  @Override
   void setId(InstallmentDTO fullDTO, Long id) {
     fullDTO.setInstallmentId(id);
   }
