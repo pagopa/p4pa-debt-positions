@@ -33,21 +33,7 @@ public class PrimaryOrgInstallmentPaidVerifierService {
    * - a boolean indicating if the primary org has a valid installment associated to the receipt
    */
   public Pair<Optional<InstallmentNoPII>, Boolean> findAndValidatePrimaryOrgInstallment(Organization primaryOrg, String noticeNumber, String iud) {
-    List<InstallmentNoPII> fullInstallmentList;
-    if(StringUtils.isEmpty(iud)) {
-      // check installments by orgId/noticeNumber
-      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
-    } else {
-      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null);
-      if(fullInstallmentList.size() > 1 || !noticeNumber.equals(fullInstallmentList.getFirst().getNav())) {
-        throw new InvalidValueException("The requested IUD [%s] of organization [%s] is not unique or its related to a different NAV: requested/obtained [%s/%s]".formatted(
-          iud,
-          primaryOrg.getOrgFiscalCode(),
-          noticeNumber,
-          fullInstallmentList.getFirst().getNav()
-        ));
-      }
-    }
+    List<InstallmentNoPII> fullInstallmentList = getFullInstallmentList(primaryOrg, noticeNumber, iud);
 
     //if no installment is found, then a new debt position must be created, just like the case of secondary-org transfer
     //(see CreatePaidTechnicalDebtPositionsService class)
@@ -70,6 +56,30 @@ public class PrimaryOrgInstallmentPaidVerifierService {
     } else {
       return Pair.of(Optional.empty(), false);
     }
+  }
+
+  private List<InstallmentNoPII> getFullInstallmentList(Organization primaryOrg, String noticeNumber, String iud) {
+    List<InstallmentNoPII> fullInstallmentList;
+    if (StringUtils.isEmpty(iud)) {
+      // check installments by orgId/noticeNumber
+      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), noticeNumber, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
+    } else {
+      fullInstallmentList = installmentNoPIIRepository.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null);
+
+      if (fullInstallmentList.isEmpty()) {
+        throw new InvalidValueException("No Installment found for IUD [%s] and organization [%s]".formatted(
+          iud, primaryOrg.getOrgFiscalCode()));
+      }
+      if (fullInstallmentList.size() > 1 || !noticeNumber.equals(fullInstallmentList.getFirst().getNav())) {
+        throw new InvalidValueException("The requested IUD [%s] of organization [%s] is not unique or its related to a different NAV: requested/obtained [%s/%s]".formatted(
+          iud,
+          primaryOrg.getOrgFiscalCode(),
+          noticeNumber,
+          fullInstallmentList.getFirst().getNav()
+        ));
+      }
+    }
+    return fullInstallmentList;
   }
 
   private Optional<InstallmentNoPII> checkValidInstallment(List<InstallmentNoPII> installmentList, CHECK_MODE checkMode, InstallmentStatus status, InstallmentStatus syncStatusTo) {

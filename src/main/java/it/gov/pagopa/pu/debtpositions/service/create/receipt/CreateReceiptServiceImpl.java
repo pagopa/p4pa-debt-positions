@@ -48,12 +48,13 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     // if it doesn't exist, we should create a new technical DP with the requested Installment
     // (use case heterogeneous IUV: many DP on same org having same IUV)
     Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
-    if (receiptInDb.isPresent() && StringUtils.isBlank(receiptDTO.getIud())) {
-      return receiptInDb.get();
+    if (receiptInDb.isPresent()) {
+      if (StringUtils.isBlank(receiptDTO.getIud())) {
+        return receiptInDb.get();
+      }
+    } else {
+      saveReceipt(receiptDTO);
     }
-
-    //persist receipt
-    saveReceipt(receiptDTO);
 
     //check if organization who handles the notice is managed by PU and update the installment status
     boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
