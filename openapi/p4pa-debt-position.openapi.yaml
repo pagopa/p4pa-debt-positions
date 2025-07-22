@@ -1584,7 +1584,6 @@ components:
         - status
         - iuv
         - amountCents
-        - dueDate
         - debtor
         - debtPositionTypeOrgDescription
         - debtPositionDescription
