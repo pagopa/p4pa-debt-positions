@@ -99,12 +99,9 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("Remittance information is mandatory");
     }
-    if (installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
-      throw new InvalidValueException("The due date cannot be retroactive");
-    }
-    if (debtPositionTypeOrg.isFlagMandatoryDueDate() && installmentDTO.getDueDate() == null) {
-      throw new InvalidValueException("The due date is mandatory");
-    }
+
+    validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin);
+
     if (installmentDTO.getAmountCents() < 0) {
       throw new InvalidValueException("Amount is not valid");
     }
@@ -125,6 +122,22 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     if (!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
       throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
+    }
+  }
+
+  private void validateDueDate(boolean flagMandatoryDueDate, InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin) {
+    if (flagMandatoryDueDate) {
+      if (installmentDTO.getDueDate() == null) {
+        throw new InvalidValueException("The due date is mandatory");
+      }
+      if(installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+        throw new InvalidValueException("The due date cannot be retroactive");
+      }
+    }
+    installmentDTO.setSwitchToExpired(flagMandatoryDueDate);
+
+    if(DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)) {
+      installmentDTO.setSwitchToExpired(Boolean.TRUE);
     }
   }
 

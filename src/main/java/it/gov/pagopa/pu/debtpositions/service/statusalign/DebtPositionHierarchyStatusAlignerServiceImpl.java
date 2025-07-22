@@ -167,7 +167,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     String expiredIuds = debtPosition.getPaymentOptions().stream()
       .flatMap(paymentOption -> paymentOption.getInstallments().stream())
       .filter(i -> i.getStatus().equals(InstallmentStatus.UNPAID) &&
-        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()))
+        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()) && i.isSwitchToExpired())
       .map(i -> {
           InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
           i.setStatus(InstallmentStatus.EXPIRED);
