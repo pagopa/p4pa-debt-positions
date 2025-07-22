@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -340,6 +341,25 @@ class InstallmentServiceImplTest {
 
     // When Then
     assertThrows(NotFoundException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
+  void givenInstallmentExpiredWhenUpdateInstallmentNotificationFeeThenInvalidStatus() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    InstallmentDTO expiredInstallment = new InstallmentDTO();
+    expiredInstallment.setStatus(InstallmentStatus.EXPIRED);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+      .thenReturn(List.of(expiredInstallment));
+
+    // When Then
+    assertThrows(InvalidConditionException.class, () ->
       installmentService.updateInstallmentNotificationFee(
         orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
