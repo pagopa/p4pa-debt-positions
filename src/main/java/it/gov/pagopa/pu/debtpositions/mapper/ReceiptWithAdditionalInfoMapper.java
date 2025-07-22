@@ -57,6 +57,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .iur(receiptDTO.getPaymentReceiptId())
           .nav(receiptDTO.getNoticeNumber())
           .dueDate(null)
+          .switchToExpired(false)
           .notificationFeeCents(receiptDTO.getFeeCents())
           .amountCents(receiptDTO.getPaymentAmountCents())
           .remittanceInformation(getRemittanceInformation(receiptDTO))
