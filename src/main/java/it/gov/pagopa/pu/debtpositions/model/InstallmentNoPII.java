@@ -49,6 +49,7 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   private String nav;
   private String iun;
   private LocalDate dueDate;
+  private boolean switchToExpired;
   private Long notificationFeeCents;
   @NotNull
   private Long amountCents;

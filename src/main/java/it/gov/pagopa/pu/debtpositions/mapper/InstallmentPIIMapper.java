@@ -45,6 +45,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
     noPII.setNav(fullDTO.getNav());
     noPII.setIun(fullDTO.getIun());
     noPII.setDueDate(fullDTO.getDueDate());
+    noPII.setSwitchToExpired(Optional.ofNullable(fullDTO.getSwitchToExpired()).orElse(false));
     noPII.setNotificationFeeCents(fullDTO.getNotificationFeeCents());
     noPII.setAmountCents(fullDTO.getAmountCents());
     noPII.setRemittanceInformation(fullDTO.getRemittanceInformation());
@@ -90,6 +91,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
       .nav(noPii.getNav())
       .iun(noPii.getIun())
       .dueDate(noPii.getDueDate())
+      .switchToExpired(noPii.isSwitchToExpired())
       .notificationFeeCents(noPii.getNotificationFeeCents())
       .amountCents(noPii.getAmountCents())
       .remittanceInformation(noPii.getRemittanceInformation())
