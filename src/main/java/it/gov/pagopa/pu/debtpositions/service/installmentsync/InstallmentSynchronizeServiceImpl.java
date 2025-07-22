@@ -52,7 +52,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   }
 
   private DebtPositionDTO retrieveAndVerifyOrigin(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
-    DebtPosition debtPosition = debtPositionRepository.findByIupdOrgAndOrganizationId(iupdOrg, orgId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(iupdOrg, orgId);
 
     if (debtPosition == null){
       return null;

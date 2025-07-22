@@ -47,7 +47,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     validateDebtPositionOrigin(debtPositionDTO);
 
-    DebtPosition debtPosition = debtPositionRepository.findByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId());
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId());
 
     if (debtPosition != null) {
       throw new ConflictErrorException("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");

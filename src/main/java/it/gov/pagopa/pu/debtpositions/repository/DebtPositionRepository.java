@@ -22,8 +22,9 @@ import java.util.List;
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
 
+  @RestResource(exported = false)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findOneWithAllDataByDebtPositionId(Long debtPositionId);
+  DebtPosition findEntityGraphByDebtPositionId(Long debtPositionId);
 
   @RestResource(exported = false)
   @Transactional
@@ -31,6 +32,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Query("UPDATE DebtPosition d SET d.status = :status WHERE d.debtPositionId = :debtPositionId")
   void updateStatus(Long debtPositionId, DebtPositionStatus status);
 
+  @RestResource(exported = false)
   @Query("""
    SELECT d
    FROM DebtPosition d
@@ -43,8 +45,9 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findByTransferId(Long transferId);
+  DebtPosition findEntityGraphByTransferId(Long transferId);
 
+  @RestResource(exported = false)
   @Query("""
    SELECT d
    FROM DebtPosition d
@@ -67,9 +70,11 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
    """)
   DebtPosition findByInstallmentId(Long installmentId);
 
+  @RestResource(exported = false)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
+  DebtPosition findEntityGraphByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
 
+  @RestResource(exported = false)
   @Query("""
    SELECT DISTINCT d
    FROM DebtPosition d
@@ -83,18 +88,20 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
    """)
   @EntityGraph(value = "completeDebtPosition")
-  Page<DebtPosition> findByIngestionFlowFileIdAndStatusToExclude(Long ingestionFlowFileId,
-                                                                 List<InstallmentStatus> statusToExclude,
-                                                                 Pageable pageable);
+  Page<DebtPosition> findEntityGraphByIngestionFlowFileIdAndStatusToExclude(Long ingestionFlowFileId,
+                                                                            List<InstallmentStatus> statusToExclude,
+                                                                            Pageable pageable);
 
   @Query("""
    SELECT d
    FROM DebtPosition d
       JOIN d.paymentOptions p
       JOIN p.installments i
-   WHERE d.organizationId = :organizationId AND i.nav = :nav
+   WHERE d.organizationId = :organizationId
+      AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND i.nav = :nav
    """)
-  DebtPosition findByOrganizationIdAndInstallmentNav(Long organizationId, String nav);
+  List<DebtPosition> findByOrganizationIdAndInstallmentNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""
@@ -111,7 +118,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
-  List<DebtPosition> findByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
+  List<DebtPosition> findEntityGraphByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""
@@ -128,7 +135,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
-  List<DebtPosition> findByOrganizationIdAndInstallmentIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigins);
+  List<DebtPosition> findEntityGraphByOrganizationIdAndInstallmentIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigins);
 
   Page<DebtPosition> findByDebtPositionTypeOrgId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId, Pageable pageable);
 

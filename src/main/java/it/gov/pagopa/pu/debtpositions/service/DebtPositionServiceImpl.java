@@ -63,19 +63,19 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
-    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndInstallmentIuv(organizationId, iuv, debtPositionOrigin);
+    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(organizationId, iuv, debtPositionOrigin);
     return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
-    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndInstallmentIud(organizationId, iud, debtPositionOrigin);
+    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(organizationId, iud, debtPositionOrigin);
     return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 
   @Override
   public DebtPosition getDebtPositionNoPII(Long debtPositionId) {
-    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
     if (debtPosition == null) {
       throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
     }
@@ -84,7 +84,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public PagedDebtPositions getPagedDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, List<InstallmentStatus> statusToExclude, Pageable pageable) {
-    Page<DebtPosition> pagedDebtPositionsDTO = debtPositionRepository.findByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, statusToExclude, pageable);
+    Page<DebtPosition> pagedDebtPositionsDTO = debtPositionRepository.findEntityGraphByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, statusToExclude, pageable);
 
     return debtPositionMapper.mapToPagedDebtPositions(pagedDebtPositionsDTO);
   }
