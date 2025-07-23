@@ -327,6 +327,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     InstallmentNoPII expiredInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
     expiredInstallment.setStatus(InstallmentStatus.UNPAID);
     expiredInstallment.setDueDate(dueDate);
+    expiredInstallment.setSwitchToExpired(true);
 
     DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
     debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
