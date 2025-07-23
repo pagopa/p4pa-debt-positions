@@ -306,6 +306,7 @@ class DebtPositionCreationServiceImplTest {
   @Test
   void givenDebtPositionWhenGenerateIuvThenAssignIuvAndIupdToInstallments() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIud("");
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv(null);

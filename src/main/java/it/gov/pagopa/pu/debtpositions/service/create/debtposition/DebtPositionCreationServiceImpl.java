@@ -33,6 +33,9 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -156,14 +159,21 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setBalance(balanceFetchService.getBalanceDefault(org.getOrganizationId(), debtPositionTypeOrg, accessToken));
     }
 
-    if (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.ORDINARY))
-      installmentDTO.setSourceFlowName(org.getIpaCode() + "_IMPORT-DOVUTO");
-    if (debtPositionDTO.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS))
-      installmentDTO.setSourceFlowName(org.getIpaCode() + "_SPONTANEO");
+    setSourceFlowName(installmentDTO, debtPositionDTO.getDebtPositionOrigin(), org.getIpaCode());
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
 
     populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
+  }
+
+  private void setSourceFlowName(InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin, String orgIpaCode) {
+    String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+    if (DebtPositionOrigin.ORDINARY.equals(debtPositionOrigin))
+      installmentDTO.setSourceFlowName(orgIpaCode + "_IMPORT-DOVUTO_" + now);
+    if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin))
+      installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO_" + now);
+    if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin))
+      installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-SIL_" + now);
   }
 
   private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
