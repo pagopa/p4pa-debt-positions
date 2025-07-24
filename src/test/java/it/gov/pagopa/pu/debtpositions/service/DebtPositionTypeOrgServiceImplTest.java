@@ -259,7 +259,7 @@ class DebtPositionTypeOrgServiceImplTest {
     Long debtPositionTypeOrgId = 1L;
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setFlagActive(false);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true)).thenReturn(1);
     //when
     debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
     //then
@@ -270,8 +270,7 @@ class DebtPositionTypeOrgServiceImplTest {
   void givenInvalidDebtPositionTypeOrgIdWhenUpdateFlagActiveDebtPositionTypeOrgThenThrowException() {
     //given
     Long debtPositionTypeOrgId = 1L;
-
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenReturn(Optional.empty());
+    Mockito.when(debtPositionTypeOrgRepositoryMock.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true)).thenReturn(0);
     //when
     NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true));
     //then
