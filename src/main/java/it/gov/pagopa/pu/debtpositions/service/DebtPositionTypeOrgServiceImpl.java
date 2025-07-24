@@ -67,12 +67,10 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
   @Override
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(
+    debtPositionTypeOrgRepository.findById(
       debtPositionTypeOrgId).orElseThrow(
       () -> new NotFoundException("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
-    if (debtPositionTypeOrg.isFlagActive() != flagActive){
-      debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive);
-    }
+    debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive);
   }
 
   private void handleOperators(DebtPositionTypeOrg debtPositionTypeOrg, SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {

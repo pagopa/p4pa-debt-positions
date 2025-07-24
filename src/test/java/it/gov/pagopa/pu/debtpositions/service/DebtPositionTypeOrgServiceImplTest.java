@@ -279,17 +279,4 @@ class DebtPositionTypeOrgServiceImplTest {
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
   }
 
-  @Test
-  void givenValidDebtPositionTypeOrgIdAndSameFlagActiveWhenUpdateFlagActiveDebtPositionTypeOrgThenUpdate() {
-    //given
-    Long debtPositionTypeOrgId = 1L;
-    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    debtPositionTypeOrg.setFlagActive(true);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenReturn(Optional.of(debtPositionTypeOrg));
-    //when
-    debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
-    //then
-    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
-  }
-
 }
