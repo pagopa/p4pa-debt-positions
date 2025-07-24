@@ -271,10 +271,11 @@ class DebtPositionTypeOrgServiceImplTest {
     //given
     Long debtPositionTypeOrgId = 1L;
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenThrow(NotFoundException.class);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId)).thenReturn(Optional.empty());
     //when
-    Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true));
+    NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true));
     //then
+    Assertions.assertEquals("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found", ex.getMessage());
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
   }
 
