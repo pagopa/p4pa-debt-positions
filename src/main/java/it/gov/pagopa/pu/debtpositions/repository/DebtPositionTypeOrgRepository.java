@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -86,5 +88,11 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgByOrganizationIdAndIuds(
     Long organizationId,
     Set<String> iuds);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE DebtPositionTypeOrg dpto SET dpto.flagActive = :flagActive  WHERE dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId")
+  void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
 }
 

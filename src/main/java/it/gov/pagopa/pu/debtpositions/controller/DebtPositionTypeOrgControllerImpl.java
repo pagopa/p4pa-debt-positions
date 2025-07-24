@@ -34,4 +34,10 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
     return ResponseEntity.ok(debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
   }
+
+  @Override
+  public ResponseEntity<Void> updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, Boolean flagActive) {
+   debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive);
+    return ResponseEntity.ok().build();
+  }
 }
