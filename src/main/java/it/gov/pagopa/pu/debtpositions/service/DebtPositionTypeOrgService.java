@@ -10,4 +10,5 @@ public interface DebtPositionTypeOrgService {
 
   void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId);
   DebtPositionTypeOrg saveDebtPositionTypeOrg(SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO);
+  void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
 }
