@@ -58,7 +58,6 @@ public class ReceiptWithAdditionalInfoMapper {
           .nav(receiptDTO.getNoticeNumber())
           .dueDate(null)
           .switchToExpired(false)
-          .notificationFeeCents(receiptDTO.getFeeCents())
           .amountCents(receiptDTO.getPaymentAmountCents())
           .remittanceInformation(getRemittanceInformation(receiptDTO))
           .balance(receiptDTO.getBalance())

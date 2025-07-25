@@ -71,7 +71,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     TestUtils.checkNotNullFields(paymentOptionDTO, "paymentOptionId", "debtPositionId", "dueDate", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     InstallmentDTO installmentDTO = paymentOptionDTO.getInstallments().getFirst();
     TestUtils.checkNotNullFields(installmentDTO, "paymentOptionId", "installmentId", "dueDate",
-      "syncStatus", "iuf", "iur", "iun", "paymentTypeCode", "balance", "legacyPaymentMetadata", "notificationDate",
+      "syncStatus", "iuf", "iur", "iun", "paymentTypeCode", "balance", "legacyPaymentMetadata", "notificationFeeCents", "notificationDate",
       "ingestionFlowFileId", "ingestionFlowFileLineNumber", "ingestionFlowFileAction", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId",
       "noPII");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
