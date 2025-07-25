@@ -48,43 +48,43 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   void deleteById(Long debtPositionTypeOrgId);
 
   @Query("""
-          select dpto
-          from DebtPositionTypeOrg dpto
-          JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
-          WHERE dpto.organizationId = :organizationId
-          AND dpto.code = :code
-          AND dptoo.operatorExternalUserId = :operatorExternalUserId
-          """)
+    select dpto
+    from DebtPositionTypeOrg dpto
+    JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+    WHERE dpto.organizationId = :organizationId
+    AND dpto.code = :code
+    AND dptoo.operatorExternalUserId = :operatorExternalUserId
+    """)
   DebtPositionTypeOrg findDebtPositionTypeOrg(
-          @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-          @Parameter(required = true) @Param("code") String code,
-          @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("code") String code,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
   );
 
   @Query("""
-      SELECT dpto from InstallmentNoPII i
-      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
-      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
-      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
-      WHERE i.nav = :nav
-      AND dp.organizationId = :organizationId
-      AND dp.debtPositionOrigin IN :debtPositionOrigins
-      AND i.status != 'CANCELLED'
-      """)
+    SELECT dpto from InstallmentNoPII i
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+    WHERE i.nav = :nav
+    AND dp.organizationId = :organizationId
+    AND dp.debtPositionOrigin IN :debtPositionOrigins
+    AND i.status != 'CANCELLED'
+    """)
   DebtPositionTypeOrg findDebtPositionTypeOrgByOrgIdAndNavAndOrigins(
     Long organizationId,
     String nav,
     List<DebtPositionOrigin> debtPositionOrigins);
 
   @Query("""
-      SELECT distinct dpto
-      from InstallmentNoPII i
-      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
-      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
-      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
-      WHERE dp.organizationId = :organizationId
-      AND i.iud IN :iuds
-      """)
+    SELECT distinct dpto
+    from InstallmentNoPII i
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+    WHERE dp.organizationId = :organizationId
+    AND i.iud IN :iuds
+    """)
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgByOrganizationIdAndIuds(
     Long organizationId,
     Set<String> iuds);
@@ -94,5 +94,15 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   @Modifying
   @Query("UPDATE DebtPositionTypeOrg dpto SET dpto.flagActive = :flagActive  WHERE dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId")
   int updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
+
+  @Query
+    ("""
+      SELECT COUNT(d)
+      FROM DebtPositionTypeOrg d
+      WHERE d.notifyOutcomePushOrgSilServiceId = :orgSilServiceId
+      OR d.amountActualizationOrgSilServiceId = :orgSilServiceId
+      """)
+  long countByOrgSilServiceId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("orgSilServiceId") Long orgSilServiceId);
+
 }
 
