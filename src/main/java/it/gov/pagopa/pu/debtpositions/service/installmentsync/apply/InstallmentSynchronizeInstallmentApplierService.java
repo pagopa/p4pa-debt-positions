@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -32,6 +33,8 @@ public class InstallmentSynchronizeInstallmentApplierService {
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
+
+    mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
       throw new ConflictErrorException(String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
@@ -74,6 +77,25 @@ public class InstallmentSynchronizeInstallmentApplierService {
     if (!modifiedFields.isEmpty()) {
       throw new ConflictErrorException(String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
         transferDTO.getTransferIndex(), iud, modifiedFields));
+    }
+  }
+
+  private void mergeDebtorFields(InstallmentSynchronizeDTO updatedInstallment, PersonDTO storedDebtor, List<String> modifiedFields) {
+    storedDebtor.setFullName(updatedInstallment.getFullName());
+    storedDebtor.setAddress(updatedInstallment.getAddress());
+    storedDebtor.setCivic(updatedInstallment.getCivic());
+    storedDebtor.setPostalCode(updatedInstallment.getPostalCode());
+    storedDebtor.setLocation(updatedInstallment.getLocation());
+    storedDebtor.setProvince(updatedInstallment.getProvince());
+    storedDebtor.setNation(updatedInstallment.getNation());
+    storedDebtor.setEmail(updatedInstallment.getEmail());
+
+    List<String> modifiedDebtorFields = new ArrayList<>();
+    checkImmutableField("entityType", updatedInstallment.getEntityType(), storedDebtor.getEntityType(), modifiedDebtorFields);
+    checkImmutableField("fiscalCode", updatedInstallment.getFiscalCode(), storedDebtor.getFiscalCode(), modifiedDebtorFields);
+
+    if(!modifiedDebtorFields.isEmpty()) {
+      modifiedFields.add("debtor: " + modifiedDebtorFields);
     }
   }
 }
