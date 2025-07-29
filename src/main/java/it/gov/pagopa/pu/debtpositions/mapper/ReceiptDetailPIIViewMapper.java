@@ -29,6 +29,7 @@ public class ReceiptDetailPIIViewMapper {
       .iud(receiptDetailNoPIIView.getIud())
       .iur(receiptDetailNoPIIView.getIur())
       .feeCents(receiptDetailNoPIIView.getFeeCents())
+      .notificationFeeCents(receiptDetailNoPIIView.getNotificationFeeCents())
       .debtor(pii.getDebtor())
       .build();
   }

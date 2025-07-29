@@ -1690,6 +1690,9 @@ components:
         feeCents:
           type: integer
           format: int64
+        notificationFeeCents:
+          type: integer
+          format: int64
     ReceiptTransferDTO:
       required:
         - idTransfer
