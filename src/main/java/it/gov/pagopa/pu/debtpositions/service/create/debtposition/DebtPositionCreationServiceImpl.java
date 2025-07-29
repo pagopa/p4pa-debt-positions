@@ -94,6 +94,11 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   @Override
+  protected boolean isDisableDebtPositionTypeOrgAllowed(DebtPositionTypeOrg debtPositionTypeOrg) {
+    return debtPositionTypeOrg.isFlagActive();
+  }
+
+  @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                 String accessToken, Organization org) {
 

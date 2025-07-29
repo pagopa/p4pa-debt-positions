@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -75,7 +77,11 @@ public abstract class BaseDebtPositionOperationService {
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
       throw new InvalidValueException("Provided organization is not ACTIVE");
     }
-    authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+    DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+
+    if (!isDisableDebtPositionTypeOrgAllowed(debtPositionTypeOrg)) {
+      throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
+    }
 
     applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
@@ -102,6 +108,17 @@ public abstract class BaseDebtPositionOperationService {
         accessToken);
     }
     return null;
+  }
+
+  /**
+   * It checks if the operator operates on an inactive DebtPositionTypeOrg.
+   *
+   * @param debtPositionTypeOrg the DebtPositionTypeOrg to check
+   * @return true if the DebtPositionTypeOrg can be handled, false otherwise
+   */
+  protected boolean isDisableDebtPositionTypeOrgAllowed(DebtPositionTypeOrg debtPositionTypeOrg) {
+    // Not overridden, so it is always allowed
+    return true;
   }
 
   /**
