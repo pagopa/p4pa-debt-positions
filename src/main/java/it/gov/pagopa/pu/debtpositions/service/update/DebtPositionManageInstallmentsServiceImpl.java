@@ -180,6 +180,6 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
   @Override
   protected boolean isDebtPositionTypeOrgDisabledAllowed() {
-    return false;
+    return true;
   }
 }

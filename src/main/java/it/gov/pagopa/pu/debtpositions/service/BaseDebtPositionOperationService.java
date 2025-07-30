@@ -79,7 +79,7 @@ public abstract class BaseDebtPositionOperationService {
     }
     DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
-    if (isDebtPositionTypeOrgDisabledAllowed() && !debtPositionTypeOrg.isFlagActive()) {
+    if (!isDebtPositionTypeOrgDisabledAllowed() && !debtPositionTypeOrg.isFlagActive()) {
       throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
     }
 
