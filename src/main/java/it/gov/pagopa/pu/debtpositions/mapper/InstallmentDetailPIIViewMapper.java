@@ -38,6 +38,9 @@ public class InstallmentDetailPIIViewMapper {
       .pspCompanyName(installmentDetailNoPIIView.getPspCompanyName())
       .iud(installmentDetailNoPIIView.getIud())
       .iur(installmentDetailNoPIIView.getIur())
+      .iun(installmentDetailNoPIIView.getIun())
+      .notificationDate(installmentDetailNoPIIView.getNotificationDate())
+      .notificationFeeCents(installmentDetailNoPIIView.getNotificationFeeCents())
       .build();
   }
 

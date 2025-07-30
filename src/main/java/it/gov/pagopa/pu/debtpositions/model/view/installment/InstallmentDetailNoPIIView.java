@@ -48,5 +48,8 @@ public class InstallmentDetailNoPIIView implements Serializable {
   @NotNull
   private String iud;
   private String iur;
+  private String iun;
+  private OffsetDateTime notificationDate;
+  private Long notificationFeeCents;
 
 }
