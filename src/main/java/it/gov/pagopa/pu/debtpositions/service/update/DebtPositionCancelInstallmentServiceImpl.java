@@ -97,7 +97,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
     return false;
   }
 }

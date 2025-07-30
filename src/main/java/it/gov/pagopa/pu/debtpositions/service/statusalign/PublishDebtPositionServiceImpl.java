@@ -77,7 +77,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
   }
 
   @Override
-  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
     return false;
   }
 }

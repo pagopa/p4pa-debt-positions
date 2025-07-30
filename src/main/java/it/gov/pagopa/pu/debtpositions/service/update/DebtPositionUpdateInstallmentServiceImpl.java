@@ -81,7 +81,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
     return false;
   }
 }
