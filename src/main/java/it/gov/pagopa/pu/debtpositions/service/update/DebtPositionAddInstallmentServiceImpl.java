@@ -83,4 +83,9 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
         }
       );
   }
+
+  @Override
+  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+    return false;
+  }
 }

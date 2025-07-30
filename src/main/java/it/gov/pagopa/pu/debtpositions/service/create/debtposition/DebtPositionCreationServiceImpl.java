@@ -94,8 +94,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   @Override
-  protected boolean isDisableDebtPositionTypeOrgAllowed(DebtPositionTypeOrg debtPositionTypeOrg) {
-    return debtPositionTypeOrg.isFlagActive();
+  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+    return true;
   }
 
   @Override

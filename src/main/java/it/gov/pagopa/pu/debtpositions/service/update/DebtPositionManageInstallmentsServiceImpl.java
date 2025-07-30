@@ -177,4 +177,9 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     // Do Nothing, operations are demanded to the invoked services
   }
+
+  @Override
+  protected boolean isDebtPositionTypeOrgFlagCheckEnabled() {
+    return false;
+  }
 }

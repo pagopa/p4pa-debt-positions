@@ -79,7 +79,7 @@ public abstract class BaseDebtPositionOperationService {
     }
     DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
-    if (!isDisableDebtPositionTypeOrgAllowed(debtPositionTypeOrg)) {
+    if (isDebtPositionTypeOrgFlagCheckEnabled() && !debtPositionTypeOrg.isFlagActive()) {
       throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
     }
 
@@ -111,15 +111,11 @@ public abstract class BaseDebtPositionOperationService {
   }
 
   /**
-   * It checks if the operator operates on an inactive DebtPositionTypeOrg.
+   * Enable or disable the check of the flag on DebtPositionTypeOrg
    *
-   * @param debtPositionTypeOrg the DebtPositionTypeOrg to check
-   * @return true if the DebtPositionTypeOrg can be handled, false otherwise
+   * @return true if the check is enabled, false otherwise
    */
-  protected boolean isDisableDebtPositionTypeOrgAllowed(DebtPositionTypeOrg debtPositionTypeOrg) {
-    // Not overridden, so it is always allowed
-    return true;
-  }
+  protected abstract boolean isDebtPositionTypeOrgFlagCheckEnabled();
 
   /**
    * It will set TO_SYNC and syncStatus to the involved installments
