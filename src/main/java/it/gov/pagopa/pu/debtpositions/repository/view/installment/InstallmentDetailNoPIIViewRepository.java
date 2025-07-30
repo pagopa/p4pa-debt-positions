@@ -33,7 +33,10 @@ public interface InstallmentDetailNoPIIViewRepository extends Repository<Install
     r.personalDataId as receiptPersonalDataId,
     r.pspCompanyName as pspCompanyName,
     i.iud as iud,
-    i.iur as iur
+    i.iur as iur,
+    i.iun as iun,
+    i.notificationDate as notificationDate,
+    i.notificationFeeCents as notificationFeeCents
     )
     FROM InstallmentDetailNoPIIView i
     LEFT JOIN ReceiptNoPII r ON i.receiptId = r.receiptId
