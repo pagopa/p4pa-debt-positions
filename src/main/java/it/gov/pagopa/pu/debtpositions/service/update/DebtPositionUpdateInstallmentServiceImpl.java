@@ -80,4 +80,8 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
       );
   }
 
+  @Override
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
+    return true;
+  }
 }

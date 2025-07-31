@@ -95,4 +95,9 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       super.saveAndAlignHierarchyStatus(debtPositionDTO);
     }
   }
+
+  @Override
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
+    return true;
+  }
 }

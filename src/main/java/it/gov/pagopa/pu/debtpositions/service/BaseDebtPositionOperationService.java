@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -75,7 +77,11 @@ public abstract class BaseDebtPositionOperationService {
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
       throw new InvalidValueException("Provided organization is not ACTIVE");
     }
-    authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+    DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
+
+    if (!isDebtPositionTypeOrgDisabledAllowed() && !debtPositionTypeOrg.isFlagActive()) {
+      throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
+    }
 
     applyOperation(debtPositionDTO, installments2operate, accessToken, org);
 
@@ -103,6 +109,13 @@ public abstract class BaseDebtPositionOperationService {
     }
     return null;
   }
+
+  /**
+   * Enable or disable the check of the flag on DebtPositionTypeOrg
+   *
+   * @return true if the check is enabled, false otherwise
+   */
+  protected abstract boolean isDebtPositionTypeOrgDisabledAllowed();
 
   /**
    * It will set TO_SYNC and syncStatus to the involved installments

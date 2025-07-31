@@ -75,4 +75,9 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
         InstallmentUtils.setStatus(installment, UNPAID);
       }));
   }
+
+  @Override
+  protected boolean isDebtPositionTypeOrgDisabledAllowed() {
+    return false;
+  }
 }
