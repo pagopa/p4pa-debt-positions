@@ -24,6 +24,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -405,5 +406,23 @@ class DebtPositionCreationServiceImplTest {
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
     assertEquals("Provided organization is not ACTIVE", exception.getMessage());
+  }
+
+  @Test
+  void givenInactiveDebtPositionTypeOrgWhenCreateThenKo() {
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    String operatorExternalId = "OPERATOREXTERNALID";
+
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setFlagActive(false);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
+
+    assertThrows(OperatorNotAuthorizedException.class, () ->
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalId));
   }
 }
