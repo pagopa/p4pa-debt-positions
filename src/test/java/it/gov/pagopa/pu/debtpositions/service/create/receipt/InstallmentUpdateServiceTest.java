@@ -1,5 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
+import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
+import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
@@ -13,11 +16,9 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
+
+import java.util.*;
+
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -28,17 +29,24 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
+
 @Slf4j
 @ExtendWith(MockitoExtension.class)
 class InstallmentUpdateServiceTest {
 
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
+  @Mock
+  private BalanceService balanceServiceMock;
 
   @InjectMocks
   private InstallmentUpdateService installmentUpdateService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+  private static final String ACCESS_TOKEN = "accessToken";
 
   @Test
   void givenFoundDebtPositionWhenUpdateInstallmentStatusOfDebtPositionThenOk() {
@@ -46,6 +54,7 @@ class InstallmentUpdateServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
       InstallmentStatus.UNPAID);
+    targetInstallment.setBalance(null);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
     debtPosition.setStatus(DebtPositionStatus.UNPAID);
 
@@ -106,12 +115,12 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(
       targetInstallment.getInstallmentId())).thenReturn(debtPosition);
 
     //when
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
-      targetInstallment, receiptDTO);
+      targetInstallment, receiptDTO, ACCESS_TOKEN);
 
     //verify
     Assertions.assertEquals(debtPosition, response);
@@ -147,8 +156,11 @@ class InstallmentUpdateServiceTest {
       idxPo[0]++;
     });
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
-      .findByInstallmentId(targetInstallment.getInstallmentId());
-
+      .findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(organizationServiceMock, Mockito.times(0))
+      .getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN);
+    Mockito.verify(balanceServiceMock, Mockito.times(0))
+      .calculateAmountBalance(Mockito.any(), Mockito.anyString());
   }
 
   @Test
@@ -169,11 +181,13 @@ class InstallmentUpdateServiceTest {
     // Transfer with transferIndex=1 (it will be changed with fee)
     Transfer transferWithIndex1 = new Transfer();
     transferWithIndex1.setTransferIndex(1);
+    transferWithIndex1.setOrgFiscalCode("12345678901");
     transferWithIndex1.setAmountCents(installmentAmount);
 
     // Other transfer (untouched)
     Transfer otherTransfer = new Transfer();
     otherTransfer.setTransferIndex(0);
+    otherTransfer.setOrgFiscalCode("otherFiscalCode");
     otherTransfer.setAmountCents(500L);
 
     // Add transfers
@@ -204,12 +218,17 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId()))
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId()))
       .thenReturn(debtPosition);
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.ofNullable(buildOrganization()));
+    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+      .balance(targetInstallment.getBalance()).amountCents(1200L).remittanceInformation(targetInstallment.getRemittanceInformation()).build();
+    Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, ACCESS_TOKEN)).thenReturn("balanceResolved");
 
     // When
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
-      targetInstallment, receiptDTO);
+      targetInstallment, receiptDTO, ACCESS_TOKEN);
 
     // Then
     InstallmentNoPII updatedInstallment = response.getPaymentOptions().getFirst()
@@ -219,6 +238,7 @@ class InstallmentUpdateServiceTest {
     Assertions.assertEquals(receiptDTO.getPaymentReceiptId(), updatedInstallment.getIur(), "set iur");
     Assertions.assertEquals(feeAmount, updatedInstallment.getNotificationFeeCents(), "set notificationFeeCents");
     Assertions.assertEquals(installmentAmount + feeAmount, updatedInstallment.getAmountCents(), "update amountCents");
+    Assertions.assertEquals("balanceResolved", updatedInstallment.getBalance());
 
     // test Transfer with transferIndex=1 updated
     Transfer updatedTransfer = updatedInstallment.getTransfers().stream()
@@ -239,12 +259,12 @@ class InstallmentUpdateServiceTest {
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(null);
     //when
-    NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
+    NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO, ACCESS_TOKEN));
     //verify
     Assertions.assertTrue(response.getMessage().startsWith("debt position not found"));
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
   }
 
   @Test
@@ -263,11 +283,11 @@ class InstallmentUpdateServiceTest {
         }
       });
     });
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId())).thenReturn(debtPosition);
     //when
-    NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO));
+    NotFoundException response = Assertions.assertThrows(NotFoundException.class, () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO, ACCESS_TOKEN));
     //verify
     Assertions.assertTrue(response.getMessage().startsWith("primary installment not found"));
-    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findByInstallmentId(targetInstallment.getInstallmentId());
+    Mockito.verify(debtPositionRepositoryMock, Mockito.times(1)).findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
   }
 }

@@ -156,6 +156,7 @@
                     "remittanceInformation": "string",
                     "sourceFlowName": "string",
                     "status": "TO_SYNC",
+                    "switchToExpired": true,
                     "syncStatus": {
                       "syncError": "string",
                       "syncStatusFrom": "TO_SYNC",
@@ -342,6 +343,9 @@
           "status": {
             "$ref": "#/components/schemas/InstallmentStatus"
           },
+          "switchToExpired": {
+            "type": "boolean"
+          },
           "syncStatus": {
             "$ref": "#/components/schemas/InstallmentSyncStatus"
           },
@@ -399,6 +403,7 @@
             "remittanceInformation": "string",
             "sourceFlowName": "string",
             "status": "TO_SYNC",
+            "switchToExpired": true,
             "syncStatus": {
               "syncError": "string",
               "syncStatusFrom": "TO_SYNC",
@@ -564,6 +569,7 @@
                       "remittanceInformation": "string",
                       "sourceFlowName": "string",
                       "status": "TO_SYNC",
+                      "switchToExpired": true,
                       "syncStatus": {
                         "syncError": "string",
                         "syncStatusFrom": "TO_SYNC",
@@ -731,6 +737,7 @@
                 "remittanceInformation": "string",
                 "sourceFlowName": "string",
                 "status": "TO_SYNC",
+                "switchToExpired": true,
                 "syncStatus": {
                   "syncError": "string",
                   "syncStatusFrom": "TO_SYNC",

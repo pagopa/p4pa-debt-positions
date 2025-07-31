@@ -65,6 +65,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     return savedDebtPositionTypeOrg;
   }
 
+  @Override
+  public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
+    if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0){
+      throw new NotFoundException("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found");
+    }
+  }
+
   private void handleOperators(DebtPositionTypeOrg debtPositionTypeOrg, SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
     if(Boolean.TRUE.equals(saveDebtPositionTypeOrgDTO.getRemoveEnabledOperators())){
       debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId());

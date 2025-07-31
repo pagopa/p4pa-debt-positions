@@ -78,7 +78,7 @@ public class ManagePaidDebtPositionService {
   private void setInstallmentAsPaid(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.debug("primaryOrg installment found id[{}]", installment.getInstallmentId());
     //update installment status
-    DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO);
+    DebtPosition debtPosition = installmentUpdateService.updateInstallmentStatusOfDebtPosition(installment, receiptDTO, accessToken);
     //update amounts
     debtPositionProcessorService.updateAmounts(debtPosition);
     //align debt position status
@@ -90,8 +90,10 @@ public class ManagePaidDebtPositionService {
   }
 
   void persistTechnicalDebtPositionFromReceiptAndNotifyEvent(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
-    log.info("Creating technical debt position from receipt[{} - {}/{}] for organization [{}/{}]",
-      receiptDTO.getReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
+    log.info("Creating technical debt position from receipt[{} - {}/{} - {}] for organization [{}/{}]",
+      receiptDTO.getReceiptId(),
+      receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber(),
+      receiptDTO.getIud(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
     debtPositionService.saveDebtPosition(debtPositionDTO);

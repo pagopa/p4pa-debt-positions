@@ -388,6 +388,47 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /installments/by-organizationId-and-receiptId:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsByOrganizationIdAndReceiptId
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: The ID of the organization
+        - name: receiptId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+          description: receipt id
+        - name: debtPositionOrigin
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
+            description: An array of debt position origins to filter by; if null, no filter is applied
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InstallmentDTO"
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
   /export/organization/{organizationId}/installments/paid:
     get:
       tags:
@@ -1174,6 +1215,29 @@ paths:
           description: Not Found
         "500":
           description: Internal server error
+    patch:
+      tags:
+        - debt-position-type-org
+      operationId: updateFlagActiveDebtPositionTypeOrg
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: flagActive
+          in: query
+          required: true
+          schema:
+            type: boolean
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+        "500":
+          description: Internal server error
   /debt-position-type-org/{debtPositionTypeOrgId}/io-notification/details:
     get:
       tags:
@@ -1349,6 +1413,8 @@ components:
         dueDate:
           type: string
           format: date
+        switchToExpired:
+          type: boolean
         notificationFeeCents:
           type: integer
           format: int64
@@ -1541,7 +1607,6 @@ components:
         - status
         - iuv
         - amountCents
-        - dueDate
         - debtor
         - debtPositionTypeOrgDescription
         - debtPositionDescription
@@ -1588,6 +1653,14 @@ components:
           type: string
         iur:
           type: string
+        iun:
+          type: string
+        notificationDate:
+          type: string
+          format: date-time
+        notificationFeeCents:
+          type: integer
+          format: int64
     ReceiptDetailDTO:
       type: object
       required:
@@ -1623,6 +1696,9 @@ components:
         iur:
           type: string
         feeCents:
+          type: integer
+          format: int64
+        notificationFeeCents:
           type: integer
           format: int64
     ReceiptTransferDTO:

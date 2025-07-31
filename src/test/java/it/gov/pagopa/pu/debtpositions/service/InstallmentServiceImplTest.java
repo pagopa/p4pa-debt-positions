@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -271,7 +272,7 @@ class InstallmentServiceImplTest {
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
 
@@ -345,6 +346,25 @@ class InstallmentServiceImplTest {
   }
 
   @Test
+  void givenInstallmentExpiredWhenUpdateInstallmentNotificationFeeThenInvalidStatus() {
+    // Given
+    String nav = "NAV";
+    Long orgId = 1L;
+    long newNotificationFee = 200L;
+
+    InstallmentDTO expiredInstallment = new InstallmentDTO();
+    expiredInstallment.setStatus(InstallmentStatus.EXPIRED);
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+      .thenReturn(List.of(expiredInstallment));
+
+    // When Then
+    assertThrows(InvalidConditionException.class, () ->
+      installmentService.updateInstallmentNotificationFee(
+        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+  }
+
+  @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNoEligibleTransfer() {
     // Given
     String nav = "NAV";
@@ -390,7 +410,7 @@ class InstallmentServiceImplTest {
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO));
-    Mockito.when(debtPositionRepositoryMock.findByInstallmentId(installmentDTO.getInstallmentId()))
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId()))
       .thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
 
@@ -482,6 +502,23 @@ class InstallmentServiceImplTest {
     // Then
     assertNull(result);
     assertEquals(dateTime, installmentDTO.getNotificationDate());
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"ORDINARY", "ORDINARY_SIL"})
+  void givenValidOrganizationAndReceiptIdWhGetInstallmentsByOrganizationIdAndReceiptIdThenOk(String debtPositionOrigin) {
+    //given
+    List<InstallmentDTO> installmentDTOList = new ArrayList<>();
+    List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
+
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+
+    //when
+    List<InstallmentDTO> response = installmentService.getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList);
+
+    //verify
+    assertNotNull(response);
+    Assertions.assertIterableEquals(installmentDTOList, response);
   }
 
 }

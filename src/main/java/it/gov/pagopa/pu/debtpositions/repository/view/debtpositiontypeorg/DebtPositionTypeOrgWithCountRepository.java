@@ -19,11 +19,13 @@ public interface DebtPositionTypeOrgWithCountRepository extends Repository<DebtP
     WHERE d.organizationId = :organizationId
     AND (:code IS NULL OR d.code = :code)
     AND (:description IS NULL OR d.description = :description)
+    AND (:flagActive IS NULL OR d.flagActive= :flagActive)
     """)
   Page<DebtPositionTypeOrgWithCount> findByCodeAndDescription(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Param("code") String code,
     @Param("description") String description,
+    @Param("flagActive")  Boolean flagActive,
     Pageable pageable);
 
 }

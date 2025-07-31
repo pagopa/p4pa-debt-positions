@@ -4,9 +4,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
@@ -27,9 +29,11 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     + "FROM DebtPositionTypeOrg dpto "
     + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
     + "WHERE dpto.organizationId = :organizationId "
-    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId")
+    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
+    + "AND (:flagActive IS NULL OR dpto.flagActive= :flagActive) ")
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgs(@Parameter(required = true) @Param("organizationId") Long organizationId,
-                                                     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
+                                                     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+                                                     @Param("flagActive")  Boolean flagActive);
 
   Page<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
                                                      Pageable pageable);
@@ -46,45 +50,61 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   void deleteById(Long debtPositionTypeOrgId);
 
   @Query("""
-          select dpto
-          from DebtPositionTypeOrg dpto
-          JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
-          WHERE dpto.organizationId = :organizationId
-          AND dpto.code = :code
-          AND dptoo.operatorExternalUserId = :operatorExternalUserId
-          """)
+    select dpto
+    from DebtPositionTypeOrg dpto
+    JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+    WHERE dpto.organizationId = :organizationId
+    AND dpto.code = :code
+    AND dptoo.operatorExternalUserId = :operatorExternalUserId
+    """)
   DebtPositionTypeOrg findDebtPositionTypeOrg(
-          @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-          @Parameter(required = true) @Param("code") String code,
-          @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("code") String code,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
   );
 
   @Query("""
-      SELECT dpto from InstallmentNoPII i
-      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
-      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
-      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
-      WHERE i.nav = :nav
-      AND dp.organizationId = :organizationId
-      AND dp.debtPositionOrigin IN :debtPositionOrigins
-      AND i.status != 'CANCELLED'
-      """)
+    SELECT dpto from InstallmentNoPII i
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+    WHERE i.nav = :nav
+    AND dp.organizationId = :organizationId
+    AND dp.debtPositionOrigin IN :debtPositionOrigins
+    AND i.status != 'CANCELLED'
+    """)
   DebtPositionTypeOrg findDebtPositionTypeOrgByOrgIdAndNavAndOrigins(
     Long organizationId,
     String nav,
     List<DebtPositionOrigin> debtPositionOrigins);
 
   @Query("""
-      SELECT distinct dpto
-      from InstallmentNoPII i
-      JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
-      JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
-      JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
-      WHERE dp.organizationId = :organizationId
-      AND i.iud IN :iuds
-      """)
+    SELECT distinct dpto
+    from InstallmentNoPII i
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+    WHERE dp.organizationId = :organizationId
+    AND i.iud IN :iuds
+    """)
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgByOrganizationIdAndIuds(
     Long organizationId,
     Set<String> iuds);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE DebtPositionTypeOrg dpto SET dpto.flagActive = :flagActive  WHERE dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId")
+  int updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
+
+  @Query
+    ("""
+      SELECT COUNT(d)
+      FROM DebtPositionTypeOrg d
+      WHERE d.notifyOutcomePushOrgSilServiceId = :orgSilServiceId
+      OR d.amountActualizationOrgSilServiceId = :orgSilServiceId
+      """)
+  long countByOrgSilServiceId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("orgSilServiceId") Long orgSilServiceId);
+
 }
 

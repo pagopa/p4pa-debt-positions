@@ -123,35 +123,28 @@ class CreateReceiptServiceImplTest {
 
   @Test
   @Tag("alreadyHandled")
-  void givenReceiptAlreadyInDbAndIudPresentWhenCreateReceiptThenPersistNewOne() {
+  void givenReceiptAlreadyInDbAndIudNotPresentWhenCreateReceiptThenCreateTechnicalPositionsWithTrue() {
     // given
-    receipt.setIud("PRESENT_IUD");
+    receipt.setIud("VALID_IUD");
     receipt.setPaymentReceiptId("NEW_RECEIPT_ID");
+    boolean primaryOrgFound = false;
 
     ReceiptNoPII existingReceipt = podamFactory.manufacturePojo(ReceiptNoPII.class);
     existingReceipt.setPaymentReceiptId(receipt.getPaymentReceiptId());
 
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receipt.getPaymentReceiptId()))
       .thenReturn(existingReceipt);
-    Mockito.when(receiptMapperMock.mapToModel(receipt)).thenReturn(receiptModel);
-    Mockito.when(receiptPIIRepositoryMock.save(receiptModel)).thenReturn(receiptModel);
 
-    Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken))
-      .thenReturn(true);
-    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock)
-      .createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
+    Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     // when
     ReceiptDTO result = receiptService.createReceipt(receipt, accessToken);
 
     // then
     Assertions.assertNotNull(result);
-    Assertions.assertEquals(receiptId, result.getReceiptId());
-
-    Mockito.verify(receiptMapperMock).mapToModel(receipt);
-    Mockito.verify(receiptPIIRepositoryMock).save(receiptModel);
     Mockito.verify(managePaidDebtPositionServiceMock).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
   }
 
   @Test

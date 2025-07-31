@@ -91,6 +91,11 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
+  @ExceptionHandler({InvalidConditionException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleInvalidConditionException(Exception ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+  }
+
 
   @ExceptionHandler({ServletException.class, ErrorResponseException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleServletException(Exception ex, HttpServletRequest request) {

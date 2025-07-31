@@ -1,9 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -90,5 +88,18 @@ class DebtPositionTypeOrgControllerTest {
 
     DebtPositionTypeOrg response = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionTypeOrg.class);
     assertEquals(expectedResult,response);
+  }
+
+  @Test
+  void whenUpdateFlagActiveDebtPositionTypeOrgThenOk() throws Exception {
+    Long debtPositionTypeOrgId = 1L;
+
+    Mockito.doNothing().when(debtPositionTypeOrgService).updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true);
+
+    mockMvc.perform(
+        patch("/debt-position-type-org/{debtPositionTypeOrgId}", debtPositionTypeOrgId)
+          .param("flagActive", String.valueOf(true)))
+      .andExpect(status().isOk())
+      .andReturn();
   }
 }

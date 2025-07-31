@@ -64,11 +64,12 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setDescription("New description");
     installmentSynchronizeDTO.setIuv("iuv_iuv");
+    installmentSynchronizeDTO.setFiscalCode("new_fiscal_code");
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("These fields for installment with iud iud are not mutable: [iuv]", exception.getMessage());
+    assertEquals("These fields for installment with iud iud are not mutable: [iuv, debtor: [fiscalCode]]", exception.getMessage());
   }
 
   @Test

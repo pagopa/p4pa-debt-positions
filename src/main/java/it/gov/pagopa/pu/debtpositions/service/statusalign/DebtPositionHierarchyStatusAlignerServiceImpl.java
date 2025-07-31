@@ -54,7 +54,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   @Transactional
   @Override
   public DebtPositionDTO finalizeSyncStatus(Long debtPositionId, SyncStatusUpdateRequestDTO syncStatusDTO) {
-    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
       throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
@@ -118,7 +118,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   @Transactional
   @Override
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
-    DebtPosition debtPosition = debtPositionRepository.findByTransferId(transferId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByTransferId(transferId);
 
     if (debtPosition == null) {
       throw new NotFoundException(String.format("Debt position related to the transfer with id %s was not found", transferId));
@@ -158,7 +158,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   @Transactional
   @Override
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> checkAndUpdateInstallmentExpiration(Long debtPositionId, String accessToken) {
-    DebtPosition debtPosition = debtPositionRepository.findOneWithAllDataByDebtPositionId(debtPositionId);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
       throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
@@ -167,7 +167,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     String expiredIuds = debtPosition.getPaymentOptions().stream()
       .flatMap(paymentOption -> paymentOption.getInstallments().stream())
       .filter(i -> i.getStatus().equals(InstallmentStatus.UNPAID) &&
-        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()))
+        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()) && i.isSwitchToExpired())
       .map(i -> {
           InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
           i.setStatus(InstallmentStatus.EXPIRED);

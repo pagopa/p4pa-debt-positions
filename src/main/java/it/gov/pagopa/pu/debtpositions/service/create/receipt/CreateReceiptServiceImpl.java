@@ -37,19 +37,24 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    log.info("createReceipt paymentReceiptId[{}} org/nav[{}/{}]", receiptDTO.getPaymentReceiptId(), receiptDTO.getOrgFiscalCode(), receiptDTO.getNoticeNumber());
+    log.info("createReceipt paymentReceiptId[{}} org/nav/iud[{}/{}/{}]",
+      receiptDTO.getPaymentReceiptId(),
+      receiptDTO.getOrgFiscalCode(),
+      receiptDTO.getNoticeNumber(),
+      receiptDTO.getIud());
 
     // if the receipt already exists, we should continue only if the input IUD exists,
     // in order to check the existence of a DP having an Installment with the requested IUD:
     // if it doesn't exist, we should create a new technical DP with the requested Installment
     // (use case heterogeneous IUV: many DP on same org having same IUV)
     Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
-    if (receiptInDb.isPresent() && StringUtils.isBlank(receiptDTO.getIud())) {
-      return receiptInDb.get();
+    if (receiptInDb.isPresent()) {
+      if (StringUtils.isBlank(receiptDTO.getIud())) {
+        return receiptInDb.get();
+      }
+    } else {
+      saveReceipt(receiptDTO);
     }
-
-    //persist receipt
-    saveReceipt(receiptDTO);
 
     //check if organization who handles the notice is managed by PU and update the installment status
     boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);

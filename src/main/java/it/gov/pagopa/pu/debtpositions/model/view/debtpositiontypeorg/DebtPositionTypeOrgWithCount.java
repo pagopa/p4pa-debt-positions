@@ -34,5 +34,6 @@ public class DebtPositionTypeOrgWithCount implements Serializable {
     + "FROM debt_position_type_org_operators o "
     + "WHERE debt_position_type_org_id = o.debt_position_type_org_id)")
   private Integer enabledOperators;
+  private boolean flagActive;
 
 }

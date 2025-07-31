@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -63,6 +64,11 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
+  public List<InstallmentDTO> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
+    return installmentPIIRepository.getByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin);
+  }
+
+  @Override
   public InstallmentDetailDTO getInstallmentDetail(Long installmentId, String operatorExternalUserId) {
     return installmentDetailPIIViewRepository.getInstallmentDetail(installmentId, operatorExternalUserId);
   }
@@ -85,7 +91,7 @@ public class InstallmentServiceImpl implements InstallmentService {
         .forEach(installmentDTO -> {
           log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
           installmentDTO.setNotificationDate(request.getNotificationDate());
-          if(installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+          if(installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
             log.info("Obtained a notificationDate on an already expired Installment: installmentId:{} dueDate:{} status:{}",
               installmentDTO.getInstallmentId(), installmentDTO.getDueDate(), installmentDTO.getStatus());
             installmentDTO.setDueDate(LocalDate.now());
@@ -111,12 +117,14 @@ public class InstallmentServiceImpl implements InstallmentService {
       throw new NotFoundException("The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
       throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
+    if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
+      throw new InvalidConditionException("The installment with NAV: " + nav + " is expired");
 
     notificationFeeCents = calculateFeeAlreadyPaid(notificationFeeCents, installments.getFirst().getIun());
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
 
-    DebtPosition debtPosition = debtPositionRepository.findByInstallmentId(installment.getInstallmentId());
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> {
