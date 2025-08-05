@@ -80,6 +80,20 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true) @Param("transferIndex") int transferIndex,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
+  @Query(value = "SELECT i from InstallmentNoPII i " +
+    "JOIN Transfer t ON i.installmentId = t.installmentId " +
+    "JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId " +
+    "JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId " +
+    "WHERE d.organizationId = :organizationId AND " +
+    "i.iuv = :iuv AND " +
+    "i.iur = :iur AND " +
+    "t.transferIndex = :transferIndex")
+  Optional<InstallmentNoPII> findByTransferSemanticKey(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("iuv") String iuv,
+    @Parameter(required = true) @Param("iur") String iur,
+    @Parameter(required = true) @Param("transferIndex") int transferIndex);
+
   @RestResource(exported = false)
   @Query(" select i" +
     "  from InstallmentNoPII i" +
