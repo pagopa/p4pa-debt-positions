@@ -110,17 +110,14 @@ class DebtPositionTypeOrgControllerTest {
   @Test
   void whenCreateTechnicalDebtPositionTypeOrgThenOk() throws Exception {
     Long organizationId = 1L;
-    DebtPositionTypeOrg expected = new DebtPositionTypeOrg();
+    DebtPositionTypeOrg dpto = new DebtPositionTypeOrg();
 
     when(debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId))
-      .thenReturn(expected);
+      .thenReturn(dpto);
 
-    MvcResult result = mockMvc.perform(
+    mockMvc.perform(
         post("/debt-position-type-org/{organizationId}/technical", organizationId))
       .andExpect(status().isOk())
       .andReturn();
-
-    DebtPositionTypeOrg response = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionTypeOrg.class);
-    assertEquals(expected,response);
   }
 }

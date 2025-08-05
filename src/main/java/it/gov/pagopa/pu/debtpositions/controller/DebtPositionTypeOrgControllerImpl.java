@@ -27,9 +27,10 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
   }
 
   @Override
-  public ResponseEntity<DebtPositionTypeOrg> createTechnicalDebtPositionTypeOrg(
+  public ResponseEntity<Void> createTechnicalDebtPositionTypeOrg(
     Long organizationId) {
-    return ResponseEntity.ok(debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId));
+    debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId);
+    return ResponseEntity.ok().build();
   }
 
   @Override
