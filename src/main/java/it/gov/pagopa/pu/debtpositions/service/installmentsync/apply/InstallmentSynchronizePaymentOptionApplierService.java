@@ -21,7 +21,7 @@ public class InstallmentSynchronizePaymentOptionApplierService {
     checkImmutableField("paymentOptionType", installmentSynchronizeDTO.getPaymentOptionType(), paymentOptionDTO.getPaymentOptionType().getValue(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("These fields for payment option with index %s of debt position with iupd %s are not mutable: %s", paymentOptionDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg(), modifiedFields));
+      throw new ConflictErrorException(String.format("[P4PA_UNMODIFIABLE_FIELD] These fields for payment option with index %s of debt position with iupd %s are not mutable: %s", paymentOptionDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg(), modifiedFields));
     }
   }
 }

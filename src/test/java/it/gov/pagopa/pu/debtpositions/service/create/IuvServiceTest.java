@@ -152,7 +152,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG, DebtPositionOrigin.ORDINARY));
 
-    Assertions.assertEquals("The iuv must be 17 characters long", exception.getMessage());
+    Assertions.assertEquals("[P4PA_INVALID_IUV] The iuv must be 17 characters long", exception.getMessage());
   }
 
   @Test
@@ -160,7 +160,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG, DebtPositionOrigin.ORDINARY));
 
-    Assertions.assertEquals("The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
+    Assertions.assertEquals("[P4PA_INVALID_IUV] The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
   }
 
   @ParameterizedTest
@@ -171,7 +171,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", IuvServiceTest.VALID_ORG, origin));
 
-    Assertions.assertEquals("The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
+    Assertions.assertEquals("[P4PA_INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
   }
 
   @Test
@@ -179,7 +179,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG, DebtPositionOrigin.SECONDARY_ORG));
 
-    Assertions.assertEquals("The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
+    Assertions.assertEquals("[P4PA_INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
   }
 
   @Test
