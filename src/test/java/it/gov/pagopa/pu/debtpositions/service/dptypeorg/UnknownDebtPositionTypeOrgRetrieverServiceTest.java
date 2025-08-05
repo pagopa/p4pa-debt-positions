@@ -1,10 +1,13 @@
-package it.gov.pagopa.pu.debtpositions.service.create.receipt;
+package it.gov.pagopa.pu.debtpositions.service.dptypeorg;
+
+import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_UNKNOWN;
 
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionTypeOrgMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
+import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,10 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.util.Optional;
-
-import static it.gov.pagopa.pu.debtpositions.service.create.receipt.UnknownDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_UNKNOWN;
 
 @ExtendWith(MockitoExtension.class)
 class UnknownDebtPositionTypeOrgRetrieverServiceTest {

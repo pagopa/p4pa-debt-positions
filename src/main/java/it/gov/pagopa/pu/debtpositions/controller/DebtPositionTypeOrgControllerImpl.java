@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,14 +13,23 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi {
   private final DebtPositionTypeOrgService debtPositionTypeOrgService;
+  private final DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
 
-  public DebtPositionTypeOrgControllerImpl(DebtPositionTypeOrgService debtPositionTypeOrgService) {
+  public DebtPositionTypeOrgControllerImpl(DebtPositionTypeOrgService debtPositionTypeOrgService,
+    DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService) {
     this.debtPositionTypeOrgService = debtPositionTypeOrgService;
+    this.debtPositionTypeOrgTechHandlerService = debtPositionTypeOrgTechHandlerService;
   }
 
   @Override
   public ResponseEntity<IONotificationDTO> getIONotificationDetails(Long debtPositionTypeOrgId, PaymentEventType paymentEventType) {
     return ResponseEntity.ok(debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, paymentEventType));
+  }
+
+  @Override
+  public ResponseEntity<DebtPositionTypeOrg> createTechnicalDebtPositionTypeOrg(
+    Long organizationId) {
+    return ResponseEntity.ok(debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId));
   }
 
   @Override
