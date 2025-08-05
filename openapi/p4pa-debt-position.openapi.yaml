@@ -1271,6 +1271,41 @@ paths:
           description: No notification details found for the specified DebtPositionTypeOrgId or notifications are not enabled
         "500":
           description: Internal server error
+  /debt-position-type-org/{organizationId}/technical:
+    post:
+      tags:
+        - debt-position-type-org
+      operationId: createTechnicalDebtPositionTypeOrg
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: [ ]
 components:
