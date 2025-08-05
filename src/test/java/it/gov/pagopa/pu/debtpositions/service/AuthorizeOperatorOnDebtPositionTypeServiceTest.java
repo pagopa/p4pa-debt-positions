@@ -116,7 +116,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
     OperatorNotAuthorizedException exception = assertThrows(OperatorNotAuthorizedException.class, () ->
       authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId));
 
-    assertEquals("The operator operatorExternalUserId is not authorized on the DebtPositionTypeOrg 2", exception.getMessage());
+    assertEquals("[P4PA_DEBT_POS_TYPE_ORG_UNAUTHORIZED] The operator operatorExternalUserId is not authorized on the DebtPositionTypeOrg 2", exception.getMessage());
   }
 }
 

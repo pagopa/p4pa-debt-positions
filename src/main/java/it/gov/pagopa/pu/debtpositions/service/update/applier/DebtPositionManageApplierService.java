@@ -41,7 +41,7 @@ public class DebtPositionManageApplierService {
     mergeDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields));
+      throw new ConflictErrorException(String.format("[P4PA_UNMODIFIABLE_FIELD] These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields));
     }
 
     if (storedInstallment.getTransfers().size() != updatedInstallment.getTransfers().size()) {
@@ -109,7 +109,7 @@ public class DebtPositionManageApplierService {
     checkImmutableField("stampProvincialResidence", storedTransfer.getStampProvincialResidence(), updatedTransfer.getStampProvincialResidence(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("These fields for transfer with index %s of installment having id %s are not mutable: %s",
+      throw new ConflictErrorException(String.format("[P4PA_UNMODIFIABLE_FIELD] These fields for transfer with index %s of installment having id %s are not mutable: %s",
         storedTransfer.getTransferIndex(), installmentId, modifiedFields));
     }
   }
