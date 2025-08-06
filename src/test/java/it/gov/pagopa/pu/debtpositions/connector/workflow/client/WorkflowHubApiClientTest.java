@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
 import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowApi;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowStatusDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,7 +44,7 @@ class WorkflowHubApiClientTest {
     Mockito.when(workflowApisHolderMock.getWorkflowApi(accessToken))
       .thenReturn(workflowApiMock);
     Mockito.when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
-      .thenReturn("COMPLETED");
+      .thenReturn(new WorkflowStatusDTO().status("COMPLETED"));
 
     // When
     String result = client.waitWorkflowCompletion(accessToken, "workflowId", 1, 1);
