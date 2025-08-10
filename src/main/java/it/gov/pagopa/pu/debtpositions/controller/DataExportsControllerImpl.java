@@ -37,26 +37,26 @@ public class DataExportsControllerImpl implements DataExportsApi {
   }
 
   @Override
-  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, Pageable pageable) {
+  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateTimeFrom, OffsetDateTime paymentDateTimeTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, Pageable pageable) {
     String invalidDateTimeIntervalErrorMessage = "The date interval between %s and %s cannot exceed %d months";
-    boolean hasPaymentDates = paymentDateFrom != null && paymentDateTo != null;
+    boolean hasPaymentDates = paymentDateTimeFrom != null && paymentDateTimeTo != null;
     boolean hasInstallmentDates = installmentUpdateDateTimeFrom != null && installmentUpdateDateTimeTo != null;
 
     if (hasPaymentDates == hasInstallmentDates) {
       throw new InvalidParamException(
-        "You must provide only one of the following date ranges: either the payment date range (paymentDateFrom and paymentDateTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
+        "You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
       );
     }
 
-    if (hasPaymentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(paymentDateFrom, paymentDateTo, exportPaidMaxMonthsInterval));
+    if (hasPaymentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateTimeFrom, paymentDateTimeTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
+      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(paymentDateTimeFrom, paymentDateTimeTo, exportPaidMaxMonthsInterval));
     }
 
     if (hasInstallmentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
       throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, exportPaidMaxMonthsInterval));
     }
 
-    OffsetDateTimeIntervalFilter paymentDateTime = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    OffsetDateTimeIntervalFilter paymentDateTime = new OffsetDateTimeIntervalFilter(paymentDateTimeFrom, paymentDateTimeTo);
     LocalDateTimeIntervalFilter installmentUpdateDateTime = new LocalDateTimeIntervalFilter(Utilities.toLocalDateTime(installmentUpdateDateTimeFrom), Utilities.toLocalDateTime(installmentUpdateDateTimeTo));
 
     return ResponseEntity.ok(installmentService.getPagedInstallmentPaidView(
