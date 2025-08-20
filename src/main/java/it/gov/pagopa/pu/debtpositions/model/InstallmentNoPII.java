@@ -41,6 +41,7 @@ public class InstallmentNoPII extends BaseEntity implements Serializable, Compar
   @Embedded
   private InstallmentSyncStatus syncStatus;
   private String iupdPagopa;
+  private boolean generateNotice;
   @NotNull
   private String iud;
   private String iuv;
