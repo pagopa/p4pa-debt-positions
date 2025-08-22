@@ -1433,6 +1433,8 @@ components:
           type: "InstallmentSyncStatus"
         iupdPagopa:
           type: string
+        generateNotice:
+          type: boolean
         iud:
           type: string
         iuv:
@@ -2077,6 +2079,8 @@ components:
         legacyPaymentMetadata:
           type: string
         flagPuPagoPaPayment:
+          type: boolean
+        generateNotice:
           type: boolean
         balance:
           type: string

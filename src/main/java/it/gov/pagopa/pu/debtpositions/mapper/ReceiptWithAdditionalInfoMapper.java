@@ -51,6 +51,7 @@ public class ReceiptWithAdditionalInfoMapper {
           .status(InstallmentStatus.PAID)
           .syncStatus(null)
           .iupdPagopa(Utilities.generateRandomIupd(organization.getOrgFiscalCode()))
+          .generateNotice(true)
           .iud(receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD())
           .iuv(receiptDTO.getCreditorReferenceId())
           .iuf(null)
