@@ -8,7 +8,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "installment")
@@ -27,7 +27,7 @@ public class InstallmentView {
   @NotNull
   private InstallmentStatus status;
   private String nav;
-  private OffsetDateTime dueDate;
+  private LocalDate dueDate;
   @NotNull
   private Long amountCents;
   @NotNull
