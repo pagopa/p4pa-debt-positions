@@ -9,7 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDate;
 
 public interface InstallmentViewRepository extends Repository<InstallmentView, Long> {
 
@@ -44,8 +44,8 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
   Page<InstallmentView> findInstallmentsByFilters(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(schema = @Schema(type = "string", format = "date-time")) @Param("dueDateFrom") OffsetDateTime dueDateFrom,
-    @Parameter(schema = @Schema(type = "string", format = "date-time")) @Param("dueDateTo") OffsetDateTime dueDateTo,
+    @Parameter(schema = @Schema(type = "string", format = "date")) @Param("dueDateFrom") LocalDate dueDateFrom,
+    @Parameter(schema = @Schema(type = "string", format = "date")) @Param("dueDateTo") LocalDate dueDateTo,
     String iuv,
     String fiscalCode,
     Long debtPositionTypeOrgId,
