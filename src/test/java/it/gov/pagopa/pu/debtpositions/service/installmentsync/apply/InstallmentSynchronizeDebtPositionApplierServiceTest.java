@@ -40,6 +40,6 @@ class InstallmentSynchronizeDebtPositionApplierServiceTest {
     DebtPositionDTO debtPositionDTO = buildSyncDebtPositionDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () -> applierDebtPositionService.merge(installmentSynchronizeDTO, debtPositionDTO, 1L));
-    assertEquals("These fields for debt position with iupd IUPD_ORG are not mutable: [multiDebtor, flagPuPagoPaPayment]", exception.getMessage());
+    assertEquals("[P4PA_UNMODIFIABLE_FIELD] These fields for debt position with iupd IUPD_ORG are not mutable: [multiDebtor, flagPuPagoPaPayment]", exception.getMessage());
   }
 }

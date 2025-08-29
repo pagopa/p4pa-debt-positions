@@ -38,6 +38,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
     noPII.setStatus(fullDTO.getStatus());
     noPII.setSyncStatus(fullDTO.getSyncStatus());
     noPII.setIupdPagopa(fullDTO.getIupdPagopa());
+    noPII.setGenerateNotice(Optional.ofNullable(fullDTO.getGenerateNotice()).orElse(false));
     noPII.setIud(fullDTO.getIud());
     noPII.setIuv(fullDTO.getIuv());
     noPII.setIur(fullDTO.getIur());
@@ -84,6 +85,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
       .status(noPii.getStatus())
       .syncStatus(noPii.getSyncStatus())
       .iupdPagopa(noPii.getIupdPagopa())
+      .generateNotice(noPii.isGenerateNotice())
       .iud(noPii.getIud())
       .iuv(noPii.getIuv())
       .iur(noPii.getIur())

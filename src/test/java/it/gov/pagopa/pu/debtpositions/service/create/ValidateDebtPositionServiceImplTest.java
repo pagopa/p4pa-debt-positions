@@ -67,7 +67,7 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, null));
-    assertEquals("Debt position type organization is mandatory", invalidValueException.getMessage());
+    assertEquals("[P4PA_MISSING_DEBT_POS_TYPE_ORG] Debt position type organization is mandatory", invalidValueException.getMessage());
   }
 
   @Test
@@ -79,7 +79,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Debt position type organization is mandatory", invalidValueException.getMessage());
+    assertEquals("[P4PA_MISSING_DEBT_POS_TYPE_ORG] Debt position type organization is mandatory", invalidValueException.getMessage());
   }
 
   @Test
@@ -175,7 +175,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Amount is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_AMOUNT] Amount is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -189,7 +189,20 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Amount is not valid for this debt position type org", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_AMOUNT] Amount is not valid for this debt position type org", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenInstallmentWithInvalidLegacyPaymentMetadataThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setLegacyPaymentMetadata("invalidMetadata");
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("[P4PA_INVALID_LEGACY_PAYMENT_METADATA] Legacy payment metadata is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -202,7 +215,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.FALSE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Balance is not formally valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_BALANCE] Balance is not formally valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -230,7 +243,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Fiscal code is mandatory", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_FISCAL_CODE] Fiscal code is mandatory", invalidValueException.getMessage());
   }
 
   @Test
@@ -244,7 +257,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("The debt position type org does not allow an anonymous unique identification code", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_FISCAL_CODE] The debt position type org does not allow an anonymous unique identification code", invalidValueException.getMessage());
   }
 
   @Test
@@ -258,7 +271,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Fiscal code of person is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_FISCAL_CODE] Fiscal code of person is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -273,7 +286,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("P. iva of legal person is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_FISCAL_CODE] P. iva of legal person is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -290,7 +303,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Beneficiary name is mandatory", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_PERSONAL_DATA] Beneficiary name is mandatory", invalidValueException.getMessage());
   }
 
   @Test
@@ -307,7 +320,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Email is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_PERSONAL_DATA] Email is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -347,7 +360,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("At most 5 transfers is allowed for installment", invalidValueException.getMessage());
+    assertEquals("[P4PA_MAX_TRANSFERS] At most 5 transfers is allowed for installment", invalidValueException.getMessage());
   }
 
   @Test
@@ -404,7 +417,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Fiscal code of transfer with index 1 is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_VAT_CODE] Fiscal code of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -424,7 +437,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Fiscal code of transfer with index 1 is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_VAT_CODE] Fiscal code of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
   @ParameterizedTest
@@ -468,7 +481,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Iban of transfer with index 1 is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_IBAN] Iban of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
   @Test
@@ -487,7 +500,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("Postal iban of transfer with index 1 is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_POSTAL_IBAN] Postal iban of transfer with index 1 is not valid", invalidValueException.getMessage());
   }
 
 
@@ -618,7 +631,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("The amount of transfer with index 1 must be greater than 0", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_CENTS_AMOUNT] The amount of transfer with index 1 must be greater than 0", invalidValueException.getMessage());
   }
 
   @Test

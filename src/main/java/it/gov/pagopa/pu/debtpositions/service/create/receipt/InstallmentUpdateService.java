@@ -104,7 +104,7 @@ public class InstallmentUpdateService {
         installment.getTransfers()
           .stream().filter(t -> t.getTransferIndex() == 1)
           .findFirst()
-          .ifPresent(transfer -> transfer.setAmountCents(receipt.getPaymentAmountCents()));
+          .ifPresent(transfer -> transfer.setAmountCents(transfer.getAmountCents() + feeAmountCents));
       }
     }
     InstallmentUtils.setStatus(installment, status);

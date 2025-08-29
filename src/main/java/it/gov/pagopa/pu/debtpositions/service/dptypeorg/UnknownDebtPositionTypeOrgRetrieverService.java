@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.receipt;
+package it.gov.pagopa.pu.debtpositions.service.dptypeorg;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionTypeOrgMapper;

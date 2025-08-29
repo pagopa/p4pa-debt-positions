@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -10,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -35,13 +37,15 @@ class DebtPositionTypeOrgControllerTest {
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
   @MockitoBean
   private BalanceService balanceServiceMock;
+  @MockitoBean
+  private DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
 
   @Test
   void whenGetIONotificationThenOk() throws Exception {
     Long debtPositionTypeOrgId = 1L;
 
     IONotificationDTO expectedResult = new IONotificationDTO();
-    Mockito.when(debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED)).thenReturn(expectedResult);
+    when(debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-position-type-org/" + debtPositionTypeOrgId + "/io-notification/details")
@@ -77,7 +81,7 @@ class DebtPositionTypeOrgControllerTest {
     debtPositionTypeOrg.setIban("iban");
     requestBody.setDebtPositionTypeOrg(debtPositionTypeOrg);
     DebtPositionTypeOrg expectedResult = new DebtPositionTypeOrg();
-    Mockito.when(debtPositionTypeOrgService.saveDebtPositionTypeOrg(requestBody)).thenReturn(expectedResult);
+    when(debtPositionTypeOrgService.saveDebtPositionTypeOrg(requestBody)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         post("/debt-position-type-org")
@@ -99,6 +103,20 @@ class DebtPositionTypeOrgControllerTest {
     mockMvc.perform(
         patch("/debt-position-type-org/{debtPositionTypeOrgId}", debtPositionTypeOrgId)
           .param("flagActive", String.valueOf(true)))
+      .andExpect(status().isOk())
+      .andReturn();
+  }
+
+  @Test
+  void whenCreateTechnicalDebtPositionTypeOrgThenOk() throws Exception {
+    Long organizationId = 1L;
+    DebtPositionTypeOrg dpto = new DebtPositionTypeOrg();
+
+    when(debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId))
+      .thenReturn(dpto);
+
+    mockMvc.perform(
+        post("/debt-position-type-org/{organizationId}/technical", organizationId))
       .andExpect(status().isOk())
       .andReturn();
   }

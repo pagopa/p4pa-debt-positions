@@ -50,7 +50,7 @@ public class InstallmentSynchronizeFaker {
       .amountCents(100L)
       .debtPositionTypeCode("TEST_CODE")
       .remittanceInformation("remittanceInformation")
-      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .legacyPaymentMetadata("1/test")
       .flagPuPagoPaPayment(Boolean.TRUE)
       .balance("balance")
       .flagMultibeneficiary(Boolean.TRUE)

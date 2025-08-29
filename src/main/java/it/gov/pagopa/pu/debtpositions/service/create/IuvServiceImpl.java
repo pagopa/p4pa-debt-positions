@@ -126,19 +126,19 @@ public class IuvServiceImpl implements IuvService {
 
   public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
-      throw new InvalidValueException("The iuv must be 17 characters long");
+      throw new InvalidValueException("[P4PA_INVALID_IUV] The iuv must be 17 characters long");
     }
     if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
-      throw new InvalidValueException("The first two character of iuv must be the same of segregation code of organization");
+      throw new InvalidValueException("[P4PA_INVALID_IUV] The first two character of iuv must be the same of segregation code of organization");
     }
 
     if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
       if (!iuv.startsWith(informationSystemId, 3)) {
-        throw new InvalidValueException("The third and fourth characters must be '00' for the origin: " + origin);
+        throw new InvalidValueException("[P4PA_INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin);
       }
     } else {
       if (iuv.startsWith(informationSystemId, 3)) {
-        throw new InvalidValueException("The third and fourth characters cannot be '00' for the origin: " + origin);
+        throw new InvalidValueException("[P4PA_INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + origin);
       }
     }
 

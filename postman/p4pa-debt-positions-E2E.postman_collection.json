@@ -1,10 +1,10 @@
 {
 	"info": {
-		"_postman_id": "daa97bbf-8b84-4791-ac2a-26eb62cb44a4",
+		"_postman_id": "79a9d966-d1a3-46d9-b0ab-511611ebe2c6",
 		"name": "p4pa-debt-positions-E2E.postman_collection",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "15747968",
-		"_collection_link": "https://warped-astronaut-141685.postman.co/workspace/P4PA~9a8b7dd5-97b6-4dd0-b3f5-95f25fd0b455/collection/15747968-daa97bbf-8b84-4791-ac2a-26eb62cb44a4?action=share&source=collection_link&creator=15747968"
+		"_collection_link": "https://warped-astronaut-141685.postman.co/workspace/P4PA~9a8b7dd5-97b6-4dd0-b3f5-95f25fd0b455/collection/15747968-79a9d966-d1a3-46d9-b0ab-511611ebe2c6?action=share&source=collection_link&creator=15747968"
 	},
 	"item": [
 		{
@@ -486,7 +486,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{mappedExternalUserId}}&paymentDateFrom={{paymentDateFrom}}&paymentDateTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
+							"raw": "{{debtPositionBaseUrl}}/export/organization/{{organizationId}}/installments/paid?operatorExternalUserId={{mappedExternalUserId}}&paymentDateTimeFrom={{paymentDateFrom}}&paymentDateTimeTo={{paymentDateTo}}&debtPositionTypeOrgId={{debtPositionTypeOrgId}}",
 							"host": [
 								"{{debtPositionBaseUrl}}"
 							],
@@ -503,11 +503,11 @@
 									"value": "{{mappedExternalUserId}}"
 								},
 								{
-									"key": "paymentDateFrom",
+									"key": "paymentDateTimeFrom",
 									"value": "{{paymentDateFrom}}"
 								},
 								{
-									"key": "paymentDateTo",
+									"key": "paymentDateTimeTo",
 									"value": "{{paymentDateTo}}"
 								},
 								{

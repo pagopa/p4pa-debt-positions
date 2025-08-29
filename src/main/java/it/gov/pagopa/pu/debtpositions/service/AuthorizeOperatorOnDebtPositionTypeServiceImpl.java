@@ -30,7 +30,7 @@ public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements Authorize
       .orElseThrow(() -> new NotFoundException("The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
 
     if (!isOperatorAuthorized(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId)) {
-      throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
+      throw new OperatorNotAuthorizedException("[P4PA_DEBT_POS_TYPE_ORG_UNAUTHORIZED] The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
     }
 
     return debtPositionTypeOrg;

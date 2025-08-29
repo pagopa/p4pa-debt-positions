@@ -33,6 +33,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
 
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
+    checkImmutableField("generateNotice", installmentSynchronizeDTO.getGenerateNotice(), installmentDTO.getGenerateNotice(), modifiedFields);
 
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
