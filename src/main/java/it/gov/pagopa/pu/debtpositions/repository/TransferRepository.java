@@ -19,6 +19,8 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     "JOIN InstallmentNoPII i ON t.installmentId = i.installmentId " +
     "JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId " +
     "JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId " +
+    "JOIN DebtPositionTypeOrg dpto ON d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "+
+    "JOIN DebtPositionType dpt ON dpto.debtPositionTypeId = dpt.debtPositionTypeId AND dpt.code <> 'MIXED' "+
     "WHERE d.organizationId = :orgId AND " +
     "i.iuv = :iuv AND " +
     "i.iur = :iur AND " +
