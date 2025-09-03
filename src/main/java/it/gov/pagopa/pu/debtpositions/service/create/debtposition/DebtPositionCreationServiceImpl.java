@@ -183,7 +183,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
-    boolean isInstallmentDuplicate = installmentNoPIIRepository.countExistingInstallments(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
+    boolean isInstallmentDuplicate = installmentNoPIIRepository.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS);
     if (isInstallmentDuplicate) {
       log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), debtPositionDTO.getOrganizationId());
       throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");

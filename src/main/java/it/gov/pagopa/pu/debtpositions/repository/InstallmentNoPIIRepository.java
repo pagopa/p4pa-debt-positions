@@ -64,7 +64,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
       AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
   ) THEN true ELSE false END
   """)
-  boolean countExistingInstallments(Long orgId, String iud, String iuv, String nav, List<DebtPositionOrigin> debtPositionOrigins);
+  boolean isInstallmentExists(Long orgId, String iud, String iuv, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @Query(value = "SELECT i from InstallmentNoPII i " +
     "JOIN Transfer t ON i.installmentId = t.installmentId " +
