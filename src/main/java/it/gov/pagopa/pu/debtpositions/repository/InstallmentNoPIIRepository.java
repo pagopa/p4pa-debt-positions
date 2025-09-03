@@ -103,6 +103,18 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "   and i.iud = :iud")
   List<InstallmentNoPII> getByOrganizationIdAndIudAndStatus(Long organizationId, String iud, List<InstallmentStatus> installmentStatuses);
 
+  @Query(" select i" +
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "    on i.paymentOptionId = po.paymentOptionId" +
+    "  join DebtPosition dp" +
+    "    on po.debtPositionId = dp.debtPositionId" +
+    " where dp.organizationId = :organizationId" +
+    "   and (:installmentStatuses is null or i.status in (:installmentStatuses))" +
+    "   and i.iud = :iud" +
+    "   and i.iuv = :iuv")
+  List<InstallmentNoPII> getByOrganizationIdAndIudAndIuvAndStatus(Long organizationId, String iud, String iuv, List<InstallmentStatus> installmentStatuses);
+
   @RestResource(exported = false)
   @Query(" select i" +
     "  from InstallmentNoPII i" +
