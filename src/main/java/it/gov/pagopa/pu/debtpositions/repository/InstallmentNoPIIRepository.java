@@ -59,7 +59,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     JOIN dp.paymentOptions po
     JOIN po.installments i
     WHERE dp.organizationId = :orgId
-      AND dp.debtPositionOrigin in (:debtPositionOrigins)
+      AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN :debtPositionOrigins)
       AND i.status <> 'CANCELLED'
       AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
   ) THEN true ELSE false END
@@ -72,7 +72,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId " +
     "JOIN DebtPositionTypeOrgOperators dptoo ON d.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId " +
     "WHERE d.organizationId = :organizationId AND " +
-    "d.debtPositionOrigin in (:debtPositionOrigins) AND " +
+    "(:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins) AND " +
     "i.iuv = :iuv AND " +
     "i.iur = :iur AND " +
     "t.transferIndex = :transferIndex AND " +
@@ -83,7 +83,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true) @Param("iur") String iur,
     @Parameter(required = true) @Param("transferIndex") int transferIndex,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query(" select i" +
