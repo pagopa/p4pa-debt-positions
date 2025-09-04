@@ -1,18 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
-
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -21,7 +11,6 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
-import it.gov.pagopa.pu.debtpositions.service.BalanceFetchService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
@@ -34,14 +23,17 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Service;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
 @Slf4j
@@ -53,7 +45,6 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionTypeRepository debtPositionTypeRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
-  private final BalanceFetchService balanceFetchService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -64,8 +55,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository,
-    BalanceFetchService balanceFetchService
+                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository
   ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -75,7 +65,6 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
     this.debtPositionTypeRepository = debtPositionTypeRepository;
-    this.balanceFetchService = balanceFetchService;
   }
 
   @Transactional
@@ -159,10 +148,6 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     if (StringUtils.isBlank(installmentDTO.getIud())) {
       String iud = Utilities.getRandomIUD();
       installmentDTO.setIud(iud);
-    }
-
-    if (StringUtils.isBlank(installmentDTO.getBalance())) {
-      installmentDTO.setBalance(balanceFetchService.getBalanceDefault(org.getOrganizationId(), debtPositionTypeOrg, accessToken));
     }
 
     setSourceFlowName(installmentDTO, debtPositionDTO.getDebtPositionOrigin(), org.getIpaCode());
