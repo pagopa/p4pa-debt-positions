@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 import it.gov.pagopa.pu.debtpositions.config.rest.RestTemplateConfig;
 import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowApi;
+import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowTypeOrgEntityControllerApi;
 import it.gov.pagopa.pu.workflowhub.generated.ApiClient;
 import it.gov.pagopa.pu.workflowhub.generated.BaseApi;
 import jakarta.annotation.PreDestroy;
@@ -16,6 +17,8 @@ public class WorkflowApisHolder {
   private final DebtPositionApi debtPositionApi;
 
   private final WorkflowApi workflowApi;
+
+  private final WorkflowTypeOrgEntityControllerApi workflowTypeOrgEntityControllerApi;
 
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
@@ -35,6 +38,7 @@ public class WorkflowApisHolder {
 
     this.debtPositionApi = new DebtPositionApi(apiClient);
     this.workflowApi = new WorkflowApi(apiClient);
+    this.workflowTypeOrgEntityControllerApi = new WorkflowTypeOrgEntityControllerApi(apiClient);
   }
 
   @PreDestroy
@@ -48,6 +52,10 @@ public class WorkflowApisHolder {
 
   public WorkflowApi getWorkflowApi(String accessToken) {
     return getApi(accessToken, workflowApi);
+  }
+
+  public WorkflowTypeOrgEntityControllerApi getWorkflowTypeOrgEntityControllerApi(String accessToken) {
+    return getApi(accessToken, workflowTypeOrgEntityControllerApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {
