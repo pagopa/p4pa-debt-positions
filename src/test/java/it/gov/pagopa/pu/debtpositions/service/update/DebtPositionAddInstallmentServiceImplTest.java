@@ -104,7 +104,7 @@ class DebtPositionAddInstallmentServiceImplTest {
       .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
     Mockito.doNothing().when(debtPositionCreationServiceMock).checkInstallment(debtPositionDTO, organization, debtPositionTypeOrg, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_ADDED, "IUD:"+iud, accessToken))
       .thenReturn(workflow);
@@ -142,7 +142,7 @@ class DebtPositionAddInstallmentServiceImplTest {
       .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
     Mockito.doNothing().when(debtPositionCreationServiceMock).checkInstallment(debtPositionDTO, organization, debtPositionTypeOrg, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken);
 
     WorkflowCreatedDTO result = debtPositionAddInstallmentService.addInstallment(debtPositionDTO, List.of(buildInstallmentDTO()), wfExecutionParameters, accessToken, operatorExternalId);
@@ -181,7 +181,7 @@ class DebtPositionAddInstallmentServiceImplTest {
       .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(po.getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(po.getInstallments().getFirst(), accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
     Mockito.doNothing().when(debtPositionCreationServiceMock).checkInstallment(debtPositionDTO, organization, debtPositionTypeOrg, po.getInstallments().getFirst(), accessToken);
 
     InvalidValueException result = assertThrows(InvalidValueException.class, () -> debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installments2operate, wfExecutionParameters, accessToken, operatorExternalId));

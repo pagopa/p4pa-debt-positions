@@ -71,7 +71,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("At least one installment of the debt position is mandatory");
       }
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
-        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
+        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
       }
     }
   }
@@ -95,7 +95,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin) {
+  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("Remittance information is mandatory");
     }
@@ -129,6 +129,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     if (!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
       throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
+    }
+
+    if (Boolean.FALSE.equals(flagPuPagoPaPayment) && StringUtils.isBlank(installmentDTO.getIuv())) {
+      throw new InvalidValueException("Iuv cannot be empty if flagPuPagoPaPayment is false");
     }
   }
 
