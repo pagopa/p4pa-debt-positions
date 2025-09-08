@@ -49,7 +49,7 @@ public class MixedDebtPositionTypeOrgRetrieverService {
     debtPositionTypeOrg.setFlagActive(false);
 
     debtPositionTypeOrg = debtPositionTypeOrgRepository.save(debtPositionTypeOrg);
-    log.info("debtPositionTypeOrg UNKNOWN created for organizationId[{}]: id[[{}]", organizationId, debtPositionTypeOrg.getDebtPositionTypeId());
+    log.info("debtPositionTypeOrg MIXED created for organizationId[{}]: id[[{}]", organizationId, debtPositionTypeOrg.getDebtPositionTypeId());
     return debtPositionTypeOrg;
   }
 
