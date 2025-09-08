@@ -212,7 +212,24 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(debtPositionDTO, resultResponse);
+  }
 
+  @Test
+  void givenNullWorkflowWhenCreateMixedDebtPositionThenOk() throws Exception {
+    MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
+
+    Mockito.when(mixedDebtPositionCreationService.createMixedDebtPosition(mixedDebtPositionDTO, accessToken, userId))
+      .thenReturn(Pair.of(null, buildDebtPositionDTO()));
+
+    MvcResult result = mockMvc.perform(
+        post("/debt-positions/mixed")
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(objectMapper.writeValueAsString(mixedDebtPositionDTO)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
   @Test

@@ -110,7 +110,6 @@ public class MixedDebtPositionCreationServiceImpl implements
       if (installmentNoPIIRepository.isInstallmentExists(
         mixedDebtPositionDTO.getOrganizationId(),
         iud, null, null, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)) {
-
         throw new InvalidValueException(
           "IUD: [%s] is not unique".formatted(iud));
       }
