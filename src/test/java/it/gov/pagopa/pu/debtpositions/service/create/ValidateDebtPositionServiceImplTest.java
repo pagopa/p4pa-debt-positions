@@ -767,6 +767,27 @@ class ValidateDebtPositionServiceImplTest {
     testValidateDPOrigin(DebtPositionOrigin.REPORTING_PAGOPA, DebtPositionStatus.UNPAID, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
   }
 
+  @Test
+  void givenFlagPuPagoPaPaymentFalseAndBlankIuvThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(false);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv("");
+
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyService.getTaxonomies("00", "11", "222", "33", 0, 5, null, accessToken)).thenReturn(pagedModelTaxonomy);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("Iuv cannot be empty if flagPuPagoPaPayment is false", invalidValueException.getMessage());
+  }
+
   private void testValidateDPOrigin(DebtPositionOrigin origin, DebtPositionStatus status, String errorMessage) {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(origin);
