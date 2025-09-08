@@ -10,7 +10,7 @@ public class DebtPositionTypeOrgFaker {
     debtPositionTypeOrg.setDebtPositionTypeOrgId(2L);
     debtPositionTypeOrg.setDebtPositionTypeId(100L);
     debtPositionTypeOrg.setOrganizationId(500L);
-    debtPositionTypeOrg.setBalance("1000.00");
+    debtPositionTypeOrg.setBalance("balance");
     debtPositionTypeOrg.setCode("TEST_CODE");
     debtPositionTypeOrg.setDescription("Test Description");
     debtPositionTypeOrg.setIban("IT60X0542811101000000123456");
