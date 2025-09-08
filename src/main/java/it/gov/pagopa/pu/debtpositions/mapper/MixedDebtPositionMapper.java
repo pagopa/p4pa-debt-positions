@@ -23,6 +23,9 @@ public class MixedDebtPositionMapper {
 
   public DebtPositionDTO mapToDebtPositionDTO(MixedDebtPositionDTO request,
     Long debtPositionTypeOrgId) {
+    if (request == null || debtPositionTypeOrgId == null) {
+      return null;
+    }
 
     List<TransferDTO> transfers = new ArrayList<>();
     List<MixedTransferDTO> requestTransfers = request.getTransfers();
@@ -58,7 +61,7 @@ public class MixedDebtPositionMapper {
 
     PaymentOptionDTO paymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(1)
+      .paymentOptionIndex(0)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(installment))
       .build();

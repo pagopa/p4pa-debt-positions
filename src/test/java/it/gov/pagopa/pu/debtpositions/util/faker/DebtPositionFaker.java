@@ -107,7 +107,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setSourceFlowName("sourceFlowName");
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setDescription("Test Description");
-    debtPositionDTO.setRemittanceInformation("Test Remittance Information");
+    debtPositionDTO.setRemittanceInformation("Payment Info");
     debtPositionDTO.setDueDate(DATE);
     debtPositionDTO.setDebtor(PersonFaker.buildPerson());
     debtPositionDTO.setTransfers(List.of(TransferFaker.buildMixedTransferDTO()));

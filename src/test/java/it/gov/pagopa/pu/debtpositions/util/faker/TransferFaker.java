@@ -75,6 +75,7 @@ public class TransferFaker {
       .stampProvincialResidence("stampProvincialResidence")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
   }
 }
