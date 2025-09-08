@@ -3,12 +3,15 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
+import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
@@ -17,6 +20,7 @@ import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,7 @@ public class MixedDebtPositionCreationServiceImpl implements
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final MixedDebtPositionMapper mixedDebtPositionMapper;
+  private final DebtPositionMapper debtPositionMapper;
 
   public MixedDebtPositionCreationServiceImpl(
     WorkflowTypeOrgService workflowTypeOrgService,
@@ -40,7 +45,8 @@ public class MixedDebtPositionCreationServiceImpl implements
     TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService,
     DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
     InstallmentNoPIIRepository installmentNoPIIRepository,
-    MixedDebtPositionMapper mixedDebtPositionMapper) {
+    MixedDebtPositionMapper mixedDebtPositionMapper,
+    DebtPositionMapper debtPositionMapper) {
     this.workflowTypeOrgService = workflowTypeOrgService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.mixedDebtPositionTypeOrgRetrieverService = mixedDebtPositionTypeOrgRetrieverService;
@@ -48,6 +54,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.mixedDebtPositionMapper = mixedDebtPositionMapper;
+    this.debtPositionMapper = debtPositionMapper;
   }
 
   @Transactional
@@ -68,8 +75,11 @@ public class MixedDebtPositionCreationServiceImpl implements
       debtPositionDTO, new WfExecutionParameters(), accessToken,
       operatorExternalUserId);
 
+    Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData = mixedDebtPositionMapper.buildDebtPositionTypeOrgId2TransfersData(
+      mixedDebtPositionDTO.getTransfers());
+    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
     technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
-      debtPositionDTO);  // TODO: correct?
+      debtPositionTypeOrgId2TransfersData, debtPosition);
 
     return Pair.of(workflowCreatedDTO, debtPositionDTO);
   }

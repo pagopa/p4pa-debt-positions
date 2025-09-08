@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -12,7 +13,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,7 +34,8 @@ public class MixedDebtPositionMapper {
           .amountCents(requestTransfer.getAmountCents())
           .stampType(requestTransfer.getStampType())
           .stampHashDocument(requestTransfer.getStampHashDocument())
-          .stampProvincialResidence(requestTransfer.getStampProvincialResidence())
+          .stampProvincialResidence(
+            requestTransfer.getStampProvincialResidence())
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
           .build()
@@ -46,7 +50,7 @@ public class MixedDebtPositionMapper {
       .balance(null)
       .dueDate(request.getDueDate())
       .debtor(request.getDebtor())
-      .legacyPaymentMetadata("TODO")
+      .legacyPaymentMetadata(null)
       .remittanceInformation(request.getRemittanceInformation())
       .sourceFlowName(request.getSourceFlowName())
       .transfers(transfers)
@@ -69,6 +73,31 @@ public class MixedDebtPositionMapper {
       .debtPositionTypeOrgId(debtPositionTypeOrgId)
       .paymentOptions(List.of(paymentOption))
       .build();
+  }
+
+  public Map<Long, List<MixedDpAdditionalData>> buildDebtPositionTypeOrgId2TransfersData(
+    List<MixedTransferDTO> transfers) {
+    Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData = new HashMap<>();
+
+    for (int i = 0; i < transfers.size(); i++) {
+      MixedTransferDTO transfer = transfers.get(i);
+      Long debtPositionTypeOrgId = transfer.getDebtPositionTypeOrgId();
+
+      if (debtPositionTypeOrgId != null) {
+        MixedDpAdditionalData additionalData = MixedDpAdditionalData.builder()
+          .transferIndex(i)
+          .iud(transfer.getIud())
+          .legacyPaymentMetadata(transfer.getLegacyPaymentMetadata())
+          .balance(transfer.getBalance())
+          .build();
+
+        debtPositionTypeOrgId2TransfersData.computeIfAbsent(
+            debtPositionTypeOrgId, k -> new ArrayList<>())
+          .add(additionalData);
+      }
+    }
+
+    return debtPositionTypeOrgId2TransfersData;
   }
 
 }
