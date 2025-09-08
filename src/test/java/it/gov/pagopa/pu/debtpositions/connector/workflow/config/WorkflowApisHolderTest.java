@@ -39,6 +39,15 @@ class WorkflowApisHolderTest extends BaseApiHolderTest {
     }
 
     @Test
+    void whenWorkflowTypeOrgEntityControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+      assertAuthenticationShouldBeSetInThreadSafeMode(
+        accessToken -> workflowApisHolder.getWorkflowTypeOrgEntityControllerApi(accessToken)
+          .crudGetWorkflowtypeorg("id"),
+        new ParameterizedTypeReference<>() {},
+        workflowApisHolder::unload);
+    }
+
+    @Test
     void whenDebtPositionApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
         assertAuthenticationShouldBeSetInThreadSafeMode(
                 accessToken -> workflowApisHolder.getDebtPositionApi(accessToken)
