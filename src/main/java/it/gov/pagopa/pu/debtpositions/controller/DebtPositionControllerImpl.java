@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -37,8 +38,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionManageInstallmentsService debtPositionManageService;
   private final DebtPositionDeletionService debtPositionDeletionService;
   private final PublishDebtPositionService publishDebtPositionService;
+  private final MixedDebtPositionCreationService mixedDebtPositionCreationService;
 
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService, PublishDebtPositionService publishDebtPositionService) {
+  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService, PublishDebtPositionService publishDebtPositionService,
+    MixedDebtPositionCreationService mixedDebtPositionCreationService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
     this.debtPositionCreationService = debtPositionCreationService;
     this.debtPositionService = debtPositionService;
@@ -47,6 +50,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     this.debtPositionManageService = debtPositionManageService;
     this.debtPositionDeletionService = debtPositionDeletionService;
     this.publishDebtPositionService = publishDebtPositionService;
+    this.mixedDebtPositionCreationService = mixedDebtPositionCreationService;
   }
 
   @Override
@@ -59,6 +63,30 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .build();
     WorkflowCreatedDTO workflow = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     if(workflow != null) {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())
+        .header(HEADER_X_RUN_ID, workflow.getRunId())
+        .body(debtPositionDTO);
+    } else {
+      return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(debtPositionDTO);
+    }
+  }
+
+  @Override
+  public ResponseEntity<DebtPositionDTO> createMixedDebtPosition(
+    MixedDebtPositionDTO mixedDebtPositionDTO) {
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+
+    Pair<WorkflowCreatedDTO, DebtPositionDTO> result = mixedDebtPositionCreationService.createMixedDebtPosition(
+      mixedDebtPositionDTO, accessToken, operatorExternalUserId);
+    WorkflowCreatedDTO workflow = result.getLeft();
+    DebtPositionDTO debtPositionDTO = result.getRight();
+
+    if (workflow != null) {
       return ResponseEntity
         .status(HttpStatus.OK)
         .header(HEADER_X_WORKFLOW_ID, workflow.getWorkflowId())

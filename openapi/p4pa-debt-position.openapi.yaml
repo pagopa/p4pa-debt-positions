@@ -1306,6 +1306,44 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /debt-positions/mixed:
+    post:
+      tags:
+        - debt-position
+      operationId: createMixedDebtPosition
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MixedDebtPositionDTO"
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionDTO"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "403":
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "409":
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DebtPositionErrorDTO"
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: [ ]
 components:
@@ -2298,3 +2336,53 @@ components:
             type: string
         removeEnabledOperators:
           type: boolean
+    MixedDebtPositionDTO:
+      type: object
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+        debtPositionOrigin:
+          type: 'DebtPositionOrigin'
+        sourceFlowName:
+          type: string
+        flagIuvVolatile:
+          type: boolean
+        description:
+          type: string
+        remittanceInformation:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
+        transfers:
+          type: array
+          items:
+            $ref: "#/components/schemas/MixedTransferDTO"
+    MixedTransferDTO:
+      type: object
+      properties:
+        iud:
+          type: string
+        debtPositionTypeOrgId:
+          type: integer
+          format: int64
+        amountCents:
+          type: integer
+          format: int64
+        balance:
+          type: string
+        stampType:
+          type: string
+        stampHashDocument:
+          type: string
+        stampProvincialResidence:
+          type: string
+        iban:
+          type: string
+        postalIban:
+          type: string
+        legacyPaymentMetadata:
+          type: string

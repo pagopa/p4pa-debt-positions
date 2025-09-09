@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import java.time.LocalDate;
@@ -60,6 +61,21 @@ public class TransferFaker {
       .iban("iban2")
       .category("category2")
       .transferIndex(2)
+      .build();
+  }
+
+  public static MixedTransferDTO buildMixedTransferDTO() {
+    return MixedTransferDTO.builder()
+      .iud("IUD")
+      .debtPositionTypeOrgId(100L)
+      .amountCents(50L)
+      .balance("Test Balance")
+      .stampType("stampType")
+      .stampHashDocument("stampHashDocument")
+      .stampProvincialResidence("stampProvincialResidence")
+      .iban("IT60X0542811101000000123456")
+      .postalIban("IT60X0542811101000000123456")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
   }
 }
