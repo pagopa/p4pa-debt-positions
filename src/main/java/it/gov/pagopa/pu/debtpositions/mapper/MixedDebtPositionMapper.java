@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
+
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -11,21 +13,30 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class MixedDebtPositionMapper {
 
-  public DebtPositionDTO mapToDebtPositionDTO(MixedDebtPositionDTO request,
-    Long debtPositionTypeOrgId) {
-    if (request == null || debtPositionTypeOrgId == null) {
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
+
+  public DebtPositionDTO mapToDebtPositionDTO(MixedDebtPositionDTO request) {
+    if (request == null) {
       return null;
     }
+
+    Long debtPositionTypeOrgId = getDebtPositionTypeOrgId(request);
 
     List<TransferDTO> transfers = new ArrayList<>();
     List<MixedTransferDTO> requestTransfers = request.getTransfers();
@@ -101,6 +112,18 @@ public class MixedDebtPositionMapper {
     }
 
     return debtPositionTypeOrgId2TransfersData;
+  }
+
+
+  private Long getDebtPositionTypeOrgId(
+    MixedDebtPositionDTO mixedDebtPositionDTO) {
+    return debtPositionTypeOrgRepository.findByOrganizationIdAndDebtPositionTypeOrgId(
+        mixedDebtPositionDTO.getOrganizationId(),
+        DEBT_POSITION_TYPE_MIXED).map(
+        DebtPositionTypeOrg::getDebtPositionTypeOrgId)
+      .orElseGet(() ->
+        mixedDebtPositionTypeOrgRetrieverService.getMixedDebtPositionTypeOrg(
+          mixedDebtPositionDTO.getOrganizationId()).getDebtPositionTypeOrgId());
   }
 
 }

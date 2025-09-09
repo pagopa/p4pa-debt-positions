@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
-import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
-
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
@@ -9,14 +8,14 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
-import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
 import java.util.List;
@@ -30,28 +29,28 @@ public class MixedDebtPositionCreationServiceImpl implements
   MixedDebtPositionCreationService {
 
   private final WorkflowTypeOrgService workflowTypeOrgService;
+  private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
   private final DebtPositionCreationService debtPositionCreationService;
-  private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
-  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final OrganizationService organizationService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final MixedDebtPositionMapper mixedDebtPositionMapper;
   private final DebtPositionMapper debtPositionMapper;
 
   public MixedDebtPositionCreationServiceImpl(
     WorkflowTypeOrgService workflowTypeOrgService,
+    AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
     DebtPositionCreationService debtPositionCreationService,
-    MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService,
     TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService,
-    DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
+    OrganizationService organizationService,
     InstallmentNoPIIRepository installmentNoPIIRepository,
     MixedDebtPositionMapper mixedDebtPositionMapper,
     DebtPositionMapper debtPositionMapper) {
     this.workflowTypeOrgService = workflowTypeOrgService;
+    this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
     this.debtPositionCreationService = debtPositionCreationService;
-    this.mixedDebtPositionTypeOrgRetrieverService = mixedDebtPositionTypeOrgRetrieverService;
     this.technicalMixedDebtPositionBuilderService = technicalMixedDebtPositionBuilderService;
-    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.organizationService = organizationService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.mixedDebtPositionMapper = mixedDebtPositionMapper;
     this.debtPositionMapper = debtPositionMapper;
@@ -62,14 +61,18 @@ public class MixedDebtPositionCreationServiceImpl implements
   public Pair<WorkflowCreatedDTO, DebtPositionDTO> createMixedDebtPosition(
     MixedDebtPositionDTO mixedDebtPositionDTO, String accessToken,
     String operatorExternalUserId) {
-    checkWorkflowTypeOrgExists(mixedDebtPositionDTO.getTransfers(),
-      accessToken);
+    Organization organization = organizationService.getOrganizationById(
+        mixedDebtPositionDTO.getOrganizationId(), accessToken)
+      .orElseThrow(() -> new NotFoundException(
+        "Organization with id: [%s] not found.".formatted(
+          mixedDebtPositionDTO.getOrganizationId())));
+
+    checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
+      mixedDebtPositionDTO.getTransfers(), accessToken, operatorExternalUserId);
     validateIudUniqueness(mixedDebtPositionDTO);
 
-    Long debtPositionTypeOrgId = getDebtPositionTypeOrgId(mixedDebtPositionDTO);
-
     DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(
-      mixedDebtPositionDTO, debtPositionTypeOrgId);
+      mixedDebtPositionDTO);
 
     WorkflowCreatedDTO workflowCreatedDTO = debtPositionCreationService.createDebtPosition(
       debtPositionDTO, new WfExecutionParameters(), accessToken,
@@ -84,19 +87,26 @@ public class MixedDebtPositionCreationServiceImpl implements
     return Pair.of(workflowCreatedDTO, debtPositionDTO);
   }
 
-  private void checkWorkflowTypeOrgExists(List<MixedTransferDTO> transfers,
-    String accessToken) {
+  private void checkWorkflowTypeOrgExistsAndAuthorization(
+    String organizationIpaCode, List<MixedTransferDTO> transfers,
+    String accessToken, String operatorExternalUserId) {
     transfers
       .stream()
       .map(MixedTransferDTO::getDebtPositionTypeOrgId)
       .filter(Objects::nonNull)
       .map(String::valueOf)
-      .forEach(id -> workflowTypeOrgService.getById(id, accessToken)
-        .ifPresent(workflowTypeOrg -> {
-          throw new InvalidValueException(
-            "Workflow with id: [%s] already exists. workflowTypeId: [%d]".formatted(
-              id, workflowTypeOrg.getWorkflowTypeId()));
-        }));
+      .forEach(dpTypeOrgId -> {
+        authorizeOperatorOnDebtPositionTypeService.authorize(
+          organizationIpaCode, Long.valueOf(dpTypeOrgId),
+          operatorExternalUserId);
+
+        workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
+          .ifPresent(workflowTypeOrg -> {
+            throw new InvalidValueException(
+              "DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+                dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
+          });
+      });
   }
 
   private void validateIudUniqueness(
@@ -114,16 +124,5 @@ public class MixedDebtPositionCreationServiceImpl implements
           "IUD: [%s] is not unique".formatted(iud));
       }
     }
-  }
-
-  private Long getDebtPositionTypeOrgId(
-    MixedDebtPositionDTO mixedDebtPositionDTO) {
-    return debtPositionTypeOrgRepository.findByOrganizationIdAndDebtPositionTypeOrgId(
-        mixedDebtPositionDTO.getOrganizationId(),
-        DEBT_POSITION_TYPE_MIXED).map(
-        DebtPositionTypeOrg::getDebtPositionTypeOrgId)
-      .orElseGet(() ->
-        mixedDebtPositionTypeOrgRetrieverService.getMixedDebtPositionTypeOrg(
-          mixedDebtPositionDTO.getOrganizationId()).getDebtPositionTypeOrgId());
   }
 }

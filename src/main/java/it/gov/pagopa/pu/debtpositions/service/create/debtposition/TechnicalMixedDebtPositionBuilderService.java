@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class TechnicalMixedDebtPositionBuilderService {
 
+  // TODO: Class not complete. [P4ADEV-3518] Technical Mixed Debt Position creation
   public List<DebtPosition> createTechnicalMixedDebtPositions(Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData, DebtPosition debtPosition) {
     List<DebtPosition> technicalMixedDebtPositions = new ArrayList<>();
 

@@ -1,31 +1,33 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
-import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
-import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
 import java.util.Collections;
@@ -52,13 +54,13 @@ class MixedDebtPositionCreationServiceTest {
   @Mock
   private WorkflowTypeOrgService workflowTypeOrgServiceMock;
   @Mock
-  private DebtPositionCreationService debtPositionCreationServiceMock;
+  private AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeServiceMock;
   @Mock
-  private MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverServiceMock;
+  private DebtPositionCreationService debtPositionCreationServiceMock;
   @Mock
   private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderServiceMock;
   @Mock
-  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  private OrganizationService organizationServiceMock;
   @Mock
   private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
   @Mock
@@ -70,10 +72,10 @@ class MixedDebtPositionCreationServiceTest {
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       workflowTypeOrgServiceMock,
+      authorizeOperatorOnDebtPositionTypeServiceMock,
       debtPositionCreationServiceMock,
-      mixedDebtPositionTypeOrgRetrieverServiceMock,
       technicalMixedDebtPositionBuilderServiceMock,
-      debtPositionTypeOrgRepositoryMock,
+      organizationServiceMock,
       installmentNoPIIRepositoryMock,
       mixedDebtPositionMapperMock,
       debtPositionMapperMock
@@ -87,7 +89,15 @@ class MixedDebtPositionCreationServiceTest {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
 
+    Organization organization = new Organization();
+    organization.setIpaCode("ipaCode");
+    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.of(organization));
+
     // checkWorkflowTypeOrgExists
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
+      eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
+      .thenReturn(new DebtPositionTypeOrg());
     when(workflowTypeOrgServiceMock.getById(anyString(), eq(accessToken)))
       .thenReturn(Optional.empty());
 
@@ -97,18 +107,8 @@ class MixedDebtPositionCreationServiceTest {
       eq(null), eq(InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)))
       .thenReturn(false);
 
-    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
-    debtPositionTypeOrg.setOrganizationId(
-      mixedDebtPositionDTO.getOrganizationId());
-    debtPositionTypeOrg.setDebtPositionTypeOrgId(DEBT_POSITION_TYPE_MIXED);
-    when(
-      debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndDebtPositionTypeOrgId(
-        mixedDebtPositionDTO.getOrganizationId(), DEBT_POSITION_TYPE_MIXED))
-      .thenReturn(Optional.of(debtPositionTypeOrg));
-
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO,
-      debtPositionTypeOrg.getDebtPositionTypeOrgId()))
+    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO))
       .thenReturn(debtPositionDTO);
 
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
@@ -139,8 +139,50 @@ class MixedDebtPositionCreationServiceTest {
     // Then
     assertEquals(workflow, result.getLeft());
     assertEquals(debtPositionDTO, result.getRight());
+  }
 
-    verifyNoInteractions(mixedDebtPositionTypeOrgRetrieverServiceMock);
+  @Test
+  void givenNotFoundOrganizationWhenCreateMixedDebtPositionThenThrowException() {
+    // Given
+    String accessToken = "TOKEN";
+    MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
+    String operatorExternalUserId = "USERID";
+
+    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.empty());
+
+    // When
+    Executable exec = () -> mixedDebtPositionCreationService.createMixedDebtPosition(
+      mixedDebtPositionDTO, accessToken, operatorExternalUserId);
+
+    // Then
+    assertThrows(NotFoundException.class, exec);
+  }
+
+  @Test
+  void givenNotAuthorizedOperatorWhenCreateMixedDebtPositionThenThrowException() {
+    // Given
+    String accessToken = "TOKEN";
+    MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
+    String operatorExternalUserId = "USERID";
+
+    Organization organization = new Organization();
+    organization.setIpaCode("ipaCode");
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.of(organization));
+
+    // checkWorkflowTypeOrgExists
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
+      eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
+      .thenThrow(new OperatorNotAuthorizedException("ERROR"));
+
+    // When
+    Executable exec = () -> mixedDebtPositionCreationService.createMixedDebtPosition(
+      mixedDebtPositionDTO, accessToken, operatorExternalUserId);
+
+    // Then
+    assertThrows(OperatorNotAuthorizedException.class, exec);
   }
 
   @Test
@@ -150,7 +192,15 @@ class MixedDebtPositionCreationServiceTest {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
 
+    Organization organization = new Organization();
+    organization.setIpaCode("ipaCode");
+    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.of(organization));
+
     // checkWorkflowTypeOrgExists
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
+      eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
+      .thenReturn(new DebtPositionTypeOrg());
     when(workflowTypeOrgServiceMock.getById(anyString(), eq(accessToken)))
       .thenReturn(Optional.of(new WorkflowTypeOrg()));
 
@@ -170,7 +220,16 @@ class MixedDebtPositionCreationServiceTest {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
 
+    Organization organization = new Organization();
+    organization.setIpaCode("ipaCode");
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.of(organization));
+
     // checkWorkflowTypeOrgExists
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
+      eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
+      .thenReturn(new DebtPositionTypeOrg());
     when(workflowTypeOrgServiceMock.getById(anyString(), eq(accessToken)))
       .thenReturn(Optional.empty());
 
@@ -195,7 +254,16 @@ class MixedDebtPositionCreationServiceTest {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
 
+    Organization organization = new Organization();
+    organization.setIpaCode("ipaCode");
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+      .thenReturn(Optional.of(organization));
+
     // checkWorkflowTypeOrgExists
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
+      eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
+      .thenReturn(new DebtPositionTypeOrg());
     when(workflowTypeOrgServiceMock.getById(anyString(), eq(accessToken)))
       .thenReturn(Optional.empty());
 
@@ -205,20 +273,8 @@ class MixedDebtPositionCreationServiceTest {
       eq(null), eq(InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)))
       .thenReturn(false);
 
-    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
-    debtPositionTypeOrg.setOrganizationId(
-      mixedDebtPositionDTO.getOrganizationId());
-    debtPositionTypeOrg.setDebtPositionTypeOrgId(DEBT_POSITION_TYPE_MIXED);
-    when(
-      debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndDebtPositionTypeOrgId(
-        mixedDebtPositionDTO.getOrganizationId(), DEBT_POSITION_TYPE_MIXED))
-      .thenReturn(Optional.empty());
-    when(mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(mixedDebtPositionDTO.getOrganizationId()))
-      .thenReturn(debtPositionTypeOrg);
-
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO,
-      debtPositionTypeOrg.getDebtPositionTypeOrgId()))
+    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO))
       .thenReturn(debtPositionDTO);
 
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");

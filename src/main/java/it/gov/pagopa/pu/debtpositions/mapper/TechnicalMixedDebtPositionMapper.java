@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class TechnicalMixedDebtPositionMapper {
 
+  // TODO: Class not complete. [P4ADEV-3518] Technical Mixed Debt Position creation
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition) {
     DebtPosition technicalMixedDp = new DebtPosition();
     technicalMixedDp.setIupdOrg(debtPosition.getIupdOrg());
