@@ -106,5 +106,23 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       """)
   long countByOrgSilServiceId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("orgSilServiceId") Long orgSilServiceId);
 
+  @Query("""
+    SELECT dpto
+    FROM DebtPositionTypeOrg dpto
+    JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+    WHERE dpto.organizationId = :organizationId
+    AND dptoo.operatorExternalUserId = :operatorExternalUserId
+    AND (:code IS NULL OR dpto.code = :code)
+    AND (:description IS NULL OR dpto.description ILIKE CONCAT('%', cast(:description as text), '%'))
+    AND (:debtPositionTypeId IS NULL OR dpto.debtPositionTypeId = :debtPositionTypeId)
+    """)
+  Page<DebtPositionTypeOrg> findPagedDebtPositionTypeOrg(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+    @Param("code") String code,
+    @Param("description") String description,
+    @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+    Pageable pageable);
+
 }
 
