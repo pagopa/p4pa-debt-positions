@@ -99,7 +99,7 @@ public class MixedDebtPositionMapper {
 
       if (debtPositionTypeOrgId != null) {
         MixedDpAdditionalData additionalData = MixedDpAdditionalData.builder()
-          .transferIndex(i)
+          .transferIndex(i+1)
           .iud(transfer.getIud())
           .legacyPaymentMetadata(transfer.getLegacyPaymentMetadata())
           .balance(transfer.getBalance())

@@ -1,5 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildMixedTransferList;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildSyncTransferDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
+
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -7,15 +14,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
-
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.*;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 
 public class InstallmentFaker {
 
@@ -156,6 +161,44 @@ public class InstallmentFaker {
       .status(InstallmentStatus.UNPAID)
       .sourceFlowName("ingestionFlowFileName")
       .transfers(new ArrayList<>(List.of(buildSyncTransferDTO())))
+      .build();
+  }
+
+  public static InstallmentNoPII buildMixedInstallmentNoPII(){
+    return InstallmentNoPII.builder()
+      .installmentId(100L)
+      .paymentOptionId(10L)
+      .status(InstallmentStatus.UNPAID)
+      .syncStatus(null)
+      .iupdPagopa("iupdPagoPa")
+      .generateNotice(true)
+      .iud("6a435de9-f4ee-4942-808a-cf59e3140a8d")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .iun("iun")
+      .dueDate(DATE)
+      .switchToExpired(false)
+      .notificationFeeCents(1000L)
+      .amountCents(300L)
+      .personalDataId(123L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("1/test")
+      .debtorEntityType(PersonEntityType.F)
+      .debtorFiscalCodeHash(new byte[] {})
+      .balance("balance")
+      .notificationDate(DATETIME)
+      .ingestionFlowFileId(1L)
+      .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
+      .sourceFlowName("sourceFlowName")
+      .receiptId(1L)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
+      .transfers(new TreeSet<>(buildMixedTransferList(3)))
       .build();
   }
 }

@@ -64,6 +64,14 @@ public class TechnicalMixedDebtPositionMapper {
   public InstallmentNoPII toTechnicalMixedDPInstallment(
     InstallmentNoPII installment, InstallmentStatus status,
     MixedDpAdditionalData mixedDpAdditionalData) {
+    Transfer transfer = installment.getTransfers().stream()
+      .filter(t -> mixedDpAdditionalData.getTransferIndex()
+        .equals(t.getTransferIndex())).findFirst()
+      .orElseThrow(() -> new RuntimeException(
+        "There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
+          mixedDpAdditionalData.getTransferIndex(),
+          installment.getInstallmentId())));
+
     InstallmentNoPII technicalMixedDpInstallment = new InstallmentNoPII();
     technicalMixedDpInstallment.setStatus(status);
     technicalMixedDpInstallment.setSyncStatus(null);
@@ -106,9 +114,6 @@ public class TechnicalMixedDebtPositionMapper {
       installment.getSourceFlowName());
     technicalMixedDpInstallment.setReceiptId(installment.getReceiptId());
 
-    Transfer transfer = installment.getTransfers().stream()
-      .filter(t -> mixedDpAdditionalData.getTransferIndex()
-        .equals(t.getTransferIndex())).findFirst().get();
     technicalMixedDpInstallment.setTransfers(
       toTechnicalMixedDPTransfers(transfer));
 

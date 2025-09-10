@@ -1,10 +1,15 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildGeneratedIuvInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildMixedInstallmentNoPII;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildSyncInstallmentDTO;
+
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -12,8 +17,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.*;
 
 public class PaymentOptionFaker {
   private static final LocalDate DATE = LocalDate.of(2099, 1, 2);
@@ -74,5 +77,22 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildSyncInstallmentDTO())));
     return paymentOptionDTO;
+  }
+
+  public static PaymentOption buildMixedPaymentOption() {
+    PaymentOption paymentOption = new PaymentOption();
+    paymentOption.setPaymentOptionId(10L);
+    paymentOption.setDebtPositionId(1L);
+    paymentOption.setTotalAmountCents(2000L);
+    paymentOption.setStatus(PaymentOptionStatus.UNPAID);
+    paymentOption.setDescription("Payment description");
+    paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
+    paymentOption.setPaymentOptionIndex(1);
+    paymentOption.setCreationDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    paymentOption.setUpdateTraceId("TRACEID");
+    paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildMixedInstallmentNoPII()))));
+    return paymentOption;
   }
 }
