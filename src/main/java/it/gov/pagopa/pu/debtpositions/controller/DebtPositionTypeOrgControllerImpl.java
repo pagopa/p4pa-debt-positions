@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,11 +15,16 @@ import org.springframework.web.bind.annotation.RestController;
 public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi {
   private final DebtPositionTypeOrgService debtPositionTypeOrgService;
   private final DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
+  private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
 
-  public DebtPositionTypeOrgControllerImpl(DebtPositionTypeOrgService debtPositionTypeOrgService,
-    DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService) {
+  public DebtPositionTypeOrgControllerImpl(
+    DebtPositionTypeOrgService debtPositionTypeOrgService,
+    DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService,
+    MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService
+  ) {
     this.debtPositionTypeOrgService = debtPositionTypeOrgService;
     this.debtPositionTypeOrgTechHandlerService = debtPositionTypeOrgTechHandlerService;
+    this.mixedDebtPositionTypeOrgRetrieverService = mixedDebtPositionTypeOrgRetrieverService;
   }
 
   @Override
@@ -30,6 +36,7 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
   public ResponseEntity<Void> createTechnicalDebtPositionTypeOrg(
     Long organizationId) {
     debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId);
+    mixedDebtPositionTypeOrgRetrieverService.getMixedDebtPositionTypeOrg(organizationId);
     return ResponseEntity.ok().build();
   }
 

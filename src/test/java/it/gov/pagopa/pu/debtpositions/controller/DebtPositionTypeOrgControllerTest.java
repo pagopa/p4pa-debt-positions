@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -39,6 +40,8 @@ class DebtPositionTypeOrgControllerTest {
   private BalanceService balanceServiceMock;
   @MockitoBean
   private DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
+  @MockitoBean
+  private MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverServiceMock;
 
   @Test
   void whenGetIONotificationThenOk() throws Exception {
@@ -111,9 +114,12 @@ class DebtPositionTypeOrgControllerTest {
   void whenCreateTechnicalDebtPositionTypeOrgThenOk() throws Exception {
     Long organizationId = 1L;
     DebtPositionTypeOrg dpto = new DebtPositionTypeOrg();
+    DebtPositionTypeOrg mixedDpto = new DebtPositionTypeOrg();
 
     when(debtPositionTypeOrgTechHandlerService.createTechnicalDebtPositionTypeOrg(organizationId))
       .thenReturn(dpto);
+    when(mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(organizationId))
+    .thenReturn(mixedDpto);
 
     mockMvc.perform(
         post("/debt-position-type-org/{organizationId}/technical", organizationId))
