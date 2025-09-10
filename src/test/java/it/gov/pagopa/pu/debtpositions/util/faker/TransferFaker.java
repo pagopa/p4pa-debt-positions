@@ -8,7 +8,6 @@ import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class TransferFaker {
@@ -83,8 +82,7 @@ public class TransferFaker {
   }
 
   public static List<Transfer> buildMixedTransferList(int size) {
-    return IntStream.rangeClosed(1, size).mapToObj(TransferFaker::buildMixedTransfer).collect(
-      Collectors.toList());
+    return IntStream.rangeClosed(1, size).mapToObj(TransferFaker::buildMixedTransfer).toList();
   }
 
   public static Transfer buildMixedTransfer(int i) {

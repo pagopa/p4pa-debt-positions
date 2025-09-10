@@ -37,33 +37,10 @@ class TechnicalMixedDebtPositionMapperTest {
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
       DebtPositionStatus.UNPAID);
 
-    assertNull(result.getDebtPositionId());
-    assertEquals(debtPosition.getIupdOrg(), result.getIupdOrg());
-    assertEquals(debtPosition.getDescription(), result.getDescription());
-    assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
-    assertEquals(DebtPositionOrigin.SPONTANEOUS_MIXED,
-      result.getDebtPositionOrigin());
-    assertEquals(debtPosition.getOrganizationId(), result.getOrganizationId());
-    assertEquals(1L, result.getDebtPositionTypeOrgId());
-    assertEquals(debtPosition.getValidityDate(), result.getValidityDate());
-    assertEquals(debtPosition.isFlagIuvVolatile(), result.isFlagIuvVolatile());
-    assertEquals(debtPosition.isMultiDebtor(), result.isMultiDebtor());
-    assertEquals(debtPosition.isFlagPuPagoPaPayment(),
-      result.isFlagPuPagoPaPayment());
-    assertEquals(1, result.getPaymentOptions().size());
+    checkDebtPosition(result, debtPosition);
 
     PaymentOption resultPO = result.getPaymentOptions().getFirst();
-    assertNull(resultPO.getPaymentOptionId());
-    assertNull(resultPO.getDebtPositionId());
-    assertNull(resultPO.getInstallments());
-    assertEquals(paymentOption.getTotalAmountCents(),
-      resultPO.getTotalAmountCents());
-    assertEquals(PaymentOptionStatus.UNPAYABLE, resultPO.getStatus());
-    assertEquals(paymentOption.getDescription(), resultPO.getDescription());
-    assertEquals(paymentOption.getPaymentOptionType(),
-      resultPO.getPaymentOptionType());
-    assertEquals(paymentOption.getPaymentOptionIndex(),
-      resultPO.getPaymentOptionIndex());
+    checkPaymentOption(resultPO, paymentOption);
   }
 
   @Test
@@ -80,6 +57,63 @@ class TechnicalMixedDebtPositionMapperTest {
     InstallmentNoPII result = mapper.toTechnicalMixedDPInstallment(installment,
       InstallmentStatus.UNPAYABLE, mixedDpAdditionalData);
 
+    checkInstallment(result, installment, mixedDpAdditionalData);
+
+    Transfer resultTransfer = installment.getTransfers().getFirst();
+    checkTransfer(transfer, resultTransfer);
+  }
+
+  @Test
+  void givenMissingTransfersWhenToTechnicalMixedDPInstallmentThenCorrectMapping() {
+    Transfer transfer = buildTransfer();
+    transfer.setTransferIndex(999);
+
+    InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(transfer))));
+
+    MixedDpAdditionalData mixedDpAdditionalData = new MixedDpAdditionalData();
+    mixedDpAdditionalData.setTransferIndex(1);
+
+    Executable exec = () -> mapper.toTechnicalMixedDPInstallment(installment, InstallmentStatus.UNPAYABLE, mixedDpAdditionalData);
+
+    assertThrows(RuntimeException.class, exec);
+  }
+
+  private static void checkDebtPosition(DebtPosition result,
+    DebtPosition debtPosition) {
+    assertNull(result.getDebtPositionId());
+    assertEquals(debtPosition.getIupdOrg(), result.getIupdOrg());
+    assertEquals(debtPosition.getDescription(), result.getDescription());
+    assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
+    assertEquals(DebtPositionOrigin.SPONTANEOUS_MIXED,
+      result.getDebtPositionOrigin());
+    assertEquals(debtPosition.getOrganizationId(), result.getOrganizationId());
+    assertEquals(1L, result.getDebtPositionTypeOrgId());
+    assertEquals(debtPosition.getValidityDate(), result.getValidityDate());
+    assertEquals(debtPosition.isFlagIuvVolatile(), result.isFlagIuvVolatile());
+    assertEquals(debtPosition.isMultiDebtor(), result.isMultiDebtor());
+    assertEquals(debtPosition.isFlagPuPagoPaPayment(),
+      result.isFlagPuPagoPaPayment());
+    assertEquals(1, result.getPaymentOptions().size());
+  }
+
+  private static void checkPaymentOption(PaymentOption resultPO,
+    PaymentOption paymentOption) {
+    assertNull(resultPO.getPaymentOptionId());
+    assertNull(resultPO.getDebtPositionId());
+    assertNull(resultPO.getInstallments());
+    assertEquals(paymentOption.getTotalAmountCents(),
+      resultPO.getTotalAmountCents());
+    assertEquals(PaymentOptionStatus.UNPAYABLE, resultPO.getStatus());
+    assertEquals(paymentOption.getDescription(), resultPO.getDescription());
+    assertEquals(paymentOption.getPaymentOptionType(),
+      resultPO.getPaymentOptionType());
+    assertEquals(paymentOption.getPaymentOptionIndex(),
+      resultPO.getPaymentOptionIndex());
+  }
+
+  private static void checkInstallment(InstallmentNoPII result,
+    InstallmentNoPII installment, MixedDpAdditionalData mixedDpAdditionalData) {
     assertNull(result.getInstallmentId());
     assertNull(result.getPaymentOptionId());
     assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
@@ -117,10 +151,10 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     assertEquals(mixedDpAdditionalData.getLegacyPaymentMetadata(),
       result.getLegacyPaymentMetadata());
-
     assertEquals(1, installment.getTransfers().size());
+  }
 
-    Transfer resultTransfer = installment.getTransfers().getFirst();
+  private static void checkTransfer(Transfer transfer, Transfer resultTransfer) {
     assertEquals(transfer.getTransferIndex(),
       resultTransfer.getTransferIndex());
     assertEquals(transfer.getOrgFiscalCode(),
@@ -135,21 +169,5 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(transfer.getCategory(), resultTransfer.getCategory());
     assertEquals(transfer.getMbdAttachment(),
       resultTransfer.getMbdAttachment());
-  }
-
-  @Test
-  void givenMissingTransfersWhenToTechnicalMixedDPInstallmentThenCorrectMapping() {
-    Transfer transfer = buildTransfer();
-    transfer.setTransferIndex(999);
-
-    InstallmentNoPII installment = buildInstallmentNoPII();
-    installment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(transfer))));
-
-    MixedDpAdditionalData mixedDpAdditionalData = new MixedDpAdditionalData();
-    mixedDpAdditionalData.setTransferIndex(1);
-
-    Executable exec = () -> mapper.toTechnicalMixedDPInstallment(installment, InstallmentStatus.UNPAYABLE, mixedDpAdditionalData);
-
-    assertThrows(RuntimeException.class, exec);
   }
 }
