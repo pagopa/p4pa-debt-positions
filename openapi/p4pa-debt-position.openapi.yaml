@@ -1306,6 +1306,41 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /debt-position-type-org-operators/{debtPositionTypeOrgId}:
+    delete:
+      tags:
+        - debt-position-type-org-operators
+      operationId: deleteOperators
+      parameters:
+        - name: debtPositionTypeOrgId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: externalOperatorUserIds
+          in: query
+          required: true
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
+      responses:
+        '200':
+          description: Number of operators successfully deleted
+          content:
+            application/json:
+              schema:
+                type: integer
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
   /debt-positions/mixed:
     post:
       tags:
