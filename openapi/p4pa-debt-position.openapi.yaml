@@ -1318,15 +1318,14 @@ paths:
           schema:
             type: integer
             format: int64
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              uniqueItems: true
-              items:
-                type: string
+        - name: externalOperatorUserIds
+          in: query
+          required: true
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              type: string
       responses:
         '200':
           description: Number of operators successfully deleted
