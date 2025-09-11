@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -87,7 +88,7 @@ public class TransferFaker {
 
   public static Transfer buildMixedTransfer(int i) {
     Transfer transfer = new Transfer();
-    transfer.setTransferId(1000L*i);
+    transfer.setTransferId(1000L * i);
     transfer.setInstallmentId(100L);
     transfer.setOrgFiscalCode("12345678903");
     transfer.setOrgName("Organization Name");
@@ -97,6 +98,8 @@ public class TransferFaker {
     transfer.setPostalIban("IT60X0542811101009000123456");
     transfer.setCategory("001122233");
     transfer.setTransferIndex(i);
+    transfer.setStamp(
+      new Stamp("stampType", "stampHashDocument", "stampProvincialResidence"));
     transfer.setCreationDate(DATETIME.toLocalDateTime());
     transfer.setUpdateDate(DATETIME.toLocalDateTime());
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");

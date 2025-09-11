@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -13,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +36,8 @@ class TechnicalMixedDebtPositionMapperTest {
       .balance("balance")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
-    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData));
+    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
+      true, List.of(mixedDpAdditionalData));
 
     checkDebtPosition(debtPosition, result);
 
@@ -50,8 +51,11 @@ class TechnicalMixedDebtPositionMapperTest {
     checkTransfer(transfer, resultTransfer);
   }
 
-  private static void checkDebtPosition(DebtPosition expected, DebtPosition result) {
-    assertNull(result.getDebtPositionId());
+  private static void checkDebtPosition(DebtPosition expected,
+    DebtPosition result) {
+    TestUtils.checkNotNullFields(result, "debtPositionId", "creationDate",
+      "updateDate", "updateOperatorExternalId", "updateTraceId");
+
     assertEquals(expected.getIupdOrg(), result.getIupdOrg());
     assertEquals(expected.getDescription(), result.getDescription());
     assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
@@ -67,9 +71,12 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(1, result.getPaymentOptions().size());
   }
 
-  private static void checkPaymentOption(PaymentOption expected, PaymentOption result) {
-    assertNull(result.getPaymentOptionId());
-    assertNull(result.getDebtPositionId());
+  private static void checkPaymentOption(PaymentOption expected,
+    PaymentOption result) {
+    TestUtils.checkNotNullFields(result, "paymentOptionId", "debtPositionId",
+      "creationDate", "updateDate", "updateOperatorExternalId",
+      "updateTraceId");
+
     assertEquals(expected.getTotalAmountCents(),
       result.getTotalAmountCents());
     assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
@@ -78,13 +85,16 @@ class TechnicalMixedDebtPositionMapperTest {
       result.getPaymentOptionType());
     assertEquals(expected.getPaymentOptionIndex(),
       result.getPaymentOptionIndex());
+    assertEquals(1, result.getInstallments().size());
   }
 
-  private static void checkInstallment(InstallmentNoPII installment, InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData) {
-    assertNull(result.getInstallmentId());
-    assertNull(result.getPaymentOptionId());
+  private static void checkInstallment(InstallmentNoPII installment,
+    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData) {
+    TestUtils.checkNotNullFields(result, "installmentId", "paymentOptionId",
+      "syncStatus", "creationDate", "updateDate", "updateOperatorExternalId",
+      "updateTraceId");
+
     assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
-    assertNull(result.getSyncStatus());
     assertEquals(installment.getIupdPagopa(), result.getIupdPagopa());
     assertEquals(installment.isGenerateNotice(), result.isGenerateNotice());
     assertEquals(installment.getIuv(), result.getIuv());
@@ -122,6 +132,9 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkTransfer(Transfer expected, Transfer result) {
+    TestUtils.checkNotNullFields(result, "creationDate", "updateDate",
+      "updateOperatorExternalId", "updateTraceId");
+
     assertEquals(expected.getTransferIndex(),
       result.getTransferIndex());
     assertEquals(expected.getOrgFiscalCode(),
