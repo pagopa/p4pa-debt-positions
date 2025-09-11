@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionSaveService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -33,6 +34,7 @@ public class MixedDebtPositionCreationServiceImpl implements
   private final DebtPositionCreationService debtPositionCreationService;
   private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
   private final OrganizationService organizationService;
+  private final DebtPositionSaveService debtPositionSaveService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final MixedDebtPositionMapper mixedDebtPositionMapper;
   private final DebtPositionMapper debtPositionMapper;
@@ -43,6 +45,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     DebtPositionCreationService debtPositionCreationService,
     TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService,
     OrganizationService organizationService,
+    DebtPositionSaveService debtPositionSaveService,
     InstallmentNoPIIRepository installmentNoPIIRepository,
     MixedDebtPositionMapper mixedDebtPositionMapper,
     DebtPositionMapper debtPositionMapper) {
@@ -51,6 +54,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     this.debtPositionCreationService = debtPositionCreationService;
     this.technicalMixedDebtPositionBuilderService = technicalMixedDebtPositionBuilderService;
     this.organizationService = organizationService;
+    this.debtPositionSaveService = debtPositionSaveService;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.mixedDebtPositionMapper = mixedDebtPositionMapper;
     this.debtPositionMapper = debtPositionMapper;
@@ -81,8 +85,11 @@ public class MixedDebtPositionCreationServiceImpl implements
     Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData = mixedDebtPositionMapper.buildDebtPositionTypeOrgId2TransfersData(
       mixedDebtPositionDTO.getTransfers());
     DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
-    technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
+    List<DebtPosition> technicalMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       debtPositionTypeOrgId2TransfersData, debtPosition);
+
+    technicalMixedDebtPositions.forEach(
+      debtPositionSaveService::saveDebtPosition);
 
     return Pair.of(workflowCreatedDTO, debtPositionDTO);
   }
