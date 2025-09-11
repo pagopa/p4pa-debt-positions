@@ -2,12 +2,14 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -16,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,6 +52,25 @@ class TechnicalMixedDebtPositionMapperTest {
 
     Transfer resultTransfer = installment.getTransfers().getFirst();
     checkTransfer(transfer, resultTransfer);
+  }
+
+  @Test
+  void givenMissingTransfersWhenToTechnicalMixedDebtPositionsThenCorrectMapping() {
+    DebtPosition debtPosition = buildMixedDebtPosition();
+    PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
+    InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
+    Transfer transfer = installment.getTransfers().getFirst();
+    transfer.setTransferIndex(999);
+
+    MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
+      .transferIndex(1)
+      .iud("IUD")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .build();
+    Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData));
+
+    assertThrows(InvalidValueException.class, exec);
   }
 
   private static void checkDebtPosition(DebtPosition expected,
