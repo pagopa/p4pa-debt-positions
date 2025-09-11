@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
@@ -15,10 +17,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -53,7 +54,7 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
     );
 
     List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
-      buildMixedDpAdditionalDataMap(oldMixedDebtPositions, debtPosition),
+      buildMixedDpAdditionalDataMap(oldMixedDebtPositions),
       debtPosition
     );
 
@@ -62,31 +63,21 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
     return newMixedDebtPositions;
   }
 
-  private Map<Long, List<MixedDpAdditionalData>> buildMixedDpAdditionalDataMap(List<DebtPosition> oldMixedTechnicalDebtPositions, DebtPosition debtPosition) {
-    Map<Long, List<MixedDpAdditionalData>> dpTechnicalMixedMap = new HashMap<>();
-
-    oldMixedTechnicalDebtPositions.forEach(mixedDebtPosition -> {
-      if (!dpTechnicalMixedMap.containsKey(mixedDebtPosition.getDebtPositionTypeOrgId())) {
-        dpTechnicalMixedMap.put(mixedDebtPosition.getDebtPositionTypeOrgId(), new ArrayList<>());
-      }
-
-      mixedDebtPosition.getPaymentOptions().forEach(paymentOption -> {
-        paymentOption.getInstallments().forEach(installment -> {
-          installment.getTransfers().forEach(transfer -> {
-            dpTechnicalMixedMap.get(mixedDebtPosition.getDebtPositionTypeOrgId()).add(
-              MixedDpAdditionalData.builder()
-                .iud(installment.getIud())
-                .balance(installment.getBalance())
-                .transferIndex(transfer.getTransferIndex())
-                .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
-                .build()
-            );
-          });
-        });
-      });
-    });
-
-    return dpTechnicalMixedMap;
+  private Map<Long, List<MixedDpAdditionalData>> buildMixedDpAdditionalDataMap(List<DebtPosition> oldMixedTechnicalDebtPositions) {
+    return oldMixedTechnicalDebtPositions.stream()
+        .collect(Collectors.groupingBy(
+          DebtPosition::getDebtPositionTypeOrgId,
+          Collectors.mapping(dp -> {
+            InstallmentNoPII installment = dp.getPaymentOptions().getFirst().getInstallments().getFirst();
+            Transfer transfer = installment.getTransfers().getFirst();
+            return MixedDpAdditionalData.builder()
+              .iud(installment.getIud())
+              .balance(installment.getBalance())
+              .transferIndex(transfer.getTransferIndex())
+              .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
+              .build();
+          }, Collectors.toList())
+        ));
   }
 
   private void deleteDebtPositionsWithoutPersonalDataId(List<DebtPosition> debtPositions) {
