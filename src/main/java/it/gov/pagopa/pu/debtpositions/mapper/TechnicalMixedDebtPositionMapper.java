@@ -5,7 +5,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
@@ -80,7 +79,7 @@ public class TechnicalMixedDebtPositionMapper {
       Transfer transfer = installment.getTransfers().stream()
         .filter(t -> mixedDpAdditionalData.getTransferIndex()
           .equals(t.getTransferIndex())).findFirst()
-        .orElseThrow(() -> new InvalidValueException(
+        .orElseThrow(() -> new IllegalStateException(
           "There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
             mixedDpAdditionalData.getTransferIndex(),
             installment.getInstallmentId())));
