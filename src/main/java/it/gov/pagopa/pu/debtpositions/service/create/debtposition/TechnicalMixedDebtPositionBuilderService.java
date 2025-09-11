@@ -3,11 +3,12 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.mapper.TechnicalMixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -17,14 +18,23 @@ public class TechnicalMixedDebtPositionBuilderService {
 
   public List<DebtPosition> createTechnicalMixedDebtPositions(
     Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
-    DebtPosition debtPosition) {
+    DebtPosition debtPosition
+  ) {
+    return createTechnicalMixedDebtPositions(debtPositionTypeOrgId2TransfersData, debtPosition, true);
+  }
+
+  public List<DebtPosition> createTechnicalMixedDebtPositions(
+    Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
+    DebtPosition debtPosition,
+    boolean isUnpayable
+  ) {
     List<DebtPosition> technicalMixedDebtPositions = new ArrayList<>();
 
     for (Long debtPositionTypeOrgId : debtPositionTypeOrgId2TransfersData.keySet()) {
       List<MixedDpAdditionalData> mixedDpAdditionalDataList = debtPositionTypeOrgId2TransfersData.get(
         debtPositionTypeOrgId);
       DebtPosition technicalDebtPosition = technicalMixedDebtPositionMapper.toTechnicalMixedDebtPosition(
-        debtPosition, debtPositionTypeOrgId, true, mixedDpAdditionalDataList);
+        debtPosition, debtPositionTypeOrgId, isUnpayable, mixedDpAdditionalDataList);
       technicalMixedDebtPositions.add(technicalDebtPosition);
     }
 

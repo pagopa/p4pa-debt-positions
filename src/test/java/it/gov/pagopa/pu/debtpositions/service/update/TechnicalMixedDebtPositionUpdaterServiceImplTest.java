@@ -152,10 +152,10 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
 ArgumentCaptor.forClass(DebtPosition.class);
 
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
-    when(dpRepositoryMock.findEntityGraphByOrganizationIdAndIuvAndDebtPositionOrigin(
+    when(dpRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(),
       installment.getIuv(),
-      DebtPositionOrigin.SPONTANEOUS
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
     )).thenReturn(List.of(oldMixedDebtPosition));
     when(mixedDPBuilderServiceMock.createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition))).thenReturn(List.of(newMixedDebtPosition));
 
@@ -166,8 +166,8 @@ ArgumentCaptor.forClass(DebtPosition.class);
     assertNotNull(result);
     assertEquals(1, result.size());
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    verify(dpRepositoryMock).findEntityGraphByOrganizationIdAndIuvAndDebtPositionOrigin(
-      debtPosition.getOrganizationId(), installment.getIuv(), DebtPositionOrigin.SPONTANEOUS);
+    verify(dpRepositoryMock).findEntityGraphByOrganizationIdAndInstallmentIuv(
+      debtPosition.getOrganizationId(), installment.getIuv(), List.of(DebtPositionOrigin.SPONTANEOUS_MIXED));
     verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition));
     verify(dpDeleteServiceMock).delete(dpCaptor.capture());
     assertEquals(newMixedDebtPosition.getDebtPositionId(), result.getFirst().getDebtPositionId());

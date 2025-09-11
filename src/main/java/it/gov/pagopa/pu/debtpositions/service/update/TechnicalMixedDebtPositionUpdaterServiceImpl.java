@@ -49,7 +49,7 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
     List<DebtPosition> oldMixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(),
       debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv(),
-      List.of(DebtPositionOrigin.SPONTANEOUS)
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
     );
 
     List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
