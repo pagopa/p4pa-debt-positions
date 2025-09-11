@@ -151,8 +151,4 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   long validateOperator(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
                         @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
-
-  @RestResource(exported = false)
-  @EntityGraph(value = "completeDebtPosition")
-  List<DebtPosition> findEntityGraphByOrganizationIdAndIuvAndDebtPositionOrigin(Long organizationId, String iuv, DebtPositionOrigin debtPositionOrigin);
 }

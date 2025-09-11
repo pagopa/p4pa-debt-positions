@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.TechnicalMixedDebtPositionBuilderService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
   public List<DebtPosition> update(DebtPosition debtPosition) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id=" + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
-    if (!"MIXED".equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
+    if (!Constants.MIXED_DP_TYPE_ORG_CODE.equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
       return List.of();
     }
 
@@ -45,15 +46,26 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
       throw new InvalidValueException("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId());
     }
 
-    List<DebtPosition> oldMixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndIuvAndDebtPositionOrigin(
+    List<DebtPosition> oldMixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(),
       debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().getIuv(),
-      DebtPositionOrigin.SPONTANEOUS
+      List.of(DebtPositionOrigin.SPONTANEOUS)
     );
 
+    List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
+      buildMixedDpAdditionalDataMap(oldMixedDebtPositions, debtPosition),
+      debtPosition
+    );
+
+    deleteDebtPositionsWithoutPersonalDataId(oldMixedDebtPositions);
+
+    return newMixedDebtPositions;
+  }
+
+  private Map<Long, List<MixedDpAdditionalData>> buildMixedDpAdditionalDataMap(List<DebtPosition> oldMixedTechnicalDebtPositions, DebtPosition debtPosition) {
     Map<Long, List<MixedDpAdditionalData>> dpTechnicalMixedMap = new HashMap<>();
 
-    oldMixedDebtPositions.forEach(mixedDebtPosition -> {
+    oldMixedTechnicalDebtPositions.forEach(mixedDebtPosition -> {
       if (!dpTechnicalMixedMap.containsKey(mixedDebtPosition.getDebtPositionTypeOrgId())) {
         dpTechnicalMixedMap.put(mixedDebtPosition.getDebtPositionTypeOrgId(), new ArrayList<>());
       }
@@ -74,17 +86,17 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
       });
     });
 
-    List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(dpTechnicalMixedMap, debtPosition);
+    return dpTechnicalMixedMap;
+  }
 
-    for (DebtPosition oldMixedDebtPosition : oldMixedDebtPositions) {
-      oldMixedDebtPosition.getPaymentOptions().forEach(paymentOption -> {
+  private void deleteDebtPositionsWithoutPersonalDataId(List<DebtPosition> debtPositions) {
+    for (DebtPosition debtPosition : debtPositions) {
+      debtPosition.getPaymentOptions().forEach(paymentOption -> {
         paymentOption.getInstallments().forEach(installment -> {
           installment.setPersonalDataId(null);
         });
       });
-      debtPositionDeleteService.delete(oldMixedDebtPosition);
+      debtPositionDeleteService.delete(debtPosition);
     }
-
-    return newMixedDebtPositions;
   }
 }
