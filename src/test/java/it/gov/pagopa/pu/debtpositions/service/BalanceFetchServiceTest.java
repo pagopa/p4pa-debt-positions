@@ -1,13 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,18 +9,22 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+
 @ExtendWith(MockitoExtension.class)
 class BalanceFetchServiceTest {
 
   private BalanceFetchService service;
 
-  @Mock private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock private BalanceService balanceServiceMock;
 
 
   @BeforeEach
   void setUp() {
-    service = new BalanceFetchService(debtPositionTypeOrgRepositoryMock, balanceServiceMock);
+    service = new BalanceFetchService(balanceServiceMock);
   }
 
   @Test

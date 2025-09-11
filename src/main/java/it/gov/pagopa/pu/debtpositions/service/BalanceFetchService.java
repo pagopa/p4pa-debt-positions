@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -11,11 +10,9 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BalanceFetchService {
 
-    private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
     private final BalanceService balanceService;
 
-    public BalanceFetchService(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, BalanceService balanceService) {
-        this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    public BalanceFetchService(BalanceService balanceService) {
         this.balanceService = balanceService;
     }
 

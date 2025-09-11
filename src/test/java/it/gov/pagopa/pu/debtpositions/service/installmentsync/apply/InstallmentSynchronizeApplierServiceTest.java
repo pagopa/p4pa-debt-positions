@@ -72,7 +72,7 @@ class InstallmentSynchronizeApplierServiceTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
-    Mockito.when(installmentSynchronizeMapperMock.map2PaymentOptionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken))
+    Mockito.when(installmentSynchronizeMapperMock.map2PaymentOptionDTO(installmentSynchronizeDTO))
       .thenReturn(syncDebtPositionDTO.getPaymentOptions().getFirst());
 
     InstallmentDTO result = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO, null, null, accessToken).getRight();
@@ -94,7 +94,7 @@ class InstallmentSynchronizeApplierServiceTest {
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
-    Mockito.when(installmentSynchronizeMapperMock.map2Installment(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken))
+    Mockito.when(installmentSynchronizeMapperMock.map2Installment(installmentSynchronizeDTO))
       .thenReturn(syncDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
 
     InstallmentDTO result = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst(), null, accessToken).getRight();
@@ -208,7 +208,7 @@ class InstallmentSynchronizeApplierServiceTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
 
-      Mockito.when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken))
+      Mockito.when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg))
       .thenReturn(newDebtPositionDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> result = installmentSynchronizeApplierService.apply(
@@ -222,7 +222,7 @@ class InstallmentSynchronizeApplierServiceTest {
     assertEquals(newDebtPositionDTO, result.getLeft());
     assertEquals(newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), result.getRight());
     Mockito.verify(installmentSynchronizeMapperMock, times(1))
-      .map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken);
+      .map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg);
     Mockito.verifyNoInteractions(applierDebtPositionServiceMock, applierPaymentOptionServiceMock, applierInstallmentServiceMock);
 
   }

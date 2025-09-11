@@ -28,5 +28,5 @@ public interface ValidateDebtPositionService {
    * @param debtPositionOrigin representing the debt position origin
    * @throws InvalidValueException if a value does not comply with business rules
    */
-    void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin);
+    void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment);
 }

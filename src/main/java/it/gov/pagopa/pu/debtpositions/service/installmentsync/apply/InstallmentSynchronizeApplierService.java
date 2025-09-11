@@ -47,7 +47,7 @@ public class InstallmentSynchronizeApplierService {
       installmentSynchronizeDTO.getDebtPositionTypeCode());
 
     if (storedDebtPosition == null) {
-      DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken);
+      DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg);
       return Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
     }
     applierDebtPositionService.merge(installmentSynchronizeDTO, storedDebtPosition, debtPositionTypeOrg.getDebtPositionTypeOrgId());
@@ -57,7 +57,7 @@ public class InstallmentSynchronizeApplierService {
 
   private Pair<DebtPositionDTO, InstallmentDTO> applyPaymentOption(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     if (storedPaymentOption == null) {
-      PaymentOptionDTO paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken);
+      PaymentOptionDTO paymentOptionDTO = installmentSynchronizeMapper.map2PaymentOptionDTO(installmentSynchronizeDTO);
       storedDebtPosition.addPaymentOptionsItem(paymentOptionDTO);
       return Pair.of(storedDebtPosition, paymentOptionDTO.getInstallments().getFirst());
     } else {
@@ -69,7 +69,7 @@ public class InstallmentSynchronizeApplierService {
 
   private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
     if (installmentDTO == null) {
-      installmentDTO = installmentSynchronizeMapper.map2Installment(installmentSynchronizeDTO, debtPositionTypeOrg, accessToken);
+      installmentDTO = installmentSynchronizeMapper.map2Installment(installmentSynchronizeDTO);
       storedPaymentOption.getInstallments().add(installmentDTO);
     } else {
       Long organizationId = installmentSynchronizeDTO.getOrganizationId();

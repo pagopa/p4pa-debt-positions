@@ -1,0 +1,128 @@
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
+import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
+
+@Service
+public class MixedDebtPositionCreationServiceImpl implements
+  MixedDebtPositionCreationService {
+
+  private final WorkflowTypeOrgService workflowTypeOrgService;
+  private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
+  private final DebtPositionCreationService debtPositionCreationService;
+  private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
+  private final OrganizationService organizationService;
+  private final InstallmentNoPIIRepository installmentNoPIIRepository;
+  private final MixedDebtPositionMapper mixedDebtPositionMapper;
+  private final DebtPositionMapper debtPositionMapper;
+
+  public MixedDebtPositionCreationServiceImpl(
+    WorkflowTypeOrgService workflowTypeOrgService,
+    AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
+    DebtPositionCreationService debtPositionCreationService,
+    TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService,
+    OrganizationService organizationService,
+    InstallmentNoPIIRepository installmentNoPIIRepository,
+    MixedDebtPositionMapper mixedDebtPositionMapper,
+    DebtPositionMapper debtPositionMapper) {
+    this.workflowTypeOrgService = workflowTypeOrgService;
+    this.authorizeOperatorOnDebtPositionTypeService = authorizeOperatorOnDebtPositionTypeService;
+    this.debtPositionCreationService = debtPositionCreationService;
+    this.technicalMixedDebtPositionBuilderService = technicalMixedDebtPositionBuilderService;
+    this.organizationService = organizationService;
+    this.installmentNoPIIRepository = installmentNoPIIRepository;
+    this.mixedDebtPositionMapper = mixedDebtPositionMapper;
+    this.debtPositionMapper = debtPositionMapper;
+  }
+
+  @Transactional
+  @Override
+  public Pair<WorkflowCreatedDTO, DebtPositionDTO> createMixedDebtPosition(
+    MixedDebtPositionDTO mixedDebtPositionDTO, String accessToken,
+    String operatorExternalUserId) {
+    Organization organization = organizationService.getOrganizationById(
+        mixedDebtPositionDTO.getOrganizationId(), accessToken)
+      .orElseThrow(() -> new NotFoundException(
+        "Organization with id: [%s] not found.".formatted(
+          mixedDebtPositionDTO.getOrganizationId())));
+
+    checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
+      mixedDebtPositionDTO.getTransfers(), accessToken, operatorExternalUserId);
+    validateIudUniqueness(mixedDebtPositionDTO);
+
+    DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(
+      mixedDebtPositionDTO);
+
+    WorkflowCreatedDTO workflowCreatedDTO = debtPositionCreationService.createDebtPosition(
+      debtPositionDTO, new WfExecutionParameters(), accessToken,
+      operatorExternalUserId);
+
+    Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData = mixedDebtPositionMapper.buildDebtPositionTypeOrgId2TransfersData(
+      mixedDebtPositionDTO.getTransfers());
+    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+    technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
+      debtPositionTypeOrgId2TransfersData, debtPosition);
+
+    return Pair.of(workflowCreatedDTO, debtPositionDTO);
+  }
+
+  private void checkWorkflowTypeOrgExistsAndAuthorization(
+    String organizationIpaCode, List<MixedTransferDTO> transfers,
+    String accessToken, String operatorExternalUserId) {
+    transfers
+      .stream()
+      .map(MixedTransferDTO::getDebtPositionTypeOrgId)
+      .filter(Objects::nonNull)
+      .map(String::valueOf)
+      .forEach(dpTypeOrgId -> {
+        authorizeOperatorOnDebtPositionTypeService.authorize(
+          organizationIpaCode, Long.valueOf(dpTypeOrgId),
+          operatorExternalUserId);
+
+        workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
+          .ifPresent(workflowTypeOrg -> {
+            throw new InvalidValueException(
+              "DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+                dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
+          });
+      });
+  }
+
+  private void validateIudUniqueness(
+    MixedDebtPositionDTO mixedDebtPositionDTO) {
+    List<String> requestIUDs = mixedDebtPositionDTO.getTransfers()
+      .stream()
+      .map(MixedTransferDTO::getIud)
+      .distinct()
+      .toList();
+    for (String iud : requestIUDs) {
+      if (installmentNoPIIRepository.isInstallmentExists(
+        mixedDebtPositionDTO.getOrganizationId(),
+        iud, null, null, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)) {
+        throw new InvalidValueException(
+          "IUD: [%s] is not unique".formatted(iud));
+      }
+    }
+  }
+}

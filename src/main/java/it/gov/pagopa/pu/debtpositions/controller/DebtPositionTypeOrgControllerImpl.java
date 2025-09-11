@@ -15,8 +15,10 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
   private final DebtPositionTypeOrgService debtPositionTypeOrgService;
   private final DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
 
-  public DebtPositionTypeOrgControllerImpl(DebtPositionTypeOrgService debtPositionTypeOrgService,
-    DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService) {
+  public DebtPositionTypeOrgControllerImpl(
+    DebtPositionTypeOrgService debtPositionTypeOrgService,
+    DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService
+  ) {
     this.debtPositionTypeOrgService = debtPositionTypeOrgService;
     this.debtPositionTypeOrgTechHandlerService = debtPositionTypeOrgTechHandlerService;
   }
