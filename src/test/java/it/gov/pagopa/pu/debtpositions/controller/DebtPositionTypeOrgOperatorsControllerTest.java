@@ -1,10 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgOperatorsService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +29,11 @@ class DebtPositionTypeOrgOperatorsControllerTest {
     controller = new DebtPositionTypeOrgOperatorsController(debtPositionTypeOrgOperatorsServiceMock);
   }
 
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgOperatorsServiceMock);
+  }
+
   @Test
   void givenDebtPositionTypeOrgIdAndSetOfExternalOperatorUserIdsWhenDeleteOperatorsThenReturnDeletedCount() {
     Long debtPositionTypeOrgId = 123L;
@@ -41,8 +48,5 @@ class DebtPositionTypeOrgOperatorsControllerTest {
     assertNotNull(result);
     assertEquals(HttpStatus.OK, result.getStatusCode());
     assertEquals(expectedDeletedCount, result.getBody());
-
-    verify(debtPositionTypeOrgOperatorsServiceMock, times(1))
-      .deleteOperators(debtPositionTypeOrgId, operatorIds);
   }
 }
