@@ -1,11 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -16,12 +13,9 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeSet;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.function.Executable;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,89 +25,62 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @Test
   void whenToTechnicalMixedDebtPositionThenCorrectMapping() {
-    DebtPosition debtPosition = buildDebtPosition();
+    DebtPosition debtPosition = buildMixedDebtPosition();
     PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
-
-    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      DebtPositionStatus.UNPAID);
-
-    checkDebtPosition(result, debtPosition);
-
-    PaymentOption resultPO = result.getPaymentOptions().getFirst();
-    checkPaymentOption(resultPO, paymentOption);
-  }
-
-  @Test
-  void whenToTechnicalMixedDPInstallmentThenCorrectMapping() {
-    InstallmentNoPII installment = buildInstallmentNoPII();
+    InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
     Transfer transfer = installment.getTransfers().getFirst();
+
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
       .balance("balance")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
+    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData));
 
-    InstallmentNoPII result = mapper.toTechnicalMixedDPInstallment(installment,
-      InstallmentStatus.UNPAYABLE, mixedDpAdditionalData);
+    checkDebtPosition(debtPosition, result);
 
-    checkInstallment(result, installment, mixedDpAdditionalData);
+    PaymentOption resultPO = result.getPaymentOptions().getFirst();
+    checkPaymentOption(paymentOption, resultPO);
+
+    InstallmentNoPII resultInstallment = resultPO.getInstallments().getFirst();
+    checkInstallment(installment, resultInstallment, mixedDpAdditionalData);
 
     Transfer resultTransfer = installment.getTransfers().getFirst();
     checkTransfer(transfer, resultTransfer);
   }
 
-  @Test
-  void givenMissingTransfersWhenToTechnicalMixedDPInstallmentThenCorrectMapping() {
-    Transfer transfer = buildTransfer();
-    transfer.setTransferIndex(999);
-
-    InstallmentNoPII installment = buildInstallmentNoPII();
-    installment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(transfer))));
-
-    MixedDpAdditionalData mixedDpAdditionalData = new MixedDpAdditionalData();
-    mixedDpAdditionalData.setTransferIndex(1);
-
-    Executable exec = () -> mapper.toTechnicalMixedDPInstallment(installment, InstallmentStatus.UNPAYABLE, mixedDpAdditionalData);
-
-    assertThrows(RuntimeException.class, exec);
-  }
-
-  private static void checkDebtPosition(DebtPosition result,
-    DebtPosition debtPosition) {
+  private static void checkDebtPosition(DebtPosition expected, DebtPosition result) {
     assertNull(result.getDebtPositionId());
-    assertEquals(debtPosition.getIupdOrg(), result.getIupdOrg());
-    assertEquals(debtPosition.getDescription(), result.getDescription());
+    assertEquals(expected.getIupdOrg(), result.getIupdOrg());
+    assertEquals(expected.getDescription(), result.getDescription());
     assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     assertEquals(DebtPositionOrigin.SPONTANEOUS_MIXED,
       result.getDebtPositionOrigin());
-    assertEquals(debtPosition.getOrganizationId(), result.getOrganizationId());
+    assertEquals(expected.getOrganizationId(), result.getOrganizationId());
     assertEquals(1L, result.getDebtPositionTypeOrgId());
-    assertEquals(debtPosition.getValidityDate(), result.getValidityDate());
-    assertEquals(debtPosition.isFlagIuvVolatile(), result.isFlagIuvVolatile());
-    assertEquals(debtPosition.isMultiDebtor(), result.isMultiDebtor());
-    assertEquals(debtPosition.isFlagPuPagoPaPayment(),
+    assertEquals(expected.getValidityDate(), result.getValidityDate());
+    assertEquals(expected.isFlagIuvVolatile(), result.isFlagIuvVolatile());
+    assertEquals(expected.isMultiDebtor(), result.isMultiDebtor());
+    assertEquals(expected.isFlagPuPagoPaPayment(),
       result.isFlagPuPagoPaPayment());
     assertEquals(1, result.getPaymentOptions().size());
   }
 
-  private static void checkPaymentOption(PaymentOption resultPO,
-    PaymentOption paymentOption) {
-    assertNull(resultPO.getPaymentOptionId());
-    assertNull(resultPO.getDebtPositionId());
-    assertNull(resultPO.getInstallments());
-    assertEquals(paymentOption.getTotalAmountCents(),
-      resultPO.getTotalAmountCents());
-    assertEquals(PaymentOptionStatus.UNPAYABLE, resultPO.getStatus());
-    assertEquals(paymentOption.getDescription(), resultPO.getDescription());
-    assertEquals(paymentOption.getPaymentOptionType(),
-      resultPO.getPaymentOptionType());
-    assertEquals(paymentOption.getPaymentOptionIndex(),
-      resultPO.getPaymentOptionIndex());
+  private static void checkPaymentOption(PaymentOption expected, PaymentOption result) {
+    assertNull(result.getPaymentOptionId());
+    assertNull(result.getDebtPositionId());
+    assertEquals(expected.getTotalAmountCents(),
+      result.getTotalAmountCents());
+    assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
+    assertEquals(expected.getDescription(), result.getDescription());
+    assertEquals(expected.getPaymentOptionType(),
+      result.getPaymentOptionType());
+    assertEquals(expected.getPaymentOptionIndex(),
+      result.getPaymentOptionIndex());
   }
 
-  private static void checkInstallment(InstallmentNoPII result,
-    InstallmentNoPII installment, MixedDpAdditionalData mixedDpAdditionalData) {
+  private static void checkInstallment(InstallmentNoPII installment, InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData) {
     assertNull(result.getInstallmentId());
     assertNull(result.getPaymentOptionId());
     assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
@@ -151,23 +118,23 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     assertEquals(mixedDpAdditionalData.getLegacyPaymentMetadata(),
       result.getLegacyPaymentMetadata());
-    assertEquals(1, installment.getTransfers().size());
+    assertEquals(1, result.getTransfers().size());
   }
 
-  private static void checkTransfer(Transfer transfer, Transfer resultTransfer) {
-    assertEquals(transfer.getTransferIndex(),
-      resultTransfer.getTransferIndex());
-    assertEquals(transfer.getOrgFiscalCode(),
-      resultTransfer.getOrgFiscalCode());
-    assertEquals(transfer.getOrgName(), resultTransfer.getOrgName());
-    assertEquals(transfer.getAmountCents(), resultTransfer.getAmountCents());
-    assertEquals(transfer.getRemittanceInformation(),
-      resultTransfer.getRemittanceInformation());
-    assertEquals(transfer.getStamp(), resultTransfer.getStamp());
-    assertEquals(transfer.getIban(), resultTransfer.getIban());
-    assertEquals(transfer.getPostalIban(), resultTransfer.getPostalIban());
-    assertEquals(transfer.getCategory(), resultTransfer.getCategory());
-    assertEquals(transfer.getMbdAttachment(),
-      resultTransfer.getMbdAttachment());
+  private static void checkTransfer(Transfer expected, Transfer result) {
+    assertEquals(expected.getTransferIndex(),
+      result.getTransferIndex());
+    assertEquals(expected.getOrgFiscalCode(),
+      result.getOrgFiscalCode());
+    assertEquals(expected.getOrgName(), result.getOrgName());
+    assertEquals(expected.getAmountCents(), result.getAmountCents());
+    assertEquals(expected.getRemittanceInformation(),
+      result.getRemittanceInformation());
+    assertEquals(expected.getStamp(), result.getStamp());
+    assertEquals(expected.getIban(), result.getIban());
+    assertEquals(expected.getPostalIban(), result.getPostalIban());
+    assertEquals(expected.getCategory(), result.getCategory());
+    assertEquals(expected.getMbdAttachment(),
+      result.getMbdAttachment());
   }
 }
