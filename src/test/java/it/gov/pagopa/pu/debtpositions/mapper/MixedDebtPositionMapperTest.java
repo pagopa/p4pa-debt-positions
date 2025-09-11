@@ -197,7 +197,7 @@ class MixedDebtPositionMapperTest {
       TransferFaker.buildMixedTransferDTO());
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
-      .transferIndex(0)
+      .transferIndex(1)
       .iud("IUD")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .balance("Test Balance")
