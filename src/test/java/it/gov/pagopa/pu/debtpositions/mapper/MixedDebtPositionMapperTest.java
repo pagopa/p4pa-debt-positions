@@ -66,7 +66,7 @@ class MixedDebtPositionMapperTest {
     String iud = "IUD";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(0)
+      .transferIndex(1)
       .amountCents(50L)
       .stampType("stampType")
       .stampHashDocument("stampHashDocument")
@@ -88,7 +88,7 @@ class MixedDebtPositionMapperTest {
       .build();
     PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(0)
+      .paymentOptionIndex(1)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(expectedInstallment))
       .build();
@@ -129,7 +129,7 @@ class MixedDebtPositionMapperTest {
     String iud = "IUD";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(0)
+      .transferIndex(1)
       .amountCents(50L)
       .stampType("stampType")
       .stampHashDocument("stampHashDocument")
@@ -151,7 +151,7 @@ class MixedDebtPositionMapperTest {
       .build();
     PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(0)
+      .paymentOptionIndex(1)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(expectedInstallment))
       .build();

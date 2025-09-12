@@ -44,7 +44,7 @@ public class MixedDebtPositionMapper {
       MixedTransferDTO requestTransfer = requestTransfers.get(i);
       transfers.add(
         TransferDTO.builder()
-          .transferIndex(i)
+          .transferIndex(i+1)
           .amountCents(requestTransfer.getAmountCents())
           .stampType(requestTransfer.getStampType())
           .stampHashDocument(requestTransfer.getStampHashDocument())
@@ -72,7 +72,7 @@ public class MixedDebtPositionMapper {
 
     PaymentOptionDTO paymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(0)
+      .paymentOptionIndex(1)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(installment))
       .build();
