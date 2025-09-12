@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MixedDebtPositionMapper {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
 
-  public DebtPositionDTO mapToDebtPositionDTO(MixedDebtPositionDTO request) {
+  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
     if (request == null) {
       return null;
     }
@@ -45,6 +46,7 @@ public class MixedDebtPositionMapper {
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i+1)
+          .orgFiscalCode(organization.getOrgFiscalCode())
           .amountCents(requestTransfer.getAmountCents())
           .stampType(requestTransfer.getStampType())
           .stampHashDocument(requestTransfer.getStampHashDocument())
