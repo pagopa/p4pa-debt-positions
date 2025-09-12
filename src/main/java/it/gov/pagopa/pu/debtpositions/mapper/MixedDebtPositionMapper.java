@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +32,7 @@ public class MixedDebtPositionMapper {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
 
-  public DebtPositionDTO mapToDebtPositionDTO(MixedDebtPositionDTO request) {
+  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
     if (request == null) {
       return null;
     }
@@ -45,6 +46,8 @@ public class MixedDebtPositionMapper {
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i+1)
+          .orgFiscalCode(organization.getOrgFiscalCode())
+          .orgName(organization.getOrgName())
           .amountCents(requestTransfer.getAmountCents())
           .stampType(requestTransfer.getStampType())
           .stampHashDocument(requestTransfer.getStampHashDocument())
@@ -52,6 +55,8 @@ public class MixedDebtPositionMapper {
             requestTransfer.getStampProvincialResidence())
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
+          .category(requestTransfer.getLegacyPaymentMetadata())
+          .remittanceInformation(request.getRemittanceInformation())
           .build()
       );
     }
@@ -81,6 +86,7 @@ public class MixedDebtPositionMapper {
       .status(DebtPositionStatus.UNPAID)
       .debtPositionOrigin(request.getDebtPositionOrigin())
       .organizationId(request.getOrganizationId())
+      .description(request.getDescription())
       .flagIuvVolatile(true)
       .flagPuPagoPaPayment(true)
       .multiDebtor(false)

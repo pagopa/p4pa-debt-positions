@@ -75,7 +75,7 @@ public class MixedDebtPositionCreationServiceImpl implements
       mixedDebtPositionDTO.getTransfers(), accessToken, operatorExternalUserId);
     validateIudUniqueness(mixedDebtPositionDTO);
 
-    DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(
+    DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(organization,
       mixedDebtPositionDTO);
 
     WorkflowCreatedDTO workflowCreatedDTO = debtPositionCreationService.createDebtPosition(
