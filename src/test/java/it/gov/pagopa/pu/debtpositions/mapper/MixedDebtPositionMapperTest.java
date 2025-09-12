@@ -78,6 +78,7 @@ class MixedDebtPositionMapperTest {
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
       .category("legacyPaymentMetadata")
+      .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)
@@ -144,6 +145,7 @@ class MixedDebtPositionMapperTest {
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
       .category("legacyPaymentMetadata")
+      .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)

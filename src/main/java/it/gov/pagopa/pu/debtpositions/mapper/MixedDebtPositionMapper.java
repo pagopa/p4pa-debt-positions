@@ -55,6 +55,7 @@ public class MixedDebtPositionMapper {
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
           .category(requestTransfer.getLegacyPaymentMetadata())
+          .remittanceInformation(request.getRemittanceInformation())
           .build()
       );
     }
