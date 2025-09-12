@@ -47,6 +47,7 @@ public class MixedDebtPositionMapper {
         TransferDTO.builder()
           .transferIndex(i+1)
           .orgFiscalCode(organization.getOrgFiscalCode())
+          .orgName(organization.getOrgName())
           .amountCents(requestTransfer.getAmountCents())
           .stampType(requestTransfer.getStampType())
           .stampHashDocument(requestTransfer.getStampHashDocument())
