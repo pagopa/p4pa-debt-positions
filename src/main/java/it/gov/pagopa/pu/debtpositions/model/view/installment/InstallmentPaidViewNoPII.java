@@ -66,4 +66,7 @@ public class InstallmentPaidViewNoPII implements Serializable {
   @NotNull
   private Long receiptPersonalDataId;
   private String rtFilePath;
+  private String iun;
+  private OffsetDateTime notificationDate;
+  private Long notificationFeeCents;
 }
