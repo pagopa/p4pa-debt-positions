@@ -82,11 +82,11 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
 
   private void deleteDebtPositionsWithoutPersonalDataId(List<DebtPosition> debtPositions) {
     for (DebtPosition debtPosition : debtPositions) {
-      debtPosition.getPaymentOptions().forEach(paymentOption -> {
-        paymentOption.getInstallments().forEach(installment -> {
-          installment.setPersonalDataId(null);
-        });
-      });
+      debtPosition.getPaymentOptions().forEach(paymentOption ->
+        paymentOption.getInstallments().forEach(installment ->
+          installment.setPersonalDataId(null)
+        )
+      );
       debtPositionDeleteService.delete(debtPosition);
     }
   }
