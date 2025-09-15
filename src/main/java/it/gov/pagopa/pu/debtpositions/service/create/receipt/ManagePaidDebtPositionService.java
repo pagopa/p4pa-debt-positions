@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -12,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.service.update.TechnicalMixedDebtPositionUpdaterService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -19,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -34,16 +37,22 @@ public class ManagePaidDebtPositionService {
   private final PaymentsProducerService paymentsProducerService;
   private final ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
   private final DebtPositionProcessorService debtPositionProcessorService;
+  private final TechnicalMixedDebtPositionUpdaterService technicalMixedDebtPositionUpdaterService;
+  private final DebtPositionMapper debtPositionMapper;
 
-  public ManagePaidDebtPositionService(OrganizationService organizationService,
-                                       PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService,
-                                       InstallmentUpdateService installmentUpdateService,
-                                       DebtPositionSyncService debtPositionSyncService,
-                                       DebtPositionService debtPositionService,
-                                       DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                       PaymentsProducerService paymentsProducerService,
-                                       ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper,
-    DebtPositionProcessorService debtPositionProcessorService) {
+  public ManagePaidDebtPositionService(
+    OrganizationService organizationService,
+    PrimaryOrgInstallmentPaidVerifierService primaryOrgInstallmentPaidVerifierService,
+    InstallmentUpdateService installmentUpdateService,
+    DebtPositionSyncService debtPositionSyncService,
+    DebtPositionService debtPositionService,
+    DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+    PaymentsProducerService paymentsProducerService,
+    ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper,
+    DebtPositionProcessorService debtPositionProcessorService,
+    TechnicalMixedDebtPositionUpdaterService technicalMixedDebtPositionUpdaterService,
+    DebtPositionMapper debtPositionMapper
+  ) {
     this.organizationService = organizationService;
     this.primaryOrgInstallmentPaidVerifierService = primaryOrgInstallmentPaidVerifierService;
     this.installmentUpdateService = installmentUpdateService;
@@ -53,6 +62,8 @@ public class ManagePaidDebtPositionService {
     this.paymentsProducerService = paymentsProducerService;
     this.receiptWithAdditionalInfoMapper = receiptWithAdditionalInfoMapper;
     this.debtPositionProcessorService = debtPositionProcessorService;
+    this.technicalMixedDebtPositionUpdaterService = technicalMixedDebtPositionUpdaterService;
+    this.debtPositionMapper = debtPositionMapper;
   }
 
   boolean handleReceiptReceivedPrimaryOrg(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
@@ -85,6 +96,11 @@ public class ManagePaidDebtPositionService {
     debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPosition);
     //persist updated debt position
     debtPositionService.saveDebtPosition(debtPosition);
+    // handle mixed technical debt positions
+    List<DebtPosition> newMixedTechnicalDebtPositions = technicalMixedDebtPositionUpdaterService.update(debtPosition);
+    for (DebtPosition newMixedTechnicalDebtPosition :  newMixedTechnicalDebtPositions) {
+      saveAndNotifyDebtPosition(this.debtPositionMapper.mapToDto(newMixedTechnicalDebtPosition), receiptDTO);
+    }
     //start debt position workflow
     invokeWorkflow(debtPositionService.mapDebtPosition(debtPosition), receiptDTO, accessToken);
   }
@@ -96,14 +112,18 @@ public class ManagePaidDebtPositionService {
       receiptDTO.getIud(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
-    debtPositionService.saveDebtPosition(debtPositionDTO);
-    //notify payment event
-    paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
-    log.info("Technical debt position created with id [{}]", debtPositionDTO.getDebtPositionId());
+    saveAndNotifyDebtPosition(debtPositionDTO, receiptDTO);
   }
 
   private String buildPaymentEventDescription(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     return "receiptId:" + receiptDTO.getReceiptId();
+  }
+
+  private void saveAndNotifyDebtPosition(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    debtPositionService.saveDebtPosition(debtPositionDTO);
+    //notify payment event
+    paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
+    log.info("Technical debt position created with id [{}]", debtPositionDTO.getDebtPositionId());
   }
 
 }

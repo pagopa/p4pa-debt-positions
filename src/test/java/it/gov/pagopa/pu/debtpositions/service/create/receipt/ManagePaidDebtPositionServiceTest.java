@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -13,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.service.update.TechnicalMixedDebtPositionUpdaterService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -54,6 +56,10 @@ class ManagePaidDebtPositionServiceTest {
   private PaymentsProducerService paymentsProducerServiceMock;
   @Mock
   private DebtPositionProcessorService debtPositionProcessorServiceMock;
+  @Mock
+  private TechnicalMixedDebtPositionUpdaterService technicalMixedDebtPositionUpdaterServiceMock;
+  @Mock
+  private DebtPositionMapper debtPositionMapperMock;
 
   @InjectMocks
   private ManagePaidDebtPositionService managePaidDebtPositionService;
@@ -112,6 +118,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPosition);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPosition);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
+    Mockito.verify(technicalMixedDebtPositionUpdaterServiceMock).update(debtPosition);
   }
 
   @Test

@@ -2,11 +2,14 @@ package it.gov.pagopa.pu.debtpositions.util.faker;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.List;
+import java.util.stream.IntStream;
 
 public class TransferFaker {
   private static final LocalDate DATE = LocalDate.of(2099, 1, 3);
@@ -77,5 +80,31 @@ public class TransferFaker {
       .postalIban("IT60X0542811101000000123456")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
+  }
+
+  public static List<Transfer> buildMixedTransferList(int size) {
+    return IntStream.rangeClosed(1, size).mapToObj(TransferFaker::buildMixedTransfer).toList();
+  }
+
+  public static Transfer buildMixedTransfer(int i) {
+    Transfer transfer = new Transfer();
+    transfer.setTransferId(1000L * i);
+    transfer.setInstallmentId(100L);
+    transfer.setOrgFiscalCode("12345678903");
+    transfer.setOrgName("Organization Name");
+    transfer.setAmountCents(100L);
+    transfer.setRemittanceInformation("Payment Info");
+    transfer.setIban("IT60X0542811101000000123456");
+    transfer.setPostalIban("IT60X0542811101009000123456");
+    transfer.setCategory("001122233");
+    transfer.setTransferIndex(i);
+    transfer.setStamp(
+      new Stamp("stampType", "stampHashDocument", "stampProvincialResidence"));
+    transfer.setCreationDate(DATETIME.toLocalDateTime());
+    transfer.setUpdateDate(DATETIME.toLocalDateTime());
+    transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    transfer.setUpdateTraceId("TRACEID");
+    transfer.setMbdAttachment("MBD_ATTACHMENT");
+    return transfer;
   }
 }

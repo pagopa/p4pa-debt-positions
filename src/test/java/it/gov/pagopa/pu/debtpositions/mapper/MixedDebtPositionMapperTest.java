@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -28,6 +29,7 @@ import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrg
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker;
 import it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -60,19 +62,24 @@ class MixedDebtPositionMapperTest {
 
   @Test
   void givenDPTypeOrgIdWhenMapToDebtPositionDTOThenCorrectMapping() {
+    Organization organization = buildOrganization();
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setDebtPositionTypeOrgId(100L);
     String iud = "IUD";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(0)
+      .transferIndex(1)
+      .orgFiscalCode(organization.getOrgFiscalCode())
+      .orgName(organization.getOrgName())
       .amountCents(50L)
       .stampType("stampType")
       .stampHashDocument("stampHashDocument")
       .stampProvincialResidence("stampProvincialResidence")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
+      .category("legacyPaymentMetadata")
+      .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)
@@ -88,7 +95,7 @@ class MixedDebtPositionMapperTest {
       .build();
     PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(0)
+      .paymentOptionIndex(1)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(expectedInstallment))
       .build();
@@ -96,6 +103,7 @@ class MixedDebtPositionMapperTest {
       .status(DebtPositionStatus.UNPAID)
       .debtPositionOrigin(DebtPositionOrigin.ORDINARY)
       .organizationId(500L)
+      .description("Test Description")
       .flagIuvVolatile(true)
       .flagPuPagoPaPayment(true)
       .multiDebtor(false)
@@ -112,7 +120,7 @@ class MixedDebtPositionMapperTest {
           anyLong(), eq(DEBT_POSITION_TYPE_MIXED)))
         .thenReturn(Optional.of(dpTypeOrg));
 
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(
+      DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
         mixedDebtPositionDTO);
 
       assertEquals(expectedResult, result);
@@ -123,19 +131,24 @@ class MixedDebtPositionMapperTest {
 
   @Test
   void givenMissingDPTypeOrgIdWhenMapToDebtPositionDTOThenCorrectMapping() {
+    Organization organization = buildOrganization();
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setDebtPositionTypeOrgId(100L);
     String iud = "IUD";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(0)
+      .transferIndex(1)
+      .orgFiscalCode(organization.getOrgFiscalCode())
+      .orgName(organization.getOrgName())
       .amountCents(50L)
       .stampType("stampType")
       .stampHashDocument("stampHashDocument")
       .stampProvincialResidence("stampProvincialResidence")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
+      .category("legacyPaymentMetadata")
+      .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)
@@ -151,7 +164,7 @@ class MixedDebtPositionMapperTest {
       .build();
     PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(0)
+      .paymentOptionIndex(1)
       .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
       .installments(List.of(expectedInstallment))
       .build();
@@ -159,6 +172,7 @@ class MixedDebtPositionMapperTest {
       .status(DebtPositionStatus.UNPAID)
       .debtPositionOrigin(DebtPositionOrigin.ORDINARY)
       .organizationId(500L)
+      .description("Test Description")
       .flagIuvVolatile(true)
       .flagPuPagoPaPayment(true)
       .multiDebtor(false)
@@ -179,7 +193,7 @@ class MixedDebtPositionMapperTest {
           anyLong()))
         .thenReturn(dpTypeOrg);
 
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(
+      DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
         mixedDebtPositionDTO);
 
       assertEquals(expectedResult, result);
@@ -188,7 +202,7 @@ class MixedDebtPositionMapperTest {
 
   @Test
   void givenNullWhenMapToDebtPositionDTOThenNull() {
-    assertNull(mapper.mapToDebtPositionDTO(null));
+    assertNull(mapper.mapToDebtPositionDTO(new Organization(), null));
   }
 
   @Test
@@ -197,7 +211,7 @@ class MixedDebtPositionMapperTest {
       TransferFaker.buildMixedTransferDTO());
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
-      .transferIndex(0)
+      .transferIndex(1)
       .iud("IUD")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .balance("Test Balance")

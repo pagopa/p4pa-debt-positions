@@ -73,7 +73,10 @@ public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends No
   }
 
   public void delete(E noPii) {
-    personalDataService.delete(noPii.getPersonalDataId());
+    if (noPii.getPersonalDataId() != null) {
+      personalDataService.delete(noPii.getPersonalDataId());
+    }
+
     noPIIRepository.delete(noPii);
   }
 

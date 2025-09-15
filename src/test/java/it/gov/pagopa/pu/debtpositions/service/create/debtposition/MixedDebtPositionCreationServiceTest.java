@@ -9,6 +9,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
@@ -26,11 +27,11 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionSaveService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,6 +63,8 @@ class MixedDebtPositionCreationServiceTest {
   @Mock
   private OrganizationService organizationServiceMock;
   @Mock
+  private DebtPositionSaveService debtPositionSaveServiceMock;
+  @Mock
   private InstallmentNoPIIRepository installmentNoPIIRepositoryMock;
   @Mock
   private MixedDebtPositionMapper mixedDebtPositionMapperMock;
@@ -76,6 +79,7 @@ class MixedDebtPositionCreationServiceTest {
       debtPositionCreationServiceMock,
       technicalMixedDebtPositionBuilderServiceMock,
       organizationServiceMock,
+      debtPositionSaveServiceMock,
       installmentNoPIIRepositoryMock,
       mixedDebtPositionMapperMock,
       debtPositionMapperMock
@@ -91,7 +95,8 @@ class MixedDebtPositionCreationServiceTest {
 
     Organization organization = new Organization();
     organization.setIpaCode("ipaCode");
-    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
       .thenReturn(Optional.of(organization));
 
     // checkWorkflowTypeOrgExists
@@ -108,7 +113,7 @@ class MixedDebtPositionCreationServiceTest {
       .thenReturn(false);
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO))
+    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(organization, mixedDebtPositionDTO))
       .thenReturn(debtPositionDTO);
 
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
@@ -130,7 +135,10 @@ class MixedDebtPositionCreationServiceTest {
     when(
       technicalMixedDebtPositionBuilderServiceMock.createTechnicalMixedDebtPositions(
         debtPositionTypeOrgId2TransfersData,
-        debtPosition)).thenReturn(Collections.emptyList());
+        debtPosition)).thenReturn(List.of(debtPosition));
+
+    doNothing().when(debtPositionSaveServiceMock)
+      .saveDebtPosition(any(DebtPosition.class));
 
     // When
     Pair<WorkflowCreatedDTO, DebtPositionDTO> result = mixedDebtPositionCreationService.createMixedDebtPosition(
@@ -148,7 +156,8 @@ class MixedDebtPositionCreationServiceTest {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
 
-    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
       .thenReturn(Optional.empty());
 
     // When
@@ -194,7 +203,8 @@ class MixedDebtPositionCreationServiceTest {
 
     Organization organization = new Organization();
     organization.setIpaCode("ipaCode");
-    when(organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
+    when(
+      organizationServiceMock.getOrganizationById(anyLong(), eq(accessToken)))
       .thenReturn(Optional.of(organization));
 
     // checkWorkflowTypeOrgExists
@@ -274,7 +284,7 @@ class MixedDebtPositionCreationServiceTest {
       .thenReturn(false);
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(mixedDebtPositionDTO))
+    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(organization, mixedDebtPositionDTO))
       .thenReturn(debtPositionDTO);
 
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
@@ -296,7 +306,10 @@ class MixedDebtPositionCreationServiceTest {
     when(
       technicalMixedDebtPositionBuilderServiceMock.createTechnicalMixedDebtPositions(
         debtPositionTypeOrgId2TransfersData,
-        debtPosition)).thenReturn(Collections.emptyList());
+        debtPosition)).thenReturn(List.of(debtPosition));
+
+    doNothing().when(debtPositionSaveServiceMock)
+      .saveDebtPosition(any(DebtPosition.class));
 
     // When
     Pair<WorkflowCreatedDTO, DebtPositionDTO> result = mixedDebtPositionCreationService.createMixedDebtPosition(
