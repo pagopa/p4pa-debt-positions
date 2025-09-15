@@ -10,8 +10,16 @@ import java.util.List;
 @RepositoryRestResource(path = "debt-position-type-org-with-active-spontaneous-count")
 public interface DebtPositionTypeOrgWithActiveSpontaneousCountRepository extends Repository<DebtPositionTypeOrgWithActiveSpontaneousCount, Long> {
 
-  @Query(value = "SELECT distinct dpto "
-    + "FROM DebtPositionTypeOrgWithActiveSpontaneousCount dpto "
-    + "WHERE dpto.organizationId IN :organizationIds ")
+  @Query("""
+    SELECT new DebtPositionTypeOrgWithActiveSpontaneousCount(
+        dpto.organizationId,
+        COUNT(*))
+    FROM DebtPositionTypeOrg dpto
+    WHERE dpto.organizationId IN :organizationIds
+    AND dpto.flagActive = TRUE
+    AND dpto.flagSpontaneous = TRUE
+    GROUP BY dpto.organizationId
+  """)
   List<DebtPositionTypeOrgWithActiveSpontaneousCount> countByOrganizationIds(List<Long> organizationIds);
+
 }
