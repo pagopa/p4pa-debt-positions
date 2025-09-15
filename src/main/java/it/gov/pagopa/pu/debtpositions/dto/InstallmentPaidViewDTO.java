@@ -63,5 +63,7 @@ public class InstallmentPaidViewDTO {
   @NotNull
   private String companyName;
   private String rtFilePath;
-
+  private String iun;
+  private OffsetDateTime notificationDate;
+  private Long notificationFeeCents;
 }

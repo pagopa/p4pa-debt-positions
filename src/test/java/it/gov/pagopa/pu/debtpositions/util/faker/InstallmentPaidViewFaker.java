@@ -32,6 +32,9 @@ public class InstallmentPaidViewFaker {
       .companyName("company")
       .receiptPersonalDataId(123L)
       .rtFilePath("rtFilePath")
+      .iun("iun")
+      .notificationDate(OFFSET_DATE_TIME)
+      .notificationFeeCents(999L)
       .build();
   }
 
