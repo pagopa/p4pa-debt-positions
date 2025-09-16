@@ -124,5 +124,4 @@ public class Utilities {
   public static String taxonomyCodeToTransferCategory(String taxonomyCode){
     return taxonomyCode.replace("9/", "").replace("/", "");
   }
-
 }
