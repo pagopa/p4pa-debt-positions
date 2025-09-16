@@ -114,10 +114,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("[P4PA_INVALID_BALANCE] Balance is not formally valid");
     }
 
-    if (
-      StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
-      && !installmentDTO.getLegacyPaymentMetadata().matches("[0129]/\\S{3,138}")
-    ) {
+    if (StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
+      && !installmentDTO.getLegacyPaymentMetadata().matches("[0129]/\\S{3,138}")) {
       throw new InvalidValueException("[P4PA_INVALID_LEGACY_PAYMENT_METADATA] Legacy payment metadata is not valid");
     }
 
@@ -141,13 +139,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (installmentDTO.getDueDate() == null) {
         throw new InvalidValueException("The due date is mandatory");
       }
-      if(installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+      if (installmentDTO.getDueDate().isBefore(LocalDate.now())) {
         throw new InvalidValueException("The due date cannot be retroactive");
       }
     }
     installmentDTO.setSwitchToExpired(flagMandatoryDueDate);
 
-    if(DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)) {
+    if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)) {
       installmentDTO.setSwitchToExpired(Boolean.TRUE);
     }
   }

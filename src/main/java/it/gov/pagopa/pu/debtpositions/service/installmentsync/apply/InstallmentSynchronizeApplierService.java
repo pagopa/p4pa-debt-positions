@@ -1,13 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
-
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -18,6 +12,12 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
+import java.util.regex.Matcher;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
 public class InstallmentSynchronizeApplierService {
@@ -89,9 +89,10 @@ public class InstallmentSynchronizeApplierService {
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
-    String taxonomyCode = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
-      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
-      .getTaxonomyCode();
+    String taxonomyCode = Optional.ofNullable(installmentSynchronizeDTO.getLegacyPaymentMetadata())
+      .filter(StringUtils::isNotBlank)
+      .map(this::extractTaxonomyFromLegacyPaymentMetadata)
+      .orElseGet(() -> getTaxonomyFromRepository(debtPositionTypeOrg.getDebtPositionTypeId()));
 
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();
@@ -107,5 +108,19 @@ public class InstallmentSynchronizeApplierService {
       .build();
 
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstTransfer);
+  }
+
+  private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
+    Matcher matcher = LEGACY_PAYMENT_METADATA_REGEX.matcher(legacyPaymentMetadata);
+    if (!matcher.find()) {
+      throw new InvalidValueException(String.format("The legacy payment metadata [%s] does not valid to extract taxonomy code", legacyPaymentMetadata));
+    }
+    return matcher.group(1);
+  }
+
+  private String getTaxonomyFromRepository(Long debtPositionTypeId) {
+    return debtPositionTypeRepository.findById(debtPositionTypeId)
+      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeId)))
+      .getTaxonomyCode();
   }
 }

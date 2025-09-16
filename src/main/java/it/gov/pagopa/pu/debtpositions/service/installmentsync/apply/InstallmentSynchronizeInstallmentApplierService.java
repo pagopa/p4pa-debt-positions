@@ -24,7 +24,6 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setAmountCents(installmentSynchronizeDTO.getAmountCents());
     installmentDTO.setRemittanceInformation(installmentSynchronizeDTO.getRemittanceInformation());
     installmentDTO.setBalance(installmentSynchronizeDTO.getBalance());
-    installmentDTO.setLegacyPaymentMetadata(installmentSynchronizeDTO.getLegacyPaymentMetadata());
     installmentDTO.setNotificationDate(installmentSynchronizeDTO.getNotificationDate());
     installmentDTO.setIngestionFlowFileId(installmentSynchronizeDTO.getIngestionFlowFileId());
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
@@ -34,6 +33,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
     checkImmutableField("generateNotice", installmentSynchronizeDTO.getGenerateNotice(), installmentDTO.getGenerateNotice(), modifiedFields);
+    checkImmutableField("legacyPaymentMetadata", installmentSynchronizeDTO.getLegacyPaymentMetadata(), installmentDTO.getLegacyPaymentMetadata(), modifiedFields);
 
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
