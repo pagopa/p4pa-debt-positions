@@ -124,5 +124,16 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
     Pageable pageable);
 
+  @Query("""
+    SELECT dpto
+    FROM DebtPositionTypeOrg dpto
+    WHERE dpto.organizationId = :organizationId
+    AND dpto.flagActive = TRUE
+    AND dpto.flagSpontaneous = TRUE
+    """)
+  List<DebtPositionTypeOrg> findActiveDebtPositionTypeOrg(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
+  );
+
 }
 
