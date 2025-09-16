@@ -15,8 +15,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
@@ -29,6 +29,8 @@ public class InstallmentSynchronizeApplierService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final OrganizationService organizationService;
   private final DebtPositionTypeRepository debtPositionTypeRepository;
+
+  public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^(9/.*?/).*$");
 
   public InstallmentSynchronizeApplierService(InstallmentSynchronizeMapper installmentSynchronizeMapper, InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService, InstallmentSynchronizeInstallmentApplierService applierInstallmentService, InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, OrganizationService organizationService, DebtPositionTypeRepository debtPositionTypeRepository) {
     this.installmentSynchronizeMapper = installmentSynchronizeMapper;
