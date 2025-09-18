@@ -172,8 +172,7 @@ openApiGenerate {
     "object" to "com.fasterxml.jackson.databind.JsonNode",
     "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
     "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg",
-    "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
-    "DebtPositionTypeOrgOperators" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators"
+    "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",

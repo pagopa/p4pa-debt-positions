@@ -1362,14 +1362,8 @@ paths:
               type: integer
               format: int64
       responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  type: 'DebtPositionTypeOrgOperators'
+        '201':
+          description: Created
         '400':
           description: Invalid request
         '403':
