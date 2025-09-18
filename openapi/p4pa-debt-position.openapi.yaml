@@ -1341,6 +1341,43 @@ paths:
           description: Not found
         '500':
           description: Internal server error
+  /debt-position-type-org-operators:
+    post:
+      tags:
+        - debt-position-type-org-operators
+      operationId: saveDebtPositionTypeOrgOperatorsForOperator
+      parameters:
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: debtPositionTypeOrgIds
+          in: query
+          required: true
+          schema:
+            type: array
+            uniqueItems: true
+            items:
+              type: integer
+              format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: 'DebtPositionTypeOrgOperators'
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
   /debt-positions/mixed:
     post:
       tags:

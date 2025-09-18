@@ -8,4 +8,5 @@ public interface DebtPositionTypeOrgOperatorsService {
   long deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
   List<DebtPositionTypeOrgOperators> saveOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
   int deleteOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
+  List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds);
 }

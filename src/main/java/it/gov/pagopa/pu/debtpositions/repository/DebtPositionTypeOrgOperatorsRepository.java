@@ -14,7 +14,9 @@ import org.springframework.transaction.annotation.Transactional;
 public interface DebtPositionTypeOrgOperatorsRepository extends JpaRepository<DebtPositionTypeOrgOperators,Long>{
 
   Optional<DebtPositionTypeOrgOperators> findByDebtPositionTypeOrgIdAndOperatorExternalUserId(Long debtPositionTypeOrgId, String operatorExternalUserId);
+
   List<DebtPositionTypeOrgOperators> findByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
+
   @Transactional
   long deleteByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
   @Transactional
@@ -22,4 +24,6 @@ public interface DebtPositionTypeOrgOperatorsRepository extends JpaRepository<De
   @Query("DELETE FROM DebtPositionTypeOrgOperators dptoo WHERE dptoo.debtPositionTypeOrgId = :debtPositionTypeOrgId "
     + " AND dptoo.operatorExternalUserId IN :operatorExternalUserIds ")
   int deleteByDebtPositionTypeOrgIdAndOperatorExternalUserId(Long debtPositionTypeOrgId, Set<String> operatorExternalUserIds);
+
+  List<DebtPositionTypeOrgOperators> findByOperatorExternalUserId(String operatorExternalUserId);
 }

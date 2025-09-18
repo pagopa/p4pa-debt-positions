@@ -135,5 +135,6 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
   );
 
+  List<DebtPositionTypeOrg> findByDebtPositionTypeOrgIdIn(Set<Long> debtPositionTypeOrgIds);
 }
 
