@@ -1368,8 +1368,6 @@ paths:
           description: Invalid request
         '403':
           description: Forbidden
-        '404':
-          description: Not found
         '500':
           description: Internal server error
   /debt-positions/mixed:
