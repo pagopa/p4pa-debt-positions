@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -473,15 +474,19 @@ class DebtPositionControllerTest {
   @Test
   void whenUpdateInstallmentNotificationFeeThenOk()
     throws Exception {
-    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
-      .builder()
-      .organizationId(0L)
-      .nav("NAV")
+    ActualizeAmountRequestDTO actualizeAmountRequestDTO = ActualizeAmountRequestDTO.builder()
       .newFeeCents(1L)
       .actualizedFromPuSil(false)
       .notificationDate(OffsetDateTime.now())
       .iun("IUN")
       .balance("BALANCE")
+      .build();
+
+    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
+      .builder()
+      .organizationId(0L)
+      .nav("NAV")
+      .actualizeAmountRequest(actualizeAmountRequestDTO)
       .build();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
@@ -492,7 +497,8 @@ class DebtPositionControllerTest {
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
     Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
-      request.getNewFeeCents(), request.getActualizedFromPuSil(), request.getBalance(), request.getIun(),request.getNotificationDate(),
+      request.getActualizeAmountRequest().getNewFeeCents(), request.getActualizeAmountRequest().getActualizedFromPuSil(),
+      request.getActualizeAmountRequest().getBalance(), request.getActualizeAmountRequest().getIun(),request.getActualizeAmountRequest().getNotificationDate(),
       wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(

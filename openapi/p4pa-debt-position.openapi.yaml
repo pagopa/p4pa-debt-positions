@@ -1094,23 +1094,12 @@ paths:
                   format: int64
                 nav:
                   type: string
-                newFeeCents:
-                  type: integer
-                  format: int64
-                actualizedFromPuSil:
-                  type: boolean
-                iun:
-                  type: string
-                balance:
-                  type: string
-                notificationDate:
-                  type: string
-                  format: date-time
+                actualizeAmountRequest:
+                  $ref: '#/components/schemas/ActualizeAmountRequestDTO'
               required:
                 - organizationId
                 - nav
-                - newFeeCents
-                - actualizedFromPuSil
+                - actualizeAmountRequest
       responses:
         "200":
           description: Ok
@@ -2461,3 +2450,21 @@ components:
           type: string
         legacyPaymentMetadata:
           type: string
+    ActualizeAmountRequestDTO:
+      type: object
+      required:
+        - newFeeCents
+        - actualizedFromPuSil
+      properties:
+        newFeeCents:
+          type: integer
+          format: int64
+        actualizedFromPuSil:
+          type: boolean
+        iun:
+          type: string
+        balance:
+          type: string
+        notificationDate:
+          type: string
+          format: date-time
