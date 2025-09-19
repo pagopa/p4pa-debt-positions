@@ -259,7 +259,7 @@ class InstallmentServiceImplTest {
     String nav = "NAV";
     Long orgId = 1L;
     long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
+    boolean actualizedFromPuSil = true;
     String iun = "IUN";
     String balance = "BALANCE";
     OffsetDateTime notificationData = OffsetDateTime.now();
