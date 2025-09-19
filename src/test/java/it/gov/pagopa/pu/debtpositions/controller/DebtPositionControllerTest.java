@@ -474,19 +474,14 @@ class DebtPositionControllerTest {
   @Test
   void whenUpdateInstallmentNotificationFeeThenOk()
     throws Exception {
-    ActualizeAmountRequestDTO actualizeAmountRequestDTO = ActualizeAmountRequestDTO.builder()
+    ActualizeAmountRequestDTO request = ActualizeAmountRequestDTO.builder()
+      .organizationId(0L)
+      .nav("NAV")
       .newFeeCents(1L)
       .actualizedFromPuSil(true)
       .notificationDate(OffsetDateTime.now())
       .iun("IUN")
       .balance("BALANCE")
-      .build();
-
-    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
-      .builder()
-      .organizationId(0L)
-      .nav("NAV")
-      .actualizeAmountRequest(actualizeAmountRequestDTO)
       .build();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
@@ -496,8 +491,8 @@ class DebtPositionControllerTest {
 
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
-    Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
-      request.getActualizeAmountRequest(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
+    Mockito.when(installmentService.updateInstallmentNotificationFee(request,
+      wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(
         put("/debt-positions/update-notification-fee")

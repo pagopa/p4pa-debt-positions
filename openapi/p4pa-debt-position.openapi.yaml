@@ -1087,19 +1087,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                organizationId:
-                  type: integer
-                  format: int64
-                nav:
-                  type: string
-                actualizeAmountRequest:
                   $ref: '#/components/schemas/ActualizeAmountRequestDTO'
-              required:
-                - organizationId
-                - nav
-                - actualizeAmountRequest
+        required: true
       responses:
         "200":
           description: Ok
@@ -2453,9 +2442,16 @@ components:
     ActualizeAmountRequestDTO:
       type: object
       required:
+        - organizationId
+        - nav
         - newFeeCents
         - actualizedFromPuSil
       properties:
+        organizationId:
+          type: integer
+          format: int64
+        nav:
+          type: string
         newFeeCents:
           type: integer
           format: int64

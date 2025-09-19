@@ -108,9 +108,11 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, ActualizeAmountRequestDTO actualizeAmountRequest,
+  public InstallmentDTO updateInstallmentNotificationFee(ActualizeAmountRequestDTO actualizeAmountRequest,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
+    String nav = actualizeAmountRequest.getNav();
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
     if(installments.isEmpty())

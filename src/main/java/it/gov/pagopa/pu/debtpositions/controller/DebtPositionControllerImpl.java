@@ -214,9 +214,9 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<InstallmentDTO> updateInstallmentNotificationFee(UpdateInstallmentNotificationFeeRequest updateInstallmentNotificationFeeRequest) {
+  public ResponseEntity<InstallmentDTO> updateInstallmentNotificationFee(ActualizeAmountRequestDTO actualizeAmountRequest) {
     log.info("Updating notification fee on installment having NAV {} and OrganizationId {}",
-      updateInstallmentNotificationFeeRequest.getNav(), updateInstallmentNotificationFeeRequest.getOrganizationId());
+      actualizeAmountRequest.getNav(), actualizeAmountRequest.getOrganizationId());
 
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
@@ -226,9 +226,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .build();
 
     InstallmentDTO installmentDTO = installmentService.updateInstallmentNotificationFee(
-      updateInstallmentNotificationFeeRequest.getOrganizationId(),
-      updateInstallmentNotificationFeeRequest.getNav(),
-      updateInstallmentNotificationFeeRequest.getActualizeAmountRequest(),
+      actualizeAmountRequest,
       wfExecutionParameters,
       accessToken,
       operatorExternalUserId);
