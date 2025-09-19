@@ -8,11 +8,13 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -21,14 +23,16 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final DebtPositionSaveService debtPositionSaveService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionDeleteService debtPositionDeleteService;
+  private final DebtPositionUpdateService debtPositionUpdateService;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository,
                                  DebtPositionSaveService debtPositionSaveService,
-                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService) {
+                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService, DebtPositionUpdateService debtPositionUpdateService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionSaveService = debtPositionSaveService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionDeleteService = debtPositionDeleteService;
+    this.debtPositionUpdateService = debtPositionUpdateService;
   }
 
   @Override
@@ -92,6 +96,17 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public void delete(DebtPosition debtPosition) {
     debtPositionDeleteService.delete(debtPosition);
+  }
+
+  @Override
+  public Optional<DebtPosition> getDebtPositionByIupdAndOrganizationId(String iupd, Long organizationId) {
+    return debtPositionRepository.findDebtPositionByIupdOrgAndOrganizationId(iupd, organizationId);
+  }
+
+  @Override
+  public void updateDebtPosition(Long debtPositionId, DebtPositionDTO debtPositionDTO) {
+    DebtPosition debtPosition = debtPositionRepository.findById(debtPositionId).orElseThrow(() -> new EntityNotFoundException("debtPositionId=" + debtPositionId + " not found"));
+    debtPositionUpdateService.updateDebtPositionFromDTO(debtPosition, debtPositionDTO);
   }
 }
 

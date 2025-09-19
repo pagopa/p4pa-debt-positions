@@ -112,18 +112,37 @@ public class ManagePaidDebtPositionService {
       receiptDTO.getIud(),
       organization.getOrganizationId(), organization.getOrgFiscalCode());
     DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization);
-    saveAndNotifyDebtPosition(debtPositionDTO, receiptDTO);
+    Optional<DebtPosition> existingDebtPosition = debtPositionService.getDebtPositionByIupdAndOrganizationId(
+      debtPositionDTO.getIupdOrg(),
+      debtPositionDTO.getOrganizationId()
+    );
+
+    if (existingDebtPosition.isEmpty()) {
+      saveAndNotifyDebtPosition(debtPositionDTO, receiptDTO);
+    } else {
+      updateAndNotifyDebtPosition(existingDebtPosition.get().getDebtPositionId(), debtPositionDTO, receiptDTO);
+    }
   }
 
   private String buildPaymentEventDescription(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     return "receiptId:" + receiptDTO.getReceiptId();
   }
 
+  private void updateAndNotifyDebtPosition(Long debtPositionId, DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    debtPositionService.updateDebtPosition(debtPositionId, debtPositionDTO);
+    notifyPayment(debtPositionDTO, receiptDTO);
+    log.info("Technical debt position updated with id [{}]", debtPositionDTO.getDebtPositionId());
+  }
+
   private void saveAndNotifyDebtPosition(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     debtPositionService.saveDebtPosition(debtPositionDTO);
+    notifyPayment(debtPositionDTO, receiptDTO);
+    log.info("Technical debt position created with id [{}]", debtPositionDTO.getDebtPositionId());
+  }
+
+  private void notifyPayment(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     //notify payment event
     paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, buildPaymentEventDescription(receiptDTO));
-    log.info("Technical debt position created with id [{}]", debtPositionDTO.getDebtPositionId());
   }
 
 }

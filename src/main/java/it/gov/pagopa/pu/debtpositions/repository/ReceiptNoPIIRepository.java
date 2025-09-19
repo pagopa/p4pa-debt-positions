@@ -8,7 +8,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 @RepositoryRestResource(path = "receipts")
-public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long> {
+public interface  ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long> {
 
   @RestResource(exported = false)
   @Query(" select r" +

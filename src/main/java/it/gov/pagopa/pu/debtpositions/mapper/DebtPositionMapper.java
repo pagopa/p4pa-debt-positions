@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
@@ -96,6 +97,26 @@ public class DebtPositionMapper {
       }
     }
     return mappedPagedDebtPositions;
+  }
+
+  public void updateFromDTO(DebtPosition debtPosition, DebtPositionDTO dto) {
+    debtPosition.setDescription(dto.getDescription());
+    debtPosition.setStatus(dto.getStatus());
+    debtPosition.setValidityDate(dto.getValidityDate());
+    debtPosition.setFlagIuvVolatile(Optional.ofNullable(dto.getFlagIuvVolatile()).orElse(false));
+    debtPosition.setMultiDebtor(Optional.ofNullable(dto.getMultiDebtor()).orElse(false));
+    debtPosition.setFlagPuPagoPaPayment(dto.getFlagPuPagoPaPayment());
+
+    List<PaymentOptionDTO> paymentOptionDTOList = dto.getPaymentOptions().stream().toList();
+    List<PaymentOption> paymentOptionList = debtPosition.getPaymentOptions().stream().toList();
+
+    IntStream.range(0, Math.min(paymentOptionDTOList.size(), paymentOptionList.size())).forEach(i -> {
+      paymentOptionMapper.updateFromDTO(paymentOptionList.get(i), paymentOptionDTOList.get(i));
+    });
+
+    SortedSet<PaymentOption> paymentOptions = new TreeSet<>(paymentOptionList);
+
+    debtPosition.setPaymentOptions(paymentOptions);
   }
 }
 
