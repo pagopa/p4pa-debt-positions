@@ -30,7 +30,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SyncCompleteDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SyncErrorDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationFeeRequest;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
