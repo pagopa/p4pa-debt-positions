@@ -229,6 +229,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       updateInstallmentNotificationFeeRequest.getOrganizationId(),
       updateInstallmentNotificationFeeRequest.getNav(),
       updateInstallmentNotificationFeeRequest.getNewFeeCents(),
+      false,
+      "balance",
+      "iun",
+      null,
       wfExecutionParameters,
       accessToken,
       operatorExternalUserId);

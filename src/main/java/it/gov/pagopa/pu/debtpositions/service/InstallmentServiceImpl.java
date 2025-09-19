@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPai
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import java.time.OffsetDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -108,11 +109,11 @@ public class InstallmentServiceImpl implements InstallmentService {
 
   @Override
   public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
+    boolean actualizedFromPuSil, String balance, String iun, OffsetDateTime notificationDate,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
-
     if(installments.isEmpty())
       throw new NotFoundException("The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
@@ -123,6 +124,12 @@ public class InstallmentServiceImpl implements InstallmentService {
     notificationFeeCents = calculateFeeAlreadyPaid(notificationFeeCents, installments.getFirst().getIun());
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
+
+    if(actualizedFromPuSil) {
+      installment.setBalance(balance);
+      installment.setIun(iun);
+      installment.setNotificationDate(notificationDate);
+    }
 
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);

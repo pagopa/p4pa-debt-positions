@@ -478,6 +478,10 @@ class DebtPositionControllerTest {
       .organizationId(0L)
       .nav("NAV")
       .newFeeCents(1L)
+      .actualizedFromPuSil(false)
+      .notificationDate(OffsetDateTime.now())
+      .iun("IUN")
+      .balance("BALANCE")
       .build();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
@@ -488,7 +492,8 @@ class DebtPositionControllerTest {
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
     Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
-      request.getNewFeeCents(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
+      request.getNewFeeCents(), request.getActualizedFromPuSil(), request.getBalance(), request.getIun(),request.getNotificationDate(),
+      wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(
         put("/debt-positions/update-notification-fee")
