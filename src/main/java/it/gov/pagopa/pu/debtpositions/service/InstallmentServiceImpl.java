@@ -108,8 +108,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
-    boolean actualizedFromPuSil, String balance, String iun, OffsetDateTime notificationDate,
+  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, ActualizeAmountRequestDTO actualizeAmountRequest,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
@@ -121,14 +120,14 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
       throw new InvalidConditionException("The installment with NAV: " + nav + " is expired");
 
-    notificationFeeCents = calculateFeeAlreadyPaid(notificationFeeCents, installments.getFirst().getIun());
+    long notificationFeeCents = calculateFeeAlreadyPaid(actualizeAmountRequest.getNewFeeCents(), installments.getFirst().getIun());
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
 
-    if(actualizedFromPuSil) {
-      installment.setBalance(balance);
-      installment.setIun(iun);
-      installment.setNotificationDate(notificationDate);
+    if(actualizeAmountRequest.getActualizedFromPuSil()) {
+      installment.setBalance(actualizeAmountRequest.getBalance());
+      installment.setIun(actualizeAmountRequest.getIun());
+      installment.setNotificationDate(actualizeAmountRequest.getNotificationDate());
     }
 
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());

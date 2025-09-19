@@ -258,11 +258,13 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = true;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(true)
+      .iun("IUN")
+      .balance("BALANCE")
+      .notificationDate(OffsetDateTime.now())
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
@@ -282,8 +284,7 @@ class InstallmentServiceImplTest {
 
     // When
     InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
-      orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData,
-      wfExecutionParameters, accessToken, operatorExternalUserId);
+      orgId, nav, actualizeAmountRequest, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     // Then
     assertEquals(200L, result.getNotificationFeeCents());
@@ -303,11 +304,10 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(Collections.emptyList());
@@ -315,8 +315,7 @@ class InstallmentServiceImplTest {
     // When Then
     assertThrows(NotFoundException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData,
-        wfExecutionParameters, accessToken, operatorExternalUserId));
+        orgId, nav, actualizeAmountRequest, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
@@ -324,11 +323,10 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
@@ -338,7 +336,7 @@ class InstallmentServiceImplTest {
     // When Then
     assertThrows(ConflictErrorException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData,
+        orgId, nav, actualizeAmountRequest,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
@@ -347,11 +345,10 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO paidInstallment = new InstallmentDTO();
     paidInstallment.setStatus(InstallmentStatus.PAID);
@@ -362,7 +359,7 @@ class InstallmentServiceImplTest {
     // When Then
     assertThrows(NotFoundException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData, wfExecutionParameters,
+        orgId, nav, actualizeAmountRequest, wfExecutionParameters,
         accessToken, operatorExternalUserId));
   }
 
@@ -371,11 +368,10 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO expiredInstallment = new InstallmentDTO();
     expiredInstallment.setStatus(InstallmentStatus.EXPIRED);
@@ -386,7 +382,7 @@ class InstallmentServiceImplTest {
     // When Then
     assertThrows(InvalidConditionException.class, () ->
       installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData,
+        orgId, nav, actualizeAmountRequest,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
@@ -395,11 +391,10 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
     installmentDTO.getTransfers().clear();
@@ -415,8 +410,7 @@ class InstallmentServiceImplTest {
 
     // When Then
     assertThrows(IllegalStateException.class, () ->
-      installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
-        actualizedFromPuSil, balance, iun, notificationData,
+      installmentService.updateInstallmentNotificationFee(orgId, nav, actualizeAmountRequest,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
@@ -425,12 +419,11 @@ class InstallmentServiceImplTest {
     // Given
     String nav = "NAV";
     Long orgId = 1L;
-    long newNotificationFee = 200L;
     long alreadyPaidFee = 50L;
-    boolean actualizedFromPuSil = false;
-    String iun = "IUN";
-    String balance = "BALANCE";
-    OffsetDateTime notificationData = OffsetDateTime.now();
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
@@ -456,7 +449,7 @@ class InstallmentServiceImplTest {
 
     // When
     InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
-      orgId, nav, newNotificationFee, actualizedFromPuSil, balance, iun, notificationData, wfExecutionParameters,
+      orgId, nav, actualizeAmountRequest, wfExecutionParameters,
       accessToken, operatorExternalUserId);
 
     // Then
