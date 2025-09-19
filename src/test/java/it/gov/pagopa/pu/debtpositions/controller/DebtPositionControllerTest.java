@@ -476,7 +476,7 @@ class DebtPositionControllerTest {
     throws Exception {
     ActualizeAmountRequestDTO actualizeAmountRequestDTO = ActualizeAmountRequestDTO.builder()
       .newFeeCents(1L)
-      .actualizedFromPuSil(false)
+      .actualizedFromPuSil(true)
       .notificationDate(OffsetDateTime.now())
       .iun("IUN")
       .balance("BALANCE")
