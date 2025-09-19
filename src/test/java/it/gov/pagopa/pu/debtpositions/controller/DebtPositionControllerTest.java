@@ -16,6 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -29,7 +30,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SyncCompleteDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SyncErrorDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationFeeRequest;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
@@ -473,11 +473,14 @@ class DebtPositionControllerTest {
   @Test
   void whenUpdateInstallmentNotificationFeeThenOk()
     throws Exception {
-    UpdateInstallmentNotificationFeeRequest request = UpdateInstallmentNotificationFeeRequest
-      .builder()
+    ActualizeAmountRequestDTO request = ActualizeAmountRequestDTO.builder()
       .organizationId(0L)
       .nav("NAV")
       .newFeeCents(1L)
+      .actualizedFromPuSil(true)
+      .notificationDate(OffsetDateTime.now())
+      .iun("IUN")
+      .balance("BALANCE")
       .build();
 
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
@@ -487,8 +490,8 @@ class DebtPositionControllerTest {
 
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
-    Mockito.when(installmentService.updateInstallmentNotificationFee(request.getOrganizationId(), request.getNav(),
-      request.getNewFeeCents(), wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
+    Mockito.when(installmentService.updateInstallmentNotificationFee(request,
+      wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(
         put("/debt-positions/update-notification-fee")
