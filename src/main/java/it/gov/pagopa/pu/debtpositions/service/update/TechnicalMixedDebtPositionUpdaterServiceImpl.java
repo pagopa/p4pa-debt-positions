@@ -55,7 +55,8 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
 
     List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       buildMixedDpAdditionalDataMap(oldMixedDebtPositions),
-      debtPosition
+      debtPosition,
+      false
     );
 
     deleteDebtPositionsWithoutPersonalDataId(oldMixedDebtPositions);
@@ -67,15 +68,15 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
     return oldMixedTechnicalDebtPositions.stream()
         .collect(Collectors.groupingBy(
           DebtPosition::getDebtPositionTypeOrgId,
-          Collectors.mapping(dp -> {
+          Collectors.flatMapping(dp -> {
             InstallmentNoPII installment = dp.getPaymentOptions().getFirst().getInstallments().getFirst();
-            Transfer transfer = installment.getTransfers().getFirst();
-            return MixedDpAdditionalData.builder()
-              .iud(installment.getIud())
-              .balance(installment.getBalance())
-              .transferIndex(transfer.getTransferIndex())
-              .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
-              .build();
+            return installment.getTransfers().stream().map(transfer ->
+              MixedDpAdditionalData.builder()
+                .iud(installment.getIud())
+                .balance(installment.getBalance())
+                .transferIndex(transfer.getTransferIndex())
+                .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
+                .build());
           }, Collectors.toList())
         ));
   }

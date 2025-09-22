@@ -62,6 +62,31 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
 
   @Transactional
   @Override
+  public List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForOperator(
+    String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds) {
+
+    List<DebtPositionTypeOrgOperators> debtPositionTypeOrgOperatorsList = debtPositionTypeOrgOperatorsRepository.findByOperatorExternalUserId(operatorExternalUserId);
+
+    if(!CollectionUtils.isEmpty(debtPositionTypeOrgOperatorsList)){
+      debtPositionTypeOrgIds.removeIf(o->debtPositionTypeOrgOperatorsList.stream().anyMatch(dptoo->dptoo.getDebtPositionTypeOrgId().equals(o)));
+    }
+
+    if(CollectionUtils.isEmpty(debtPositionTypeOrgIds)){
+      return Collections.emptyList();
+    }
+
+    return debtPositionTypeOrgOperatorsRepository.saveAll(
+      debtPositionTypeOrgIds.stream().map(o->{
+        DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
+        debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(o);
+        debtPositionTypeOrgOperators.setOperatorExternalUserId(operatorExternalUserId);
+        return debtPositionTypeOrgOperators;
+      }).toList()
+    );
+  }
+
+  @Transactional
+  @Override
   public int deleteOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds) {
     int deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgIdAndOperatorExternalUserId(
       debtPositionTypeOrgId,

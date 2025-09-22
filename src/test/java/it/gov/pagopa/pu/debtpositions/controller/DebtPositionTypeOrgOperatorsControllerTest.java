@@ -11,11 +11,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionTypeOrgOperatorsControllerTest {
@@ -48,5 +48,21 @@ class DebtPositionTypeOrgOperatorsControllerTest {
     assertNotNull(result);
     assertEquals(HttpStatus.OK, result.getStatusCode());
     assertEquals(expectedDeletedCount, result.getBody());
+  }
+
+  @Test
+  void givenOperatorExternalUserIdAndSetOfDebtPositionTypeOrgIdsWhenSaveDebtPositionTypeOrgOperatorsForOperatorThenReturnCreated() {
+    String operatorExternalUserId = "operator1";
+    Set<Long> debtPositionTypeOrgIds = Set.of(10L, 20L);
+
+    when(debtPositionTypeOrgOperatorsServiceMock
+      .saveDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, debtPositionTypeOrgIds))
+      .thenReturn(Collections.emptyList());
+
+    ResponseEntity<Void> result = controller.saveDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, debtPositionTypeOrgIds);
+
+    assertNotNull(result);
+    assertEquals(HttpStatus.CREATED, result.getStatusCode());
+    assertNull(result.getBody());
   }
 }
