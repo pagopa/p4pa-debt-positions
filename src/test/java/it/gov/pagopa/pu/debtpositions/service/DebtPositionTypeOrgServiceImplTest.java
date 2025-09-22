@@ -101,7 +101,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10L);
+    Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10);
     Mockito.doNothing().when(debtPositionTypeOrgRepositoryMock).delete(debtPositionTypeOrg);
 
     debtPositionTypeOrgService.deleteDebtPositionTypeOrg(debtPositionTypeOrgId);
@@ -132,7 +132,7 @@ class DebtPositionTypeOrgServiceImplTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.save(expectedResult))
       .thenReturn(expectedResult);
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(
-      expectedResult.getDebtPositionTypeOrgId())).thenReturn(1L);
+      expectedResult.getDebtPositionTypeOrgId())).thenReturn(1);
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.saveOperators(
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getEnabledOperators())).thenReturn(null);
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperators(

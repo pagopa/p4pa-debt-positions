@@ -23,8 +23,8 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
 
   @Transactional
   @Override
-  public long deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId) {
-    long deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(
+  public int deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId) {
+    Integer deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(
       debtPositionTypeOrgId);
     logDeletedOperators(debtPositionTypeOrgId, deletedOperators);
     return deletedOperators;
