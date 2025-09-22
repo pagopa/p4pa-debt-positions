@@ -1,8 +1,25 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
+import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildSyncDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
@@ -11,27 +28,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
-import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import java.util.Optional;
-import org.apache.commons.lang3.tuple.Pair;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeApplierServiceTest {
@@ -49,7 +45,7 @@ class InstallmentSynchronizeApplierServiceTest {
   @Mock
   private OrganizationService organizationServiceMock;
   @Mock
-  private DebtPositionTypeRepository debtPositionTypeRepositoryMock;
+  private CategoryResolverService categoryResolverServiceMock;
 
   private InstallmentSynchronizeApplierService installmentSynchronizeApplierService;
 
@@ -57,7 +53,7 @@ class InstallmentSynchronizeApplierServiceTest {
   void setUp() {
     installmentSynchronizeApplierService = new InstallmentSynchronizeApplierService(installmentSynchronizeMapperMock,
       applierDebtPositionServiceMock, applierInstallmentServiceMock, applierPaymentOptionServiceMock, debtPositionTypeOrgRepositoryMock,
-      organizationServiceMock, debtPositionTypeRepositoryMock);
+      organizationServiceMock, categoryResolverServiceMock);
   }
 
   @Test
@@ -116,8 +112,60 @@ class InstallmentSynchronizeApplierServiceTest {
       .thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeOrg.getDebtPositionTypeId()))
-      .thenReturn(Optional.of(buildDebtPositionType()));
+    Mockito.when(categoryResolverServiceMock.resolveCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
+      debtPositionTypeOrg.getDebtPositionTypeId())).thenReturn("category");
+    Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
+    Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
+    Mockito.doNothing().when(applierInstallmentServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+
+    InstallmentDTO result = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
+      debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken).getRight();
+
+    assertEquals(result, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+    Mockito.verifyNoInteractions(installmentSynchronizeMapperMock);
+  }
+
+  @Test
+  void testApplyWhenFirstTransferPopulatedThenOk() {
+    String accessToken = "ACCESSTOKEN";
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization organization = buildOrganization();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.addAdditionalTransfersItem(TransferSynchronizeDTO.builder().transferIndex(1).build());
+
+    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
+    Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
+    Mockito.doNothing().when(applierInstallmentServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+
+    InstallmentDTO result = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
+      debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken).getRight();
+
+    assertEquals(result, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+    Mockito.verifyNoInteractions(installmentSynchronizeMapperMock);
+    Mockito.verifyNoInteractions(categoryResolverServiceMock);
+  }
+
+  @Test
+  void testApplyWithLegacyMetadataNotNullAndValidThenOk() {
+    String accessToken = "ACCESSTOKEN";
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization organization = buildOrganization();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setCategory("9/abc123/");
+
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setLegacyPaymentMetadata("9/abc123/xx");
+
+    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
     Mockito.doNothing().when(applierInstallmentServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
@@ -170,32 +218,6 @@ class InstallmentSynchronizeApplierServiceTest {
         paymentOptionDTO, installmentDTO, accessToken));
     assertEquals(String.format("The debt position type code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
       invalidValueException.getMessage());
-  }
-
-  @Test
-  void testApplyDebtPositionTypeNotFoundThenException() {
-    String accessToken = "ACCESSTOKEN";
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
-    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
-
-    Organization organization = buildOrganization();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-
-    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.of(organization));
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
-      .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeOrg.getDebtPositionTypeId()))
-      .thenReturn(Optional.empty());
-
-    NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
-      installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
-        paymentOptionDTO, installmentDTO, accessToken));
-    assertEquals(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId()),
-      notFoundException.getMessage());
   }
 
   @Test

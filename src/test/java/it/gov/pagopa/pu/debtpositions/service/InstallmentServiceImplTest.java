@@ -256,9 +256,15 @@ class InstallmentServiceImplTest {
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenSuccess() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(true)
+      .iun("IUN")
+      .balance("BALANCE")
+      .notificationDate(OffsetDateTime.now())
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
@@ -269,7 +275,8 @@ class InstallmentServiceImplTest {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId())).thenReturn(debtPosition);
@@ -277,8 +284,7 @@ class InstallmentServiceImplTest {
 
 
     // When
-    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
-      orgId, nav, newNotificationFee,wfExecutionParameters, accessToken, operatorExternalUserId);
+    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(actualizeAmountRequest, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     // Then
     assertEquals(200L, result.getNotificationFeeCents());
@@ -296,80 +302,98 @@ class InstallmentServiceImplTest {
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNotFoundException() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(Collections.emptyList());
 
     // When Then
     assertThrows(NotFoundException.class, () ->
-      installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+      installmentService.updateInstallmentNotificationFee(actualizeAmountRequest, wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenConflictErrorException() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
+
     InstallmentDTO installmentDTO = getInstallmentDTO();
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(installmentDTO, installmentDTO));
 
     // When Then
     assertThrows(ConflictErrorException.class, () ->
-      installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+      installmentService.updateInstallmentNotificationFee(actualizeAmountRequest,
+        wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenFiltersCorrectStatus() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO paidInstallment = new InstallmentDTO();
     paidInstallment.setStatus(InstallmentStatus.PAID);
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
       .thenReturn(List.of(paidInstallment));
 
     // When Then
     assertThrows(NotFoundException.class, () ->
-      installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+      installmentService.updateInstallmentNotificationFee(actualizeAmountRequest, wfExecutionParameters,
+        accessToken, operatorExternalUserId));
   }
 
   @Test
   void givenInstallmentExpiredWhenUpdateInstallmentNotificationFeeThenInvalidStatus() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO expiredInstallment = new InstallmentDTO();
     expiredInstallment.setStatus(InstallmentStatus.EXPIRED);
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(expiredInstallment));
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of(expiredInstallment));
 
     // When Then
     assertThrows(InvalidConditionException.class, () ->
-      installmentService.updateInstallmentNotificationFee(
-        orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId));
+      installmentService.updateInstallmentNotificationFee(actualizeAmountRequest,
+        wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
   void givenNewNotificationFeeWhenUpdateInstallmentNotificationFeeThenNoEligibleTransfer() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
     installmentDTO.getTransfers().clear();
@@ -379,23 +403,26 @@ class InstallmentServiceImplTest {
     installmentDTO.getTransfers().add(taxTransfer);
 
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installmentDTO));
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of(installmentDTO));
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
 
     // When Then
     assertThrows(IllegalStateException.class, () ->
-      installmentService.updateInstallmentNotificationFee(orgId, nav, newNotificationFee,
+      installmentService.updateInstallmentNotificationFee(actualizeAmountRequest,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }
 
   @Test
   void givenNotificationFeeWhenFeeAlreadyPaidThenSubtractFromInput() {
     // Given
-    String nav = "NAV";
-    Long orgId = 1L;
-    long newNotificationFee = 200L;
     long alreadyPaidFee = 50L;
+    ActualizeAmountRequestDTO actualizeAmountRequest = ActualizeAmountRequestDTO.builder()
+      .organizationId(1L)
+      .nav("NAV")
+      .newFeeCents(200L)
+      .actualizedFromPuSil(false)
+      .build();
 
     InstallmentDTO installmentDTO = getInstallmentDTO();
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
@@ -408,8 +435,8 @@ class InstallmentServiceImplTest {
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(installmentDTO)));
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(paymentOptionDTO)));
 
-    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(orgId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS))
-      .thenReturn(List.of(installmentDTO));
+    Mockito.when(installmentPIIRepositoryMock.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        actualizeAmountRequest.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(List.of(installmentDTO));
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentDTO.getInstallmentId()))
       .thenReturn(debtPosition);
     Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
@@ -420,8 +447,8 @@ class InstallmentServiceImplTest {
       .thenReturn(List.of(installmentNoPII));
 
     // When
-    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(
-      orgId, nav, newNotificationFee, wfExecutionParameters, accessToken, operatorExternalUserId);
+    InstallmentDTO result = installmentService.updateInstallmentNotificationFee(actualizeAmountRequest, wfExecutionParameters,
+      accessToken, operatorExternalUserId);
 
     // Then
     assertEquals(150L, result.getNotificationFeeCents());

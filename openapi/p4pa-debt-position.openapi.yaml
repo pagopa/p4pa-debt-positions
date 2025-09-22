@@ -1087,20 +1087,8 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                organizationId:
-                  type: integer
-                  format: int64
-                nav:
-                  type: string
-                newFeeCents:
-                  type: integer
-                  format: int64
-              required:
-                - organizationId
-                - nav
-                - newFeeCents
+                  $ref: '#/components/schemas/ActualizeAmountRequestDTO'
+        required: true
       responses:
         "200":
           description: Ok
@@ -2451,3 +2439,28 @@ components:
           type: string
         legacyPaymentMetadata:
           type: string
+    ActualizeAmountRequestDTO:
+      type: object
+      required:
+        - organizationId
+        - nav
+        - newFeeCents
+        - actualizedFromPuSil
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+        nav:
+          type: string
+        newFeeCents:
+          type: integer
+          format: int64
+        actualizedFromPuSil:
+          type: boolean
+        iun:
+          type: string
+        balance:
+          type: string
+        notificationDate:
+          type: string
+          format: date-time
