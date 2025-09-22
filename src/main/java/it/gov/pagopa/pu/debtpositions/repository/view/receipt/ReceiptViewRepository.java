@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.Parameter;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptView;
 import java.time.OffsetDateTime;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -24,7 +26,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
     + "WHERE dp.organizationId = :organizationId "
     + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
-    + "AND (:receiptOrigin IS NULL OR r.receiptOrigin = :receiptOrigin) "
+    + "AND (:receiptOrigins IS NULL OR r.receiptOrigin IN :receiptOrigins) "
     + "AND (:iuv IS NULL OR i.iuv = :iuv) "
     + "AND (:iur IS NULL OR i.iur = :iur) "
     + "AND (:iud IS NULL OR i.iud = :iud) "
@@ -33,7 +35,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo) ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Param("receiptOrigin") ReceiptOriginType receiptOrigin,
+    @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @Param("iuv") String iuv,
     @Param("iur") String iur,
