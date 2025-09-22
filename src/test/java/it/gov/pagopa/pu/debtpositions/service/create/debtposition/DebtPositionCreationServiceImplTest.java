@@ -13,7 +13,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
-import it.gov.pagopa.pu.debtpositions.service.CategoryFetchService;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
@@ -71,7 +71,7 @@ class DebtPositionCreationServiceImplTest {
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
-  private CategoryFetchService categoryFetchServiceMock;
+  private CategoryResolverService categoryResolverServiceMock;
 
   private DebtPositionCreationService createDebtPositionService;
 
@@ -82,7 +82,7 @@ class DebtPositionCreationServiceImplTest {
     createDebtPositionService = new DebtPositionCreationServiceImpl(authorizeOperatorOnDebtPositionTypeServiceMock,
       validateDebtPositionServiceMock, debtPositionServiceMock, iuvServiceMock, debtPositionSyncServiceMock, installmentNoPIIRepositoryMock,
       debtPositionProcessorServiceMock, organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock,
-      debtPositionTypeOrgRepositoryMock, categoryFetchServiceMock);
+      debtPositionTypeOrgRepositoryMock, categoryResolverServiceMock);
   }
 
   @Test
@@ -148,7 +148,7 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
-    Mockito.when(categoryFetchServiceMock.fetchCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
+    Mockito.when(categoryResolverServiceMock.resolveCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
       debtPositionTypeOrg.getDebtPositionTypeId())).thenReturn("001122233");
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav(), InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)).thenReturn(false);

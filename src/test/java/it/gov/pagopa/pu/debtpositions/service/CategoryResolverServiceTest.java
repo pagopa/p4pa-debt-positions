@@ -19,16 +19,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryFetchServiceTest {
+class CategoryResolverServiceTest {
 
   @Mock
   private DebtPositionTypeRepository debtPositionTypeRepositoryMock;
 
-  private CategoryFetchService service;
+  private CategoryResolverService service;
 
   @BeforeEach
   void setUp() {
-    service = new CategoryFetchService(debtPositionTypeRepositoryMock);
+    service = new CategoryResolverService(debtPositionTypeRepositoryMock);
   }
 
   @Test
@@ -36,7 +36,7 @@ class CategoryFetchServiceTest {
     String legacyPaymentMetadata = "9/001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    String result = service.fetchCategory(legacyPaymentMetadata, debtPositionTypeId);
+    String result = service.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
 
     assertEquals("001122233", result);
 
@@ -48,7 +48,7 @@ class CategoryFetchServiceTest {
     String legacyPaymentMetadata = "001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.fetchCategory(legacyPaymentMetadata, debtPositionTypeId));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.resolveCategory(legacyPaymentMetadata, debtPositionTypeId));
 
     assertEquals("The legacy payment metadata [001122233/xxx] is not valid to extract taxonomy code", exception.getMessage());
   }
@@ -59,7 +59,7 @@ class CategoryFetchServiceTest {
 
     Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.of(buildDebtPositionType()));
 
-    String result = service.fetchCategory(null, debtPositionTypeId);
+    String result = service.resolveCategory(null, debtPositionTypeId);
 
     assertEquals("001122233", result);
   }
@@ -70,7 +70,7 @@ class CategoryFetchServiceTest {
 
     Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.empty());
 
-    NotFoundException exception = assertThrows(NotFoundException.class, () -> service.fetchCategory(null, debtPositionTypeId));
+    NotFoundException exception = assertThrows(NotFoundException.class, () -> service.resolveCategory(null, debtPositionTypeId));
 
     assertEquals("The debt position type with id 1 is not found", exception.getMessage());
   }

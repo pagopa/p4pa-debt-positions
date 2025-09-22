@@ -10,7 +10,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
-import it.gov.pagopa.pu.debtpositions.service.CategoryFetchService;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
@@ -42,7 +42,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
-  private final CategoryFetchService categoryFetchService;
+  private final CategoryResolverService categoryResolverService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -53,7 +53,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryFetchService categoryFetchService
+                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService
   ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -62,7 +62,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
-    this.categoryFetchService = categoryFetchService;
+    this.categoryResolverService = categoryResolverService;
   }
 
   @Transactional
@@ -185,7 +185,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       return;
     }
 
-    String category = categoryFetchService.fetchCategory(installmentDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId());
+    String category = categoryResolverService.resolveCategory(installmentDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId());
 
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();

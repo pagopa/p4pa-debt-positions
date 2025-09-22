@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import it.gov.pagopa.pu.debtpositions.service.CategoryFetchService;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
@@ -21,16 +21,16 @@ public class InstallmentSynchronizeApplierService {
   private final InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final OrganizationService organizationService;
-  private final CategoryFetchService categoryFetchService;
+  private final CategoryResolverService categoryResolverService;
 
-  public InstallmentSynchronizeApplierService(InstallmentSynchronizeMapper installmentSynchronizeMapper, InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService, InstallmentSynchronizeInstallmentApplierService applierInstallmentService, InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, OrganizationService organizationService, CategoryFetchService categoryFetchService) {
+  public InstallmentSynchronizeApplierService(InstallmentSynchronizeMapper installmentSynchronizeMapper, InstallmentSynchronizeDebtPositionApplierService applierDebtPositionService, InstallmentSynchronizeInstallmentApplierService applierInstallmentService, InstallmentSynchronizePaymentOptionApplierService applierPaymentOptionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, OrganizationService organizationService, CategoryResolverService categoryResolverService) {
     this.installmentSynchronizeMapper = installmentSynchronizeMapper;
     this.applierDebtPositionService = applierDebtPositionService;
     this.applierInstallmentService = applierInstallmentService;
     this.applierPaymentOptionService = applierPaymentOptionService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.organizationService = organizationService;
-    this.categoryFetchService = categoryFetchService;
+    this.categoryResolverService = categoryResolverService;
   }
 
   public Pair<DebtPositionDTO, InstallmentDTO> apply(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionDTO storedDebtPosition,
@@ -87,7 +87,7 @@ public class InstallmentSynchronizeApplierService {
       return;
     }
 
-    String category = categoryFetchService.fetchCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId());
+    String category = categoryResolverService.resolveCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId());
 
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();

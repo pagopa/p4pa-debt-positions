@@ -13,15 +13,15 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METAD
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
-public class CategoryFetchService {
+public class CategoryResolverService {
 
   private final DebtPositionTypeRepository debtPositionTypeRepository;
 
-  public CategoryFetchService(DebtPositionTypeRepository debtPositionTypeRepository) {
+  public CategoryResolverService(DebtPositionTypeRepository debtPositionTypeRepository) {
     this.debtPositionTypeRepository = debtPositionTypeRepository;
   }
 
-  public String fetchCategory(String legacyPaymentMetadata, Long debtPositionTypeId){
+  public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId){
     String taxonomyCode = Optional.ofNullable(legacyPaymentMetadata)
       .filter(StringUtils::isNotBlank)
       .map(this::extractTaxonomyFromLegacyPaymentMetadata)
