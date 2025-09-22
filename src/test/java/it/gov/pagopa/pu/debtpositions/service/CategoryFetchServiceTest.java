@@ -50,7 +50,7 @@ class CategoryFetchServiceTest {
 
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.fetchCategory(legacyPaymentMetadata, debtPositionTypeId));
 
-    assertEquals("The legacy payment metadata [001122233/xxx] does not valid to extract taxonomy code", exception.getMessage());
+    assertEquals("The legacy payment metadata [001122233/xxx] is not valid to extract taxonomy code", exception.getMessage());
   }
 
   @Test
