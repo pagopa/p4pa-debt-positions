@@ -17,8 +17,8 @@ public interface DebtPositionTypeOrgWithCountRepository extends Repository<DebtP
     SELECT d
     FROM DebtPositionTypeOrgWithCount d
     WHERE d.organizationId = :organizationId
-    AND (:code IS NULL OR d.code = :code)
-    AND (:description IS NULL OR d.description = :description)
+    AND (:code IS NULL OR d.code ILIKE CONCAT('%', CAST(:code AS text), '%'))
+    AND (:description IS NULL OR d.description ILIKE CONCAT('%', CAST(:description AS text), '%'))
     AND (:flagActive IS NULL OR d.flagActive= :flagActive)
     """)
   Page<DebtPositionTypeOrgWithCount> findByCodeAndDescription(
