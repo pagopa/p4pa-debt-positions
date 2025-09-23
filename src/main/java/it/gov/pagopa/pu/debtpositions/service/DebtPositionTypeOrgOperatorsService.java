@@ -5,7 +5,8 @@ import java.util.List;
 import java.util.Set;
 
 public interface DebtPositionTypeOrgOperatorsService {
-  long deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
+  int deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId);
   List<DebtPositionTypeOrgOperators> saveOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
   int deleteOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
+  List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds);
 }

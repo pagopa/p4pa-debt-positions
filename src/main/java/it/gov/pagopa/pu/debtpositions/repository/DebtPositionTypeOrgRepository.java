@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,10 +16,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 
 @RepositoryRestResource(path = "debt-position-type-orgs")
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg, Long> {
@@ -95,7 +94,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   @Transactional
   @Modifying
   @Query("UPDATE DebtPositionTypeOrg dpto SET dpto.flagActive = :flagActive  WHERE dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId")
-  int updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
+  Integer updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
 
   @Query
     ("""
@@ -135,5 +134,28 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
   );
 
+  List<DebtPositionTypeOrg> findByDebtPositionTypeOrgIdIn(Set<Long> debtPositionTypeOrgIds);
+
+  @Query("""
+    SELECT dpto
+    FROM DebtPositionTypeOrg dpto
+    WHERE dpto.organizationId = :organizationId
+    AND NOT EXISTS (
+      SELECT dptoo
+      FROM DebtPositionTypeOrgOperators dptoo
+      WHERE dptoo.operatorExternalUserId = :operatorExternalUserId
+      AND dptoo.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    )
+    AND (:code IS NULL OR dpto.code = :code)
+    AND (:description IS NULL OR dpto.description ILIKE CONCAT('%', cast(:description as text), '%'))
+    AND (:debtPositionTypeId IS NULL OR dpto.debtPositionTypeId = :debtPositionTypeId)
+    """)
+  Page<DebtPositionTypeOrg> findDebtPositionTypeOrgNotEnabledForOperator(
+      @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+      @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+      @Param("code") String code,
+      @Param("description") String description,
+      @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+      Pageable pageable);
 }
 

@@ -4,14 +4,13 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
@@ -33,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
 @Service
 @Slf4j
@@ -43,8 +41,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final IuvService iuvService;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
-  private final DebtPositionTypeRepository debtPositionTypeRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
+  private final CategoryResolverService categoryResolverService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -55,7 +53,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
-                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionTypeRepository debtPositionTypeRepository
+                                         DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService
   ) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService,
       debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -64,7 +62,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
-    this.debtPositionTypeRepository = debtPositionTypeRepository;
+    this.categoryResolverService = categoryResolverService;
   }
 
   @Transactional
@@ -187,9 +185,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       return;
     }
 
-    String taxonomyCode = debtPositionTypeRepository.findById(debtPositionTypeOrg.getDebtPositionTypeId())
-      .orElseThrow(() -> new NotFoundException(String.format("The debt position type with id %s is not found", debtPositionTypeOrg.getDebtPositionTypeId())))
-      .getTaxonomyCode();
+    String category = categoryResolverService.resolveCategory(installmentDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId());
 
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
@@ -199,7 +195,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
       .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
-      .category(taxonomyCodeToTransferCategory(taxonomyCode))
+      .category(category)
       .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentDTO.getRemittanceInformation())
       .build();

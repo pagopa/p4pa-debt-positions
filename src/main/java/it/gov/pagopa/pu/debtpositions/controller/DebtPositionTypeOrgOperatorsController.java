@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionTypeOrgOperatorsApi;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgOperatorsService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -21,5 +22,12 @@ public class DebtPositionTypeOrgOperatorsController implements DebtPositionTypeO
   public ResponseEntity<Integer> deleteOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds) {
     log.info("User requested deleteOperators having debtPositionTypeOrgId {}", debtPositionTypeOrgId);
     return ResponseEntity.ok(debtPositionTypeOrgOperatorsService.deleteOperators(debtPositionTypeOrgId, externalOperatorUserIds));
+  }
+
+  @Override
+  public ResponseEntity<Void> saveDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds) {
+    log.info("User requested saveDebtPositionTypeOrgOperatorsForOperator having operatorExternalUserId {} and debtPositionTypeOrgIds {}", operatorExternalUserId, debtPositionTypeOrgIds);
+    debtPositionTypeOrgOperatorsService.saveDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, debtPositionTypeOrgIds);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
   }
 }

@@ -23,8 +23,8 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
 
   @Transactional
   @Override
-  public long deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId) {
-    long deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(
+  public int deleteOperatorsByDebtPositionTypeOrgId(Long debtPositionTypeOrgId) {
+    Integer deletedOperators = debtPositionTypeOrgOperatorsRepository.deleteByDebtPositionTypeOrgId(
       debtPositionTypeOrgId);
     logDeletedOperators(debtPositionTypeOrgId, deletedOperators);
     return deletedOperators;
@@ -55,6 +55,31 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
         DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
         debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
         debtPositionTypeOrgOperators.setOperatorExternalUserId(o);
+        return debtPositionTypeOrgOperators;
+      }).toList()
+    );
+  }
+
+  @Transactional
+  @Override
+  public List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForOperator(
+    String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds) {
+
+    List<DebtPositionTypeOrgOperators> debtPositionTypeOrgOperatorsList = debtPositionTypeOrgOperatorsRepository.findByOperatorExternalUserId(operatorExternalUserId);
+
+    if(!CollectionUtils.isEmpty(debtPositionTypeOrgOperatorsList)){
+      debtPositionTypeOrgIds.removeIf(o->debtPositionTypeOrgOperatorsList.stream().anyMatch(dptoo->dptoo.getDebtPositionTypeOrgId().equals(o)));
+    }
+
+    if(CollectionUtils.isEmpty(debtPositionTypeOrgIds)){
+      return Collections.emptyList();
+    }
+
+    return debtPositionTypeOrgOperatorsRepository.saveAll(
+      debtPositionTypeOrgIds.stream().map(o->{
+        DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
+        debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(o);
+        debtPositionTypeOrgOperators.setOperatorExternalUserId(operatorExternalUserId);
         return debtPositionTypeOrgOperators;
       }).toList()
     );

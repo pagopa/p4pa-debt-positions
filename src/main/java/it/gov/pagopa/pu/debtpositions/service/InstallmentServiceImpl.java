@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPai
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import java.time.OffsetDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -107,12 +108,13 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public InstallmentDTO updateInstallmentNotificationFee(Long organizationId, String nav, long notificationFeeCents,
+  public InstallmentDTO updateInstallmentNotificationFee(ActualizeAmountRequestDTO actualizeAmountRequest,
     WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
-    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(organizationId, nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
+    String nav = actualizeAmountRequest.getNav();
+    List<InstallmentDTO> installments = installmentPIIRepository.getByOrganizationIdAndNav(actualizeAmountRequest.getOrganizationId(),
+        nav, InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS).stream()
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
-
     if(installments.isEmpty())
       throw new NotFoundException("The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
@@ -120,9 +122,15 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
       throw new InvalidConditionException("The installment with NAV: " + nav + " is expired");
 
-    notificationFeeCents = calculateFeeAlreadyPaid(notificationFeeCents, installments.getFirst().getIun());
+    long notificationFeeCents = calculateFeeAlreadyPaid(actualizeAmountRequest.getNewFeeCents(), installments.getFirst().getIun());
 
     InstallmentDTO installment = calculateNewAmount(installments.getFirst(), notificationFeeCents);
+
+    if(actualizeAmountRequest.getActualizedFromPuSil()) {
+      installment.setBalance(actualizeAmountRequest.getBalance());
+      installment.setIun(actualizeAmountRequest.getIun());
+      installment.setNotificationDate(actualizeAmountRequest.getNotificationDate());
+    }
 
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     DebtPositionDTO debtPositionDTO = debtPositionMapper.mapToDto(debtPosition);
