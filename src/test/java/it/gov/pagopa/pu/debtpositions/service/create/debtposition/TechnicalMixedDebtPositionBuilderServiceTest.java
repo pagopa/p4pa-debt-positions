@@ -60,7 +60,7 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
     List<DebtPosition> result = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       debtPositionTypeOrgId2TransfersData, debtPosition);
 
-    assertEquals(debtPositionTypeOrgId2TransfersData.keySet().size(),
+    assertEquals(debtPositionTypeOrgId2TransfersData.size(),
       result.size());
     checkTotalTransfersSize(result,
       (mixedDpAdditionalDataList1.size() + mixedDpAdditionalDataList2.size()));
