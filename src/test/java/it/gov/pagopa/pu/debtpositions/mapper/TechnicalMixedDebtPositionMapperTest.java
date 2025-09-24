@@ -10,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +37,6 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @BeforeEach
   void init() {
-    SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
     mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
   }
 
@@ -57,7 +55,7 @@ class TechnicalMixedDebtPositionMapperTest {
       .build();
 
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      true, List.of(mixedDpAdditionalData));
+      true, List.of(mixedDpAdditionalData), accessToken);
 
     checkDebtPosition(debtPosition, result, true);
 
@@ -88,11 +86,11 @@ class TechnicalMixedDebtPositionMapperTest {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
-    Mockito.when(balanceResolverServiceMock.resolveAmountBalance(debtPosition.getOrganizationId(), installment, accessToken))
+    Mockito.when(balanceResolverServiceMock.resolveAmountBalance(Mockito.anyLong(), Mockito.any(), Mockito.anyString()))
       .thenReturn("balanceResolved");
 
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      false, List.of(mixedDpAdditionalData));
+      false, List.of(mixedDpAdditionalData), accessToken);
 
     checkDebtPosition(debtPosition, result, false);
 
@@ -120,7 +118,7 @@ class TechnicalMixedDebtPositionMapperTest {
       .balance("balance")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
-    Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData));
+    Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData), accessToken);
 
     assertThrows(IllegalStateException.class, exec);
   }

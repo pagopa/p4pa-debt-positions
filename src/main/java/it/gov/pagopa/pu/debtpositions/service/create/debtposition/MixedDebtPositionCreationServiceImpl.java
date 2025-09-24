@@ -86,7 +86,7 @@ public class MixedDebtPositionCreationServiceImpl implements
       mixedDebtPositionDTO.getTransfers());
     DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
     List<DebtPosition> technicalMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
-      debtPositionTypeOrgId2TransfersData, debtPosition);
+      debtPositionTypeOrgId2TransfersData, debtPosition, accessToken);
 
     technicalMixedDebtPositions.forEach(
       debtPositionSaveService::saveDebtPosition);

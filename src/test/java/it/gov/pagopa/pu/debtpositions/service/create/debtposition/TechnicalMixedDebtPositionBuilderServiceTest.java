@@ -38,6 +38,7 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
   @Test
   void whenCreateTechnicalMixedDebtPositionsThenOk() {
     DebtPosition debtPosition = buildMixedDebtPosition();
+    String accessToken = "TOKEN";
 
     Long dpTypeOrgId1 = 1L;
     Long dpTypeOrgId2 = 2L;
@@ -58,7 +59,7 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
       mixedDpAdditionalDataList2);
 
     List<DebtPosition> result = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
-      debtPositionTypeOrgId2TransfersData, debtPosition);
+      debtPositionTypeOrgId2TransfersData, debtPosition, accessToken);
 
     assertEquals(debtPositionTypeOrgId2TransfersData.size(),
       result.size());
