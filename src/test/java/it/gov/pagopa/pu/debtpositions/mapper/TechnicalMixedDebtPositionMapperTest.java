@@ -1,9 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -13,17 +9,38 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class TechnicalMixedDebtPositionMapperTest {
 
-  private final TechnicalMixedDebtPositionMapper mapper = new TechnicalMixedDebtPositionMapper();
+  @Mock
+  private BalanceResolverService balanceResolverServiceMock;
+
+  private TechnicalMixedDebtPositionMapper mapper;
+
+  private final String accessToken = "ACCESSTOKEN";
+
+  @BeforeEach
+  void init() {
+    SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
+    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
+  }
 
   @Test
   void whenToTechnicalMixedDebtPositionThenCorrectMapping() {
@@ -38,16 +55,52 @@ class TechnicalMixedDebtPositionMapperTest {
       .balance("balance")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
+
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
       true, List.of(mixedDpAdditionalData));
 
-    checkDebtPosition(debtPosition, result);
+    checkDebtPosition(debtPosition, result, true);
 
     PaymentOption resultPO = result.getPaymentOptions().getFirst();
-    checkPaymentOption(paymentOption, resultPO);
+    checkPaymentOption(paymentOption, resultPO, true);
 
     InstallmentNoPII resultInstallment = resultPO.getInstallments().getFirst();
-    checkInstallment(installment, resultInstallment, mixedDpAdditionalData);
+    checkInstallment(installment, resultInstallment, mixedDpAdditionalData, true);
+
+    Transfer resultTransfer = installment.getTransfers().getFirst();
+    checkTransfer(transfer, resultTransfer);
+
+    Mockito.verify(balanceResolverServiceMock, Mockito.times(0))
+      .resolveAmountBalance(debtPosition.getOrganizationId(), installment, accessToken);
+  }
+
+  @Test
+  void whenToTechnicalMixedDebtPositionPaidThenCorrectMapping() {
+    DebtPosition debtPosition = buildMixedDebtPosition();
+    PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
+    InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
+    Transfer transfer = installment.getTransfers().getFirst();
+
+    MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
+      .transferIndex(1)
+      .iud("IUD")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .build();
+
+    Mockito.when(balanceResolverServiceMock.resolveAmountBalance(debtPosition.getOrganizationId(), installment, accessToken))
+      .thenReturn("balanceResolved");
+
+    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
+      false, List.of(mixedDpAdditionalData));
+
+    checkDebtPosition(debtPosition, result, false);
+
+    PaymentOption resultPO = result.getPaymentOptions().getFirst();
+    checkPaymentOption(paymentOption, resultPO, false);
+
+    InstallmentNoPII resultInstallment = resultPO.getInstallments().getFirst();
+    checkInstallment(installment, resultInstallment, mixedDpAdditionalData, false);
 
     Transfer resultTransfer = installment.getTransfers().getFirst();
     checkTransfer(transfer, resultTransfer);
@@ -73,13 +126,17 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkDebtPosition(DebtPosition expected,
-    DebtPosition result) {
+    DebtPosition result, boolean isUnpayable) {
     TestUtils.checkNotNullFields(result, "debtPositionId", "creationDate",
       "updateDate", "updateOperatorExternalId", "updateTraceId");
 
     assertEquals(expected.getIupdOrg(), result.getIupdOrg());
     assertEquals(expected.getDescription(), result.getDescription());
-    assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
+    if (isUnpayable) {
+      assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
+    } else {
+      assertEquals(DebtPositionStatus.PAID, result.getStatus());
+    }
     assertEquals(DebtPositionOrigin.SPONTANEOUS_MIXED,
       result.getDebtPositionOrigin());
     assertEquals(expected.getOrganizationId(), result.getOrganizationId());
@@ -93,14 +150,18 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkPaymentOption(PaymentOption expected,
-    PaymentOption result) {
+    PaymentOption result, boolean isUnpayable) {
     TestUtils.checkNotNullFields(result, "paymentOptionId", "debtPositionId",
       "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
     assertEquals(expected.getTotalAmountCents(),
       result.getTotalAmountCents());
-    assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
+    if (isUnpayable) {
+      assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
+    } else {
+      assertEquals(PaymentOptionStatus.PAID, result.getStatus());
+    }
     assertEquals(expected.getDescription(), result.getDescription());
     assertEquals(expected.getPaymentOptionType(),
       result.getPaymentOptionType());
@@ -110,12 +171,18 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkInstallment(InstallmentNoPII installment,
-    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData) {
+    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData, boolean isUnpayable) {
     TestUtils.checkNotNullFields(result, "installmentId", "paymentOptionId",
       "syncStatus", "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
-    assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
+    if(isUnpayable) {
+      assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
+      assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
+    } else {
+      assertEquals(InstallmentStatus.PAID, result.getStatus());
+      assertEquals("balanceResolved", result.getBalance());
+    }
     assertEquals(installment.getIupdPagopa(), result.getIupdPagopa());
     assertEquals(installment.isGenerateNotice(), result.isGenerateNotice());
     assertEquals(installment.getIuv(), result.getIuv());
@@ -146,7 +213,6 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(installment.getSourceFlowName(), result.getSourceFlowName());
     assertEquals(installment.getReceiptId(), result.getReceiptId());
     assertEquals(mixedDpAdditionalData.getIud(), result.getIud());
-    assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     assertEquals(mixedDpAdditionalData.getLegacyPaymentMetadata(),
       result.getLegacyPaymentMetadata());
     assertEquals(1, result.getTransfers().size());

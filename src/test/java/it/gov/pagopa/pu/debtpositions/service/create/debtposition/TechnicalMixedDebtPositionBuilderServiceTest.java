@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,7 +24,10 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
 
   private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
 
-  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper();
+  @Mock
+  private BalanceResolverService balanceResolverServiceMock;
+
+  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
 
   @BeforeEach
   void init() {

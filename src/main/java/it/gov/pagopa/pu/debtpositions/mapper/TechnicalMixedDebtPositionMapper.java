@@ -9,13 +9,23 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import org.springframework.stereotype.Service;
 
 @Service
 public class TechnicalMixedDebtPositionMapper {
+
+  private final BalanceResolverService balanceResolverService;
+
+  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService) {
+    this.balanceResolverService = balanceResolverService;
+  }
 
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition,
     Long debtPositionTypeOrgId,
@@ -36,18 +46,18 @@ public class TechnicalMixedDebtPositionMapper {
     technicalMixedDp.setFlagPuPagoPaPayment(
       debtPosition.isFlagPuPagoPaPayment());
     technicalMixedDp.setPaymentOptions(
-      toTechnicalMixedDPPaymentOptions(debtPosition.getPaymentOptions(),
-        isUnpayable, mixedDpAdditionalDataList));
+      toTechnicalMixedDPPaymentOptions(
+        debtPosition, isUnpayable, mixedDpAdditionalDataList));
 
     return technicalMixedDp;
   }
 
   private SortedSet<PaymentOption> toTechnicalMixedDPPaymentOptions(
-    SortedSet<PaymentOption> paymentOptions, boolean isUnpayable,
+    DebtPosition debtPosition, boolean isUnpayable,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList) {
     SortedSet<PaymentOption> set = new TreeSet<>();
 
-    for (PaymentOption paymentOption : paymentOptions) {
+    for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
       PaymentOption technicalMixedDpPaymentOption = new PaymentOption();
       technicalMixedDpPaymentOption.setTotalAmountCents(
         paymentOption.getTotalAmountCents());
@@ -60,7 +70,8 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setPaymentOptionIndex(
         paymentOption.getPaymentOptionIndex());
       technicalMixedDpPaymentOption.setInstallments(
-        toTechnicalMixedDPInstallments(paymentOption.getInstallments(),
+        toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
+          paymentOption.getInstallments(),
           isUnpayable, mixedDpAdditionalDataList));
 
       set.add(technicalMixedDpPaymentOption);
@@ -70,7 +81,7 @@ public class TechnicalMixedDebtPositionMapper {
   }
 
   private SortedSet<InstallmentNoPII> toTechnicalMixedDPInstallments(
-    SortedSet<InstallmentNoPII> installments, boolean isUnpayable,
+    Long organizationId, SortedSet<InstallmentNoPII> installments, boolean isUnpayable,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList) {
     SortedSet<InstallmentNoPII> set = new TreeSet<>();
 
@@ -106,8 +117,12 @@ public class TechnicalMixedDebtPositionMapper {
         installment.getAmountCents());
       technicalMixedDpInstallment.setRemittanceInformation(
         installment.getRemittanceInformation());
-      technicalMixedDpInstallment.setBalance(
-        mixedDpAdditionalData.getBalance());
+      if (!isUnpayable && StringUtils.isNotBlank(mixedDpAdditionalData.getBalance())) {
+        String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, installment, SecurityUtils.getAccessToken());
+        technicalMixedDpInstallment.setBalance(balanceResolved);
+      } else {
+        technicalMixedDpInstallment.setBalance(mixedDpAdditionalData.getBalance());
+      }
       technicalMixedDpInstallment.setLegacyPaymentMetadata(
         mixedDpAdditionalData.getLegacyPaymentMetadata());
       technicalMixedDpInstallment.setPersonalDataId(
