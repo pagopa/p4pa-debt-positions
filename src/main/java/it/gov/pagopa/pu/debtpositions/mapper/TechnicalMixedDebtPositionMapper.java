@@ -118,6 +118,7 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpInstallment.setRemittanceInformation(
         installment.getRemittanceInformation());
       if (!isUnpayable && StringUtils.isNotBlank(mixedDpAdditionalData.getBalance())) {
+        installment.setBalance(mixedDpAdditionalData.getBalance());
         String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, installment, SecurityUtils.getAccessToken());
         technicalMixedDpInstallment.setBalance(balanceResolved);
       } else {
