@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionSer
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequiredArgsConstructor
 @Slf4j
 public class DebtPositionControllerImpl implements DebtPositionApi {
 
@@ -39,19 +41,6 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionDeletionService debtPositionDeletionService;
   private final PublishDebtPositionService publishDebtPositionService;
   private final MixedDebtPositionCreationService mixedDebtPositionCreationService;
-
-  public DebtPositionControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionCreationService debtPositionCreationService, DebtPositionService debtPositionService, InstallmentSynchronizeService installmentSynchronizeService, InstallmentService installmentService, DebtPositionManageInstallmentsService debtPositionManageService, DebtPositionDeletionService debtPositionDeletionService, PublishDebtPositionService publishDebtPositionService,
-    MixedDebtPositionCreationService mixedDebtPositionCreationService) {
-    this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
-    this.debtPositionCreationService = debtPositionCreationService;
-    this.debtPositionService = debtPositionService;
-    this.installmentSynchronizeService = installmentSynchronizeService;
-    this.installmentService = installmentService;
-    this.debtPositionManageService = debtPositionManageService;
-    this.debtPositionDeletionService = debtPositionDeletionService;
-    this.publishDebtPositionService = publishDebtPositionService;
-    this.mixedDebtPositionCreationService = mixedDebtPositionCreationService;
-  }
 
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {

@@ -6,7 +6,6 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -34,5 +33,18 @@ public class TechnicalMixedDebtPositionBuilderService {
     }
 
     return technicalMixedDebtPositions;
+  public List<DebtPosition> createTechnicalMixedDebtPositions(
+    Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
+    DebtPosition debtPosition,
+    boolean isUnpayable
+  ) {
+    return debtPositionTypeOrgId2TransfersData.entrySet().stream()
+      .map(e ->
+        technicalMixedDebtPositionMapper.toTechnicalMixedDebtPosition(
+          debtPosition,
+          e.getKey(),
+          isUnpayable,
+          e.getValue()))
+      .toList();
   }
 }

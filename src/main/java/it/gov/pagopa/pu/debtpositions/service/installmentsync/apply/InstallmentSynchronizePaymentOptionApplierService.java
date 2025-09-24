@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
@@ -17,7 +18,7 @@ public class InstallmentSynchronizePaymentOptionApplierService {
     paymentOptionDTO.setDescription(installmentSynchronizeDTO.getPaymentOptionDescription());
 
     List<String> modifiedFields = new ArrayList<>();
-    checkImmutableField("paymentOptionIndex", installmentSynchronizeDTO.getPaymentOptionIndex(), paymentOptionDTO.getPaymentOptionIndex(), modifiedFields);
+    checkImmutableField("paymentOptionIndex", installmentSynchronizeDTO.getPaymentOptionIndex(), Objects.requireNonNull(paymentOptionDTO.getPaymentOptionIndex()), modifiedFields);
     checkImmutableField("paymentOptionType", installmentSynchronizeDTO.getPaymentOptionType(), paymentOptionDTO.getPaymentOptionType().getValue(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
