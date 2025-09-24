@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -23,16 +23,14 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final DebtPositionSaveService debtPositionSaveService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionDeleteService debtPositionDeleteService;
-  private final DebtPositionUpdateService debtPositionUpdateService;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository,
                                  DebtPositionSaveService debtPositionSaveService,
-                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService, DebtPositionUpdateService debtPositionUpdateService) {
+                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionSaveService = debtPositionSaveService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionDeleteService = debtPositionDeleteService;
-    this.debtPositionUpdateService = debtPositionUpdateService;
   }
 
   @Override
@@ -105,8 +103,12 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public void updateDebtPosition(Long debtPositionId, DebtPositionDTO debtPositionDTO) {
-    DebtPosition debtPosition = debtPositionRepository.findById(debtPositionId).orElseThrow(() -> new EntityNotFoundException("debtPositionId=" + debtPositionId + " not found"));
-    debtPositionUpdateService.updateDebtPositionFromDTO(debtPosition, debtPositionDTO);
+    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
+    if (debtPosition == null) {
+      throw new EntityNotFoundException("DebtPosition with id %d not found".formatted(debtPositionId));
+    }
+    debtPositionDTO.setDebtPositionId(debtPositionId);
+    debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO);
   }
 }
 

@@ -43,9 +43,6 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       receiptDTO.getNoticeNumber(),
       receiptDTO.getIud());
 
-    //check if organization who handles the notice is managed by PU and update the installment status
-    boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
-
     // if the receipt already exists, we should continue only if the input IUD exists,
     // in order to check the existence of a DP having an Installment with the requested IUD:
     // if it doesn't exist, we should create a new technical DP with the requested Installment
@@ -53,12 +50,14 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
     if (receiptInDb.isPresent()) {
       if (StringUtils.isBlank(receiptDTO.getIud())) {
-        createPaidTechnicalDebtPositionsService.createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);
         return receiptInDb.get();
       }
     } else {
       saveReceipt(receiptDTO);
     }
+
+    //check if organization who handles the notice is managed by PU and update the installment status
+    boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
 
     //for every organization handled by PU and mentioned in the receipt
     createPaidTechnicalDebtPositionsService.createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);

@@ -160,6 +160,10 @@ class ManagePaidDebtPositionServiceTest {
     DebtPositionDTO debtPositionDTO = podamFactory.manufacturePojo(DebtPositionDTO.class);
 
     Mockito.when(receiptWithAdditionalInfoMapperMock.mapToDebtPosition(receiptDTO, organization)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionServiceMock.getDebtPositionByIupdAndOrganizationId(
+      debtPositionDTO.getIupdOrg(),
+      debtPositionDTO.getOrganizationId()
+    )).thenReturn(Optional.empty());
     Mockito.doNothing().when(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:"+receiptDTO.getReceiptId());
 
     //when
