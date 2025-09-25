@@ -1,20 +1,22 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -107,8 +109,84 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     if (debtPosition == null) {
       throw new EntityNotFoundException("DebtPosition with id %d not found".formatted(debtPositionId));
     }
-    debtPositionDTO.setDebtPositionId(debtPositionId);
+
+    propagateIdsForDebtPosition(debtPosition, debtPositionDTO);
+
     debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO);
+  }
+
+  private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {
+    if (entity == null || dto == null) return;
+
+    if (dto.getDebtPositionId() == null && entity.getDebtPositionId() != null) {
+      dto.setDebtPositionId(entity.getDebtPositionId());
+    }
+
+    Map<Integer, PaymentOption> poByIndex = indexBy(
+      entity.getPaymentOptions(),
+      PaymentOption::getPaymentOptionIndex
+    );
+
+    streamOf(dto.getPaymentOptions())
+      .forEach(poDTO -> {
+        PaymentOption poEntity = poByIndex.get(poDTO.getPaymentOptionIndex());
+        if (poEntity != null) {
+          propagateIdsForPaymentOption(poEntity, poDTO);
+        }
+      });
+  }
+
+  private void propagateIdsForPaymentOption(PaymentOption poEntity, PaymentOptionDTO poDTO) {
+    if (poDTO.getPaymentOptionId() == null && poEntity.getPaymentOptionId() != null) {
+      poDTO.setPaymentOptionId(poEntity.getPaymentOptionId());
+    }
+
+    Map<String, InstallmentNoPII> instByIud = indexBy(
+      poEntity.getInstallments(),
+      InstallmentNoPII::getIud
+    );
+
+    streamOf(poDTO.getInstallments())
+      .forEach(instDTO -> {
+        InstallmentNoPII instEntity = instByIud.get(instDTO.getIud());
+        if (instEntity != null) {
+          propagateIdsForInstallment(instEntity, instDTO);
+        }
+      });
+  }
+
+  private void propagateIdsForInstallment(InstallmentNoPII instEntity, InstallmentDTO instDTO) {
+    if (instDTO.getInstallmentId() == null && instEntity.getInstallmentId() != null) {
+      instDTO.setInstallmentId(instEntity.getInstallmentId());
+    }
+
+    Map<Integer, Transfer> trByIndex = indexBy(
+      instEntity.getTransfers(),
+      Transfer::getTransferIndex
+    );
+
+    streamOf(instDTO.getTransfers())
+      .forEach(trDTO -> {
+        Transfer trEntity = trByIndex.get(trDTO.getTransferIndex());
+        if (trEntity != null && trDTO.getTransferId() == null) {
+          trDTO.setTransferId(trEntity.getTransferId());
+        }
+      });
+  }
+
+  private static <T> Stream<T> streamOf(Collection<T> c) {
+    return c == null ? Stream.empty() : c.stream().filter(Objects::nonNull);
+  }
+
+  private static <T, K> Map<K, T> indexBy(Collection<T> items, Function<T, K> keyFn) {
+    return streamOf(items)
+      .map(t -> new AbstractMap.SimpleEntry<>(keyFn.apply(t), t))
+      .filter(e -> e.getKey() != null)
+      .collect(Collectors.toMap(
+        Map.Entry::getKey,
+        Map.Entry::getValue,
+        (a, b) -> a
+      ));
   }
 }
 
