@@ -132,7 +132,7 @@ class MixedDebtPositionCreationServiceTest {
     when(
       technicalMixedDebtPositionBuilderServiceMock.createTechnicalMixedDebtPositions(
         debtPositionTypeOrgId2TransfersData,
-        debtPosition)).thenReturn(List.of(debtPosition));
+        debtPosition, accessToken)).thenReturn(List.of(debtPosition));
 
     doNothing().when(debtPositionSaveServiceMock)
       .saveDebtPosition(any(DebtPosition.class));

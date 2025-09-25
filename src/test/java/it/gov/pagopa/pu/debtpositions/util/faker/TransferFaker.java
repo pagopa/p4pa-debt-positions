@@ -19,7 +19,7 @@ public class TransferFaker {
     Transfer transfer = new Transfer();
     transfer.setTransferId(1000L);
     transfer.setInstallmentId(100L);
-    transfer.setOrgFiscalCode("12345678903");
+    transfer.setOrgFiscalCode("12345678901");
     transfer.setOrgName("Organization Name");
     transfer.setAmountCents(100L);
     transfer.setRemittanceInformation("Payment Info");
@@ -39,7 +39,7 @@ public class TransferFaker {
     return TransferDTO.builder()
       .transferId(1000L)
       .installmentId(100L)
-      .orgFiscalCode("12345678903")
+      .orgFiscalCode("12345678901")
       .orgName("Organization Name")
       .amountCents(100L)
       .remittanceInformation("Payment Info")
@@ -90,7 +90,7 @@ public class TransferFaker {
     Transfer transfer = new Transfer();
     transfer.setTransferId(1000L * i);
     transfer.setInstallmentId(100L);
-    transfer.setOrgFiscalCode("12345678903");
+    transfer.setOrgFiscalCode("12345678901");
     transfer.setOrgName("Organization Name");
     transfer.setAmountCents(100L);
     transfer.setRemittanceInformation("Payment Info");
