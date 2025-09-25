@@ -41,6 +41,8 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
   @Mock
   private DebtPositionDeleteService dpDeleteServiceMock;
 
+  private static final String ACCESS_TOKEN = "TOKEN";
+
   private TechnicalMixedDebtPositionUpdaterService service;
 
   @BeforeEach
@@ -68,7 +70,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // When
-    List<DebtPosition> result = service.update(debtPosition);
+    List<DebtPosition> result = service.update(debtPosition, ACCESS_TOKEN);
 
     // Then
     assertTrue(result.isEmpty());
@@ -86,7 +88,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("paymentOptions size must be 1 for debtPositionId=" +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
@@ -102,7 +104,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("paymentOptions size must be 1 for debtPositionId=" +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
@@ -118,7 +120,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId(), exception.getMessage());
   }
@@ -134,7 +136,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId(), exception.getMessage());
   }
@@ -157,10 +159,10 @@ ArgumentCaptor.forClass(DebtPosition.class);
       installment.getIuv(),
       List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
     )).thenReturn(List.of(oldMixedDebtPosition));
-    when(mixedDPBuilderServiceMock.createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false))).thenReturn(List.of(newMixedDebtPosition));
+    when(mixedDPBuilderServiceMock.createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(ACCESS_TOKEN))).thenReturn(List.of(newMixedDebtPosition));
 
     // When
-    List<DebtPosition> result = service.update(debtPosition);
+    List<DebtPosition> result = service.update(debtPosition, ACCESS_TOKEN);
 
     // Then
     assertNotNull(result);
@@ -168,7 +170,7 @@ ArgumentCaptor.forClass(DebtPosition.class);
     verify(dpTypeOrgRepositoryMock).findById(1L);
     verify(dpRepositoryMock).findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(), installment.getIuv(), List.of(DebtPositionOrigin.SPONTANEOUS_MIXED));
-    verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false));
+    verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(ACCESS_TOKEN));
     verify(dpDeleteServiceMock).delete(dpCaptor.capture());
     assertEquals(newMixedDebtPosition.getDebtPositionId(), result.getFirst().getDebtPositionId());
     assertEquals(oldMixedDebtPosition.getDebtPositionId(), dpCaptor.getValue().getDebtPositionId());
@@ -180,7 +182,7 @@ ArgumentCaptor.forClass(DebtPosition.class);
     DebtPosition debtPosition = generateDebtPosition();
     when(dpTypeOrgRepositoryMock.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(NotFoundException.class, () -> service.update(debtPosition));
+    assertThrows(NotFoundException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
   }
 

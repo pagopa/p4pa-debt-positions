@@ -118,7 +118,7 @@ class ManagePaidDebtPositionServiceTest {
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPosition);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPosition);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPosition);
-    Mockito.verify(technicalMixedDebtPositionUpdaterServiceMock).update(debtPosition);
+    Mockito.verify(technicalMixedDebtPositionUpdaterServiceMock).update(debtPosition, accessToken);
   }
 
   @Test
