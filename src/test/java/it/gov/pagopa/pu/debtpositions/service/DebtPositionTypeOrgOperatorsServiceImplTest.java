@@ -32,12 +32,12 @@ class DebtPositionTypeOrgOperatorsServiceImplTest {
   @Test
   void whenDeleteOperatorsByDebtPositionTypeOrgIdThenOk() {
     Long debtPositionTypeOrgId = 1L;
-    long expectedResult = 2L;
+    Integer expectedResult = 2;
 
     Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(
       expectedResult);
 
-    long result = debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    Integer result = debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
 
     Assertions.assertEquals(expectedResult, result);
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgOperatorsRepositoryMock);

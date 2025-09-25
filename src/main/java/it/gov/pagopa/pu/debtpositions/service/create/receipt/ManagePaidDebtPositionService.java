@@ -97,7 +97,7 @@ public class ManagePaidDebtPositionService {
     //persist updated debt position
     debtPositionService.saveDebtPosition(debtPosition);
     // handle mixed technical debt positions
-    List<DebtPosition> newMixedTechnicalDebtPositions = technicalMixedDebtPositionUpdaterService.update(debtPosition);
+    List<DebtPosition> newMixedTechnicalDebtPositions = technicalMixedDebtPositionUpdaterService.update(debtPosition, accessToken);
     for (DebtPosition newMixedTechnicalDebtPosition :  newMixedTechnicalDebtPositions) {
       saveAndNotifyDebtPosition(this.debtPositionMapper.mapToDto(newMixedTechnicalDebtPosition), receiptDTO);
     }

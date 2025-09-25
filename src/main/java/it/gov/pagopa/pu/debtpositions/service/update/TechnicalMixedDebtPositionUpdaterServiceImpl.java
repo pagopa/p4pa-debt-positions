@@ -6,8 +6,6 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
@@ -32,7 +30,7 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
   private final DebtPositionDeleteService debtPositionDeleteService;
 
   @Override
-  public List<DebtPosition> update(DebtPosition debtPosition) {
+  public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id=" + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
     if (!Constants.MIXED_DP_TYPE_ORG_CODE.equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
@@ -56,7 +54,8 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
     List<DebtPosition> newMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       buildMixedDpAdditionalDataMap(oldMixedDebtPositions),
       debtPosition,
-      false
+      false,
+      accessToken
     );
 
     deleteDebtPositionsWithoutPersonalDataId(oldMixedDebtPositions);
@@ -66,19 +65,21 @@ public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMi
 
   private Map<Long, List<MixedDpAdditionalData>> buildMixedDpAdditionalDataMap(List<DebtPosition> oldMixedTechnicalDebtPositions) {
     return oldMixedTechnicalDebtPositions.stream()
-        .collect(Collectors.groupingBy(
-          DebtPosition::getDebtPositionTypeOrgId,
-          Collectors.flatMapping(dp -> {
-            InstallmentNoPII installment = dp.getPaymentOptions().getFirst().getInstallments().getFirst();
-            return installment.getTransfers().stream().map(transfer ->
-              MixedDpAdditionalData.builder()
-                .iud(installment.getIud())
-                .balance(installment.getBalance())
-                .transferIndex(transfer.getTransferIndex())
-                .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
-                .build());
-          }, Collectors.toList())
-        ));
+      .collect(Collectors.groupingBy(
+        DebtPosition::getDebtPositionTypeOrgId,
+        Collectors.flatMapping(
+          dp -> dp.getPaymentOptions().getFirst().getInstallments().stream()
+            .flatMap(installment ->
+              installment.getTransfers().stream().map(transfer ->
+                MixedDpAdditionalData.builder()
+                  .iud(installment.getIud())
+                  .balance(installment.getBalance())
+                  .transferIndex(transfer.getTransferIndex())
+                  .legacyPaymentMetadata(installment.getLegacyPaymentMetadata())
+                  .build())),
+          Collectors.toList()
+        )
+      ));
   }
 
   private void deleteDebtPositionsWithoutPersonalDataId(List<DebtPosition> debtPositions) {

@@ -11,9 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
@@ -21,7 +24,10 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
 
   private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
 
-  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper();
+  @Mock
+  private BalanceResolverService balanceResolverServiceMock;
+
+  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
 
   @BeforeEach
   void init() {
@@ -32,6 +38,7 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
   @Test
   void whenCreateTechnicalMixedDebtPositionsThenOk() {
     DebtPosition debtPosition = buildMixedDebtPosition();
+    String accessToken = "TOKEN";
 
     Long dpTypeOrgId1 = 1L;
     Long dpTypeOrgId2 = 2L;
@@ -52,9 +59,9 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
       mixedDpAdditionalDataList2);
 
     List<DebtPosition> result = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
-      debtPositionTypeOrgId2TransfersData, debtPosition);
+      debtPositionTypeOrgId2TransfersData, debtPosition, accessToken);
 
-    assertEquals(debtPositionTypeOrgId2TransfersData.keySet().size(),
+    assertEquals(debtPositionTypeOrgId2TransfersData.size(),
       result.size());
     checkTotalTransfersSize(result,
       (mixedDpAdditionalDataList1.size() + mixedDpAdditionalDataList2.size()));

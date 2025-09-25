@@ -3,14 +3,14 @@ import java.util.*
 
 plugins {
   java
-  id("org.springframework.boot") version "3.5.5"
+  id("org.springframework.boot") version "3.5.6"
   id("io.spring.dependency-management") version "1.1.7"
   jacoco
-  id("org.sonarqube") version "6.2.0.5505"
+  id("org.sonarqube") version "6.3.1.5724"
   id("com.github.ben-manes.versions") version "0.52.0"
-  id("org.openapi.generator") version "7.13.0"
+  id("org.openapi.generator") version "7.15.0"
   id("org.ajoberstar.grgit") version "5.3.2"
-  id("com.gorylenko.gradle-git-properties") version "2.5.0"
+  id("com.gorylenko.gradle-git-properties") version "2.5.3"
 }
 
 group = "it.gov.pagopa.payhub"
@@ -39,15 +39,16 @@ dependencyManagement {
   }
 }
 
-val springDocOpenApiVersion = "2.8.9"
-val openApiToolsVersion = "0.2.6"
-val springWolfAsyncApiVersion = "1.13.0"
-val micrometerVersion = "1.5.1"
+val springDocOpenApiVersion = "2.8.13"
+val janinoVersion = "3.1.12"
+val openApiToolsVersion = "0.2.7"
+val springWolfAsyncApiVersion = "1.16.0"
+val micrometerVersion = "1.5.4"
 val postgresJdbcVersion = "42.7.7"
-val bouncycastleVersion = "1.81"
+val bouncycastleVersion = "1.82"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
-val caffeineVersion = "3.2.1"
+val caffeineVersion = "3.2.2"
 val httpClientVersion = "5.5"
 
 dependencies {
@@ -64,6 +65,7 @@ dependencies {
   implementation("io.micrometer:micrometer-tracing-bridge-otel:$micrometerVersion")
   implementation("io.micrometer:micrometer-registry-prometheus")
   implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:$springDocOpenApiVersion")
+  implementation("org.codehaus.janino:janino:$janinoVersion")
   implementation("io.github.springwolf:springwolf-kafka:${springWolfAsyncApiVersion}")
   implementation("io.github.springwolf:springwolf-ui:${springWolfAsyncApiVersion}")
   implementation("io.github.springwolf:springwolf-cloud-stream:${springWolfAsyncApiVersion}")

@@ -94,7 +94,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   @Transactional
   @Modifying
   @Query("UPDATE DebtPositionTypeOrg dpto SET dpto.flagActive = :flagActive  WHERE dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId")
-  int updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
+  Integer updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
 
   @Query
     ("""
