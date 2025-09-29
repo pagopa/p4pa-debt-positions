@@ -164,6 +164,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     streamOf(instDTO.getTransfers())
       .forEach(trDTO -> {
         Transfer trEntity = trByIndex.get(trDTO.getTransferIndex());
+        trDTO.setInstallmentId(instDTO.getInstallmentId());
         if (trEntity != null) {
           trDTO.setTransferId(trEntity.getTransferId());
         }
