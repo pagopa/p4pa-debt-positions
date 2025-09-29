@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.model;
 
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
+import it.gov.pagopa.pu.debtpositions.model.validator.TaxonomyCodeConstraint;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -50,6 +51,7 @@ public class DebtPositionType extends BaseEntity implements Serializable {
   private String collectingReason;
   @NotNull
   @JsonSetter(nulls = Nulls.SKIP)
+  @TaxonomyCodeConstraint
   private String taxonomyCode;
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;
