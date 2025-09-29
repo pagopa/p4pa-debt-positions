@@ -442,10 +442,10 @@ class DebtPositionServiceImplTest {
     Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(captor.capture());
     DebtPositionDTO saved = captor.getValue();
 
-    Assertions.assertEquals(existingDpIdInDto, saved.getDebtPositionId());
-    Assertions.assertEquals(poIdDto, saved.getPaymentOptions().getFirst().getPaymentOptionId());
-    Assertions.assertEquals(instIdDto, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getInstallmentId());
-    Assertions.assertEquals(trIdDto, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().getTransferId());
+    Assertions.assertEquals(dpId, saved.getDebtPositionId());
+    Assertions.assertEquals(poIdEntity, saved.getPaymentOptions().getFirst().getPaymentOptionId());
+    Assertions.assertEquals(instIdEntity, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getInstallmentId());
+    Assertions.assertEquals(trIdEntity, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().getTransferId());
 
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtPositionId(dpId);
   }

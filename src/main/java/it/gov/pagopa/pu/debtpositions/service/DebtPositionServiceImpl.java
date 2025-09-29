@@ -118,9 +118,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {
     if (entity == null || dto == null) return;
 
-    if (dto.getDebtPositionId() == null && entity.getDebtPositionId() != null) {
-      dto.setDebtPositionId(entity.getDebtPositionId());
-    }
+    dto.setDebtPositionId(entity.getDebtPositionId());
 
     Map<Integer, PaymentOption> poByIndex = indexBy(
       entity.getPaymentOptions(),
@@ -130,6 +128,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     streamOf(dto.getPaymentOptions())
       .forEach(poDTO -> {
         PaymentOption poEntity = poByIndex.get(poDTO.getPaymentOptionIndex());
+        poDTO.setDebtPositionId(dto.getDebtPositionId());
         if (poEntity != null) {
           propagateIdsForPaymentOption(poEntity, poDTO);
         }
@@ -137,9 +136,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   private void propagateIdsForPaymentOption(PaymentOption poEntity, PaymentOptionDTO poDTO) {
-    if (poDTO.getPaymentOptionId() == null && poEntity.getPaymentOptionId() != null) {
-      poDTO.setPaymentOptionId(poEntity.getPaymentOptionId());
-    }
+    poDTO.setPaymentOptionId(poEntity.getPaymentOptionId());
 
     Map<String, InstallmentNoPII> instByIud = indexBy(
       poEntity.getInstallments(),
@@ -149,6 +146,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     streamOf(poDTO.getInstallments())
       .forEach(instDTO -> {
         InstallmentNoPII instEntity = instByIud.get(instDTO.getIud());
+        instDTO.setPaymentOptionId(poDTO.getPaymentOptionId());
         if (instEntity != null) {
           propagateIdsForInstallment(instEntity, instDTO);
         }
@@ -156,9 +154,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   private void propagateIdsForInstallment(InstallmentNoPII instEntity, InstallmentDTO instDTO) {
-    if (instDTO.getInstallmentId() == null && instEntity.getInstallmentId() != null) {
-      instDTO.setInstallmentId(instEntity.getInstallmentId());
-    }
+    instDTO.setInstallmentId(instEntity.getInstallmentId());
 
     Map<Integer, Transfer> trByIndex = indexBy(
       instEntity.getTransfers(),
@@ -168,7 +164,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     streamOf(instDTO.getTransfers())
       .forEach(trDTO -> {
         Transfer trEntity = trByIndex.get(trDTO.getTransferIndex());
-        if (trEntity != null && trDTO.getTransferId() == null) {
+        if (trEntity != null) {
           trDTO.setTransferId(trEntity.getTransferId());
         }
       });
@@ -180,12 +176,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   private static <T, K> Map<K, T> indexBy(Collection<T> items, Function<T, K> keyFn) {
     return streamOf(items)
-      .map(t -> new AbstractMap.SimpleEntry<>(keyFn.apply(t), t))
-      .filter(e -> e.getKey() != null)
       .collect(Collectors.toMap(
-        Map.Entry::getKey,
-        Map.Entry::getValue,
-        (a, b) -> a
+        keyFn,
+        Function.identity()
       ));
   }
 }
