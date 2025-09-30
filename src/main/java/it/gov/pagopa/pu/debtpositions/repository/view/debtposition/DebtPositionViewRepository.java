@@ -43,6 +43,7 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
       AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
       AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
       AND ((:status IS NULL) OR (dp.status = :status ))
+      AND ((:iuv IS NULL) OR (i.iuv = :iuv ))
   """
   )
   Page<DebtPositionView> findDebtPositionViews(
@@ -54,6 +55,7 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
     String fiscalCode,
     Long debtPositionTypeOrgId,
     DebtPositionStatus status,
+    String iuv,
     Pageable pageable
   );
 }

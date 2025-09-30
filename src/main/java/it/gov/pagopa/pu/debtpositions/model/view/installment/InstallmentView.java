@@ -21,7 +21,10 @@ public class InstallmentView {
   @Id
   private Long installmentId;
   @NotNull
+  private Long debtPositionId;
+  @NotNull
   private Long paymentOptionId;
+  private Long receiptId;
   private String iuv;
   @Enumerated(EnumType.STRING)
   @NotNull

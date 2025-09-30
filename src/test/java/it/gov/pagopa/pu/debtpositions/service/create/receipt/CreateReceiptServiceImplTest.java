@@ -83,7 +83,7 @@ class CreateReceiptServiceImplTest {
     boolean primaryOrgFound = true;
     receipt.setIud("iud");
     Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
-    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
 
     //when
     ReceiptDTO response = receiptService.createReceipt(receipt, accessToken);
@@ -96,7 +96,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptPIIRepositoryMock, Mockito.times(1)).save(receiptModel);
     Mockito.verify(receiptMapperMock, Mockito.times(1)).mapToModel(receipt);
     Mockito.verify(managePaidDebtPositionServiceMock, Mockito.times(1)).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createPaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock, Mockito.times(1)).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, !primaryOrgFound, accessToken);
   }
 
   @Test
@@ -106,7 +106,7 @@ class CreateReceiptServiceImplTest {
     receipt.setIud("VALID_IUD");
 
     Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
-    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     // when
     ReceiptDTO result = receiptService.createReceipt(receipt, accessToken);
@@ -118,7 +118,7 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptMapperMock).mapToModel(receipt);
     Mockito.verify(receiptPIIRepositoryMock).save(receiptModel);
     Mockito.verify(managePaidDebtPositionServiceMock).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
   }
 
   @Test
@@ -136,7 +136,7 @@ class CreateReceiptServiceImplTest {
       .thenReturn(existingReceipt);
 
     Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken)).thenReturn(primaryOrgFound);
-    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
+    Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
 
     // when
     ReceiptDTO result = receiptService.createReceipt(receipt, accessToken);
@@ -144,7 +144,7 @@ class CreateReceiptServiceImplTest {
     // then
     Assertions.assertNotNull(result);
     Mockito.verify(managePaidDebtPositionServiceMock).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, true, accessToken);
   }
 
   @Test
@@ -156,7 +156,7 @@ class CreateReceiptServiceImplTest {
     Mockito.when(managePaidDebtPositionServiceMock.handleReceiptReceivedPrimaryOrg(receipt, accessToken))
       .thenReturn(true);
     Mockito.doNothing().when(createPaidTechnicalDebtPositionsServiceMock)
-      .createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
+      .createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
 
     // when
     ReceiptDTO result = receiptService.createReceipt(receipt, accessToken);
@@ -168,6 +168,6 @@ class CreateReceiptServiceImplTest {
     Mockito.verify(receiptMapperMock).mapToModel(receipt);
     Mockito.verify(receiptPIIRepositoryMock).save(receiptModel);
     Mockito.verify(managePaidDebtPositionServiceMock).handleReceiptReceivedPrimaryOrg(receipt, accessToken);
-    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createPaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
+    Mockito.verify(createPaidTechnicalDebtPositionsServiceMock).createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receipt, false, accessToken);
   }
 }

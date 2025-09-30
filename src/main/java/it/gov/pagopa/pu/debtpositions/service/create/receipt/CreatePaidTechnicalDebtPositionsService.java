@@ -19,7 +19,7 @@ public class CreatePaidTechnicalDebtPositionsService {
     this.managePaidDebtPositionService = managePaidDebtPositionService;
   }
 
-  void createPaidTechnicalDebtPositionsFromReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, boolean includePrimaryOrg, String accessToken) {
+  void createOrUpdatePaidTechnicalDebtPositionsFromReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, boolean includePrimaryOrg, String accessToken) {
     //for every organization handled by PU and mentioned in the receipt
     receiptDTO.getTransfers().stream()
       //get the fiscal code of the organization

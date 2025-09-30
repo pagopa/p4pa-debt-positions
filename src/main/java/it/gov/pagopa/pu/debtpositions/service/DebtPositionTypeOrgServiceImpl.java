@@ -102,12 +102,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     checkImmutableField("debtPositionTypeOrgId", existingDebtPositionTypeOrg.getDebtPositionTypeOrgId(), updatedDebtPositionTypeOrg.getDebtPositionTypeOrgId(), modifiedFields);
     checkImmutableField("debtPositionTypeId", existingDebtPositionTypeOrg.getDebtPositionTypeId(), updatedDebtPositionTypeOrg.getDebtPositionTypeId(), modifiedFields);
     checkImmutableField("organizationId", existingDebtPositionTypeOrg.getOrganizationId(), updatedDebtPositionTypeOrg.getOrganizationId(), modifiedFields);
-    checkImmutableField("balance", existingDebtPositionTypeOrg.getBalance(), updatedDebtPositionTypeOrg.getBalance(), modifiedFields);
     checkImmutableField("code", existingDebtPositionTypeOrg.getCode(), updatedDebtPositionTypeOrg.getCode(), modifiedFields);
     checkImmutableField("description", existingDebtPositionTypeOrg.getDescription(), updatedDebtPositionTypeOrg.getDescription(), modifiedFields);
     checkImmutableField("orgSector", existingDebtPositionTypeOrg.getOrgSector(), updatedDebtPositionTypeOrg.getOrgSector(), modifiedFields);
-    checkImmutableField("flagAnonymousFiscalCode", existingDebtPositionTypeOrg.isFlagAnonymousFiscalCode(), updatedDebtPositionTypeOrg.isFlagAnonymousFiscalCode(), modifiedFields);
-    checkImmutableField("flagMandatoryDueDate", existingDebtPositionTypeOrg.isFlagMandatoryDueDate(), updatedDebtPositionTypeOrg.isFlagMandatoryDueDate(), modifiedFields);
     checkImmutableField("flagActive", existingDebtPositionTypeOrg.isFlagActive(), updatedDebtPositionTypeOrg.isFlagActive(), modifiedFields);
     checkImmutableField("flagAmountActualization", existingDebtPositionTypeOrg.isFlagAmountActualization(), updatedDebtPositionTypeOrg.isFlagAmountActualization(), modifiedFields);
     checkImmutableField("flagExternal", existingDebtPositionTypeOrg.isFlagExternal(), updatedDebtPositionTypeOrg.isFlagExternal(), modifiedFields);
