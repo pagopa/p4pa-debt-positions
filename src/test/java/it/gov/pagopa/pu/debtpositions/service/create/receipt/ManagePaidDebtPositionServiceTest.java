@@ -153,13 +153,17 @@ class ManagePaidDebtPositionServiceTest {
   }
 
   @Test
-  void givenReceiptWhenPersistTechnicalDebtPositionFromReceiptAndNotifyEventThenOk(){
+  void givenReceiptNotExistingWhenPersistTechnicalDebtPositionFromReceiptAndNotifyEventThenOk(){
     //given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     DebtPositionDTO debtPositionDTO = podamFactory.manufacturePojo(DebtPositionDTO.class);
 
     Mockito.when(receiptWithAdditionalInfoMapperMock.mapToDebtPosition(receiptDTO, organization)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionServiceMock.getDebtPositionByIupdAndOrganizationId(
+      debtPositionDTO.getIupdOrg(),
+      debtPositionDTO.getOrganizationId()
+    )).thenReturn(Optional.empty());
     Mockito.doNothing().when(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:"+receiptDTO.getReceiptId());
 
     //when
@@ -167,6 +171,30 @@ class ManagePaidDebtPositionServiceTest {
 
     //verify
     Mockito.verify(debtPositionServiceMock, Mockito.times(1)).saveDebtPosition(debtPositionDTO);
+  }
+
+  @Test
+  void givenReceiptExistingWhenPersistTechnicalDebtPositionFromReceiptAndNotifyEventThenOk(){
+    //given
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    DebtPositionDTO debtPositionDTO = podamFactory.manufacturePojo(DebtPositionDTO.class);
+    DebtPosition existingDebtPosition = new DebtPosition();
+    existingDebtPosition.setDebtPositionId(1L);
+
+    Mockito.when(receiptWithAdditionalInfoMapperMock.mapToDebtPosition(receiptDTO, organization)).thenReturn(debtPositionDTO);
+    Mockito.when(debtPositionServiceMock.getDebtPositionByIupdAndOrganizationId(
+      debtPositionDTO.getIupdOrg(),
+      debtPositionDTO.getOrganizationId()
+    )).thenReturn(Optional.of(existingDebtPosition));
+    Mockito.doNothing().when(paymentsProducerServiceMock).notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:"+receiptDTO.getReceiptId());
+
+    //when
+    managePaidDebtPositionService.persistTechnicalDebtPositionFromReceiptAndNotifyEvent(receiptDTO, organization);
+
+    //verify
+    Mockito.verify(debtPositionServiceMock, Mockito.never()).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).updateDebtPosition(1L, debtPositionDTO);
   }
 
 }
