@@ -18,6 +18,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(path = "debt-positions")
 public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long> {
@@ -151,4 +152,6 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   long validateOperator(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
                         @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
+
+  Optional<DebtPosition> findDebtPositionByIupdOrgAndOrganizationId(String iupd, Long organizationId);
 }

@@ -34,7 +34,7 @@ class CreatePaidTechnicalDebtPositionsServiceTest {
 
   @ParameterizedTest
   @ValueSource(booleans = {true, false})
-  void whenCreatePaidTechnicalDebtPositionsFromReceiptThenOk(boolean includePrimaryOrg) {
+  void whenCreateOrUpdatePaidTechnicalDebtPositionsFromReceiptThenOk(boolean includePrimaryOrg) {
     // given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setOrgFiscalCode(receiptDTO.getTransfers().getFirst().getFiscalCodePA());
@@ -47,7 +47,7 @@ class CreatePaidTechnicalDebtPositionsServiceTest {
     }).toList();
 
     //when
-    createPaidTechnicalDebtPositionsService.createPaidTechnicalDebtPositionsFromReceipt(receiptDTO, includePrimaryOrg, ACCESS_TOKEN);
+    createPaidTechnicalDebtPositionsService.createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receiptDTO, includePrimaryOrg, ACCESS_TOKEN);
 
     //verify
     orgList.forEach(org -> {
