@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class FieldBean implements Serializable {
+public class SpontaneousFormField implements Serializable {
   @NotNull
   private String name;
   private boolean required;
@@ -56,7 +56,7 @@ public class FieldBean implements Serializable {
   private String groupBy;
   private Map<String, String> extraAttr;
   private List<String> enumerationList;
-  private List<FieldBean> subfields;
+  private List<SpontaneousFormField> subfields;
   private String validDependsOn;
   private String validDependsOnUids;
   private String valueDependsOn;

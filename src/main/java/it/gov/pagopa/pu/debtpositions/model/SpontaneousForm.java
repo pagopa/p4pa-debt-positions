@@ -40,6 +40,27 @@ public class SpontaneousForm extends BaseEntity implements Serializable {
   @NotNull
   @JdbcTypeCode(SqlTypes.JSON)
   private SpontaneousFormStructure structure;
+  /**
+  * Dictionary of localized messages for spontaneous form fields.
+  * The map has three levels of nesting:
+  * <ul>
+  *   <li><b>First level</b>: language code (e.g. "EN").</li>
+  *   <li><b>Second level</b>: field name (e.g. "payment_field").</li>
+  *   <li><b>Third level</b>: attribute name and message for that field (e.g. "label", "error", "help").</li>
+  * </ul>
+  * Example:
+  * <pre>
+  * {
+  *   "EN": {
+  *     "payment_field": {
+  *       "label": "Payment description",
+  *       "error": "Specify the payment description",
+  *       "help":  "Specify the payment description"
+  *     }
+  *   }
+  * }
+  * </pre>
+  */
   @JdbcTypeCode(SqlTypes.JSON)
   private Map<String, Map<String,Map<String,String>>> dictionary;
 }

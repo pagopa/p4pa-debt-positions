@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class SpontaneousFormStructure implements Serializable {
   @Valid
-  private List<FieldBean> fields;
-  private String amount;
-  private boolean amountInForm;
+  private List<SpontaneousFormField> fields;
+  private String amountFieldName;
+  private boolean hasAmountInForm;
 }
