@@ -60,7 +60,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
 
     //for every organization handled by PU and mentioned in the receipt
-    createPaidTechnicalDebtPositionsService.createPaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);
+    createPaidTechnicalDebtPositionsService.createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);
 
     return receiptDTO;
   }
