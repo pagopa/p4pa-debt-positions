@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -36,6 +37,7 @@ public class UnknownDebtPositionTypeOrgRetrieverService {
     this.debtPositionTypeOrgMapper = debtPositionTypeOrgMapper;
   }
 
+  @Transactional(Transactional.TxType.NOT_SUPPORTED)
   public DebtPositionTypeOrg getUnknownDebtPositionTypeOrg(Long organizationId) {
     return debtPositionTypeOrgSecondaryOrgMap.computeIfAbsent(organizationId,this::retrieveDebtPositionTypeOrg);
   }

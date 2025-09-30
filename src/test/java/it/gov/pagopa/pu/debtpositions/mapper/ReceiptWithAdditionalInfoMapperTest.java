@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -17,15 +16,11 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 class ReceiptWithAdditionalInfoMapperTest {
 
   @Mock
   private UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverServiceMock;
-  @Mock
-  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   @InjectMocks
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
@@ -47,8 +42,6 @@ class ReceiptWithAdditionalInfoMapperTest {
       receiptWithAdditionalNodeDataDTO.setIud(null);
       receiptWithAdditionalNodeDataDTO.setReceiptOrigin(ReceiptOriginType.valueOf(receiptOrigin));
     }
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptWithAdditionalNodeDataDTO.getDebtPositionTypeOrgCode()))
-        .thenReturn(Optional.empty());
     Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()))
       .thenReturn(debtPositionTypeOrg);
 
