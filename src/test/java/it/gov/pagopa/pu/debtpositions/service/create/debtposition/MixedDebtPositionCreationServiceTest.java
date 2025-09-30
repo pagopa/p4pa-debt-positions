@@ -54,7 +54,7 @@ class MixedDebtPositionCreationServiceTest {
   @Mock
   private AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeServiceMock;
   @Mock
-  private DebtPositionCreationService debtPositionCreationServiceMock;
+  private MixedDebtPositionCreationServiceImpl.MixedOrdinaryDebtPositionCreationInnerService debtPositionCreationServiceMock;
   @Mock
   private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderServiceMock;
   @Mock
