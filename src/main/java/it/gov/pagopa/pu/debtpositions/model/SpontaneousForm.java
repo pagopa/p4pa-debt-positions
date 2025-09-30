@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.spontaneous.SpontaneousFormStructure;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -61,6 +62,26 @@ public class SpontaneousForm extends BaseEntity implements Serializable {
   * }
   * </pre>
   */
+  @Schema(
+      description = """
+            Dictionary of localized messages for spontaneous form fields.
+            The map has three levels of nesting:
+            1. First level: language code (e.g. "EN")
+            2. Second level: field name (e.g. "payment_field")
+            3. Third level: attribute name and message for that field (e.g. "label", "error", "help")
+
+            Example:
+            {
+              "EN": {
+                "payment_field": {
+                  "label": "Payment description",
+                  "error": "Specify the payment description",
+                  "help": "Specify the payment description"
+                }
+              }
+            }
+            """
+  )
   @JdbcTypeCode(SqlTypes.JSON)
   private Map<String, Map<String,Map<String,String>>> dictionary;
 }
