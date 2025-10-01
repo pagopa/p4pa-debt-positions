@@ -23,12 +23,12 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxon
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryValidatorServiceTest {
+class CategoryValidatorServiceImplTest {
 
   @Mock
   private TaxonomyService taxonomyServiceMock;
   @InjectMocks
-  private CategoryValidatorService service;
+  private CategoryValidatorServiceImpl service;
 
   private final String accessToken = "ACCESSTOKEN";
 
