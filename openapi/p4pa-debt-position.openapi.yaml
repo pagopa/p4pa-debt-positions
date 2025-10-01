@@ -2391,6 +2391,12 @@ components:
           type: boolean
     MixedDebtPositionDTO:
       type: object
+      required:
+        - organizationId
+        - debtPositionOrigin
+        - sourceFlowName
+        - debtor
+        - transfers
       properties:
         organizationId:
           type: integer
@@ -2416,6 +2422,10 @@ components:
             $ref: "#/components/schemas/MixedTransferDTO"
     MixedTransferDTO:
       type: object
+      required:
+        - iud
+        - debtPositionTypeOrgId
+        - amountCents
       properties:
         iud:
           type: string

@@ -1,35 +1,23 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
-
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class MixedDebtPositionMapper {
 
-  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
 
   public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
@@ -45,7 +33,7 @@ public class MixedDebtPositionMapper {
       MixedTransferDTO requestTransfer = requestTransfers.get(i);
       transfers.add(
         TransferDTO.builder()
-          .transferIndex(i+1)
+          .transferIndex(i + 1)
           .orgFiscalCode(organization.getOrgFiscalCode())
           .orgName(organization.getOrgName())
           .amountCents(requestTransfer.getAmountCents())
@@ -103,18 +91,16 @@ public class MixedDebtPositionMapper {
       MixedTransferDTO transfer = transfers.get(i);
       Long debtPositionTypeOrgId = transfer.getDebtPositionTypeOrgId();
 
-      if (debtPositionTypeOrgId != null) {
-        MixedDpAdditionalData additionalData = MixedDpAdditionalData.builder()
-          .transferIndex(i+1)
-          .iud(transfer.getIud())
-          .legacyPaymentMetadata(transfer.getLegacyPaymentMetadata())
-          .balance(transfer.getBalance())
-          .build();
+      MixedDpAdditionalData additionalData = MixedDpAdditionalData.builder()
+        .transferIndex(i + 1)
+        .iud(transfer.getIud())
+        .legacyPaymentMetadata(transfer.getLegacyPaymentMetadata())
+        .balance(transfer.getBalance())
+        .build();
 
-        debtPositionTypeOrgId2TransfersData.computeIfAbsent(
-            debtPositionTypeOrgId, k -> new ArrayList<>())
-          .add(additionalData);
-      }
+      debtPositionTypeOrgId2TransfersData.computeIfAbsent(
+          debtPositionTypeOrgId, k -> new ArrayList<>())
+        .add(additionalData);
     }
 
     return debtPositionTypeOrgId2TransfersData;
@@ -123,13 +109,8 @@ public class MixedDebtPositionMapper {
 
   private Long getDebtPositionTypeOrgId(
     MixedDebtPositionDTO mixedDebtPositionDTO) {
-    return debtPositionTypeOrgRepository.findByOrganizationIdAndDebtPositionTypeOrgId(
-        mixedDebtPositionDTO.getOrganizationId(),
-        DEBT_POSITION_TYPE_MIXED).map(
-        DebtPositionTypeOrg::getDebtPositionTypeOrgId)
-      .orElseGet(() ->
-        mixedDebtPositionTypeOrgRetrieverService.getMixedDebtPositionTypeOrg(
-          mixedDebtPositionDTO.getOrganizationId()).getDebtPositionTypeOrgId());
+    return mixedDebtPositionTypeOrgRetrieverService.getMixedDebtPositionTypeOrg(
+      mixedDebtPositionDTO.getOrganizationId()).getDebtPositionTypeOrgId();
   }
 
 }
