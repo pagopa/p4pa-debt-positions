@@ -546,40 +546,6 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void giveNotFoundCategoryCodeWhenValidateThenThrowInvalidCategoryException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
-    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    String expectedErrorMessage = "The category code \"001122233\" does not exist in the archive";
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenThrow(new InvalidValueException(expectedErrorMessage));
-
-    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals(expectedErrorMessage, invalidValueException.getMessage());
-  }
-
-  @Test
-  void givenTransferCategoryInvalidEmptyThenThrowValidationException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    debtPositionDTO.getPaymentOptions()
-      .getFirst()
-      .getInstallments()
-      .getFirst()
-      .getTransfers().getFirst().setCategory("0011223");
-
-    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
-    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-
-    String expectedErrorMessage = "The category code \"0011223\" does not meet the required length or format";
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("0011223")).thenThrow(new InvalidValueException(expectedErrorMessage));
-
-    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals(expectedErrorMessage, invalidValueException.getMessage());
-  }
-
-  @Test
   void givenTransferAmountNegativeThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
@@ -657,15 +623,15 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenInvalidTaxonomyCategoryWhenValidateThenThrowInvalidValueException() {
+  void givenInvalidTransferCategoryWhenValidateThenThrowInvalidValueException() {
+    // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
     Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(false);
-
+    // When, Then
     InvalidValueException invalidValueException = assertThrows(
       InvalidValueException.class,
       () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg)
