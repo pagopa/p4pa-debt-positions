@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
-import it.gov.pagopa.pu.debtpositions.service.CategoryValidatorService;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
@@ -27,16 +27,16 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
   public static final int TRANSFER_INDEX_MAX_SIZE = 5;
   public static final String ANONIMO = "ANONIMO";
-  private final CategoryValidatorService categoryValidatorService;
+  private final TaxonomyValidatorService taxonomyValidatorService;
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
   private final boolean isOrgPIvaCheckEnabled;
 
-  public ValidateDebtPositionServiceImpl(CategoryValidatorService categoryValidatorService,
+  public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
                                          @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
-    this.categoryValidatorService = categoryValidatorService;
+    this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
@@ -233,7 +233,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
       String taxonomyCategory = transferDTO.getCategory();
-      if(!categoryValidatorService.isCategoryValid(taxonomyCategory)) {
+      if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory)) {
         throw new InvalidValueException("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     }

@@ -20,12 +20,12 @@ import java.util.List;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
 
 @ExtendWith(MockitoExtension.class)
-class CategoryValidatorServiceImplTest {
+class TaxonomyValidatorServiceImplTest {
 
   @Mock
   private TaxonomyService taxonomyServiceMock;
   @InjectMocks
-  private CategoryValidatorServiceImpl service;
+  private TaxonomyValidatorServiceImpl service;
 
   private final String accessToken = "ACCESSTOKEN";
 
@@ -62,7 +62,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertTrue(() -> service.isCategoryValid(validCategory));
+    Assertions.assertTrue(() -> service.isTaxonomyCategoryValid(validCategory));
   }
 
   @Test
@@ -83,7 +83,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertFalse(service.isCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
   }
 
   @Test
@@ -102,7 +102,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertFalse(service.isCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
   }
 
   @Test
@@ -117,7 +117,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(null);
     // When, Then
-    Assertions.assertFalse(service.isCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
   }
 
   @Test
@@ -125,7 +125,7 @@ class CategoryValidatorServiceImplTest {
     // Given
     String invalidCategory = "0011222"; // valid 001122233
     // When, Then
-    Assertions.assertFalse(service.isCategoryValid(invalidCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(invalidCategory));
   }
 
   @Test
@@ -154,7 +154,7 @@ class CategoryValidatorServiceImplTest {
     // Given
     String invalidTaxonomyCode = "9/0011222/"; // valid 9/001122233/
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCodeValid(invalidTaxonomyCode));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(invalidTaxonomyCode));
   }
 
   @Test

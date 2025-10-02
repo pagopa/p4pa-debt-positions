@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model.validator;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.service.CategoryValidatorService;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 class TaxonomyCodeConstraintValidatorTest {
 
   @Mock
-  private CategoryValidatorService serviceMock;
+  private TaxonomyValidatorService serviceMock;
 
   @InjectMocks
   private TaxonomyCodeConstraintValidator validator;
@@ -37,7 +37,7 @@ class TaxonomyCodeConstraintValidatorTest {
   }
 
   @Test
-  void givenInvalidTaxonomyCodeWhenIsValidThenThrowInvalidCategoryException() {
+  void givenInvalidTaxonomyCodeWhenIsValidThenThrowInvalidValueException() {
     //Given
     Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString()))
       .thenThrow(new InvalidValueException("Error"));
