@@ -17,7 +17,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
 
   @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
-  @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dpto.description as debtPositionTypeOrgDescription) "
+  @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dpto.description as debtPositionTypeOrgDescription, r.debtorFiscalCodeHash as debtorFiscalCodeHash) "
     + "FROM ReceiptView r "
     + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
     + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
