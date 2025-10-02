@@ -657,6 +657,26 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenInvalidTaxonomyCategoryWhenValidateThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(false);
+
+    InvalidValueException invalidValueException = assertThrows(
+      InvalidValueException.class,
+      () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg)
+    );
+    assertEquals(
+      "[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index 1 is not valid",
+      invalidValueException.getMessage()
+    );
+  }
+
+  @Test
   void testOtherValidateThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
