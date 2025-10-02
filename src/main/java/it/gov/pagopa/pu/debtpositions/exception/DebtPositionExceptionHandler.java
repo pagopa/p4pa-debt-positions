@@ -127,11 +127,6 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
-  @ExceptionHandler({InvalidCategoryException.class})
-  public ResponseEntity<DebtPositionErrorDTO> handleInvalidCategoryException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_INVALID_CATEGORY);
-  }
-
   static ResponseEntity<DebtPositionErrorDTO> handleException(Exception ex, HttpServletRequest request, HttpStatusCode httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
     logException(ex, request, httpStatus);
 

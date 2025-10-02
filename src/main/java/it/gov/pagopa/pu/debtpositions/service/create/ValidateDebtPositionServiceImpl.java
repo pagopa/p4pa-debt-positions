@@ -232,8 +232,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
-      String category = transferDTO.getCategory();
-      categoryValidatorService.isCategoryValid(category);
+      String taxonomyCategory = transferDTO.getCategory();
+      if(!categoryValidatorService.isCategoryValid(taxonomyCategory)) {
+        throw new InvalidValueException("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+      }
     }
   }
 }

@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidCategoryException;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
@@ -21,6 +20,7 @@ public class CategoryValidatorServiceImpl implements CategoryValidatorService {
 
   public boolean isTaxonomyCodeValid(String taxonomyCode) {
       if(!taxonomyCode.startsWith("9/") || !taxonomyCode.endsWith("/")) {
+        log.error("The taxonomy code [" + taxonomyCode + "] does not meet the required format");
         return false;
       }
       String category = Utilities.taxonomyCodeToTransferCategory(taxonomyCode);
@@ -44,14 +44,12 @@ public class CategoryValidatorServiceImpl implements CategoryValidatorService {
       );
 
       if (pagedModelTaxonomy == null || pagedModelTaxonomy.getEmbedded() == null || CollectionUtils.isEmpty(pagedModelTaxonomy.getEmbedded().getTaxonomies())) {
-        String errorMessage = "The category code \"" + category + "\" does not exist in the archive";
-        log.error(errorMessage);
-        throw new InvalidCategoryException(errorMessage);
+        log.error("The category code [" + category + "] does not exist in the archive");
+        return false;
       }
     } catch (IndexOutOfBoundsException exception) {
-      String errorMessage = "The category code \"" + category + "\" does not meet the required length or format";
-      log.error(errorMessage);
-      throw new InvalidCategoryException(errorMessage);
+      log.error("The category code [" + category + "] does not meet the required length or format");
+      return false;
     }
     return true;
   }

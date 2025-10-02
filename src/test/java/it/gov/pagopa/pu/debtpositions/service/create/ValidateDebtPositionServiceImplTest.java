@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidCategoryException;
 import it.gov.pagopa.pu.debtpositions.service.CategoryValidatorService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -554,9 +553,9 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
     String expectedErrorMessage = "The category code \"001122233\" does not exist in the archive";
-    Mockito.when(categoryValidatorService.isCategoryValid("001122233")).thenThrow(new InvalidCategoryException(expectedErrorMessage));
+    Mockito.when(categoryValidatorService.isCategoryValid("001122233")).thenThrow(new InvalidValueException(expectedErrorMessage));
 
-    InvalidCategoryException invalidValueException = assertThrows(InvalidCategoryException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals(expectedErrorMessage, invalidValueException.getMessage());
   }
 
@@ -574,9 +573,9 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     String expectedErrorMessage = "The category code \"0011223\" does not meet the required length or format";
-    Mockito.when(categoryValidatorService.isCategoryValid("0011223")).thenThrow(new InvalidCategoryException(expectedErrorMessage));
+    Mockito.when(categoryValidatorService.isCategoryValid("0011223")).thenThrow(new InvalidValueException(expectedErrorMessage));
 
-    InvalidCategoryException invalidValueException = assertThrows(InvalidCategoryException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals(expectedErrorMessage, invalidValueException.getMessage());
   }
 

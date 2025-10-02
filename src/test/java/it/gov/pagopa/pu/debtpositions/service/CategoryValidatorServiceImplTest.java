@@ -1,9 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidCategoryException;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomyEmbedded;
 import org.junit.jupiter.api.AfterEach;
@@ -20,7 +18,6 @@ import java.util.Collections;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class CategoryValidatorServiceImplTest {
@@ -86,12 +83,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    InvalidCategoryException invalidCategoryException = assertThrows(
-      InvalidCategoryException.class,
-      () -> service.isCategoryValid(validCategory)
-    );
-    String expectedExceptionMessage = "The category code \"" + Utilities.taxonomyCodeToTransferCategory(validCategory) + "\" does not exist in the archive";
-    Assertions.assertEquals(expectedExceptionMessage, invalidCategoryException.getMessage());
+    Assertions.assertFalse(service.isCategoryValid(validCategory));
   }
 
   @Test
@@ -110,12 +102,7 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    InvalidCategoryException invalidCategoryException = assertThrows(
-      InvalidCategoryException.class,
-      () -> service.isCategoryValid(validCategory)
-    );
-    String expectedExceptionMessage = "The category code \"" + Utilities.taxonomyCodeToTransferCategory(validCategory) + "\" does not exist in the archive";
-    Assertions.assertEquals(expectedExceptionMessage, invalidCategoryException.getMessage());
+    Assertions.assertFalse(service.isCategoryValid(validCategory));
   }
 
   @Test
@@ -130,25 +117,15 @@ class CategoryValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(null);
     // When, Then
-    InvalidCategoryException invalidCategoryException = assertThrows(
-      InvalidCategoryException.class,
-      () -> service.isCategoryValid(validCategory)
-    );
-    String expectedExceptionMessage = "The category code \"" + Utilities.taxonomyCodeToTransferCategory(validCategory) + "\" does not exist in the archive";
-    Assertions.assertEquals(expectedExceptionMessage, invalidCategoryException.getMessage());
+    Assertions.assertFalse(service.isCategoryValid(validCategory));
   }
 
   @Test
-  void givenInvalidCategory_categoryDoesNotMeetRequiredLength_whenIsValidThenThrowsInvalidCategoryException(){
+  void givenInvalidCategory_categoryDoesNotMeetRequiredLength_whenIsValidThenFalse(){
     // Given
     String invalidCategory = "0011222"; // valid 001122233
     // When, Then
-    InvalidCategoryException invalidCategoryException = assertThrows(
-      InvalidCategoryException.class,
-      () -> service.isCategoryValid(invalidCategory)
-    );
-    String expectedExceptionMessage = "The category code \"" + invalidCategory + "\" does not meet the required length or format";
-    Assertions.assertEquals(expectedExceptionMessage, invalidCategoryException.getMessage());
+    Assertions.assertFalse(service.isCategoryValid(invalidCategory));
   }
 
   @Test
@@ -173,16 +150,11 @@ class CategoryValidatorServiceImplTest {
   }
 
   @Test
-  void givenInvalidTaxonomyCode_categoryDoesNotMeetRequiredLength_whenIsValidThenThrowsInvalidCategoryException(){
+  void givenInvalidTaxonomyCode_categoryDoesNotMeetRequiredLength_whenIsValidThenFalse(){
     // Given
     String invalidTaxonomyCode = "9/0011222/"; // valid 9/001122233/
     // When, Then
-    InvalidCategoryException invalidCategoryException = assertThrows(
-      InvalidCategoryException.class,
-      () -> service.isTaxonomyCodeValid(invalidTaxonomyCode)
-    );
-    String expectedExceptionMessage = "The category code \"" + Utilities.taxonomyCodeToTransferCategory(invalidTaxonomyCode) + "\" does not meet the required length or format";
-    Assertions.assertEquals(expectedExceptionMessage, invalidCategoryException.getMessage());
+    Assertions.assertFalse(service.isTaxonomyCodeValid(invalidTaxonomyCode));
   }
 
   @Test
