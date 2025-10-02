@@ -101,11 +101,17 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
         checkReadOnlyFields(dpto, debtPositionTypeOrg);
       }
       if(debtPositionTypeOrg.getSpontaneousFormId() != null) {
-        spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId()).ifPresent(spontaneousForm -> {
-          if (!Objects.equals(debtPositionTypeOrg.getOrganizationId(), spontaneousForm.getOrganizationId())){
-            throw new ValidationException("SpontaneousFormId %d is not tied to the organizationId %d".formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()));
-          }
-        });
+        spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId())
+          .ifPresentOrElse(spontaneousForm -> {
+            if (!Objects.equals(debtPositionTypeOrg.getOrganizationId(), spontaneousForm.getOrganizationId())) {
+              throw new ValidationException("SpontaneousFormId %d is not tied to the organizationId %d"
+                .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()));
+            }
+          }, () -> {
+            throw new ValidationException("SpontaneousFormId %d not found"
+              .formatted(debtPositionTypeOrg.getSpontaneousFormId()));
+          });
+
       }
   }
 
