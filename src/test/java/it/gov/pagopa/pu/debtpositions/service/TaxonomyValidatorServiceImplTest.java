@@ -154,7 +154,7 @@ class TaxonomyValidatorServiceImplTest {
     // Given
     String invalidTaxonomyCode = "9/0011222/"; // valid 9/001122233/
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCategoryValid(invalidTaxonomyCode));
+    Assertions.assertFalse(service.isTaxonomyCodeValid(invalidTaxonomyCode));
   }
 
   @Test
