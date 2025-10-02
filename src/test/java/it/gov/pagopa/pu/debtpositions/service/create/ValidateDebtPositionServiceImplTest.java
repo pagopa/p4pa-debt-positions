@@ -547,35 +547,7 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenPagedTaxonomiesNullThenThrowValidationException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
-    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    String expectedErrorMessage = "The category code \"001122233\" does not exist in the archive";
-    Mockito.when(categoryValidatorService.isCategoryValid("001122233")).thenThrow(new InvalidCategoryException(expectedErrorMessage));
-
-    InvalidCategoryException invalidValueException = assertThrows(InvalidCategoryException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals(expectedErrorMessage, invalidValueException.getMessage());
-  }
-
-  @Test
-  void givenPagedTaxonomiesEmbeddedNullThenThrowValidationException() {
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
-    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    String expectedErrorMessage = "The category code \"001122233\" does not exist in the archive";
-    Mockito.when(categoryValidatorService.isCategoryValid("001122233")).thenThrow(new InvalidCategoryException(expectedErrorMessage));
-
-    InvalidCategoryException invalidValueException = assertThrows(InvalidCategoryException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals(expectedErrorMessage, invalidValueException.getMessage());
-  }
-
-  @Test
-  void givenPagedTaxonomiesEmbeddedEmptyThenThrowValidationException() {
+  void giveNotFoundCategoryCodeWhenValidateThenThrowInvalidCategoryException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
