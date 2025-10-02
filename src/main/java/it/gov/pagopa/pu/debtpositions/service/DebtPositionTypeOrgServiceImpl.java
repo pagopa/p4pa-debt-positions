@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +15,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
@@ -22,11 +24,14 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
+  private final SpontaneousFormRepository spontaneousFormRepository;
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
-    DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService) {
+                                        DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
+                                        SpontaneousFormRepository spontaneousFormRepository) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionTypeOrgOperatorsService = debtPositionTypeOrgOperatorsService;
+    this.spontaneousFormRepository = spontaneousFormRepository;
   }
 
   @Override
@@ -94,6 +99,19 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
         DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
                 .orElseThrow(()->new NotFoundException("DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
         checkReadOnlyFields(dpto, debtPositionTypeOrg);
+      }
+      if(debtPositionTypeOrg.getSpontaneousFormId() != null) {
+        spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId())
+          .ifPresentOrElse(spontaneousForm -> {
+            if (!Objects.equals(debtPositionTypeOrg.getOrganizationId(), spontaneousForm.getOrganizationId())) {
+              throw new ValidationException("SpontaneousFormId %d is not tied to the organizationId %d"
+                .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()));
+            }
+          }, () -> {
+            throw new ValidationException("SpontaneousFormId %d not found"
+              .formatted(debtPositionTypeOrg.getSpontaneousFormId()));
+          });
+
       }
   }
 

@@ -4,7 +4,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.validation.ValidationException;
@@ -28,6 +30,8 @@ class DebtPositionTypeOrgServiceImplTest {
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
   private DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsServiceMock;
+  @Mock
+  private SpontaneousFormRepository spontaneousFormRepositoryMock;
 
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
 
@@ -35,7 +39,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock,debtPositionTypeOrgOperatorsServiceMock));
+    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock,debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock));
   }
 
   @Test
@@ -128,6 +132,7 @@ class DebtPositionTypeOrgServiceImplTest {
     saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(true);
     DebtPositionTypeOrg expectedResult = saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg();
     expectedResult.setDebtPositionTypeOrgId(null);
+    expectedResult.setSpontaneousFormId(null);
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.save(expectedResult))
       .thenReturn(expectedResult);
@@ -150,6 +155,7 @@ class DebtPositionTypeOrgServiceImplTest {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
+    debtPositionTypeOrg.setSpontaneousFormId(null);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
     saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
@@ -211,6 +217,7 @@ class DebtPositionTypeOrgServiceImplTest {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
+    debtPositionTypeOrg.setSpontaneousFormId(null);
     DebtPositionTypeOrg updatedDebtPositionTypeOrg = buildUpdatedDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(updatedDebtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
@@ -277,5 +284,93 @@ class DebtPositionTypeOrgServiceImplTest {
     Assertions.assertEquals("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found", ex.getMessage());
 
   }
+
+  @Test
+  void givenNullDebtPositionTypeOrgWhenSaveDebtPositionTypeOrgThenValidationException() {
+    // given
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(null);
+
+    // then
+    ValidationException ex = Assertions.assertThrows(ValidationException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
+
+    Assertions.assertEquals("DebtPositionTypeOrg must not be null", ex.getMessage());
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+
+  @Test
+  void givenMismatchedOrganizationIdWhenSaveDebtPositionTypeOrgThenValidationException() {
+    // given
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
+    debtPositionTypeOrg.setOrganizationId(1L);
+    debtPositionTypeOrg.setSpontaneousFormId(100L);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    var spontaneousForm = podamFactory.manufacturePojo(it.gov.pagopa.pu.debtpositions.model.SpontaneousForm.class);
+    spontaneousForm.setOrganizationId(999L);
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(debtPositionTypeOrg.getSpontaneousFormId()))
+      .thenReturn(Optional.of(spontaneousForm));
+
+    //then
+    ValidationException ex = Assertions.assertThrows(ValidationException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
+
+    Assertions.assertEquals(
+      "SpontaneousFormId %d is not tied to the organizationId %d"
+        .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()),
+      ex.getMessage()
+    );
+
+    Mockito.verify(spontaneousFormRepositoryMock).findById(debtPositionTypeOrg.getSpontaneousFormId());
+    Mockito.verifyNoMoreInteractions(spontaneousFormRepositoryMock);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenSpontaneousFormIdButFormNotFoundWhenSaveDebtPositionTypeOrgThenValidationException() {
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
+    debtPositionTypeOrg.setSpontaneousFormId(123L);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(123L)).thenReturn(Optional.empty());
+
+    ValidationException ex = Assertions.assertThrows(ValidationException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
+
+    Assertions.assertEquals("SpontaneousFormId 123 not found", ex.getMessage());
+
+    Mockito.verify(spontaneousFormRepositoryMock).findById(123L);
+    Mockito.verifyNoMoreInteractions(spontaneousFormRepositoryMock);
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenMatchingOrganizationIdWhenSaveDebtPositionTypeOrgThenOk() {
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
+    debtPositionTypeOrg.setSpontaneousFormId(123L);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    SpontaneousForm spontaneousForm = new SpontaneousForm();
+    spontaneousForm.setOrganizationId(debtPositionTypeOrg.getOrganizationId());
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(123L)).thenReturn(Optional.of(spontaneousForm));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(debtPositionTypeOrg);
+
+    DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO);
+
+    Assertions.assertEquals(debtPositionTypeOrg, result);
+    Mockito.verify(spontaneousFormRepositoryMock).findById(123L);
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).save(debtPositionTypeOrg);
+  }
+
 
 }
