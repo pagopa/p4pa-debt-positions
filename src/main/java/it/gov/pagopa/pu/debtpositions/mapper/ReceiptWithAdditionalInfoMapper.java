@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -15,13 +16,16 @@ import java.util.List;
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
   private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
-  public ReceiptWithAdditionalInfoMapper(UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
+  public ReceiptWithAdditionalInfoMapper(UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     this.unknownDebtPositionTypeOrgRetrieverService = unknownDebtPositionTypeOrgRetrieverService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
-    DebtPositionTypeOrg debtPositionTypeOrg = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId());
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptDTO.getDebtPositionTypeOrgCode())
+      .orElseGet(() -> unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()));
 
     OffsetDateTime now = OffsetDateTime.now();
     return DebtPositionDTO.builder()
