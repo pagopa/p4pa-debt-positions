@@ -153,5 +153,5 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
                         @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
-  Optional<DebtPosition> findDebtPositionByIupdOrgAndOrganizationId(String iupd, Long organizationId);
+  Optional<DebtPosition> findDebtPositionByIupdOrgAndOrganizationId(String iupdOrg, Long organizationId);
 }
