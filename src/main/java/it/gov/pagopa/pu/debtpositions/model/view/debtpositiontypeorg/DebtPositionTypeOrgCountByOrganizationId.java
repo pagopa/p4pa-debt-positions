@@ -21,4 +21,5 @@ public class DebtPositionTypeOrgCountByOrganizationId implements Serializable {
     + "FROM debt_position_type_org dpto "
     + "WHERE organization_id = dpto.organization_id)")
   private Integer activeOrganizations;
+  private boolean flagActive;
 }
