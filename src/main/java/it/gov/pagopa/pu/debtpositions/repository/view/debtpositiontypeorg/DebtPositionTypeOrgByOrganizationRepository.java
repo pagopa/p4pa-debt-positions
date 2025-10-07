@@ -11,8 +11,7 @@ public interface DebtPositionTypeOrgByOrganizationRepository extends Repository<
 
   @Query(value = "SELECT distinct dpto "
     + "FROM DebtPositionTypeOrgCountByOrganizationId dpto "
-    + "WHERE dpto.organizationId IN :organizationIds "
-    + "AND dpto.flagActive = true ")
+    + "WHERE dpto.organizationId IN :organizationIds ")
   List<DebtPositionTypeOrgCountByOrganizationId> countByOrganizationIds(List<Long> organizationIds);
 
 }
