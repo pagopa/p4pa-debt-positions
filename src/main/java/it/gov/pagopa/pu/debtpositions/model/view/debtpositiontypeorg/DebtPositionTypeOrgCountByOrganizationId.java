@@ -19,7 +19,7 @@ public class DebtPositionTypeOrgCountByOrganizationId implements Serializable {
   private Long organizationId;
   @Formula("(SELECT COUNT(*) "
     + "FROM debt_position_type_org dpto "
-    + "WHERE organization_id = dpto.organization_id)")
+    + "WHERE organization_id = dpto.organization_id "
+    + "AND dpto.flag_active = true)")
   private Integer activeOrganizations;
-  private boolean flagActive;
 }
