@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,6 +54,7 @@ class MixedDebtPositionMapperTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setDebtPositionTypeOrgId(100L);
     String iud = "IUD";
+    String category = "01234567";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
       .transferIndex(1)
@@ -64,7 +66,7 @@ class MixedDebtPositionMapperTest {
       .stampProvincialResidence("stampProvincialResidence")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
-      .category("01234567")
+      .category(category)
       .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
@@ -97,9 +99,9 @@ class MixedDebtPositionMapperTest {
       .paymentOptions(List.of(expectedPaymentOption))
       .build();
 
-    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(
-      Utilities.class)) {
+    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
       utilities.when(Utilities::getRandomIUD).thenReturn(iud);
+      utilities.when(() -> taxonomyCodeToTransferCategory("9/01234567/")).thenReturn(category);
 
       when(
         mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(
@@ -107,10 +109,10 @@ class MixedDebtPositionMapperTest {
         .thenReturn(dpTypeOrg);
 
       when(categoryResolverServiceMock.extractTaxonomyFromLegacyPaymentMetadata("9/01234567/xxxxx"))
-        .thenReturn("01234567");
+        .thenReturn("9/01234567/");
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
-        mixedDebtPositionDTO);
+          mixedDebtPositionDTO);
 
       assertEquals(expectedResult, result);
     }

@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
+
 @Service
 @RequiredArgsConstructor
 public class MixedDebtPositionMapper {
@@ -33,6 +35,7 @@ public class MixedDebtPositionMapper {
     List<MixedTransferDTO> requestTransfers = request.getTransfers();
     for (int i = 0; i < requestTransfers.size(); i++) {
       MixedTransferDTO requestTransfer = requestTransfers.get(i);
+      String category = taxonomyCodeToTransferCategory(categoryResolverService.extractTaxonomyFromLegacyPaymentMetadata(requestTransfer.getLegacyPaymentMetadata()));
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i + 1)
@@ -45,7 +48,7 @@ public class MixedDebtPositionMapper {
             requestTransfer.getStampProvincialResidence())
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
-          .category(categoryResolverService.extractTaxonomyFromLegacyPaymentMetadata(requestTransfer.getLegacyPaymentMetadata()))
+          .category(category)
           .remittanceInformation(request.getRemittanceInformation())
           .build()
       );
