@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.WS_USER_PREFIX;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -71,6 +72,32 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
     PagedInstallmentsPaidView pagedInstallmentsPaidView = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
     Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTO(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
+    Mockito.when(pagedInstallmentsPaidViewMapperMock.mapToPagedInstallmentsPaidView(installmentPaidViewNoPIIS)).thenReturn(pagedInstallmentsPaidView);
+    //when
+    PagedInstallmentsPaidView result = installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
+    //then
+    assertNotNull(result);
+    assertEquals(pagedInstallmentsPaidView, result);
+  }
+
+  @Test
+  void givenSystemUser_WhenGetPagedInstallmentPaidView_ThenReturnPagedInstallmentsPaidView() {
+    //given
+    Long organizationId = 1L;
+    String operatorExternalUserId = WS_USER_PREFIX + "operatorExternalUserId";
+    OffsetDateTime paymentDateFrom = OffsetDateTime.now().withOffsetSameInstant(ZoneOffset.UTC);
+    OffsetDateTime paymentDateTo = OffsetDateTime.now().plusMonths(1).withOffsetSameInstant(ZoneOffset.UTC);
+    Long debtPositionTypeOrgId = 1L;
+
+    OffsetDateTimeIntervalFilter offsetDateTimeIntervalFilter = new OffsetDateTimeIntervalFilter(paymentDateFrom, paymentDateTo);
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, null, debtPositionTypeOrgId, null);
+    List<InstallmentPaidViewNoPII> content = podamFactory.manufacturePojo(List.class, InstallmentPaidViewNoPII.class);
+    Pageable pageable = PageRequest.of(0, 10);
+    Page<InstallmentPaidViewNoPII> installmentPaidViewNoPIIS = new PageImpl<>(content, pageable, 10);
+
+    PagedInstallmentsPaidView pagedInstallmentsPaidView = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
+
+    Mockito.when(installmentPaidViewNoPIIDTORepositoryMock.findInstallmentPaidViewNoPIIDTOWithoutOperator(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1))).thenReturn(installmentPaidViewNoPIIS);
     Mockito.when(pagedInstallmentsPaidViewMapperMock.mapToPagedInstallmentsPaidView(installmentPaidViewNoPIIS)).thenReturn(pagedInstallmentsPaidView);
     //when
     PagedInstallmentsPaidView result = installmentPaidViewPIIViewRepository.getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
