@@ -6,10 +6,12 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Slf4j
@@ -33,6 +35,7 @@ public class MixedDebtPositionTypeOrgRetrieverService {
     this.debtPositionTypeOrgMapper = debtPositionTypeOrgMapper;
   }
 
+  @Transactional(Transactional.TxType.NOT_SUPPORTED)
   public DebtPositionTypeOrg getMixedDebtPositionTypeOrg(Long organizationId) {
     return debtPositionTypeOrgSecondaryOrgMap.computeIfAbsent(organizationId,this::retrieveDebtPositionTypeOrg);
   }

@@ -1,15 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
 import it.gov.pagopa.pu.debtpositions.model.validator.BalanceConstraint;
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
+import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "debt_position_type_org")
@@ -55,4 +59,5 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private boolean flagAmountActualization;
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
+  private Long spontaneousFormId;
 }

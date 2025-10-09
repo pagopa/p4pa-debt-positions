@@ -12,18 +12,26 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.MixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionSaveService;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
+import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
+import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
+import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import org.apache.commons.lang3.tuple.Pair;
-import org.springframework.stereotype.Service;
 
 @Service
 public class MixedDebtPositionCreationServiceImpl implements
@@ -31,7 +39,7 @@ public class MixedDebtPositionCreationServiceImpl implements
 
   private final WorkflowTypeOrgService workflowTypeOrgService;
   private final AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService;
-  private final DebtPositionCreationService debtPositionCreationService;
+  private final MixedOrdinaryDebtPositionCreationInnerService debtPositionCreationService;
   private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
   private final OrganizationService organizationService;
   private final DebtPositionSaveService debtPositionSaveService;
@@ -42,7 +50,7 @@ public class MixedDebtPositionCreationServiceImpl implements
   public MixedDebtPositionCreationServiceImpl(
     WorkflowTypeOrgService workflowTypeOrgService,
     AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
-    DebtPositionCreationService debtPositionCreationService,
+    MixedOrdinaryDebtPositionCreationInnerService debtPositionCreationService,
     TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService,
     OrganizationService organizationService,
     DebtPositionSaveService debtPositionSaveService,
@@ -58,6 +66,19 @@ public class MixedDebtPositionCreationServiceImpl implements
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.mixedDebtPositionMapper = mixedDebtPositionMapper;
     this.debtPositionMapper = debtPositionMapper;
+  }
+
+  @Service
+  public static class MixedOrdinaryDebtPositionCreationInnerService extends DebtPositionCreationServiceImpl {
+
+    public MixedOrdinaryDebtPositionCreationInnerService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, ValidateDebtPositionService validateDebtPositionService, DebtPositionService debtPositionService, IuvService iuvService, DebtPositionSyncService debtPositionSyncService, InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService) {
+      super(authorizeOperatorOnDebtPositionTypeService, validateDebtPositionService, debtPositionService, iuvService, debtPositionSyncService, installmentNoPIIRepository, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService, debtPositionTypeOrgRepository, categoryResolverService);
+    }
+
+    @Override
+    protected boolean isDebtPositionTypeOrgDisabledAllowed() {
+      return true;
+    }
   }
 
   @Transactional
