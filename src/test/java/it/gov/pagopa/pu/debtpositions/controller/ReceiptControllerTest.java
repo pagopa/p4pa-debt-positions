@@ -86,21 +86,23 @@ class ReceiptControllerTest {
   @Test
   void whenGetReceiptDetailThenOk() throws Exception {
     //given
+    Long organizationId = 1L;
     Long receiptId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
     ReceiptDetailDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId)).thenReturn(expectedResponse);
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/receipts/"+receiptId+"/detail")
-          .param("operatorExternalUserId",operatorExternalUserId))
+          .param("operatorExternalUserId", operatorExternalUserId)
+          .param("organizationId", organizationId.toString()))
       .andExpect(status().isOk())
       .andReturn();
 
     ReceiptDetailDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId);
+    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
   }
 }
