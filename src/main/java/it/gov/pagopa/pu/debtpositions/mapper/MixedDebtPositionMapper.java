@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -19,6 +20,7 @@ import java.util.Map;
 public class MixedDebtPositionMapper {
 
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
+  private final CategoryResolverService categoryResolverService;
 
   public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
     if (request == null) {
@@ -43,7 +45,7 @@ public class MixedDebtPositionMapper {
             requestTransfer.getStampProvincialResidence())
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
-          .category(requestTransfer.getLegacyPaymentMetadata())
+          .category(categoryResolverService.extractTaxonomyFromLegacyPaymentMetadata(requestTransfer.getLegacyPaymentMetadata()))
           .remittanceInformation(request.getRemittanceInformation())
           .build()
       );

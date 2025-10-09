@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker;
@@ -35,12 +36,14 @@ class MixedDebtPositionMapperTest {
 
   @Mock
   private MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverServiceMock;
+  @Mock
+  private CategoryResolverService categoryResolverServiceMock;
 
   private MixedDebtPositionMapper mapper;
 
   @BeforeEach
   void init() {
-    mapper = new MixedDebtPositionMapper(mixedDebtPositionTypeOrgRetrieverServiceMock);
+    mapper = new MixedDebtPositionMapper(mixedDebtPositionTypeOrgRetrieverServiceMock, categoryResolverServiceMock);
   }
 
   @Test
@@ -61,7 +64,7 @@ class MixedDebtPositionMapperTest {
       .stampProvincialResidence("stampProvincialResidence")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
-      .category("legacyPaymentMetadata")
+      .category("01234567")
       .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
@@ -103,6 +106,9 @@ class MixedDebtPositionMapperTest {
           anyLong()))
         .thenReturn(dpTypeOrg);
 
+      when(categoryResolverServiceMock.extractTaxonomyFromLegacyPaymentMetadata("9/01234567/xxxxx"))
+        .thenReturn("01234567");
+
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
         mixedDebtPositionDTO);
 
@@ -123,7 +129,7 @@ class MixedDebtPositionMapperTest {
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
-      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .legacyPaymentMetadata("9/01234567/xxxxx")
       .balance("Test Balance")
       .build();
     Map<Long, List<MixedDpAdditionalData>> expected = Map.of(100L,
