@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.WS_USER_PREFIX;
+
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
@@ -25,15 +27,26 @@ public class InstallmentPaidViewPIIViewRepositoryImpl implements InstallmentPaid
     this.pagedInstallmentsPaidViewMapper = pagedInstallmentsPaidViewMapper;
   }
 
-
   @Override
-  public PagedInstallmentsPaidView getPagedInstallmentPaidView(ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO, Pageable pageable) {
+  public PagedInstallmentsPaidView getPagedInstallmentPaidView(
+    ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO,
+    Pageable pageable) {
+    Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO =
+      exportPaidInstallmentsFiltersDTO.getOperatorExternalUserId()
+        .startsWith(WS_USER_PREFIX) ?
+        installmentPaidViewNoPIIDTORepository.findInstallmentPaidViewNoPIIDTOWithoutOperator(
+          exportPaidInstallmentsFiltersDTO, pageable)
+        : installmentPaidViewNoPIIDTORepository.findInstallmentPaidViewNoPIIDTO(
+          exportPaidInstallmentsFiltersDTO, pageable);
 
-    Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO = installmentPaidViewNoPIIDTORepository.findInstallmentPaidViewNoPIIDTO(exportPaidInstallmentsFiltersDTO, pageable);
-
-    if(pagedInstallmentPaidViewNoPIIDTO.getTotalElements() > maxTotalElements){
-      throw new ExportTooManyRecordsException("The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(pagedInstallmentPaidViewNoPIIDTO.getTotalElements(), maxTotalElements));
+    if (pagedInstallmentPaidViewNoPIIDTO.getTotalElements() > maxTotalElements) {
+      throw new ExportTooManyRecordsException(
+        "The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(
+          pagedInstallmentPaidViewNoPIIDTO.getTotalElements(),
+          maxTotalElements));
     }
-    return pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(pagedInstallmentPaidViewNoPIIDTO);
+
+    return pagedInstallmentsPaidViewMapper.mapToPagedInstallmentsPaidView(
+      pagedInstallmentPaidViewNoPIIDTO);
   }
 }
