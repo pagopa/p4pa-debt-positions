@@ -477,6 +477,13 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: debtPositionOrigins
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
       responses:
         "200":
           description: Ok
