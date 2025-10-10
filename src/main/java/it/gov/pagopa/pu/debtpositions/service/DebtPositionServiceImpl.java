@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -13,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -25,14 +27,16 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final DebtPositionSaveService debtPositionSaveService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionDeleteService debtPositionDeleteService;
+  private final DataCipherService dataCipherService;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository,
                                  DebtPositionSaveService debtPositionSaveService,
-                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService) {
+                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService, DataCipherService dataCipherService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionSaveService = debtPositionSaveService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionDeleteService = debtPositionDeleteService;
+    this.dataCipherService = dataCipherService;
   }
 
   @Override
@@ -113,6 +117,27 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     propagateIdsForDebtPosition(debtPosition, debtPositionDTO);
 
     debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO);
+  }
+
+  @Override
+  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, Long organizationId, LocalDate dateFrom, LocalDate dateTo) {
+    if (debtorFiscalCode == null || debtorEntityType == null) {
+      throw new IllegalArgumentException("debtorFiscalCode and debtorEntityType are required");
+    }
+
+    byte[] debtorFiscalCodeHash = dataCipherService.hash(debtorFiscalCode);
+
+    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
+      debtorFiscalCodeHash,
+      debtorEntityType,
+      status,
+      debtPositionOrigin,
+      organizationId,
+      dateFrom,
+      dateTo
+    );
+
+    return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 
   private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {

@@ -16,20 +16,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncCompleteDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncErrorDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
@@ -555,5 +542,25 @@ class DebtPositionControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
+
+  @Test
+  void whenGetDebtPositionsByDebtorFiscalCodeAndDebtorEntityTypeThenOk() throws Exception {
+    PersonEntityType debtorEntityType = PersonEntityType.F;
+    String debtorFiscalCode = "fiscalcode";
+    Long organizationId = 1L;
+
+    List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, organizationId, null, null)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
+          .queryParam("organizationId", String.valueOf(organizationId))
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    assertEquals(expectedResult, resultResponse);
   }
 }
