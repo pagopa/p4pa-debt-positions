@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -154,4 +156,33 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
   Optional<DebtPosition> findDebtPositionByIupdOrgAndOrganizationId(String iupd, Long organizationId);
+
+  @RestResource(exported = false)
+  @Query("""
+   SELECT d
+     FROM DebtPosition d
+    WHERE (:organizationId IS NULL OR d.organizationId = :organizationId)
+      AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND EXISTS (
+        SELECT 1
+          FROM PaymentOption p
+          JOIN p.installments i
+         WHERE p.debtPositionId = d.debtPositionId
+           AND i.debtorFiscalCodeHash = :debtorFiscalCodeHash
+           AND i.debtorEntityType = :debtorEntityType
+           AND (:status IS NULL OR i.status IN :status)
+           AND (:dateFrom IS NULL OR i.dueDate >= :dateFrom)
+           AND (:dateTo IS NULL OR i.dueDate <= :dateTo)
+      )
+  """)
+  @EntityGraph(value = "completeDebtPosition")
+  List<DebtPosition> findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
+    @Param("debtorFiscalCodeHash") byte[] debtorFiscalCodeHash,
+    @Param("debtorEntityType") PersonEntityType debtorEntityType,
+    @Param("status") List<InstallmentStatus> status,
+    @Param("debtPositionOrigin") List<DebtPositionOrigin> debtPositionOrigin,
+    @Param("organizationId") Long organizationId,
+    @Param("dateFrom") LocalDate dateFrom,
+    @Param("dateTo") LocalDate dateTo
+  );
 }

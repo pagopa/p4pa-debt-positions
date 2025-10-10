@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -257,5 +258,27 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       .header(HEADER_X_WORKFLOW_ID, result.getRight().getWorkflowId())
       .header(HEADER_X_RUN_ID, result.getRight().getRunId())
       .body(result.getLeft());
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
+    String fiscalCode,
+    PersonEntityType entityType,
+    List<InstallmentStatus> status,
+    List<DebtPositionOrigin> debtPositionOrigin,
+    Long organizationId,
+    LocalDate dateFrom,
+    LocalDate dateTo
+  ) {
+    log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
+      fiscalCode,
+      entityType,
+      status,
+      debtPositionOrigin,
+      organizationId,
+      dateFrom,
+      dateTo
+    ));
   }
 }
