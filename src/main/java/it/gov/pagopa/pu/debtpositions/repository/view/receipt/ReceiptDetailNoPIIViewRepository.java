@@ -34,8 +34,11 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
     + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
     + "WHERE r.receiptId = :receiptId "
-    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId ")
+    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
+    + "AND dp.organizationId = :organizationId "
+    + "AND dp.debtPositionOrigin IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).ORDINARY_DEBT_POSITION_ORIGINS})")
   Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
-    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
+    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId);
 }

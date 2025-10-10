@@ -10,5 +10,7 @@ public class Constants {
 
   public static final String MIXED_DP_TYPE_ORG_CODE = "MIXED";
 
+  public static final String WS_USER_PREFIX = "WS_USER-";
+
 }
 

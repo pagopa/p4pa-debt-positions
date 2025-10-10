@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.controller.generated.DataExportsApi;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidDateTimeIntervalException;
@@ -11,13 +12,13 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.OffsetDateTime;
-import java.time.temporal.ChronoUnit;
 
 @RestController
 public class DataExportsControllerImpl implements DataExportsApi {
@@ -37,7 +38,7 @@ public class DataExportsControllerImpl implements DataExportsApi {
   }
 
   @Override
-  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateTimeFrom, OffsetDateTime paymentDateTimeTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, Pageable pageable) {
+  public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateTimeFrom, OffsetDateTime paymentDateTimeTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, List<DebtPositionOrigin> debtPositionOrigins, Pageable pageable) {
     String invalidDateTimeIntervalErrorMessage = "The date interval between %s and %s cannot exceed %d months";
     boolean hasPaymentDates = paymentDateTimeFrom != null && paymentDateTimeTo != null;
     boolean hasInstallmentDates = installmentUpdateDateTimeFrom != null && installmentUpdateDateTimeTo != null;
@@ -66,6 +67,7 @@ public class DataExportsControllerImpl implements DataExportsApi {
         .paymentDateTime(paymentDateTime)
         .installmentUpdateDateTime(installmentUpdateDateTime)
         .debtPositionTypeOrgId(debtPositionTypeOrgId)
+        .debtPositionOrigins(debtPositionOrigins)
         .build(),
      pageable));
   }

@@ -555,6 +555,13 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: debtPositionOrigins
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/DebtPositionOrigin"
       responses:
         "200":
           description: Ok
@@ -726,6 +733,12 @@ paths:
           required: true
           schema:
             type: string
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
       responses:
         "200":
           description: Ok
