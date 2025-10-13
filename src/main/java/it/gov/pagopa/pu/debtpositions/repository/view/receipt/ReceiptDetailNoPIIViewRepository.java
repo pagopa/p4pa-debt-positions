@@ -36,7 +36,6 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     + "WHERE r.receiptId = :receiptId "
     + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
     + "AND dp.organizationId = :organizationId "
-    + "AND dp.debtPositionOrigin IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).ORDINARY_DEBT_POSITION_ORIGINS}) "
     + "AND dp.debtPositionOrigin <> it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin.SPONTANEOUS_MIXED ")
   Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
