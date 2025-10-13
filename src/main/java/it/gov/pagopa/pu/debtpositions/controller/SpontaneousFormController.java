@@ -20,6 +20,7 @@ public class SpontaneousFormController implements SpontaneousFormApi {
 
   @Override
   public ResponseEntity<SpontaneousForm> createSpontaneousForm(SpontaneousForm spontaneousForm) {
+    log.info("creating SpontaneousForm having organizationId {} and code {}", spontaneousForm.getOrganizationId(), spontaneousForm.getCode());
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(spontaneousFormService.createSpontaneousForm(spontaneousForm));
   }
