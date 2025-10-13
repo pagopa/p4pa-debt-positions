@@ -31,7 +31,7 @@ public class CategoryResolverService {
       try {
         String extractedCode = extractTaxonomyFromLegacyPaymentMetadata(legacyPaymentMetadata);
 
-        if (taxonomyValidatorService.isTaxonomyCategoryValid(extractedCode)) {
+        if (taxonomyValidatorService.isTaxonomyCodeValid(extractedCode)) {
           taxonomyCode = extractedCode;
         } else {
           log.warn("Extracted taxonomy [{}] from legacyPaymentMetadata is not valid. Getting taxonomy from debtPositionTypeId {}.", extractedCode, debtPositionTypeId);
