@@ -38,7 +38,7 @@ class CategoryResolverServiceTest {
     String legacyPaymentMetadata = "9/001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCategoryValid("9/001122233/")).thenReturn(true);
+    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCodeValid("9/001122233/")).thenReturn(true);
 
     String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
 
@@ -52,7 +52,7 @@ class CategoryResolverServiceTest {
     String legacyPaymentMetadata = "9/001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCategoryValid("9/001122233/")).thenReturn(false);
+    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCodeValid("9/001122233/")).thenReturn(false);
     Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.of(buildDebtPositionType()));
 
     String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
