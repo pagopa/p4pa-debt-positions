@@ -304,16 +304,16 @@ paths:
           required: false
           schema:
             type: string
-            format: date
-            example: 2025-01-01
+            format: date-time
+            example: 2025-01-01T00:00:00
         - name: dateTo
           in: query
           description: End date (inclusive)
           required: false
           schema:
             type: string
-            format: date
-            example: 2025-01-01
+            format: date-time
+            example: 2025-01-01T00:00:00
       responses:
         "200":
           description: Ok
