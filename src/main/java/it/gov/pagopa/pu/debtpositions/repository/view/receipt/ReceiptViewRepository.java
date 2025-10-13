@@ -33,7 +33,8 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND (:debtPositionTypeOrgId IS NULL OR dp.debtPositionTypeOrgId = :debtPositionTypeOrgId) "
     + "AND (cast(:paymentDateTimeFrom as date) IS NULL OR r.paymentDateTime >= :paymentDateTimeFrom) "
     + "AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo) "
-    + "AND ((:fiscalCode IS NULL) OR (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)})) ")
+    + "AND ((:fiscalCode IS NULL) OR (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)})) "
+    + "AND dp.debtPositionOrigin <> it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin.SPONTANEOUS_MIXED ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
