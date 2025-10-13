@@ -1487,6 +1487,32 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /spontaneous-forms:
+    post:
+      tags:
+        - spontaneous-form
+      operationId: createSpontaneousForm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'SpontaneousForm'
+        required: true
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: 'SpontaneousForm'
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden
+        '409':
+          description: Conflict
+        '500':
+          description: Internal server error
 security:
   - BearerAuth: [ ]
 components:
