@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.regex.Matcher;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 
+@Slf4j
 @Service
 public class CategoryResolverService {
 
@@ -23,7 +25,7 @@ public class CategoryResolverService {
   }
 
   public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId) {
-    String taxonomyCode;
+    String taxonomyCode = null;
 
     if (StringUtils.isNotBlank(legacyPaymentMetadata)) {
       try {
@@ -32,12 +34,15 @@ public class CategoryResolverService {
         if (taxonomyValidatorService.isTaxonomyCategoryValid(extractedCode)) {
           taxonomyCode = extractedCode;
         } else {
-          taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
+          log.warn("Extracted taxonomy [{}] from legacyPaymentMetadata is not valid. Getting taxonomy from debtPositionTypeId {}.", extractedCode, debtPositionTypeId);
         }
       } catch (Exception e) {
-        taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
+        log.warn("Failed to extract taxonomy from legacyPaymentMetadata [{}], getting taxonomy from debtPositionTypeId {}. Error: {}.",
+          legacyPaymentMetadata, debtPositionTypeId, e.getMessage());
       }
-    } else {
+    }
+
+    if (taxonomyCode == null) {
       taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
     }
 
