@@ -3,6 +3,8 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -15,14 +17,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
-
 @Service
 @RequiredArgsConstructor
 public class MixedDebtPositionMapper {
 
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
   public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
     if (request == null) {
@@ -35,7 +36,10 @@ public class MixedDebtPositionMapper {
     List<MixedTransferDTO> requestTransfers = request.getTransfers();
     for (int i = 0; i < requestTransfers.size(); i++) {
       MixedTransferDTO requestTransfer = requestTransfers.get(i);
-      String category = taxonomyCodeToTransferCategory(categoryResolverService.extractTaxonomyFromLegacyPaymentMetadata(requestTransfer.getLegacyPaymentMetadata()));
+      Long debtPositionTypeId = debtPositionTypeOrgRepository.findById(requestTransfer.getDebtPositionTypeOrgId())
+        .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s is not found", requestTransfer.getDebtPositionTypeOrgId())))
+        .getDebtPositionTypeId();
+      String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId);
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i + 1)

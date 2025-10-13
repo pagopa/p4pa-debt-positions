@@ -49,7 +49,7 @@ public class CategoryResolverService {
     return taxonomyCodeToTransferCategory(taxonomyCode);
   }
 
-  public String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
+  private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
     Matcher matcher = LEGACY_PAYMENT_METADATA_REGEX.matcher(legacyPaymentMetadata);
     if (!matcher.find()) {
       throw new InvalidValueException(String.format("The legacy payment metadata [%s] is not valid to extract taxonomy code", legacyPaymentMetadata));
