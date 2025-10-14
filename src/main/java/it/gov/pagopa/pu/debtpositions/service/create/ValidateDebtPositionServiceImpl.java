@@ -96,7 +96,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
   public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
-      throw new InvalidValueException("Remittance information is mandatory");
+      throw new InvalidValueException("[P4PA_MISSING_REMITTANCE_INFORMATION] Remittance information is mandatory");
     }
 
     validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin);
@@ -230,7 +230,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
   private void checkTaxonomyCategory(TransferDTO transferDTO) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
-      throw new InvalidValueException("Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
+      throw new InvalidValueException("[P4PA_MISSING_TAXONOMY_CATEGORY] Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
       String taxonomyCategory = transferDTO.getCategory();
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory)) {
