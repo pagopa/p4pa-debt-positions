@@ -5,10 +5,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.model.*;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -21,9 +20,11 @@ import java.util.TreeSet;
 public class TechnicalMixedDebtPositionMapper {
 
   private final BalanceResolverService balanceResolverService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
-  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService) {
+  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     this.balanceResolverService = balanceResolverService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition,
@@ -142,14 +143,27 @@ public class TechnicalMixedDebtPositionMapper {
         technicalMixedDpInstallment.setTransfers(
           toTechnicalMixedDPTransfers(transfer));
 
-        if (!isUnpayable && StringUtils.isNotBlank(mixedDpAdditionalData.getBalance())) {
-          String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, technicalMixedDpInstallment, accessToken);
-          technicalMixedDpInstallment.setBalance(balanceResolved);
-        }
+        setBalance(organizationId, isUnpayable, accessToken, installment, mixedDpAdditionalData, technicalMixedDpInstallment);
         set.add(technicalMixedDpInstallment);
       }));
 
     return set;
+  }
+
+  private void setBalance(Long organizationId, boolean isUnpayable, String accessToken, InstallmentNoPII installment, MixedDpAdditionalData mixedDpAdditionalData, InstallmentNoPII technicalMixedDpInstallment) {
+    if (!isUnpayable) {
+      if (StringUtils.isNotBlank(mixedDpAdditionalData.getBalance())) {
+        String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, technicalMixedDpInstallment, accessToken);
+        technicalMixedDpInstallment.setBalance(balanceResolved);
+      } else {
+        DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+        if (debtPositionTypeOrg == null) {
+          throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
+        }
+        String balance = balanceResolverService.getBalanceDefault(organizationId, debtPositionTypeOrg, accessToken);
+        technicalMixedDpInstallment.setBalance(balance);
+      }
+    }
   }
 
   private SortedSet<Transfer> toTechnicalMixedDPTransfers(Transfer transfer) {

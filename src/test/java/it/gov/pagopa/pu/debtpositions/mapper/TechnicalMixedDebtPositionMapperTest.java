@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +31,8 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   private TechnicalMixedDebtPositionMapper mapper;
 
@@ -37,7 +40,7 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @BeforeEach
   void init() {
-    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
+    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepositoryMock);
   }
 
   @Test

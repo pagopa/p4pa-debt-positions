@@ -1,23 +1,24 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.mapper.TechnicalMixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class TechnicalMixedDebtPositionBuilderServiceTest {
@@ -26,8 +27,10 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
 
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
-  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
+  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepositoryMock);
 
   @BeforeEach
   void init() {
