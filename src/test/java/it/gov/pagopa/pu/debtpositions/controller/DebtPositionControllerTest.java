@@ -32,6 +32,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -561,6 +562,31 @@ class DebtPositionControllerTest {
       .andReturn();
 
     List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void whenGetDebtPositionsByDebtorFiscalCodeAndDebtorEntityTypeAndDatesThenOk() throws Exception {
+    PersonEntityType debtorEntityType = PersonEntityType.F;
+    String debtorFiscalCode = "fiscalcode";
+    Long organizationId = 1L;
+    OffsetDateTime fromDate = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
+    OffsetDateTime toDate = OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 999000000, ZoneOffset.UTC);
+
+    List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, organizationId, fromDate.toLocalDateTime(), toDate.toLocalDateTime())).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
+          .queryParam("organizationId", String.valueOf(organizationId))
+          .queryParam("dateFrom", fromDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+          .queryParam("dateTo", toDate.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME))
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>() {
+    });
     assertEquals(expectedResult, resultResponse);
   }
 }
