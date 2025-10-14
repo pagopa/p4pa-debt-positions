@@ -25,7 +25,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -487,8 +487,8 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = List.of(InstallmentStatus.PAID);
     List<DebtPositionOrigin> origin = List.of(DebtPositionOrigin.ORDINARY);
     Long orgId = 123L;
-    LocalDate dateFrom = LocalDate.of(2023, 1, 1);
-    LocalDate dateTo = LocalDate.of(2023, 12, 31);
+    LocalDateTime dateFrom = LocalDateTime.of(2023, 1, 1, 0, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2023, 12, 31, 23, 59);
 
     byte[] fiscalCodeHash = new byte[]{1,2,3};
     List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
@@ -520,8 +520,8 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = null;
     List<DebtPositionOrigin> origin = null;
     Long orgId = 456L;
-    LocalDate dateFrom = null;
-    LocalDate dateTo = null;
+    LocalDateTime dateFrom = null;
+    LocalDateTime dateTo = null;
 
     byte[] fiscalCodeHash = new byte[]{4,5,6};
     List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
@@ -553,8 +553,8 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = List.of();
     List<DebtPositionOrigin> origin = List.of();
     Long orgId = null;
-    LocalDate dateFrom = null;
-    LocalDate dateTo = null;
+    LocalDateTime dateFrom = null;
+    LocalDateTime dateTo = null;
 
     byte[] fiscalCodeHash = new byte[]{7,8,9};
     List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
@@ -586,8 +586,8 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = null;
     List<DebtPositionOrigin> origin = null;
     Long orgId = null;
-    LocalDate dateFrom = null;
-    LocalDate dateTo = null;
+    LocalDateTime dateFrom = null;
+    LocalDateTime dateTo = null;
 
     // When / Then
     Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
@@ -603,8 +603,8 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = List.of();
     List<DebtPositionOrigin> origin = List.of();
     Long orgId = 789L;
-    LocalDate dateFrom = LocalDate.of(2022, 1, 1);
-    LocalDate dateTo = LocalDate.of(2022, 12, 31);
+    LocalDateTime dateFrom = LocalDateTime.of(2023, 1, 1, 0, 0);
+    LocalDateTime dateTo = LocalDateTime.of(2023, 12, 31, 23, 59);
 
     byte[] fiscalCodeHash = new byte[]{10,11,12};
     List<DebtPosition> entities = List.of();
