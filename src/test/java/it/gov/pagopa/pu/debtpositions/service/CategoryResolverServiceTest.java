@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,11 +23,14 @@ class CategoryResolverServiceTest {
   @Mock
   private DebtPositionTypeRepository debtPositionTypeRepositoryMock;
 
-  private CategoryResolverService service;
+  @Mock
+  private TaxonomyValidatorService taxonomyValidatorServiceMock;
+
+  private CategoryResolverService categoryResolverService;
 
   @BeforeEach
   void setUp() {
-    service = new CategoryResolverService(debtPositionTypeRepositoryMock);
+    categoryResolverService = new CategoryResolverService(debtPositionTypeRepositoryMock, taxonomyValidatorServiceMock);
   }
 
   @Test
@@ -36,7 +38,9 @@ class CategoryResolverServiceTest {
     String legacyPaymentMetadata = "9/001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    String result = service.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
+    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCodeValid("9/001122233/")).thenReturn(true);
+
+    String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
 
     assertEquals("001122233", result);
 
@@ -44,13 +48,28 @@ class CategoryResolverServiceTest {
   }
 
   @Test
-  void whenInvalidLegacyPaymentMetadataWhenFetchCategoryThenException() {
+  void whenTaxonomyCategoryInvalidWhenFetchCategoryThenSuccess() {
+    String legacyPaymentMetadata = "9/001122233/xxx";
+    Long debtPositionTypeId = 1L;
+
+    Mockito.when(taxonomyValidatorServiceMock.isTaxonomyCodeValid("9/001122233/")).thenReturn(false);
+    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.of(buildDebtPositionType()));
+
+    String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
+
+    assertEquals("001122233", result);
+  }
+
+  @Test
+  void whenInvalidLegacyPaymentMetadataWhenFetchCategoryThenGetFromDP() {
     String legacyPaymentMetadata = "001122233/xxx";
     Long debtPositionTypeId = 1L;
 
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.resolveCategory(legacyPaymentMetadata, debtPositionTypeId));
+    Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.of(buildDebtPositionType()));
 
-    assertEquals("The legacy payment metadata [001122233/xxx] is not valid to extract taxonomy code", exception.getMessage());
+    String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId);
+
+    assertEquals("001122233", result);
   }
 
   @Test
@@ -59,7 +78,7 @@ class CategoryResolverServiceTest {
 
     Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.of(buildDebtPositionType()));
 
-    String result = service.resolveCategory(null, debtPositionTypeId);
+    String result = categoryResolverService.resolveCategory(null, debtPositionTypeId);
 
     assertEquals("001122233", result);
   }
@@ -70,7 +89,7 @@ class CategoryResolverServiceTest {
 
     Mockito.when(debtPositionTypeRepositoryMock.findById(debtPositionTypeId)).thenReturn(Optional.empty());
 
-    NotFoundException exception = assertThrows(NotFoundException.class, () -> service.resolveCategory(null, debtPositionTypeId));
+    NotFoundException exception = assertThrows(NotFoundException.class, () -> categoryResolverService.resolveCategory(null, debtPositionTypeId));
 
     assertEquals("The debt position type with id 1 is not found", exception.getMessage());
   }
