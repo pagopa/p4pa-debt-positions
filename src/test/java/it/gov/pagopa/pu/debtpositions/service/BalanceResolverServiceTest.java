@@ -164,14 +164,11 @@ class BalanceResolverServiceTest {
     InstallmentNoPII installment = buildInstallmentNoPII();
     installment.setBalance("");
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setBalance("");
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(debtPositionTypeOrg);
-    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
-      .thenReturn(Optional.ofNullable(buildOrganization()));
-    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
-      .balance("balance").amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
-    Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
+    Mockito.when(balanceServiceMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrg.getCode(), accessToken))
       .thenReturn("");
 
     service.updateBalanceResolvingAmount(installment, orgId, accessToken);
