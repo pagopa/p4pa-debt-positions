@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.mapper.TechnicalMixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -27,10 +26,8 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
 
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
-  @Mock
-  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
-  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepositoryMock);
+  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
 
   @BeforeEach
   void init() {

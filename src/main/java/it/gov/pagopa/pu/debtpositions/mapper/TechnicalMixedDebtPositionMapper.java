@@ -5,9 +5,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.model.*;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -20,11 +21,9 @@ import java.util.TreeSet;
 public class TechnicalMixedDebtPositionMapper {
 
   private final BalanceResolverService balanceResolverService;
-  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
-  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
+  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService) {
     this.balanceResolverService = balanceResolverService;
-    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition,
@@ -156,12 +155,8 @@ public class TechnicalMixedDebtPositionMapper {
         String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, technicalMixedDpInstallment, accessToken);
         technicalMixedDpInstallment.setBalance(balanceResolved);
       } else {
-        DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-        if (debtPositionTypeOrg == null) {
-          throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
-        }
-        String balance = balanceResolverService.getBalanceDefault(organizationId, debtPositionTypeOrg, accessToken);
-        technicalMixedDpInstallment.setBalance(balance);
+        balanceResolverService.updateBalanceResolvingAmount(installment, organizationId, accessToken);
+        technicalMixedDpInstallment.setBalance(installment.getBalance());
       }
     }
   }

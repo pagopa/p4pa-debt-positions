@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,16 +30,20 @@ class BalanceResolverServiceTest {
 
   private BalanceResolverService service;
 
-  @Mock private BalanceService balanceServiceMock;
-  @Mock private OrganizationService organizationServiceMock;
+  @Mock
+  private BalanceService balanceServiceMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   @BeforeEach
   void setUp() {
-    service = new BalanceResolverService(balanceServiceMock, organizationServiceMock);
+    service = new BalanceResolverService(balanceServiceMock, organizationServiceMock, debtPositionTypeOrgRepositoryMock);
   }
 
   @Test
-  void givenDebtPositionTypeOrgWithBalanceWhenGetBalanceThenSuccess(){
+  void givenDebtPositionTypeOrgWithBalanceWhenGetBalanceThenSuccess() {
     Long orgId = 1L;
     String accessToken = "accessToken";
 
@@ -50,7 +56,7 @@ class BalanceResolverServiceTest {
   }
 
   @Test
-  void givenDebtPositionTypeOrgWithBalanceNullWhenGetBalanceThenSuccess(){
+  void givenDebtPositionTypeOrgWithBalanceNullWhenGetBalanceThenSuccess() {
     Long orgId = 1L;
     String accessToken = "accessToken";
 
@@ -65,7 +71,7 @@ class BalanceResolverServiceTest {
   }
 
   @Test
-  void givenInstallmentWhenResolveAmountBalanceThenSuccess(){
+  void givenInstallmentWhenResolveAmountBalanceThenSuccess() {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
@@ -81,7 +87,7 @@ class BalanceResolverServiceTest {
   }
 
   @Test
-  void givenInstallmentWithOrgNotFoundWhenResolveAmountBalanceThenSuccess(){
+  void givenInstallmentWithOrgNotFoundWhenResolveAmountBalanceThenSuccess() {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
@@ -95,4 +101,81 @@ class BalanceResolverServiceTest {
     Mockito.verify(balanceServiceMock, times(0)).calculateAmountBalance(Mockito.any(), Mockito.anyString());
   }
 
+  @Test
+  void givenInstallmentWithNoBalanceWhenUpdateBalanceResolvingAmountThenSuccess() {
+    Long orgId = 1L;
+    String accessToken = "accessToken";
+    InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setBalance(null);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.ofNullable(buildOrganization()));
+    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+      .balance("balance").amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+    Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
+      .thenReturn("balanceResolved");
+
+    service.updateBalanceResolvingAmount(installment, orgId, accessToken);
+
+    assertEquals("balanceResolved", installment.getBalance());
+  }
+
+  @Test
+  void givenIncorrectDebtPositionTypeOrgWhenUpdateBalanceResolvingAmountThenException() {
+    Long orgId = 1L;
+    String accessToken = "accessToken";
+    InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setBalance(null);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(null);
+
+    NotFoundException response = Assertions.assertThrows(NotFoundException.class,
+      () -> service.updateBalanceResolvingAmount(installment, orgId, accessToken));
+
+    Assertions.assertEquals("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found", response.getMessage());
+  }
+
+  @Test
+  void givenInstallmentWhenUpdateBalanceResolvingAmountThenSuccess() {
+    Long orgId = 1L;
+    String accessToken = "accessToken";
+    InstallmentNoPII installment = buildInstallmentNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.ofNullable(buildOrganization()));
+    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+      .balance(installment.getBalance()).amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+    Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
+      .thenReturn("balanceResolved");
+
+    service.updateBalanceResolvingAmount(installment, orgId, accessToken);
+
+    assertEquals("balanceResolved", installment.getBalance());
+  }
+
+  @Test
+  void givenInstallmentWithEmptyBalanceWhenUpdateBalanceResolvingAmountThenSuccess() {
+    Long orgId = 1L;
+    String accessToken = "accessToken";
+    InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setBalance("");
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.ofNullable(buildOrganization()));
+    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+      .balance("balance").amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+    Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
+      .thenReturn("");
+
+    service.updateBalanceResolvingAmount(installment, orgId, accessToken);
+
+    assertEquals("", installment.getBalance());
+  }
 }
