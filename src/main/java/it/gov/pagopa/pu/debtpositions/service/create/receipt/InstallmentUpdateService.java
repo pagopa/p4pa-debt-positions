@@ -91,14 +91,14 @@ public class InstallmentUpdateService {
     if (receipt != null) {
       installment.setReceiptId(receipt.getReceiptId());
       installment.setIur(receipt.getPaymentReceiptId());
+      if (StringUtils.isNotBlank(receipt.getBalance())) {
+        installment.setBalance(receipt.getBalance());
+      }
       long feeAmountCents = receipt.getPaymentAmountCents() - installment.getAmountCents();
       if (feeAmountCents > 0) {
         log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
         installment.setNotificationFeeCents(feeAmountCents);
         log.debug("Update amounts");
-        if (StringUtils.isNotBlank(receipt.getBalance())) {
-          installment.setBalance(receipt.getBalance());
-        }
         installment.setAmountCents(installment.getAmountCents() + feeAmountCents);
         installment.getTransfers()
           .stream().filter(t -> t.getTransferIndex() == 1)
