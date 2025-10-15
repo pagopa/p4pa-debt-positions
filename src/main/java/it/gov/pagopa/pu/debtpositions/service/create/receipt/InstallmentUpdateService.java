@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -88,7 +87,7 @@ public class InstallmentUpdateService {
     });
   }
 
-  private void updateInstallmentStatusAndFeeOfDebtPosition(InstallmentNoPII installment, InstallmentStatus status, ReceiptDTO receipt) {
+  private void updateInstallmentStatusAndFeeOfDebtPosition(InstallmentNoPII installment, InstallmentStatus status, ReceiptWithAdditionalNodeDataDTO receipt) {
     if (receipt != null) {
       installment.setReceiptId(receipt.getReceiptId());
       installment.setIur(receipt.getPaymentReceiptId());
@@ -97,6 +96,9 @@ public class InstallmentUpdateService {
         log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
         installment.setNotificationFeeCents(feeAmountCents);
         log.debug("Update amounts");
+        if (StringUtils.isNotBlank(receipt.getBalance())) {
+          installment.setBalance(receipt.getBalance());
+        }
         installment.setAmountCents(installment.getAmountCents() + feeAmountCents);
         installment.getTransfers()
           .stream().filter(t -> t.getTransferIndex() == 1)
