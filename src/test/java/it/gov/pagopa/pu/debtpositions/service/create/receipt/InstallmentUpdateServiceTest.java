@@ -114,6 +114,8 @@ class InstallmentUpdateServiceTest {
       targetInstallment.getInstallmentId())).thenReturn(debtPosition);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setBalance(null);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(targetInstallment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
 
     //when
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
@@ -167,6 +169,7 @@ class InstallmentUpdateServiceTest {
     targetInstallment.setBalance(null);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
     debtPosition.setStatus(DebtPositionStatus.UNPAID);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     PaymentOption po0 = PaymentOptionFaker.buildPaymentOption();
     po0.setPaymentOptionIndex(1);
@@ -187,11 +190,13 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(targetInstallment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(
       targetInstallment.getInstallmentId())).thenReturn(debtPosition);
     Mockito.doThrow(new NotFoundException("The DebtPositionTypeOrg for installment with id " + targetInstallment.getInstallmentId() + " was not found"))
       .when(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), ACCESS_TOKEN);
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
 
     NotFoundException response = Assertions.assertThrows(NotFoundException.class,
       () -> installmentUpdateService.updateInstallmentStatusOfDebtPosition(targetInstallment, receiptDTO, ACCESS_TOKEN));
@@ -201,7 +206,7 @@ class InstallmentUpdateServiceTest {
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
       .findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
     Mockito.verify(balanceResolverServiceMock, Mockito.times(1))
-      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), ACCESS_TOKEN);
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
     Mockito.verify(balanceResolverServiceMock, Mockito.times(0))
       .resolveAmountBalance(debtPosition.getOrganizationId(), targetInstallment, ACCESS_TOKEN);
   }
@@ -212,6 +217,7 @@ class InstallmentUpdateServiceTest {
     long installmentAmount = 1000L;
     long paymentAmount = 1200L;
     long feeAmount = paymentAmount - installmentAmount; // = 200
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setPaymentReceiptId("RECEIPTID");
@@ -261,10 +267,13 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(targetInstallment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId()))
       .thenReturn(debtPosition);
     Mockito.doNothing().when(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), ACCESS_TOKEN);
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
 
     // When
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
