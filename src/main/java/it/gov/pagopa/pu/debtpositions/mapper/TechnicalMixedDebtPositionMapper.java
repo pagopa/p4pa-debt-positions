@@ -142,7 +142,7 @@ public class TechnicalMixedDebtPositionMapper {
           toTechnicalMixedDPTransfers(transfer));
 
         if (!isUnpayable) {
-          balanceResolverService.updateBalanceResolvingAmount(installment, organizationId, accessToken);
+          balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, accessToken);
         }
         set.add(technicalMixedDpInstallment);
       }));
