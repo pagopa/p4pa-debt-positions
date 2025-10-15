@@ -5,9 +5,11 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -21,10 +23,12 @@ import java.util.stream.Stream;
 public class InstallmentUpdateService {
 
   private final DebtPositionRepository debtPositionRepository;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final BalanceResolverService balanceResolverService;
 
-  InstallmentUpdateService(DebtPositionRepository debtPositionRepository, BalanceResolverService balanceResolverService) {
+  InstallmentUpdateService(DebtPositionRepository debtPositionRepository, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, BalanceResolverService balanceResolverService) {
     this.debtPositionRepository = debtPositionRepository;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.balanceResolverService = balanceResolverService;
   }
 
@@ -54,7 +58,11 @@ public class InstallmentUpdateService {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
-        balanceResolverService.updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), accessToken);
+        DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+        if (debtPositionTypeOrg == null) {
+          throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
+        }
+        balanceResolverService.updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
         // update mbdAttachment of transfer entity if present in input ReceiptDTO
         updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {

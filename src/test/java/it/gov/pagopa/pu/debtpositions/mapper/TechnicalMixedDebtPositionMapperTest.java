@@ -5,10 +5,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.model.*;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +20,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -30,6 +29,8 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
   private TechnicalMixedDebtPositionMapper mapper;
 
@@ -37,7 +38,7 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @BeforeEach
   void init() {
-    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock);
+    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepository);
   }
 
   @Test
@@ -129,6 +130,7 @@ class TechnicalMixedDebtPositionMapperTest {
     PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
     InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
     Transfer transfer = installment.getTransfers().getFirst();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
@@ -137,7 +139,7 @@ class TechnicalMixedDebtPositionMapperTest {
       .build();
 
     Mockito.doNothing().when(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(installment, debtPosition.getOrganizationId(), accessToken);
+      .updateBalanceResolvingAmount(installment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
     installment.setBalance("balanceResolved");
 
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
