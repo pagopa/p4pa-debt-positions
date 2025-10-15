@@ -10,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -142,23 +141,13 @@ public class TechnicalMixedDebtPositionMapper {
         technicalMixedDpInstallment.setTransfers(
           toTechnicalMixedDPTransfers(transfer));
 
-        setBalance(organizationId, isUnpayable, accessToken, installment, mixedDpAdditionalData, technicalMixedDpInstallment);
+        if (!isUnpayable) {
+          balanceResolverService.updateBalanceResolvingAmount(installment, organizationId, accessToken);
+        }
         set.add(technicalMixedDpInstallment);
       }));
 
     return set;
-  }
-
-  private void setBalance(Long organizationId, boolean isUnpayable, String accessToken, InstallmentNoPII installment, MixedDpAdditionalData mixedDpAdditionalData, InstallmentNoPII technicalMixedDpInstallment) {
-    if (!isUnpayable) {
-      if (StringUtils.isNotBlank(mixedDpAdditionalData.getBalance())) {
-        String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, technicalMixedDpInstallment, accessToken);
-        technicalMixedDpInstallment.setBalance(balanceResolved);
-      } else {
-        balanceResolverService.updateBalanceResolvingAmount(installment, organizationId, accessToken);
-        technicalMixedDpInstallment.setBalance(installment.getBalance());
-      }
-    }
   }
 
   private SortedSet<Transfer> toTechnicalMixedDPTransfers(Transfer transfer) {
