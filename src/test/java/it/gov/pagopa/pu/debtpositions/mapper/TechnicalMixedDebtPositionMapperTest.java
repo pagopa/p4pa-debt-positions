@@ -18,6 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
@@ -79,16 +80,22 @@ class TechnicalMixedDebtPositionMapperTest {
     PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
     InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
     Transfer transfer = installment.getTransfers().getFirst();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
-      .balance("balance")
+      .balance("balanceResolved")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
-    Mockito.when(balanceResolverServiceMock.resolveAmountBalance(Mockito.anyLong(), Mockito.any(), Mockito.anyString()))
-      .thenReturn("balanceResolved");
+    Mockito.when(debtPositionTypeOrgRepository.findById(1L))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.doNothing().when(balanceResolverServiceMock)
+      .updateBalanceResolvingAmount(Mockito.any(InstallmentNoPII.class),
+        Mockito.eq(debtPosition.getOrganizationId()),
+        Mockito.any(DebtPositionTypeOrg.class),
+        Mockito.eq(accessToken));
 
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
       false, List.of(mixedDpAdditionalData), accessToken);
@@ -122,39 +129,6 @@ class TechnicalMixedDebtPositionMapperTest {
     Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData), accessToken);
 
     assertThrows(IllegalStateException.class, exec);
-  }
-
-  @Test
-  void whenToTechnicalMixedDebtPositionPaidWithNoBalanceThenCorrectMapping() {
-    DebtPosition debtPosition = buildMixedDebtPosition();
-    PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
-    InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
-    Transfer transfer = installment.getTransfers().getFirst();
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
-      .transferIndex(1)
-      .iud("IUD")
-      .legacyPaymentMetadata("legacyPaymentMetadata")
-      .build();
-
-    Mockito.doNothing().when(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(installment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
-    installment.setBalance("balanceResolved");
-
-    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      false, List.of(mixedDpAdditionalData), accessToken);
-
-    checkDebtPosition(debtPosition, result, false);
-
-    PaymentOption resultPO = result.getPaymentOptions().getFirst();
-    checkPaymentOption(paymentOption, resultPO, false);
-
-    InstallmentNoPII resultInstallment = resultPO.getInstallments().getFirst();
-    checkInstallment(installment, resultInstallment, mixedDpAdditionalData, false);
-
-    Transfer resultTransfer = installment.getTransfers().getFirst();
-    checkTransfer(transfer, resultTransfer);
   }
 
   private static void checkDebtPosition(DebtPosition expected,
