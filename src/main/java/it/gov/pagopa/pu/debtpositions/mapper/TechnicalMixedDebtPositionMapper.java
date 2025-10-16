@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
@@ -145,7 +146,7 @@ public class TechnicalMixedDebtPositionMapper {
 
         if (!isUnpayable) {
           DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-            .orElseThrow(() -> new IllegalStateException("DebtPositionTypeOrg with id [%d] not found.".formatted(debtPositionTypeOrgId)));
+            .orElseThrow(() -> new NotFoundException("The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
           balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, debtPositionTypeOrg, accessToken);
         }
         set.add(technicalMixedDpInstallment);
