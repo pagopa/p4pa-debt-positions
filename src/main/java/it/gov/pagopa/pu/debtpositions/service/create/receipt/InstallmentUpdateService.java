@@ -58,7 +58,7 @@ public class InstallmentUpdateService {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
-        updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), accessToken);
+        resolveBalance(installment, accessToken, paidInstallment, debtPosition);
         // update mbdAttachment of transfer entity if present in input ReceiptDTO
         updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {
@@ -109,19 +109,11 @@ public class InstallmentUpdateService {
     InstallmentUtils.setStatus(installment, status);
   }
 
-  private void updateBalanceResolvingAmount(InstallmentNoPII installment, Long organizationId, String accessToken) {
-    if (StringUtils.isBlank(installment.getBalance())) {
-      DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-      if(debtPositionTypeOrg == null) {
-        throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
-      }
-      String balance = balanceResolverService.getBalanceDefault(organizationId, debtPositionTypeOrg, accessToken);
-      installment.setBalance(balance);
+  private void resolveBalance(InstallmentNoPII installment, String accessToken, InstallmentNoPII paidInstallment, DebtPosition debtPosition) {
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    if (debtPositionTypeOrg == null) {
+      throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
     }
-
-    if (StringUtils.isNotBlank(installment.getBalance())) {
-      String balanceResolved = balanceResolverService.resolveAmountBalance(organizationId, installment, accessToken);
-      installment.setBalance(balanceResolved);
-    }
+    balanceResolverService.updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
   }
 }
