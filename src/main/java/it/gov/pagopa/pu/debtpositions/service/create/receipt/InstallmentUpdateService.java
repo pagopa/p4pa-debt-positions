@@ -58,11 +58,7 @@ public class InstallmentUpdateService {
         // set status of the found installment to PAID and link it to the receipt
         log.info("Installment [{}] found for receipt [{}]", paidInstallment.getInstallmentId(), receiptDTO.getReceiptId());
         updateInstallmentStatusAndFeeOfDebtPosition(paidInstallment, InstallmentStatus.PAID, receiptDTO);
-        DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-        if (debtPositionTypeOrg == null) {
-          throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
-        }
-        balanceResolverService.updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
+        resolveBalance(installment, accessToken, paidInstallment, debtPosition);
         // update mbdAttachment of transfer entity if present in input ReceiptDTO
         updateMbdAttachment(receiptDTO, paidInstallment);
       }, () -> {
@@ -111,5 +107,13 @@ public class InstallmentUpdateService {
       }
     }
     InstallmentUtils.setStatus(installment, status);
+  }
+
+  private void resolveBalance(InstallmentNoPII installment, String accessToken, InstallmentNoPII paidInstallment, DebtPosition debtPosition) {
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    if (debtPositionTypeOrg == null) {
+      throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
+    }
+    balanceResolverService.updateBalanceResolvingAmount(paidInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, accessToken);
   }
 }
