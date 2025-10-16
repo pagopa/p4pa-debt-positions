@@ -33,6 +33,7 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
     return spontaneousFormRepository.save(spontaneousForm);
   }
 
+  @Transactional
   @Override
   public void deleteSpontaneousForm(Long spontaneousFormId) {
     SpontaneousForm spontaneousForm = spontaneousFormRepository.findById(
