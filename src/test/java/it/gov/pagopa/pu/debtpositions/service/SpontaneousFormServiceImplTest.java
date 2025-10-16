@@ -1,7 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import jakarta.validation.ValidationException;
@@ -21,23 +23,27 @@ class SpontaneousFormServiceImplTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   @Mock
   private SpontaneousFormRepository spontaneousFormRepositoryMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   private SpontaneousFormService spontaneousFormService;
 
   @BeforeEach
   void setUp() {
     spontaneousFormService = new SpontaneousFormServiceImpl(
-        spontaneousFormRepositoryMock
+        spontaneousFormRepositoryMock,
+        debtPositionTypeOrgRepositoryMock
     );
   }
 
   @AfterEach
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
-        spontaneousFormRepositoryMock);
+        spontaneousFormRepositoryMock,
+        debtPositionTypeOrgRepositoryMock);
   }
 
   @Test
-  void whenGetReceiptThenOk() {
+  void whenCreateSpontaneousFormThenOk() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     spontaneousForm.setSpontaneousFormId(null);
 
@@ -51,7 +57,7 @@ class SpontaneousFormServiceImplTest {
   }
 
   @Test
-  void givenExistingSpontaneousFormWithMatchingOrganizationIdAndCodeWhenGetReceiptThenConflictErrorException() {
+  void givenExistingSpontaneousFormWithMatchingOrganizationIdAndCodeWhenCreateSpontaneousFormThenConflictErrorException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     spontaneousForm.setSpontaneousFormId(null);
 
@@ -61,11 +67,45 @@ class SpontaneousFormServiceImplTest {
   }
 
   @Test
-  void givenSpontaneousFormIdNotNullWhenGetReceiptThenValidationException() {
+  void givenSpontaneousFormIdNotNullWhenCreateSpontaneousFormThenValidationException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
     Assertions.assertThrows(ValidationException.class,()-> spontaneousFormService.createSpontaneousForm(spontaneousForm));
 
     Mockito.verifyNoInteractions(spontaneousFormRepositoryMock);
+  }
+
+  @Test
+  void whenDeleteSpontaneousFormThenOk() {
+    SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
+    Long spontaneousFormId = spontaneousForm.getSpontaneousFormId();
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(0L);
+    Mockito.doNothing().when(spontaneousFormRepositoryMock).delete(spontaneousForm);
+
+    Assertions.assertDoesNotThrow(()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
+  }
+
+  @Test
+  void givenReferencedSpontaneousFormWhenDeleteSpontaneousFormThenConflictErrorException() {
+    SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
+    Long spontaneousFormId = spontaneousForm.getSpontaneousFormId();
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(1L);
+
+    Assertions.assertThrows(ConflictErrorException.class, ()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
+  }
+
+  @Test
+  void givenNoSpontaneousFormWhenDeleteSpontaneousFormThenNotFoundException() {
+    Long spontaneousFormId = 1L;
+
+    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.empty());
+
+    Assertions.assertThrows(NotFoundException.class, ()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
+
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock);
   }
 }

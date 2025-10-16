@@ -1513,6 +1513,27 @@ paths:
           description: Conflict
         '500':
           description: Internal server error
+  /spontaneous-forms/{spontaneousFormId}:
+    delete:
+      tags:
+        - spontaneous-form
+      operationId: deleteSpontaneousForm
+      parameters:
+        - name: spontaneousFormId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Ok
+        '404':
+          description: Not Found
+        '409':
+          description: Conflict
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: [ ]
 components:
