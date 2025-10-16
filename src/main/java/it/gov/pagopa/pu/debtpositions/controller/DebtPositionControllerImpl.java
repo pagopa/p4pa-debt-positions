@@ -22,7 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RestController
@@ -267,8 +267,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
     Long organizationId,
-    LocalDate dateFrom,
-    LocalDate dateTo
+    OffsetDateTime dateFrom,
+    OffsetDateTime dateTo
   ) {
     log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
@@ -277,8 +277,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       status,
       debtPositionOrigin,
       organizationId,
-      dateFrom,
-      dateTo
+      dateFrom != null ? dateFrom.toLocalDateTime() : null,
+      dateTo != null ? dateTo.toLocalDateTime() : null
     ));
   }
 }

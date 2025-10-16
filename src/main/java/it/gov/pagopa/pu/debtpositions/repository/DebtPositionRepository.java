@@ -18,7 +18,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -171,8 +171,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
            AND i.debtorFiscalCodeHash = :debtorFiscalCodeHash
            AND i.debtorEntityType = :debtorEntityType
            AND (:status IS NULL OR i.status IN :status)
-           AND (:dateFrom IS NULL OR i.dueDate >= :dateFrom)
-           AND (:dateTo IS NULL OR i.dueDate <= :dateTo)
+           AND (cast(:dateFrom as string) IS NULL OR i.updateDate >= :dateFrom)
+           AND (cast(:dateTo as string) IS NULL OR i.updateDate <= :dateTo)
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
@@ -180,9 +180,9 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtorFiscalCodeHash") byte[] debtorFiscalCodeHash,
     @Param("debtorEntityType") PersonEntityType debtorEntityType,
     @Param("status") List<InstallmentStatus> status,
-    @Param("debtPositionOrigin") List<DebtPositionOrigin> debtPositionOrigin,
+    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
     @Param("organizationId") Long organizationId,
-    @Param("dateFrom") LocalDate dateFrom,
-    @Param("dateTo") LocalDate dateTo
+    @Param("dateFrom") LocalDateTime dateFrom,
+    @Param("dateTo") LocalDateTime dateTo
   );
 }

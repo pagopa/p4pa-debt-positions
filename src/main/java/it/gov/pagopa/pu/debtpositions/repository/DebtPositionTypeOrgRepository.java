@@ -157,5 +157,12 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       @Param("description") String description,
       @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
       Pageable pageable);
+
+  @Query("""
+      SELECT COUNT(d)
+      FROM DebtPositionTypeOrg d
+      WHERE d.spontaneousFormId = :spontaneousFormId
+      """)
+  long countBySpontaneousFormId(Long spontaneousFormId);
 }
 

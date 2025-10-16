@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
@@ -49,5 +50,17 @@ class SpontaneousFormControllerTest {
     assertNotNull(result);
     assertEquals(HttpStatus.CREATED, result.getStatusCode());
     assertEquals(expectedResult,result.getBody());
+  }
+
+  @Test
+  void whenDeleteSpontaneousFormThenReturnOk() {
+    Long spontaneousFormId = 1L;
+
+    doNothing().when(spontaneousFormServiceMock).deleteSpontaneousForm(spontaneousFormId);
+
+    ResponseEntity<Void> result = controller.deleteSpontaneousForm(spontaneousFormId);
+
+    assertNotNull(result);
+    assertEquals(HttpStatus.OK, result.getStatusCode());
   }
 }
