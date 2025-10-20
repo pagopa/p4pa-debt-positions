@@ -60,8 +60,6 @@ public class TechnicalMixedDebtPositionMapper {
 
     for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
       PaymentOption technicalMixedDpPaymentOption = new PaymentOption();
-      technicalMixedDpPaymentOption.setTotalAmountCents(
-        paymentOption.getTotalAmountCents());
       technicalMixedDpPaymentOption.setStatus(
         isUnpayable ? PaymentOptionStatus.UNPAYABLE : PaymentOptionStatus.PAID);
       technicalMixedDpPaymentOption.setDescription(
@@ -74,6 +72,11 @@ public class TechnicalMixedDebtPositionMapper {
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
           paymentOption.getInstallments(),
           isUnpayable, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+
+      long totalAmount = technicalMixedDpPaymentOption.getInstallments().stream()
+        .mapToLong(InstallmentNoPII::getAmountCents)
+        .sum();
+      technicalMixedDpPaymentOption.setTotalAmountCents(totalAmount);
 
       set.add(technicalMixedDpPaymentOption);
     }
