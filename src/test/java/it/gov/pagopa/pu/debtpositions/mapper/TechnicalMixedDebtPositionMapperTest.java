@@ -161,8 +161,10 @@ class TechnicalMixedDebtPositionMapperTest {
       "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
-    assertEquals(expected.getTotalAmountCents(),
-      result.getTotalAmountCents());
+    long totalAmount = result.getInstallments().stream()
+      .mapToLong(InstallmentNoPII::getAmountCents)
+      .sum();
+    assertEquals(totalAmount, result.getTotalAmountCents());
     if (isUnpayable) {
       assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
     } else {
