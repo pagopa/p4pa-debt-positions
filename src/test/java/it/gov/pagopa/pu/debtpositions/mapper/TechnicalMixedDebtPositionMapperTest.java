@@ -200,7 +200,7 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(installment.isSwitchToExpired(), result.isSwitchToExpired());
     assertEquals(installment.getNotificationFeeCents(),
       result.getNotificationFeeCents());
-    assertEquals(installment.getAmountCents(), result.getAmountCents());
+    assertEquals(installment.getTransfers().getFirst().getAmountCents(), result.getAmountCents());
     assertEquals(installment.getRemittanceInformation(),
       result.getRemittanceInformation());
     assertEquals(installment.getPersonalDataId(), result.getPersonalDataId());
