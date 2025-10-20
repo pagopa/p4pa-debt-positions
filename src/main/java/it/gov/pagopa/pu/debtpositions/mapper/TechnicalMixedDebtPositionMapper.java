@@ -116,7 +116,7 @@ public class TechnicalMixedDebtPositionMapper {
         technicalMixedDpInstallment.setNotificationFeeCents(
           installment.getNotificationFeeCents());
         technicalMixedDpInstallment.setAmountCents(
-          installment.getAmountCents());
+          transfer.getAmountCents());
         technicalMixedDpInstallment.setRemittanceInformation(
           installment.getRemittanceInformation());
         technicalMixedDpInstallment.setBalance(
