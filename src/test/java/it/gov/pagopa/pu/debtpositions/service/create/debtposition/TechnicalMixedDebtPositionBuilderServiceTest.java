@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashMap;
@@ -23,17 +24,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class TechnicalMixedDebtPositionBuilderServiceTest {
 
-  private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
-
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
   @Mock
+  private DebtPositionProcessorService debtPositionProcessorService;
+  @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
-  private final TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepositoryMock);
+  private TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
 
   @BeforeEach
   void init() {
+    TechnicalMixedDebtPositionMapper technicalMixedDebtPositionMapper = new TechnicalMixedDebtPositionMapper(
+      balanceResolverServiceMock, debtPositionTypeOrgRepositoryMock, debtPositionProcessorService);
     technicalMixedDebtPositionBuilderService = new TechnicalMixedDebtPositionBuilderService(
       technicalMixedDebtPositionMapper);
   }
@@ -60,6 +63,8 @@ class TechnicalMixedDebtPositionBuilderServiceTest {
       mixedDpAdditionalDataList1);
     debtPositionTypeOrgId2TransfersData.put(dpTypeOrgId2,
       mixedDpAdditionalDataList2);
+
+    Mockito.doNothing().when(debtPositionProcessorService).updateAmounts(Mockito.any());
 
     List<DebtPosition> result = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       debtPositionTypeOrgId2TransfersData, debtPosition, accessToken);
