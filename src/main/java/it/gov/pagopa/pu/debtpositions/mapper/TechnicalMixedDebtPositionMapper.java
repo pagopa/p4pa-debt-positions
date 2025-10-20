@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,10 +21,12 @@ public class TechnicalMixedDebtPositionMapper {
 
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final BalanceResolverService balanceResolverService;
+  private final DebtPositionProcessorService debtPositionProcessorService;
 
-  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
+  public TechnicalMixedDebtPositionMapper(BalanceResolverService balanceResolverService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, DebtPositionProcessorService debtPositionProcessorService) {
     this.balanceResolverService = balanceResolverService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.debtPositionProcessorService = debtPositionProcessorService;
   }
 
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition,
@@ -48,6 +51,7 @@ public class TechnicalMixedDebtPositionMapper {
     technicalMixedDp.setPaymentOptions(
       toTechnicalMixedDPPaymentOptions(
         debtPosition, isUnpayable, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+    debtPositionProcessorService.updateAmounts(technicalMixedDp);
 
     return technicalMixedDp;
   }
@@ -60,6 +64,8 @@ public class TechnicalMixedDebtPositionMapper {
 
     for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
       PaymentOption technicalMixedDpPaymentOption = new PaymentOption();
+      technicalMixedDpPaymentOption.setTotalAmountCents(
+        paymentOption.getTotalAmountCents());
       technicalMixedDpPaymentOption.setStatus(
         isUnpayable ? PaymentOptionStatus.UNPAYABLE : PaymentOptionStatus.PAID);
       technicalMixedDpPaymentOption.setDescription(
@@ -72,11 +78,6 @@ public class TechnicalMixedDebtPositionMapper {
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
           paymentOption.getInstallments(),
           isUnpayable, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
-
-      long totalAmount = technicalMixedDpPaymentOption.getInstallments().stream()
-        .mapToLong(InstallmentNoPII::getAmountCents)
-        .sum();
-      technicalMixedDpPaymentOption.setTotalAmountCents(totalAmount);
 
       set.add(technicalMixedDpPaymentOption);
     }
