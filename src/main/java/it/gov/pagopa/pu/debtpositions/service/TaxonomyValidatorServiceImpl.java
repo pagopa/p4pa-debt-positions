@@ -18,21 +18,26 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
     this.taxonomyService = taxonomyService;
   }
 
-  public boolean isTaxonomyCodeValid(String taxonomyCode) {
+  public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
       if(!taxonomyCode.startsWith("9/") || !taxonomyCode.endsWith("/")) {
         log.error("The taxonomy code [" + taxonomyCode + "] does not meet the required format");
         return false;
       }
       String taxonomyCategory = Utilities.taxonomyCodeToTransferCategory(taxonomyCode);
-      return isTaxonomyCategoryValid(taxonomyCategory);
+      return isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode);
   }
 
-  public boolean isTaxonomyCategoryValid(String taxonomyCategory) {
+  public boolean isTaxonomyCategoryValid(String taxonomyCategory, String orgTypeCode) {
     try {
       String organizationType = taxonomyCategory.substring(0, 2);
       String macroAreaCode = taxonomyCategory.substring(2, 4);
       String serviceTypeCode = taxonomyCategory.substring(4, 7);
       String collectionReason = taxonomyCategory.substring(7, 9);
+
+      if (orgTypeCode != null && !orgTypeCode.equals(organizationType)) {
+        log.error("The taxonomy category code [" + taxonomyCategory + "] is not valid for the organization type [" + orgTypeCode + "]");
+        return false;
+      }
 
       PagedModelTaxonomy pagedModelTaxonomy = taxonomyService.getTaxonomies(
         organizationType,

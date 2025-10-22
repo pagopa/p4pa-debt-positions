@@ -1,14 +1,16 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
-import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,15 +33,18 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final DebtPositionRepository debtPositionRepository;
   private final BalanceService balanceService;
   private final boolean isOrgPIvaCheckEnabled;
+  private final OrganizationService organizationService;
 
   public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
+                                         OrganizationService organizationService,
                                          @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
+    this.organizationService = organizationService;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -119,7 +124,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-    validateTransfers(installmentDTO.getTransfers());
+    validateTransfers(installmentDTO.getTransfers(), accessToken);
 
     Long totalAmountTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
@@ -176,7 +181,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateTransfers(List<TransferDTO> transferDTOList) {
+  private void validateTransfers(List<TransferDTO> transferDTOList, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
       throw new InvalidValueException("At least one transfer is mandatory for installment");
     }
@@ -202,7 +207,11 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("[P4PA_INVALID_VAT_CODE] Fiscal code of transfer with index " + index + " is not valid");
       }
       checkIbanOrStamp(transferDTO);
-      checkTaxonomyCategory(transferDTO);
+
+      String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
+        .map(Organization::getOrgTypeCode)
+        .orElseThrow(() -> new InvalidValueException("[P4PA_INVALID_ORG_FISCAL_CODE] Organization with fiscal code " + transferDTO.getOrgFiscalCode() + " not found"));
+      checkTaxonomyCategory(transferDTO, orgTypeCode);
     });
   }
 
@@ -228,12 +237,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void checkTaxonomyCategory(TransferDTO transferDTO) {
+  private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException("[P4PA_MISSING_TAXONOMY_CATEGORY] Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
       String taxonomyCategory = transferDTO.getCategory();
-      if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory)) {
+      if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
         throw new InvalidValueException("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     }

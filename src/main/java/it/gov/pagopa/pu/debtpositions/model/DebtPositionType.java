@@ -3,18 +3,14 @@ package it.gov.pagopa.pu.debtpositions.model;
 import com.fasterxml.jackson.annotation.JsonSetter;
 import com.fasterxml.jackson.annotation.Nulls;
 import it.gov.pagopa.pu.debtpositions.model.validator.TaxonomyCodeConstraint;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Entity
 @Table(name = "debt_position_type")
@@ -22,6 +18,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
+@TaxonomyCodeConstraint
 public class DebtPositionType extends BaseEntity implements Serializable {
 
   @Id
@@ -51,7 +48,6 @@ public class DebtPositionType extends BaseEntity implements Serializable {
   private String collectingReason;
   @NotNull
   @JsonSetter(nulls = Nulls.SKIP)
-  @TaxonomyCodeConstraint
   private String taxonomyCode;
   private boolean flagAnonymousFiscalCode;
   private boolean flagMandatoryDueDate;

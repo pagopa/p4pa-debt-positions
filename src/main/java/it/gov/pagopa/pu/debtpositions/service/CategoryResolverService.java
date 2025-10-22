@@ -24,14 +24,14 @@ public class CategoryResolverService {
     this.debtPositionTypeRepository = debtPositionTypeRepository;
   }
 
-  public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId) {
+  public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId, String orgTypeCode) {
     String taxonomyCode = null;
 
     if (StringUtils.isNotBlank(legacyPaymentMetadata)) {
       try {
         String extractedCode = extractTaxonomyFromLegacyPaymentMetadata(legacyPaymentMetadata);
 
-        if (taxonomyValidatorService.isTaxonomyCodeValid(extractedCode)) {
+        if (taxonomyValidatorService.isTaxonomyCodeValid(extractedCode, orgTypeCode)) {
           taxonomyCode = extractedCode;
         } else {
           log.warn("Extracted taxonomy [{}] from legacyPaymentMetadata is not valid. Getting taxonomy from debtPositionTypeId {}.", extractedCode, debtPositionTypeId);

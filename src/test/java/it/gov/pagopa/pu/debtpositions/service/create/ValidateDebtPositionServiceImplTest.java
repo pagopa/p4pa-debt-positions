@@ -1,13 +1,15 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
-import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,10 +22,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -41,11 +45,14 @@ class ValidateDebtPositionServiceImplTest {
   @Mock
   private BalanceService balanceServiceMock;
 
+  @Mock
+  private OrganizationService organizationService;
+
   private final String accessToken = "ACCESSTOKEN";
 
   @BeforeEach
   void init() {
-    service = new ValidateDebtPositionServiceImpl(taxonomyValidatorService, debtPositionRepository, balanceServiceMock, false);
+    service = new ValidateDebtPositionServiceImpl(taxonomyValidatorService, debtPositionRepository, balanceServiceMock, organizationService, false);
   }
 
   @Test
@@ -95,12 +102,14 @@ class ValidateDebtPositionServiceImplTest {
   void givenDuplicatePaymentOptionIndexThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
 
     debtPositionDTO.setPaymentOptions(List.of(PaymentOptionFaker.buildPaymentOptionDTO(), PaymentOptionFaker.buildPaymentOptionDTO()));
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
@@ -526,6 +535,24 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenTransferNotFoundOrganizationThenThrowValidationException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    TransferDTO transfer = debtPositionDTO.getPaymentOptions()
+      .getFirst()
+      .getInstallments()
+      .getFirst()
+      .getTransfers().getFirst();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenThrow(new InvalidValueException("[P4PA_INVALID_ORG_FISCAL_CODE] Organization with fiscal code " + transfer.getOrgFiscalCode() + " not found"));
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("[P4PA_INVALID_ORG_FISCAL_CODE] Organization with fiscal code " + transfer.getOrgFiscalCode() + " not found", invalidValueException.getMessage());
+  }
+
+  @Test
   void givenTransferCategoryNullThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
@@ -540,6 +567,7 @@ class ValidateDebtPositionServiceImplTest {
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(buildOrganization()));
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("[P4PA_MISSING_TAXONOMY_CATEGORY] Category of transfer with index 1 is mandatory", invalidValueException.getMessage());
@@ -573,10 +601,12 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst()
       .getTransfers().getFirst();
     transfer.setAmountCents(120L);
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("The sum of transfers amounts has to be equal to installment amount", invalidValueException.getMessage());
@@ -600,10 +630,12 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.getPaymentOptions()
       .getFirst()
       .getInstallments().getFirst().setAmountCents(200L);
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
   }
@@ -613,10 +645,12 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals(Boolean.TRUE, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSwitchToExpired());
@@ -627,10 +661,12 @@ class ValidateDebtPositionServiceImplTest {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(false);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(false);
     // When, Then
     InvalidValueException invalidValueException = assertThrows(
       InvalidValueException.class,
@@ -648,10 +684,12 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setFlagMandatoryDueDate(false);
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals(Boolean.FALSE, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSwitchToExpired());
@@ -698,10 +736,12 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(false);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv("");
+    Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
-    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233")).thenReturn(true);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals("Iuv cannot be empty if flagPuPagoPaPayment is false", invalidValueException.getMessage());

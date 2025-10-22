@@ -1,12 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.model.validator;
 
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class TaxonomyCodeConstraintValidator implements ConstraintValidator<TaxonomyCodeConstraint, String> {
+public class TaxonomyCodeConstraintValidator implements ConstraintValidator<TaxonomyCodeConstraint, DebtPositionType> {
 
   private final TaxonomyValidatorService taxonomyValidatorService;
 
@@ -15,7 +16,10 @@ public class TaxonomyCodeConstraintValidator implements ConstraintValidator<Taxo
   }
 
   @Override
-  public boolean isValid(String taxonomyCode, ConstraintValidatorContext context) {
-    return taxonomyValidatorService.isTaxonomyCodeValid(taxonomyCode);
+  public boolean isValid(DebtPositionType debtPositionType, ConstraintValidatorContext context) {
+    String taxonomyCode = debtPositionType.getTaxonomyCode();
+    String orgType = debtPositionType.getOrgType();
+
+    return taxonomyValidatorService.isTaxonomyCodeValid(taxonomyCode, orgType);
   }
 }

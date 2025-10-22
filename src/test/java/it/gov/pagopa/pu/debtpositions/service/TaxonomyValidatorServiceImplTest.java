@@ -62,7 +62,7 @@ class TaxonomyValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertTrue(() -> service.isTaxonomyCategoryValid(validCategory));
+    Assertions.assertTrue(() -> service.isTaxonomyCategoryValid(validCategory, organizationType));
   }
 
   @Test
@@ -83,7 +83,7 @@ class TaxonomyValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory, organizationType));
   }
 
   @Test
@@ -102,7 +102,7 @@ class TaxonomyValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory, organizationType));
   }
 
   @Test
@@ -117,15 +117,16 @@ class TaxonomyValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(null);
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory, organizationType));
   }
 
   @Test
   void givenInvalidCategory_categoryDoesNotMeetRequiredLength_whenIsValidThenFalse(){
     // Given
     String invalidCategory = "0011222"; // valid 001122233
+    String organizationType = "00";
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCategoryValid(invalidCategory));
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(invalidCategory, organizationType));
   }
 
   @Test
@@ -146,28 +147,30 @@ class TaxonomyValidatorServiceImplTest {
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
     // When, Then
-    Assertions.assertTrue(() -> service.isTaxonomyCodeValid(validTaxonomyCode));
+    Assertions.assertTrue(() -> service.isTaxonomyCodeValid(validTaxonomyCode, organizationType));
   }
 
   @Test
   void givenInvalidTaxonomyCode_categoryDoesNotMeetRequiredLength_whenIsValidThenFalse(){
     // Given
     String invalidTaxonomyCode = "9/0011222/"; // valid 9/001122233/
+    String organizationType = "00";
     // When, Then
-    Assertions.assertFalse(service.isTaxonomyCodeValid(invalidTaxonomyCode));
+    Assertions.assertFalse(service.isTaxonomyCodeValid(invalidTaxonomyCode, organizationType));
   }
 
   @Test
   void givenInvalidTaxonomyCode_incompleteFormat_whenIsValidThenFalse(){
     // Given
     String invalidTaxonomyCode1 = "9/001122233"; // valid 9/001122233/
+    String organizationType = "00";
     // When, Then
-    Assertions.assertFalse(() -> service.isTaxonomyCodeValid(invalidTaxonomyCode1));
+    Assertions.assertFalse(() -> service.isTaxonomyCodeValid(invalidTaxonomyCode1, organizationType));
 
     // Given
     String invalidTaxonomyCode2 = "001122233/"; // valid 9/001122233/
     // When, Then
-    Assertions.assertFalse(() -> service.isTaxonomyCodeValid(invalidTaxonomyCode2));
+    Assertions.assertFalse(() -> service.isTaxonomyCodeValid(invalidTaxonomyCode2, organizationType));
   }
 
 }
