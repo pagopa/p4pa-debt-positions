@@ -210,7 +210,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
       String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
         .map(Organization::getOrgTypeCode)
-        .orElseThrow(() -> new InvalidValueException("[P4PA_INVALID_ORG_FISCAL_CODE] Organization with fiscal code " + transferDTO.getOrgFiscalCode() + " not found"));
+        .orElse(null);
       checkTaxonomyCategory(transferDTO, orgTypeCode);
     });
   }
