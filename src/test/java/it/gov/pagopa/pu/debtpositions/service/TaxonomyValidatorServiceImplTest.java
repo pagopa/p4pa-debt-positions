@@ -173,4 +173,43 @@ class TaxonomyValidatorServiceImplTest {
     Assertions.assertFalse(() -> service.isTaxonomyCodeValid(invalidTaxonomyCode2, organizationType));
   }
 
+  @Test
+  void givenValidCategoryAndNullOrgTypeCodeWhenIsValidThenTrue(){
+    // Given
+    String validCategory = "001122233";
+    String organizationType = "00";
+    String macroAreaCode = "11";
+    String serviceTypeCode = "222";
+    String collectionReason = "33";
+
+    PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
+      .embedded(PagedModelTaxonomyEmbedded.builder()
+        .taxonomies(List.of(buildTaxonomy()))
+        .build())
+      .build();
+
+    Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
+      .thenReturn(pagedModelTaxonomy);
+    // When, Then
+    Assertions.assertTrue(() -> service.isTaxonomyCategoryValid(validCategory, null));
+  }
+
+  @Test
+  void givenMismatchedOrgTypeCodeWhenIsTaxonomyCategoryValidThenFalse() {
+    // Given
+    String validCategory = "001122233";
+    String mismatchedOrgTypeCode = "99";
+    // When, Then
+    Assertions.assertFalse(service.isTaxonomyCategoryValid(validCategory, mismatchedOrgTypeCode));
+  }
+
+  @Test
+  void givenMismatchedOrgTypeCodeWhenIsTaxonomyCodeValidThenFalse() {
+    // Given
+    String validTaxonomyCode = "9/001122233/";
+    String mismatchedOrgTypeCode = "99";
+    // When, Then
+    Assertions.assertFalse(() -> service.isTaxonomyCodeValid(validTaxonomyCode, mismatchedOrgTypeCode));
+  }
+
 }
