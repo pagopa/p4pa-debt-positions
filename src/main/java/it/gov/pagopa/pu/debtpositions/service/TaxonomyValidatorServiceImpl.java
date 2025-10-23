@@ -20,7 +20,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
       if(!taxonomyCode.startsWith("9/") || !taxonomyCode.endsWith("/")) {
-        log.error("The taxonomy code [" + taxonomyCode + "] does not meet the required format");
+        log.error("The taxonomy code [{}] does not meet the required format", taxonomyCode);
         return false;
       }
       String taxonomyCategory = Utilities.taxonomyCodeToTransferCategory(taxonomyCode);
@@ -35,7 +35,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       String collectionReason = taxonomyCategory.substring(7, 9);
 
       if (orgTypeCode != null && !orgTypeCode.equals(organizationType)) {
-        log.error("The taxonomy category code [" + taxonomyCategory + "] is not valid for the organization type [" + orgTypeCode + "]");
+        log.error("The taxonomy category code [{}] is not valid for the organization type [{}]", taxonomyCategory, orgTypeCode);
         return false;
       }
 
@@ -49,11 +49,11 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       );
 
       if (pagedModelTaxonomy == null || pagedModelTaxonomy.getEmbedded() == null || CollectionUtils.isEmpty(pagedModelTaxonomy.getEmbedded().getTaxonomies())) {
-        log.error("The taxonomy category code [" + taxonomyCategory + "] does not exist in the archive");
+        log.error("The taxonomy category code [{}] does not exist in the archive", taxonomyCategory);
         return false;
       }
     } catch (IndexOutOfBoundsException exception) {
-      log.error("The taxonomy category code [" + taxonomyCategory + "] does not meet the required length or format");
+      log.error("The taxonomy category code [{}] does not meet the required length or format", taxonomyCategory);
       return false;
     }
     return true;
