@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -21,9 +22,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -39,18 +42,21 @@ class MixedDebtPositionMapperTest {
   private MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverServiceMock;
   @Mock
   private CategoryResolverService categoryResolverServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   private MixedDebtPositionMapper mapper;
 
   @BeforeEach
   void init() {
-    mapper = new MixedDebtPositionMapper(mixedDebtPositionTypeOrgRetrieverServiceMock, categoryResolverServiceMock);
+    mapper = new MixedDebtPositionMapper(mixedDebtPositionTypeOrgRetrieverServiceMock, categoryResolverServiceMock, debtPositionTypeOrgRepositoryMock);
   }
 
   @Test
   void whenMapToDebtPositionDTOThenCorrectMapping() {
     Organization organization = buildOrganization();
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setDebtPositionTypeOrgId(100L);
     String iud = "IUD";
@@ -108,8 +114,13 @@ class MixedDebtPositionMapperTest {
           anyLong()))
         .thenReturn(dpTypeOrg);
 
-      when(categoryResolverServiceMock.extractTaxonomyFromLegacyPaymentMetadata("9/01234567/xxxxx"))
-        .thenReturn("9/01234567/");
+      when(
+        debtPositionTypeOrgRepositoryMock.findById(
+          anyLong()))
+        .thenReturn(Optional.of(debtPositionTypeOrg));
+
+      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
+        .thenReturn("01234567");
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
           mixedDebtPositionDTO);

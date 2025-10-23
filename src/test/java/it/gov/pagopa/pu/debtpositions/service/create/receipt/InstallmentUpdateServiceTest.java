@@ -12,9 +12,6 @@ import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
-
-import java.util.*;
-
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -24,6 +21,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.*;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 
@@ -117,8 +116,8 @@ class InstallmentUpdateServiceTest {
     debtPositionTypeOrg.setBalance(null);
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(targetInstallment.getInstallmentId()))
       .thenReturn(debtPositionTypeOrg);
-    Mockito.when(balanceResolverServiceMock.getBalanceDefault(debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN))
-      .thenReturn(null);
+    Mockito.doNothing().when(balanceResolverServiceMock)
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
 
     //when
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
@@ -159,14 +158,15 @@ class InstallmentUpdateServiceTest {
     });
     Mockito.verify(debtPositionRepositoryMock, Mockito.times(1))
       .findEntityGraphByInstallmentId(targetInstallment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock, Mockito.times(0))
-      .resolveAmountBalance(debtPosition.getOrganizationId(), targetInstallment, ACCESS_TOKEN);
+    Mockito.verify(balanceResolverServiceMock, Mockito.times(1))
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
   }
 
   @Test
   void givenDebtPositionWithBalanceNullWhenDebtPositionTypeOrgNotFoundThenException() {
     //given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance(null);
     InstallmentNoPII targetInstallment = PrimaryOrgInstallmentPaidVerifierServiceTest.getInstallment(
       InstallmentStatus.UNPAID);
     targetInstallment.setBalance(null);
@@ -216,6 +216,7 @@ class InstallmentUpdateServiceTest {
     long installmentAmount = 1000L;
     long paymentAmount = 1200L;
     long feeAmount = paymentAmount - installmentAmount; // = 200
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setPaymentReceiptId("RECEIPTID");
@@ -265,10 +266,13 @@ class InstallmentUpdateServiceTest {
           paymentOption.getPaymentOptionId()));
     });
 
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(targetInstallment.getInstallmentId()))
+      .thenReturn(debtPositionTypeOrg);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(targetInstallment.getInstallmentId()))
       .thenReturn(debtPosition);
-    Mockito.when(balanceResolverServiceMock.resolveAmountBalance(debtPosition.getOrganizationId(), targetInstallment, ACCESS_TOKEN))
-      .thenReturn("balanceResolved");
+    Mockito.doNothing().when(balanceResolverServiceMock)
+      .updateBalanceResolvingAmount(targetInstallment, debtPosition.getOrganizationId(), debtPositionTypeOrg, ACCESS_TOKEN);
 
     // When
     DebtPosition response = installmentUpdateService.updateInstallmentStatusOfDebtPosition(
@@ -282,7 +286,6 @@ class InstallmentUpdateServiceTest {
     Assertions.assertEquals(receiptDTO.getPaymentReceiptId(), updatedInstallment.getIur(), "set iur");
     Assertions.assertEquals(feeAmount, updatedInstallment.getNotificationFeeCents(), "set notificationFeeCents");
     Assertions.assertEquals(installmentAmount + feeAmount, updatedInstallment.getAmountCents(), "update amountCents");
-    Assertions.assertEquals("balanceResolved", updatedInstallment.getBalance());
 
     // test Transfer with transferIndex=1 updated
     Transfer updatedTransfer = updatedInstallment.getTransfers().stream()

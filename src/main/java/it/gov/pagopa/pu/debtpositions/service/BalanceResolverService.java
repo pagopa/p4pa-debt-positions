@@ -16,38 +16,50 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class BalanceResolverService {
 
-    private final BalanceService balanceService;
-    private final OrganizationService organizationService;
+  private final BalanceService balanceService;
+  private final OrganizationService organizationService;
 
-    public BalanceResolverService(BalanceService balanceService, OrganizationService organizationService) {
-        this.balanceService = balanceService;
-      this.organizationService = organizationService;
+  public BalanceResolverService(BalanceService balanceService, OrganizationService organizationService) {
+    this.balanceService = balanceService;
+    this.organizationService = organizationService;
+  }
+
+  public String getBalanceDefault(Long organizationId, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
+    log.info("Retrieving balance from DebtPositionTypeOrg with orgId[{}] and debtPositionTypeCode[{}]", organizationId, debtPositionTypeOrg.getCode());
+
+    if (StringUtils.isNotBlank(debtPositionTypeOrg.getBalance())) {
+      return debtPositionTypeOrg.getBalance();
     }
 
-    public String getBalanceDefault(Long organizationId, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
-        log.info("Retrieving balance from DebtPositionTypeOrg with orgId[{}] and debtPositionTypeCode[{}]", organizationId, debtPositionTypeOrg.getCode());
+    return balanceService.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrg.getCode(), accessToken);
+  }
 
-        if (StringUtils.isNotBlank(debtPositionTypeOrg.getBalance())) {
-            return debtPositionTypeOrg.getBalance();
-        }
+  public String resolveAmountBalance(Long organizationId, InstallmentNoPII installment, String accessToken) {
+    Organization org = organizationService.getOrganizationById(organizationId, accessToken)
+      .orElseThrow(() -> new NotFoundException("Organization with id " + organizationId + " not found"));
 
-        return balanceService.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrg.getCode(), accessToken);
+    Long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
+      .filter(transfer -> transfer.getOrgFiscalCode().equals(org.getOrgFiscalCode()))
+      .mapToLong(Transfer::getAmountCents).sum();
+
+    CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
+      .balance(installment.getBalance())
+      .amountCents(totalAmountCentsPrimaryOrg)
+      .remittanceInformation(installment.getRemittanceInformation())
+      .build();
+
+    return balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
+  }
+
+  public void updateBalanceResolvingAmount(InstallmentNoPII installment, Long organizationId, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
+    if (StringUtils.isBlank(installment.getBalance())) {
+      String balance = getBalanceDefault(organizationId, debtPositionTypeOrg, accessToken);
+      installment.setBalance(balance);
     }
 
-    public String resolveAmountBalance(Long organizationId, InstallmentNoPII installment, String accessToken){
-      Organization org = organizationService.getOrganizationById(organizationId, accessToken)
-        .orElseThrow(() -> new NotFoundException("Organization with id " + organizationId + " not found"));
-
-      Long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
-        .filter(transfer -> transfer.getOrgFiscalCode().equals(org.getOrgFiscalCode()))
-        .mapToLong(Transfer::getAmountCents).sum();
-
-      CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
-        .balance(installment.getBalance())
-        .amountCents(totalAmountCentsPrimaryOrg)
-        .remittanceInformation(installment.getRemittanceInformation())
-        .build();
-
-      return balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
+    if (StringUtils.isNotBlank(installment.getBalance())) {
+      String balanceResolved = resolveAmountBalance(organizationId, installment, accessToken);
+      installment.setBalance(balanceResolved);
     }
+  }
 }
