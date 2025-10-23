@@ -119,7 +119,7 @@ class MixedDebtPositionMapperTest {
           anyLong()))
         .thenReturn(Optional.of(debtPositionTypeOrg));
 
-      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId()))
+      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
         .thenReturn("01234567");
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,

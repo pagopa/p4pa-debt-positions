@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model.validator;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -10,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
 
 @ExtendWith(MockitoExtension.class)
 class TaxonomyCodeConstraintValidatorTest {
@@ -28,10 +31,10 @@ class TaxonomyCodeConstraintValidatorTest {
   @Test
   void givenValidTaxonomyCodeWhenIsValidThenReturnTrue() {
     //Given
-    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString()))
+    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
       .thenReturn(true);
     //When
-    boolean actualResult = validator.isValid("valid_taxonomy_code", null);
+    boolean actualResult = validator.isValid(buildDebtPositionType(), null);
     //Then
     Assertions.assertTrue(actualResult);
   }
@@ -39,13 +42,14 @@ class TaxonomyCodeConstraintValidatorTest {
   @Test
   void givenInvalidTaxonomyCodeWhenIsValidThenThrowInvalidValueException() {
     //Given
-    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString()))
+    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
       .thenThrow(new InvalidValueException("Error"));
+
+    DebtPositionType debtPositionType = buildDebtPositionType();
     //When, then
     InvalidValueException actualException = Assertions.assertThrows(
       InvalidValueException.class,
-      () -> validator.isValid("invalid_taxonomy_code", null)
-    );
+      () -> validator.isValid(debtPositionType, null));
     Assertions.assertEquals("Error", actualException.getMessage());
   }
 
