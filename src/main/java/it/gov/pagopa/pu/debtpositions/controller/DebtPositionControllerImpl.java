@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyS
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -277,8 +278,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       status,
       debtPositionOrigin,
       organizationId,
-      dateFrom != null ? dateFrom.toLocalDateTime() : null,
-      dateTo != null ? dateTo.toLocalDateTime() : null
+      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
+      Utilities.offsetDateTimeToLocalDateTime(dateTo)
     ));
   }
 }

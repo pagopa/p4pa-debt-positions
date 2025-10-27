@@ -36,6 +36,12 @@ public class Utilities {
       : null;
   }
 
+  public static LocalDateTime offsetDateTimeToLocalDateTime(OffsetDateTime offsetDateTime) {
+    return offsetDateTime != null
+      ? offsetDateTime.toLocalDateTime()
+      : null;
+  }
+
   public static boolean isValidIban(String iban) {
     return iban != null && iban.length() == IBAN_LENGTH;
   }

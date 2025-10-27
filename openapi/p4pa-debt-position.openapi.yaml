@@ -674,7 +674,7 @@ paths:
         "400":
           description: Invalid request
         "409":
-          description: Debt position already exists
+          description: Debt position already exists and cannot be changed
         "500":
           description: Internal server error
   /receipts/{receiptId}:
@@ -1782,6 +1782,10 @@ components:
           type: string
     ReceiptDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO>"
+      ]
+      x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       required:
         - receiptOrigin
         - paymentReceiptId
@@ -1865,6 +1869,14 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
+        updateTraceId:
+          type: string
+        noPII:
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          type: 'ReceiptNoPII'
     InstallmentDetailDTO:
       type: object
       required:

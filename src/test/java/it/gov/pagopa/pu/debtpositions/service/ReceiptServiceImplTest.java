@@ -41,7 +41,7 @@ class ReceiptServiceImplTest {
     Long receiptId = 1L;
     ReceiptDTO receipt = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptPIIRepositoryMock.getReceiptDetail(receiptId)).thenReturn(receipt);
+    Mockito.when(receiptPIIRepositoryMock.findById(receiptId)).thenReturn(receipt);
 
     //when
     ReceiptDTO response = receiptService.getReceipt(receiptId);
@@ -50,7 +50,7 @@ class ReceiptServiceImplTest {
     Assertions.assertNotNull(response);
     Assertions.assertEquals(receipt, response);
 
-    Mockito.verify(receiptPIIRepositoryMock).getReceiptDetail(receiptId);
+    Mockito.verify(receiptPIIRepositoryMock).findById(receiptId);
   }
 
   @Test
