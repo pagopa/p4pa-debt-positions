@@ -82,7 +82,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
       .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
-      .thenReturn(installment);
+      .thenReturn(Optional.of(installment));
     Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO)))
       .thenReturn(dp);
 
@@ -105,7 +105,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
       .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
-      .thenReturn(null);
+      .thenReturn(Optional.empty());
     Mockito.when(technicalDpCreationServiceMock.create(Mockito.same(receiptDTO)))
       .thenReturn(dp);
 

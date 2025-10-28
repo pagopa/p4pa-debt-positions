@@ -140,7 +140,7 @@ class CreateReceiptServiceTest {
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
 
-    // When
+    // When, Then
     Assertions.assertThrows(ConflictErrorException.class, () -> service.createReceipt(receiptDTO, accessToken));
   }
 
@@ -157,7 +157,7 @@ class CreateReceiptServiceTest {
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
 
-    // When
+    // When, Then
     Assertions.assertThrows(ConflictErrorException.class, () -> service.createReceipt(receiptDTO, accessToken));
   }
 
