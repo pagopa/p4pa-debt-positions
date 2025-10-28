@@ -18,12 +18,14 @@ public class ReceiptBasedTechnicalDpHandlerService {
   private final DebtPositionService debtPositionService;
   private final PaymentsProducerService paymentsProducerService;
   private final DebtPositionMapper debtPositionMapper;
+  private final TechnicalDpUpdateService technicalDpUpdateService;
 
-  public ReceiptBasedTechnicalDpHandlerService(ReceiptWithAdditionalInfoMapper receiptMapper, DebtPositionService debtPositionService, PaymentsProducerService paymentsProducerService, DebtPositionMapper debtPositionMapper) {
+  public ReceiptBasedTechnicalDpHandlerService(ReceiptWithAdditionalInfoMapper receiptMapper, DebtPositionService debtPositionService, PaymentsProducerService paymentsProducerService, DebtPositionMapper debtPositionMapper, TechnicalDpUpdateService technicalDpUpdateService) {
     this.receiptMapper = receiptMapper;
     this.debtPositionService = debtPositionService;
     this.paymentsProducerService = paymentsProducerService;
     this.debtPositionMapper = debtPositionMapper;
+    this.technicalDpUpdateService = technicalDpUpdateService;
   }
 
   public DebtPosition createAndPublishTechDp(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO){
@@ -35,5 +37,10 @@ public class ReceiptBasedTechnicalDpHandlerService {
   public DebtPosition publishTechDp(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO){
     paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:" + receiptDTO.getReceiptId());
     return debtPositionMapper.mapToModel(debtPositionDTO);
+  }
+
+  public DebtPosition updateAndPublishTechDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+    DebtPositionDTO debtPositionDTO = technicalDpUpdateService.updateDp(dp, receiptDTO, organization);
+    return publishTechDp(debtPositionDTO, receiptDTO);
   }
 }

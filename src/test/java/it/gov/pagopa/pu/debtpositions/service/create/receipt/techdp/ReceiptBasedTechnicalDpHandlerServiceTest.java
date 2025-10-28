@@ -29,6 +29,8 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
   private PaymentsProducerService paymentsProducerServiceMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
+  @Mock
+  private TechnicalDpUpdateService dpUpdateServiceMock;
 
   private ReceiptBasedTechnicalDpHandlerService service;
 
@@ -38,7 +40,8 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
       receiptMapperMock,
       debtPositionServiceMock,
       paymentsProducerServiceMock,
-      debtPositionMapperMock
+      debtPositionMapperMock,
+      dpUpdateServiceMock
     );
   }
 
@@ -48,7 +51,8 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
       receiptMapperMock,
       debtPositionServiceMock,
       paymentsProducerServiceMock,
-      debtPositionMapperMock
+      debtPositionMapperMock,
+      dpUpdateServiceMock
     );
   }
 
@@ -98,5 +102,29 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
 
     Mockito.verify(paymentsProducerServiceMock)
       .notifyPaymentsEvent(Mockito.same(dpDto), Mockito.eq(PaymentEventType.RT_RECEIVED), Mockito.eq("receiptId:-1"));
+  }
+
+  @Test
+  void whenUpdateAndPublishTechDpThenOk(){
+    // Given
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
+    Organization organization = new Organization();
+    DebtPosition dp = new DebtPosition();
+    DebtPositionDTO dpDto = new DebtPositionDTO();
+
+    service = Mockito.spy(service);
+
+    Mockito.when(dpUpdateServiceMock.updateDp(Mockito.same(dp), Mockito.same(receiptDTO), Mockito.same(organization)))
+        .thenReturn(dpDto);
+
+    Mockito.doReturn(dp)
+      .when(service)
+      .publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO));
+
+    // When
+    DebtPosition result = service.updateAndPublishTechDp(dp, receiptDTO, organization);
+
+    // Then
+    Assertions.assertSame(dp, result);
   }
 }

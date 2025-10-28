@@ -41,7 +41,7 @@ public class PrimaryOrgPaymentHandlerService {
   private DebtPosition handlePuPrimaryOrgPayment(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization primaryOrg) {
     Optional<InstallmentNoPII> installment = installmentRetrieverService.retrieve(primaryOrg, receiptDTO.getNoticeNumber(), receiptDTO.getIud());
     if(installment.isPresent()){
-      return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO);
+      return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO, primaryOrg);
     } else {
       return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO);
     }
