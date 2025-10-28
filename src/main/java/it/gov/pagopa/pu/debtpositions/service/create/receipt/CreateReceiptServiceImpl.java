@@ -8,10 +8,13 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -46,9 +49,11 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
     saveReceipt(receiptDTO);
 
-    DebtPosition primaryOrgDp = primaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
-    secondaryOrgPaymentHandlerService.handle(primaryOrgDp, receiptDTO.getTransfers(), accessToken);
-    mixedDpPaymentHandlerService.handle(primaryOrgDp);
+    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
+    secondaryOrgPaymentHandlerService.handle(primaryOrgDp, receiptDTO, accessToken);
+    if(primaryOrgDp.isPresent()){
+      mixedDpPaymentHandlerService.handle(primaryOrgDp.get());
+    }
 
     return receiptDTO;
   }

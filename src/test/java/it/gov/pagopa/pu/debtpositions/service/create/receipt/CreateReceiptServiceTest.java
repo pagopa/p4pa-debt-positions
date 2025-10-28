@@ -8,16 +8,21 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class CreateReceiptServiceTest {
@@ -38,7 +43,7 @@ class CreateReceiptServiceTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
-  void init(){
+  void init() {
     service = new CreateReceiptServiceImpl(
       receiptNoPIIRepositoryMock,
       receiptPIIRepositoryMock,
@@ -49,7 +54,7 @@ class CreateReceiptServiceTest {
   }
 
   @AfterEach
-  void verifyNoMoreInteractions(){
+  void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       receiptNoPIIRepositoryMock,
       receiptPIIRepositoryMock,
@@ -59,8 +64,9 @@ class CreateReceiptServiceTest {
     );
   }
 
-  @Test
-  void givenNewReceiptWhenCreateReceiptThenOk(){
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void givenNewReceiptWhenCreateReceiptThenOk(boolean primaryOrgHandledByPu) {
     // Given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     String accessToken = "ACCESSTOKEN";
@@ -69,18 +75,20 @@ class CreateReceiptServiceTest {
       .thenReturn(null);
 
     // When, Then
-    testProcessedReceiptAndDpHandling(receiptDTO, accessToken);
+    testProcessedReceiptAndDpHandling(receiptDTO, accessToken, primaryOrgHandledByPu);
   }
 
-  private void testProcessedReceiptAndDpHandling(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+  private void testProcessedReceiptAndDpHandling(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken, boolean primaryOrgHandledByPu) {
     // Given
-    DebtPosition primaryOrgDp = new DebtPosition();
+    Optional<DebtPosition> primaryOrgDp = primaryOrgHandledByPu
+      ? Optional.of(new DebtPosition())
+      : Optional.empty();
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptId(-1L);
 
     Mockito.when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
       .thenReturn(storedReceipt);
-    Mockito.when(primaryOrgPaymentHandlerServiceMock.handle(Mockito.same(receiptDTO), Mockito.same(accessToken)))
+    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.same(receiptDTO), Mockito.same(accessToken)))
       .thenReturn(primaryOrgDp);
 
     // When
@@ -92,13 +100,15 @@ class CreateReceiptServiceTest {
     Assertions.assertSame(receiptDTO.getNoPII(), storedReceipt.getNoPII());
 
     Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
-      .handle(Mockito.same(primaryOrgDp), Mockito.same(receiptDTO.getTransfers()), Mockito.same(accessToken));
-    Mockito.verify(mixedDpPaymentHandlerServiceMock)
-      .handle(Mockito.same(primaryOrgDp));
+      .handle(Mockito.same(primaryOrgDp), Mockito.same(receiptDTO), Mockito.same(accessToken));
+    if(primaryOrgHandledByPu) {
+      Mockito.verify(mixedDpPaymentHandlerServiceMock)
+        .handle(Mockito.same(primaryOrgDp.get()));
+    }
   }
 
   @Test
-  void givenExistentReceiptAndNotManualImportWhenCreateReceiptThenDoNothing(){
+  void givenExistentReceiptAndNotManualImportWhenCreateReceiptThenDoNothing() {
     // Given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setIud(null);
@@ -119,7 +129,7 @@ class CreateReceiptServiceTest {
   }
 
   @Test
-  void givenExistentReceiptAndManualImportAndUnexpectedOriginWhenCreateReceiptThenConflict(){
+  void givenExistentReceiptAndManualImportAndUnexpectedOriginWhenCreateReceiptThenConflict() {
     // Given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     String accessToken = "ACCESSTOKEN";
@@ -135,7 +145,7 @@ class CreateReceiptServiceTest {
   }
 
   @Test
-  void givenExistentReceiptAndDifferentOriginWhenCreateReceiptThenConflict(){
+  void givenExistentReceiptAndDifferentOriginWhenCreateReceiptThenConflict() {
     // Given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
@@ -151,8 +161,9 @@ class CreateReceiptServiceTest {
     Assertions.assertThrows(ConflictErrorException.class, () -> service.createReceipt(receiptDTO, accessToken));
   }
 
-  @Test
-  void givenExistentReceiptAndManualImportWhenCreateReceiptThenOk(){
+  @ParameterizedTest
+  @ValueSource(booleans = {true, false})
+  void givenExistentReceiptAndManualImportWhenCreateReceiptThenOk(boolean primaryOrgHandledByPu) {
     // Given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
@@ -164,6 +175,6 @@ class CreateReceiptServiceTest {
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
 
-    testProcessedReceiptAndDpHandling(receiptDTO, accessToken);
+    testProcessedReceiptAndDpHandling(receiptDTO, accessToken, primaryOrgHandledByPu);
   }
 }
