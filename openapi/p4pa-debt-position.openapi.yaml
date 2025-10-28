@@ -1513,6 +1513,27 @@ paths:
           description: Conflict
         '500':
           description: Internal server error
+    put:
+      tags:
+        - spontaneous-form
+      operationId: updateSpontaneousForm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'SpontaneousForm'
+        required: true
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
   /spontaneous-forms/{spontaneousFormId}:
     delete:
       tags:

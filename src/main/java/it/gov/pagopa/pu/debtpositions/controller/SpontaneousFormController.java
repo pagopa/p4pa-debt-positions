@@ -31,4 +31,11 @@ public class SpontaneousFormController implements SpontaneousFormApi {
     spontaneousFormService.deleteSpontaneousForm(spontaneousFormId);
     return ResponseEntity.ok().build();
   }
+
+  @Override
+  public ResponseEntity<Void> updateSpontaneousForm(SpontaneousForm spontaneousForm) {
+    log.info("updating SpontaneousForm having organizationId {} and code {}", spontaneousForm.getOrganizationId(), spontaneousForm.getCode());
+    spontaneousFormService.updateSpontaneousForm(spontaneousForm);
+    return ResponseEntity.ok().build();
+  }
 }

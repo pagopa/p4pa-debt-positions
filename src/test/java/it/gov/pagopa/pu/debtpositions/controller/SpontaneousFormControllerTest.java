@@ -1,10 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.service.SpontaneousFormService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -18,6 +13,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SpontaneousFormControllerTest {
@@ -59,6 +59,18 @@ class SpontaneousFormControllerTest {
     doNothing().when(spontaneousFormServiceMock).deleteSpontaneousForm(spontaneousFormId);
 
     ResponseEntity<Void> result = controller.deleteSpontaneousForm(spontaneousFormId);
+
+    assertNotNull(result);
+    assertEquals(HttpStatus.OK, result.getStatusCode());
+  }
+
+  @Test
+  void whenUpdateSpontaneousFormThenReturnOk() {
+    SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
+
+    Mockito.when(spontaneousFormServiceMock.updateSpontaneousForm(spontaneousForm)).thenReturn(spontaneousForm);
+
+    ResponseEntity<Void> result = controller.updateSpontaneousForm(spontaneousForm);
 
     assertNotNull(result);
     assertEquals(HttpStatus.OK, result.getStatusCode());
