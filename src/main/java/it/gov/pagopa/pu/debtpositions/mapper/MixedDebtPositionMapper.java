@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.RequiredArgsConstructor;
@@ -53,7 +54,7 @@ public class MixedDebtPositionMapper {
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
           .category(category)
-          .remittanceInformation(request.getRemittanceInformation())
+          .remittanceInformation(requestTransfer.getRemittanceInformation())
           .build()
       );
     }
@@ -67,7 +68,7 @@ public class MixedDebtPositionMapper {
       .dueDate(request.getDueDate())
       .debtor(request.getDebtor())
       .legacyPaymentMetadata(null)
-      .remittanceInformation(request.getRemittanceInformation())
+      .remittanceInformation(Constants.MULTIPLE_REMITTANCE_INFO)
       .sourceFlowName(request.getSourceFlowName())
       .transfers(transfers)
       .build();

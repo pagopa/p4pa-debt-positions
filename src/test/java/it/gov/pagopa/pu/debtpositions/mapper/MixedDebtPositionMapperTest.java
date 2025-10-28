@@ -83,7 +83,7 @@ class MixedDebtPositionMapperTest {
       .dueDate(DATE)
       .debtor(PersonFaker.buildPerson())
       .legacyPaymentMetadata(null)
-      .remittanceInformation("Payment Info")
+      .remittanceInformation("causali multiple")
       .sourceFlowName("sourceFlowName")
       .transfers(List.of(expectedTransfer))
       .build();

@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.MixedTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.model.Stamp;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -79,6 +80,7 @@ public class TransferFaker {
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
       .legacyPaymentMetadata("9/01234567/xxxxx")
+      .remittanceInformation("Payment Info")
       .build();
   }
 

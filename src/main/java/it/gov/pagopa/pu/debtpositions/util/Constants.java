@@ -12,5 +12,7 @@ public class Constants {
 
   public static final String WS_USER_PREFIX = "WS_USER-";
 
+  public static final String MULTIPLE_REMITTANCE_INFO = "causali multiple";
+
 }
 
