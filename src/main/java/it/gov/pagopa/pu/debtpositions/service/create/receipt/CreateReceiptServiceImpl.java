@@ -51,9 +51,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
     Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
     secondaryOrgPaymentHandlerService.handle(primaryOrgDp, receiptDTO, accessToken);
-    if(primaryOrgDp.isPresent()){
-      mixedDpPaymentHandlerService.handle(primaryOrgDp.get());
-    }
+    primaryOrgDp.ifPresent(mixedDpPaymentHandlerService::handle);
 
     return receiptDTO;
   }
