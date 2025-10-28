@@ -7,8 +7,14 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.ValidationException;
-import java.util.Optional;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
 @Service
 public class SpontaneousFormServiceImpl implements SpontaneousFormService {
@@ -44,5 +50,30 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
       throw new ConflictErrorException("The SpontaneousForm having id "+spontaneousFormId+" is referenced by "+dptoCount+" DebtPositionTypeOrgs");
     }
     spontaneousFormRepository.delete(spontaneousForm);
+  }
+
+  @Transactional
+  @Override
+  public SpontaneousForm updateSpontaneousForm(SpontaneousForm spontaneousForm) {
+    if(spontaneousForm.getSpontaneousFormId()==null){
+      throw new ValidationException("SpontaneousFormId must not be null");
+    }
+    validateSpontaneousForm(spontaneousForm);
+    return spontaneousFormRepository.save(spontaneousForm);
+  }
+
+  private void validateSpontaneousForm(SpontaneousForm spontaneousForm) {
+    SpontaneousForm existingSpontaneousForm = spontaneousFormRepository.findById(spontaneousForm.getSpontaneousFormId())
+      .orElseThrow(()->new NotFoundException("SpontaneousForm having id %s not found".formatted(spontaneousForm.getSpontaneousFormId())));
+    checkReadOnlyFields(existingSpontaneousForm, spontaneousForm);
+  }
+
+  private void checkReadOnlyFields(SpontaneousForm existingSpontaneousForm, SpontaneousForm updatedSpontaneousForm) {
+    List<String> modifiedFields = new ArrayList<>();
+    checkImmutableField("organizationId", existingSpontaneousForm.getOrganizationId(), updatedSpontaneousForm.getOrganizationId(), modifiedFields);
+    checkImmutableField("code", existingSpontaneousForm.getCode(), updatedSpontaneousForm.getCode(), modifiedFields);
+    if(!CollectionUtils.isEmpty(modifiedFields)){
+      throw new ValidationException("The following SpontaneousForm fields are readOnly. "+modifiedFields);
+    }
   }
 }
