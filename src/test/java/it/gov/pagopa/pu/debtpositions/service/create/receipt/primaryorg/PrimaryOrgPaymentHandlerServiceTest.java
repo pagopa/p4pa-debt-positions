@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
@@ -28,7 +29,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
   @Mock
   private PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerServiceMock;
   @Mock
-  private PrimaryOrgTechnicalDpCreationService technicalDpCreationServiceMock;
+  private ReceiptBasedTechnicalDpHandlerService technicalDpCreationServiceMock;
 
   private PrimaryOrgPaymentHandlerService service;
 
@@ -106,7 +107,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
       .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.empty());
-    Mockito.when(technicalDpCreationServiceMock.create(Mockito.same(receiptDTO)))
+    Mockito.when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO)))
       .thenReturn(dp);
 
     // When

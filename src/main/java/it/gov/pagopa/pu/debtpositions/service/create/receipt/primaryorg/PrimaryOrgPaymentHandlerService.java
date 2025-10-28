@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -17,9 +18,9 @@ public class PrimaryOrgPaymentHandlerService {
   private final OrganizationService organizationService;
   private final PrimaryOrgInstallmentRetrieverService installmentRetrieverService;
   private final PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService;
-  private final PrimaryOrgTechnicalDpCreationService technicalDpCreationService;
+  private final ReceiptBasedTechnicalDpHandlerService technicalDpCreationService;
 
-  public PrimaryOrgPaymentHandlerService(OrganizationService organizationService, PrimaryOrgInstallmentRetrieverService installmentRetrieverService, PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService, PrimaryOrgTechnicalDpCreationService technicalDpCreationService) {
+  public PrimaryOrgPaymentHandlerService(OrganizationService organizationService, PrimaryOrgInstallmentRetrieverService installmentRetrieverService, PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService, ReceiptBasedTechnicalDpHandlerService technicalDpCreationService) {
     this.organizationService = organizationService;
     this.installmentRetrieverService = installmentRetrieverService;
     this.installmentPaymentHandlerService = installmentPaymentHandlerService;
@@ -42,7 +43,7 @@ public class PrimaryOrgPaymentHandlerService {
     if(installment.isPresent()){
       return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO);
     } else {
-      return technicalDpCreationService.create(receiptDTO);
+      return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO);
     }
   }
 }
