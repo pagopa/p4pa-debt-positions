@@ -31,14 +31,14 @@ public class TechnicalMixedDebtPositionMapper {
 
   public DebtPosition toTechnicalMixedDebtPosition(DebtPosition debtPosition,
                                                    Long debtPositionTypeOrgId,
-                                                   boolean isUnpayable,
+                                                   boolean isUnpaid,
                                                    List<MixedDpAdditionalData> mixedDpAdditionalDataList,
                                                    String accessToken) {
     DebtPosition technicalMixedDp = new DebtPosition();
     technicalMixedDp.setIupdOrg(debtPosition.getIupdOrg());
     technicalMixedDp.setDescription(debtPosition.getDescription());
     technicalMixedDp.setStatus(
-      isUnpayable ? DebtPositionStatus.UNPAID : DebtPositionStatus.PAID);
+      isUnpaid ? DebtPositionStatus.UNPAID : DebtPositionStatus.PAID);
     technicalMixedDp.setDebtPositionOrigin(
       DebtPositionOrigin.SPONTANEOUS_MIXED);
     technicalMixedDp.setOrganizationId(debtPosition.getOrganizationId());
@@ -50,14 +50,14 @@ public class TechnicalMixedDebtPositionMapper {
       debtPosition.isFlagPuPagoPaPayment());
     technicalMixedDp.setPaymentOptions(
       toTechnicalMixedDPPaymentOptions(
-        debtPosition, isUnpayable, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+        debtPosition, isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
     debtPositionProcessorService.updateAmounts(technicalMixedDp);
 
     return technicalMixedDp;
   }
 
   private SortedSet<PaymentOption> toTechnicalMixedDPPaymentOptions(
-    DebtPosition debtPosition, boolean isUnpayable,
+    DebtPosition debtPosition, boolean isUnpaid,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList,
     Long debtPositionTypeOrgId, String accessToken) {
     SortedSet<PaymentOption> set = new TreeSet<>();
@@ -67,7 +67,7 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setTotalAmountCents(
         paymentOption.getTotalAmountCents());
       technicalMixedDpPaymentOption.setStatus(
-        isUnpayable ? PaymentOptionStatus.UNPAYABLE : PaymentOptionStatus.PAID);
+        isUnpaid ? PaymentOptionStatus.UNPAID : PaymentOptionStatus.PAID);
       technicalMixedDpPaymentOption.setDescription(
         paymentOption.getDescription());
       technicalMixedDpPaymentOption.setPaymentOptionType(
@@ -77,7 +77,7 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setInstallments(
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
           paymentOption.getInstallments(),
-          isUnpayable, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+          isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
 
       set.add(technicalMixedDpPaymentOption);
     }
@@ -86,7 +86,7 @@ public class TechnicalMixedDebtPositionMapper {
   }
 
   private SortedSet<InstallmentNoPII> toTechnicalMixedDPInstallments(
-    Long organizationId, SortedSet<InstallmentNoPII> installments, boolean isUnpayable,
+    Long organizationId, SortedSet<InstallmentNoPII> installments, boolean isUnpaid,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList,
     Long debtPositionTypeOrgId, String accessToken) {
     SortedSet<InstallmentNoPII> set = new TreeSet<>();
@@ -103,7 +103,7 @@ public class TechnicalMixedDebtPositionMapper {
 
         InstallmentNoPII technicalMixedDpInstallment = new InstallmentNoPII();
         technicalMixedDpInstallment.setStatus(
-          isUnpayable ? InstallmentStatus.UNPAYABLE : InstallmentStatus.PAID);
+          isUnpaid ? InstallmentStatus.UNPAID : InstallmentStatus.PAID);
         technicalMixedDpInstallment.setSyncStatus(null);
         technicalMixedDpInstallment.setIupdPagopa(installment.getIupdPagopa());
         technicalMixedDpInstallment.setGenerateNotice(
@@ -148,7 +148,7 @@ public class TechnicalMixedDebtPositionMapper {
         technicalMixedDpInstallment.setTransfers(
           toTechnicalMixedDPTransfers(transfer));
 
-        if (!isUnpayable) {
+        if (!isUnpaid) {
           DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
             .orElseThrow(() -> new NotFoundException("The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
           balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, debtPositionTypeOrg, accessToken);
