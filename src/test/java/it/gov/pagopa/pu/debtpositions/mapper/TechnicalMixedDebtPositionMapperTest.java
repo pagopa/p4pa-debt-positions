@@ -135,13 +135,13 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkDebtPosition(DebtPosition expected,
-    DebtPosition result, boolean isUnpayable) {
+    DebtPosition result, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "debtPositionId", "creationDate",
       "updateDate", "updateOperatorExternalId", "updateTraceId");
 
     assertEquals(expected.getIupdOrg(), result.getIupdOrg());
     assertEquals(expected.getDescription(), result.getDescription());
-    if (isUnpayable) {
+    if (isUnpaid) {
       assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     } else {
       assertEquals(DebtPositionStatus.PAID, result.getStatus());
@@ -159,14 +159,14 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkPaymentOption(PaymentOption expected,
-    PaymentOption result, boolean isUnpayable) {
+    PaymentOption result, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "paymentOptionId", "debtPositionId",
       "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
     assertEquals(expected.getTotalAmountCents(),
       result.getTotalAmountCents());
-    if (isUnpayable) {
+    if (isUnpaid) {
       assertEquals(PaymentOptionStatus.UNPAID, result.getStatus());
     } else {
       assertEquals(PaymentOptionStatus.PAID, result.getStatus());
@@ -180,12 +180,12 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkInstallment(InstallmentNoPII installment,
-    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData, boolean isUnpayable) {
+    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "installmentId", "paymentOptionId",
       "syncStatus", "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
-    if(isUnpayable) {
+    if(isUnpaid) {
       assertEquals(InstallmentStatus.UNPAID, result.getStatus());
       assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     } else {
