@@ -67,7 +67,7 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setTotalAmountCents(
         paymentOption.getTotalAmountCents());
       technicalMixedDpPaymentOption.setStatus(
-        isUnpayable ? PaymentOptionStatus.UNPAYABLE : PaymentOptionStatus.PAID);
+        isUnpayable ? PaymentOptionStatus.UNPAID : PaymentOptionStatus.PAID);
       technicalMixedDpPaymentOption.setDescription(
         paymentOption.getDescription());
       technicalMixedDpPaymentOption.setPaymentOptionType(

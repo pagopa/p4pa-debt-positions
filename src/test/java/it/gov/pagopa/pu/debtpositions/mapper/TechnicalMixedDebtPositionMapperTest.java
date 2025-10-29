@@ -167,7 +167,7 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(expected.getTotalAmountCents(),
       result.getTotalAmountCents());
     if (isUnpayable) {
-      assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
+      assertEquals(PaymentOptionStatus.UNPAID, result.getStatus());
     } else {
       assertEquals(PaymentOptionStatus.PAID, result.getStatus());
     }
