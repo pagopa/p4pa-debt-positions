@@ -71,7 +71,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
           validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
 
           InstallmentStatus statusTo = installmentDTO.getStatus();
-          if (installmentDTO.getStatus().equals(InstallmentStatus.EXPIRED) && installmentDTO.getDueDate() != null &&
+          if (InstallmentStatus.EXPIRED.equals(installmentDTO.getStatus()) && installmentDTO.getDueDate() != null &&
             installmentDTO.getDueDate().isAfter(LocalDate.now())) {
             statusTo = InstallmentStatus.UNPAID;
           }

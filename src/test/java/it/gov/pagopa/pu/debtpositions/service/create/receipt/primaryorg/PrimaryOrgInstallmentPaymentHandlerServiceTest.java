@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinary.OrdinaryDPPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
@@ -50,6 +51,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
   @Test
   void givenNotExistentDPWhenHandlePaymentThrow(){
     // Given
+    String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setInstallmentId(-1L);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
@@ -59,12 +61,13 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
       .thenReturn(null);
 
     // When, Then
-    Assertions.assertThrows(NotFoundException.class, () -> service.handlePayment(installment, receiptDTO, organization));
+    Assertions.assertThrows(NotFoundException.class, () -> service.handlePayment(installment, receiptDTO, organization, accessToken));
   }
 
   @Test
   void givenOrdinaryDpWhenHandlePaymentInvokeItsHandler(){
     // Given
+    String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setInstallmentId(-1L);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
@@ -76,18 +79,19 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
       .thenReturn(expectedResult);
 
     // When
-    DebtPosition result = service.handlePayment(installment, receiptDTO, organization);
+    DebtPosition result = service.handlePayment(installment, receiptDTO, organization, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
 
     Mockito.verify(ordinaryDPPaymentHandlerServiceMock)
-      .handlePayment(Mockito.same(expectedResult), Mockito.same(installment.getInstallmentId()), Mockito.same(receiptDTO));
+      .handlePayment(Mockito.same(expectedResult), Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 
   @Test
   void givenTechDpWhenHandlePaymentInvokeItsHandler(){
     // Given
+    String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setInstallmentId(-1L);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
@@ -103,7 +107,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
       .thenReturn(expectedResult);
 
     // When
-    DebtPosition result = service.handlePayment(installment, receiptDTO, organization);
+    DebtPosition result = service.handlePayment(installment, receiptDTO, organization, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);

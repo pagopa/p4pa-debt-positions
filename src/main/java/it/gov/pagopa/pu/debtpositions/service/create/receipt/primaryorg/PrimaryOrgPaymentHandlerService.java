@@ -35,13 +35,13 @@ public class PrimaryOrgPaymentHandlerService {
       return Optional.empty();
     }
 
-    return Optional.of(handlePuPrimaryOrgPayment(receiptDTO, primaryOrg));
+    return Optional.of(handlePuPrimaryOrgPayment(receiptDTO, primaryOrg, accessToken));
   }
 
-  private DebtPosition handlePuPrimaryOrgPayment(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization primaryOrg) {
+  private DebtPosition handlePuPrimaryOrgPayment(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization primaryOrg, String accessToken) {
     Optional<InstallmentNoPII> installment = installmentRetrieverService.retrieve(primaryOrg, receiptDTO.getNoticeNumber(), receiptDTO.getIud());
     if(installment.isPresent()){
-      return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO, primaryOrg);
+      return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO, primaryOrg, accessToken);
     } else {
       return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO);
     }

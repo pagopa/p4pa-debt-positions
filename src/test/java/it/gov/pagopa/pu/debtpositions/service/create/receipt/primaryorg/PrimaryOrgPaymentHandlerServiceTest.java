@@ -84,7 +84,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
       .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.of(installment));
-    Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(organization)))
+    Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(accessToken)))
       .thenReturn(dp);
 
     // When
