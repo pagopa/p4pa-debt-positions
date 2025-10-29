@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -63,6 +64,8 @@ public class TechnicalMixedDebtPositionMapper {
     SortedSet<PaymentOption> set = new TreeSet<>();
 
     for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
+      SortedSet<InstallmentNoPII> installments = paymentOption.getInstallments();
+
       PaymentOption technicalMixedDpPaymentOption = new PaymentOption();
       technicalMixedDpPaymentOption.setTotalAmountCents(
         paymentOption.getTotalAmountCents());
@@ -71,12 +74,12 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setDescription(
         paymentOption.getDescription());
       technicalMixedDpPaymentOption.setPaymentOptionType(
-        paymentOption.getPaymentOptionType());
+        installments.size() == 1 ? PaymentOptionType.SINGLE_INSTALLMENT : PaymentOptionType.INSTALLMENTS);
       technicalMixedDpPaymentOption.setPaymentOptionIndex(
         paymentOption.getPaymentOptionIndex());
       technicalMixedDpPaymentOption.setInstallments(
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
-          paymentOption.getInstallments(),
+          installments,
           isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
 
       set.add(technicalMixedDpPaymentOption);
