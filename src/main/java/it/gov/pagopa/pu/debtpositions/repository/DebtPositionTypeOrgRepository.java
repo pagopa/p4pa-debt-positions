@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import jakarta.transaction.Transactional;
+
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -164,5 +166,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       WHERE d.spontaneousFormId = :spontaneousFormId
       """)
   long countBySpontaneousFormId(Long spontaneousFormId);
+
+  List<DebtPositionTypeOrg> findByUpdateDateGreaterThanEqual(LocalDate updateDate);
 }
 
