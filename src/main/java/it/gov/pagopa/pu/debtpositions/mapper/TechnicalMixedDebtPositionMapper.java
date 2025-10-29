@@ -103,7 +103,7 @@ public class TechnicalMixedDebtPositionMapper {
 
         InstallmentNoPII technicalMixedDpInstallment = new InstallmentNoPII();
         technicalMixedDpInstallment.setStatus(
-          isUnpayable ? InstallmentStatus.UNPAYABLE : InstallmentStatus.PAID);
+          isUnpayable ? InstallmentStatus.UNPAID : InstallmentStatus.PAID);
         technicalMixedDpInstallment.setSyncStatus(null);
         technicalMixedDpInstallment.setIupdPagopa(installment.getIupdPagopa());
         technicalMixedDpInstallment.setGenerateNotice(

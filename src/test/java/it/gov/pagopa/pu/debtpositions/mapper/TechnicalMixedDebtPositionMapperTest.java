@@ -186,7 +186,7 @@ class TechnicalMixedDebtPositionMapperTest {
       "updateTraceId");
 
     if(isUnpayable) {
-      assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
+      assertEquals(InstallmentStatus.UNPAID, result.getStatus());
       assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     } else {
       assertEquals(InstallmentStatus.PAID, result.getStatus());
