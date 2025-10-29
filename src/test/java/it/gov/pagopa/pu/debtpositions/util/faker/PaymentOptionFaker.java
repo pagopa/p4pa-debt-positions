@@ -95,4 +95,21 @@ public class PaymentOptionFaker {
     paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildMixedInstallmentNoPII()))));
     return paymentOption;
   }
+
+  public static PaymentOption buildMixedPaymentOptionWithMultipleInstallments() {
+    PaymentOption paymentOption = new PaymentOption();
+    paymentOption.setPaymentOptionId(10L);
+    paymentOption.setDebtPositionId(1L);
+    paymentOption.setTotalAmountCents(2000L);
+    paymentOption.setStatus(PaymentOptionStatus.UNPAID);
+    paymentOption.setDescription("Payment description");
+    paymentOption.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
+    paymentOption.setPaymentOptionIndex(1);
+    paymentOption.setCreationDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateDate(DATETIME.toLocalDateTime());
+    paymentOption.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    paymentOption.setUpdateTraceId("TRACEID");
+    paymentOption.setInstallments(new TreeSet<>(new ArrayList<>(List.of(buildMixedInstallmentNoPII(100L), buildMixedInstallmentNoPII(101L)))));
+    return paymentOption;
+  }
 }

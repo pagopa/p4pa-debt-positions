@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
@@ -19,12 +20,15 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.SortedSet;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionWithMultipleInstallments;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(MockitoExtension.class)
 class TechnicalMixedDebtPositionMapperTest {
@@ -134,6 +138,25 @@ class TechnicalMixedDebtPositionMapperTest {
     assertThrows(IllegalStateException.class, exec);
   }
 
+  @Test
+  void givenDPWithMultipleInstallmentsWhenToTechnicalMixedDebtPositionsThenCorrectMappingForPaymentOptionType() {
+    DebtPosition debtPosition = buildMixedDebtPositionWithMultipleInstallments();
+    PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
+
+    MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
+      .transferIndex(1)
+      .iud("IUD")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .build();
+
+    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
+      true, List.of(mixedDpAdditionalData), accessToken);
+
+    PaymentOption resultPO = result.getPaymentOptions().getFirst();
+    checkPaymentOption(paymentOption, resultPO, true);
+  }
+
   private static void checkDebtPosition(DebtPosition expected,
     DebtPosition result, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "debtPositionId", "creationDate",
@@ -172,7 +195,7 @@ class TechnicalMixedDebtPositionMapperTest {
       assertEquals(PaymentOptionStatus.PAID, result.getStatus());
     }
     assertEquals(expected.getDescription(), result.getDescription());
-    assertEquals(expected.getPaymentOptionType(),
+    assertEquals(expected.getInstallments().size() == 1 ? PaymentOptionType.SINGLE_INSTALLMENT : PaymentOptionType.INSTALLMENTS,
       result.getPaymentOptionType());
     assertEquals(expected.getPaymentOptionIndex(),
       result.getPaymentOptionIndex());

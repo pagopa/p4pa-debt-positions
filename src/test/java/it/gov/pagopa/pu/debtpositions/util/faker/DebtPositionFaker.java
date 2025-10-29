@@ -1,11 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildGeneratedIuvPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildMixedPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildSyncPaymentOptionDTO;
-
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -18,6 +12,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
@@ -133,6 +129,27 @@ public class DebtPositionFaker {
     debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPosition.setUpdateTraceId("TRACEID");
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildMixedPaymentOption()))));
+    return debtPosition;
+  }
+
+  public static DebtPosition buildMixedDebtPositionWithMultipleInstallments() {
+    DebtPosition debtPosition = new DebtPosition();
+    debtPosition.setDebtPositionId(1L);
+    debtPosition.setDebtPositionTypeOrgId(1L);
+    debtPosition.setIupdOrg("IUPD_ORG");
+    debtPosition.setDescription("Test Description");
+    debtPosition.setStatus(DebtPositionStatus.UNPAID);
+    debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
+    debtPosition.setOrganizationId(500L);
+    debtPosition.setValidityDate(DATE);
+    debtPosition.setFlagIuvVolatile(true);
+    debtPosition.setFlagPuPagoPaPayment(true);
+    debtPosition.setMultiDebtor(false);
+    debtPosition.setCreationDate(DATETIME.toLocalDateTime());
+    debtPosition.setUpdateDate(DATETIME.toLocalDateTime());
+    debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
+    debtPosition.setUpdateTraceId("TRACEID");
+    debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildMixedPaymentOptionWithMultipleInstallments()))));
     return debtPosition;
   }
 }

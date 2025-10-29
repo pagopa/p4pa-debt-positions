@@ -201,4 +201,42 @@ public class InstallmentFaker {
       .transfers(new TreeSet<>(buildMixedTransferList(3)))
       .build();
   }
+
+  public static InstallmentNoPII buildMixedInstallmentNoPII(Long installmentId){
+    return InstallmentNoPII.builder()
+      .installmentId(installmentId)
+      .paymentOptionId(10L)
+      .status(InstallmentStatus.UNPAID)
+      .syncStatus(null)
+      .iupdPagopa("iupdPagoPa")
+      .generateNotice(true)
+      .iud("6a435de9-f4ee-4942-808a-cf59e3140a8d")
+      .iuv("iuv")
+      .iur("iur")
+      .iuf("iuf")
+      .nav("nav")
+      .iun("iun")
+      .dueDate(DATE)
+      .switchToExpired(false)
+      .notificationFeeCents(1000L)
+      .amountCents(300L)
+      .personalDataId(123L)
+      .remittanceInformation("remittanceInformation")
+      .legacyPaymentMetadata("1/test")
+      .debtorEntityType(PersonEntityType.F)
+      .debtorFiscalCodeHash(new byte[] {})
+      .balance("balance")
+      .notificationDate(DATETIME)
+      .ingestionFlowFileId(1L)
+      .ingestionFlowFileLineNumber(100L)
+      .ingestionFlowFileAction(Action.I)
+      .sourceFlowName("sourceFlowName")
+      .receiptId(1L)
+      .creationDate(DATETIME.toLocalDateTime())
+      .updateDate(DATETIME.toLocalDateTime())
+      .updateOperatorExternalId("OPERATOREXTERNALUSERID")
+      .updateTraceId("TRACEID")
+      .transfers(new TreeSet<>(buildMixedTransferList(3)))
+      .build();
+  }
 }
