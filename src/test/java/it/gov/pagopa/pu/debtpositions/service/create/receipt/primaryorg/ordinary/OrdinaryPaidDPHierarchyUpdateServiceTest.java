@@ -21,6 +21,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.util.Set;
 import java.util.TreeSet;
 
+@SuppressWarnings("squid:S117") // suppressing naming convention warning for variable written with "_" name
 @ExtendWith(MockitoExtension.class)
 class OrdinaryPaidDPHierarchyUpdateServiceTest {
 
