@@ -21,11 +21,11 @@ public class TechnicalMixedDebtPositionBuilderService {
   }
 
   public List<DebtPosition> createTechnicalMixedDebtPositions(Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
-                                                              DebtPosition debtPosition, boolean isUnpayable, String accessToken) {
+                                                              DebtPosition debtPosition, boolean isUnpaid, String accessToken) {
     return debtPositionTypeOrgId2TransfersData.entrySet().stream()
       .map(e ->
         technicalMixedDebtPositionMapper.toTechnicalMixedDebtPosition(
-          debtPosition, e.getKey(), isUnpayable, e.getValue(), accessToken))
+          debtPosition, e.getKey(), isUnpaid, e.getValue(), accessToken))
       .toList();
   }
 }

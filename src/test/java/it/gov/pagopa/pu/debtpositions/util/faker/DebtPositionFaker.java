@@ -131,25 +131,4 @@ public class DebtPositionFaker {
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildMixedPaymentOption()))));
     return debtPosition;
   }
-
-  public static DebtPosition buildMixedDebtPositionWithMultipleInstallments() {
-    DebtPosition debtPosition = new DebtPosition();
-    debtPosition.setDebtPositionId(1L);
-    debtPosition.setDebtPositionTypeOrgId(1L);
-    debtPosition.setIupdOrg("IUPD_ORG");
-    debtPosition.setDescription("Test Description");
-    debtPosition.setStatus(DebtPositionStatus.UNPAID);
-    debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
-    debtPosition.setOrganizationId(500L);
-    debtPosition.setValidityDate(DATE);
-    debtPosition.setFlagIuvVolatile(true);
-    debtPosition.setFlagPuPagoPaPayment(true);
-    debtPosition.setMultiDebtor(false);
-    debtPosition.setCreationDate(DATETIME.toLocalDateTime());
-    debtPosition.setUpdateDate(DATETIME.toLocalDateTime());
-    debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
-    debtPosition.setUpdateTraceId("TRACEID");
-    debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildMixedPaymentOptionWithMultipleInstallments()))));
-    return debtPosition;
-  }
 }

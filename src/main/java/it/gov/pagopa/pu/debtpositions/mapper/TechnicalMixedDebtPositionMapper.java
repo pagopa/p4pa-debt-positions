@@ -64,8 +64,6 @@ public class TechnicalMixedDebtPositionMapper {
     SortedSet<PaymentOption> set = new TreeSet<>();
 
     for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
-      SortedSet<InstallmentNoPII> installments = paymentOption.getInstallments();
-
       PaymentOption technicalMixedDpPaymentOption = new PaymentOption();
       technicalMixedDpPaymentOption.setTotalAmountCents(
         paymentOption.getTotalAmountCents());
@@ -74,12 +72,12 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setDescription(
         paymentOption.getDescription());
       technicalMixedDpPaymentOption.setPaymentOptionType(
-        installments.size() == 1 ? PaymentOptionType.SINGLE_INSTALLMENT : PaymentOptionType.INSTALLMENTS);
+        mixedDpAdditionalDataList.size() == 1 ? PaymentOptionType.SINGLE_INSTALLMENT : PaymentOptionType.INSTALLMENTS);
       technicalMixedDpPaymentOption.setPaymentOptionIndex(
         paymentOption.getPaymentOptionIndex());
       technicalMixedDpPaymentOption.setInstallments(
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
-          installments,
+          paymentOption.getInstallments(),
           isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
 
       set.add(technicalMixedDpPaymentOption);
