@@ -100,7 +100,7 @@ class CreateReceiptServiceTest {
     Assertions.assertSame(receiptDTO.getNoPII(), storedReceipt.getNoPII());
 
     Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
-      .handle(Mockito.same(primaryOrgDp), Mockito.same(receiptDTO), Mockito.same(accessToken));
+      .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
     if(primaryOrgHandledByPu) {
       Mockito.verify(mixedDpPaymentHandlerServiceMock)
         .handle(Mockito.same(primaryOrgDp.get()));

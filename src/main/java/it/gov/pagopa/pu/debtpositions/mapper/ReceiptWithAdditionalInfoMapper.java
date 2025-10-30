@@ -9,8 +9,8 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
-import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.stream.Stream;
 
 @Service
 public class ReceiptWithAdditionalInfoMapper {
@@ -27,7 +27,8 @@ public class ReceiptWithAdditionalInfoMapper {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(organization.getOrganizationId(), receiptDTO.getDebtPositionTypeOrgCode())
       .orElseGet(() -> unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organization.getOrganizationId()));
 
-    OffsetDateTime now = OffsetDateTime.now();
+    List<TransferDTO> techTransfers = buildTechTransfers(receiptDTO, organization);
+
     return DebtPositionDTO.builder()
       .organizationId(organization.getOrganizationId())
       .debtPositionOrigin(getDebtPositionOrigin(receiptDTO, organization))
@@ -39,8 +40,6 @@ public class ReceiptWithAdditionalInfoMapper {
       .flagIuvVolatile(false)
       .multiDebtor(false)
       .flagPuPagoPaPayment(true)
-      .creationDate(receiptDTO.getPaymentDateTime())
-      .updateDate(now)
       .paymentOptions(List.of(PaymentOptionDTO.builder()
         .totalAmountCents(receiptDTO.getPaymentAmountCents())
         .status(PaymentOptionStatus.PAID)
@@ -69,12 +68,19 @@ public class ReceiptWithAdditionalInfoMapper {
           .ingestionFlowFileLineNumber(null)
           .receiptId(receiptDTO.getReceiptId())
           .sourceFlowName(receiptDTO.getSourceFlowName())
-          .creationDate(receiptDTO.getPaymentDateTime())
-          .updateDate(now)
-          .transfers(receiptDTO.getTransfers().stream().map(this::mapTransfer).toList())
+          .transfers(techTransfers)
           .build()))
         .build()))
       .build();
+  }
+
+  private List<TransferDTO> buildTechTransfers(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+    Stream<ReceiptTransferDTO> techReceiptTransfers = receiptDTO.getTransfers().stream();
+    if(!organization.getOrgFiscalCode().equals(receiptDTO.getOrgFiscalCode())){
+      techReceiptTransfers = techReceiptTransfers
+        .filter(rt -> organization.getOrgFiscalCode().equals(rt.getFiscalCodePA()));
+    }
+    return techReceiptTransfers.map(this::mapTransfer).toList();
   }
 
   /**

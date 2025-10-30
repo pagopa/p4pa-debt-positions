@@ -39,7 +39,7 @@ public class ReceiptBasedTechnicalDpHandlerService {
     return debtPositionMapper.mapToModel(debtPositionDTO);
   }
 
-  public DebtPosition updateAndPublishTechDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+  public DebtPosition updateAndPublishTechDp(Organization organization, DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     DebtPositionDTO debtPositionDTO = technicalDpUpdateService.updateDp(dp, receiptDTO, organization);
     return publishTechDp(debtPositionDTO, receiptDTO);
   }

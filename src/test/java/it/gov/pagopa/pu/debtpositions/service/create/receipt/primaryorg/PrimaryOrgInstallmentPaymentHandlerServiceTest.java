@@ -103,7 +103,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installment.getInstallmentId()))
       .thenReturn(fetchedDp);
 
-    Mockito.when(technicalDpHandlerServiceMock.updateAndPublishTechDp(Mockito.same(fetchedDp), Mockito.same(receiptDTO), Mockito.same(organization)))
+    Mockito.when(technicalDpHandlerServiceMock.updateAndPublishTechDp(Mockito.same(organization), Mockito.same(fetchedDp), Mockito.same(receiptDTO)))
       .thenReturn(expectedResult);
 
     // When

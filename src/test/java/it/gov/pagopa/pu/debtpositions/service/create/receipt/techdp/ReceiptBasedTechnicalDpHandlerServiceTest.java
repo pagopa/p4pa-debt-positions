@@ -122,7 +122,7 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
       .publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO));
 
     // When
-    DebtPosition result = service.updateAndPublishTechDp(dp, receiptDTO, organization);
+    DebtPosition result = service.updateAndPublishTechDp(organization, dp, receiptDTO);
 
     // Then
     Assertions.assertSame(dp, result);

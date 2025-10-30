@@ -34,7 +34,7 @@ public class PrimaryOrgInstallmentPaymentHandlerService {
       ordinaryDPPaymentHandlerService.handlePayment(dp, installment, receiptDTO, accessToken);
       return dp;
     } else {
-      return technicalDpHandlerService.updateAndPublishTechDp(dp, receiptDTO, organization);
+      return technicalDpHandlerService.updateAndPublishTechDp(organization, dp, receiptDTO);
     }
   }
 }
