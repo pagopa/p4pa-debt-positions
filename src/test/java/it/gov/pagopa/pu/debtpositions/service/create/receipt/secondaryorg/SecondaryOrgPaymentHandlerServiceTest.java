@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.receipt;
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;

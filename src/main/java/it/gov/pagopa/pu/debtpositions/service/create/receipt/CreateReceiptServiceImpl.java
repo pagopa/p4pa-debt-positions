@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

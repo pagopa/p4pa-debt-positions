@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.receipt;
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -27,7 +27,7 @@ public class SecondaryOrgPaymentHandlerService {
     this.receiptBasedTechnicalDpHandlerService = receiptBasedTechnicalDpHandlerService;
   }
 
-  void handle(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+  public void handle(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     receiptDTO.getTransfers().stream()
       .map(ReceiptTransferDTO::getFiscalCodePA)
       .filter(secondaryOrgFiscalCode -> !secondaryOrgFiscalCode.equals(receiptDTO.getOrgFiscalCode()))
