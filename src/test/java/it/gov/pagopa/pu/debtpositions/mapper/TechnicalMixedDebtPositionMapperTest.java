@@ -136,7 +136,7 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   @Test
-  void givenDPWithMultipleInstallmentsWhenToTechnicalMixedDebtPositionsThenCorrectMappingForPaymentOptionType() {
+  void givenDPMixedWithMultipleInstallmentsWhenToTechnicalMixedDebtPositionsThenCorrectMappingForPaymentOptionType() {
     DebtPosition debtPosition = buildMixedDebtPosition();
     PaymentOption expectedPO = debtPosition.getPaymentOptions().getFirst();
 

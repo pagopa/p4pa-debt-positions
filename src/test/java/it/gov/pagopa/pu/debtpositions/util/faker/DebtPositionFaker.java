@@ -1,5 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildGeneratedIuvPaymentOptionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildMixedPaymentOption;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildSyncPaymentOptionDTO;
+
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
@@ -12,8 +18,6 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
-
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
