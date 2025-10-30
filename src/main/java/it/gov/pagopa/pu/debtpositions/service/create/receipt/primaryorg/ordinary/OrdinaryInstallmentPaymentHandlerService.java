@@ -71,7 +71,7 @@ public class OrdinaryInstallmentPaymentHandlerService {
       .forEach(receiptTransferDTO ->
         installment.getTransfers().stream()
           .filter(transfer -> receiptTransferDTO.getIdTransfer().equals(transfer.getTransferIndex()))
-          .forEach(transfer -> transfer.setMbdAttachment(transfer.getMbdAttachment()))
+          .forEach(transfer -> transfer.setMbdAttachment(receiptTransferDTO.getMbdAttachment()))
       );
   }
 }
