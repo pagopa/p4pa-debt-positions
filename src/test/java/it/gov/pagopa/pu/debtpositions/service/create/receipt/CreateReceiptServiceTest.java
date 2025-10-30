@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -103,7 +104,7 @@ class CreateReceiptServiceTest {
       .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
     if(primaryOrgHandledByPu) {
       Mockito.verify(mixedDpPaymentHandlerServiceMock)
-        .handle(Mockito.same(primaryOrgDp.get()));
+        .handle(Mockito.same(primaryOrgDp.get()), Mockito.same(receiptDTO), Mockito.same(accessToken));
     }
   }
 

@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;

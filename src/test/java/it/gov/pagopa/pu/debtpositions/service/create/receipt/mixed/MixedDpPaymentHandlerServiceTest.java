@@ -1,0 +1,92 @@
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed;
+
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.List;
+
+@ExtendWith(MockitoExtension.class)
+class MixedDpPaymentHandlerServiceTest {
+
+  @Mock
+  private TechnicalMixedDebtPositionUpdaterService technicalMixedDebtPositionUpdaterServiceMock;
+  @Mock
+  private DebtPositionMapper mapperMock;
+  @Mock
+  private ReceiptBasedTechnicalDpHandlerService technicalDpHandlerServiceMock;
+
+  private MixedDpPaymentHandlerService service;
+
+  @BeforeEach
+  void init() {
+    service = new MixedDpPaymentHandlerService(
+      technicalMixedDebtPositionUpdaterServiceMock,
+      mapperMock,
+      technicalDpHandlerServiceMock
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(
+      technicalMixedDebtPositionUpdaterServiceMock,
+      mapperMock,
+      technicalDpHandlerServiceMock);
+  }
+
+  @Test
+  void givenNoMixedTypeWhenHandleThenDoNothing(){
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    DebtPosition primaryOrgDp = new DebtPosition();
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
+
+    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(accessToken)))
+      .thenReturn(List.of());
+
+    // When
+    service.handle(primaryOrgDp, receiptDTO, accessToken);
+
+    // Then
+    Mockito.verifyNoInteractions(mapperMock, technicalDpHandlerServiceMock);
+  }
+
+  @Test
+  void givenMixedTypeWhenHandleThenDoNothing(){
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    DebtPosition primaryOrgDp = new DebtPosition();
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
+
+    DebtPosition techDpMixed1 = new DebtPosition();
+    DebtPositionDTO techDpMixed1DTO = new DebtPositionDTO();
+    DebtPosition techDpMixed2 = new DebtPosition();
+    DebtPositionDTO techDpMixed2DTO = new DebtPositionDTO();
+
+    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(accessToken)))
+      .thenReturn(List.of(techDpMixed1, techDpMixed2));
+    Mockito.when(mapperMock.mapToDto(Mockito.same(techDpMixed1)))
+      .thenReturn(techDpMixed1DTO);
+    Mockito.when(mapperMock.mapToDto(Mockito.same(techDpMixed2)))
+      .thenReturn(techDpMixed2DTO);
+
+    // When
+    service.handle(primaryOrgDp, receiptDTO, accessToken);
+
+    // Then
+    Mockito.verify(technicalDpHandlerServiceMock)
+      .publishTechDp(Mockito.same(techDpMixed1DTO), Mockito.same(receiptDTO));
+    Mockito.verify(technicalDpHandlerServiceMock)
+      .publishTechDp(Mockito.same(techDpMixed2DTO), Mockito.same(receiptDTO));
+  }
+}
