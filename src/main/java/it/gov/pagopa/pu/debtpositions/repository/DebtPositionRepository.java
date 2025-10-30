@@ -161,8 +161,10 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Query("""
    SELECT d
      FROM DebtPosition d
+        JOIN DebtPositionTypeOrg dpto on d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
     WHERE (:organizationId IS NULL OR d.organizationId = :organizationId)
       AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND (:debtPositionTypeOrgCodesToExclude IS NULL OR dpto.code NOT IN :debtPositionTypeOrgCodesToExclude)
       AND EXISTS (
         SELECT 1
           FROM PaymentOption p
@@ -181,6 +183,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtorEntityType") PersonEntityType debtorEntityType,
     @Param("status") List<InstallmentStatus> status,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
+    @Param("debtPositionTypeOrgCodesToExclude") List<String> debtPositionTypeOrgCodesToExclude,
     @Param("organizationId") Long organizationId,
     @Param("dateFrom") LocalDateTime dateFrom,
     @Param("dateTo") LocalDateTime dateTo
