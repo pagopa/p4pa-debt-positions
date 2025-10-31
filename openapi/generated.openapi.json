@@ -10306,7 +10306,7 @@
             "type" : "string"
           }
         },
-        "required" : [ "amountCents", "debtPositionTypeOrgId", "iud" ]
+        "required" : [ "amountCents", "debtPositionTypeOrgId", "iud", "remittanceInformation" ]
       },
       "SaveDebtPositionTypeOrgDTO" : {
         "type" : "object",

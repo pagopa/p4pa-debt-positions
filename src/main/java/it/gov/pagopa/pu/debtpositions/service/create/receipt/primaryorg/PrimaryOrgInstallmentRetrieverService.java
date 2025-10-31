@@ -31,7 +31,7 @@ public class PrimaryOrgInstallmentRetrieverService {
   }
 
   private Optional<InstallmentNoPII> findByNav(Organization primaryOrg, String nav) {
-    List<InstallmentNoPII> installments = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)
+    List<InstallmentNoPII> installments = installmentNoPIIRepository.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED)
       .stream()
       .filter(i -> !InstallmentStatus.CANCELLED.equals(i.getStatus()))
       .toList();

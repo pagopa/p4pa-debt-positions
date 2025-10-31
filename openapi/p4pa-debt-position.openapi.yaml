@@ -2593,6 +2593,7 @@ components:
       required:
         - iud
         - debtPositionTypeOrgId
+        - remittanceInformation
         - amountCents
       properties:
         iud:
