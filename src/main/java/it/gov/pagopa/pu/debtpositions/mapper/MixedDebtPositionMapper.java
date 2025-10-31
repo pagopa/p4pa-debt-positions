@@ -21,6 +21,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MixedDebtPositionMapper {
 
+  private static final String MULTIPLE_REMITTANCE_INFO = "causali multiple";
+
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
@@ -53,7 +55,7 @@ public class MixedDebtPositionMapper {
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
           .category(category)
-          .remittanceInformation(request.getRemittanceInformation())
+          .remittanceInformation(requestTransfer.getRemittanceInformation())
           .build()
       );
     }
@@ -67,7 +69,7 @@ public class MixedDebtPositionMapper {
       .dueDate(request.getDueDate())
       .debtor(request.getDebtor())
       .legacyPaymentMetadata(null)
-      .remittanceInformation(request.getRemittanceInformation())
+      .remittanceInformation(MULTIPLE_REMITTANCE_INFO)
       .sourceFlowName(request.getSourceFlowName())
       .transfers(transfers)
       .build();
