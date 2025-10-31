@@ -552,7 +552,7 @@ class DebtPositionControllerTest {
     Long organizationId = 1L;
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, null, null)).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, organizationId, null, null)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
@@ -574,7 +574,7 @@ class DebtPositionControllerTest {
     OffsetDateTime toDate = OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 999000000, ZoneOffset.UTC);
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, fromDate.toLocalDateTime(), toDate.toLocalDateTime())).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, organizationId, fromDate.toLocalDateTime(), toDate.toLocalDateTime())).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
