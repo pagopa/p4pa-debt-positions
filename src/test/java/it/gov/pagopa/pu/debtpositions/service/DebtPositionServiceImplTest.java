@@ -26,7 +26,6 @@ import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
