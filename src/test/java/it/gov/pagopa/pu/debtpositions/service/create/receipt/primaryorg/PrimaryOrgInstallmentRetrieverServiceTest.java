@@ -119,7 +119,7 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
   primaryOrg.setOrganizationId(-1L);
   String nav = "NAV";
 
-  Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS))
+  Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
     .thenReturn(List.of());
 
   // When
@@ -140,7 +140,7 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
     InstallmentNoPII installment2 = new InstallmentNoPII();
     installment2.setStatus(InstallmentStatus.UNPAYABLE);
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS))
+    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
       .thenReturn(List.of(installment1, installment2));
 
     // When, Then
@@ -158,7 +158,7 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
     InstallmentNoPII installment2 = new InstallmentNoPII();
     installment2.setStatus(InstallmentStatus.CANCELLED);
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS))
+    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
       .thenReturn(List.of(installment1, installment2));
 
     // When
