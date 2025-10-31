@@ -2,14 +2,12 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import java.util.Optional;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,6 +18,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
 class ReceiptPIIRepositoryImplTest {
@@ -43,7 +43,7 @@ class ReceiptPIIRepositoryImplTest {
   @Test
   void givenValidReceiptWhenSaveThenOk() {
     // Given
-    Receipt receipt = podamFactory.manufacturePojo(Receipt.class);
+    ReceiptDTO receipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     receipt.setReceiptId(null);
     receipt.setNoPII(null);
     ReceiptNoPII savedNoPii = podamFactory.manufacturePojo(ReceiptNoPII.class);
@@ -55,7 +55,7 @@ class ReceiptPIIRepositoryImplTest {
     Mockito.when(receiptNoPIIRepositoryMock.save(pair.getFirst())).thenReturn(savedNoPii);
 
     // When
-    Receipt result = receiptPIIRepository.save(receipt);
+    ReceiptDTO result = receiptPIIRepository.save(receipt);
 
     // Then
     Assertions.assertSame(receipt, result);
@@ -76,15 +76,15 @@ class ReceiptPIIRepositoryImplTest {
 
     Mockito.when(receiptNoPIIRepositoryMock.findById(receiptId)).thenReturn(
       Optional.of(receiptNoPII));
-    Mockito.when(receiptPIIMapperMock.mapToReceiptDTO(receiptNoPII)).thenReturn(receiptDto);
+    Mockito.when(receiptPIIMapperMock.map(receiptNoPII)).thenReturn(receiptDto);
 
     // When
-    ReceiptDTO result = receiptPIIRepository.getReceiptDetail(receiptId);
+    ReceiptDTO result = receiptPIIRepository.findById(receiptId);
 
     // Then
     Assertions.assertEquals(receiptDto, result);
     Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
-    Mockito.verify(receiptPIIMapperMock).mapToReceiptDTO(receiptNoPII);
+    Mockito.verify(receiptPIIMapperMock).map(receiptNoPII);
   }
 
   @Test
@@ -96,7 +96,7 @@ class ReceiptPIIRepositoryImplTest {
       Optional.empty());
 
     // When
-    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.getReceiptDetail(receiptId));
+    Assertions.assertThrows(NotFoundException.class,()->receiptPIIRepository.findById(receiptId));
 
     Mockito.verify(receiptNoPIIRepositoryMock).findById(receiptId);
     Mockito.verifyNoInteractions(receiptPIIMapperMock);

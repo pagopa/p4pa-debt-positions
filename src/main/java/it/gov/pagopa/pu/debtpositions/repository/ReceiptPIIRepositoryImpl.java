@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
@@ -11,7 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReceiptPIIRepositoryImpl extends BasePIIRepository<Receipt, ReceiptNoPII, ReceiptPIIDTO, Long> implements ReceiptPIIRepository {
+public class ReceiptPIIRepositoryImpl extends BasePIIRepository<ReceiptDTO, ReceiptNoPII, ReceiptPIIDTO, Long> implements ReceiptPIIRepository {
 
   private final ReceiptPIIMapper receiptPIIMapper;
   private final ReceiptNoPIIRepository receiptNoPIIRepository;
@@ -23,7 +22,7 @@ public class ReceiptPIIRepositoryImpl extends BasePIIRepository<Receipt, Receipt
   }
 
   @Override
-  void setId(Receipt fullDTO, Long id) {
+  void setId(ReceiptDTO fullDTO, Long id) {
     fullDTO.setReceiptId(id);
   }
 
@@ -48,11 +47,11 @@ public class ReceiptPIIRepositoryImpl extends BasePIIRepository<Receipt, Receipt
   }
 
   @Override
-  public ReceiptDTO getReceiptDetail(Long receiptId) {
+  public ReceiptDTO findById(Long receiptId) {
     ReceiptNoPII receiptNoPII = receiptNoPIIRepository.findById(receiptId)
       .orElseThrow(() -> new NotFoundException(
         "ReceiptNoPII having receiptId %d not found".formatted(
           receiptId)));
-    return receiptPIIMapper.mapToReceiptDTO(receiptNoPII);
+    return receiptPIIMapper.map(receiptNoPII);
   }
 }

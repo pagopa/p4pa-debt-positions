@@ -57,7 +57,7 @@ class ReceiptControllerTest {
 
     ReceiptDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
     });
-    TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate");
+    TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate", "noPII");
 
     Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
       Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
@@ -78,7 +78,7 @@ class ReceiptControllerTest {
       .andReturn();
 
     ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
-    TestUtils.reflectionEqualsByName(expectedResponse,response);
+    TestUtils.reflectionEqualsByName(expectedResponse,response, "noPII");
 
     Mockito.verify(receiptServiceMock).getReceipt(receiptId);
   }

@@ -26,7 +26,7 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   @Override
   public ReceiptDTO getReceipt(Long receiptId) {
-    return receiptPIIRepository.getReceiptDetail(receiptId);
+    return receiptPIIRepository.findById(receiptId);
   }
 
   @Override

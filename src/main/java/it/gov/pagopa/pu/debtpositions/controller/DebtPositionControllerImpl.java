@@ -6,13 +6,14 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.MixedDebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -277,8 +278,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       status,
       debtPositionOrigin,
       organizationId,
-      dateFrom != null ? dateFrom.toLocalDateTime() : null,
-      dateTo != null ? dateTo.toLocalDateTime() : null
+      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
+      Utilities.offsetDateTimeToLocalDateTime(dateTo)
     ));
   }
 }
