@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.TreeSet;
@@ -496,19 +497,19 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo)).thenReturn(entities);
     Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertIterableEquals(dtos, result);
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
     Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
   }
 
@@ -529,19 +530,19 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo)).thenReturn(entities);
     Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertIterableEquals(dtos, result);
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
     Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
   }
 
@@ -562,19 +563,19 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo)).thenReturn(entities);
     Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertIterableEquals(dtos, result);
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
     Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
   }
 
@@ -591,7 +592,7 @@ class DebtPositionServiceImplTest {
 
     // When / Then
     Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, orgId, dateFrom, dateTo));
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo));
     Mockito.verifyNoInteractions(dataCipherServiceMock, debtPositionRepositoryMock, debtPositionMapperMock);
   }
 
@@ -611,18 +612,18 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo)).thenReturn(entities);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, orgId, dateFrom, dateTo);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo);
     Mockito.verifyNoInteractions(debtPositionMapperMock);
   }
 }

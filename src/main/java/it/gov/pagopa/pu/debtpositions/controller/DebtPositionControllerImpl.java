@@ -266,6 +266,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     PersonEntityType entityType,
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
+    List<String> debtPositionTypeOrgCodesToExclude,
     Long organizationId,
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
@@ -276,6 +277,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       entityType,
       status,
       debtPositionOrigin,
+      debtPositionTypeOrgCodesToExclude,
       organizationId,
       dateFrom != null ? dateFrom.toLocalDateTime() : null,
       dateTo != null ? dateTo.toLocalDateTime() : null
