@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -12,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
+import it.gov.pagopa.pu.debtpositions.util.DateConversionUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.RequiredArgsConstructor;
@@ -272,6 +274,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     OffsetDateTime dateTo
   ) {
     log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
+      DateConversionUtils.offsetDateTime2LocalDateTime(dateFrom),
+      DateConversionUtils.offsetDateTime2LocalDateTime(dateTo));
+
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCode,
       entityType,
@@ -279,8 +285,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       debtPositionOrigin,
       debtPositionTypeOrgCodesToExclude,
       organizationId,
-      dateFrom != null ? dateFrom.toLocalDateTime() : null,
-      dateTo != null ? dateTo.toLocalDateTime() : null
+      dateTimeIntervalFilter
     ));
   }
 }

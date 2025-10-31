@@ -15,6 +15,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -26,12 +27,11 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
+import it.gov.pagopa.pu.debtpositions.util.DateConversionUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -550,9 +550,10 @@ class DebtPositionControllerTest {
     PersonEntityType debtorEntityType = PersonEntityType.F;
     String debtorFiscalCode = "fiscalcode";
     Long organizationId = 1L;
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(null, null);
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, null, null)).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, dateTimeIntervalFilter)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
@@ -572,9 +573,12 @@ class DebtPositionControllerTest {
     Long organizationId = 1L;
     OffsetDateTime fromDate = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     OffsetDateTime toDate = OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 999000000, ZoneOffset.UTC);
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
+      DateConversionUtils.offsetDateTime2LocalDateTime(fromDate),
+      DateConversionUtils.offsetDateTime2LocalDateTime(toDate));
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, fromDate.toLocalDateTime(), toDate.toLocalDateTime())).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, dateTimeIntervalFilter)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())

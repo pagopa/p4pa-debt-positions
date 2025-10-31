@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -173,8 +174,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
            AND i.debtorFiscalCodeHash = :debtorFiscalCodeHash
            AND i.debtorEntityType = :debtorEntityType
            AND (:status IS NULL OR i.status IN :status)
-           AND (cast(:dateFrom as string) IS NULL OR i.updateDate >= :dateFrom)
-           AND (cast(:dateTo as string) IS NULL OR i.updateDate <= :dateTo)
+           AND (cast(:#{#dateTimeIntervalFilter.from} AS STRING) IS NULL OR i.updateDate >= :#{#dateTimeIntervalFilter.from})
+           AND (cast(:#{#dateTimeIntervalFilter.to} AS STRING) IS NULL OR i.updateDate <= :#{#dateTimeIntervalFilter.to})
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
@@ -185,7 +186,6 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
     @Param("debtPositionTypeOrgCodesToExclude") List<String> debtPositionTypeOrgCodesToExclude,
     @Param("organizationId") Long organizationId,
-    @Param("dateFrom") LocalDateTime dateFrom,
-    @Param("dateTo") LocalDateTime dateTo
+    @Param("dateTimeIntervalFilter") LocalDateTimeIntervalFilter dateTimeIntervalFilter
   );
 }
