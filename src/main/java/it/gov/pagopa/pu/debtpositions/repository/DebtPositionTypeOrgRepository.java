@@ -167,6 +167,6 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       """)
   long countBySpontaneousFormId(Long spontaneousFormId);
 
-  List<DebtPositionTypeOrg> findByUpdateDateGreaterThanEqual(LocalDate updateDate);
+  List<DebtPositionTypeOrg> findByUpdateDateGreaterThanEqualOrderByUpdateDateAsc(LocalDate updateDate);
 }
 
