@@ -1,16 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildGeneratedIuvPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildMixedPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOption;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildPaymentOptionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.buildSyncPaymentOptionDTO;
-
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -18,6 +13,8 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker.*;
 
 public class DebtPositionFaker {
 
@@ -108,7 +105,6 @@ public class DebtPositionFaker {
     debtPositionDTO.setSourceFlowName("sourceFlowName");
     debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setDescription("Test Description");
-    debtPositionDTO.setRemittanceInformation("Payment Info");
     debtPositionDTO.setDueDate(DATE);
     debtPositionDTO.setDebtor(PersonFaker.buildPerson());
     debtPositionDTO.setTransfers(List.of(TransferFaker.buildMixedTransferDTO()));

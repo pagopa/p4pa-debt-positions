@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
@@ -134,14 +135,50 @@ class TechnicalMixedDebtPositionMapperTest {
     assertThrows(IllegalStateException.class, exec);
   }
 
+  @Test
+  void givenDPMixedWithMultipleInstallmentsWhenToTechnicalMixedDebtPositionsThenCorrectMappingForPaymentOptionType() {
+    DebtPosition debtPosition = buildMixedDebtPosition();
+    PaymentOption expectedPO = debtPosition.getPaymentOptions().getFirst();
+
+    MixedDpAdditionalData mixedDpAdditionalDataEl1 = MixedDpAdditionalData.builder()
+      .transferIndex(1)
+      .iud("IUD")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .build();
+
+    MixedDpAdditionalData mixedDpAdditionalDataEl2 = MixedDpAdditionalData.builder()
+      .transferIndex(2)
+      .iud("IUD")
+      .balance("balance")
+      .legacyPaymentMetadata("legacyPaymentMetadata")
+      .build();
+
+    DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
+      true, List.of(mixedDpAdditionalDataEl1, mixedDpAdditionalDataEl2), accessToken);
+
+    PaymentOption resultPO = result.getPaymentOptions().getFirst();
+
+    TestUtils.checkNotNullFields(result, "paymentOptionId", "debtPositionId",
+      "creationDate", "updateDate", "updateOperatorExternalId",
+      "updateTraceId");
+
+    assertEquals(expectedPO.getTotalAmountCents(), resultPO.getTotalAmountCents());
+    assertEquals(PaymentOptionStatus.UNPAID, resultPO.getStatus());
+    assertEquals(expectedPO.getDescription(), resultPO.getDescription());
+    assertEquals(PaymentOptionType.INSTALLMENTS, resultPO.getPaymentOptionType());
+    assertEquals(expectedPO.getPaymentOptionIndex(), resultPO.getPaymentOptionIndex());
+    assertEquals(1, resultPO.getInstallments().size());
+  }
+
   private static void checkDebtPosition(DebtPosition expected,
-    DebtPosition result, boolean isUnpayable) {
+    DebtPosition result, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "debtPositionId", "creationDate",
       "updateDate", "updateOperatorExternalId", "updateTraceId");
 
     assertEquals(expected.getIupdOrg(), result.getIupdOrg());
     assertEquals(expected.getDescription(), result.getDescription());
-    if (isUnpayable) {
+    if (isUnpaid) {
       assertEquals(DebtPositionStatus.UNPAID, result.getStatus());
     } else {
       assertEquals(DebtPositionStatus.PAID, result.getStatus());
@@ -159,15 +196,15 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkPaymentOption(PaymentOption expected,
-    PaymentOption result, boolean isUnpayable) {
+    PaymentOption result, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "paymentOptionId", "debtPositionId",
       "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
     assertEquals(expected.getTotalAmountCents(),
       result.getTotalAmountCents());
-    if (isUnpayable) {
-      assertEquals(PaymentOptionStatus.UNPAYABLE, result.getStatus());
+    if (isUnpaid) {
+      assertEquals(PaymentOptionStatus.UNPAID, result.getStatus());
     } else {
       assertEquals(PaymentOptionStatus.PAID, result.getStatus());
     }
@@ -180,13 +217,13 @@ class TechnicalMixedDebtPositionMapperTest {
   }
 
   private static void checkInstallment(InstallmentNoPII installment,
-    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData, boolean isUnpayable) {
+    InstallmentNoPII result, MixedDpAdditionalData mixedDpAdditionalData, boolean isUnpaid) {
     TestUtils.checkNotNullFields(result, "installmentId", "paymentOptionId",
       "syncStatus", "creationDate", "updateDate", "updateOperatorExternalId",
       "updateTraceId");
 
-    if(isUnpayable) {
-      assertEquals(InstallmentStatus.UNPAYABLE, result.getStatus());
+    if(isUnpaid) {
+      assertEquals(InstallmentStatus.UNPAID, result.getStatus());
       assertEquals(mixedDpAdditionalData.getBalance(), result.getBalance());
     } else {
       assertEquals(InstallmentStatus.PAID, result.getStatus());
