@@ -586,13 +586,14 @@ class DebtPositionServiceImplTest {
     PersonEntityType entityType = PersonEntityType.F;
     List<InstallmentStatus> status = null;
     List<DebtPositionOrigin> origin = null;
+    List<String> debtPositionTypeOrgCodesToExclude = Collections.emptyList();
     Long orgId = null;
     LocalDateTime dateFrom = null;
     LocalDateTime dateTo = null;
 
     // When / Then
     Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateFrom, dateTo));
+      fiscalCode, entityType, status, origin, debtPositionTypeOrgCodesToExclude, orgId, dateFrom, dateTo));
     Mockito.verifyNoInteractions(dataCipherServiceMock, debtPositionRepositoryMock, debtPositionMapperMock);
   }
 
