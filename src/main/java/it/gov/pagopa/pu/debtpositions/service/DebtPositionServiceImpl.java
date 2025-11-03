@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
@@ -10,7 +11,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +102,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, Long organizationId, LocalDateTime dateFrom, LocalDateTime dateTo) {
+  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, Long organizationId, LocalDateTimeIntervalFilter dateTimeIntervalFilter) {
     if (debtorFiscalCode == null || debtorEntityType == null) {
       throw new IllegalArgumentException("debtorFiscalCode and debtorEntityType are required");
     }
@@ -114,9 +114,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       debtorEntityType,
       status,
       debtPositionOrigin,
+      debtPositionTypeOrgCodesToExclude,
       organizationId,
-      dateFrom,
-      dateTo
+      dateTimeIntervalFilter
     );
 
     return debtPositions.stream().map(this::mapDebtPosition).toList();

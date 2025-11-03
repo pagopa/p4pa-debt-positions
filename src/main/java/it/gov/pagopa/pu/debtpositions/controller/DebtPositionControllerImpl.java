@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -267,19 +268,24 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     PersonEntityType entityType,
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
+    List<String> debtPositionTypeOrgCodesToExclude,
     Long organizationId,
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
   ) {
-    log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
+    log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationId, dateFrom, dateTo);
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
+      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
+      Utilities.offsetDateTimeToLocalDateTime(dateTo));
+
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCode,
       entityType,
       status,
       debtPositionOrigin,
+      debtPositionTypeOrgCodesToExclude,
       organizationId,
-      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
-      Utilities.offsetDateTimeToLocalDateTime(dateTo)
+      dateTimeIntervalFilter
     ));
   }
 }

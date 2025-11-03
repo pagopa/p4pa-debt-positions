@@ -27,8 +27,8 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
-import it.gov.pagopa.pu.debtpositions.util.DateConversionUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 
 import java.time.*;
@@ -574,8 +574,8 @@ class DebtPositionControllerTest {
     OffsetDateTime fromDate = OffsetDateTime.of(2025, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     OffsetDateTime toDate = OffsetDateTime.of(2025, 12, 31, 23, 59, 59, 999000000, ZoneOffset.UTC);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
-      DateConversionUtils.offsetDateTime2LocalDateTime(fromDate),
-      DateConversionUtils.offsetDateTime2LocalDateTime(toDate));
+      Utilities.offsetDateTimeToLocalDateTime(fromDate),
+      Utilities.offsetDateTimeToLocalDateTime(toDate));
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
     Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationId, dateTimeIntervalFilter)).thenReturn(expectedResult);
