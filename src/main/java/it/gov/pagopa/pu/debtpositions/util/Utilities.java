@@ -26,7 +26,7 @@ public class Utilities {
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
   public static final int IBAN_LENGTH = 27;
   public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^(9/[^/]+/).*$");
-  private static final NumberFormat numberFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
+  private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
 
   public static boolean isValidEmail(final String email) {
     Matcher matcher = EMAIL_PATTERN.matcher(email);
@@ -140,6 +140,6 @@ public class Utilities {
       return "";
     }
     double price = priceInCents / 100.0;
-    return numberFormat.format(price);
+    return currencyFormat.format(price);
   }
 }

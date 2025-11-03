@@ -1,12 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import freemarker.template.TemplateException;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -19,8 +25,6 @@ import java.util.Map;
 @Service
 @Slf4j
 public class ReceiptFileServiceImpl implements ReceiptFileService{
-    private final DocumentComposition documentComposition;
-
     public static final String RECEIPT_LOGO = "logo";
     public static final String RECEIPT_ORG_NAME = "orgName";
     public static final String RECEIPT_IUV = "iuv";
@@ -39,19 +43,36 @@ public class ReceiptFileServiceImpl implements ReceiptFileService{
     public static final String EMISSION_DATE = "emissionDate";
     public static final String EMISSION_TIME = "emissionTime";
 
-    public ReceiptFileServiceImpl(DocumentComposition documentComposition) {
-        this.documentComposition = documentComposition;
+    private final DocumentComposition documentComposition;
+    private final OrganizationService organizationService;
+    private final ReceiptService receiptService;
+
+    public ReceiptFileServiceImpl(DocumentComposition documentComposition,
+                                  OrganizationService organizationService,
+                                  ReceiptService receiptService) {
+      this.documentComposition = documentComposition;
+      this.organizationService = organizationService;
+      this.receiptService = receiptService;
     }
 
 
-    public byte[] generateReceiptPdf(ReceiptDetailDTO receiptDetail, Organization organization) {
+    public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId) {
+        ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, SecurityUtils.getCurrentUserExternalId(), organizationId);
+        if(receiptDetail==null){
+          throw new NotFoundException("Receipt with ID "+receiptId+" not found");
+        }
+        Organization organization = organizationService.getOrganizationById(organizationId, SecurityUtils.getAccessToken())
+          .orElseThrow(() -> new NotFoundException("Organization with ID "+organizationId+" not found"));
+
         byte[] receiptPdf;
         try {
             receiptPdf = documentComposition.executePdfTemplate(DocumentComposition.TemplateType.RECEIPT, buildTemplateModel(receiptDetail, organization));
         } catch (IOException | TemplateException e) {
             throw new IllegalStateException(e);
         }
-        return receiptPdf;
+
+        return new FileResourceDTO(new ByteArrayResource(receiptPdf),
+          "RECEIPT_"+organization.getOrgFiscalCode()+"_"+receiptId+".pdf");
     }
 
     private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, Organization organization) {

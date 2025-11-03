@@ -1,7 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import freemarker.template.TemplateException;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -13,10 +18,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.service.create.receipt.ReceiptFileServiceImpl.DATE_TIME_FORMATTER;
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,27 +32,45 @@ import static org.junit.jupiter.api.Assertions.*;
 class ReceiptFileServiceImplTest {
   @Mock
   private DocumentComposition documentCompositionMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
+  @Mock
+  private ReceiptService receiptServiceMock;
 
   private ReceiptFileService receiptFileService;
+
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+  private final String accessToken = "fakeAccessToken";
+  private final String userId = "USERID";
 
   @BeforeEach
   void setUp() {
-    receiptFileService = new ReceiptFileServiceImpl(documentCompositionMock);
+    receiptFileService = new ReceiptFileServiceImpl(documentCompositionMock, organizationServiceMock, receiptServiceMock);
+    SecurityUtilsTest.configureSecurityContext(accessToken, userId);
   }
 
   @AfterEach
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
-      documentCompositionMock
+      documentCompositionMock,
+      organizationServiceMock,
+      receiptServiceMock
     );
   }
 
   @Test
   void givenValidUserWhenGetReceiptPdfThenOk() throws TemplateException, IOException {
-    it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO.class);
+    Long receiptId = 123L;
+    Long organizationId = 1L;
+    ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+    receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
-    byte[] expectedResult = "PDF-DATA".getBytes();
+    organization.setOrganizationId(organizationId);
+    organization.setOrgFiscalCode("FISCALCODE");
+    byte[] expectedContent = "PDF-DATA".getBytes();
+
+    FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
+      "RECEIPT_"+organization.getOrgFiscalCode()+"_"+receiptId+".pdf");
 
     Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
       o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
@@ -64,18 +89,35 @@ class ReceiptFileServiceImplTest {
         && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
         && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
         && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
-    ))).thenReturn(expectedResult);
+    ))).thenReturn(expectedContent);
 
-    byte[] result = receiptFileService.generateReceiptPdf(receiptDetailDTO, organization);
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+      .thenReturn(receiptDetailDTO);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+      .thenReturn(Optional.of(organization));
+
+    FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
 
     assertNotNull(result);
-    assertArrayEquals(expectedResult, result);
+    assertEquals(expectedResult, result);
   }
 
   @Test
   void givenIOExceptionWhenGetReceiptPdfThenIllegalStateException() throws TemplateException, IOException {
-    it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO.class);
+    Long receiptId = 123L;
+    Long organizationId = 1L;
+    ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+    receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(organizationId);
+    organization.setOrgFiscalCode("FISCALCODE");
+
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+      .thenReturn(receiptDetailDTO);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+      .thenReturn(Optional.of(organization));
 
     Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
       o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
@@ -96,13 +138,25 @@ class ReceiptFileServiceImplTest {
         && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
     ))).thenThrow(new IOException());
 
-    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptDetailDTO,organization));
+    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptId, organizationId));
   }
 
   @Test
   void givenTemplateExceptionWhenGetReceiptPdfThenIllegalStateException() throws TemplateException, IOException {
-    it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO.class);
+    Long receiptId = 123L;
+    Long organizationId = 1L;
+    ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+    receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(organizationId);
+    organization.setOrgFiscalCode("FISCALCODE");
+
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+      .thenReturn(receiptDetailDTO);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+      .thenReturn(Optional.of(organization));
+
 
     Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
       o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
@@ -123,6 +177,6 @@ class ReceiptFileServiceImplTest {
         && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
     ))).thenThrow(new TemplateException(null));
 
-    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptDetailDTO,organization));
+    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptId, organizationId));
   }
 }
