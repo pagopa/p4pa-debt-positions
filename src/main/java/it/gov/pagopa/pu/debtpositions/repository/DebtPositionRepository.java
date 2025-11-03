@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -18,7 +19,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -178,8 +178,10 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Query("""
    SELECT d
      FROM DebtPosition d
+        JOIN DebtPositionTypeOrg dpto on d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
     WHERE (:organizationId IS NULL OR d.organizationId = :organizationId)
       AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND (:debtPositionTypeOrgCodesToExclude IS NULL OR dpto.code NOT IN :debtPositionTypeOrgCodesToExclude)
       AND EXISTS (
         SELECT 1
           FROM PaymentOption p
@@ -188,8 +190,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
            AND i.debtorFiscalCodeHash = :debtorFiscalCodeHash
            AND i.debtorEntityType = :debtorEntityType
            AND (:status IS NULL OR i.status IN :status)
-           AND (cast(:dateFrom as string) IS NULL OR i.updateDate >= :dateFrom)
-           AND (cast(:dateTo as string) IS NULL OR i.updateDate <= :dateTo)
+           AND (cast(:#{#dateTimeIntervalFilter.from} AS STRING) IS NULL OR i.updateDate >= :#{#dateTimeIntervalFilter.from})
+           AND (cast(:#{#dateTimeIntervalFilter.to} AS STRING) IS NULL OR i.updateDate <= :#{#dateTimeIntervalFilter.to})
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
@@ -198,8 +200,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtorEntityType") PersonEntityType debtorEntityType,
     @Param("status") List<InstallmentStatus> status,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
+    @Param("debtPositionTypeOrgCodesToExclude") List<String> debtPositionTypeOrgCodesToExclude,
     @Param("organizationId") Long organizationId,
-    @Param("dateFrom") LocalDateTime dateFrom,
-    @Param("dateTo") LocalDateTime dateTo
+    @Param("dateTimeIntervalFilter") LocalDateTimeIntervalFilter dateTimeIntervalFilter
   );
 }
