@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.PersonalReceiptNoPIIView;
 import org.springframework.data.domain.Page;
@@ -42,7 +44,7 @@ public interface PersonalReceiptNoPIIViewRepository extends Repository<PersonalR
   )
   Page<PersonalReceiptNoPIIView> getPagedPersonalReceipt(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
-    @Parameter(required = true) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
+    @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
     Pageable pageable
   );
