@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.update;
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -9,7 +9,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.TechnicalMixedDebtPositionBuilderService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.TechnicalMixedDebtPositionBuilderService;
 import it.gov.pagopa.pu.debtpositions.util.Constants;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,14 +22,13 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class TechnicalMixedDebtPositionUpdaterServiceImpl implements TechnicalMixedDebtPositionUpdaterService {
+public class TechnicalMixedDebtPositionUpdaterService  {
 
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionRepository debtPositionRepository;
   private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
   private final DebtPositionDeleteService debtPositionDeleteService;
 
-  @Override
   public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id=" + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 

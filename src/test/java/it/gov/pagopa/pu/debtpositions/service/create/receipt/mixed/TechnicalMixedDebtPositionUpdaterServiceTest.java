@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.update;
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
@@ -8,7 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.TechnicalMixedDebtPositionBuilderService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.TechnicalMixedDebtPositionBuilderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,7 +30,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class TechnicalMixedDebtPositionUpdaterServiceImplTest {
+class TechnicalMixedDebtPositionUpdaterServiceTest {
 
   @Mock
   private DebtPositionTypeOrgRepository dpTypeOrgRepositoryMock;
@@ -47,7 +47,7 @@ class TechnicalMixedDebtPositionUpdaterServiceImplTest {
 
   @BeforeEach
   void setup() {
-    service = new TechnicalMixedDebtPositionUpdaterServiceImpl(
+    service = new TechnicalMixedDebtPositionUpdaterService(
       dpTypeOrgRepositoryMock,
       dpRepositoryMock,
       mixedDPBuilderServiceMock,

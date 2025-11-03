@@ -22,10 +22,15 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UtilitiesTest {
 
   @Test
-  void testIbanInvalid(){
+  void testIbanInvalid() {
     String iban = "test";
     boolean result = Utilities.isValidIban(iban);
     assertFalse(result);
+  }
+
+  @Test
+  void testLocalDatetimeToOffsetDateTimeWithNull() {
+    assertNull(Utilities.localDatetimeToOffsetDateTime(null), "The result should be null for a null input.");
   }
 
   @Test
@@ -35,38 +40,47 @@ public class UtilitiesTest {
     OffsetDateTime result = Utilities.localDatetimeToOffsetDateTime(expectedOffsetDateTime.toLocalDateTime());
 
     assertEquals(expectedOffsetDateTime, result);
-    }
+  }
+
+  @Test
+  void testOffsetDateToLocalDatetimeTimeWithNull() {
+    assertNull(Utilities.offsetDateTimeToLocalDateTime(null), "The result should be null for a null input.");
+  }
+
+  @Test
+  void testOffsetDateToLocalDatetimeTime() {
+    LocalDateTime expectedLocalDateTime = LocalDateTime.now();
+
+    LocalDateTime result = Utilities.offsetDateTimeToLocalDateTime(Utilities.localDatetimeToOffsetDateTime(expectedLocalDateTime));
+
+    assertEquals(expectedLocalDateTime, result);
+  }
 
   @ParameterizedTest
   @ValueSource(strings = {"", "12345", "12345abc123", "1234/abc123", "00000000001"})
-  void testValidateEmptyPIVA(String piva){
+  void testValidateEmptyPIVA(String piva) {
     boolean result = Utilities.isValidPIVA(piva, true);
     assertFalse(result);
   }
 
   @Test
-  void testValidateFiscalCode(){
+  void testValidateFiscalCode() {
     boolean result = Utilities.isValidFiscalCode("AAAAAA");
     assertFalse(result);
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"AAAAAA", "000001"})
-  void testValidateFiscalCodeOrPiva(String fiscalCode){
+  void testValidateFiscalCodeOrPiva(String fiscalCode) {
     boolean result = Utilities.isValidFiscalCodeOrPIVA(fiscalCode, false);
     assertFalse(result);
   }
 
   @ParameterizedTest
   @ValueSource(strings = {"AAAAAA00B00C000D", "01234567890"})
-  void testPositiveValidateFiscalCodeOrPiva(String fiscalCode){
+  void testPositiveValidateFiscalCodeOrPiva(String fiscalCode) {
     boolean result = Utilities.isValidFiscalCodeOrPIVA(fiscalCode, false);
     assertTrue(result);
-  }
-
-  @Test
-  void testLocalDatetimeToOffsetDateTimeWithNull() {
-    assertNull(Utilities.localDatetimeToOffsetDateTime(null), "The result should be null for a null input.");
   }
 
   @Test
@@ -94,7 +108,7 @@ public class UtilitiesTest {
 
   @ParameterizedTest
   @MethodSource("valueSource")
-  void testIsValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, Long maxInterval,Boolean expectedResult){
+  void testIsValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, Long maxInterval, Boolean expectedResult) {
 
     boolean result = Utilities.isValidIntervalBetweenOffsetDateTime(dateFrom, dateTo, chronoUnit, maxInterval);
 
@@ -109,17 +123,17 @@ public class UtilitiesTest {
       Arguments.of(now, now.plusDays(60), ChronoUnit.DAYS, 60L, true),
       Arguments.of(now, now.plusWeeks(4), ChronoUnit.WEEKS, 4L, true),
       Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 5L, true),
-      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,3L, true),
+      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS, 3L, true),
       Arguments.of(now, now.plusHours(20), ChronoUnit.HOURS, 10L, false),
       Arguments.of(now, now.plusDays(60), ChronoUnit.DAYS, 30L, false),
       Arguments.of(now, now.plusWeeks(4), ChronoUnit.WEEKS, 3L, false),
       Arguments.of(now, now.plusMonths(5), ChronoUnit.MONTHS, 2L, false),
-      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS,2L, false)
+      Arguments.of(now, now.plusYears(3), ChronoUnit.YEARS, 2L, false)
     );
   }
 
   @Test
-  void testCheckImmutableField_OffsetDateTime(){
+  void testCheckImmutableField_OffsetDateTime() {
     List<String> result = new ArrayList<>();
     OffsetDateTime o1 = OffsetDateTime.now();
     OffsetDateTime o2 = o1.withOffsetSameInstant(ZoneOffset.MIN);
@@ -131,7 +145,7 @@ public class UtilitiesTest {
   }
 
   @Test
-  void testCheckImmutableField_Comparable(){
+  void testCheckImmutableField_Comparable() {
     List<String> result = new ArrayList<>();
     BigDecimal o1 = BigDecimal.ONE;
     BigDecimal o2 = BigDecimal.valueOf(1_00, 2);
@@ -143,7 +157,7 @@ public class UtilitiesTest {
   }
 
   @Test
-  void testCheckImmutableField_Object(){
+  void testCheckImmutableField_Object() {
     List<String> result = new ArrayList<>();
     String o1 = "string";
     String o2 = "string";
@@ -155,7 +169,7 @@ public class UtilitiesTest {
   }
 
   @Test
-  void testGetTraceId(){
+  void testGetTraceId() {
     // Given
     String expectedResult = "TRACEID";
     setTraceId(expectedResult);
@@ -192,7 +206,8 @@ public class UtilitiesTest {
   public static void setTraceId(String traceId) {
     MDC.put("traceId", traceId);
   }
-  public static void clearTraceIdContext(){
+
+  public static void clearTraceIdContext() {
     MDC.clear();
   }
 

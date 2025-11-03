@@ -175,6 +175,7 @@ openApiGenerate {
     "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
     "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg",
     "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
+    "ReceiptNoPII" to "it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII",
     "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm"
   ))
   configOptions.set(mapOf(

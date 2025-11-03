@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
@@ -44,7 +43,7 @@ class ReceiptPIIMapperTest {
   @Test
   void givenValidReceiptWhenMapThenReturnPairReceiptNoPIIandPII() {
     //given
-    Receipt receipt = podamFactory.manufacturePojo(Receipt.class);
+    ReceiptDTO receipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     byte[] fiscalCodeHash = "FISCAL_CODE_HASH".getBytes(StandardCharsets.UTF_8);
     Mockito.when(dataCipherServiceMock.hash(receipt.getDebtor().getFiscalCode())).thenReturn(fiscalCodeHash);
 
@@ -70,24 +69,7 @@ class ReceiptPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(receipt.getPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
 
     //when
-    Receipt response = receiptPIIMapper.map(receipt);
-
-    //verify
-    Assertions.assertNotNull(response);
-    TestUtils.reflectionEqualsByName(receipt, response, "debtor", "payer");
-    TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), response.getDebtor());
-    TestUtils.reflectionEqualsByName(receiptPIIDTO.getPayer(), response.getPayer());
-    TestUtils.checkNotNullFields(response);
-  }
-
-  @Test
-  void givenValidReceiptNoPIIWhenMapToReceiptDTOThenReturnReceiptDTO() {
-    //given
-    ReceiptNoPII receipt = podamFactory.manufacturePojo(ReceiptNoPII.class);
-    ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
-    Mockito.when(personalDataServiceMock.get(receipt.getPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
-    //when
-    ReceiptDTO response = receiptPIIMapper.mapToReceiptDTO(receipt);
+    ReceiptDTO response = receiptPIIMapper.map(receipt);
 
     //verify
     Assertions.assertNotNull(response);

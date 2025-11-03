@@ -1,10 +1,11 @@
-package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.mapper.TechnicalMixedDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,20 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
-import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.MixedDebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
-import it.gov.pagopa.pu.debtpositions.util.DateConversionUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -268,24 +267,19 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     PersonEntityType entityType,
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
-    List<String> debtPositionTypeOrgCodesToExclude,
     Long organizationId,
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
   ) {
     log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
-    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
-      DateConversionUtils.offsetDateTime2LocalDateTime(dateFrom),
-      DateConversionUtils.offsetDateTime2LocalDateTime(dateTo));
-
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCode,
       entityType,
       status,
       debtPositionOrigin,
-      debtPositionTypeOrgCodesToExclude,
       organizationId,
-      dateTimeIntervalFilter
+      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
+      Utilities.offsetDateTimeToLocalDateTime(dateTo)
     ));
   }
 }

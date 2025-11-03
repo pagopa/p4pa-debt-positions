@@ -69,9 +69,23 @@ public class InstallmentUtils {
     DebtPositionOrigin.ORDINARY,
     DebtPositionOrigin.ORDINARY_SIL,
     DebtPositionOrigin.SPONTANEOUS,
-    DebtPositionOrigin.SPONTANEOUS_SIL,
-    DebtPositionOrigin.RECEIPT_FILE
+    DebtPositionOrigin.SPONTANEOUS_SIL
   );
+
+  public static final List<DebtPositionOrigin> PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED = Stream.concat(
+    ORDINARY_DEBT_POSITION_ORIGINS.stream(),
+    Stream.of(
+      DebtPositionOrigin.SPONTANEOUS_MIXED,
+      DebtPositionOrigin.RECEIPT_FILE,
+      DebtPositionOrigin.RECEIPT_PAGOPA,
+      DebtPositionOrigin.REPORTING_PAGOPA)
+  ).toList();
+
+  public static final List<DebtPositionOrigin> PRIMARY_ORG_DEBT_POSITION_ORIGINS = Stream.concat(
+    PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED.stream(),
+    Stream.of(
+      DebtPositionOrigin.SPONTANEOUS_MIXED)
+  ).toList();
 
   /**
    * It will check if the Installment is in a payable status

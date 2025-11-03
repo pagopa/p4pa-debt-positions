@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.mapper.TechnicalMixedDebtPositionMapper;

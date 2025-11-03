@@ -60,8 +60,8 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
     noPII.setIngestionFlowFileAction(fullDTO.getIngestionFlowFileAction());
     noPII.setSourceFlowName(fullDTO.getSourceFlowName());
     noPII.setReceiptId(fullDTO.getReceiptId());
-    noPII.setCreationDate(fullDTO.getCreationDate() != null ? fullDTO.getCreationDate().toLocalDateTime() : null);
-    noPII.setUpdateDate(fullDTO.getUpdateDate() != null ? fullDTO.getUpdateDate().toLocalDateTime() : null);
+    noPII.setCreationDate(Utilities.offsetDateTimeToLocalDateTime(fullDTO.getCreationDate()));
+    noPII.setUpdateDate(Utilities.offsetDateTimeToLocalDateTime(fullDTO.getUpdateDate()));
     noPII.setUpdateOperatorExternalId(fullDTO.getUpdateOperatorExternalId());
     noPII.setUpdateTraceId(fullDTO.getUpdateTraceId());
     noPII.setTransfers(fullDTO.getTransfers().stream().map(transferMapper::mapToModel).collect(Collectors.toCollection(TreeSet::new)));

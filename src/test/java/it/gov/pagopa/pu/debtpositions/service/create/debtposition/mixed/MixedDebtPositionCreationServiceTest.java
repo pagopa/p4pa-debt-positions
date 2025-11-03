@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
+package it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
@@ -106,7 +106,7 @@ class MixedDebtPositionCreationServiceTest {
     // validateIudUniqueness
     when(installmentNoPIIRepositoryMock.isInstallmentExists(
       eq(mixedDebtPositionDTO.getOrganizationId()), anyString(), eq(null),
-      eq(null), eq(InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)))
+      eq(null), eq(InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)))
       .thenReturn(false);
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -243,7 +243,7 @@ class MixedDebtPositionCreationServiceTest {
     // validateIudUniqueness
     when(installmentNoPIIRepositoryMock.isInstallmentExists(
       eq(mixedDebtPositionDTO.getOrganizationId()), anyString(), eq(null),
-      eq(null), eq(InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS)))
+      eq(null), eq(InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)))
       .thenReturn(true);
 
     // When
