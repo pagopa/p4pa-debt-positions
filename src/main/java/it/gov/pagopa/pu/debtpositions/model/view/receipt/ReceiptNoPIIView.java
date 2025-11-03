@@ -18,7 +18,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class PersonalReceiptNoPIIView implements Serializable {
+public class ReceiptNoPIIView implements Serializable {
 
   @Id
   private Long receiptId;

@@ -4,7 +4,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
-import it.gov.pagopa.pu.debtpositions.model.view.receipt.PersonalReceiptNoPIIView;
+import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptNoPIIView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -14,11 +14,11 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
 
-@RepositoryRestResource(path = "personal-receipt-view")
-public interface PersonalReceiptNoPIIViewRepository extends Repository<PersonalReceiptNoPIIView, Long> {
+@RepositoryRestResource(path = "receipt-no-pii-view")
+public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView, Long> {
 
   @Query("""
-    SELECT new PersonalReceiptNoPIIView(
+    SELECT new ReceiptNoPIIView(
       r.receiptId as receiptId,
       r.orgFiscalCode as orgFiscalCode,
       r.paymentAmountCents as paymentAmountCents,
@@ -42,7 +42,7 @@ public interface PersonalReceiptNoPIIViewRepository extends Repository<PersonalR
       AND ((:receiptOrigins IS NULL) OR (r.receiptOrigin IN :receiptOrigins))
    """
   )
-  Page<PersonalReceiptNoPIIView> getPagedPersonalReceipt(
+  Page<ReceiptNoPIIView> getPagedReceiptByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
