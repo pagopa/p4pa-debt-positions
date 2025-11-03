@@ -273,7 +273,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
   ) {
-    log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationId, dateFrom, dateTo);
+    log.info("Retrieving DebtPosition by debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationId={} dateFrom={} dateTo={}", entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationId, dateFrom, dateTo);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
       Utilities.offsetDateTimeToLocalDateTime(dateFrom),
       Utilities.offsetDateTimeToLocalDateTime(dateTo));
