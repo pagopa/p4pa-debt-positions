@@ -233,4 +233,21 @@ public class UtilitiesTest {
 
     Assertions.assertNull(result);
   }
+
+  @ParameterizedTest
+  @MethodSource("formatPriceValueSource")
+  void testFormatPrice(Long priceInCents, String expectedResult){
+    String result = Utilities.formatPrice(priceInCents);
+    assertEquals(expectedResult, result);
+  }
+
+  static Stream<Arguments> formatPriceValueSource() {
+    return Stream.of(
+      Arguments.of(0L,"0,00\u00A0€"),
+      Arguments.of(1000L,"10,00\u00A0€"),
+      Arguments.of(123L,"1,23\u00A0€"),
+      Arguments.of(15L,"0,15\u00A0€"),
+      Arguments.of(657893L,"6.578,93\u00A0€")
+    );
+  }
 }
