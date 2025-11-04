@@ -793,7 +793,7 @@ paths:
         "200":
           description: Ok
           content:
-            application/pdf:
+            application/octet-stream:
               schema:
                 type: string
                 format: binary
