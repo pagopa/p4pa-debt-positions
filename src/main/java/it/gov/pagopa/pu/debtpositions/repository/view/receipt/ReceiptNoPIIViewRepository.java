@@ -38,11 +38,12 @@ public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView,
     JOIN DebtPositionType dpt ON dpto.debtPositionTypeId = dpt.debtPositionTypeId
     WHERE
       (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)})
+      AND dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PRIMARY_ORG_DEBT_POSITION_ORIGINS})
       AND (r.orgFiscalCode IN :organizationsFiscalCode)
       AND ((:receiptOrigins IS NULL) OR (r.receiptOrigin IN :receiptOrigins))
    """
   )
-  Page<ReceiptNoPIIView> getPagedReceiptByFilters(
+  Page<ReceiptNoPIIView> getPagedPrimaryReceiptByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
