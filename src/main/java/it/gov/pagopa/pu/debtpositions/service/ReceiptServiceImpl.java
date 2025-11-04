@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
@@ -31,7 +32,11 @@ public class ReceiptServiceImpl implements ReceiptService {
 
   @Override
   public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId) {
-    return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+    if(StringUtils.isNotBlank(operatorExternalUserId)){
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+    }else{
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId);
+    }
   }
 
   @Override
