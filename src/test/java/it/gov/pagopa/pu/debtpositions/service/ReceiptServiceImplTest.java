@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptArchivingPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,6 +35,14 @@ class ReceiptServiceImplTest {
   private ReceiptServiceImpl receiptService;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
+  @AfterEach
+  void setUp() {
+    Mockito.verifyNoMoreInteractions(
+      receiptPIIRepositoryMock,
+      receiptDetailPIIViewRepositoryMock,
+      receiptArchivingPIIViewRepositoryMock);
+  }
 
   @Test
   void whenGetReceiptThenOk() {
@@ -71,6 +80,23 @@ class ReceiptServiceImplTest {
     Assertions.assertEquals(receipt, response);
 
     Mockito.verify(receiptDetailPIIViewRepositoryMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+  }
+
+  @Test
+  void givenNoOperatorExternalUserIdwhenGetReceiptDetailThenOk() {
+    //given
+    Long organizationId = 1L;
+    Long receiptId = 1L;
+    ReceiptDetailDTO receipt = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+
+    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, organizationId)).thenReturn(receipt);
+
+    //when
+    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, null, organizationId);
+
+    //verify
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(receipt, response);
   }
 
   @Test

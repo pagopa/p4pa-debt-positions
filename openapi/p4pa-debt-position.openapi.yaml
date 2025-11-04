@@ -737,7 +737,7 @@ paths:
           description: The ID of the receipt
         - name: operatorExternalUserId
           in: query
-          required: true
+          required: false
           schema:
             type: string
         - name: organizationId
