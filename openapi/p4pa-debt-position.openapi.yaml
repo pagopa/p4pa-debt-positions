@@ -1562,6 +1562,32 @@ paths:
           description: Conflict
         "500":
           description: Internal server error
+  /debt-positions/taxonomy-category/validate:
+    get:
+      tags:
+        - debt-position
+      operationId: validateTaxonomyCategory
+      parameters:
+        - name: taxonomyCategory
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
 security:
   - BearerAuth: [ ]
 components:
