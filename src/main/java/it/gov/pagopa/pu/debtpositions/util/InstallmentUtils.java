@@ -75,7 +75,6 @@ public class InstallmentUtils {
   public static final List<DebtPositionOrigin> PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED = Stream.concat(
     ORDINARY_DEBT_POSITION_ORIGINS.stream(),
     Stream.of(
-      DebtPositionOrigin.SPONTANEOUS_MIXED,
       DebtPositionOrigin.RECEIPT_FILE,
       DebtPositionOrigin.RECEIPT_PAGOPA,
       DebtPositionOrigin.REPORTING_PAGOPA)
