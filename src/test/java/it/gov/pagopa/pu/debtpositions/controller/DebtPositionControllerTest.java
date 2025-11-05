@@ -5,7 +5,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildM
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -615,14 +614,4 @@ class DebtPositionControllerTest {
     assertEquals(expectedResult, resultResponse);
   }
 
-  @Test
-  void whenValidateTaxonomyCategoryThenOk() throws Exception {
-    Mockito.doNothing().when(taxonomyValidatorService).validateTaxonomyCategory(anyString());
-
-    mockMvc.perform(
-        get("/debt-positions/taxonomy-category/validate")
-          .queryParam("taxonomyCategory", "CATEGORY")
-          .contentType(MediaType.APPLICATION_JSON_VALUE))
-      .andExpect(status().isOk());
-  }
 }

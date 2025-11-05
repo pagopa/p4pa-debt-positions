@@ -17,7 +17,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
-import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
@@ -55,7 +54,6 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionDeletionService debtPositionDeletionService;
   private final PublishDebtPositionService publishDebtPositionService;
   private final MixedDebtPositionCreationService mixedDebtPositionCreationService;
-  private final TaxonomyValidatorService taxonomyValidatorService;
 
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
@@ -236,14 +234,6 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       operatorExternalUserId);
 
     return ResponseEntity.ok(installmentDTO);
-  }
-
-  @Override
-  public ResponseEntity<Void> validateTaxonomyCategory(
-    String taxonomyCategory) {
-    log.info("User requested validation on taxonomyCategory [{}]", taxonomyCategory);
-    taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory);
-    return ResponseEntity.ok().build();
   }
 
   @Override

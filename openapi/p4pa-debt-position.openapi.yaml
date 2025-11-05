@@ -1594,10 +1594,10 @@ paths:
           description: Conflict
         "500":
           description: Internal server error
-  /debt-positions/taxonomy-category/validate:
+  /transfers/taxonomy-category/validate:
     get:
       tags:
-        - debt-position
+        - transfer
       operationId: validateTaxonomyCategory
       parameters:
         - name: taxonomyCategory
