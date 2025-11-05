@@ -17,9 +17,24 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
+import it.gov.pagopa.pu.debtpositions.dto.generated.SyncCompleteDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.SyncErrorDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
@@ -30,8 +45,10 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallme
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -87,6 +104,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private MixedDebtPositionCreationService mixedDebtPositionCreationService;
+
+  @MockitoBean
+  private TaxonomyValidatorService taxonomyValidatorService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -593,4 +613,5 @@ class DebtPositionControllerTest {
     });
     assertEquals(expectedResult, resultResponse);
   }
+
 }

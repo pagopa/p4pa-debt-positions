@@ -1,8 +1,17 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -19,12 +28,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(TransferControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
 class TransferControllerTest {
@@ -37,6 +40,9 @@ class TransferControllerTest {
 
   @MockitoBean
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
+
+  @MockitoBean
+  private TaxonomyValidatorService taxonomyValidatorService;
 
   private final String accessToken = "ACCESSTOKEN";
 
@@ -89,5 +95,17 @@ class TransferControllerTest {
 
     DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
+  }
+
+
+  @Test
+  void whenValidateTaxonomyCategoryThenOk() throws Exception {
+    Mockito.doNothing().when(taxonomyValidatorService).validateTaxonomyCategory(anyString());
+
+    mockMvc.perform(
+        get("/transfers/taxonomy-category/validate")
+          .queryParam("taxonomyCategory", "CATEGORY")
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk());
   }
 }
