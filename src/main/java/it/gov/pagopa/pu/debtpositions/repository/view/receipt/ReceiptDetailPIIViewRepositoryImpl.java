@@ -26,4 +26,13 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
           receiptId, operatorExternalUserId)));
     return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
   }
+
+  @Override
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, Long organizationId) {
+    ReceiptDetailNoPIIView receiptDetailNoPIIView = receiptDetailNoPIIViewRepository.findReceiptDetailView(receiptId, organizationId)
+      .orElseThrow(() -> new NotFoundException(
+        "ReceiptDetailNoPIIView having receiptId %d not found".formatted(
+          receiptId)));
+    return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+  }
 }

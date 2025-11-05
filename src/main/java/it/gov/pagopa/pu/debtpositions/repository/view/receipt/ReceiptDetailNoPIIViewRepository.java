@@ -41,4 +41,31 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @Parameter(required = true) @Param("organizationId") Long organizationId);
+
+  @RestResource(exported = false)
+  @Query(value = "SELECT new ReceiptDetailNoPIIView("
+    + "r.receiptId as receiptId, "
+    + "i.iuv as iuv, "
+    + "r.paymentAmountCents as paymentAmountCents, "
+    + "i.remittanceInformation as remittanceInformation, "
+    + "dpto.description as debtPositionTypeOrgDescription, "
+    + "i.personalDataId as debtorPersonalDataId, "
+    + "r.paymentDateTime as paymentDateTime, "
+    + "r.pspCompanyName as pspCompanyName, "
+    + "i.iud as iud, "
+    + "i.iur as iur, "
+    + "r.feeCents as feeCents, "
+    + "i.notificationFeeCents as notificationFeeCents "
+    + ") "
+    + "FROM ReceiptDetailNoPIIView r "
+    + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
+    + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
+    + "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId "
+    + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
+    + "WHERE r.receiptId = :receiptId "
+    + "AND dp.organizationId = :organizationId "
+    + "AND dp.debtPositionOrigin <> it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin.SPONTANEOUS_MIXED ")
+  Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
+    @Parameter(required = true) @Param("receiptId") Long receiptId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId);
 }
