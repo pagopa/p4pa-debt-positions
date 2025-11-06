@@ -59,7 +59,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       AND dptoo.operatorExternalUserId = :#{#filter.operatorExternalUserId}
       AND (:#{#filter.debtPositionTypeOrgId} IS NULL OR dptoo.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId})
       AND (:#{#filter.debtPositionOrigins} IS NULL OR dp.debtPositionOrigin IN :#{#filter.debtPositionOrigins})
-      AND t.transferIndex = 1
+      AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE}
   """
   )
   Page<InstallmentPaidViewNoPII> findInstallmentPaidViewNoPIIDTO(
@@ -111,7 +111,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       AND (CAST(:#{#filter.installmentUpdateDateTime.to} AS STRING) IS NULL OR i.updateDate <= :#{#filter.installmentUpdateDateTime.to})
       AND (:#{#filter.debtPositionTypeOrgId} IS NULL OR dpto.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId})
       AND (:#{#filter.debtPositionOrigins} IS NULL OR dp.debtPositionOrigin IN :#{#filter.debtPositionOrigins})
-      AND t.transferIndex = 1
+      AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE}
   """
   )
   Page<InstallmentPaidViewNoPII> findInstallmentPaidViewNoPIIDTOWithoutOperator(
