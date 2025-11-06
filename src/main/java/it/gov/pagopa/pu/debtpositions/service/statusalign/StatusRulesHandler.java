@@ -44,10 +44,10 @@ public abstract class StatusRulesHandler<E extends Enum<E>, T, D> {
 
   public void updateEntityStatus(T entity) {
     List<E> childStatuses = getChildStatuses(entity);
-    log.info("Calculating new Status for {}", entity.getClass());
+    log.debug("Calculating new Status for {}", entity.getClass());
     D newStatus = calculateNewStatus(childStatuses);
     setStatus(entity, newStatus);
-    log.info("Updating entity {} with status {}", entity.getClass(), newStatus);
+    log.debug("Updating entity {} with status {}", entity.getClass(), newStatus);
     storeStatus(entity, newStatus);
   }
 

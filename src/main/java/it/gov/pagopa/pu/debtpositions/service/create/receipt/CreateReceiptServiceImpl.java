@@ -1,15 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
-import io.micrometer.common.util.StringUtils;
-import it.gov.pagopa.pu.debtpositions.dto.Receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.ReceiptMapper;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
+import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -21,68 +25,91 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
   private final ReceiptNoPIIRepository receiptNoPIIRepository;
   private final ReceiptPIIRepository receiptPIIRepository;
-  private final ReceiptMapper receiptMapper;
-  private final ManagePaidDebtPositionService managePaidDebtPositionService;
-  private final CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService;
 
-  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, ReceiptMapper receiptMapper, ManagePaidDebtPositionService managePaidDebtPositionService, CreatePaidTechnicalDebtPositionsService createPaidTechnicalDebtPositionsService) {
+  private final PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService;
+  private final SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService;
+  private final MixedDpPaymentHandlerService mixedDpPaymentHandlerService;
+
+  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService, SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService, MixedDpPaymentHandlerService mixedDpPaymentHandlerService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
-    this.receiptMapper = receiptMapper;
-    this.managePaidDebtPositionService = managePaidDebtPositionService;
-    this.createPaidTechnicalDebtPositionsService = createPaidTechnicalDebtPositionsService;
+    this.primaryOrgPaymentHandlerService = primaryOrgPaymentHandlerService;
+    this.secondaryOrgPaymentHandlerService = secondaryOrgPaymentHandlerService;
+    this.mixedDpPaymentHandlerService = mixedDpPaymentHandlerService;
   }
 
 
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    log.info("createReceipt paymentReceiptId[{}} org/nav/iud[{}/{}/{}]",
-      receiptDTO.getPaymentReceiptId(),
-      receiptDTO.getOrgFiscalCode(),
-      receiptDTO.getNoticeNumber(),
-      receiptDTO.getIud());
+    logReceiptData("createReceipt", receiptDTO);
 
-    // if the receipt already exists, we should continue only if the input IUD exists,
-    // in order to check the existence of a DP having an Installment with the requested IUD:
-    // if it doesn't exist, we should create a new technical DP with the requested Installment
-    // (use case heterogeneous IUV: many DP on same org having same IUV)
-    Optional<ReceiptDTO> receiptInDb = checkIfAlreadyStored(receiptDTO);
-    if (receiptInDb.isPresent()) {
-      if (StringUtils.isBlank(receiptDTO.getIud())) {
-        return receiptInDb.get();
-      }
-    } else {
-      saveReceipt(receiptDTO);
+    ReceiptDTO receiptAlreadyHandled = checkIfAlreadyHandled(receiptDTO);
+    if (receiptAlreadyHandled != null) {
+      return receiptAlreadyHandled;
     }
 
-    //check if organization who handles the notice is managed by PU and update the installment status
-    boolean primaryOrgFound = managePaidDebtPositionService.handleReceiptReceivedPrimaryOrg(receiptDTO, accessToken);
+    saveReceipt(receiptDTO);
 
-    //for every organization handled by PU and mentioned in the receipt
-    createPaidTechnicalDebtPositionsService.createOrUpdatePaidTechnicalDebtPositionsFromReceipt(receiptDTO, !primaryOrgFound, accessToken);
+    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
+    secondaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
+    primaryOrgDp.ifPresent(dp -> mixedDpPaymentHandlerService.handle(dp, receiptDTO, accessToken));
 
     return receiptDTO;
   }
 
-  // check if the same receipt is already present on DB.
-  // in this case just ignore it since it simply means that the same receipt has been broadcast
-  // to multiple organizations managed by PU
-  private Optional<ReceiptDTO> checkIfAlreadyStored(ReceiptDTO receiptDTO) {
+  private ReceiptDTO checkIfAlreadyHandled(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    ReceiptDTO receiptInDb = checkIfAlreadyStored(receiptDTO);
+    if (receiptInDb != null) {
+      if (isManualImport(receiptDTO)) {
+        if (!ReceiptOriginType.RECEIPT_FILE.equals(receiptInDb.getReceiptOrigin())) {
+          throw new ConflictErrorException("Receipt having paymentReceiptId " + receiptDTO.getPaymentReceiptId() +
+            " has already been stored with origin " + receiptInDb.getReceiptOrigin() + " and id " + receiptInDb.getReceiptId());
+        }
+        logReceiptData("Updating Receipt manually imported receiptOrigin[" + receiptDTO.getReceiptOrigin() + "]", receiptDTO);
+      } else {
+        logReceiptData("Skipping Receipt already handled receiptOrigin[" + receiptDTO.getReceiptOrigin() + "]", receiptDTO);
+        // Nothing to do (neither updating data), this event has already been handled
+        return receiptInDb;
+      }
+    }
+    return null;
+  }
+
+  private static void logReceiptData(String message, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    log.info("{} paymentReceiptId[{}} org/nav/iud[{}/{}/{}]",
+      message,
+      receiptDTO.getPaymentReceiptId(),
+      receiptDTO.getOrgFiscalCode(),
+      receiptDTO.getNoticeNumber(),
+      receiptDTO.getIud());
+  }
+
+  private ReceiptDTO checkIfAlreadyStored(ReceiptDTO receiptDTO) {
     ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
     if (receiptInDb != null) {
+      if(!receiptInDb.getReceiptOrigin().equals(receiptDTO.getReceiptOrigin())){
+        throw new ConflictErrorException("Receipt having paymentReceiptId " + receiptDTO.getPaymentReceiptId() +
+          " has already been stored with origin " + receiptInDb.getReceiptOrigin() + " and id " + receiptInDb.getReceiptId() +
+          " while the requested Receipt has origin " + receiptDTO.getReceiptOrigin());
+      }
       log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
       receiptDTO.setReceiptId(receiptInDb.getReceiptId());
-      return Optional.of(receiptDTO);
+      receiptDTO.setNoPII(receiptInDb);
+      return receiptDTO;
     }
-    return Optional.empty();
+    return null;
+  }
+
+  private boolean isManualImport(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    return !StringUtils.isEmpty(receiptDTO.getIud());
   }
 
   private void saveReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
-    Receipt receipt = receiptMapper.mapToModel(receiptDTO);
-    long newId = receiptPIIRepository.save(receipt).getReceiptId();
-    receiptDTO.setReceiptId(newId);
-    log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), newId);
+    ReceiptDTO storedReceipt = receiptPIIRepository.save(receiptDTO);
+    receiptDTO.setReceiptId(storedReceipt.getReceiptId());
+    receiptDTO.setNoPII(storedReceipt.getNoPII());
+    log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), storedReceipt.getReceiptId());
   }
 
 }

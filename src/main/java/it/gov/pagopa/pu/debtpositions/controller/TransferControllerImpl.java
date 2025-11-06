@@ -1,8 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_RUN_ID;
+import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_WORKFLOW_ID;
+
 import it.gov.pagopa.pu.debtpositions.controller.generated.TransferApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
+import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -12,17 +16,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_RUN_ID;
-import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_WORKFLOW_ID;
-
 @RestController
 @Slf4j
 public class TransferControllerImpl implements TransferApi {
 
   private final DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
+  private final TaxonomyValidatorService taxonomyValidatorService;
 
-  public TransferControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService) {
+  public TransferControllerImpl(DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
+    TaxonomyValidatorService taxonomyValidatorService) {
     this.debtPositionHierarchyStatusAlignerService = debtPositionHierarchyStatusAlignerService;
+    this.taxonomyValidatorService = taxonomyValidatorService;
   }
 
   @Override
@@ -35,5 +39,13 @@ public class TransferControllerImpl implements TransferApi {
       outBuilder.header(HEADER_X_RUN_ID, result.getRight().getRunId());
     }
     return outBuilder.body(result.getLeft());
+  }
+
+  @Override
+  public ResponseEntity<Void> validateTaxonomyCategory(
+    String taxonomyCategory) {
+    log.info("User requested validation on taxonomyCategory [{}]", taxonomyCategory);
+    taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory);
+    return ResponseEntity.ok().build();
   }
 }

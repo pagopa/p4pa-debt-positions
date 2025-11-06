@@ -109,6 +109,7 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       AND (CAST(:#{#filter.paymentDateTime.to} AS STRING) IS NULL OR r.paymentDateTime <= :#{#filter.paymentDateTime.to})
       AND (CAST(:#{#filter.installmentUpdateDateTime.from} AS STRING) IS NULL OR i.updateDate >= :#{#filter.installmentUpdateDateTime.from})
       AND (CAST(:#{#filter.installmentUpdateDateTime.to} AS STRING) IS NULL OR i.updateDate <= :#{#filter.installmentUpdateDateTime.to})
+      AND (:#{#filter.debtPositionTypeOrgId} IS NULL OR dpto.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId})
       AND (:#{#filter.debtPositionOrigins} IS NULL OR dp.debtPositionOrigin IN :#{#filter.debtPositionOrigins})
       AND t.transferIndex = 1
   """

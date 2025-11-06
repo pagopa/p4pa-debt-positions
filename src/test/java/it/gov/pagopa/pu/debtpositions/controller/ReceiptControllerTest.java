@@ -2,23 +2,31 @@ package it.gov.pagopa.pu.debtpositions.controller;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.ReceiptFileService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.nio.charset.StandardCharsets;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -38,7 +46,11 @@ class ReceiptControllerTest {
   @MockitoBean
   private ReceiptService receiptServiceMock;
 
+  @MockitoBean
+  private ReceiptFileService receiptFileServiceMock;
+
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+
 
   @Test
   void whenCreateReceiptThenOk() throws Exception {
@@ -57,7 +69,7 @@ class ReceiptControllerTest {
 
     ReceiptDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
     });
-    TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate");
+    TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate", "noPII");
 
     Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
       Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
@@ -78,7 +90,7 @@ class ReceiptControllerTest {
       .andReturn();
 
     ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
-    TestUtils.reflectionEqualsByName(expectedResponse,response);
+    TestUtils.reflectionEqualsByName(expectedResponse,response, "noPII");
 
     Mockito.verify(receiptServiceMock).getReceipt(receiptId);
   }
@@ -104,5 +116,35 @@ class ReceiptControllerTest {
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
     Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+  }
+
+  @Test
+  void whenGetReceiptPdfThenOk() throws Exception {
+    // GIVEN
+    Long organizationId = 1L;
+    Long receiptId = 99L;
+    byte[] pdfBytes = "PDF_CONTENT".getBytes(StandardCharsets.UTF_8);
+    FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(pdfBytes),
+      "RECEIPT_CFENTE_"+receiptId+".pdf");
+
+    Mockito.when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId)).thenReturn(expectedResult);
+
+    String urlPattern = "/receipts/{receiptId}/pdf";
+    String expectedFileName = "RECEIPT_CFENTE_"+receiptId+".pdf";
+
+    mockMvc.perform(
+        MockMvcRequestBuilders.get(urlPattern, receiptId)
+          .param("organizationId", organizationId.toString()))
+
+      .andExpect(status().isOk())
+      .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_PDF_VALUE))
+      .andExpect(MockMvcResultMatchers.header().string(
+        HttpHeaders.CONTENT_DISPOSITION,
+        Matchers.containsString("attachment; filename=\"" + expectedFileName + "\"")
+      ))
+      .andExpect(MockMvcResultMatchers.content().bytes(pdfBytes))
+      .andReturn();
+
+    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(receiptId, organizationId);
   }
 }

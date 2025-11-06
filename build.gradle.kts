@@ -50,6 +50,7 @@ val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.2"
 val httpClientVersion = "5.5"
+val openHtmlToPdfVersion = "1.0.10"
 
 dependencies {
   implementation("org.springframework.boot:spring-boot-starter")
@@ -75,6 +76,8 @@ dependencies {
   implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
   implementation("org.postgresql:postgresql:$postgresJdbcVersion")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
+  implementation("org.springframework.boot:spring-boot-starter-freemarker")
+  implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:${openHtmlToPdfVersion}")
 
   compileOnly("org.projectlombok:lombok")
 
@@ -175,6 +178,7 @@ openApiGenerate {
     "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
     "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg",
     "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
+    "ReceiptNoPII" to "it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII",
     "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm"
   ))
   configOptions.set(mapOf(

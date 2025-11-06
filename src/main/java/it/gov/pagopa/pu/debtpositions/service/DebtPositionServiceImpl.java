@@ -1,24 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
@@ -108,19 +102,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public void updateDebtPosition(Long debtPositionId, DebtPositionDTO debtPositionDTO) {
-    DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
-    if (debtPosition == null) {
-      throw new EntityNotFoundException("DebtPosition with id %d not found".formatted(debtPositionId));
-    }
-
-    propagateIdsForDebtPosition(debtPosition, debtPositionDTO);
-
-    debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO);
-  }
-
-  @Override
-  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, Long organizationId, LocalDateTime dateFrom, LocalDateTime dateTo) {
+  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, Long organizationId, LocalDateTimeIntervalFilter dateTimeIntervalFilter) {
     if (debtorFiscalCode == null || debtorEntityType == null) {
       throw new IllegalArgumentException("debtorFiscalCode and debtorEntityType are required");
     }
@@ -132,80 +114,13 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       debtorEntityType,
       status,
       debtPositionOrigin,
+      debtPositionTypeOrgCodesToExclude,
       organizationId,
-      dateFrom,
-      dateTo
+      dateTimeIntervalFilter
     );
 
     return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 
-  private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {
-    if (entity == null || dto == null) return;
-
-    dto.setDebtPositionId(entity.getDebtPositionId());
-
-    Map<Integer, PaymentOption> poByIndex = indexBy(
-      entity.getPaymentOptions(),
-      PaymentOption::getPaymentOptionIndex
-    );
-
-    streamOf(dto.getPaymentOptions())
-      .forEach(poDTO -> {
-        PaymentOption poEntity = poByIndex.get(poDTO.getPaymentOptionIndex());
-        poDTO.setDebtPositionId(dto.getDebtPositionId());
-        if (poEntity != null) {
-          propagateIdsForPaymentOption(poEntity, poDTO);
-        }
-      });
-  }
-
-  private void propagateIdsForPaymentOption(PaymentOption poEntity, PaymentOptionDTO poDTO) {
-    poDTO.setPaymentOptionId(poEntity.getPaymentOptionId());
-
-    Map<String, InstallmentNoPII> instByIud = indexBy(
-      poEntity.getInstallments(),
-      InstallmentNoPII::getIud
-    );
-
-    streamOf(poDTO.getInstallments())
-      .forEach(instDTO -> {
-        InstallmentNoPII instEntity = instByIud.get(instDTO.getIud());
-        instDTO.setPaymentOptionId(poDTO.getPaymentOptionId());
-        if (instEntity != null) {
-          propagateIdsForInstallment(instEntity, instDTO);
-        }
-      });
-  }
-
-  private void propagateIdsForInstallment(InstallmentNoPII instEntity, InstallmentDTO instDTO) {
-    instDTO.setInstallmentId(instEntity.getInstallmentId());
-
-    Map<Integer, Transfer> trByIndex = indexBy(
-      instEntity.getTransfers(),
-      Transfer::getTransferIndex
-    );
-
-    streamOf(instDTO.getTransfers())
-      .forEach(trDTO -> {
-        Transfer trEntity = trByIndex.get(trDTO.getTransferIndex());
-        trDTO.setInstallmentId(instDTO.getInstallmentId());
-        if (trEntity != null) {
-          trDTO.setTransferId(trEntity.getTransferId());
-        }
-      });
-  }
-
-  private static <T> Stream<T> streamOf(Collection<T> c) {
-    return c == null ? Stream.empty() : c.stream().filter(Objects::nonNull);
-  }
-
-  private static <T, K> Map<K, T> indexBy(Collection<T> items, Function<T, K> keyFn) {
-    return streamOf(items)
-      .collect(Collectors.toMap(
-        keyFn,
-        Function.identity()
-      ));
-  }
 }
 

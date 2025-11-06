@@ -1,19 +1,34 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
+import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
-import it.gov.pagopa.pu.debtpositions.service.create.debtposition.MixedDebtPositionCreationService;
+import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.MixedDebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.delete.DebtPositionDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,9 +36,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.time.OffsetDateTime;
-import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -266,19 +278,24 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     PersonEntityType entityType,
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
+    List<String> debtPositionTypeOrgCodesToExclude,
     Long organizationId,
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
   ) {
-    log.info("Retrieving DebtPosition by debtorFiscalCode={} debtorEntityType={} debtPositionOrigins={} organizationId={} dateFrom={} dateTo={}", fiscalCode, entityType, debtPositionOrigin, organizationId, dateFrom, dateTo);
+    log.info("Retrieving DebtPosition by debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationId={} dateFrom={} dateTo={}", entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationId, dateFrom, dateTo);
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
+      Utilities.offsetDateTimeToLocalDateTime(dateFrom),
+      Utilities.offsetDateTimeToLocalDateTime(dateTo));
+
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCode,
       entityType,
       status,
       debtPositionOrigin,
+      debtPositionTypeOrgCodesToExclude,
       organizationId,
-      dateFrom != null ? dateFrom.toLocalDateTime() : null,
-      dateTo != null ? dateTo.toLocalDateTime() : null
+      dateTimeIntervalFilter
     ));
   }
 }

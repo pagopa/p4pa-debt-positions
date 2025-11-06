@@ -12,6 +12,10 @@ import org.springframework.data.util.Pair;
 import java.io.Serializable;
 import java.util.Optional;
 
+/**
+ * A repository which will handle the PII segregation.<<BR/>
+ * It will split the full representation of the entity ({@link FullPIIDTO} into {@link NoPIIEntity} and {@link PIIDTO}, storing the PII on a separate DB and setting its identifier on the {@link NoPIIEntity}'s personalDataId field.
+ */
 public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends NoPIIEntity<P>, P extends PIIDTO, I extends Serializable> {
 
   private final BasePIIMapper<F, E, P> piiMapper;

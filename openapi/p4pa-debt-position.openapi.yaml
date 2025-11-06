@@ -291,6 +291,13 @@ paths:
             items:
               $ref: "#/components/schemas/DebtPositionOrigin"
             description: An array of debt position origins to filter by; if null, no filter is applied
+        - name: debtPositionTypeOrgCodesToExclude
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
         - name: organizationId
           in: query
           required: false
@@ -674,7 +681,7 @@ paths:
         "400":
           description: Invalid request
         "409":
-          description: Debt position already exists
+          description: Debt position already exists and cannot be changed
         "500":
           description: Internal server error
   /receipts/{receiptId}:
@@ -730,7 +737,7 @@ paths:
           description: The ID of the receipt
         - name: operatorExternalUserId
           in: query
-          required: true
+          required: false
           schema:
             type: string
         - name: organizationId
@@ -764,6 +771,38 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /receipts/{receiptId}/pdf:
+    get:
+      tags:
+        - receipt
+      operationId: getReceiptPdf
+      parameters:
+        - name: receiptId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        "400":
+          description: Invalid request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal server error
   /installments/{installmentId}:
     get:
       tags:
@@ -1513,6 +1552,27 @@ paths:
           description: Conflict
         '500':
           description: Internal server error
+    put:
+      tags:
+        - spontaneous-form
+      operationId: updateSpontaneousForm
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: 'SpontaneousForm'
+        required: true
+      responses:
+        '200':
+          description: Ok
+        '400':
+          description: Invalid request
+        '403':
+          description: Forbidden
+        '404':
+          description: Not found
+        '500':
+          description: Internal server error
   /spontaneous-forms/{spontaneousFormId}:
     delete:
       tags:
@@ -1534,6 +1594,32 @@ paths:
           description: Conflict
         "500":
           description: Internal server error
+  /transfers/taxonomy-category/validate:
+    get:
+      tags:
+        - transfer
+      operationId: validateTaxonomyCategory
+      parameters:
+        - name: taxonomyCategory
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Ok
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
 security:
   - BearerAuth: [ ]
 components:
@@ -1782,6 +1868,10 @@ components:
           type: string
     ReceiptDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO>"
+      ]
+      x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       required:
         - receiptOrigin
         - paymentReceiptId
@@ -1865,6 +1955,14 @@ components:
         updateDate:
           type: string
           format: date-time
+        updateOperatorExternalId:
+          type: string
+        updateTraceId:
+          type: string
+        noPII:
+          x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
+          type: 'ReceiptNoPII'
     InstallmentDetailDTO:
       type: object
       required:
@@ -2546,8 +2644,6 @@ components:
           type: boolean
         description:
           type: string
-        remittanceInformation:
-          type: string
         dueDate:
           type: string
           format: date
@@ -2562,6 +2658,7 @@ components:
       required:
         - iud
         - debtPositionTypeOrgId
+        - remittanceInformation
         - amountCents
       properties:
         iud:
@@ -2585,6 +2682,8 @@ components:
         postalIban:
           type: string
         legacyPaymentMetadata:
+          type: string
+        remittanceInformation:
           type: string
     ActualizeAmountRequestDTO:
       type: object
