@@ -40,7 +40,7 @@ public interface ReceiptArchivingNoPIIViewRepository extends Repository<ReceiptA
       AND dp.organizationId = :organizationId
       AND r.paymentDateTime BETWEEN :paymentDateTimeFrom AND :paymentDateTimeTo
       AND dptoo.operatorExternalUserId = :operatorExternalUserId
-      AND t.transferIndex = 1
+      AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE}
   """
     )
     Page<ReceiptArchivingNoPIIView> findReceiptArchivingViewNoPIIDTO(
