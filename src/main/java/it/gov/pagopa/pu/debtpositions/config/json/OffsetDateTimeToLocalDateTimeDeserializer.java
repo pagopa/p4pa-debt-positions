@@ -17,6 +17,10 @@ public class OffsetDateTimeToLocalDateTimeDeserializer extends JsonDeserializer<
   public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 
     String dateString = p.getValueAsString();
+    return string2LocalDateTime(dateString);
+  }
+
+  public static LocalDateTime string2LocalDateTime(String dateString) {
     if(dateString.contains("+") || dateString.endsWith("Z")){
       return OffsetDateTime.parse(dateString).toLocalDateTime();
     } else {
