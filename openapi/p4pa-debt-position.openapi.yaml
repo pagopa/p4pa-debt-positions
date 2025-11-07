@@ -2248,6 +2248,8 @@ components:
             - DEBT_POSITION_NOT_FOUND
         message:
           type: string
+        traceId:
+          type: string
     DebtPositionTypeOrgDTO:
       required:
         - debtPositionTypeId
