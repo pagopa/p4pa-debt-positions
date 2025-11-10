@@ -23,6 +23,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     i.paymentOptionId as paymentOptionId,
     i.receiptId as receiptId,
     i.iuv as iuv,
+    i.iud as iud,
     i.status as status,
     i.nav as nav,
     i.dueDate as dueDate,
@@ -41,6 +42,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     AND (cast(:dueDateFrom as date) IS NULL OR i.dueDate >= :dueDateFrom)
     AND (cast(:dueDateTo as date) IS NULL OR i.dueDate <= :dueDateTo)
     AND (:iuv IS NULL OR i.iuv = :iuv)
+    AND (:iud is NULL or i.iud = :iud)
     AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
     AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN (:debtPositionOrigins))
     AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
@@ -51,6 +53,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     @Parameter(schema = @Schema(type = "string", format = "date")) @Param("dueDateFrom") LocalDate dueDateFrom,
     @Parameter(schema = @Schema(type = "string", format = "date")) @Param("dueDateTo") LocalDate dueDateTo,
     String iuv,
+    String iud,
     String fiscalCode,
     List<DebtPositionOrigin> debtPositionOrigins,
     Long debtPositionTypeOrgId,

@@ -26,6 +26,7 @@ public class InstallmentView {
   private Long paymentOptionId;
   private Long receiptId;
   private String iuv;
+  private String iud;
   @Enumerated(EnumType.STRING)
   @NotNull
   private InstallmentStatus status;
