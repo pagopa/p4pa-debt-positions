@@ -9,8 +9,10 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.TechnicalMixedDebtPositionBuilderService;
 import it.gov.pagopa.pu.debtpositions.util.Constants;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,10 @@ public class TechnicalMixedDebtPositionUpdaterService  {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionRepository debtPositionRepository;
   private final TechnicalMixedDebtPositionBuilderService technicalMixedDebtPositionBuilderService;
+  private final DebtPositionService debtPositionService;
   private final DebtPositionDeleteService debtPositionDeleteService;
 
+  @Transactional
   public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id=" + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
@@ -56,6 +60,8 @@ public class TechnicalMixedDebtPositionUpdaterService  {
       false,
       accessToken
     );
+
+    newMixedDebtPositions.forEach(debtPositionService::saveDebtPosition);
 
     deleteDebtPositionsWithoutPersonalDataId(oldMixedDebtPositions);
 
