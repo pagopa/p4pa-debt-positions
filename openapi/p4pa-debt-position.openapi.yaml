@@ -2646,8 +2646,6 @@ components:
           type: boolean
         description:
           type: string
-        remittanceInformation:
-          type: string
         dueDate:
           type: string
           format: date

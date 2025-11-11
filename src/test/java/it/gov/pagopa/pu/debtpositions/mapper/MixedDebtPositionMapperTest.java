@@ -73,6 +73,7 @@ class MixedDebtPositionMapperTest {
       .iban("IT60X0542811101000000123456")
       .postalIban("IT60X0542811101000000123456")
       .category(category)
+      .remittanceInformation("Payment Info")
       .build();
     InstallmentDTO expectedInstallment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)
@@ -82,6 +83,7 @@ class MixedDebtPositionMapperTest {
       .dueDate(DATE)
       .debtor(PersonFaker.buildPerson())
       .legacyPaymentMetadata(null)
+      .remittanceInformation("causali multiple")
       .sourceFlowName("sourceFlowName")
       .transfers(List.of(expectedTransfer))
       .build();
@@ -122,84 +124,6 @@ class MixedDebtPositionMapperTest {
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
           mixedDebtPositionDTO);
-
-      assertEquals(expectedResult, result);
-    }
-  }
-
-  @Test
-  void whenMapMixedToDebtPositionDTOThenCorrectMapping() {
-    Organization organization = buildOrganization();
-    MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
-    mixedDebtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED);
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
-    dpTypeOrg.setDebtPositionTypeOrgId(100L);
-    String iud = "IUD";
-    String category = "01234567";
-
-    TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(1)
-      .orgFiscalCode(organization.getOrgFiscalCode())
-      .orgName(organization.getOrgName())
-      .amountCents(50L)
-      .stampType("stampType")
-      .stampHashDocument("stampHashDocument")
-      .stampProvincialResidence("stampProvincialResidence")
-      .iban("IT60X0542811101000000123456")
-      .postalIban("IT60X0542811101000000123456")
-      .category(category)
-      .remittanceInformation("Payment Info")
-      .build();
-    InstallmentDTO expectedInstallment = InstallmentDTO.builder()
-      .status(InstallmentStatus.UNPAID)
-      .amountCents(50L)
-      .iud(iud)
-      .balance(null)
-      .dueDate(DATE)
-      .debtor(PersonFaker.buildPerson())
-      .legacyPaymentMetadata(null)
-      .remittanceInformation("causali multiple")
-      .sourceFlowName("sourceFlowName")
-      .transfers(List.of(expectedTransfer))
-      .build();
-    PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
-      .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(1)
-      .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
-      .installments(List.of(expectedInstallment))
-      .build();
-    DebtPositionDTO expectedResult = DebtPositionDTO.builder()
-      .status(DebtPositionStatus.UNPAID)
-      .debtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED)
-      .organizationId(500L)
-      .description("Test Description")
-      .flagIuvVolatile(true)
-      .flagPuPagoPaPayment(true)
-      .multiDebtor(false)
-      .debtPositionTypeOrgId(dpTypeOrg.getDebtPositionTypeOrgId())
-      .paymentOptions(List.of(expectedPaymentOption))
-      .build();
-
-    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
-      utilities.when(Utilities::getRandomIUD).thenReturn(iud);
-      utilities.when(() -> taxonomyCodeToTransferCategory("9/01234567/")).thenReturn(category);
-
-      when(
-        mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(
-          anyLong()))
-        .thenReturn(dpTypeOrg);
-
-      when(
-        debtPositionTypeOrgRepositoryMock.findById(
-          anyLong()))
-        .thenReturn(Optional.of(debtPositionTypeOrg));
-
-      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
-        .thenReturn("01234567");
-
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
-        mixedDebtPositionDTO);
 
       assertEquals(expectedResult, result);
     }
