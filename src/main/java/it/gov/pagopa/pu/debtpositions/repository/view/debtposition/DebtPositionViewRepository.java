@@ -44,6 +44,7 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
       AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
       AND ((:status IS NULL) OR (dp.status = :status ))
       AND ((:iuv IS NULL) OR (i.iuv = :iuv ))
+      AND ((:iud IS NULL) OR (i.iud = :iud ))
   """
   )
   Page<DebtPositionView> findDebtPositionViews(
@@ -56,6 +57,7 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
     Long debtPositionTypeOrgId,
     DebtPositionStatus status,
     String iuv,
+    String iud,
     Pageable pageable
   );
 }
