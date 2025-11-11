@@ -55,10 +55,12 @@ public class MixedDebtPositionMapper {
           .iban(requestTransfer.getIban())
           .postalIban(requestTransfer.getPostalIban())
           .category(category)
-          .remittanceInformation(requestTransfer.getRemittanceInformation())
+          .remittanceInformation(DebtPositionOrigin.SPONTANEOUS_MIXED.equals(request.getDebtPositionOrigin()) ? requestTransfer.getRemittanceInformation() : null)
           .build()
       );
     }
+
+    String remittanceInfo = DebtPositionOrigin.SPONTANEOUS_MIXED.equals(request.getDebtPositionOrigin()) ?  MULTIPLE_REMITTANCE_INFO : request.getRemittanceInformation();
 
     InstallmentDTO installment = InstallmentDTO.builder()
       .status(InstallmentStatus.UNPAID)
@@ -69,7 +71,7 @@ public class MixedDebtPositionMapper {
       .dueDate(request.getDueDate())
       .debtor(request.getDebtor())
       .legacyPaymentMetadata(null)
-      .remittanceInformation(MULTIPLE_REMITTANCE_INFO)
+      .remittanceInformation(remittanceInfo)
       .sourceFlowName(request.getSourceFlowName())
       .transfers(transfers)
       .build();
