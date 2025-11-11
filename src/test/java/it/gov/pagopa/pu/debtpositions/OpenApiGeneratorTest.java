@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
   "spring.datasource.citizen.password=sa",
 
   "logging.level.org.springdoc.core.utils.SpringDocAnnotationsUtils=OFF",
+  "spring.cloud.function.definition=",
   "springwolf.enabled=false",
 })
 @Slf4j
