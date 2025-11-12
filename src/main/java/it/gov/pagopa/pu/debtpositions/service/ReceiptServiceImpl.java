@@ -31,11 +31,11 @@ public class ReceiptServiceImpl implements ReceiptService {
   }
 
   @Override
-  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId) {
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId, String iud) {
     if(StringUtils.isNotBlank(operatorExternalUserId)){
-      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
     }else{
-      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId);
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId, iud);
     }
   }
 
