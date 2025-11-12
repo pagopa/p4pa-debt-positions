@@ -3,6 +3,6 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 
 public interface ReceiptDetailPIIViewRepository {
-  ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId);
-  ReceiptDetailDTO getReceiptDetail(Long receiptId, Long organizationId);
+  ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId, String iud);
+  ReceiptDetailDTO getReceiptDetail(Long receiptId, Long organizationId, String iud);
 }

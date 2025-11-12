@@ -19,8 +19,8 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
   }
 
   @Override
-  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId) {
-    ReceiptDetailNoPIIView receiptDetailNoPIIView = receiptDetailNoPIIViewRepository.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId)
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId, String iud) {
+    ReceiptDetailNoPIIView receiptDetailNoPIIView = receiptDetailNoPIIViewRepository.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud)
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d and operatorExternalUserId %s not found".formatted(
           receiptId, operatorExternalUserId)));
@@ -28,8 +28,8 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
   }
 
   @Override
-  public ReceiptDetailDTO getReceiptDetail(Long receiptId, Long organizationId) {
-    ReceiptDetailNoPIIView receiptDetailNoPIIView = receiptDetailNoPIIViewRepository.findReceiptDetailView(receiptId, organizationId)
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, Long organizationId, String iud) {
+    ReceiptDetailNoPIIView receiptDetailNoPIIView = receiptDetailNoPIIViewRepository.findReceiptDetailView(receiptId, organizationId, iud)
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d not found".formatted(
           receiptId)));

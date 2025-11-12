@@ -68,18 +68,19 @@ class ReceiptServiceImplTest {
     Long organizationId = 1L;
     Long receiptId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
+    String iud = "iud";
     ReceiptDetailDTO receipt = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId)).thenReturn(receipt);
+    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(receipt);
 
     //when
-    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
 
     //verify
     Assertions.assertNotNull(response);
     Assertions.assertEquals(receipt, response);
 
-    Mockito.verify(receiptDetailPIIViewRepositoryMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+    Mockito.verify(receiptDetailPIIViewRepositoryMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
   }
 
   @Test
@@ -87,12 +88,13 @@ class ReceiptServiceImplTest {
     //given
     Long organizationId = 1L;
     Long receiptId = 1L;
+    String iud = "iud";
     ReceiptDetailDTO receipt = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, organizationId)).thenReturn(receipt);
+    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, organizationId, iud)).thenReturn(receipt);
 
     //when
-    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, null, organizationId);
+    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, null, organizationId, iud);
 
     //verify
     Assertions.assertNotNull(response);

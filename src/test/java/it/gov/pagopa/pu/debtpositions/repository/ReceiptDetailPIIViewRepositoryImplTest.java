@@ -43,20 +43,21 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     Long organizationId = 1L;
     Long receiptId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
+    String iud = "iud";
     ReceiptDetailNoPIIView receiptDetailNoPIIView = podamFactory.manufacturePojo(
       ReceiptDetailNoPIIView.class);
     ReceiptDetailDTO receiptDetail = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId)).thenReturn(
+    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(
       Optional.of(receiptDetailNoPIIView));
     Mockito.when(receiptDetailPIIViewMapperMock.mapToReceiptDetailDTO(receiptDetailNoPIIView)).thenReturn(receiptDetail);
 
     // When
-    ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+    ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
 
     // Then
     Assertions.assertEquals(receiptDetail, result);
-    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, operatorExternalUserId, organizationId);
+    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud);
     Mockito.verify(receiptDetailPIIViewMapperMock).mapToReceiptDetailDTO(receiptDetailNoPIIView);
   }
 
@@ -66,14 +67,15 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     Long organizationId = 1L;
     Long receiptId = 1L;
     String operatorExternalUserId = "operatorExternalUserId";
+    String iud = "iud";
 
-    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId)).thenReturn(
+    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(
       Optional.empty());
 
     // When
-    Assertions.assertThrows(NotFoundException.class,()->receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId));
+    Assertions.assertThrows(NotFoundException.class,()->receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud));
 
-    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, operatorExternalUserId, organizationId);
+    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud);
     Mockito.verifyNoInteractions(receiptDetailPIIViewMapperMock);
   }
 
@@ -82,20 +84,21 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     // Given
     Long organizationId = 1L;
     Long receiptId = 1L;
+    String iud = "iud";
     ReceiptDetailNoPIIView receiptDetailNoPIIView = podamFactory.manufacturePojo(
       ReceiptDetailNoPIIView.class);
     ReceiptDetailDTO receiptDetail = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, organizationId)).thenReturn(
+    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, organizationId, iud)).thenReturn(
       Optional.of(receiptDetailNoPIIView));
     Mockito.when(receiptDetailPIIViewMapperMock.mapToReceiptDetailDTO(receiptDetailNoPIIView)).thenReturn(receiptDetail);
 
     // When
-    ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId);
+    ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId, iud);
 
     // Then
     Assertions.assertEquals(receiptDetail, result);
-    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, organizationId);
+    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, organizationId, iud);
     Mockito.verify(receiptDetailPIIViewMapperMock).mapToReceiptDetailDTO(receiptDetailNoPIIView);
   }
 
@@ -104,14 +107,15 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     // Given
     Long organizationId = 1L;
     Long receiptId = 1L;
+    String iud = "iud";
 
-    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, organizationId)).thenReturn(
+    Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, organizationId, iud)).thenReturn(
       Optional.empty());
 
     // When
-    Assertions.assertThrows(NotFoundException.class,()->receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId));
+    Assertions.assertThrows(NotFoundException.class,()->receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId, iud));
 
-    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, organizationId);
+    Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, organizationId, iud);
     Mockito.verifyNoInteractions(receiptDetailPIIViewMapperMock);
   }
 }

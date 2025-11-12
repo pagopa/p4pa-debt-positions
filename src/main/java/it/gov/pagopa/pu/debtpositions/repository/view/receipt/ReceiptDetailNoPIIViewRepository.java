@@ -37,11 +37,13 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     + "WHERE r.receiptId = :receiptId "
     + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
     + "AND dp.organizationId = :organizationId "
+    + "AND (:iud IS NULL OR i.iud = :iud) "
     + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
   Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Parameter(required = true) @Param("organizationId") Long organizationId);
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
+    @Param("iud") String iud);
 
   @RestResource(exported = false)
   @Query(value = "SELECT new ReceiptDetailNoPIIView("
@@ -66,8 +68,10 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
     + "WHERE r.receiptId = :receiptId "
     + "AND dp.organizationId = :organizationId "
+    + "AND (:iud IS NULL OR i.iud = :iud) "
     + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
   Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
-    @Parameter(required = true) @Param("organizationId") Long organizationId);
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
+    @Param("iud") String iud);
 }
