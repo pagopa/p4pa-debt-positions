@@ -21,6 +21,7 @@ public class ReceiptDetailPIIViewMapper {
     return ReceiptDetailDTO.builder()
       .receiptId(receiptDetailNoPIIView.getReceiptId())
       .iuv(receiptDetailNoPIIView.getIuv())
+      .nav(receiptDetailNoPIIView.getNav())
       .paymentAmountCents(receiptDetailNoPIIView.getPaymentAmountCents())
       .remittanceInformation(receiptDetailNoPIIView.getRemittanceInformation())
       .debtPositionTypeOrgDescription(receiptDetailNoPIIView.getDebtPositionTypeOrgDescription())
