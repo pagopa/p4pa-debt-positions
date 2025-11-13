@@ -300,11 +300,13 @@ paths:
               type: string
         - name: organizationId
           in: query
-          required: false
+          required: true
           schema:
-            type: integer
-            format: int64
-          description: The ID of the organization
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: The IDs of the organizations
         - name: dateFrom
           in: query
           description: Start date (inclusive)
