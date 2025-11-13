@@ -303,7 +303,7 @@ class DebtPositionServiceImplTest {
     PersonEntityType entityType = PersonEntityType.F;
     List<InstallmentStatus> status = List.of(InstallmentStatus.PAID);
     List<DebtPositionOrigin> origin = List.of(DebtPositionOrigin.ORDINARY);
-    Long orgId = 123L;
+    List<Long> orgIds = List.of(123L);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, 1, 1, 0, 0),
       LocalDateTime.of(2023, 12, 31, 23, 59));
 
@@ -313,19 +313,19 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
     Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertIterableEquals(dtos, result);
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
     Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
   }
 
@@ -336,7 +336,7 @@ class DebtPositionServiceImplTest {
     PersonEntityType entityType = PersonEntityType.F;
     List<InstallmentStatus> status = null;
     List<DebtPositionOrigin> origin = null;
-    Long orgId = 456L;
+    List<Long> orgIds = List.of(456L);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(null, null);
 
     byte[] fiscalCodeHash = new byte[]{4,5,6};
@@ -345,51 +345,19 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
     Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertIterableEquals(dtos, result);
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
-    Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
-  }
-
-  @Test
-  void givenNullOrganizationIdAndDatesWhenGetDebtPositionsByDebtorFiscalCodeAndDebtorEntityTypeThenOk() {
-    // Given
-    String fiscalCode = "NOPQRS12T34U567V";
-    PersonEntityType entityType = PersonEntityType.F;
-    List<InstallmentStatus> status = List.of();
-    List<DebtPositionOrigin> origin = List.of();
-    Long orgId = null;
-    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(null, null);
-
-    byte[] fiscalCodeHash = new byte[]{7,8,9};
-    List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
-    List<DebtPositionDTO> dtos = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
-
-    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter)).thenReturn(entities);
-    Mockito.when(debtPositionMapperMock.mapToDto(entities.getFirst())).thenReturn(dtos.getFirst());
-
-    // When
-    List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
-
-    // Then
-    Assertions.assertNotNull(result);
-    Assertions.assertIterableEquals(dtos, result);
-    Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
-    Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
     Mockito.verify(debtPositionMapperMock).mapToDto(entities.getFirst());
   }
 
@@ -401,12 +369,12 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = null;
     List<DebtPositionOrigin> origin = null;
     List<String> debtPositionTypeOrgCodesToExclude = Collections.emptyList();
-    Long orgId = null;
+    List<Long> orgIds = List.of();
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(null, null);
 
     // When / Then
     Assertions.assertThrows(IllegalArgumentException.class, () -> debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, debtPositionTypeOrgCodesToExclude, orgId, dateTimeIntervalFilter));
+      fiscalCode, entityType, status, origin, debtPositionTypeOrgCodesToExclude, orgIds, dateTimeIntervalFilter));
     Mockito.verifyNoInteractions(dataCipherServiceMock, debtPositionRepositoryMock, debtPositionMapperMock);
   }
 
@@ -417,7 +385,7 @@ class DebtPositionServiceImplTest {
     PersonEntityType entityType = PersonEntityType.F;
     List<InstallmentStatus> status = List.of();
     List<DebtPositionOrigin> origin = List.of();
-    Long orgId = 789L;
+    List<Long> orgIds = List.of(789L);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, 1, 1, 0, 0),
       LocalDateTime.of(2023, 12, 31, 23, 59));
 
@@ -426,18 +394,18 @@ class DebtPositionServiceImplTest {
 
     Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter)).thenReturn(entities);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCode, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCode, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
 
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
     Mockito.verify(dataCipherServiceMock).hash(fiscalCode);
     Mockito.verify(debtPositionRepositoryMock).findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
-      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgId, dateTimeIntervalFilter);
+      fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter);
     Mockito.verifyNoInteractions(debtPositionMapperMock);
   }
 }
