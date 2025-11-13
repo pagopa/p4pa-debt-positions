@@ -22,6 +22,7 @@ public class ReceiptDetailNoPIIView implements Serializable {
   @Id
   private Long receiptId;
   private String iuv;
+  private String nav;
   @NotNull
   private Long paymentAmountCents;
   @NotNull

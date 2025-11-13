@@ -52,6 +52,7 @@ class TechnicalMixedDebtPositionMapperTest {
     PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
     InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
     Transfer transfer = installment.getTransfers().getFirst();
+    installment.setRemittanceInformation(transfer.getRemittanceInformation());
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
@@ -84,6 +85,7 @@ class TechnicalMixedDebtPositionMapperTest {
     PaymentOption paymentOption = debtPosition.getPaymentOptions().getFirst();
     InstallmentNoPII installment = paymentOption.getInstallments().getFirst();
     Transfer transfer = installment.getTransfers().getFirst();
+    installment.setRemittanceInformation(transfer.getRemittanceInformation());
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()

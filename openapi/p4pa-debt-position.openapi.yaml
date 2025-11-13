@@ -748,6 +748,11 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: iud
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
@@ -2040,6 +2045,8 @@ components:
           type: integer
           format: int64
         iuv:
+          type: string
+        nav:
           type: string
         paymentAmountCents:
           type: integer

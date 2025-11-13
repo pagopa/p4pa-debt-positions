@@ -123,7 +123,7 @@ public class TechnicalMixedDebtPositionMapper {
         technicalMixedDpInstallment.setAmountCents(
           transfer.getAmountCents());
         technicalMixedDpInstallment.setRemittanceInformation(
-          installment.getRemittanceInformation());
+          transfer.getRemittanceInformation());
         technicalMixedDpInstallment.setBalance(
           mixedDpAdditionalData.getBalance());
         technicalMixedDpInstallment.setLegacyPaymentMetadata(

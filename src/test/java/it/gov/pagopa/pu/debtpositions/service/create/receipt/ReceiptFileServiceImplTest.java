@@ -91,7 +91,7 @@ class ReceiptFileServiceImplTest {
         && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
     ))).thenReturn(expectedContent);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
       .thenReturn(receiptDetailDTO);
 
     Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -113,7 +113,7 @@ class ReceiptFileServiceImplTest {
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
       .thenReturn(receiptDetailDTO);
 
     Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -151,7 +151,7 @@ class ReceiptFileServiceImplTest {
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId))
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
       .thenReturn(receiptDetailDTO);
 
     Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))

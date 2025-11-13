@@ -41,8 +41,8 @@ public class ReceiptControllerImpl implements ReceiptApi {
   }
 
   @Override
-  public ResponseEntity<ReceiptDetailDTO> getReceiptDetail(Long receiptId, Long organizationId, String operatorExternalUserId) {
-    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId));
+  public ResponseEntity<ReceiptDetailDTO> getReceiptDetail(Long receiptId, Long organizationId, String operatorExternalUserId, String iud) {
+    return ResponseEntity.ok(receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud));
   }
 
   @Override

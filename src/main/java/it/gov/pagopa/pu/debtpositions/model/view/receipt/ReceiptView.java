@@ -34,5 +34,7 @@ public class ReceiptView implements Serializable {
   private String debtPositionTypeOrgDescription;
   @NotNull
   private byte[] debtorFiscalCodeHash;
+  @NotNull
+  private String iud;
 
 }
