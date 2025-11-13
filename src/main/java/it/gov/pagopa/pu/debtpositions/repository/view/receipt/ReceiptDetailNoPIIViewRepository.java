@@ -66,7 +66,7 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
       ReceiptDetailNoPIIView first = receipts.getFirst();
       first.setRemittanceInformation(MixedDebtPositionMapper.MULTIPLE_REMITTANCE_INFO);
       List<String> dpTypes = receipts.stream().map(ReceiptDetailNoPIIView::getDebtPositionTypeOrgDescription).distinct().toList();
-      first.setDebtPositionTypeOrgDescription(dpTypes.size() == 1 ? dpTypes.getFirst(): "Tipologie Multiple");
+      first.setDebtPositionTypeOrgDescription(dpTypes.size() == 1 ? dpTypes.getFirst(): "Tipologie multiple");
       return Optional.of(first);
     }
   }

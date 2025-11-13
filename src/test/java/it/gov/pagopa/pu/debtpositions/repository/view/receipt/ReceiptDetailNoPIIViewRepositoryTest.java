@@ -90,7 +90,7 @@ class ReceiptDetailNoPIIViewRepositoryTest {
       MixedDebtPositionMapper.MULTIPLE_REMITTANCE_INFO,
       first.getRemittanceInformation()
     );
-    Assertions.assertEquals("Tipologie Multiple", first.getDebtPositionTypeOrgDescription());
+    Assertions.assertEquals("Tipologie multiple", first.getDebtPositionTypeOrgDescription());
   }
 }
 

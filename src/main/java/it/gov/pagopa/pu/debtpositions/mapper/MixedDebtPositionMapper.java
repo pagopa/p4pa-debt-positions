@@ -21,7 +21,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class MixedDebtPositionMapper {
 
-  public static final String MULTIPLE_REMITTANCE_INFO = "causali multiple";
+  public static final String MULTIPLE_REMITTANCE_INFO = "Causali multiple";
 
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
