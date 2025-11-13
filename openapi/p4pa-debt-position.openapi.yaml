@@ -298,7 +298,7 @@ paths:
             type: array
             items:
               type: string
-        - name: organizationId
+        - name: organizationIds
           in: query
           required: true
           schema:
