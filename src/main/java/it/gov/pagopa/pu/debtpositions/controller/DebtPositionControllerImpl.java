@@ -276,14 +276,14 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
     String fiscalCode,
     PersonEntityType entityType,
+    List<Long> organizationIds,
     List<InstallmentStatus> status,
     List<DebtPositionOrigin> debtPositionOrigin,
     List<String> debtPositionTypeOrgCodesToExclude,
-    Long organizationId,
     OffsetDateTime dateFrom,
     OffsetDateTime dateTo
   ) {
-    log.info("Retrieving DebtPosition by debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationId={} dateFrom={} dateTo={}", entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationId, dateFrom, dateTo);
+    log.info("Retrieving DebtPosition by debtorEntityType={} debtPositionOrigins={} debtPositionTypeOrgCodesToExclude={} organizationIds={} dateFrom={} dateTo={}", entityType, debtPositionOrigin, debtPositionTypeOrgCodesToExclude, organizationIds, dateFrom, dateTo);
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(
       Utilities.offsetDateTimeToLocalDateTime(dateFrom),
       Utilities.offsetDateTimeToLocalDateTime(dateTo));
@@ -294,7 +294,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       status,
       debtPositionOrigin,
       debtPositionTypeOrgCodesToExclude,
-      organizationId,
+      organizationIds,
       dateTimeIntervalFilter
     ));
   }
