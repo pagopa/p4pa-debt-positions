@@ -34,10 +34,18 @@ public class InstallmentUtils {
     PaymentOptionStatus.PARTIALLY_PAID,
     PaymentOptionStatus.UNPAYABLE);
 
+  public static final Set<PaymentOptionStatus> PAYABLE_PO_STATUSES = Set.of(
+    PaymentOptionStatus.UNPAID,
+    PaymentOptionStatus.PARTIALLY_PAID);
+
   public static final Set<DebtPositionStatus> MODIFIABLE_DP_STATUSES = Set.of(
     DebtPositionStatus.DRAFT,
     DebtPositionStatus.UNPAID,
     DebtPositionStatus.EXPIRED,
+    DebtPositionStatus.PARTIALLY_PAID);
+
+  public static final Set<DebtPositionStatus> OPEN_DP_STATUSES = Set.of(
+    DebtPositionStatus.UNPAID,
     DebtPositionStatus.PARTIALLY_PAID);
 
   public static final Set<DebtPositionStatus> DELETABLE_DP_STATUSES = Set.of(
@@ -59,6 +67,7 @@ public class InstallmentUtils {
   public static final Set<InstallmentStatus> PAID_STATUSES = Set.of(
     InstallmentStatus.PAID,
     InstallmentStatus.REPORTED);
+
 
   private static final Set<InstallmentStatus> INVALIDABLE_STATUSES = Stream.concat(
     PAYABLE_STATUSES.stream(),
