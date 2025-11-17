@@ -118,7 +118,6 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
           JOIN p.installments i
          WHERE p.debtPositionId = d.debtPositionId
            AND i.iuv = :iuv
-           AND (:dueDate IS NULL OR i.dueDate <= :dueDate)
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
@@ -135,7 +134,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
           FROM PaymentOption p
           JOIN p.installments i
          WHERE p.debtPositionId = d.debtPositionId
-           AND i.iuv = IN :iuv
+           AND i.iuv = IN :iuvs
            AND i.dueDate < current_date
       )
   """)
