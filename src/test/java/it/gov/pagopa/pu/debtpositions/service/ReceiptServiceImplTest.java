@@ -21,6 +21,8 @@ import uk.co.jemos.podam.api.PodamFactory;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 
+import static it.gov.pagopa.pu.debtpositions.util.SecurityUtils.SYSTEM_USERID_PREFIX;
+
 @ExtendWith(MockitoExtension.class)
 class ReceiptServiceImplTest {
 
@@ -95,6 +97,25 @@ class ReceiptServiceImplTest {
 
     //when
     ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, null, organizationId, iud);
+
+    //verify
+    Assertions.assertNotNull(response);
+    Assertions.assertEquals(receipt, response);
+  }
+
+  @Test
+  void givenSystemUserPrefixWhenGetReceiptDetailThenOk() {
+    //given
+    Long organizationId = 1L;
+    Long receiptId = 1L;
+    String iud = "iud";
+    String operatorExternalUserId = SYSTEM_USERID_PREFIX+"test";
+    ReceiptDetailDTO receipt = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+
+    Mockito.when(receiptDetailPIIViewRepositoryMock.getReceiptDetail(receiptId, organizationId, iud)).thenReturn(receipt);
+
+    //when
+    ReceiptDetailDTO response = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
 
     //verify
     Assertions.assertNotNull(response);
