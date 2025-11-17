@@ -134,7 +134,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
           FROM PaymentOption p
           JOIN p.installments i
          WHERE p.debtPositionId = d.debtPositionId
-           AND i.iuv = IN :iuvs
+           AND i.iuv IN :iuvs
            AND i.dueDate < current_date
       )
   """)
