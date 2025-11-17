@@ -118,10 +118,29 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
           JOIN p.installments i
          WHERE p.debtPositionId = d.debtPositionId
            AND i.iuv = :iuv
+           AND (:dueDate IS NULL OR i.dueDate <= :dueDate)
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findEntityGraphByOrganizationIdAndInstallmentIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigins);
+
+  @RestResource(exported = false)
+  @Query("""
+   SELECT d
+     FROM DebtPosition d
+    WHERE d.organizationId = :organizationId
+      AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
+      AND EXISTS (
+        SELECT 1
+          FROM PaymentOption p
+          JOIN p.installments i
+         WHERE p.debtPositionId = d.debtPositionId
+           AND i.iuv = IN :iuv
+           AND i.dueDate < current_date
+      )
+  """)
+  @EntityGraph(value = "completeDebtPosition")
+  List<DebtPosition> findEntityGraphByOrganizationIdAndExpiredIuvs(Long organizationId, List<String> iuvs, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""
