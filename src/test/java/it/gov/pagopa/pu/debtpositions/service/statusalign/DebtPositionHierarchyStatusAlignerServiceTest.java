@@ -83,7 +83,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       paymentOptionInnerStatusAlignerServiceMock,
       debtPositionInnerStatusAlignerServiceMock,
       debtPositionMapperMock,
-      syncServiceMock
+      syncServiceMock,
+      debtPositionTypeOrgRepositoryMock
     );
   }
 
@@ -351,6 +352,87 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertSame(workflow, result.getRight());
 
     verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED, null);
+  }
+
+  @Test
+  void givenCheckAndUpdateInstallmentExpirationWhenDueDateIsBeforeNowAndMixedTypeThenProcessMixedDebtPositions() {
+    Long debtPositionId = 1L;
+    String accessToken = "ACCESSTOKEN";
+    LocalDate dueDate = LocalDate.of(2025, 1, 1);
+
+    // Setup ORDINARY debt position with MIXED type
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
+    InstallmentNoPII expiredInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    expiredInstallment.setStatus(InstallmentStatus.UNPAID);
+    expiredInstallment.setDueDate(dueDate);
+    expiredInstallment.setSwitchToExpired(true);
+    expiredInstallment.setIuv("IUV-123");
+
+    // Setup mixed debt positions
+    DebtPosition mixedDebtPosition1 = buildDebtPosition();
+    mixedDebtPosition1.setDebtPositionId(2L);
+    mixedDebtPosition1.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED);
+    InstallmentNoPII mixedInstallment1 = mixedDebtPosition1.getPaymentOptions().getFirst().getInstallments().getFirst();
+    mixedInstallment1.setInstallmentId(200L);
+    mixedInstallment1.setStatus(InstallmentStatus.UNPAID);
+    mixedInstallment1.setDueDate(dueDate);
+    mixedInstallment1.setSwitchToExpired(true);
+    mixedInstallment1.setIud("IUD-MIXED-1");
+    mixedInstallment1.setIuv("IUV-123");
+
+    DebtPosition mixedDebtPosition2 = buildDebtPosition();
+    mixedDebtPosition2.setDebtPositionId(3L);
+    mixedDebtPosition2.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED);
+    InstallmentNoPII mixedInstallment2 = mixedDebtPosition2.getPaymentOptions().getFirst().getInstallments().getFirst();
+    mixedInstallment2.setInstallmentId(201L);
+    mixedInstallment2.setStatus(InstallmentStatus.UNPAID);
+    mixedInstallment2.setDueDate(dueDate);
+    mixedInstallment2.setSwitchToExpired(true);
+    mixedInstallment2.setIud("IUD-MIXED-2");
+    mixedInstallment2.setIuv("IUV-123");
+
+    List<DebtPosition> mixedDebtPositions = List.of(mixedDebtPosition1, mixedDebtPosition2);
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("WFID", "RUNID");
+
+    DebtPositionTypeOrg debtPositionTypeOrg = DebtPositionTypeOrg.builder()
+      .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
+      .code("MIXED")
+      .build();
+
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndExpiredIuvs(
+      debtPosition.getOrganizationId(),
+      List.of("IUV-123"),
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
+    )).thenReturn(mixedDebtPositions);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED, null);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(200L, InstallmentStatus.EXPIRED, null);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatus(201L, InstallmentStatus.EXPIRED, null);
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.eq(PaymentEventType.DPI_EXPIRED), Mockito.eq("IUD:"+expiredInstallment.getIud()), Mockito.same(accessToken)))
+      .thenReturn(workflow);
+
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = service.checkAndUpdateInstallmentExpiration(debtPositionId, accessToken);
+
+    assertEquals(InstallmentStatus.EXPIRED, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertSame(workflow, result.getRight());
+
+    verify(installmentNoPIIRepositoryMock).updateStatus(expiredInstallment.getInstallmentId(), InstallmentStatus.EXPIRED, null);
+    verify(installmentNoPIIRepositoryMock).updateStatus(200L, InstallmentStatus.EXPIRED, null);
+    verify(installmentNoPIIRepositoryMock).updateStatus(201L, InstallmentStatus.EXPIRED, null);
+    verify(debtPositionRepositoryMock).findEntityGraphByOrganizationIdAndExpiredIuvs(
+      debtPosition.getOrganizationId(),
+      List.of("IUV-123"),
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
+    );
   }
 
   @Test

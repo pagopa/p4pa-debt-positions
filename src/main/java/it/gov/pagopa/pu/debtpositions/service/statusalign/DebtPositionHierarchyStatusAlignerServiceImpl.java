@@ -186,24 +186,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     WorkflowCreatedDTO workflowCreated = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
       paymentEventType, paymentEventType != null ? "IUD:" + expiredIuds : null, accessToken);
 
-    if (
-      DebtPositionOrigin.ORDINARY.equals(debtPosition.getDebtPositionOrigin())
-      && Constants.MIXED_DP_TYPE_ORG_CODE.equals(debtPositionTypeOrg.getCode())
-      && !expiredIuvs.isEmpty()
-    ) {
-      List<DebtPosition> mixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndExpiredIuvs(
-        debtPosition.getOrganizationId(),
-        expiredIuvs.stream().toList(),
-        List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
-      );
-
-      String expiredMixedIuds = mixedDebtPositions.stream()
-        .map(dp -> updateExpiredInstallmentsStatus(dp, null).toList())
-        .flatMap(List::stream)
-        .collect(Collectors.joining(","));
-
-      log.info("expired mixed iuds for debtPosition={}: {}", debtPosition.getDebtPositionId(),  expiredMixedIuds);
-    }
+    handleMixedTechDPExpiration(debtPosition, debtPositionTypeOrg, expiredIuvs);
 
     return Pair.of(debtPositionDTO, workflowCreated);
   }
@@ -220,6 +203,34 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   protected DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
     alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  private void handleMixedTechDPExpiration(DebtPosition debtPosition, DebtPositionTypeOrg debtPositionTypeOrg, Set<String> iuvs) {
+    if (
+      !DebtPositionOrigin.ORDINARY.equals(debtPosition.getDebtPositionOrigin())
+      || !Constants.MIXED_DP_TYPE_ORG_CODE.equals(debtPositionTypeOrg.getCode())
+      || iuvs.isEmpty()
+    ) {
+      return;
+    }
+
+
+    List<DebtPosition> mixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndExpiredIuvs(
+      debtPosition.getOrganizationId(),
+      iuvs.stream().toList(),
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
+    );
+
+    String expiredMixedIuds = mixedDebtPositions.stream()
+      .map(dp -> {
+        List<String> iuds = updateExpiredInstallmentsStatus(dp, null).toList();
+        alignHierarchyStatus(debtPosition);
+        return iuds;
+      })
+      .flatMap(List::stream)
+      .collect(Collectors.joining(","));
+
+    log.info("expired mixed iuds for debtPosition={}: {}", debtPosition.getDebtPositionId(),  expiredMixedIuds);
   }
 
   private Stream<String> updateExpiredInstallmentsStatus(DebtPosition debtPosition, Consumer<InstallmentNoPII> action) {
