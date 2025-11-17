@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.debtposition;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.model.view.debtposition.DebtPositionExtendedView;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,7 +45,7 @@ public interface DebtPositionExtendedViewRepository extends Repository<DebtPosit
   """)
   Page<DebtPositionExtendedView> findPagedPrimaryDebtPositionExtendViewByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
-    @Param("organizationIds") List<Long> organizationIds,
+    @Parameter(name = "organizationIds", required = true, array = @ArraySchema(schema = @Schema(type = "integer", format = "int64")))@Param("organizationIds") List<Long> organizationIds,
     Pageable pageable
   );
 }
