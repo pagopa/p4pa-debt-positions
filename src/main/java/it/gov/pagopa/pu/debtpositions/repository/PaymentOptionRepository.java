@@ -30,6 +30,6 @@ public interface PaymentOptionRepository extends JpaRepository<PaymentOption,Lon
      po.debtPositionId = :debtPositionId
      AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_PO_STATUSES})
   """)
-  List<PaymentOption> findPaymentOptionsByDebtPositionId(@Parameter(required = true) @Param("debtPositionId")Long debtPositionId);
+  List<PaymentOption> findPayablePaymentOptionsByDebtPositionId(@Parameter(required = true) @Param("debtPositionId")Long debtPositionId);
 
 }
