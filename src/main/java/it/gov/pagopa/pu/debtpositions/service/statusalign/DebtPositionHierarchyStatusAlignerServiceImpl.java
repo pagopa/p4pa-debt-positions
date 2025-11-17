@@ -176,9 +176,8 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       .orElseThrow(() -> new NotFoundException(String.format("DebtPositionTypeOrg with id %d was not found", debtPosition.getDebtPositionTypeOrgId())));
 
     Set<String> expiredIuvs = new HashSet<>();
-    String expiredIuds = updateExpiredInstallmentsStatus(debtPosition, i -> {
-      expiredIuvs.add(i.getIuv());
-    }).collect(Collectors.joining(","));
+    String expiredIuds = updateExpiredInstallmentsStatus(debtPosition, i -> expiredIuvs.add(i.getIuv()))
+      .collect(Collectors.joining(","));
 
     DebtPositionDTO debtPositionDTO = alignHierarchyStatusAndRemap(debtPosition);
 
