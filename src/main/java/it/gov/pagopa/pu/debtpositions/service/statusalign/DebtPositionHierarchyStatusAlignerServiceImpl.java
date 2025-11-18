@@ -206,8 +206,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   private void handleMixedTechDPExpiration(DebtPosition debtPosition, DebtPositionTypeOrg debtPositionTypeOrg, Set<String> iuvs) {
     if (
-      !DebtPositionOrigin.ORDINARY.equals(debtPosition.getDebtPositionOrigin())
-      || !Constants.MIXED_DP_TYPE_ORG_CODE.equals(debtPositionTypeOrg.getCode())
+      !Constants.MIXED_DP_TYPE_ORG_CODE.equals(debtPositionTypeOrg.getCode())
       || iuvs.isEmpty()
     ) {
       return;
