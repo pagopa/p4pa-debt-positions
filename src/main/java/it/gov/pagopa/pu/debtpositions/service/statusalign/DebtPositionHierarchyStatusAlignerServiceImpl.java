@@ -7,12 +7,15 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionEx
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
@@ -22,7 +25,10 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,17 +44,19 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   private final DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService;
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionSyncService debtPositionSyncService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
 
 
 
   public DebtPositionHierarchyStatusAlignerServiceImpl(DebtPositionRepository debtPositionRepository,
-                                                       InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService) {
+                                                       InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
     this.debtPositionRepository = debtPositionRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.paymentOptionInnerStatusAlignerService = paymentOptionInnerStatusAlignerService;
     this.debtPositionInnerStatusAlignerService = debtPositionInnerStatusAlignerService;
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionSyncService = debtPositionSyncService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
   }
 
   @Transactional
@@ -164,24 +172,20 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       throw new NotFoundException(String.format("Debt position related to the id %s was not found", debtPositionId));
     }
 
-    String expiredIuds = debtPosition.getPaymentOptions().stream()
-      .flatMap(paymentOption -> paymentOption.getInstallments().stream())
-      .filter(i -> i.getStatus().equals(InstallmentStatus.UNPAID) &&
-        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()) && i.isSwitchToExpired())
-      .map(i -> {
-          InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
-          i.setStatus(InstallmentStatus.EXPIRED);
-          log.info("Updating status {} for installment with id {} related to debt position {} after checking the due date", newStatus, i.getInstallmentId(), debtPositionId);
-          installmentNoPIIRepository.updateStatus(i.getInstallmentId(), newStatus, null);
-          return i.getIud();
-        }
-      ).collect(Collectors.joining(","));
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId())
+      .orElseThrow(() -> new NotFoundException(String.format("DebtPositionTypeOrg with id %d was not found", debtPosition.getDebtPositionTypeOrgId())));
+
+    Set<String> expiredIuvs = new HashSet<>();
+    String expiredIuds = updateExpiredInstallmentsStatus(debtPosition, i -> expiredIuvs.add(i.getIuv()))
+      .collect(Collectors.joining(","));
 
     DebtPositionDTO debtPositionDTO = alignHierarchyStatusAndRemap(debtPosition);
 
     PaymentEventType paymentEventType = StringUtils.isNotEmpty(expiredIuds) ? PaymentEventType.DPI_EXPIRED : null;
     WorkflowCreatedDTO workflowCreated = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
       paymentEventType, paymentEventType != null ? "IUD:" + expiredIuds : null, accessToken);
+
+    handleMixedTechDPExpiration(debtPosition, debtPositionTypeOrg, expiredIuvs);
 
     return Pair.of(debtPositionDTO, workflowCreated);
   }
@@ -198,5 +202,50 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   protected DebtPositionDTO alignHierarchyStatusAndRemap(DebtPosition debtPosition) {
     alignHierarchyStatus(debtPosition);
     return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  private void handleMixedTechDPExpiration(DebtPosition debtPosition, DebtPositionTypeOrg debtPositionTypeOrg, Set<String> iuvs) {
+    if (
+      !Constants.MIXED_DP_TYPE_ORG_CODE.equals(debtPositionTypeOrg.getCode())
+      || iuvs.isEmpty()
+    ) {
+      return;
+    }
+
+
+    List<DebtPosition> mixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndExpiredIuvs(
+      debtPosition.getOrganizationId(),
+      iuvs.stream().toList(),
+      List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
+    );
+
+    String expiredMixedIuds = mixedDebtPositions.stream()
+      .map(dp -> {
+        List<String> iuds = updateExpiredInstallmentsStatus(dp, null).toList();
+        alignHierarchyStatus(debtPosition);
+        return iuds;
+      })
+      .flatMap(List::stream)
+      .collect(Collectors.joining(","));
+
+    log.info("expired mixed iuds for debtPosition={}: {}", debtPosition.getDebtPositionId(),  expiredMixedIuds);
+  }
+
+  private Stream<String> updateExpiredInstallmentsStatus(DebtPosition debtPosition, Consumer<InstallmentNoPII> action) {
+    return debtPosition.getPaymentOptions().stream()
+      .flatMap(paymentOption -> paymentOption.getInstallments().stream())
+      .filter(i -> i.getStatus().equals(InstallmentStatus.UNPAID) &&
+        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()) && i.isSwitchToExpired())
+      .map(i -> {
+          InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
+          i.setStatus(InstallmentStatus.EXPIRED);
+          log.info("Updating status {} for installment with id {} related to debt position {} after checking the due date", newStatus, i.getInstallmentId(), debtPosition.getDebtPositionId());
+          installmentNoPIIRepository.updateStatus(i.getInstallmentId(), newStatus, null);
+          if (action != null) {
+            action.accept(i);
+          }
+          return i.getIud();
+        }
+      );
   }
 }
