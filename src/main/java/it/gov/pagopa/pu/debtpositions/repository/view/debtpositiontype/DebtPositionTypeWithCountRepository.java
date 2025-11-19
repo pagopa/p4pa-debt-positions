@@ -13,11 +13,16 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(path = "debt-position-types-with-count")
 public interface DebtPositionTypeWithCountRepository extends Repository<DebtPositionTypeWithCount, Long> {
 
-  @Query(value = "SELECT d "
-    + "FROM DebtPositionTypeWithCount d "
-    + "WHERE d.brokerId = :brokerId "
-    + "AND (:description is null OR d.description ILIKE CONCAT('%', cast(:description as text), '%'))")
-  Page<DebtPositionTypeWithCount> findByBrokerId(@Param("brokerId") @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) Long brokerId,
+  @Query("""
+    SELECT d
+    FROM DebtPositionTypeWithCount d
+    WHERE d.brokerId = :brokerId
+    AND (:code IS NULL OR d.code ILIKE CONCAT('%', CAST(:code AS text), '%'))
+    AND (:description IS NULL OR d.description ILIKE CONCAT('%', cast(:description as text), '%'))
+    """)
+  Page<DebtPositionTypeWithCount> findByBrokerId(
+    @Param("brokerId") @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) Long brokerId,
+    String code,
     String description,
     Pageable pageable);
 
