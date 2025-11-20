@@ -12,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
+import static it.gov.pagopa.pu.debtpositions.util.SecurityUtils.SYSTEM_USERID_PREFIX;
+
 @Service
 public class ReceiptServiceImpl implements ReceiptService {
 
@@ -31,11 +33,11 @@ public class ReceiptServiceImpl implements ReceiptService {
   }
 
   @Override
-  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId) {
-    if(StringUtils.isNotBlank(operatorExternalUserId)){
-      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId);
+  public ReceiptDetailDTO getReceiptDetail(Long receiptId, String operatorExternalUserId, Long organizationId, String iud) {
+    if(StringUtils.isNotBlank(operatorExternalUserId) && !operatorExternalUserId.startsWith(SYSTEM_USERID_PREFIX)){
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
     }else{
-      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId);
+      return receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId, iud);
     }
   }
 

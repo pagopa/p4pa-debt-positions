@@ -17,7 +17,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
 
   @SuppressWarnings("squid:S107") // Suppressing too many parameters warning: it's allowed in query methods
-  @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dpto.description as debtPositionTypeOrgDescription, r.debtorFiscalCodeHash as debtorFiscalCodeHash) "
+  @Query(value = "SELECT new ReceiptView(r.receiptId as receiptId, r.paymentAmountCents as paymentAmountCents,r.paymentDateTime as paymentDateTime, i.installmentId as installmentId, r.receiptOrigin as receiptOrigin,i.iuv as iuv, dpto.description as debtPositionTypeOrgDescription, r.debtorFiscalCodeHash as debtorFiscalCodeHash, i.iud as iud) "
     + "FROM ReceiptView r "
     + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
     + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
@@ -34,7 +34,7 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND (cast(:paymentDateTimeFrom as date) IS NULL OR r.paymentDateTime >= :paymentDateTimeFrom) "
     + "AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo) "
     + "AND ((:fiscalCode IS NULL) OR (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)})) "
-    + "AND dp.debtPositionOrigin <> it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin.SPONTANEOUS_MIXED ")
+    + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,

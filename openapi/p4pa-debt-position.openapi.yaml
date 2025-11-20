@@ -298,13 +298,15 @@ paths:
             type: array
             items:
               type: string
-        - name: organizationId
+        - name: organizationIds
           in: query
-          required: false
+          required: true
           schema:
-            type: integer
-            format: int64
-          description: The ID of the organization
+            type: array
+            items:
+              type: integer
+              format: int64
+          description: The IDs of the organizations
         - name: dateFrom
           in: query
           description: Start date (inclusive)
@@ -746,6 +748,11 @@ paths:
           schema:
             type: integer
             format: int64
+        - name: iud
+          in: query
+          required: false
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
@@ -2039,6 +2046,8 @@ components:
           format: int64
         iuv:
           type: string
+        nav:
+          type: string
         paymentAmountCents:
           type: integer
           format: int64
@@ -2247,6 +2256,8 @@ components:
             - DEBT_POSITION_GENERIC_ERROR
             - DEBT_POSITION_NOT_FOUND
         message:
+          type: string
+        traceId:
           type: string
     DebtPositionTypeOrgDTO:
       required:

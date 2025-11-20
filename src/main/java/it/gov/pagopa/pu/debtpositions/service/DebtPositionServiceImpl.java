@@ -102,7 +102,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, Long organizationId, LocalDateTimeIntervalFilter dateTimeIntervalFilter) {
+  public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, List<Long> organizationIds, LocalDateTimeIntervalFilter dateTimeIntervalFilter) {
     if (debtorFiscalCode == null || debtorEntityType == null) {
       throw new IllegalArgumentException("debtorFiscalCode and debtorEntityType are required");
     }
@@ -115,7 +115,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       status,
       debtPositionOrigin,
       debtPositionTypeOrgCodesToExclude,
-      organizationId,
+      organizationIds,
       dateTimeIntervalFilter
     );
 

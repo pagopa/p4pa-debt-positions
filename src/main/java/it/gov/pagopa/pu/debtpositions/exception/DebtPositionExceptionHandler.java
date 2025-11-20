@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionErrorDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -135,7 +136,7 @@ public class DebtPositionExceptionHandler {
     return ResponseEntity
       .status(httpStatus)
       .contentType(MediaType.APPLICATION_JSON)
-      .body(new DebtPositionErrorDTO(errorEnum, message));
+      .body(new DebtPositionErrorDTO(errorEnum, message, Utilities.getTraceId()));
   }
 
   private static void logException(Exception ex, HttpServletRequest request, HttpStatusCode httpStatus) {

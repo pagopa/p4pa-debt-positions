@@ -44,6 +44,7 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
       AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
       AND ((:status IS NULL) OR (dp.status = :status ))
       AND ((:iuv IS NULL) OR (i.iuv = :iuv ))
+      AND ((:iud IS NULL) OR (i.iud = :iud ))
   """
   )
   Page<DebtPositionView> findDebtPositionViews(
@@ -56,6 +57,38 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
     Long debtPositionTypeOrgId,
     DebtPositionStatus status,
     String iuv,
+    String iud,
+    Pageable pageable
+  );
+
+  @Query("""
+   SELECT distinct new DebtPositionView(
+      dp.debtPositionId as debtPositionId,
+      dp.description as description,
+      dpto.description as debtPositionTypeOrgDescription,
+      dp.creationDate as creationDate,
+      dp.status as status,
+      dp.debtPositionOrigin as debtPositionOrigin,
+      dpto.debtPositionTypeOrgId as debtPositionTypeOrgId,
+      dp.organizationId as organizationId
+    )
+    FROM DebtPosition dp
+    JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    WHERE
+     dp.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).OPEN_DP_STATUSES})
+     AND dp.organizationId IN :organizationIds
+     AND EXISTS (
+             SELECT 1
+             FROM PaymentOption po
+             JOIN po.installments i
+             WHERE po.debtPositionId = dp.debtPositionId
+             AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+     )
+    AND dp.debtPositionOrigin != 'SPONTANEOUS_MIXED'
+  """)
+  Page<DebtPositionView> findPagedPrimaryDebtPositionViewByFilters(
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Parameter(name = "organizationIds", required = true, array = @ArraySchema(schema = @Schema(type = "integer", format = "int64")))@Param("organizationIds") List<Long> organizationIds,
     Pageable pageable
   );
 }

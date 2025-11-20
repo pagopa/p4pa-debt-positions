@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
+import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.TechnicalMixedDebtPositionBuilderService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -39,6 +40,8 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
   @Mock
   private TechnicalMixedDebtPositionBuilderService mixedDPBuilderServiceMock;
   @Mock
+  private DebtPositionService dpServiceMock;
+  @Mock
   private DebtPositionDeleteService dpDeleteServiceMock;
 
   private static final String ACCESS_TOKEN = "TOKEN";
@@ -51,13 +54,14 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
       dpTypeOrgRepositoryMock,
       dpRepositoryMock,
       mixedDPBuilderServiceMock,
+      dpServiceMock,
       dpDeleteServiceMock
     );
   }
 
   @AfterEach
   void afterEach() {
-    verifyNoMoreInteractions(dpTypeOrgRepositoryMock, dpRepositoryMock, mixedDPBuilderServiceMock, dpDeleteServiceMock);
+    verifyNoMoreInteractions(dpTypeOrgRepositoryMock, dpRepositoryMock, mixedDPBuilderServiceMock, dpServiceMock, dpDeleteServiceMock);
   }
 
   @Test
@@ -171,6 +175,7 @@ ArgumentCaptor.forClass(DebtPosition.class);
     verify(dpRepositoryMock).findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(), installment.getIuv(), List.of(DebtPositionOrigin.SPONTANEOUS_MIXED));
     verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(ACCESS_TOKEN));
+    result.forEach(dp -> verify(dpServiceMock).saveDebtPosition(same(dp)));
     verify(dpDeleteServiceMock).delete(dpCaptor.capture());
     assertEquals(newMixedDebtPosition.getDebtPositionId(), result.getFirst().getDebtPositionId());
     assertEquals(oldMixedDebtPosition.getDebtPositionId(), dpCaptor.getValue().getDebtPositionId());
