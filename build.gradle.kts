@@ -192,7 +192,8 @@ openApiGenerate {
     "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg",
     "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
     "ReceiptNoPII" to "it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII",
-    "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm"
+    "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm",
+    "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",
