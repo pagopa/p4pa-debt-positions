@@ -48,6 +48,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     DebtorDebtPositionDTO dto = result.getContent().get(0);
     assertEquals(dp.getDebtPositionId(), dto.getDebtPositionId());
     assertEquals("TYPE_DESCRIPTION", dto.getDebtPositionTypeOrgDescription());
+    TestUtils.checkNotNullFields(result);
   }
 
   @Test
@@ -93,6 +94,10 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     assertEquals(2, result.size());
     assertEquals("DESC1", result.get(0).getDebtPositionTypeOrgDescription());
     assertEquals("DESC2", result.get(1).getDebtPositionTypeOrgDescription());
+    result.forEach(
+      TestUtils::checkNotNullFields
+    );
+
   }
 
   @Test
@@ -109,7 +114,11 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     // then
     assertNotNull(result);
     assertEquals(1, result.getContent().size());
-    assertNull(result.getContent().get(0).getDebtPositionTypeOrgDescription());
+    assertNull(result.getContent().getFirst().getDebtPositionTypeOrgDescription());
+
+    result.getContent().forEach(
+     dpr -> TestUtils.checkNotNullFields(dpr,"debtPositionTypeOrgDescription")
+    );
   }
 }
 
