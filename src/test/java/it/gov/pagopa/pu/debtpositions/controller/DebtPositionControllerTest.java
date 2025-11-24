@@ -1,37 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncCompleteDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncErrorDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
@@ -45,15 +19,6 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallme
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -67,6 +32,26 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DebtPositionControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -611,6 +596,30 @@ class DebtPositionControllerTest {
 
     List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>() {
     });
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void givenOrgIdsWhenGetPagedDebtorUnpaidDebtPositionsThenOk() throws Exception {
+    List<Long> organizationIds = List.of(1L);
+    String debtorFiscalCode = "debtorFiscalCode";
+    PagedDebtorUnpaidDebtPositionDTO expectedResult = new PagedDebtorUnpaidDebtPositionDTO();
+
+    Mockito.when(debtPositionService.getPagedDebtorUnpaidDebtPosition(debtorFiscalCode, organizationIds, Pageable.ofSize(1))).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+      get("/debt-positions/unpaid/debtor")
+        .header("X-fiscal-code", debtorFiscalCode)
+        .queryParam("organizationIds", organizationIds.stream().map(String::valueOf).toArray(String[]::new))
+        .param("size", "1")
+        .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    PagedDebtorUnpaidDebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(),
+      PagedDebtorUnpaidDebtPositionDTO.class);
+
+    assertNotNull(resultResponse);
     assertEquals(expectedResult, resultResponse);
   }
 
