@@ -3,18 +3,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ManageDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.MixedDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
-import it.gov.pagopa.pu.debtpositions.dto.generated.SyncStatusUpdateRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
@@ -297,5 +286,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
       organizationIds,
       dateTimeIntervalFilter
     ));
+  }
+
+  @Override
+  public ResponseEntity<PagedDebtorUnpaidDebtPositionDTO> getPagedDebtorUnpaidDebtPositions(String xFiscalCode, List<Long> organizationIds, Pageable pageable) {
+    log.info("User requested getPagedDebtorUnpaidDebtPositions with organizationIds %s".formatted(organizationIds));
+    return ResponseEntity.ok(debtPositionService.getPagedDebtorUnpaidDebtPosition(xFiscalCode, organizationIds, pageable));
   }
 }

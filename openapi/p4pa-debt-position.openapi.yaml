@@ -1533,6 +1533,39 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /debt-positions/unpaid/debtor:
+    get:
+      tags:
+        - debt-position
+      operationId: getPagedDebtorUnpaidDebtPositions
+      parameters:
+        - name: X-fiscal-code
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: organizationIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedDebtorUnpaidDebtPositionDTO"
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Access denied
+        '500':
+          description: Internal Server Error
+      x-spring-paginated: true
   /spontaneous-forms:
     post:
       tags:
@@ -2032,6 +2065,31 @@ components:
           x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
           x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
           type: 'ReceiptNoPII'
+    PagedDebtorUnpaidDebtPositionDTO:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            type: "DebtorDebtPositionDTO"
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
     InstallmentDetailDTO:
       type: object
       required:
