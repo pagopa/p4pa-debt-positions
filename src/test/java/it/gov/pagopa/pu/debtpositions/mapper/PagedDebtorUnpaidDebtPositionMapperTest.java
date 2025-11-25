@@ -49,6 +49,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     assertEquals(dp.getDebtPositionId(), dto.getDebtPositionId());
     assertEquals("TYPE_DESCRIPTION", dto.getDebtPositionTypeOrgDescription());
     TestUtils.checkNotNullFields(result);
+    result.getContent().forEach(TestUtils::checkNotNullFields);
   }
 
   @Test
