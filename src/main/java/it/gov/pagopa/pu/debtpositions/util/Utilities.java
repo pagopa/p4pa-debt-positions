@@ -24,7 +24,7 @@ public class Utilities {
 
   public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
-  public static final int IBAN_LENGTH = 27;
+  public static final Pattern IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]{23,30}$");
   public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^(9/[^/]+/).*$");
   private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
 
@@ -46,7 +46,7 @@ public class Utilities {
   }
 
   public static boolean isValidIban(String iban) {
-    return iban != null && iban.length() == IBAN_LENGTH;
+    return iban != null && IBAN_PATTERN.matcher(iban).matches();
   }
 
   public static boolean isValidPIVA(String pi, boolean isOrgPIvaCheckEnabled) {
