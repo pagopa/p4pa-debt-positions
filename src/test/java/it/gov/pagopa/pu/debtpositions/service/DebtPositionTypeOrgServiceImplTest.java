@@ -338,6 +338,22 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
+  void givenInvalidIbanWhenSaveDebtPositionTypeOrgThenValidationException() {
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setIban("invalidIban");
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    ValidationException ex = Assertions.assertThrows(ValidationException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
+
+    Assertions.assertEquals(
+      "Provided iban is not valid",
+      ex.getMessage()
+    );
+  }
+
+  @Test
   void givenSpontaneousFormIdButFormNotFoundWhenSaveDebtPositionTypeOrgThenValidationException() {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
