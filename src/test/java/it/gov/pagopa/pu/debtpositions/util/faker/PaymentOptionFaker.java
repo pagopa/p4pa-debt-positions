@@ -46,7 +46,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
-    paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
     paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setCreationDate(DATETIME);
     paymentOptionDTO.setUpdateDate(DATETIME);
@@ -63,7 +63,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setTotalAmountCents(2000L);
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
     paymentOptionDTO.setDescription("Payment description");
-    paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
     paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildGeneratedIuvInstallmentDTO())));
     return paymentOptionDTO;
@@ -73,7 +73,7 @@ public class PaymentOptionFaker {
     PaymentOptionDTO paymentOptionDTO = new PaymentOptionDTO();
     paymentOptionDTO.setDescription("Payment description");
     paymentOptionDTO.setStatus(PaymentOptionStatus.UNPAID);
-    paymentOptionDTO.setPaymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT);
+    paymentOptionDTO.setPaymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT);
     paymentOptionDTO.setPaymentOptionIndex(1);
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildSyncInstallmentDTO())));
     return paymentOptionDTO;

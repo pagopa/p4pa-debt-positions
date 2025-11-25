@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 
 import java.io.Serializable;
+import java.time.LocalDate;
 
 public interface BaseInstallment extends Serializable {
   Long getInstallmentId();
@@ -16,4 +17,5 @@ public interface BaseInstallment extends Serializable {
   void setSyncStatus(InstallmentSyncStatus syncStatus);
 
   Long getAmountCents();
+  LocalDate getDueDate();
 }
