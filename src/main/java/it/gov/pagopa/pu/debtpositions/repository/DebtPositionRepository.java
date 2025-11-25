@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -221,5 +222,30 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtPositionTypeOrgCodesToExclude") List<String> debtPositionTypeOrgCodesToExclude,
     @Param("organizationIds") List<Long> organizationIds,
     @Param("dateTimeIntervalFilter") LocalDateTimeIntervalFilter dateTimeIntervalFilter
+  );
+
+  @RestResource(exported = false)
+  @Query("""
+    SELECT dp
+    FROM DebtPosition dp
+    WHERE
+     dp.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).OPEN_DP_STATUSES})
+     AND dp.organizationId IN :organizationIds
+     AND EXISTS (
+             SELECT 1
+             FROM PaymentOption po
+             JOIN po.installments i
+             WHERE po.debtPositionId = dp.debtPositionId
+             AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_PO_STATUSES})
+             AND i.status = 'UNPAID'
+             AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+     )
+    AND dp.debtPositionOrigin != 'SPONTANEOUS_MIXED'
+  """)
+  @EntityGraph(value = "completeDebtPosition")
+  Page<DebtPosition> findPagedPrimaryDebtPositionByFilters(
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Parameter(name = "organizationIds", required = true, array = @ArraySchema(schema = @Schema(type = "integer", format = "int64")))@Param("organizationIds") List<Long> organizationIds,
+    Pageable pageable
   );
 }

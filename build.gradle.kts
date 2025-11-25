@@ -100,7 +100,7 @@ dependencies {
 
   compileOnly("org.projectlombok:lombok")
 
-  //	Testing
+  //  Testing
   testImplementation("org.springframework.boot:spring-boot-starter-test")
   testImplementation("org.mockito:mockito-core")
   testImplementation("org.projectlombok:lombok")
@@ -109,8 +109,8 @@ dependencies {
 
   testAnnotationProcessor("org.projectlombok:lombok")
 
-  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
   annotationProcessor("org.projectlombok:lombok")
+  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 }
 
 tasks.withType<Test> {
@@ -193,7 +193,8 @@ openApiGenerate {
     "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
     "ReceiptNoPII" to "it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII",
     "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm",
-    "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition"
+    "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
+    "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO"
   ))
   configOptions.set(mapOf(
     "dateLibrary" to "java8",
