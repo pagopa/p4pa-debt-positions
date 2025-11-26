@@ -1,13 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
@@ -27,6 +19,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(TransferControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -100,11 +100,12 @@ class TransferControllerTest {
 
   @Test
   void whenValidateTaxonomyCategoryThenOk() throws Exception {
-    Mockito.doNothing().when(taxonomyValidatorService).validateTaxonomyCategory(anyString());
+    Mockito.doNothing().when(taxonomyValidatorService).validateTaxonomyCategory(anyString(), anyString());
 
     mockMvc.perform(
         get("/transfers/taxonomy-category/validate")
           .queryParam("taxonomyCategory", "CATEGORY")
+          .queryParam("orgFiscalCode", "orgFiscalCode")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk());
   }

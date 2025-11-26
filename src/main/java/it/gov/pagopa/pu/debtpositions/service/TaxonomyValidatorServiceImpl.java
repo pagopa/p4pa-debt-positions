@@ -1,9 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -14,15 +15,22 @@ import org.springframework.util.CollectionUtils;
 public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   private final TaxonomyService taxonomyService;
+  private final OrganizationService organizationService;
 
-  public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService) {
+  public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService, OrganizationService organizationService) {
     this.taxonomyService = taxonomyService;
+    this.organizationService = organizationService;
   }
 
-  public void validateTaxonomyCategory(String taxonomyCategory) {
-    if (!isTaxonomyCategoryValid(taxonomyCategory, null)) {
-      throw new InvalidValueException("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category is not valid");
+  public boolean validateTaxonomyCategory(String taxonomyCategory, String orgFiscalCode) {
+    String orgTypeCode = organizationService.getOrganizationByFiscalCode(orgFiscalCode, SecurityUtils.getAccessToken())
+      .map(Organization::getOrgTypeCode)
+      .orElse(null);
+    if (!isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
+      log.error("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category is not valid");
+      return false;
     }
+    return true;
   }
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {

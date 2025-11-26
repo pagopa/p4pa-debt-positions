@@ -1,16 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomyEmbedded;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,6 +16,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TaxonomyFaker.buildTaxonomy;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 @ExtendWith(MockitoExtension.class)
 class TaxonomyValidatorServiceImplTest {
 
@@ -28,6 +32,8 @@ class TaxonomyValidatorServiceImplTest {
   public static final String VALID_TAXONOMY_CODE = "9/001122233/";
   @Mock
   private TaxonomyService taxonomyServiceMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
   @InjectMocks
   private TaxonomyValidatorServiceImpl service;
 
@@ -45,7 +51,7 @@ class TaxonomyValidatorServiceImplTest {
 
   @AfterEach
   void verifyNoMoreInteractions(){
-    Mockito.verifyNoMoreInteractions(taxonomyServiceMock);
+    Mockito.verifyNoMoreInteractions(taxonomyServiceMock, organizationServiceMock);
   }
 
   @Test
@@ -54,6 +60,9 @@ class TaxonomyValidatorServiceImplTest {
     String macroAreaCode = "11";
     String serviceTypeCode = "222";
     String collectionReason = "33";
+    String orgFiscalCode = "orgFiscalCode";
+    Organization org = buildOrganization();
+    org.setOrgTypeCode("00");
 
     PagedModelTaxonomy pagedModelTaxonomy = PagedModelTaxonomy.builder()
       .embedded(PagedModelTaxonomyEmbedded.builder()
@@ -63,14 +72,22 @@ class TaxonomyValidatorServiceImplTest {
 
     Mockito.when(taxonomyServiceMock.getTaxonomies(organizationType, macroAreaCode, serviceTypeCode, collectionReason, 0, 5, null, accessToken))
       .thenReturn(pagedModelTaxonomy);
+    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(orgFiscalCode, accessToken))
+      .thenReturn(Optional.of(org));
 
-    assertDoesNotThrow(() -> service.validateTaxonomyCategory(VALID_CATEGORY));
-    assertDoesNotThrow(() -> service.validateTaxonomyCategory(VALID_TAXONOMY_CODE));
+    assertTrue(() -> service.validateTaxonomyCategory(VALID_CATEGORY, orgFiscalCode));
+    assertTrue(() -> service.validateTaxonomyCategory(VALID_TAXONOMY_CODE, orgFiscalCode));
   }
 
   @Test
   void givenInvalidCategoryWhenValidateTaxonomyCategoryThenThrowException() {
-    assertThrows(InvalidValueException.class, () -> service.validateTaxonomyCategory("0011222"));
+    String orgFiscalCode = "orgFiscalCode";
+    Organization org = buildOrganization();
+    org.setOrgTypeCode(null);
+    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(orgFiscalCode, accessToken))
+      .thenReturn(Optional.of(org));
+
+    assertFalse(() -> service.validateTaxonomyCategory("0011222", "orgFiscalCode"));
   }
 
   @Test

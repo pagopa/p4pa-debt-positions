@@ -1,8 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_RUN_ID;
-import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_WORKFLOW_ID;
-
 import it.gov.pagopa.pu.debtpositions.controller.generated.TransferApi;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
@@ -15,6 +12,9 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
+
+import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_RUN_ID;
+import static it.gov.pagopa.pu.debtpositions.controller.DebtPositionControllerImpl.HEADER_X_WORKFLOW_ID;
 
 @RestController
 @Slf4j
@@ -42,10 +42,9 @@ public class TransferControllerImpl implements TransferApi {
   }
 
   @Override
-  public ResponseEntity<Void> validateTaxonomyCategory(
-    String taxonomyCategory) {
-    log.info("User requested validation on taxonomyCategory [{}]", taxonomyCategory);
-    taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory);
+  public ResponseEntity<Boolean> validateTaxonomyCategory(String taxonomyCategory, String orgFiscalCode) {
+    log.info("User requested validation on taxonomyCategory [{}] and orgFiscalCode", taxonomyCategory);
+    taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory, orgFiscalCode);
     return ResponseEntity.ok().build();
   }
 }
