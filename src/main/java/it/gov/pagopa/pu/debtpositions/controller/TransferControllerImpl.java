@@ -44,7 +44,6 @@ public class TransferControllerImpl implements TransferApi {
   @Override
   public ResponseEntity<Boolean> validateTaxonomyCategory(String taxonomyCategory, String orgFiscalCode) {
     log.info("User requested validation on taxonomyCategory [{}] and orgFiscalCode", taxonomyCategory);
-    taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory, orgFiscalCode);
-    return ResponseEntity.ok().build();
+    return ResponseEntity.ok(taxonomyValidatorService.validateTaxonomyCategory(taxonomyCategory, orgFiscalCode));
   }
 }
