@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.MvcResult;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
@@ -100,13 +101,18 @@ class TransferControllerTest {
 
   @Test
   void whenValidateTaxonomyCategoryThenOk() throws Exception {
-    Mockito.doNothing().when(taxonomyValidatorService).validateTaxonomyCategory(anyString(), anyString());
+    Mockito.when(taxonomyValidatorService.validateTaxonomyCategory(anyString(), anyString()))
+      .thenReturn(true);
 
-    mockMvc.perform(
+    MvcResult result = mockMvc.perform(
         get("/transfers/taxonomy-category/validate")
           .queryParam("taxonomyCategory", "CATEGORY")
           .queryParam("orgFiscalCode", "orgFiscalCode")
           .contentType(MediaType.APPLICATION_JSON_VALUE))
-      .andExpect(status().isOk());
+      .andExpect(status().isOk())
+      .andReturn();
+
+    Boolean resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), Boolean.class);
+    assertTrue(resultResponse);
   }
 }
