@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
@@ -44,7 +45,7 @@ public class ReceiptWithAdditionalInfoMapper {
         .totalAmountCents(receiptDTO.getPaymentAmountCents())
         .status(PaymentOptionStatus.PAID)
         .description(receiptDTO.getDescription())
-        .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
+        .paymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT)
         .paymentOptionIndex(1)
         .installments(List.of(InstallmentDTO.builder()
           .status(InstallmentStatus.PAID)

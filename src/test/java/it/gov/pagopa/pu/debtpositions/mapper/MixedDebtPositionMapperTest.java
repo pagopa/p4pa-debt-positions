@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO.PaymentOptionTypeEnum;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
@@ -90,7 +90,7 @@ class MixedDebtPositionMapperTest {
     PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
       .status(PaymentOptionStatus.UNPAID)
       .paymentOptionIndex(1)
-      .paymentOptionType(PaymentOptionTypeEnum.SINGLE_INSTALLMENT)
+      .paymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT)
       .installments(List.of(expectedInstallment))
       .build();
     DebtPositionDTO expectedResult = DebtPositionDTO.builder()
