@@ -158,13 +158,15 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   }
 
   private void setSourceFlowName(InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin, String orgIpaCode) {
-    String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
-    if (DebtPositionOrigin.ORDINARY.equals(debtPositionOrigin))
-      installmentDTO.setSourceFlowName(orgIpaCode + "_IMPORT-DOVUTO_" + now);
-    if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin))
-      installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO_" + now);
-    if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin))
-      installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-SIL_" + now);
+    if(installmentDTO.getSourceFlowName() == null) {
+      String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+      if (DebtPositionOrigin.ORDINARY.equals(debtPositionOrigin))
+        installmentDTO.setSourceFlowName(orgIpaCode + "_IMPORT-DOVUTO_" + now);
+      if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin))
+        installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO_" + now);
+      if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin))
+        installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-SIL_" + now);
+    }
   }
 
   private void verifyInstallmentUniqueness(DebtPositionDTO debtPositionDTO, InstallmentDTO installmentDTO) {
