@@ -22,10 +22,23 @@ import static org.junit.jupiter.api.Assertions.*;
 public class UtilitiesTest {
 
   @Test
-  void testIbanInvalid() {
+  void givenInvalidIbanWhenIsValidIbanThenReturnFalse() {
     String iban = "test";
     boolean result = Utilities.isValidIban(iban);
     assertFalse(result);
+  }
+
+  @Test
+  void givenNullIbanWhenIsValidIbanThenReturnFalse() {
+    boolean result = Utilities.isValidIban(null);
+    assertFalse(result);
+  }
+
+  @Test
+  void givenValidIbanWhenIsValidIbanThenReturnTrue() {
+    String iban = "IT0000000000000000000000000";
+    boolean result = Utilities.isValidIban(iban);
+    assertTrue(result);
   }
 
   @Test
