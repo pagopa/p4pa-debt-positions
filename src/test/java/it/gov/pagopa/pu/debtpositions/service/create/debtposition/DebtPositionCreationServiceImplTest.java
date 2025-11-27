@@ -33,6 +33,8 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -414,5 +416,80 @@ class DebtPositionCreationServiceImplTest {
 
     assertThrows(OperatorNotAuthorizedException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalId));
+  }
+
+  @Test
+  void givenDPWithOrdinaryOriginAndInstallmentWithNullSourceFlowNameWhenCreateDebtPositionThenSetDefaultValue() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
+
+    assertNull(result);
+    assertEquals(organization.getIpaCode() + "_IMPORT-DOVUTO_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
+  }
+
+  @Test
+  void givenDPWithSpontaneousOriginAndInstallmentWithNullSourceFlowNameWhenCreateDebtPositionThenSetDefaultValue() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
+
+    assertNull(result);
+    assertEquals(organization.getIpaCode() + "_SPONTANEO_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
+  }
+
+  @Test
+  void givenDPWithSpontaneousSilOriginAndInstallmentWithNullSourceFlowNameWhenCreateDebtPositionThenSetDefaultValue() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
+
+    assertNull(result);
+    assertEquals(organization.getIpaCode() + "_SPONTANEO-SIL_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
   }
 }
