@@ -23,6 +23,7 @@ public class DebtPositionManageApplierService {
     storedInstallment.setBalance(updatedInstallment.getBalance());
     storedInstallment.setLegacyPaymentMetadata(updatedInstallment.getLegacyPaymentMetadata());
     storedInstallment.setAmountCents(updatedInstallment.getAmountCents());
+    storedInstallment.setSourceFlowName(updatedInstallment.getSourceFlowName());
     List<String> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionId", updatedInstallment.getPaymentOptionId(), storedInstallment.getPaymentOptionId(), modifiedFields);
     checkImmutableField("iupdPagopa", updatedInstallment.getIupdPagopa(), storedInstallment.getIupdPagopa(), modifiedFields);
@@ -36,7 +37,6 @@ public class DebtPositionManageApplierService {
     checkImmutableField("receiptId", updatedInstallment.getReceiptId(), storedInstallment.getReceiptId(), modifiedFields);
     checkImmutableField("notificationDate", updatedInstallment.getNotificationDate(), storedInstallment.getNotificationDate(), modifiedFields);
     checkImmutableField("notificationFeeCents", updatedInstallment.getNotificationFeeCents(), storedInstallment.getNotificationFeeCents(), modifiedFields);
-    checkImmutableField("sourceFlowName", updatedInstallment.getSourceFlowName(), storedInstallment.getSourceFlowName(), modifiedFields);
 
     mergeDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 
