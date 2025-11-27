@@ -190,7 +190,6 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(expected.getOrganizationId(), result.getOrganizationId());
     assertEquals(1L, result.getDebtPositionTypeOrgId());
     assertEquals(expected.getValidityDate(), result.getValidityDate());
-    assertEquals(expected.isFlagIuvVolatile(), result.isFlagIuvVolatile());
     assertEquals(expected.isMultiDebtor(), result.isMultiDebtor());
     assertEquals(expected.isFlagPuPagoPaPayment(),
       result.isFlagPuPagoPaPayment());

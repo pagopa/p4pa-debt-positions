@@ -86,7 +86,6 @@ public class MixedDebtPositionMapper {
       .debtPositionOrigin(request.getDebtPositionOrigin())
       .organizationId(request.getOrganizationId())
       .description(request.getDescription())
-      .flagIuvVolatile(true)
       .flagPuPagoPaPayment(true)
       .multiDebtor(false)
       .debtPositionTypeOrgId(debtPositionTypeOrgId)
