@@ -1600,6 +1600,8 @@ paths:
           description: Unauthorized - Missing or invalid token
         '403':
           description: Forbidden - Access denied
+        '404':
+          description: Not Found
         '500':
           description: Internal Server Error
   /spontaneous-forms:

@@ -633,6 +633,8 @@ class DebtPositionServiceImplTest {
       () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
         debtPositionId, fiscalCode, organizationId)
     );
+
+    Mockito.verifyNoInteractions(debtPositionMapperMock);
   }
 
 }

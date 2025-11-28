@@ -7988,6 +7988,16 @@
               }
             }
           },
+          "404" : {
+            "description" : "Not Found",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/DebtorDebtPositionDTO"
+                }
+              }
+            }
+          },
           "500" : {
             "description" : "Internal Server Error",
             "content" : {
@@ -11279,20 +11289,20 @@
           "status" : {
             "$ref" : "#/components/schemas/InstallmentStatus"
           },
-          "dueDate" : {
-            "type" : "string",
-            "format" : "date"
+          "syncStatus" : {
+            "$ref" : "#/components/schemas/InstallmentSyncStatus"
           },
           "amountCents" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "syncStatus" : {
-            "$ref" : "#/components/schemas/InstallmentSyncStatus"
-          },
           "installmentId" : {
             "type" : "integer",
             "format" : "int64"
+          },
+          "dueDate" : {
+            "type" : "string",
+            "format" : "date"
           },
           "iud" : {
             "type" : "string"
@@ -11302,26 +11312,26 @@
       "BasePaymentOption" : {
         "type" : "object",
         "properties" : {
-          "status" : {
-            "$ref" : "#/components/schemas/PaymentOptionStatus"
+          "paymentOptionType" : {
+            "$ref" : "#/components/schemas/PaymentOptionType"
           },
           "totalAmountCents" : {
             "type" : "integer",
             "format" : "int64",
             "writeOnly" : true
           },
-          "paymentOptionType" : {
-            "$ref" : "#/components/schemas/PaymentOptionType"
-          },
-          "paymentOptionId" : {
-            "type" : "integer",
-            "format" : "int64"
+          "status" : {
+            "$ref" : "#/components/schemas/PaymentOptionStatus"
           },
           "installments" : {
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/BaseInstallment"
             }
+          },
+          "paymentOptionId" : {
+            "type" : "integer",
+            "format" : "int64"
           }
         }
       },
