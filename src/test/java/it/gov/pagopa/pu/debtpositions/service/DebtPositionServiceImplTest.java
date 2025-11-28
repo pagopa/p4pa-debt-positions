@@ -1,10 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtorDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedDebtorUnpaidDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -51,6 +53,8 @@ class DebtPositionServiceImplTest {
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
   private PagedDebtorUnpaidDebtPositionMapper pagedDebtorUnpaidDebtPositionMapperMock;
+  @Mock
+  private DebtorDebtPositionMapper debtorDebtPositionMapperMock;
 
   private DebtPositionServiceImpl debtPositionService;
 
@@ -65,7 +69,8 @@ class DebtPositionServiceImplTest {
       debtPositionDeleteServiceMock,
       dataCipherServiceMock,
       debtPositionTypeOrgRepositoryMock,
-      pagedDebtorUnpaidDebtPositionMapperMock
+      pagedDebtorUnpaidDebtPositionMapperMock,
+      debtorDebtPositionMapperMock
     );
   }
 
@@ -76,7 +81,8 @@ class DebtPositionServiceImplTest {
       debtPositionSaveServiceMock,
       debtPositionMapperMock,
       debtPositionDeleteServiceMock,
-      pagedDebtorUnpaidDebtPositionMapperMock);
+      pagedDebtorUnpaidDebtPositionMapperMock,
+      debtorDebtPositionMapperMock);
   }
 
   @Test
@@ -539,6 +545,94 @@ class DebtPositionServiceImplTest {
     // then
     Mockito.verify(debtPositionRepositoryMock)
       .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable);
+  }
+
+  @Test
+  void givenExistingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenOk() {
+    // Given
+    Long debtPositionId = 1L;
+    String fiscalCode = "debtorFiscalCode";
+    Long organizationId = 10L;
+
+    DebtPosition entity = podamFactory.manufacturePojo(DebtPosition.class);
+    entity.setDebtPositionTypeOrgId(99L);
+
+    DebtPositionTypeOrg typeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+
+    DebtorDebtPositionDTO expected = podamFactory.manufacturePojo(DebtorDebtPositionDTO.class);
+
+    Mockito.when(
+      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+        debtPositionId, fiscalCode, organizationId)
+    ).thenReturn(entity);
+
+    Mockito.when(
+      debtPositionTypeOrgRepositoryMock.findById(99L)
+    ).thenReturn(Optional.of(typeOrg));
+
+    Mockito.when(
+      debtorDebtPositionMapperMock.map(entity, typeOrg)
+    ).thenReturn(expected);
+
+    // When
+    DebtorDebtPositionDTO result = debtPositionService.getDebtorUnpaidDebtPositionOverview(
+      debtPositionId, fiscalCode, organizationId
+    );
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertSame(expected, result);
+  }
+
+
+  @Test
+  void givenMissingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
+    // Given
+    Long debtPositionId = 1L;
+    String fiscalCode = "debtorFiscalCode";
+    Long organizationId = 10L;
+
+    Mockito.when(
+      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+        debtPositionId, fiscalCode, organizationId)
+    ).thenReturn(null);
+
+    // When / Then
+    Assertions.assertThrows(
+      NotFoundException.class,
+      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
+        debtPositionId, fiscalCode, organizationId
+      )
+    );
+
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock, debtPositionMapperMock);
+  }
+
+  @Test
+  void givenMissingTypeOrgWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
+    // Given
+    Long debtPositionId = 1L;
+    String fiscalCode = "debtorFiscalCode";
+    Long organizationId = 10L;
+
+    DebtPosition entity = podamFactory.manufacturePojo(DebtPosition.class);
+    entity.setDebtPositionTypeOrgId(123L);
+
+    Mockito.when(
+      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+        debtPositionId, fiscalCode, organizationId)
+    ).thenReturn(entity);
+
+    Mockito.when(
+      debtPositionTypeOrgRepositoryMock.findById(123L)
+    ).thenReturn(Optional.empty());
+
+    //Then
+    Assertions.assertThrows(
+      NotFoundException.class,
+      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
+        debtPositionId, fiscalCode, organizationId)
+    );
   }
 
 }

@@ -1,10 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtorDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedDebtorUnpaidDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -30,10 +32,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   private final DataCipherService dataCipherService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final PagedDebtorUnpaidDebtPositionMapper pagedDebtorUnpaidDebtPositionMapper;
+  private final DebtorDebtPositionMapper debtorDebtPositionMapper;
 
   public DebtPositionServiceImpl(DebtPositionRepository debtPositionRepository,
                                  DebtPositionSaveService debtPositionSaveService,
-                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService, DataCipherService dataCipherService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, PagedDebtorUnpaidDebtPositionMapper pagedDebtorUnpaidDebtPositionMapper) {
+                                 DebtPositionMapper debtPositionMapper, DebtPositionDeleteService debtPositionDeleteService, DataCipherService dataCipherService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, PagedDebtorUnpaidDebtPositionMapper pagedDebtorUnpaidDebtPositionMapper, DebtorDebtPositionMapper debtorDebtPositionMapper) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionSaveService = debtPositionSaveService;
     this.debtPositionMapper = debtPositionMapper;
@@ -41,6 +44,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     this.dataCipherService = dataCipherService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.pagedDebtorUnpaidDebtPositionMapper = pagedDebtorUnpaidDebtPositionMapper;
+    this.debtorDebtPositionMapper = debtorDebtPositionMapper;
   }
 
   @Override
@@ -139,6 +143,15 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     return pagedDebtorUnpaidDebtPositionMapper.map(pagedPrimaryDebtPositionByFilters, retrieveDebtPositionTypeOrgMap(pagedPrimaryDebtPositionByFilters));
   }
 
+  @Override
+  public DebtorDebtPositionDTO getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
+    DebtPosition primaryDebtPositionDetail = debtPositionRepository.getPrimaryDebtPositionOverviewByFilters(debtPositionId, xFiscalCode, organizationId);
+    if (primaryDebtPositionDetail == null){
+      throw new NotFoundException("DebtPosition with id "+ debtPositionId + "not found");
+    }
+    return debtorDebtPositionMapper.map(primaryDebtPositionDetail, retrieveDebtPositionTypeOrg(primaryDebtPositionDetail.getDebtPositionTypeOrgId()));
+  }
+
   private Map<Long, DebtPositionTypeOrg> retrieveDebtPositionTypeOrgMap(Page<DebtPosition> pagedPrimaryDebtPositionByFilters){
     List<DebtPosition> debtPositions = pagedPrimaryDebtPositionByFilters.getContent();
     if (debtPositions.isEmpty()){
@@ -146,8 +159,12 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     }
 
     return debtPositions.stream()
-      .collect(Collectors.toMap(DebtPosition::getDebtPositionId, dp -> debtPositionTypeOrgRepository.findById(dp.getDebtPositionTypeOrgId())
-        .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id "+ dp.getDebtPositionTypeOrgId() + "not found"))));
+      .collect(Collectors.toMap(DebtPosition::getDebtPositionId, dp -> retrieveDebtPositionTypeOrg(dp.getDebtPositionTypeOrgId())));
+  }
+
+  private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long debtPositionTypeOrgId){
+    return debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
+      .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id "+ debtPositionTypeOrgId + "not found"));
   }
 }
 
