@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
@@ -21,8 +20,6 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class CreateReceiptServiceImpl implements CreateReceiptService {
-
-
   private final ReceiptNoPIIRepository receiptNoPIIRepository;
   private final ReceiptPIIRepository receiptPIIRepository;
 
@@ -38,18 +35,23 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     this.mixedDpPaymentHandlerService = mixedDpPaymentHandlerService;
   }
 
-
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     logReceiptData("createReceipt", receiptDTO);
 
-    ReceiptDTO receiptAlreadyHandled = checkIfAlreadyHandled(receiptDTO);
-    if (receiptAlreadyHandled != null) {
-      return receiptAlreadyHandled;
+    ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
+    boolean shouldSave;
+
+    if (existingReceipt == null) {
+      shouldSave = true;
+    } else {
+      shouldSave = shouldUpdateExistingReceipt(receiptDTO, existingReceipt);
     }
 
-    saveReceipt(receiptDTO);
+    if (shouldSave) {
+      saveReceipt(receiptDTO);
+    }
 
     Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
     secondaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
@@ -58,41 +60,9 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     return receiptDTO;
   }
 
-  private ReceiptDTO checkIfAlreadyHandled(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
-    ReceiptDTO receiptInDb = checkIfAlreadyStored(receiptDTO);
-    if (receiptInDb != null) {
-      if (isManualImport(receiptDTO)) {
-        if (!ReceiptOriginType.RECEIPT_FILE.equals(receiptInDb.getReceiptOrigin())) {
-          throw new ConflictErrorException("Receipt having paymentReceiptId " + receiptDTO.getPaymentReceiptId() +
-            " has already been stored with origin " + receiptInDb.getReceiptOrigin() + " and id " + receiptInDb.getReceiptId());
-        }
-        logReceiptData("Updating Receipt manually imported receiptOrigin[" + receiptDTO.getReceiptOrigin() + "]", receiptDTO);
-      } else {
-        logReceiptData("Skipping Receipt already handled receiptOrigin[" + receiptDTO.getReceiptOrigin() + "]", receiptDTO);
-        // Nothing to do (neither updating data), this event has already been handled
-        return receiptInDb;
-      }
-    }
-    return null;
-  }
-
-  private static void logReceiptData(String message, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
-    log.info("{} paymentReceiptId[{}} org/nav/iud[{}/{}/{}]",
-      message,
-      receiptDTO.getPaymentReceiptId(),
-      receiptDTO.getOrgFiscalCode(),
-      receiptDTO.getNoticeNumber(),
-      receiptDTO.getIud());
-  }
-
-  private ReceiptDTO checkIfAlreadyStored(ReceiptDTO receiptDTO) {
+  private ReceiptDTO getExistingReceipt(ReceiptDTO receiptDTO) {
     ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
     if (receiptInDb != null) {
-      if(!receiptInDb.getReceiptOrigin().equals(receiptDTO.getReceiptOrigin())){
-        throw new ConflictErrorException("Receipt having paymentReceiptId " + receiptDTO.getPaymentReceiptId() +
-          " has already been stored with origin " + receiptInDb.getReceiptOrigin() + " and id " + receiptInDb.getReceiptId() +
-          " while the requested Receipt has origin " + receiptDTO.getReceiptOrigin());
-      }
       log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
       receiptDTO.setReceiptId(receiptInDb.getReceiptId());
       receiptDTO.setNoPII(receiptInDb);
@@ -101,15 +71,34 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     return null;
   }
 
-  private boolean isManualImport(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
-    return !StringUtils.isEmpty(receiptDTO.getIud());
+  private static void logReceiptData(String message, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    log.info("{} paymentReceiptId[{}] org/nav/iud[{}/{}/{}]",
+      message,
+      receiptDTO.getPaymentReceiptId(),
+      receiptDTO.getOrgFiscalCode(),
+      receiptDTO.getNoticeNumber(),
+      receiptDTO.getIud());
+  }
+
+  private boolean shouldUpdateExistingReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, ReceiptDTO existingReceipt) {
+    if (StringUtils.isEmpty(receiptDTO.getIud())) {
+      log.info("Skipping update: receipt already exists and is not a manual import");
+      return false;
+    }
+
+    if (ReceiptOriginType.RECEIPT_FILE.equals(existingReceipt.getReceiptOrigin())) {
+      logReceiptData("Updating Receipt manually imported with technical origin", receiptDTO);
+      return true;
+    }
+
+    log.info("Skipping update for manual import: existing receipt origin [{}] is not technical", existingReceipt.getReceiptOrigin());
+    return false;
   }
 
   private void saveReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     ReceiptDTO storedReceipt = receiptPIIRepository.save(receiptDTO);
     receiptDTO.setReceiptId(storedReceipt.getReceiptId());
     receiptDTO.setNoPII(storedReceipt.getNoPII());
-    log.debug("Receipt paymentReceiptId[{}} persisted with id[{}]", receiptDTO.getPaymentReceiptId(), storedReceipt.getReceiptId());
+    log.debug("Receipt paymentReceiptId[{}] persisted/updated with id[{}]", receiptDTO.getPaymentReceiptId(), storedReceipt.getReceiptId());
   }
-
 }
