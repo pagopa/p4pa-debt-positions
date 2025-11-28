@@ -166,7 +166,7 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenInstallmentWithAmountInvalidThenThrowValidationException() {
+  void givenInstallmentWithNegativeAmountThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
@@ -176,7 +176,21 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("[P4PA_INVALID_AMOUNT] Amount is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_CENTS_AMOUNT] The installment amount must be greater than 0", invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenInstallmentWithZeroAmountThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS);
+    debtPositionTypeOrg.setFlagMandatoryDueDate(false);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setAmountCents(0L);
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+
+    InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+    assertEquals("[P4PA_INVALID_CENTS_AMOUNT] The installment amount must be greater than 0", invalidValueException.getMessage());
   }
 
   @Test
