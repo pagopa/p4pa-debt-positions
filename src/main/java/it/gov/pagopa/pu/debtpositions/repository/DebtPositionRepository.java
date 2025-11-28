@@ -267,7 +267,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
      )
   """)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition getPrimaryDebtPositionOverviewByFilters(
+  DebtPosition getUnpaidOrExpiredDebtPositionsByFiscalCode(
     @Param("debtPositionId") Long debtPositionId,
     @Param("debtorFiscalCode") String debtorFiscalCode,
     @Param("organizationId") Long organizationId

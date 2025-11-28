@@ -145,7 +145,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   @Override
   public DebtorDebtPositionDTO getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
-    DebtPosition primaryDebtPositionDetail = debtPositionRepository.getPrimaryDebtPositionOverviewByFilters(debtPositionId, xFiscalCode, organizationId);
+    DebtPosition primaryDebtPositionDetail = debtPositionRepository.getUnpaidOrExpiredDebtPositionsByFiscalCode(debtPositionId, xFiscalCode, organizationId);
     if (primaryDebtPositionDetail == null){
       throw new NotFoundException("DebtPosition with id "+ debtPositionId + "not found");
     }

@@ -562,7 +562,7 @@ class DebtPositionServiceImplTest {
     DebtorDebtPositionDTO expected = podamFactory.manufacturePojo(DebtorDebtPositionDTO.class);
 
     Mockito.when(
-      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+      debtPositionRepositoryMock.getUnpaidOrExpiredDebtPositionsByFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
@@ -593,7 +593,7 @@ class DebtPositionServiceImplTest {
     Long organizationId = 10L;
 
     Mockito.when(
-      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+      debtPositionRepositoryMock.getUnpaidOrExpiredDebtPositionsByFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(null);
 
@@ -619,7 +619,7 @@ class DebtPositionServiceImplTest {
     entity.setDebtPositionTypeOrgId(123L);
 
     Mockito.when(
-      debtPositionRepositoryMock.getPrimaryDebtPositionOverviewByFilters(
+      debtPositionRepositoryMock.getUnpaidOrExpiredDebtPositionsByFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
