@@ -106,8 +106,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin);
 
-    if (installmentDTO.getAmountCents() < 0) {
-      throw new InvalidValueException("[P4PA_INVALID_AMOUNT] Amount is not valid");
+    if (installmentDTO.getAmountCents() <= 0) {
+      throw new InvalidValueException("[P4PA_INVALID_CENTS_AMOUNT] The installment amount must be greater than 0");
     }
     if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) &&
       debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
