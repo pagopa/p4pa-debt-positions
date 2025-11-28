@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.controller;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.NullNode;
+import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
@@ -608,7 +609,7 @@ class DebtPositionControllerTest {
     Mockito.when(debtPositionService.getPagedDebtorUnpaidDebtPosition(debtorFiscalCode, organizationIds, Pageable.ofSize(1))).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
-      get("/debt-positions/unpaid/debtor")
+      get("/debt-positions/debtor/unpaid")
         .header("X-fiscal-code", debtorFiscalCode)
         .queryParam("organizationIds", organizationIds.stream().map(String::valueOf).toArray(String[]::new))
         .param("size", "1")
@@ -618,6 +619,30 @@ class DebtPositionControllerTest {
 
     PagedDebtorUnpaidDebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(),
       PagedDebtorUnpaidDebtPositionDTO.class);
+
+    assertNotNull(resultResponse);
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
+  void givenOrgIdWhenGetDebtorUnpaidDebtPositionOverviewThenOk() throws Exception {
+    Long debtPositionId = 1L;
+    Long organizationId = 1L;
+    String debtorFiscalCode = "debtorFiscalCode";
+    DebtorDebtPositionDTO expectedResult = new DebtorDebtPositionDTO();
+
+    Mockito.when(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, debtorFiscalCode, organizationId)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/debtor/unpaid/{debtPositionId}/overview", debtPositionId)
+          .header("X-fiscal-code", debtorFiscalCode)
+          .queryParam("organizationId", organizationId.toString())
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    DebtorDebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(),
+      DebtorDebtPositionDTO.class);
 
     assertNotNull(resultResponse);
     assertEquals(expectedResult, resultResponse);

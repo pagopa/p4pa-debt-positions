@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -23,5 +24,6 @@ public interface DebtPositionService {
   List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin);
   List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, List<Long> organizationIds, LocalDateTimeIntervalFilter dateTimeIntervalFilter);
   PagedDebtorUnpaidDebtPositionDTO getPagedDebtorUnpaidDebtPosition(String xFiscalCode, List<Long> organizationIds, Pageable pageable);
+  DebtorDebtPositionDTO getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId);
   void delete(DebtPosition debtPosition);
 }

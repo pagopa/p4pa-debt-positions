@@ -248,4 +248,28 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Parameter(name = "organizationIds", required = true, array = @ArraySchema(schema = @Schema(type = "integer", format = "int64")))@Param("organizationIds") List<Long> organizationIds,
     Pageable pageable
   );
+
+  @RestResource(exported = false)
+  @Query("""
+    SELECT dp
+    FROM DebtPosition dp
+    WHERE
+     dp.debtPositionId = :debtPositionId
+     AND dp.organizationId = :organizationId
+     AND EXISTS (
+             SELECT 1
+             FROM PaymentOption po
+             JOIN po.installments i
+             WHERE po.debtPositionId = dp.debtPositionId
+             AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_AND_EXPIRED_PO_STATUSES})
+             AND i.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_AND_EXPIRED_INSTALLMENT_STATUSES})
+             AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+     )
+  """)
+  @EntityGraph(value = "completeDebtPosition")
+  DebtPosition findEntityGraphUnpaidOrExpiredDebtPositionsByDebtorFiscalCode(
+    @Param("debtPositionId") Long debtPositionId,
+    @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Param("organizationId") Long organizationId
+  );
 }

@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
@@ -292,5 +293,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<PagedDebtorUnpaidDebtPositionDTO> getPagedDebtorUnpaidDebtPositions(String xFiscalCode, List<Long> organizationIds, Pageable pageable) {
     log.info("User requested getPagedDebtorUnpaidDebtPositions with organizationIds %s".formatted(organizationIds));
     return ResponseEntity.ok(debtPositionService.getPagedDebtorUnpaidDebtPosition(xFiscalCode, organizationIds, pageable));
+  }
+
+  @Override
+  public ResponseEntity<DebtorDebtPositionDTO> getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
+    log.info("User requested getDebtorUnpaidDebtPositionOverview with organizationId %s and debtPositionId %s".formatted(organizationId, debtPositionId));
+    return ResponseEntity.ok(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, xFiscalCode, organizationId));
   }
 }
