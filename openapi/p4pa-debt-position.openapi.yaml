@@ -1566,11 +1566,11 @@ paths:
         '500':
           description: Internal Server Error
       x-spring-paginated: true
-  /debt-positions/debtor/unpaid/{debtPositionId}/overview:
+  /debt-positions/debtor/unpaid/{debtPositionId}:
     get:
       tags:
         - debt-position
-      operationId: getDebtorUnpaidDebtPositionOverview
+      operationId: getDebtorUnpaidDebtPositionDetails
       parameters:
         - name: debtPositionId
           in: path

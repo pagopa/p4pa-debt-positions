@@ -296,8 +296,8 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
-  public ResponseEntity<DebtorDebtPositionDTO> getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
-    log.info("User requested getDebtorUnpaidDebtPositionOverview with organizationId %s and debtPositionId %s".formatted(organizationId, debtPositionId));
-    return ResponseEntity.ok(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, xFiscalCode, organizationId));
+  public ResponseEntity<DebtorDebtPositionDTO> getDebtorUnpaidDebtPositionDetails(Long debtPositionId, String xFiscalCode, Long organizationId) {
+    log.info("User requested getDebtorUnpaidDebtPositionDetails with organizationId %s and debtPositionId %s".formatted(organizationId, debtPositionId));
+    return ResponseEntity.ok(debtPositionService.getDebtorUnpaidDebtPositionDetails(debtPositionId, xFiscalCode, organizationId));
   }
 }

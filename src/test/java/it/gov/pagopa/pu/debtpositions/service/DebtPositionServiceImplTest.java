@@ -548,7 +548,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenOk() {
+  void givenExistingDebtPositionWhenGetDebtorUnpaidDebtPositionDetailsThenOk() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
@@ -562,7 +562,7 @@ class DebtPositionServiceImplTest {
     DebtorDebtPositionDTO expected = podamFactory.manufacturePojo(DebtorDebtPositionDTO.class);
 
     Mockito.when(
-      debtPositionRepositoryMock.findEntityGraphUnpaidOrExpiredDebtPositionsByDebtorFiscalCode(
+      debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
@@ -575,7 +575,7 @@ class DebtPositionServiceImplTest {
     ).thenReturn(expected);
 
     // When
-    DebtorDebtPositionDTO result = debtPositionService.getDebtorUnpaidDebtPositionOverview(
+    DebtorDebtPositionDTO result = debtPositionService.getDebtorUnpaidDebtPositionDetails(
       debtPositionId, fiscalCode, organizationId
     );
 
@@ -586,21 +586,21 @@ class DebtPositionServiceImplTest {
 
 
   @Test
-  void givenMissingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
+  void givenMissingDebtPositionWhenGetDebtorUnpaidDebtPositionDetailsThenThrowNotFoundException() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
     Long organizationId = 10L;
 
     Mockito.when(
-      debtPositionRepositoryMock.findEntityGraphUnpaidOrExpiredDebtPositionsByDebtorFiscalCode(
+      debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(null);
 
     // When / Then
     Assertions.assertThrows(
       NotFoundException.class,
-      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
+      () -> debtPositionService.getDebtorUnpaidDebtPositionDetails(
         debtPositionId, fiscalCode, organizationId
       )
     );
@@ -609,7 +609,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenMissingTypeOrgWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
+  void givenMissingTypeOrgWhenGetDebtorUnpaidDebtPositionDetailsThenThrowNotFoundException() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
@@ -619,7 +619,7 @@ class DebtPositionServiceImplTest {
     entity.setDebtPositionTypeOrgId(123L);
 
     Mockito.when(
-      debtPositionRepositoryMock.findEntityGraphUnpaidOrExpiredDebtPositionsByDebtorFiscalCode(
+      debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
@@ -630,7 +630,7 @@ class DebtPositionServiceImplTest {
     //Then
     Assertions.assertThrows(
       NotFoundException.class,
-      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
+      () -> debtPositionService.getDebtorUnpaidDebtPositionDetails(
         debtPositionId, fiscalCode, organizationId)
     );
 
