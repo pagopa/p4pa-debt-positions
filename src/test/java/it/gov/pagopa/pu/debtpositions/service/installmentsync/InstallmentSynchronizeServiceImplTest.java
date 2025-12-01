@@ -19,6 +19,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Collections;
+import java.util.List;
+
 import static it.gov.pagopa.pu.debtpositions.dto.generated.Action.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
@@ -160,5 +163,49 @@ class InstallmentSynchronizeServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenInstallmentDTOWithIupdNullWhenSynchronizeUpdateActionThenOk() {
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIupdOrg(null);
+    installmentSynchronizeDTO.setAction(M);
+
+    DebtPosition debtPosition = buildDebtPosition();
+    debtPosition.setDebtPositionOrigin(debtPositionOrigin);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getIud(), List.of(debtPositionOrigin))).thenReturn(List.of(debtPosition));
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
+    Mockito.when(installmentSynchronizeUpdateServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
+      wfExecutionParameters, accessToken, operatorExternalUserId)).thenReturn(expectedResult);
+
+    WorkflowCreatedDTO result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId);
+
+    assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenInstallmentDTOWithIupdNullWhenSynchronizeCancelActionAndfindEntityGraphByOrganizationIdAndInstallmentIudReturnNullDpThenOk(){
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIupdOrg(null);
+    installmentSynchronizeDTO.setAction(A);
+
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getIud(), List.of(debtPositionOrigin))).thenReturn(Collections.emptyList());
+    Mockito.when(installmentSynchronizeCancelServiceMock.syncInstallment(installmentSynchronizeDTO, null,
+      wfExecutionParameters, accessToken, operatorExternalUserId)).thenReturn(null);
+
+    WorkflowCreatedDTO result = installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId);
+
+    assertNull(result);
   }
 }

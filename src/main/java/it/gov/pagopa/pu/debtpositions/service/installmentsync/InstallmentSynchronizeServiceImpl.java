@@ -58,7 +58,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
       return retrieveDebtPositionByIupd(iupdOrg, orgId, debtPositionOrigin);
     }
 
-    return retrieveDebtPositionByIud(iud, orgId);
+    return retrieveDebtPositionByIud(iud, orgId, debtPositionOrigin);
   }
 
   private DebtPositionDTO retrieveDebtPositionByIupd(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
@@ -75,8 +75,8 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     return debtPositionMapper.mapToDto(debtPosition);
   }
 
-  private DebtPositionDTO retrieveDebtPositionByIud(String iud, Long orgId) {
-    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(orgId, iud, null);
+  private DebtPositionDTO retrieveDebtPositionByIud(String iud, Long orgId, DebtPositionOrigin debtPositionOrigin) {
+    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(orgId, iud, List.of(debtPositionOrigin));
 
     if(debtPositions.isEmpty()) {
       return null;
