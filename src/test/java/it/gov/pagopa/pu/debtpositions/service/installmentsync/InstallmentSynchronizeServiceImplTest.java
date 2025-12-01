@@ -208,4 +208,23 @@ class InstallmentSynchronizeServiceImplTest {
 
     assertNull(result);
   }
+
+  @Test
+  void givenInstallmentDTOWithIupdNullWhenSynchronizeCancelActionAndFindEntityGraphByOrganizationIdAndInstallmentIudReturnMultipleDpDpThenThrowEx() {
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIupdOrg(null);
+    installmentSynchronizeDTO.setAction(A);
+
+    List<DebtPosition> debtPositions = List.of(buildDebtPosition(), buildDebtPosition());
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getIud(), List.of(debtPositionOrigin))).thenReturn(debtPositions);
+
+    assertThrows(ConflictErrorException.class, () -> installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId),
+      String.format("Multiple debt positions found for iud %s", installmentSynchronizeDTO.getIud()));
+
+    verify(debtPositionMapperMock, times(0)).mapToDto(debtPositions.getFirst());
+  }
 }
