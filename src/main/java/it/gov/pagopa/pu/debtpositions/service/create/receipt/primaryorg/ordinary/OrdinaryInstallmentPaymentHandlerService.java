@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinar
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -29,9 +30,11 @@ public class OrdinaryInstallmentPaymentHandlerService {
       installment.getInstallmentId(), receiptDTO.getReceiptId());
 
     updateInstallmentFromReceipt(installment, receiptDTO);
-    resolveBalance(installment, accessToken);
-    // update mbdAttachment of transfer entity if present in input ReceiptDTO
-    updateMbdAttachment(installment, receiptDTO);
+    if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin())) {
+      resolveBalance(installment, accessToken);
+      // update mbdAttachment of transfer entity if present in input ReceiptDTO
+      updateMbdAttachment(installment, receiptDTO);
+    }
   }
 
   private void updateInstallmentFromReceipt(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
@@ -57,7 +60,7 @@ public class OrdinaryInstallmentPaymentHandlerService {
     }
   }
 
-  private void resolveBalance(InstallmentNoPII installment, String accessToken) {
+  public void resolveBalance(InstallmentNoPII installment, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
     if (debtPositionTypeOrg == null) {
       throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
