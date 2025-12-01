@@ -38,7 +38,6 @@ public class ReceiptWithAdditionalInfoMapper {
       .description(receiptDTO.getDescription())
       .status(DebtPositionStatus.PAID)
       .validityDate(null)
-      .flagIuvVolatile(false)
       .multiDebtor(false)
       .flagPuPagoPaPayment(true)
       .paymentOptions(List.of(PaymentOptionDTO.builder()

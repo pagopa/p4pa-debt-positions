@@ -1807,8 +1807,6 @@ components:
         validityDate:
           type: string
           format: date
-        flagIuvVolatile:
-          type: boolean
         multiDebtor:
           type: boolean
         flagPuPagoPaPayment:
@@ -2813,8 +2811,6 @@ components:
           type: 'DebtPositionOrigin'
         sourceFlowName:
           type: string
-        flagIuvVolatile:
-          type: boolean
         description:
           type: string
         dueDate:

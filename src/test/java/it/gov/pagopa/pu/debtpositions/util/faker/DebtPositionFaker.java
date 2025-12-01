@@ -31,7 +31,6 @@ public class DebtPositionFaker {
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPosition.setOrganizationId(500L);
     debtPosition.setValidityDate(DATE);
-    debtPosition.setFlagIuvVolatile(true);
     debtPosition.setMultiDebtor(false);
     debtPosition.setFlagPuPagoPaPayment(false);
     debtPosition.setCreationDate(DATETIME.toLocalDateTime());
@@ -52,7 +51,6 @@ public class DebtPositionFaker {
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPositionDTO.setOrganizationId(500L);
     debtPositionDTO.setValidityDate(DATE);
-    debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
     debtPositionDTO.setFlagPuPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATETIME);
@@ -73,7 +71,6 @@ public class DebtPositionFaker {
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPositionDTO.setOrganizationId(500L);
     debtPositionDTO.setValidityDate(DATE);
-    debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setMultiDebtor(false);
     debtPositionDTO.setFlagPuPagoPaPayment(false);
     debtPositionDTO.setCreationDate(DATETIME);
@@ -93,7 +90,6 @@ public class DebtPositionFaker {
     debtPositionDTO.setValidityDate(DATE);
     debtPositionDTO.setMultiDebtor(true);
     debtPositionDTO.setFlagPuPagoPaPayment(true);
-    debtPositionDTO.setFlagIuvVolatile(false);
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildSyncPaymentOptionDTO())));
     return debtPositionDTO;
   }
@@ -103,7 +99,6 @@ public class DebtPositionFaker {
     debtPositionDTO.setOrganizationId(500L);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPositionDTO.setSourceFlowName("sourceFlowName");
-    debtPositionDTO.setFlagIuvVolatile(true);
     debtPositionDTO.setDescription("Test Description");
     debtPositionDTO.setDueDate(DATE);
     debtPositionDTO.setDebtor(PersonFaker.buildPerson());
@@ -121,7 +116,6 @@ public class DebtPositionFaker {
     debtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPosition.setOrganizationId(500L);
     debtPosition.setValidityDate(DATE);
-    debtPosition.setFlagIuvVolatile(true);
     debtPosition.setFlagPuPagoPaPayment(true);
     debtPosition.setMultiDebtor(false);
     debtPosition.setCreationDate(DATETIME.toLocalDateTime());
