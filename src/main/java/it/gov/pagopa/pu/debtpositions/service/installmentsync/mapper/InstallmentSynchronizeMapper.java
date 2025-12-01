@@ -22,7 +22,6 @@ public class InstallmentSynchronizeMapper {
       .validityDate(installmentSynchronizeDTO.getValidityDate())
       .multiDebtor(installmentSynchronizeDTO.getMultiDebtor())
       .flagPuPagoPaPayment(installmentSynchronizeDTO.getFlagPuPagoPaPayment())
-      .flagIuvVolatile(Boolean.FALSE)
       .status((Boolean.TRUE).equals(installmentSynchronizeDTO.getDraft()) ? DebtPositionStatus.DRAFT : DebtPositionStatus.UNPAID)
       .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO)))
       .build();
