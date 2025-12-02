@@ -63,7 +63,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private ReceiptDTO getExistingReceipt(ReceiptDTO receiptDTO) {
     ReceiptNoPII receiptInDb = receiptNoPIIRepository.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId());
     if (receiptInDb != null) {
-      log.info("Receipt with paymentReceiptId[{}] already present in DB id[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId());
+      log.info("Receipt with paymentReceiptId[{}] already present in DB with id[{}] and origin[{}]", receiptDTO.getPaymentReceiptId(), receiptInDb.getReceiptId(), receiptInDb.getReceiptOrigin());
       receiptDTO.setReceiptId(receiptInDb.getReceiptId());
       receiptDTO.setNoPII(receiptInDb);
       return receiptDTO;
