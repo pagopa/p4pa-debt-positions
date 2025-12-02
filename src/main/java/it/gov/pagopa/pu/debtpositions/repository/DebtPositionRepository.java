@@ -262,12 +262,12 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
              JOIN po.installments i
              WHERE po.debtPositionId = dp.debtPositionId
              AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_AND_EXPIRED_PO_STATUSES})
-             AND i.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_AND_EXPIRED_INSTALLMENT_STATUSES})
+             AND i.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).UNPAID_OR_PAID_INSTALLMENT_STATUSES})
              AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
      )
   """)
   @EntityGraph(value = "completeDebtPosition")
-  DebtPosition findEntityGraphUnpaidOrExpiredDebtPositionsByDebtorFiscalCode(
+  DebtPosition findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
     @Param("debtPositionId") Long debtPositionId,
     @Param("debtorFiscalCode") String debtorFiscalCode,
     @Param("organizationId") Long organizationId
