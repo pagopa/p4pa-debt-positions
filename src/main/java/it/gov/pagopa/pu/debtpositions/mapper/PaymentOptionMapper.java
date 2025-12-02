@@ -52,7 +52,7 @@ public class PaymentOptionMapper {
       .totalAmountCents(paymentOption.getTotalAmountCents())
       .status(paymentOption.getStatus())
       .description(paymentOption.getDescription())
-      .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(paymentOption.getPaymentOptionType().name()))
+      .paymentOptionType(paymentOption.getPaymentOptionType())
       .paymentOptionIndex(paymentOption.getPaymentOptionIndex())
       .installments(
         paymentOption.getInstallments().stream()

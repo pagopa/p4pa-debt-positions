@@ -45,7 +45,6 @@ public class TechnicalMixedDebtPositionMapper {
     technicalMixedDp.setOrganizationId(debtPosition.getOrganizationId());
     technicalMixedDp.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
     technicalMixedDp.setValidityDate(debtPosition.getValidityDate());
-    technicalMixedDp.setFlagIuvVolatile(debtPosition.isFlagIuvVolatile());
     technicalMixedDp.setMultiDebtor(debtPosition.isMultiDebtor());
     technicalMixedDp.setFlagPuPagoPaPayment(
       debtPosition.isFlagPuPagoPaPayment());

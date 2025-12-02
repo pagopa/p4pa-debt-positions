@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +22,6 @@ public class InstallmentSynchronizeMapper {
       .validityDate(installmentSynchronizeDTO.getValidityDate())
       .multiDebtor(installmentSynchronizeDTO.getMultiDebtor())
       .flagPuPagoPaPayment(installmentSynchronizeDTO.getFlagPuPagoPaPayment())
-      .flagIuvVolatile(Boolean.FALSE)
       .status((Boolean.TRUE).equals(installmentSynchronizeDTO.getDraft()) ? DebtPositionStatus.DRAFT : DebtPositionStatus.UNPAID)
       .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO)))
       .build();
@@ -30,7 +30,7 @@ public class InstallmentSynchronizeMapper {
   public PaymentOptionDTO map2PaymentOptionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO){
     return PaymentOptionDTO.builder()
       .paymentOptionIndex(installmentSynchronizeDTO.getPaymentOptionIndex())
-      .paymentOptionType(PaymentOptionDTO.PaymentOptionTypeEnum.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
+      .paymentOptionType(PaymentOptionType.valueOf(installmentSynchronizeDTO.getPaymentOptionType()))
       .description(installmentSynchronizeDTO.getPaymentOptionDescription())
       .status(Boolean.TRUE.equals(installmentSynchronizeDTO.getDraft()) ? PaymentOptionStatus.DRAFT :PaymentOptionStatus.UNPAID)
       .installments(List.of(map2Installment(installmentSynchronizeDTO)))

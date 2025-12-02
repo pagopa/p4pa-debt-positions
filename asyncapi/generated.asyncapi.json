@@ -62,9 +62,6 @@
           "description": {
             "type": "string"
           },
-          "flagIuvVolatile": {
-            "type": "boolean"
-          },
           "flagPuPagoPaPayment": {
             "type": "boolean"
           },
@@ -109,7 +106,6 @@
             "debtPositionOrigin": "ORDINARY",
             "debtPositionTypeOrgId": 0,
             "description": "string",
-            "flagIuvVolatile": true,
             "flagPuPagoPaPayment": true,
             "iupdOrg": "string",
             "multiDebtor": true,
@@ -528,7 +524,6 @@
               "debtPositionOrigin": "ORDINARY",
               "debtPositionTypeOrgId": 0,
               "description": "string",
-              "flagIuvVolatile": true,
               "flagPuPagoPaPayment": true,
               "iupdOrg": "string",
               "multiDebtor": true,
@@ -682,7 +677,7 @@
             "format": "int32"
           },
           "paymentOptionType": {
-            "$ref": "#/components/schemas/PaymentOptionTypeEnum"
+            "$ref": "#/components/schemas/PaymentOptionType"
           },
           "status": {
             "$ref": "#/components/schemas/PaymentOptionStatus"
@@ -813,14 +808,14 @@
           "\"TO_SYNC\""
         ]
       },
-      "PaymentOptionTypeEnum": {
-        "title": "PaymentOptionTypeEnum",
+      "PaymentOptionType": {
+        "title": "PaymentOptionType",
         "type": "string",
         "enum": [
           "SINGLE_INSTALLMENT",
-          "REDUCED_SINGLE_INSTALLMENT",
           "INSTALLMENTS",
-          "DOWN_PAYMENT"
+          "DOWN_PAYMENT",
+          "REDUCED_SINGLE_INSTALLMENT"
         ],
         "examples": [
           "\"SINGLE_INSTALLMENT\""

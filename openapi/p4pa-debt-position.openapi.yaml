@@ -1533,6 +1533,77 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
+  /debt-positions/debtor/unpaid:
+    get:
+      tags:
+        - debt-position
+      operationId: getPagedDebtorUnpaidDebtPositions
+      parameters:
+        - name: X-fiscal-code
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: organizationIds
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+              format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedDebtorUnpaidDebtPositionDTO"
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Access denied
+        '500':
+          description: Internal Server Error
+      x-spring-paginated: true
+  /debt-positions/debtor/unpaid/{debtPositionId}/overview:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtorUnpaidDebtPositionOverview
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-fiscal-code
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "DebtorDebtPositionDTO"
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Access denied
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
   /spontaneous-forms:
     post:
       tags:
@@ -1612,9 +1683,18 @@ paths:
           required: true
           schema:
             type: string
+        - name: orgFiscalCode
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           description: Ok
+          content:
+            application/json:
+              schema:
+                type: boolean
         "400":
           description: Bad Request
           content:
@@ -1627,6 +1707,68 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
+  /crud-ext/debt-positions/{debtPositionId}:
+    get:
+      tags:
+        - debt-position-entity-extended-controller
+      description: Returns the DebtPosition without PII
+      operationId: getDebtPositionNoPiiById
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: DebtPosition without PII
+          content:
+            application/json:
+              schema:
+                type: 'BaseDebtPosition'
+        "400":
+          description: Invalid request parameters
+        "500":
+          description: Internal server error
+  /crud-ext/debt-positions/organization/{organizationId}/iuv/{iuv}:
+    get:
+      tags:
+        - debt-position-entity-extended-controller
+      description: Returns the DebtPosition without PII
+      operationId: getDebtPositionsNoPiiByOrganizationIdAndInstallmentIuv
+      parameters:
+        - name: organizationId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: iuv
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: debtPositionOrigins
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: 'DebtPositionOrigin'
+      responses:
+        "200":
+          description: DebtPositions without PII
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: 'BaseDebtPosition'
+        "400":
+          description: Invalid request parameters
+        "500":
+          description: Internal server error
 security:
   - BearerAuth: [ ]
 components:
@@ -1665,8 +1807,6 @@ components:
         validityDate:
           type: string
           format: date
-        flagIuvVolatile:
-          type: boolean
         multiDebtor:
           type: boolean
         flagPuPagoPaPayment:
@@ -1707,12 +1847,7 @@ components:
         description:
           type: string
         paymentOptionType:
-          type: string
-          enum:
-            - SINGLE_INSTALLMENT
-            - REDUCED_SINGLE_INSTALLMENT
-            - INSTALLMENTS
-            - DOWN_PAYMENT
+          type: 'PaymentOptionType'
         paymentOptionIndex:
           type: integer
           format: int32
@@ -1970,6 +2105,31 @@ components:
           x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
           x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
           type: 'ReceiptNoPII'
+    PagedDebtorUnpaidDebtPositionDTO:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            type: "DebtorDebtPositionDTO"
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
     InstallmentDetailDTO:
       type: object
       required:
@@ -2651,8 +2811,6 @@ components:
           type: 'DebtPositionOrigin'
         sourceFlowName:
           type: string
-        flagIuvVolatile:
-          type: boolean
         description:
           type: string
         dueDate:

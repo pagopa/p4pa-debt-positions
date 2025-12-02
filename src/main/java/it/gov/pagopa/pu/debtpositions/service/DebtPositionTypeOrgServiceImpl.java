@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -94,6 +95,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private void validateDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
       if (debtPositionTypeOrg == null) {
           throw new ValidationException("DebtPositionTypeOrg must not be null");
+      }
+      if(!Utilities.isValidIban(debtPositionTypeOrg.getIban())) {
+          throw new ValidationException("Provided iban is not valid");
       }
       if(debtPositionTypeOrg.getDebtPositionTypeOrgId()!=null){
         DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())

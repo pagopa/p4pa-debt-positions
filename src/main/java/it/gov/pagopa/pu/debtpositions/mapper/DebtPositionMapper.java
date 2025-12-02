@@ -34,7 +34,6 @@ public class DebtPositionMapper {
     debtPosition.setOrganizationId(dto.getOrganizationId());
     debtPosition.setDebtPositionTypeOrgId(dto.getDebtPositionTypeOrgId());
     debtPosition.setValidityDate(dto.getValidityDate());
-    debtPosition.setFlagIuvVolatile(Optional.ofNullable(dto.getFlagIuvVolatile()).orElse(false));
     debtPosition.setDebtPositionOrigin(dto.getDebtPositionOrigin());
     debtPosition.setMultiDebtor(Optional.ofNullable(dto.getMultiDebtor()).orElse(false));
     debtPosition.setFlagPuPagoPaPayment(dto.getFlagPuPagoPaPayment());
@@ -56,7 +55,6 @@ public class DebtPositionMapper {
       .organizationId(debtPosition.getOrganizationId())
       .debtPositionTypeOrgId(debtPosition.getDebtPositionTypeOrgId())
       .validityDate(debtPosition.getValidityDate())
-      .flagIuvVolatile(debtPosition.isFlagIuvVolatile())
       .debtPositionOrigin(debtPosition.getDebtPositionOrigin())
       .multiDebtor(debtPosition.isMultiDebtor())
       .flagPuPagoPaPayment(debtPosition.isFlagPuPagoPaPayment())

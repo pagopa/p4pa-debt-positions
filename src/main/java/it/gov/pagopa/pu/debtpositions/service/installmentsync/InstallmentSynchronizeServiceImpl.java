@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Slf4j
 public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronizeService {
@@ -38,7 +40,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   @Transactional
   @Override
   public WorkflowCreatedDTO installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
-    DebtPositionDTO debtPositionDTO = retrieveAndVerifyOrigin(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
+    DebtPositionDTO debtPositionDTO = retrieveDebtPosition(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
     Action action = installmentSynchronizeDTO.getAction();
     return switch (action) {
@@ -51,16 +53,39 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     };
   }
 
-  private DebtPositionDTO retrieveAndVerifyOrigin(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
+  private DebtPositionDTO retrieveDebtPosition(String iupdOrg, String iud, Long orgId, DebtPositionOrigin debtPositionOrigin) {
+    if (iupdOrg != null) {
+      return retrieveDebtPositionByIupd(iupdOrg, orgId, debtPositionOrigin);
+    }
+
+    return retrieveDebtPositionByIud(iud, orgId, debtPositionOrigin);
+  }
+
+  private DebtPositionDTO retrieveDebtPositionByIupd(String iupdOrg, Long orgId, DebtPositionOrigin debtPositionOrigin) {
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(iupdOrg, orgId);
 
-    if (debtPosition == null){
+    if (debtPosition == null) {
       return null;
     }
 
     if (!debtPositionOrigin.equals(debtPosition.getDebtPositionOrigin())) {
       throw new ConflictErrorException(String.format("There is another debt position with iupd %s requested but different origin", iupdOrg));
     }
+
     return debtPositionMapper.mapToDto(debtPosition);
+  }
+
+  private DebtPositionDTO retrieveDebtPositionByIud(String iud, Long orgId, DebtPositionOrigin debtPositionOrigin) {
+    List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(orgId, iud, List.of(debtPositionOrigin));
+
+    if(debtPositions.isEmpty()) {
+      return null;
+    }
+
+    if (debtPositions.size() > 1) {
+      throw new ConflictErrorException(String.format("Multiple debt positions found for iud %s", iud));
+    }
+
+    return debtPositionMapper.mapToDto(debtPositions.getFirst());
   }
 }
