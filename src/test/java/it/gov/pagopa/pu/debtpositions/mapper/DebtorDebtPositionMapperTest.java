@@ -115,6 +115,7 @@ class DebtorDebtPositionMapperTest {
     assertEquals(LocalDate.of(2025, 1, 10), ((InstallmentNoPII) installments.getFirst()).getDueDate());
     assertEquals(LocalDate.of(2025, 3, 10), ((InstallmentNoPII) installments.get(1)).getDueDate());
     assertEquals(LocalDate.of(2025, 5, 10), ((InstallmentNoPII) installments.get(2)).getDueDate());
+    TestUtils.checkNotNullFields(result);
   }
 
   @Test
@@ -148,7 +149,7 @@ class DebtorDebtPositionMapperTest {
     DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg());
 
     // then
-    assertTrue(result.getPaymentOptions().getFirst().getInstallments().isEmpty());
+    assertNull(result.getPaymentOptions().getFirst().getInstallments());
   }
 
 }
