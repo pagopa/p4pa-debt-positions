@@ -147,11 +147,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         throw new InvalidValueException("The due date cannot be retroactive");
       }
     }
-    installmentDTO.setSwitchToExpired(flagMandatoryDueDate);
 
-    if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)) {
-      installmentDTO.setSwitchToExpired(Boolean.TRUE);
-    }
+    boolean switchToExpired = flagMandatoryDueDate
+        || DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)
+        || DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin);
+
+    installmentDTO.setSwitchToExpired(switchToExpired);
   }
 
   private void validatePersonData(PersonDTO personDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {
