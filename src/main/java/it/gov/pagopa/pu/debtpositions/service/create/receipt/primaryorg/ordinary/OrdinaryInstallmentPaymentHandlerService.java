@@ -31,7 +31,10 @@ public class OrdinaryInstallmentPaymentHandlerService {
 
     updateInstallmentFromReceipt(installment, receiptDTO);
     if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin())) {
-      resolveBalance(installment, accessToken);
+      if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
+        installment.setBalance(receiptDTO.getBalance());
+        resolveBalance(installment, accessToken);
+      }
       // update mbdAttachment of transfer entity if present in input ReceiptDTO
       updateMbdAttachment(installment, receiptDTO);
     }
@@ -41,9 +44,6 @@ public class OrdinaryInstallmentPaymentHandlerService {
     installment.setReceiptId(receiptDTO.getReceiptId());
     InstallmentUtils.setStatus(installment, InstallmentStatus.PAID);
     installment.setIur(receiptDTO.getPaymentReceiptId());
-    if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
-      installment.setBalance(receiptDTO.getBalance());
-    }
     updateAmountAndNotificationFee(installment, receiptDTO);
   }
 
@@ -65,6 +65,10 @@ public class OrdinaryInstallmentPaymentHandlerService {
     if (debtPositionTypeOrg == null) {
       throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
     }
+    resolveBalance(installment, debtPositionTypeOrg, accessToken);
+  }
+
+  public void resolveBalance(InstallmentNoPII installment, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
     balanceResolverService.updateBalanceResolvingAmount(installment, debtPositionTypeOrg.getOrganizationId(), debtPositionTypeOrg, accessToken);
   }
 

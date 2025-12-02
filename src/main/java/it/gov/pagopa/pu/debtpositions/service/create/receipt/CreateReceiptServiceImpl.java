@@ -82,12 +82,12 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
   private boolean shouldUpdateExistingReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, ReceiptDTO existingReceipt) {
     if (StringUtils.isEmpty(receiptDTO.getIud())) {
-      log.info("Skipping update: receipt already exists and is not a manual import");
+      log.info("Skipping receipt update: the input is not a manual import");
       return false;
     }
 
     if (ReceiptOriginType.RECEIPT_FILE.equals(existingReceipt.getReceiptOrigin())) {
-      logReceiptData("Updating Receipt manually imported with technical origin", receiptDTO);
+      log.info("Updating receipt: the input is a manual import and the stored receipt has technical origin: {}", existingReceipt.getReceiptOrigin());
       return true;
     }
 
