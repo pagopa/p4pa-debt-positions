@@ -98,7 +98,6 @@ class MixedDebtPositionMapperTest {
       .debtPositionOrigin(DebtPositionOrigin.ORDINARY)
       .organizationId(500L)
       .description("Test Description")
-      .flagIuvVolatile(true)
       .flagPuPagoPaPayment(true)
       .multiDebtor(false)
       .debtPositionTypeOrgId(dpTypeOrg.getDebtPositionTypeOrgId())

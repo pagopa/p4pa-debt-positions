@@ -1533,7 +1533,7 @@ paths:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
         "500":
           description: Internal server error
-  /debt-positions/unpaid/debtor:
+  /debt-positions/debtor/unpaid:
     get:
       tags:
         - debt-position
@@ -1566,6 +1566,44 @@ paths:
         '500':
           description: Internal Server Error
       x-spring-paginated: true
+  /debt-positions/debtor/unpaid/{debtPositionId}/overview:
+    get:
+      tags:
+        - debt-position
+      operationId: getDebtorUnpaidDebtPositionOverview
+      parameters:
+        - name: debtPositionId
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: X-fiscal-code
+          in: header
+          required: true
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: "DebtorDebtPositionDTO"
+        '401':
+          description: Unauthorized - Missing or invalid token
+        '403':
+          description: Forbidden - Access denied
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
   /spontaneous-forms:
     post:
       tags:
@@ -1769,8 +1807,6 @@ components:
         validityDate:
           type: string
           format: date
-        flagIuvVolatile:
-          type: boolean
         multiDebtor:
           type: boolean
         flagPuPagoPaPayment:
@@ -2775,8 +2811,6 @@ components:
           type: 'DebtPositionOrigin'
         sourceFlowName:
           type: string
-        flagIuvVolatile:
-          type: boolean
         description:
           type: string
         dueDate:
