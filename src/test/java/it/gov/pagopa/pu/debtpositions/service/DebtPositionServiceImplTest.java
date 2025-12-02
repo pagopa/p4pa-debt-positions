@@ -548,7 +548,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenExistingDebtPositionWhenGetDebtorUnpaidDebtPositionDetailsThenOk() {
+  void givenExistingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenOk() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
@@ -575,7 +575,7 @@ class DebtPositionServiceImplTest {
     ).thenReturn(expected);
 
     // When
-    DebtorDebtPositionDTO result = debtPositionService.getDebtorUnpaidDebtPositionDetails(
+    DebtorDebtPositionDTO result = debtPositionService.getDebtorUnpaidDebtPositionOverview(
       debtPositionId, fiscalCode, organizationId
     );
 
@@ -586,7 +586,7 @@ class DebtPositionServiceImplTest {
 
 
   @Test
-  void givenMissingDebtPositionWhenGetDebtorUnpaidDebtPositionDetailsThenThrowNotFoundException() {
+  void givenMissingDebtPositionWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
@@ -600,7 +600,7 @@ class DebtPositionServiceImplTest {
     // When / Then
     Assertions.assertThrows(
       NotFoundException.class,
-      () -> debtPositionService.getDebtorUnpaidDebtPositionDetails(
+      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
         debtPositionId, fiscalCode, organizationId
       )
     );
@@ -609,7 +609,7 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
-  void givenMissingTypeOrgWhenGetDebtorUnpaidDebtPositionDetailsThenThrowNotFoundException() {
+  void givenMissingTypeOrgWhenGetDebtorUnpaidDebtPositionOverviewThenThrowNotFoundException() {
     // Given
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
@@ -630,7 +630,7 @@ class DebtPositionServiceImplTest {
     //Then
     Assertions.assertThrows(
       NotFoundException.class,
-      () -> debtPositionService.getDebtorUnpaidDebtPositionDetails(
+      () -> debtPositionService.getDebtorUnpaidDebtPositionOverview(
         debtPositionId, fiscalCode, organizationId)
     );
 

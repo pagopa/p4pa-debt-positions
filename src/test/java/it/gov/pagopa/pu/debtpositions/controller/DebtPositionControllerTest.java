@@ -625,16 +625,16 @@ class DebtPositionControllerTest {
   }
 
   @Test
-  void givenOrgIdWhenGetDebtorUnpaidDebtPositionDetailsThenOk() throws Exception {
+  void givenOrgIdWhenGetDebtorUnpaidDebtPositionOverviewThenOk() throws Exception {
     Long debtPositionId = 1L;
     Long organizationId = 1L;
     String debtorFiscalCode = "debtorFiscalCode";
     DebtorDebtPositionDTO expectedResult = new DebtorDebtPositionDTO();
 
-    Mockito.when(debtPositionService.getDebtorUnpaidDebtPositionDetails(debtPositionId, debtorFiscalCode, organizationId)).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, debtorFiscalCode, organizationId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
-        get("/debt-positions/debtor/unpaid/{debtPositionId}", debtPositionId)
+        get("/debt-positions/debtor/unpaid/{debtPositionId}/overview", debtPositionId)
           .header("X-fiscal-code", debtorFiscalCode)
           .queryParam("organizationId", organizationId.toString())
           .contentType(MediaType.APPLICATION_JSON_VALUE))
