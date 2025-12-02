@@ -17,9 +17,9 @@ import org.hibernate.annotations.Formula;
 public class DebtPositionTypeOrgCountByOrganizationId implements Serializable {
   @Id
   private Long organizationId;
+
   @Formula("(SELECT COUNT(*) "
     + "FROM debt_position_type_org dpto "
-    + "WHERE organization_id = dpto.organization_id "
-    + "AND dpto.flag_active = true)")
-  private Integer activeOrganizations;
+    + "WHERE organization_id = dpto.organization_id)")
+  private Integer organizations;
 }
