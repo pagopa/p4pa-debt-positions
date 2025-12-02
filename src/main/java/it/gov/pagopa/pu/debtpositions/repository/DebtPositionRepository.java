@@ -272,4 +272,10 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
     @Param("debtorFiscalCode") String debtorFiscalCode,
     @Param("organizationId") Long organizationId
   );
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE DebtPosition d SET d.debtPositionTypeOrgId = :newTypeOrgId WHERE d.debtPositionId = :debtPositionId")
+  Integer updateDebtPositionTypeOrgId(Long debtPositionId, Long newTypeOrgId);
 }
