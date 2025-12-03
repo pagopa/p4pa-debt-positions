@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -19,6 +20,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 public class TechnicalDpUpdateService {
 
   private final ReceiptWithAdditionalInfoMapper receiptMapper;
@@ -29,15 +31,15 @@ public class TechnicalDpUpdateService {
     this.debtPositionService = debtPositionService;
   }
 
-  public DebtPositionDTO updateDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
+  public void updateDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization) {
     DebtPositionDTO updatedTechDp = receiptMapper.mapToDebtPosition(receiptDTO, organization);
-    updateDp(dp, updatedTechDp);
-    return updatedTechDp;
-  }
 
-  public void updateDp(DebtPosition dp, DebtPositionDTO dpDTO) {
-    propagateIdsForDebtPosition(dp, dpDTO);
-    debtPositionService.saveDebtPosition(dpDTO);
+    if (dp.getDebtPositionTypeOrgId() != -1) {
+      updatedTechDp.setDebtPositionTypeOrgId(dp.getDebtPositionTypeOrgId());
+    }
+
+    propagateIdsForDebtPosition(dp, updatedTechDp);
+    debtPositionService.saveDebtPosition(updatedTechDp);
   }
 
   private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {
