@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -58,6 +59,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   private DebtPositionSyncService syncServiceMock;
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  @Mock
+  private TransferRepository transferRepositoryMock;
 
   private DebtPositionHierarchyStatusAlignerServiceImpl service;
 
@@ -71,7 +74,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         debtPositionInnerStatusAlignerServiceMock,
         debtPositionMapperMock,
         syncServiceMock,
-        debtPositionTypeOrgRepositoryMock)
+        debtPositionTypeOrgRepositoryMock,
+        transferRepositoryMock)
     );
   }
 
@@ -84,7 +88,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       debtPositionInnerStatusAlignerServiceMock,
       debtPositionMapperMock,
       syncServiceMock,
-      debtPositionTypeOrgRepositoryMock
+      debtPositionTypeOrgRepositoryMock,
+      transferRepositoryMock
     );
   }
 
