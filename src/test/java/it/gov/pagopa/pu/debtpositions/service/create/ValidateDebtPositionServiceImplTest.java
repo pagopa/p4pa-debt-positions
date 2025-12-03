@@ -615,6 +615,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setAmountCents(200L);
     TransferDTO firstTransfer = buildTransferDTO();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setTransferIndex(2);
