@@ -18,4 +18,7 @@ public interface BaseInstallment extends Serializable {
 
   Long getAmountCents();
   LocalDate getDueDate();
+  String getIuv();
+  String getNav();
+  String getRemittanceInformation();
 }
