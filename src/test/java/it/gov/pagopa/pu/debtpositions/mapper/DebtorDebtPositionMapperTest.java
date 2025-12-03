@@ -80,6 +80,10 @@ class DebtorDebtPositionMapperTest {
     // given
     DebtPosition dp = podam.manufacturePojo(DebtPosition.class);
 
+    DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
+    typeOrg.setDescription("TYPE_ORG_DESC");
+
+
     PaymentOption po = new PaymentOption();
     po.setPaymentOptionId(1L);
 
@@ -107,7 +111,7 @@ class DebtorDebtPositionMapperTest {
     dp.setPaymentOptions(options);
 
     // when
-    DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg());
+    DebtorDebtPositionDTO result = mapper.map(dp, typeOrg);
 
     // then
     List<?> installments = result.getPaymentOptions().getFirst().getInstallments().stream().toList();
