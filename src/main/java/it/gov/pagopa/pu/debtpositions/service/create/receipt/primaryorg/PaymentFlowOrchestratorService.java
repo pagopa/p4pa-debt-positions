@@ -29,12 +29,7 @@ public class PaymentFlowOrchestratorService {
   private final OrdinaryInstallmentPaymentHandlerService ordinaryInstallmentPaymentHandlerService;
   private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
-  public PaymentFlowOrchestratorService(ReceiptService receiptService,
-                                        DebtPositionRepository debtPositionRepository,
-                                        InstallmentNoPIIRepository installmentNoPIIRepository,
-                                        OrdinaryInstallmentPaymentHandlerService ordinaryInstallmentPaymentHandlerService,
-                                        DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
-                                        UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
+  public PaymentFlowOrchestratorService(ReceiptService receiptService, DebtPositionRepository debtPositionRepository, InstallmentNoPIIRepository installmentNoPIIRepository, OrdinaryInstallmentPaymentHandlerService ordinaryInstallmentPaymentHandlerService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
     this.receiptService = receiptService;
     this.debtPositionRepository = debtPositionRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
@@ -47,8 +42,8 @@ public class PaymentFlowOrchestratorService {
                                      ReceiptWithAdditionalNodeDataDTO incomingReceiptDTO,
                                      DebtPosition dp,
                                      Runnable fullUpdateAction,
-                                     Runnable partialUpdateAction,
-                                     Runnable syncAction) {
+                                     Runnable syncWorkflowAction,
+                                     String accessToken) {
 
     ReceiptDTO storedReceipt = receiptService.getReceipt(installment.getReceiptId());
 
@@ -58,20 +53,23 @@ public class PaymentFlowOrchestratorService {
     if (isStoredPagoPa) {
       if (!isIncomingPagoPa) {
         log.info("Updating balance/dpTypeOrgId for debtPositionId {} (Stored: {}, Incoming: {})", dp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
-        partialUpdateAction.run();
-        syncAction.run();
+        updateBalanceAndMeta(dp, installment, incomingReceiptDTO.getDebtPositionTypeOrgCode(), accessToken);
+
+        syncWorkflowAction.run();
       } else {
         log.info("Skipping update and workflow for DP {} (Both RECEIPT_PAGOPA origin)", dp.getDebtPositionId());
       }
     } else {
       if (isIncomingPagoPa) {
         log.info("Executing Full Update for DP {} (Stored: {}, Incoming: {})", dp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
+
         fullUpdateAction.run();
-        syncAction.run();
+        syncWorkflowAction.run();
       } else {
         log.info("Updating balance/dpTypeOrgId for DP {} (Both not RECEIPT_PAGOPA origin)", dp.getDebtPositionId());
-        partialUpdateAction.run();
-        syncAction.run();
+        updateBalanceAndMeta(dp, installment, incomingReceiptDTO.getDebtPositionTypeOrgCode(), accessToken);
+
+        syncWorkflowAction.run();
       }
     }
   }
