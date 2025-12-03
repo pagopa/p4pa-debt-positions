@@ -18,11 +18,9 @@ import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPosit
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.Constants;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -146,7 +144,6 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     if (debtPosition.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS_MIXED)) {
       log.debug("Debt position with id {} have SPONTANEOUS_MIXED origin", debtPosition.getDebtPositionId());
 
-      // Find installment and transfer index for the target transfer
       Pair<InstallmentNoPII, Transfer> installmentAndTransfer = debtPosition.getPaymentOptions().stream()
         .flatMap(p -> p.getInstallments().stream())
         .flatMap(i -> i.getTransfers().stream()
@@ -155,7 +152,6 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         .findFirst()
         .orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
 
-      // Fetch the transfer using the repository method
       Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
         debtPosition.getOrganizationId(),
         installmentAndTransfer.getLeft().getIuv(),
