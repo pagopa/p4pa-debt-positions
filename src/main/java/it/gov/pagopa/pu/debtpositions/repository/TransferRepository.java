@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,5 +57,20 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
       """)
   List<Transfer> findByInstallmentId(
     @Parameter(required = true) @Param("installmentId") Long installmentId);
+
+  @RestResource(exported = false)
+  @Query("""
+    SELECT t
+    FROM Transfer t
+    JOIN InstallmentNoPII i ON t.installmentId = i.installmentId
+    JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId
+    JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    JOIN DebtPositionType dpt ON dpto.debtPositionTypeId = dpt.debtPositionTypeId AND dpt.code = 'MIXED'
+    WHERE d.organizationId = :organizationId
+    AND i.iuv = :iuv
+    AND t.transferIndex = :transferIndex
+    """)
+  Optional<Transfer> findByOrganizationIdAndIuvAndTransferIndex(Long organizationId, String iuv, int transferIndex);
 
 }
