@@ -24,6 +24,8 @@ public class DebtorDebtPositionDTO implements BaseDebtPosition{
 
   private DebtPositionOrigin debtPositionOrigin;
 
+  private String iupdOrg;
+
   private Long organizationId;
 
   private List<BasePaymentOption> paymentOptions = new ArrayList<>();
