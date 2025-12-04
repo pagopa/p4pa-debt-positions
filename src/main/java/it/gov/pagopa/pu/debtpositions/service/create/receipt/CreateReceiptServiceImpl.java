@@ -91,7 +91,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       return true;
     }
 
-    log.info("Skipping update for manual import: existing receipt origin [{}] is not technical", existingReceipt.getReceiptOrigin());
+    log.info("Skipping update for manual import: existing receipt origin [{}] is not technical", existingReceipt.getNoPII().getReceiptOrigin());
     return false;
   }
 
