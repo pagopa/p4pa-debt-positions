@@ -14,7 +14,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
+import org.junit.jupiter.params.provider.*;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -23,7 +23,9 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
+import static it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin.*;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
@@ -419,7 +421,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenTransferPIVANullThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
+    debtPositionDTO.setDebtPositionOrigin(ORDINARY_SIL);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO transfer = debtPositionDTO.getPaymentOptions()
       .getFirst()
@@ -438,7 +440,7 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenTransferPIVANotValidThenThrowValidationException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
+    debtPositionDTO.setDebtPositionOrigin(ORDINARY_SIL);
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     TransferDTO transfer = debtPositionDTO.getPaymentOptions()
@@ -613,6 +615,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setAmountCents(200L);
     TransferDTO firstTransfer = buildTransferDTO();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setTransferIndex(2);
@@ -673,9 +676,11 @@ class ValidateDebtPositionServiceImplTest {
     );
   }
 
-  @Test
-  void testOtherValidateThenSuccess() {
+  @ParameterizedTest
+  @MethodSource("provideOrdinaryOrigins")
+  void testOtherValidateThenSuccess(DebtPositionOrigin origin, boolean expected) {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setDebtPositionOrigin(origin);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getDebtor().setEmail(null);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setFlagMandatoryDueDate(false);
@@ -687,17 +692,26 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
 
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals(Boolean.FALSE, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSwitchToExpired());
+    assertEquals(expected, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSwitchToExpired());
+  }
+
+  private static Stream<Arguments> provideOrdinaryOrigins() {
+    return Stream.of(
+      Arguments.of(ORDINARY, false),
+      Arguments.of(ORDINARY_SIL, false),
+      Arguments.of(SPONTANEOUS, true),
+      Arguments.of(SPONTANEOUS_SIL, true)
+    );
   }
 
   @Test
   void testValidateWhenDPOriginOrdinaryAndStatusPaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.ORDINARY, DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+    testValidateDPOrigin(ORDINARY, DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
   }
 
   @Test
   void testValidateWhenDPOriginOrdinarySilAndStatusPaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.ORDINARY_SIL,DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+    testValidateDPOrigin(ORDINARY_SIL,DebtPositionStatus.PAID, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
   }
 
   @Test
