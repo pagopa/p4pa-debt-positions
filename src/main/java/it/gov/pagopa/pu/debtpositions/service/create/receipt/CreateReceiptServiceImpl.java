@@ -86,8 +86,8 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       return false;
     }
 
-    if (ReceiptOriginType.RECEIPT_FILE.equals(existingReceipt.getReceiptOrigin())) {
-      log.info("Updating receipt: the input is a manual import and the stored receipt has technical origin: {}", existingReceipt.getReceiptOrigin());
+    if (ReceiptOriginType.RECEIPT_FILE.equals(existingReceipt.getNoPII().getReceiptOrigin())) {
+      log.info("Updating receipt: the input is a manual import and the stored receipt has technical origin: {}", existingReceipt.getNoPII().getReceiptOrigin());
       return true;
     }
 
