@@ -149,6 +149,7 @@ class CreateReceiptServiceTest {
   void givenManualExistingReceiptWhenCreateReceiptThenOk() {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+
     String accessToken = "ACCESSTOKEN";
     ReceiptNoPII receiptInDb = podamFactory.manufacturePojo(ReceiptNoPII.class);
     receiptInDb.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
