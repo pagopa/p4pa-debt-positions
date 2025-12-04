@@ -53,7 +53,7 @@ public class PaymentFlowOrchestratorService {
     if (isStoredPagoPa) {
       if (!isIncomingPagoPa) {
         log.info("Updating balance/dpTypeOrgId for debtPositionId {} (Stored: {}, Incoming: {})", dp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
-        updateBalanceAndMeta(dp, installment, incomingReceiptDTO.getDebtPositionTypeOrgCode(), accessToken);
+        updateBalanceAndMeta(dp, installment, incomingReceiptDTO, accessToken);
 
         syncWorkflowAction.run();
       } else {
@@ -67,19 +67,19 @@ public class PaymentFlowOrchestratorService {
         syncWorkflowAction.run();
       } else {
         log.info("Updating balance/dpTypeOrgId for DP {} (Both not RECEIPT_PAGOPA origin)", dp.getDebtPositionId());
-        updateBalanceAndMeta(dp, installment, incomingReceiptDTO.getDebtPositionTypeOrgCode(), accessToken);
+        updateBalanceAndMeta(dp, installment, incomingReceiptDTO, accessToken);
 
         syncWorkflowAction.run();
       }
     }
   }
 
-  public void updateBalanceAndMeta(DebtPosition dp, InstallmentNoPII installment, String debtPositionTypeOrgCode, String accessToken) {
+  public void updateBalanceAndMeta(DebtPosition dp, InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO incomingReceiptDTO, String accessToken) {
     DebtPositionTypeOrg unknownTypeOrg = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
     DebtPositionTypeOrg typeOrgToUse = null;
 
     if (Objects.equals(dp.getDebtPositionTypeOrgId(), unknownTypeOrg.getDebtPositionTypeOrgId())) {
-      Optional<DebtPositionTypeOrg> specificTypeOrgOpt = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(dp.getOrganizationId(), debtPositionTypeOrgCode);
+      Optional<DebtPositionTypeOrg> specificTypeOrgOpt = debtPositionTypeOrgRepository.findByOrganizationIdAndCode(dp.getOrganizationId(), incomingReceiptDTO.getDebtPositionTypeOrgCode());
 
       if (specificTypeOrgOpt.isPresent()) {
         DebtPositionTypeOrg specificTypeOrg = specificTypeOrgOpt.get();
@@ -94,6 +94,7 @@ public class PaymentFlowOrchestratorService {
     }
 
     log.info("Updating balance for installmentId[{}]", installment.getInstallmentId());
+    installment.setBalance(incomingReceiptDTO.getBalance());
 
     if (typeOrgToUse != null) {
       ordinaryInstallmentPaymentHandlerService.resolveBalance(installment, typeOrgToUse, accessToken);
