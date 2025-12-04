@@ -104,11 +104,14 @@ class PaymentFlowOrchestratorServiceTest {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     ReceiptWithAdditionalNodeDataDTO incomingReceipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     incomingReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
+    incomingReceipt.setBalance("NEW_BALANCE");
     incomingReceipt.setDebtPositionTypeOrgCode("CODE");
+
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
     DebtPositionTypeOrg unknownTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     unknownTypeOrg.setDebtPositionTypeOrgId(99L);
     dp.setDebtPositionTypeOrgId(100L);
+
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
 
@@ -123,10 +126,11 @@ class PaymentFlowOrchestratorServiceTest {
     service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
 
     // Then
+    Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock).getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
     Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), installment.getBalance());
+    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
     Mockito.verify(fullUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction).run();
   }
@@ -161,11 +165,14 @@ class PaymentFlowOrchestratorServiceTest {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     ReceiptWithAdditionalNodeDataDTO incomingReceipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     incomingReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
+    incomingReceipt.setBalance("NEW_BALANCE");
     incomingReceipt.setDebtPositionTypeOrgCode("CODE");
+
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
     DebtPositionTypeOrg unknownTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     unknownTypeOrg.setDebtPositionTypeOrgId(99L);
     dp.setDebtPositionTypeOrgId(100L);
+
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
 
@@ -180,10 +187,11 @@ class PaymentFlowOrchestratorServiceTest {
     service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
 
     // Then
+    Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock).getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
     Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), installment.getBalance());
+    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
     Mockito.verify(fullUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction).run();
   }
@@ -196,6 +204,10 @@ class PaymentFlowOrchestratorServiceTest {
     dp.setDebtPositionTypeOrgId(unknownTypeOrg.getDebtPositionTypeOrgId());
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     String code = "CODE";
+    ReceiptWithAdditionalNodeDataDTO incomingReceipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    incomingReceipt.setDebtPositionTypeOrgCode(code);
+    incomingReceipt.setBalance("BAL");
+
     DebtPositionTypeOrg specificTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
 
     Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(dp.getOrganizationId()))
@@ -204,13 +216,14 @@ class PaymentFlowOrchestratorServiceTest {
       .thenReturn(Optional.of(specificTypeOrg));
 
     // When
-    service.updateBalanceAndMeta(dp, installment, code, accessToken);
+    service.updateBalanceAndMeta(dp, installment, incomingReceipt, accessToken);
 
     // Then
     Assertions.assertEquals(specificTypeOrg.getDebtPositionTypeOrgId(), dp.getDebtPositionTypeOrgId());
+    Assertions.assertEquals("BAL", installment.getBalance());
     Mockito.verify(debtPositionRepositoryMock).updateDebtPositionTypeOrgId(dp.getDebtPositionId(), specificTypeOrg.getDebtPositionTypeOrgId());
     Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, specificTypeOrg, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), installment.getBalance());
+    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "BAL");
   }
 
   @Test
@@ -221,6 +234,9 @@ class PaymentFlowOrchestratorServiceTest {
     dp.setDebtPositionTypeOrgId(unknownTypeOrg.getDebtPositionTypeOrgId());
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     String code = "CODE";
+    ReceiptWithAdditionalNodeDataDTO incomingReceipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    incomingReceipt.setDebtPositionTypeOrgCode(code);
+    incomingReceipt.setBalance("BAL");
 
     Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(dp.getOrganizationId()))
       .thenReturn(unknownTypeOrg);
@@ -228,13 +244,14 @@ class PaymentFlowOrchestratorServiceTest {
       .thenReturn(Optional.empty());
 
     // When
-    service.updateBalanceAndMeta(dp, installment, code, accessToken);
+    service.updateBalanceAndMeta(dp, installment, incomingReceipt, accessToken);
 
     // Then
     Assertions.assertEquals(unknownTypeOrg.getDebtPositionTypeOrgId(), dp.getDebtPositionTypeOrgId());
+    Assertions.assertEquals("BAL", installment.getBalance());
     Mockito.verify(debtPositionRepositoryMock, Mockito.never()).updateDebtPositionTypeOrgId(Mockito.anyLong(), Mockito.anyLong());
     Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, unknownTypeOrg, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), installment.getBalance());
+    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "BAL");
   }
 
   @Test
@@ -245,18 +262,20 @@ class PaymentFlowOrchestratorServiceTest {
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
     dp.setDebtPositionTypeOrgId(123L);
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
-    String code = "CODE";
+    ReceiptWithAdditionalNodeDataDTO incomingReceipt = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    incomingReceipt.setBalance("BAL");
 
     Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(dp.getOrganizationId()))
       .thenReturn(unknownTypeOrg);
 
     // When
-    service.updateBalanceAndMeta(dp, installment, code, accessToken);
+    service.updateBalanceAndMeta(dp, installment, incomingReceipt, accessToken);
 
     // Then
+    Assertions.assertEquals("BAL", installment.getBalance());
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).findByOrganizationIdAndCode(Mockito.anyLong(), Mockito.anyString());
     Mockito.verify(debtPositionRepositoryMock, Mockito.never()).updateDebtPositionTypeOrgId(Mockito.anyLong(), Mockito.anyLong());
     Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), installment.getBalance());
+    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "BAL");
   }
 }
