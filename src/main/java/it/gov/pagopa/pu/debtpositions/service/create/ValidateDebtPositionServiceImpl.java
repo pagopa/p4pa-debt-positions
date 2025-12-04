@@ -109,8 +109,13 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (installmentDTO.getAmountCents() <= 0) {
       throw new InvalidValueException("[P4PA_INVALID_CENTS_AMOUNT] The installment amount must be greater than 0");
     }
-    if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) &&
-      debtPositionTypeOrg.getAmountCents() != null && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())) {
+    if (
+        (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) ||
+         DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin) ||
+         DebtPositionOrigin.ORDINARY_SIL.equals(debtPositionOrigin))
+         && debtPositionTypeOrg.getAmountCents() != null
+         && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())
+    ) {
       throw new InvalidValueException("[P4PA_INVALID_AMOUNT] Amount is not valid for this debt position type org");
     }
     if (StringUtils.isNotBlank(installmentDTO.getBalance()) &&
