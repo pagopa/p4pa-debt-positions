@@ -6,11 +6,13 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface DebtorDebtPositionMapper {
@@ -36,12 +38,18 @@ public interface DebtorDebtPositionMapper {
 
       SortedSet<InstallmentNoPII> installments = paymentOption.getInstallments();
       if (installments != null) {
-        SortedSet<InstallmentNoPII> sortedInstallments = new TreeSet<>(
-          Comparator.comparing(InstallmentNoPII::getDueDate, Comparator.nullsLast(Comparator.naturalOrder()))
-            .thenComparing(InstallmentNoPII::getInstallmentId)
-        );
-        sortedInstallments.addAll(installments);
+        SortedSet<InstallmentNoPII> sortedInstallments = installments.stream()
+          .filter(i -> InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.contains(i.getStatus()))
+          .collect(Collectors.toCollection(() -> new TreeSet<>(
+            Comparator.comparing(InstallmentNoPII::getDueDate, Comparator.nullsLast(Comparator.naturalOrder()))
+              .thenComparing(InstallmentNoPII::getInstallmentId)
+          )));
+
         paymentOption.setInstallments(sortedInstallments);
+
+        if (sortedInstallments.isEmpty()){
+          continue;
+        }
       }
       list.add(paymentOption);
     }
