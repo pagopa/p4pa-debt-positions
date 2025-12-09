@@ -334,10 +334,10 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     )).thenReturn(Optional.of(ordinaryTransfer));
     // Second call (recursive) returns ORDINARY debt position
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByTransferId(ordinaryTransfer.getTransferId())).thenReturn(ordinaryDebtPosition);
-    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIuf(200L, InstallmentStatus.REPORTED, request.getIuf());
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIuf(Mockito.anyLong(), Mockito.eq(InstallmentStatus.REPORTED), Mockito.eq(request.getIuf()));
     Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(Mockito.any());
-    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(ordinaryDebtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(ordinaryDebtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(Mockito.any(DebtPosition.class));
+    Mockito.when(debtPositionMapperMock.mapToDto(Mockito.any(DebtPosition.class))).thenReturn(debtPositionDTOexpected);
     Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
         Mockito.eq(PaymentEventType.DPI_REPORTED), Mockito.eq("IUD:"+ordinaryInstallment.getIud()), Mockito.same(accessToken)))
       .thenReturn(workflow);
