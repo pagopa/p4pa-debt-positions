@@ -36,6 +36,12 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentD
   }
 
   @Override
+  public List<InstallmentDTO> findByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId) {
+    return installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)
+      .stream().map(installmentPIIMapper::map).toList();
+  }
+
+  @Override
   void setId(InstallmentDTO fullDTO, Long id) {
     fullDTO.setInstallmentId(id);
   }
