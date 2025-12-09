@@ -141,26 +141,6 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       throw new NotFoundException(String.format("Debt position related to the transfer with id %s was not found", transferId));
     }
 
-    if (debtPosition.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS_MIXED)) {
-      log.debug("Debt position with id {} have SPONTANEOUS_MIXED origin", debtPosition.getDebtPositionId());
-
-      Pair<InstallmentNoPII, Transfer> installmentAndTransfer = debtPosition.getPaymentOptions().stream()
-        .flatMap(p -> p.getInstallments().stream())
-        .flatMap(i -> i.getTransfers().stream()
-          .filter(t -> t.getTransferId().equals(transferId))
-          .map(t -> Pair.of(i, t)))
-        .findFirst()
-        .orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
-
-      Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
-        debtPosition.getOrganizationId(),
-        installmentAndTransfer.getLeft().getIuv(),
-        installmentAndTransfer.getRight().getTransferIndex()
-      ).orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found", transferId)));
-
-      return notifyReportedTransferId(transfer.getTransferId(), transferReportedRequest, accessToken);
-    }
-
     String reportedIuds = debtPosition.getPaymentOptions().stream()
       .flatMap(p -> p.getInstallments().stream())
       .filter(i -> i.getTransfers().stream().anyMatch(transfer -> transfer.getTransferId().equals(transferId)))
@@ -187,6 +167,26 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     if(StringUtils.isNotEmpty(reportedIuds)){
       workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
         PaymentEventType.DPI_REPORTED, "IUD:" + reportedIuds, accessToken);
+    }
+
+    if (debtPosition.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS_MIXED)) {
+      log.debug("Debt position with id {} have SPONTANEOUS_MIXED origin", debtPosition.getDebtPositionId());
+
+      Pair<InstallmentNoPII, Transfer> installmentAndTransfer = debtPosition.getPaymentOptions().stream()
+        .flatMap(p -> p.getInstallments().stream())
+        .flatMap(i -> i.getTransfers().stream()
+          .filter(t -> t.getTransferId().equals(transferId))
+          .map(t -> Pair.of(i, t)))
+        .findFirst()
+        .orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
+
+      Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
+        debtPosition.getOrganizationId(),
+        installmentAndTransfer.getLeft().getIuv(),
+        installmentAndTransfer.getRight().getTransferIndex()
+      ).orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found", transferId)));
+
+      return notifyReportedTransferId(transfer.getTransferId(), transferReportedRequest, accessToken);
     }
 
     return Pair.of(debtPositionDTO, workflow);
