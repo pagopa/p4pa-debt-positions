@@ -6,13 +6,11 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
+import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -58,6 +56,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
   private DebtPositionSyncService syncServiceMock;
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  @Mock
+  private TransferRepository transferRepositoryMock;
 
   private DebtPositionHierarchyStatusAlignerServiceImpl service;
 
@@ -71,7 +71,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
         debtPositionInnerStatusAlignerServiceMock,
         debtPositionMapperMock,
         syncServiceMock,
-        debtPositionTypeOrgRepositoryMock)
+        debtPositionTypeOrgRepositoryMock,
+        transferRepositoryMock)
     );
   }
 
@@ -84,7 +85,8 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
       debtPositionInnerStatusAlignerServiceMock,
       debtPositionMapperMock,
       syncServiceMock,
-      debtPositionTypeOrgRepositoryMock
+      debtPositionTypeOrgRepositoryMock,
+      transferRepositoryMock
     );
   }
 
@@ -283,6 +285,74 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
 
     assertEquals(InstallmentStatus.REPORTED, reportedInstallment.getStatus());
     assertEquals(request.getIuf(), reportedInstallment.getIuf());
+  }
+
+  @Test
+  void givenNotifyReportedTransferIdWhenDebtPositionIsSpontaneousMixedThenOk() {
+    Long transferId = 1000L;
+    Long ordinaryTransferId = 2000L;
+    String accessToken = "ACCESSTOKEN";
+    TransferReportedRequest request = TransferReportedRequest.builder()
+      .iuf("IUF")
+      .build();
+
+    // Setup SPONTANEOUS_MIXED debt position
+    DebtPosition mixedDebtPosition = buildDebtPosition();
+    mixedDebtPosition.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED);
+    InstallmentNoPII mixedInstallment = mixedDebtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    mixedInstallment.setStatus(InstallmentStatus.PAID);
+    mixedInstallment.setIuv("IUV-123");
+
+    Transfer mixedTransfer = mixedInstallment.getTransfers().getFirst();
+
+    // Setup ORDINARY debt position (the target one)
+    DebtPosition ordinaryDebtPosition = buildDebtPosition();
+    ordinaryDebtPosition.setDebtPositionId(2L);
+    ordinaryDebtPosition.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
+    InstallmentNoPII ordinaryInstallment = ordinaryDebtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    ordinaryInstallment.setInstallmentId(200L);
+    ordinaryInstallment.setStatus(InstallmentStatus.PAID);
+    ordinaryInstallment.setIuv("IUV-123");
+
+    Transfer ordinaryTransfer = ordinaryInstallment.getTransfers().getFirst();
+    ordinaryTransfer.setTransferId(ordinaryTransferId);
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.setStatus(DebtPositionStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setIuf(request.getIuf());
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("WFID", "RUNID");
+
+    // First call returns SPONTANEOUS_MIXED debt position
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByTransferId(transferId)).thenReturn(mixedDebtPosition);
+    // Find the ordinary transfer
+    Mockito.when(transferRepositoryMock.findByOrganizationIdAndIuvAndTransferIndex(
+      mixedDebtPosition.getOrganizationId(),
+      mixedInstallment.getIuv(),
+      mixedTransfer.getTransferIndex()
+    )).thenReturn(Optional.of(ordinaryTransfer));
+    // Second call (recursive) returns ORDINARY debt position
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByTransferId(ordinaryTransfer.getTransferId())).thenReturn(ordinaryDebtPosition);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIuf(Mockito.anyLong(), Mockito.eq(InstallmentStatus.REPORTED), Mockito.eq(request.getIuf()));
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(Mockito.any());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(Mockito.any(DebtPosition.class));
+    Mockito.when(debtPositionMapperMock.mapToDto(Mockito.any(DebtPosition.class))).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(Mockito.same(debtPositionDTOexpected), Mockito.eq(new WfExecutionParameters()),
+        Mockito.eq(PaymentEventType.DPI_REPORTED), Mockito.eq("IUD:"+ordinaryInstallment.getIud()), Mockito.same(accessToken)))
+      .thenReturn(workflow);
+
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = service.notifyReportedTransferId(transferId, request, accessToken);
+
+    assertEquals(DebtPositionStatus.REPORTED, result.getLeft().getStatus());
+    assertEquals(PaymentOptionStatus.REPORTED, result.getLeft().getPaymentOptions().getFirst().getStatus());
+    assertEquals(InstallmentStatus.REPORTED, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(request.getIuf(), result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getIuf());
+    reflectionEqualsByName(debtPositionDTOexpected, result.getLeft());
+    assertSame(workflow, result.getRight());
+
+    assertEquals(InstallmentStatus.REPORTED, ordinaryInstallment.getStatus());
+    assertEquals(request.getIuf(), ordinaryInstallment.getIuf());
   }
 
   @Test

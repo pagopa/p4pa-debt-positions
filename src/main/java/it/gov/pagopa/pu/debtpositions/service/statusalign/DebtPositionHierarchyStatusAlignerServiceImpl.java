@@ -9,9 +9,11 @@ import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition.DebtPositionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.paymentoption.PaymentOptionInnerStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -45,11 +47,17 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionSyncService debtPositionSyncService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
-
+  private final TransferRepository transferRepository;
 
 
   public DebtPositionHierarchyStatusAlignerServiceImpl(DebtPositionRepository debtPositionRepository,
-                                                       InstallmentNoPIIRepository installmentNoPIIRepository, PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService, DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService, DebtPositionMapper debtPositionMapper, DebtPositionSyncService debtPositionSyncService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository) {
+                                                       InstallmentNoPIIRepository installmentNoPIIRepository,
+                                                       PaymentOptionInnerStatusAlignerService paymentOptionInnerStatusAlignerService,
+                                                       DebtPositionInnerStatusAlignerService debtPositionInnerStatusAlignerService,
+                                                       DebtPositionMapper debtPositionMapper,
+                                                       DebtPositionSyncService debtPositionSyncService,
+                                                       DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
+                                                       TransferRepository transferRepository) {
     this.debtPositionRepository = debtPositionRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.paymentOptionInnerStatusAlignerService = paymentOptionInnerStatusAlignerService;
@@ -57,6 +65,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     this.debtPositionMapper = debtPositionMapper;
     this.debtPositionSyncService = debtPositionSyncService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.transferRepository = transferRepository;
   }
 
   @Transactional
@@ -158,6 +167,26 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     if(StringUtils.isNotEmpty(reportedIuds)){
       workflow = debtPositionSyncService.syncDebtPosition(debtPositionDTO, new WfExecutionParameters(),
         PaymentEventType.DPI_REPORTED, "IUD:" + reportedIuds, accessToken);
+    }
+
+    if (debtPosition.getDebtPositionOrigin().equals(DebtPositionOrigin.SPONTANEOUS_MIXED)) {
+      log.debug("Debt position with id {} have SPONTANEOUS_MIXED origin", debtPosition.getDebtPositionId());
+
+      Pair<InstallmentNoPII, Transfer> installmentAndTransfer = debtPosition.getPaymentOptions().stream()
+        .flatMap(p -> p.getInstallments().stream())
+        .flatMap(i -> i.getTransfers().stream()
+          .filter(t -> t.getTransferId().equals(transferId))
+          .map(t -> Pair.of(i, t)))
+        .findFirst()
+        .orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
+
+      Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
+        debtPosition.getOrganizationId(),
+        installmentAndTransfer.getLeft().getIuv(),
+        installmentAndTransfer.getRight().getTransferIndex()
+      ).orElseThrow(() -> new NotFoundException(String.format("Transfer with id %s was not found", transferId)));
+
+      return notifyReportedTransferId(transfer.getTransferId(), transferReportedRequest, accessToken);
     }
 
     return Pair.of(debtPositionDTO, workflow);
