@@ -179,5 +179,5 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("paymentOptionId") Long paymentOptionId,
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
-    @Parameter(required = true) @Param("organizationId") Long organizationId);
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId);
 }
