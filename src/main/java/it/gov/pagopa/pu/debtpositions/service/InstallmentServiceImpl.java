@@ -1,15 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.InstallmentDebtorDTOMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
@@ -17,16 +22,15 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPai
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import java.time.OffsetDateTime;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -39,6 +43,8 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final DebtPositionRepository debtPositionRepository;
   private final DebtPositionMapper debtPositionMapper;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final InstallmentDebtorDTOMapper installmentDebtorDTOMapper;
 
   public InstallmentServiceImpl(
     InstallmentPIIRepository installmentPIIRepository,
@@ -48,7 +54,7 @@ public class InstallmentServiceImpl implements InstallmentService {
     DebtPositionService debtPositionService,
     DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
     DebtPositionRepository debtPositionRepository,
-    DebtPositionMapper debtPositionMapper) {
+    DebtPositionMapper debtPositionMapper, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, InstallmentDebtorDTOMapper installmentDebtorDTOMapper) {
     this.installmentPIIRepository = installmentPIIRepository;
     this.installmentNoPIIRepository = installmentNoPIIRepository;
     this.installmentDetailPIIViewRepository = installmentDetailPIIViewRepository;
@@ -57,6 +63,8 @@ public class InstallmentServiceImpl implements InstallmentService {
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
+    this.installmentDebtorDTOMapper = installmentDebtorDTOMapper;
   }
 
   @Override
@@ -183,5 +191,23 @@ public class InstallmentServiceImpl implements InstallmentService {
 
     installmentDTO.setAmountCents(newInstallmentAmount);
     return installmentDTO;
+  }
+
+  @Override
+  public List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId) {
+    if(organizationId==null && StringUtils.isBlank(debtorFiscalCode)){
+      throw new InvalidParamException("Either debtorFiscalCode or organizationId must be provided");
+    }
+    List<InstallmentDTO> installments = installmentPIIRepository.findByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+    if(CollectionUtils.isEmpty(installments)){
+      return Collections.emptyList();
+    }
+    return installmentDebtorDTOMapper.map(installments,buildDebtPositionTypeOrgMap(installments));
+  }
+
+  private Map<Long, DebtPositionTypeOrg> buildDebtPositionTypeOrgMap(List<InstallmentDTO> installments) {
+    Set<Long> installmentIdSet = installments.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
+    return installmentIdSet.stream().collect(
+      Collectors.toMap(Function.identity(),debtPositionTypeOrgRepository::getDebtPositionTypeOrgByInstallmentId));
   }
 }

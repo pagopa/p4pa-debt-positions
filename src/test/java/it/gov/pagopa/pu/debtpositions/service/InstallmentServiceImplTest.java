@@ -1,32 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.InstallmentDebtorDTOMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
@@ -35,24 +23,29 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallme
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import java.time.LocalDate;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
+import java.util.*;
+import java.util.stream.Stream;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentServiceImplTest {
@@ -73,6 +66,10 @@ class InstallmentServiceImplTest {
   private DebtPositionRepository debtPositionRepositoryMock;
   @Mock
   private DebtPositionMapper debtPositionMapperMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  @Mock
+  private InstallmentDebtorDTOMapper installmentDebtorDTOMapperMock;
 
   private InstallmentServiceImpl installmentService;
 
@@ -92,7 +89,9 @@ class InstallmentServiceImplTest {
       debtPositionServiceMock,
       debtPositionUpdateInstallmentServiceMock,
       debtPositionRepositoryMock,
-      debtPositionMapperMock);
+      debtPositionMapperMock,
+      debtPositionTypeOrgRepositoryMock,
+      installmentDebtorDTOMapperMock);
 
       wfExecutionParameters = WfExecutionParameters.builder()
       .massive(false)
@@ -110,7 +109,8 @@ class InstallmentServiceImplTest {
       debtPositionServiceMock,
       debtPositionUpdateInstallmentServiceMock,
       debtPositionRepositoryMock,
-      debtPositionMapperMock);
+      debtPositionMapperMock,
+      debtPositionTypeOrgRepositoryMock);
   }
 
   @ParameterizedTest
@@ -560,4 +560,58 @@ class InstallmentServiceImplTest {
     Assertions.assertIterableEquals(installmentDTOList, response);
   }
 
+  @ParameterizedTest
+  @MethodSource(value = "getInstallmentsByIuvOrNavSource")
+  void whenGetInstallmentsByIuvOrNavThenOk(String debtorFiscalCode, Long organizationId) {
+    String iuvOrNav = "iuvOrNav";
+    List<InstallmentDTO> installments = podamFactory.manufacturePojo(List.class,InstallmentDTO.class);
+    Map<Long, DebtPositionTypeOrg> dptoMap = new HashMap<>();
+    for (InstallmentDTO installment : installments) {
+      dptoMap.put(installment.getInstallmentId(),podamFactory.manufacturePojo(DebtPositionTypeOrg.class));
+    }
+    List<InstallmentDebtorDTO> expectedResult = podamFactory.manufacturePojo(List.class,InstallmentDebtorDTO.class);
+
+    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(installments);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong()))
+      .thenAnswer(invocation -> dptoMap.get(invocation.getArgument(0, Long.class)));
+    Mockito.when(installmentDebtorDTOMapperMock.map(installments,dptoMap)).thenReturn(expectedResult);
+
+    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(expectedResult,result);
+    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.times(dptoMap.size())).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
+  }
+
+  private static Stream<Arguments> getInstallmentsByIuvOrNavSource(){
+    return Stream.of(
+      Arguments.of("debtorFiscalCode", 1L),
+      Arguments.of("debtorFiscalCode", null),
+      Arguments.of(null, 1L)
+    );
+  }
+
+  @Test
+  void givenNoInstallmentsWhenGetInstallmentsByIuvOrNavThenEmptyList() {
+    String iuvOrNav = "iuvOrNav";
+    String debtorFiscalCode = "debtorFiscalCode";
+    Long organizationId = 1L;
+
+    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(Collections.emptyList());
+
+    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertTrue(result.isEmpty());
+    Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock,installmentDebtorDTOMapperMock);
+  }
+
+  @Test
+  void givenNoDebtorFiscalCodeAndNoOrganizationIdWhenGetInstallmentsByIuvOrNavThenInvalidParamException() {
+    String iuvOrNav = "iuvOrNav";
+
+    assertThrows(InvalidParamException.class,() -> installmentService.getInstallmentsByIuvOrNav(iuvOrNav, null, null));
+
+    Mockito.verifyNoInteractions(installmentNoPIIRepositoryMock,debtPositionTypeOrgRepositoryMock,installmentDebtorDTOMapperMock);
+  }
 }

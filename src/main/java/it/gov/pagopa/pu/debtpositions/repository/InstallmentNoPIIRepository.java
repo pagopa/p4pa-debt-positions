@@ -149,4 +149,20 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
+  @RestResource(exported = false)
+  @Query("""
+    select i
+    from InstallmentNoPII i
+    join PaymentOption po on i.paymentOptionId = po.paymentOptionId
+    join DebtPosition dp on po.debtPositionId = dp.debtPositionId
+    where i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).UNPAID_OR_PAID_INSTALLMENT_STATUSES})
+    AND (i.iuv = :iuvOrNav OR i.nav = :iuvOrNav)
+    AND ((:debtorFiscalCode is null) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)} ))
+    AND ((:organizationId is null) OR (dp.organizationId = :organizationId))
+    AND dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED})
+    """)
+  List<InstallmentNoPII> findByIuvOrNav(
+    @Parameter(required = true) @Param("iuvOrNav") String iuvOrNav,
+    String debtorFiscalCode,
+    Long organizationId);
 }

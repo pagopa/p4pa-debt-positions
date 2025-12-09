@@ -20,4 +20,6 @@ public interface InstallmentService {
   InstallmentDTO updateInstallmentNotificationFee(ActualizeAmountRequestDTO actualizeAmountRequestDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId);
 
   List<InstallmentDTO> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin);
+
+  List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId);
 }
