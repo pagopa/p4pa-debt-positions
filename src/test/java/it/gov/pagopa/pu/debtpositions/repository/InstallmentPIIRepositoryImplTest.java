@@ -252,4 +252,22 @@ class InstallmentPIIRepositoryImplTest {
     Assertions.assertEquals(installmentDTOList.size(), result.size());
     installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
   }
+
+  @Test
+  void whenFindByIuvOrNavThenOk() {
+    String iuvOrNav = "iuvOrNav";
+    String debtorFiscalCode = "debtorFiscalCode";
+    Long organizationId = 1L;
+    List<InstallmentNoPII> installments = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+
+    Mockito.when(installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(installments);
+    Mockito.when(mapperMock.map((InstallmentNoPII) Mockito.argThat(installments::contains))).thenAnswer(invocationOnMock -> new InstallmentDTO());
+
+    List<InstallmentDTO> result = installmentPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId);
+
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(installments.size(), result.size());
+    Mockito.verify(mapperMock, Mockito.times(installments.size())).map(Mockito.any(InstallmentNoPII.class));
+    installments.forEach(i -> Mockito.verify(mapperMock).map(i));
+  }
 }

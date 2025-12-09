@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -133,4 +134,25 @@ class InstallmentControllerTest {
     Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
   }
 
+  @Test
+  void whenGetInstallmentsByIuvOrNavThenOk() throws Exception {
+    String iuvOrNav = "iuvOrNav";
+    String debtorFiscalCode = "debtorFiscalCode";
+    Long organizationId = 1L;
+    List<InstallmentDebtorDTO> expectedResponse = podamFactory.manufacturePojo(List.class,InstallmentDebtorDTO.class);
+
+    Mockito.when(installmentServiceMock.getInstallmentsByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(expectedResponse);
+
+    MvcResult result = mockMvc.perform(
+        MockMvcRequestBuilders.get("/installments/debtor")
+          .param("iuvOrNav",iuvOrNav)
+          .param("organizationId",organizationId.toString())
+          .header("X-fiscal-code",debtorFiscalCode))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<InstallmentDebtorDTO> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+
+    Assertions.assertEquals(expectedResponse,response);
+  }
 }
