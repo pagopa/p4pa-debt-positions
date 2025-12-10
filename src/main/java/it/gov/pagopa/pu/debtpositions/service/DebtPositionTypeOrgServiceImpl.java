@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -55,7 +56,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(
       debtPositionTypeOrgId).orElseThrow(
-        () -> new NotFoundException("DebtPositionTypeOrg having id "+debtPositionTypeOrgId+" not found"));
+      () -> new NotFoundException("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
     debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
@@ -67,56 +68,59 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     validateDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
     DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(
       saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
-    handleOperators(savedDebtPositionTypeOrg,saveDebtPositionTypeOrgDTO);
+    handleOperators(savedDebtPositionTypeOrg, saveDebtPositionTypeOrgDTO);
     return savedDebtPositionTypeOrg;
   }
 
   @Override
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
-    if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0){
+    if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0) {
       throw new NotFoundException("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found");
     }
   }
 
   private void handleOperators(DebtPositionTypeOrg debtPositionTypeOrg, SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
-    if(Boolean.TRUE.equals(saveDebtPositionTypeOrgDTO.getRemoveEnabledOperators())){
+    if (Boolean.TRUE.equals(saveDebtPositionTypeOrgDTO.getRemoveEnabledOperators())) {
       debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId());
     }
-    if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getDisabledOperators())){
+    if (!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getDisabledOperators())) {
       debtPositionTypeOrgOperatorsService.deleteOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getDisabledOperators());
     }
-    if(!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())){
+    if (!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())) {
       debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getEnabledOperators());
     }
   }
 
   private void validateDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
-      if (debtPositionTypeOrg == null) {
-          throw new ValidationException("DebtPositionTypeOrg must not be null");
-      }
-      if(!Utilities.isValidIban(debtPositionTypeOrg.getIban())) {
-          throw new ValidationException("Provided iban is not valid");
-      }
-      if(debtPositionTypeOrg.getDebtPositionTypeOrgId()!=null){
-        DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
-                .orElseThrow(()->new NotFoundException("DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
-        checkReadOnlyFields(dpto, debtPositionTypeOrg);
-      }
-      if(debtPositionTypeOrg.getSpontaneousFormId() != null) {
-        spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId())
-          .ifPresentOrElse(spontaneousForm -> {
-            if (!Objects.equals(debtPositionTypeOrg.getOrganizationId(), spontaneousForm.getOrganizationId())) {
-              throw new ValidationException("SpontaneousFormId %d is not tied to the organizationId %d"
-                .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()));
-            }
-          }, () -> {
-            throw new ValidationException("SpontaneousFormId %d not found"
-              .formatted(debtPositionTypeOrg.getSpontaneousFormId()));
-          });
+    if (debtPositionTypeOrg == null) {
+      throw new ValidationException("DebtPositionTypeOrg must not be null");
+    }
+    if (StringUtils.isNotBlank(debtPositionTypeOrg.getIban()) && !Utilities.isValidIban(debtPositionTypeOrg.getIban())) {
+      throw new ValidationException("Provided iban is not valid");
+    }
+    if (StringUtils.isNotBlank(debtPositionTypeOrg.getPostalIban()) && !Utilities.isValidIban(debtPositionTypeOrg.getPostalIban())) {
+      throw new ValidationException("Provided postal iban is not valid");
+    }
+    if (debtPositionTypeOrg.getDebtPositionTypeOrgId() != null) {
+      DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
+        .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
+      checkReadOnlyFields(dpto, debtPositionTypeOrg);
+    }
+    if (debtPositionTypeOrg.getSpontaneousFormId() != null) {
+      spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId())
+        .ifPresentOrElse(spontaneousForm -> {
+          if (!Objects.equals(debtPositionTypeOrg.getOrganizationId(), spontaneousForm.getOrganizationId())) {
+            throw new ValidationException("SpontaneousFormId %d is not tied to the organizationId %d"
+              .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()));
+          }
+        }, () -> {
+          throw new ValidationException("SpontaneousFormId %d not found"
+            .formatted(debtPositionTypeOrg.getSpontaneousFormId()));
+        });
 
-      }
+    }
   }
 
   private void checkReadOnlyFields(DebtPositionTypeOrg existingDebtPositionTypeOrg, DebtPositionTypeOrg updatedDebtPositionTypeOrg) {
@@ -130,8 +134,8 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     checkImmutableField("flagActive", existingDebtPositionTypeOrg.isFlagActive(), updatedDebtPositionTypeOrg.isFlagActive(), modifiedFields);
     checkImmutableField("flagAmountActualization", existingDebtPositionTypeOrg.isFlagAmountActualization(), updatedDebtPositionTypeOrg.isFlagAmountActualization(), modifiedFields);
     checkImmutableField("flagExternal", existingDebtPositionTypeOrg.isFlagExternal(), updatedDebtPositionTypeOrg.isFlagExternal(), modifiedFields);
-    if(!CollectionUtils.isEmpty(modifiedFields)){
-      throw new ValidationException("The following DebtPositionTypeOrg fields are readOnly. "+modifiedFields);
+    if (!CollectionUtils.isEmpty(modifiedFields)) {
+      throw new ValidationException("The following DebtPositionTypeOrg fields are readOnly. " + modifiedFields);
     }
   }
 }
