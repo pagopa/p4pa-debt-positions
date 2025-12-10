@@ -30,7 +30,8 @@ public class OrdinaryInstallmentPaymentHandlerService {
       installment.getInstallmentId(), receiptDTO.getReceiptId());
 
     updateInstallmentFromReceipt(installment, receiptDTO);
-    if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin())) {
+    if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin()) ||
+      !InstallmentUtils.PAID_STATUSES.contains(installment.getStatus())) {
       if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
         installment.setBalance(receiptDTO.getBalance());
         resolveBalance(installment, accessToken);
