@@ -171,11 +171,11 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals(ANONIMO)) {
         throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] The debt position type org does not allow an anonymous unique identification code");
       }
-      if (!personDTO.getFiscalCode().equals(ANONIMO) && !isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
+      if (!personDTO.getFiscalCode().equals(ANONIMO) && !isValidFiscalCode(personDTO.getFiscalCode())) {
         throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] Fiscal code of person is not valid");
       }
     } else {
-      if (!isValidPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
+      if (!isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] P. iva of legal person is not valid");
       }
     }
