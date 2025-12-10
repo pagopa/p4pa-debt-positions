@@ -176,7 +176,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       }
     } else {
       if (!isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
-        throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] P. iva of legal person is not valid");
+        throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] Fiscal code or p. iva of legal person is not valid");
       }
     }
     if (StringUtils.isBlank(personDTO.getFullName())) {
