@@ -47,7 +47,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
     AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN (:debtPositionOrigins))
     AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
-    AND ((:status IS NULL) OR (dp.status = :status ))
+    AND ((:status IS NULL) OR (i.status = :status ))
     """)
   Page<InstallmentView> findInstallmentsByFilters(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
