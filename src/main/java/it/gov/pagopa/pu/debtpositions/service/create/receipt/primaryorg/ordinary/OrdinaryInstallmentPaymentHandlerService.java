@@ -31,13 +31,18 @@ public class OrdinaryInstallmentPaymentHandlerService {
 
     InstallmentStatus previousStatus = installment.getStatus();
     updateInstallmentFromReceipt(installment, receiptDTO);
-    if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin()) ||
-      !InstallmentUtils.PAID_STATUSES.contains(previousStatus)) {
+
+    if (!InstallmentUtils.PAID_STATUSES.contains(previousStatus)) {
+      if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
+        installment.setBalance(receiptDTO.getBalance());
+      }
+      resolveBalance(installment, accessToken);
+      updateMbdAttachment(installment, receiptDTO);
+    } else if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin())) {
       if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
         installment.setBalance(receiptDTO.getBalance());
         resolveBalance(installment, accessToken);
       }
-      // update mbdAttachment of transfer entity if present in input ReceiptDTO
       updateMbdAttachment(installment, receiptDTO);
     }
   }
