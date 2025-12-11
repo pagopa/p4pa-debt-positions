@@ -7,7 +7,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PaymentFlowOrchestratorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -26,11 +25,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 class OrdinaryDPPaymentHandlerServiceTest {
 
   @Mock
-  private OrdinaryInstallmentPaymentHandlerService installmentPaymentHandlerServiceMock;
-  @Mock
-  private OrdinaryPaidDPHierarchyUpdateService hierarchyUpdateServiceMock;
-  @Mock
-  private DebtPositionService debtPositionServiceMock;
+  private StandardPaymentUpdateService standardPaymentUpdateServiceMock;
   @Mock
   private DebtPositionMapper mapperMock;
   @Mock
@@ -43,12 +38,11 @@ class OrdinaryDPPaymentHandlerServiceTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   private final String accessToken = "ACCESSTOKEN";
 
+
   @BeforeEach
   void init(){
     service = new OrdinaryDPPaymentHandlerService(
-      installmentPaymentHandlerServiceMock,
-      hierarchyUpdateServiceMock,
-      debtPositionServiceMock,
+      standardPaymentUpdateServiceMock,
       mapperMock,
       syncServiceMock,
       paymentFlowOrchestratorServiceMock
@@ -58,9 +52,7 @@ class OrdinaryDPPaymentHandlerServiceTest {
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
-      installmentPaymentHandlerServiceMock,
-      hierarchyUpdateServiceMock,
-      debtPositionServiceMock,
+      standardPaymentUpdateServiceMock,
       mapperMock,
       syncServiceMock,
       paymentFlowOrchestratorServiceMock
@@ -82,12 +74,8 @@ class OrdinaryDPPaymentHandlerServiceTest {
     service.handlePayment(dp, installment, receiptDTO, accessToken);
 
     // Then
-    Mockito.verify(installmentPaymentHandlerServiceMock)
-      .updateInstallment(installment, receiptDTO, accessToken);
-    Mockito.verify(hierarchyUpdateServiceMock)
-      .updateHierarchy(dp, installment);
-    Mockito.verify(debtPositionServiceMock)
-      .saveDebtPosition(dp);
+    Mockito.verify(standardPaymentUpdateServiceMock)
+      .performStandardUpdate(dp, installment, receiptDTO, accessToken);
     Mockito.verify(mapperMock).mapToDto(dp);
     Mockito.verify(syncServiceMock)
       .syncDebtPosition(
@@ -118,7 +106,7 @@ class OrdinaryDPPaymentHandlerServiceTest {
         Mockito.eq(dp),
         Mockito.any(Runnable.class),
         Mockito.any(Runnable.class),
-        Mockito.eq(accessToken)
+        Mockito.any(Runnable.class)
       );
   }
 
@@ -139,18 +127,41 @@ class OrdinaryDPPaymentHandlerServiceTest {
       .handleAlreadyPaidLogic(
         Mockito.any(), Mockito.any(), Mockito.any(),
         fullUpdateCaptor.capture(),
-        Mockito.any(), Mockito.anyString()
+        Mockito.any(), Mockito.any()
       );
 
     fullUpdateCaptor.getValue().run();
 
     // Then
-    Mockito.verify(installmentPaymentHandlerServiceMock)
-      .updateInstallment(installment, receiptDTO, accessToken);
-    Mockito.verify(hierarchyUpdateServiceMock)
-      .updateHierarchy(dp, installment);
-    Mockito.verify(debtPositionServiceMock)
-      .saveDebtPosition(dp);
+    Mockito.verify(standardPaymentUpdateServiceMock)
+      .performStandardUpdate(dp, installment, receiptDTO, accessToken);
+  }
+
+  @Test
+  void givenPaidInstallmentWhenOrchestratorExecutesPartialUpdateThenUpdateBalanceAndMeta() {
+    // Given
+    DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.PAID);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+
+    ArgumentCaptor<Runnable> partialUpdateCaptor = ArgumentCaptor.forClass(Runnable.class);
+
+    // When
+    service.handlePayment(dp, installment, receiptDTO, accessToken);
+
+    Mockito.verify(paymentFlowOrchestratorServiceMock)
+      .handleAlreadyPaidLogic(
+        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+        partialUpdateCaptor.capture(),
+        Mockito.any()
+      );
+
+    partialUpdateCaptor.getValue().run();
+
+    // Then
+    Mockito.verify(paymentFlowOrchestratorServiceMock)
+      .updateBalanceAndMeta(dp, installment, receiptDTO, accessToken);
   }
 
   @Test
@@ -171,9 +182,8 @@ class OrdinaryDPPaymentHandlerServiceTest {
 
     Mockito.verify(paymentFlowOrchestratorServiceMock)
       .handleAlreadyPaidLogic(
-        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
-        syncCaptor.capture(),
-        Mockito.anyString()
+        Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(),
+        syncCaptor.capture()
       );
 
     syncCaptor.getValue().run();

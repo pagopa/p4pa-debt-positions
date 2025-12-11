@@ -85,16 +85,18 @@ class PaymentFlowOrchestratorServiceTest {
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
 
     Runnable fullUpdateAction = Mockito.mock(Runnable.class);
+    Runnable partialUpdateAction = Mockito.mock(Runnable.class);
     Runnable syncWorkflowAction = Mockito.mock(Runnable.class);
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
 
     // When
-    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
+    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, partialUpdateAction, syncWorkflowAction);
 
     // Then
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(fullUpdateAction, Mockito.never()).run();
+    Mockito.verify(partialUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction, Mockito.never()).run();
   }
 
@@ -108,29 +110,22 @@ class PaymentFlowOrchestratorServiceTest {
     incomingReceipt.setDebtPositionTypeOrgCode("CODE");
 
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
-    DebtPositionTypeOrg unknownTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    unknownTypeOrg.setDebtPositionTypeOrgId(99L);
-    dp.setDebtPositionTypeOrgId(100L);
 
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
 
     Runnable fullUpdateAction = Mockito.mock(Runnable.class);
+    Runnable partialUpdateAction = Mockito.mock(Runnable.class);
     Runnable syncWorkflowAction = Mockito.mock(Runnable.class);
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
-    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(dp.getOrganizationId()))
-      .thenReturn(unknownTypeOrg);
 
     // When
-    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
+    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, partialUpdateAction, syncWorkflowAction);
 
     // Then
-    Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
-    Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock).getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
-    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
+    Mockito.verify(partialUpdateAction).run();
     Mockito.verify(fullUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction).run();
   }
@@ -146,16 +141,18 @@ class PaymentFlowOrchestratorServiceTest {
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
 
     Runnable fullUpdateAction = Mockito.mock(Runnable.class);
+    Runnable partialUpdateAction = Mockito.mock(Runnable.class);
     Runnable syncWorkflowAction = Mockito.mock(Runnable.class);
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
 
     // When
-    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
+    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, partialUpdateAction, syncWorkflowAction);
 
     // Then
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(fullUpdateAction).run();
+    Mockito.verify(partialUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction).run();
   }
 
@@ -169,29 +166,22 @@ class PaymentFlowOrchestratorServiceTest {
     incomingReceipt.setDebtPositionTypeOrgCode("CODE");
 
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
-    DebtPositionTypeOrg unknownTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    unknownTypeOrg.setDebtPositionTypeOrgId(99L);
-    dp.setDebtPositionTypeOrgId(100L);
 
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
 
     Runnable fullUpdateAction = Mockito.mock(Runnable.class);
+    Runnable partialUpdateAction = Mockito.mock(Runnable.class);
     Runnable syncWorkflowAction = Mockito.mock(Runnable.class);
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
-    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(dp.getOrganizationId()))
-      .thenReturn(unknownTypeOrg);
 
     // When
-    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, syncWorkflowAction, accessToken);
+    service.handleAlreadyPaidLogic(installment, incomingReceipt, dp, fullUpdateAction, partialUpdateAction, syncWorkflowAction);
 
     // Then
-    Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
-    Mockito.verify(unknownDebtPositionTypeOrgRetrieverServiceMock).getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
-    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
-    Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
+    Mockito.verify(partialUpdateAction).run();
     Mockito.verify(fullUpdateAction, Mockito.never()).run();
     Mockito.verify(syncWorkflowAction).run();
   }
