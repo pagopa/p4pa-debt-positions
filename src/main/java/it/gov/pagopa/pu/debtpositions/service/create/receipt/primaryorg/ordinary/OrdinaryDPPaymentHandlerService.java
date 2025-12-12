@@ -7,7 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PaymentFlowOrchestratorService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.utils.PaymentFlowOrchestratorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -18,18 +18,17 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OrdinaryDPPaymentHandlerService {
 
-  private final StandardPaymentUpdateService standardPaymentUpdateService;
   private final DebtPositionMapper mapper;
   private final DebtPositionSyncService syncService;
+  private final UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp;
   private final PaymentFlowOrchestratorService paymentFlowOrchestratorService;
 
-  public OrdinaryDPPaymentHandlerService(StandardPaymentUpdateService standardPaymentUpdateService,
-                                         DebtPositionMapper mapper,
+  public OrdinaryDPPaymentHandlerService(DebtPositionMapper mapper,
                                          DebtPositionSyncService syncService,
-                                         PaymentFlowOrchestratorService paymentFlowOrchestratorService) {
-    this.standardPaymentUpdateService = standardPaymentUpdateService;
+                                         UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp, PaymentFlowOrchestratorService paymentFlowOrchestratorService) {
     this.mapper = mapper;
     this.syncService = syncService;
+    this.updateAndSynchronizeOrdinaryDp = updateAndSynchronizeOrdinaryDp;
     this.paymentFlowOrchestratorService = paymentFlowOrchestratorService;
   }
 
@@ -37,16 +36,15 @@ public class OrdinaryDPPaymentHandlerService {
     Runnable syncWorkflowAction = () -> invokeWorkflow(dp, receiptDTO, accessToken);
 
     if (!InstallmentUtils.PAID_STATUSES.contains(installment.getStatus())) {
-      standardPaymentUpdateService.performStandardUpdate(dp, installment, receiptDTO, accessToken);
+      paymentFlowOrchestratorService.performStandardUpdate(dp, installment, receiptDTO, accessToken);
       syncWorkflowAction.run();
     } else {
-      paymentFlowOrchestratorService.handleAlreadyPaidLogic(
+      updateAndSynchronizeOrdinaryDp.handleOrdinaryDpAlreadyPaid(
         installment,
         receiptDTO,
         dp,
-        () -> standardPaymentUpdateService.performStandardUpdate(dp, installment, receiptDTO, accessToken),
-        () -> paymentFlowOrchestratorService.updateBalanceAndMeta(dp, installment, receiptDTO, accessToken),
-        syncWorkflowAction
+        syncWorkflowAction,
+        accessToken
       );
     }
   }
