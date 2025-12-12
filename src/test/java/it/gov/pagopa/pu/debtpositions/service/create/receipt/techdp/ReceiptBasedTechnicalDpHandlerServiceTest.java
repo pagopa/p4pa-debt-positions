@@ -6,13 +6,14 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PaymentFlowOrchestratorService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinary.StandardPaymentUpdateService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -34,8 +35,6 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
   private final String accessToken = "ACCESSTOKEN";
 
   @Mock
-  private ReceiptWithAdditionalInfoMapper receiptMapperMock;
-  @Mock
   private DebtPositionService debtPositionServiceMock;
   @Mock
   private PaymentsProducerService paymentsProducerServiceMock;
@@ -49,31 +48,36 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
   private PaymentFlowOrchestratorService paymentFlowOrchestratorServiceMock;
   @Mock
   private ReceiptService receiptServiceMock;
+  @Mock
+  private UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverServiceMock;
 
   private ReceiptBasedTechnicalDpHandlerService service;
 
   @BeforeEach
   void init(){
     service = new ReceiptBasedTechnicalDpHandlerService(
-      receiptMapperMock,
       debtPositionServiceMock,
       paymentsProducerServiceMock,
       debtPositionMapperMock,
       dpUpdateServiceMock,
       standardPaymentUpdateServiceMock,
       paymentFlowOrchestratorServiceMock,
-      receiptServiceMock
+      receiptServiceMock,
+      unknownDebtPositionTypeOrgRetrieverServiceMock
     );
   }
 
   @AfterEach
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
-      receiptMapperMock,
       debtPositionServiceMock,
       paymentsProducerServiceMock,
       debtPositionMapperMock,
-      dpUpdateServiceMock
+      dpUpdateServiceMock,
+      standardPaymentUpdateServiceMock,
+      paymentFlowOrchestratorServiceMock,
+      receiptServiceMock,
+      unknownDebtPositionTypeOrgRetrieverServiceMock
     );
   }
 
@@ -87,7 +91,7 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
 
     ReceiptBasedTechnicalDpHandlerService spyService = Mockito.spy(service);
 
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization)))
+    Mockito.when(dpUpdateServiceMock.getDebtPositionDTO(Mockito.same(receiptDTO), Mockito.same(organization)))
       .thenReturn(dpDto);
 
     Mockito.doReturn(expectedResult)
@@ -204,7 +208,15 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
   void whenOrchestratorExecutesPartialUpdateAndRightBranchThenUpdateDp() {
     // Given
     Organization organization = new Organization();
+    organization.setOrganizationId(1L);
+
     DebtPosition dp = podamFactory.manufacturePojo(DebtPosition.class);
+    dp.setDebtPositionTypeOrgId(100L);
+    dp.setOrganizationId(1L);
+
+    DebtPositionTypeOrg unknownTypeOrg = new DebtPositionTypeOrg();
+    unknownTypeOrg.setDebtPositionTypeOrgId(999L);
+
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
@@ -212,6 +224,9 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
     storedReceipt.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
+
+    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(1L))
+      .thenReturn(unknownTypeOrg);
 
     ArgumentCaptor<Runnable> partialUpdateCaptor = ArgumentCaptor.forClass(Runnable.class);
 
@@ -225,7 +240,13 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
 
     // Then
     Mockito.verify(dpUpdateServiceMock)
-      .updateDp(dp, receiptDTO, organization);
+      .updateDp(
+        Mockito.same(dp),
+        Mockito.same(receiptDTO),
+        Mockito.same(organization),
+        Mockito.eq(true),
+        Mockito.same(unknownTypeOrg)
+      );
   }
 
   @Test

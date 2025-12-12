@@ -6,21 +6,23 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.event.producer.PaymentsProducerService;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PaymentFlowOrchestratorService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinary.StandardPaymentUpdateService;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class ReceiptBasedTechnicalDpHandlerService {
 
-  private final ReceiptWithAdditionalInfoMapper receiptMapper;
   private final DebtPositionService debtPositionService;
   private final PaymentsProducerService paymentsProducerService;
   private final DebtPositionMapper debtPositionMapper;
@@ -28,16 +30,16 @@ public class ReceiptBasedTechnicalDpHandlerService {
   private final StandardPaymentUpdateService standardPaymentUpdateService;
   private final PaymentFlowOrchestratorService paymentFlowOrchestratorService;
   private final ReceiptService receiptService;
+  private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
-  public ReceiptBasedTechnicalDpHandlerService(ReceiptWithAdditionalInfoMapper receiptMapper,
-                                               DebtPositionService debtPositionService,
+  public ReceiptBasedTechnicalDpHandlerService(DebtPositionService debtPositionService,
                                                PaymentsProducerService paymentsProducerService,
                                                DebtPositionMapper debtPositionMapper,
                                                TechnicalDpUpdateService technicalDpUpdateService,
                                                StandardPaymentUpdateService standardPaymentUpdateService,
                                                PaymentFlowOrchestratorService paymentFlowOrchestratorService,
-                                               ReceiptService receiptService) {
-    this.receiptMapper = receiptMapper;
+                                               ReceiptService receiptService,
+                                               UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
     this.debtPositionService = debtPositionService;
     this.paymentsProducerService = paymentsProducerService;
     this.debtPositionMapper = debtPositionMapper;
@@ -45,10 +47,11 @@ public class ReceiptBasedTechnicalDpHandlerService {
     this.standardPaymentUpdateService = standardPaymentUpdateService;
     this.paymentFlowOrchestratorService = paymentFlowOrchestratorService;
     this.receiptService = receiptService;
+    this.unknownDebtPositionTypeOrgRetrieverService = unknownDebtPositionTypeOrgRetrieverService;
   }
 
   public DebtPosition createAndPublishTechDp(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO){
-    DebtPositionDTO debtPositionDTO = receiptMapper.mapToDebtPosition(receiptDTO, organization);
+    DebtPositionDTO debtPositionDTO = technicalDpUpdateService.getDebtPositionDTO(receiptDTO, organization);
     debtPositionService.saveDebtPosition(debtPositionDTO);
     return publishTechDp(debtPositionDTO, receiptDTO);
   }
@@ -70,7 +73,9 @@ public class ReceiptBasedTechnicalDpHandlerService {
       if (ReceiptOriginType.RECEIPT_PAGOPA.equals(storedReceipt.getReceiptOrigin())) {
         paymentFlowOrchestratorService.updateBalanceAndMeta(dp, installment, receiptDTO, accessToken);
       } else {
-        technicalDpUpdateService.updateDp(dp, receiptDTO, organization);
+        DebtPositionTypeOrg unknownTypeOrg = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(dp.getOrganizationId());
+        boolean preserveTypeOrg = !Objects.equals(dp.getDebtPositionTypeOrgId(), unknownTypeOrg.getDebtPositionTypeOrgId());
+        technicalDpUpdateService.updateDp(dp, receiptDTO, organization, preserveTypeOrg, unknownTypeOrg);
       }
     };
 
