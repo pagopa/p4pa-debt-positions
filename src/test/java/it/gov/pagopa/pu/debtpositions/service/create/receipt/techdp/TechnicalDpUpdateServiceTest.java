@@ -2,10 +2,11 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.mapper.ReceiptWithAdditionalInfoMapper;
-import it.gov.pagopa.pu.debtpositions.model.*;
-import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
-import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -17,9 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.TreeSet;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,10 +28,6 @@ class TechnicalDpUpdateServiceTest {
   private ReceiptWithAdditionalInfoMapper receiptMapperMock;
   @Mock
   private DebtPositionService debtPositionServiceMock;
-  @Mock
-  private UnknownDebtPositionTypeOrgRetrieverService unknownRetrieverServiceMock;
-  @Mock
-  private DebtPositionTypeOrgRepository typeOrgRepositoryMock;
 
   private TechnicalDpUpdateService service;
 
@@ -40,9 +35,7 @@ class TechnicalDpUpdateServiceTest {
   void init() {
     service = new TechnicalDpUpdateService(
       receiptMapperMock,
-      debtPositionServiceMock,
-      unknownRetrieverServiceMock,
-      typeOrgRepositoryMock
+      debtPositionServiceMock
     );
   }
 
@@ -55,119 +48,93 @@ class TechnicalDpUpdateServiceTest {
   }
 
   @Test
-  void whenUpdateDpThenResolveTypeOrgMapAndSave() {
+  void whenThenMapAndUpdateIt() {
     // Given
+    Long dpTypeOrgId = 10L;
     DebtPosition dp = new DebtPosition();
-    dp.setPaymentOptions(new TreeSet<>());
-
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
-    receiptDTO.setDebtPositionTypeOrgCode("CODE");
     Organization organization = new Organization();
-    organization.setOrganizationId(1L);
-
-    DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
-    typeOrg.setDebtPositionTypeOrgId(100L);
-
     DebtPositionDTO expectedResult = new DebtPositionDTO();
-    expectedResult.setPaymentOptions(new ArrayList<>());
 
-    Mockito.when(typeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "CODE"))
-      .thenReturn(Optional.of(typeOrg));
-
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(100L)))
+    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(dpTypeOrgId)))
       .thenReturn(expectedResult);
 
+    service = Mockito.spy(service);
+    Mockito.doNothing()
+      .when(service)
+      .updateDp(Mockito.same(dp), Mockito.same(expectedResult));
+
     // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization);
+    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId);
 
     // Then
     Assertions.assertSame(expectedResult, result);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(expectedResult);
   }
 
   @Test
-  void givenPreserveTypeOrgTrueWhenUpdateDpThenUseExistingId() {
+  void givenExistingDebtPositionWhenUpdateDebtPositionThenPropagatesIdsAndSaves() {
     // Given
-    DebtPosition dp = new DebtPosition();
-    dp.setDebtPositionTypeOrgId(55L);
-    dp.setPaymentOptions(new TreeSet<>());
+    Long dpId = 10L;
+    Long poId = 20L;
+    Integer poIndex = 1;
+    String iud = "IUD-001";
+    Long instId = 30L;
+    Integer trIndex = 0;
+    Long trId = 40L;
 
-    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
-    Organization organization = new Organization();
+    Transfer trEntity = new Transfer();
+    trEntity.setTransferIndex(trIndex);
+    trEntity.setTransferId(trId);
 
-    DebtPositionDTO expectedResult = new DebtPositionDTO();
-    expectedResult.setPaymentOptions(new ArrayList<>());
+    InstallmentNoPII instEntity = new InstallmentNoPII();
+    instEntity.setIud(iud);
+    instEntity.setInstallmentId(instId);
+    instEntity.setTransfers(new TreeSet<>(List.of(trEntity)));
 
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(55L)))
-      .thenReturn(expectedResult);
+    PaymentOption poEntity = new PaymentOption();
+    poEntity.setPaymentOptionId(poId);
+    poEntity.setPaymentOptionIndex(poIndex);
+    poEntity.setInstallments(new TreeSet<>(List.of(instEntity)));
+
+    DebtPosition entity = new DebtPosition();
+    entity.setDebtPositionId(dpId);
+    entity.setPaymentOptions(new TreeSet<>(List.of(poEntity)));
+
+    TransferDTO trDTO = new TransferDTO();
+    trDTO.setTransferIndex(trIndex);
+
+    InstallmentDTO instDTO = new InstallmentDTO();
+    instDTO.setIud(iud);
+    instDTO.setTransfers(List.of(trDTO));
+
+    PaymentOptionDTO poDTO = new PaymentOptionDTO();
+    poDTO.setPaymentOptionIndex(poIndex);
+    poDTO.setInstallments(List.of(instDTO));
+
+    DebtPositionDTO dpDTO = new DebtPositionDTO();
+    dpDTO.setPaymentOptions(List.of(poDTO));
 
     // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, true, null);
+    service.updateDp(entity, dpDTO);
 
     // Then
-    Assertions.assertSame(expectedResult, result);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(expectedResult);
-    Mockito.verify(typeOrgRepositoryMock, Mockito.never()).findByOrganizationIdAndCode(Mockito.any(), Mockito.any());
-  }
+    ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture());
+    DebtPositionDTO saved = captor.getValue();
 
-  @Test
-  void givenUnknownTypeWhenUpdateDpThenUseItAsFallback() {
-    // Given
-    DebtPosition dp = new DebtPosition();
-    dp.setPaymentOptions(new TreeSet<>());
+    Assertions.assertEquals(dpId, saved.getDebtPositionId());
 
-    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
-    receiptDTO.setDebtPositionTypeOrgCode("CODE");
-    Organization organization = new Organization();
-    organization.setOrganizationId(1L);
+    PaymentOptionDTO savedPo = saved.getPaymentOptions().getFirst();
+    Assertions.assertEquals(poId, savedPo.getPaymentOptionId());
+    Assertions.assertEquals(poIndex, savedPo.getPaymentOptionIndex());
 
-    DebtPositionTypeOrg unknownTypeOrg = new DebtPositionTypeOrg();
-    unknownTypeOrg.setDebtPositionTypeOrgId(99L);
+    InstallmentDTO savedInst = savedPo.getInstallments().getFirst();
+    Assertions.assertEquals(instId, savedInst.getInstallmentId());
+    Assertions.assertEquals(iud, savedInst.getIud());
 
-    DebtPositionDTO expectedResult = new DebtPositionDTO();
-    expectedResult.setPaymentOptions(new ArrayList<>());
-
-    Mockito.when(typeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "CODE"))
-      .thenReturn(Optional.empty());
-
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(99L)))
-      .thenReturn(expectedResult);
-
-    // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, false, unknownTypeOrg);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(expectedResult);
-    Mockito.verify(unknownRetrieverServiceMock, Mockito.never()).getUnknownDebtPositionTypeOrg(Mockito.any());
-  }
-
-  @Test
-  void whenGetDebtPositionDTOThenResolveAndMap() {
-    // Given
-    ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
-    receiptDTO.setDebtPositionTypeOrgCode("CODE");
-    Organization organization = new Organization();
-    organization.setOrganizationId(1L);
-
-    DebtPositionTypeOrg unknownTypeOrg = new DebtPositionTypeOrg();
-    unknownTypeOrg.setDebtPositionTypeOrgId(77L);
-
-    DebtPositionDTO expectedResult = new DebtPositionDTO();
-
-    Mockito.when(typeOrgRepositoryMock.findByOrganizationIdAndCode(1L, "CODE"))
-      .thenReturn(Optional.empty());
-    Mockito.when(unknownRetrieverServiceMock.getUnknownDebtPositionTypeOrg(1L))
-      .thenReturn(unknownTypeOrg);
-
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(77L)))
-      .thenReturn(expectedResult);
-
-    // When
-    DebtPositionDTO result = service.getDebtPositionDTO(receiptDTO, organization);
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
+    TransferDTO savedTr = savedInst.getTransfers().getFirst();
+    Assertions.assertEquals(trId, savedTr.getTransferId());
+    Assertions.assertEquals(trIndex, savedTr.getTransferIndex());
   }
 
   @Test
@@ -233,4 +200,5 @@ class TechnicalDpUpdateServiceTest {
     Assertions.assertEquals(instIdEntity, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getInstallmentId());
     Assertions.assertEquals(trIdEntity, saved.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().getTransferId());
   }
+
 }

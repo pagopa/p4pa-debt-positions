@@ -30,7 +30,7 @@ public class PrimaryOrgInstallmentPaymentHandlerService {
       throw new NotFoundException("debt position not found for installment " + installment.getInstallmentId());
     }
 
-    if(InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(dp.getDebtPositionOrigin())){
+    if (InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(dp.getDebtPositionOrigin())) {
       ordinaryDPPaymentHandlerService.handlePayment(dp, installment, receiptDTO, accessToken);
       return dp;
     } else {

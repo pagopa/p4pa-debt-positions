@@ -34,10 +34,10 @@ public class UpdateAndSynchronizeTechDp {
   }
 
   public DebtPosition handleTechDpAlreadyPaid(InstallmentNoPII installment,
-                                                 ReceiptWithAdditionalNodeDataDTO incomingReceiptDTO,
-                                                 DebtPosition dp,
-                                                 Organization organization,
-                                                 String accessToken) {
+                                              ReceiptWithAdditionalNodeDataDTO incomingReceiptDTO,
+                                              DebtPosition storedDp,
+                                              Organization organization,
+                                              String accessToken) {
 
     ReceiptDTO storedReceipt = receiptService.getReceipt(installment.getReceiptId());
 
@@ -46,27 +46,32 @@ public class UpdateAndSynchronizeTechDp {
 
     if (isStoredPagoPa) {
       if (!isIncomingPagoPa) {
-        log.info("Updating balance/dpTypeOrgId for debtPositionId {} (Receipt - [Stored: {}, Incoming: {}])", dp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
-        paymentFlowOrchestratorService.updateBalanceAndMeta(dp, installment, incomingReceiptDTO, accessToken);
-        publishTechDp(debtPositionMapper.mapToDto(dp), incomingReceiptDTO);
+        log.info("Updating balance/dpTypeOrgId for debtPositionId {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
+        paymentFlowOrchestratorService.updateBalanceAndMeta(storedDp, installment, incomingReceiptDTO, accessToken);
+        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
       } else {
-        log.info("Skipping update and workflow for DP {} (Both RECEIPT_PAGOPA origin)", dp.getDebtPositionId());
+        log.info("Skipping update and workflow for DP {} (Both RECEIPT_PAGOPA origin)", storedDp.getDebtPositionId());
       }
     } else {
       if (isIncomingPagoPa) {
-        log.info("Executing Full Update for DP {} (Receipt - [Stored: {}, Incoming: {}])", dp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
-        paymentFlowOrchestratorService.performStandardUpdate(dp, installment, incomingReceiptDTO, accessToken);
-        publishTechDp(debtPositionMapper.mapToDto(dp), incomingReceiptDTO);
+        log.info("Executing Full Update for DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
+        paymentFlowOrchestratorService.performStandardUpdate(storedDp, installment, incomingReceiptDTO, accessToken);
+        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
       } else {
-        log.info("Updating DP {} (Both not RECEIPT_PAGOPA origin)", dp.getDebtPositionId());
-        DebtPositionDTO dto = technicalDpUpdateService.updateDp(dp, incomingReceiptDTO, organization);
+        log.info("Updating DP {} (Both not RECEIPT_PAGOPA origin)", storedDp.getDebtPositionId());
+
+        Long debtPositionTypeOrgId = paymentFlowOrchestratorService.resolveDebtPositionTypeOrgId(
+          organization.getOrganizationId(), incomingReceiptDTO.getDebtPositionTypeOrgCode(), storedDp.getDebtPositionTypeOrgId());
+
+        DebtPositionDTO dto = technicalDpUpdateService.updateDp(storedDp, incomingReceiptDTO, organization, debtPositionTypeOrgId);
+
         publishTechDp(dto, incomingReceiptDTO);
       }
     }
-    return dp;
+    return storedDp;
   }
 
-  public DebtPosition publishTechDp(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO){
+  public DebtPosition publishTechDp(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:" + receiptDTO.getReceiptId());
     return debtPositionMapper.mapToModel(debtPositionDTO);
   }
