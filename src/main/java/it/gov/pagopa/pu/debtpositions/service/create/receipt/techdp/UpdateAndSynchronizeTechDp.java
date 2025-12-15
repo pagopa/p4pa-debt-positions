@@ -50,7 +50,7 @@ public class UpdateAndSynchronizeTechDp {
         paymentFlowOrchestratorService.updateBalanceAndMeta(storedDp, installment, incomingReceiptDTO, accessToken);
         publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
       } else {
-        log.info("Skipping update and workflow for DP {} (Both RECEIPT_PAGOPA origin)", storedDp.getDebtPositionId());
+        log.info("Skipping update for DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
       }
     } else {
       if (isIncomingPagoPa) {
@@ -58,7 +58,7 @@ public class UpdateAndSynchronizeTechDp {
         paymentFlowOrchestratorService.performStandardUpdate(storedDp, installment, incomingReceiptDTO, accessToken);
         publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
       } else {
-        log.info("Updating DP {} (Both not RECEIPT_PAGOPA origin)", storedDp.getDebtPositionId());
+        log.info("Updating DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
 
         Long debtPositionTypeOrgId = paymentFlowOrchestratorService.resolveDebtPositionTypeOrgId(
           organization.getOrganizationId(), incomingReceiptDTO.getDebtPositionTypeOrgCode(), storedDp.getDebtPositionTypeOrgId());
