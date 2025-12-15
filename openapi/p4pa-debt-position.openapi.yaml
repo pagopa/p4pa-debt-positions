@@ -2175,6 +2175,7 @@ components:
         - debtor
         - debtPositionTypeOrgDescription
         - debtPositionId
+        - debtPositionOrigin
       properties:
         installmentId:
           type: integer
@@ -2206,6 +2207,8 @@ components:
         debtPositionId:
           type: integer
           format: int64
+        debtPositionOrigin:
+          type: 'DebtPositionOrigin'
         paymentDateTime:
           type: string
           format: date-time
