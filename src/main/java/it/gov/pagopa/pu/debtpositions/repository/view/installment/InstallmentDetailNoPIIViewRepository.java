@@ -29,6 +29,7 @@ public interface InstallmentDetailNoPIIViewRepository extends Repository<Install
     dpto.description as debtPositionTypeOrgDescription,
     dp.description as debtPositionDescription,
     dp.debtPositionId as debtPositionId,
+    dp.debtPositionOrigin as debtPositionOrigin,
     r.paymentDateTime as paymentDateTime,
     r.personalDataId as receiptPersonalDataId,
     r.pspCompanyName as pspCompanyName,
