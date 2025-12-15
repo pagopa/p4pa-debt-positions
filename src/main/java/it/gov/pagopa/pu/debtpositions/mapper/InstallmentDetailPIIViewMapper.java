@@ -33,6 +33,7 @@ public class InstallmentDetailPIIViewMapper {
       .debtPositionTypeOrgDescription(installmentDetailNoPIIView.getDebtPositionTypeOrgDescription())
       .debtPositionDescription(installmentDetailNoPIIView.getDebtPositionDescription())
       .debtPositionId(installmentDetailNoPIIView.getDebtPositionId())
+      .debtPositionOrigin(installmentDetailNoPIIView.getDebtPositionOrigin())
       .paymentDateTime(installmentDetailNoPIIView.getPaymentDateTime())
       .payer(getPayer(installmentDetailNoPIIView.getReceiptPersonalDataId()))
       .pspCompanyName(installmentDetailNoPIIView.getPspCompanyName())
