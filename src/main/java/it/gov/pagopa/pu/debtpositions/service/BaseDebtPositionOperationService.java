@@ -80,7 +80,7 @@ public abstract class BaseDebtPositionOperationService {
     DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
     if (!isDebtPositionTypeOrgDisabledAllowed() && !debtPositionTypeOrg.isFlagActive()) {
-      throw new OperatorNotAuthorizedException("The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
+      throw new OperatorNotAuthorizedException("[P4PA_DEBT_POS_TYPE_ORG_UNAUTHORIZED] The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
     }
 
     applyOperation(debtPositionDTO, installments2operate, accessToken, org);
