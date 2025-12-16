@@ -32,6 +32,8 @@ public class ReceiptDetailPIIViewMapper {
       .feeCents(receiptDetailNoPIIView.getFeeCents())
       .notificationFeeCents(receiptDetailNoPIIView.getNotificationFeeCents())
       .debtor(pii.getDebtor())
+      .receiptOrigin(receiptDetailNoPIIView.getReceiptOrigin())
+      .debtPositionOrigin(receiptDetailNoPIIView.getDebtPositionOrigin())
       .build();
   }
 }
