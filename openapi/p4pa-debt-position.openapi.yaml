@@ -2238,6 +2238,8 @@ components:
         - debtor
         - pspCompanyName
         - iud
+        - receiptOrigin
+        - debtPositionOrigin
       properties:
         receiptId:
           type: integer
@@ -2270,6 +2272,10 @@ components:
         notificationFeeCents:
           type: integer
           format: int64
+        receiptOrigin:
+          type: 'ReceiptOrigin'
+        debtPositionOrigin:
+          type: 'DebtPositionOrigin'
     ReceiptTransferDTO:
       required:
         - idTransfer
