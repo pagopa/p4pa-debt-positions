@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model.view.receipt;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -39,4 +41,8 @@ public class ReceiptDetailNoPIIView implements Serializable {
   private String iur;
   private Long feeCents;
   private Long notificationFeeCents;
+  @NotNull
+  private ReceiptOriginType receiptOrigin;
+  @NotNull
+  private DebtPositionOrigin debtPositionOrigin;
 }
