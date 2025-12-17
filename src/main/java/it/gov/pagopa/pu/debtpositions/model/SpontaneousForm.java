@@ -42,6 +42,7 @@ public class SpontaneousForm extends BaseEntity implements Serializable {
     (SELECT COUNT(*)
       FROM debt_position_type_org dpto
       WHERE organization_id = dpto.organization_id
+      AND spontaneous_form_id = dpto.spontaneous_form_id
       AND dpto.flag_active = true)
     """)
   private Integer debtPositionTypeOrgCount;
