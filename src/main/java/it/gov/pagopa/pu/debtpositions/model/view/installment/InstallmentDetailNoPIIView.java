@@ -41,6 +41,7 @@ public class InstallmentDetailNoPIIView implements Serializable {
   private String debtPositionDescription;
   @NotNull
   private Long debtPositionId;
+  @Enumerated(EnumType.STRING)
   @NotNull
   private DebtPositionOrigin debtPositionOrigin;
   private OffsetDateTime paymentDateTime;
