@@ -36,7 +36,7 @@ class TemporalAccessorConversionConfigTest {
       String date = "DATE";
       LocalDateTime expectedResult = LocalDateTime.now();
 
-      offsetDateTimeToLocalDateTimeDeserializerMockedStatic.when(() -> OffsetDateTimeToLocalDateTimeDeserializer.string2LocalDateTime(date))
+      offsetDateTimeToLocalDateTimeDeserializerMockedStatic.when(() -> OffsetDateTimeToLocalDateTimeDeserializer.parse(date))
         .thenReturn(expectedResult);
 
       // When
@@ -59,7 +59,7 @@ class TemporalAccessorConversionConfigTest {
       String date = "DATE";
       OffsetDateTime expectedResult = OffsetDateTime.now();
 
-      localDateTimeToOffsetDateTimeDeserializerMockedStatic.when(() -> LocalDateTimeToOffsetDateTimeDeserializer.string2OffsetDateTime(date))
+      localDateTimeToOffsetDateTimeDeserializerMockedStatic.when(() -> LocalDateTimeToOffsetDateTimeDeserializer.parseString(date))
         .thenReturn(expectedResult);
 
       // When

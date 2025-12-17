@@ -1,12 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
 import jakarta.persistence.EntityManagerFactory;
-import org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy;
+import org.hibernate.boot.model.naming.PhysicalNamingStrategySnakeCaseImpl;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
-import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
-import org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy;
+import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
+import org.springframework.boot.hibernate.SpringImplicitNamingStrategy;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
@@ -41,7 +41,7 @@ public class CitizenDataSourceConfig {
     return builder.dataSource(dataSource)
             .packages("it.gov.pagopa.pu.debtpositions.citizen.model")
             .properties(Map.of(
-                    "hibernate.physical_naming_strategy", CamelCaseToUnderscoresNamingStrategy.class.getName(),
+                    "hibernate.physical_naming_strategy", PhysicalNamingStrategySnakeCaseImpl.class.getName(),
                     "hibernate.implicit_naming_strategy", SpringImplicitNamingStrategy.class.getName(),
                     "jakarta.persistence.validation.factory", validatorFactoryBean
             ))
