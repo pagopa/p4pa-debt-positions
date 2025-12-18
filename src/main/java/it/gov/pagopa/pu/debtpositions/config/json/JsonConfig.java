@@ -13,7 +13,6 @@ import it.gov.pagopa.pu.debtpositions.config.json.jackson3.LocalDateTimeToOffset
 import it.gov.pagopa.pu.debtpositions.config.json.jackson3.OffsetDateTimeToLocalDateTimeJackson3Deserializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.web.config.EnableSpringDataWebSupport;
 import tools.jackson.databind.JacksonModule;
 import tools.jackson.databind.json.JsonMapper;
 
@@ -22,7 +21,7 @@ import java.time.OffsetDateTime;
 import java.util.TimeZone;
 
 @Configuration
-@EnableSpringDataWebSupport
+//@EnableSpringDataWebSupport To avoid if using spring data rest
 public class JsonConfig {
 
   @Bean
