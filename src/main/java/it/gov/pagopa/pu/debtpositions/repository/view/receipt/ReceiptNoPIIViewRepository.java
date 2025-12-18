@@ -12,6 +12,7 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @RepositoryRestResource(path = "receipt-no-pii-view")
@@ -41,12 +42,18 @@ public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView,
       AND dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED})
       AND (r.orgFiscalCode IN :organizationsFiscalCode)
       AND ((:receiptOrigins IS NULL) OR (r.receiptOrigin IN :receiptOrigins))
+      AND ((:noticeNumberOrIuv IS NULL) OR (r.noticeNumber = :noticeNumberOrIuv OR i.iuv = :noticeNumberOrIuv))
+      AND (cast(:paymentDateTimeFrom as date) IS NULL OR r.paymentDateTime >= :paymentDateTimeFrom)
+      AND (cast(:paymentDateTimeTo as date) IS NULL OR r.paymentDateTime <= :paymentDateTimeTo)
    """
   )
   Page<ReceiptNoPIIView> getPagedPrimaryReceiptByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
     @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
+    @Param("noticeNumberOrIuv") String noticeNumberOrIuv,
+    @Param("paymentDateTimeFrom") OffsetDateTime paymentDateTimeFrom,
+    @Param("paymentDateTimeTo") OffsetDateTime paymentDateTimeTo,
     Pageable pageable
   );
 

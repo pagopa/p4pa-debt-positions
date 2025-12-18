@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentView;
 import it.gov.pagopa.pu.workflowhub.dto.generated.DebtPositionOrigin;
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     AND ((:fiscalCode IS NULL) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#fiscalCode)} ))
     AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN (:debtPositionOrigins))
     AND ((:debtPositionTypeOrgId IS NULL) OR (dpto.debtPositionTypeOrgId = :debtPositionTypeOrgId ))
+    AND ((:status IS NULL) OR (i.status = :status ))
     """)
   Page<InstallmentView> findInstallmentsByFilters(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
@@ -57,6 +59,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     String fiscalCode,
     List<DebtPositionOrigin> debtPositionOrigins,
     Long debtPositionTypeOrgId,
+    InstallmentStatus status,
     Pageable pageable);
 
 }

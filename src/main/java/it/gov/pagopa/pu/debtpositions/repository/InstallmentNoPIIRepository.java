@@ -53,17 +53,17 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   void updateStatusAndIuf(Long installmentId, InstallmentStatus status, String iuf);
 
   @Query("""
-  SELECT CASE WHEN EXISTS (
-    SELECT 1
-    FROM DebtPosition dp
-    JOIN dp.paymentOptions po
-    JOIN po.installments i
-    WHERE dp.organizationId = :orgId
-      AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN :debtPositionOrigins)
-      AND i.status <> 'CANCELLED'
-      AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
-  ) THEN true ELSE false END
-  """)
+    SELECT CASE WHEN EXISTS (
+      SELECT 1
+      FROM DebtPosition dp
+      JOIN dp.paymentOptions po
+      JOIN po.installments i
+      WHERE dp.organizationId = :orgId
+        AND (:debtPositionOrigins IS NULL OR dp.debtPositionOrigin IN :debtPositionOrigins)
+        AND i.status <> 'CANCELLED'
+        AND ((i.iud = :iud) OR (:iuv IS NOT NULL AND i.iuv = :iuv) OR (:nav IS NOT NULL AND i.nav = :nav))
+    ) THEN true ELSE false END
+    """)
   boolean isInstallmentExists(Long orgId, String iud, String iuv, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @Query(value = "SELECT i from InstallmentNoPII i " +
@@ -126,13 +126,13 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true) @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses);
 
   @Query(" select i" +
-          "  from InstallmentNoPII i" +
-          "  join PaymentOption po" +
-          "    on i.paymentOptionId = po.paymentOptionId" +
-          "  join DebtPosition dp" +
-          "    on po.debtPositionId = dp.debtPositionId" +
-          " where dp.organizationId = :organizationId" +
-          "   and i.iud in :iuds")
+    "  from InstallmentNoPII i" +
+    "  join PaymentOption po" +
+    "    on i.paymentOptionId = po.paymentOptionId" +
+    "  join DebtPosition dp" +
+    "    on po.debtPositionId = dp.debtPositionId" +
+    " where dp.organizationId = :organizationId" +
+    "   and i.iud in :iuds")
   List<InstallmentNoPII> findByOrganizationIdAndIuds(Long organizationId, Set<String> iuds);
 
   @Query(" select i" +
@@ -149,4 +149,41 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
+  @RestResource(exported = false)
+  @Query("""
+    select i
+    from InstallmentNoPII i
+    join PaymentOption po on i.paymentOptionId = po.paymentOptionId
+    join DebtPosition dp on po.debtPositionId = dp.debtPositionId
+    where i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).UNPAID_OR_PAID_INSTALLMENT_STATUSES})
+    AND (i.iuv = :iuvOrNav OR i.nav = :iuvOrNav)
+    AND ((:debtorFiscalCode is null) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)} ))
+    AND ((:organizationId is null) OR (dp.organizationId = :organizationId))
+    AND dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED})
+    """)
+  List<InstallmentNoPII> findByIuvOrNav(
+    @Parameter(required = true) @Param("iuvOrNav") String iuvOrNav,
+    String debtorFiscalCode,
+    Long organizationId);
+
+  @Query("""
+    SELECT i
+    FROM InstallmentNoPII i
+    JOIN PaymentOption po on i.paymentOptionId = :paymentOptionId
+    JOIN DebtPosition dp on po.debtPositionId = :debtPositionId
+    WHERE i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+    AND i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).UNPAID_OR_PAID_INSTALLMENT_STATUSES})
+    AND dp.organizationId = :organizationId
+    """)
+  List<InstallmentNoPII> findDebtorUnpaidOrPaidByDebtPositionIdAndPaymentOptionId(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("paymentOptionId") Long paymentOptionId,
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId);
+
+  @RestResource(exported = false)
+  @Transactional
+  @Modifying
+  @Query("UPDATE InstallmentNoPII i SET i.balance = :balance WHERE i.installmentId = :installmentId")
+  void updateBalance(Long installmentId, String balance);
 }

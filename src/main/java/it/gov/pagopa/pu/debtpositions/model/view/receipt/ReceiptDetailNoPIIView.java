@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model.view.receipt;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -39,4 +39,10 @@ public class ReceiptDetailNoPIIView implements Serializable {
   private String iur;
   private Long feeCents;
   private Long notificationFeeCents;
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private ReceiptOriginType receiptOrigin;
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private DebtPositionOrigin debtPositionOrigin;
 }

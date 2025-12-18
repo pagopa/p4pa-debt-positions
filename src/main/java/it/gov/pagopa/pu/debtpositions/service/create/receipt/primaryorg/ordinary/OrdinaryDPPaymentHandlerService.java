@@ -7,7 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.utils.PaymentFlowOrchestratorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -18,28 +18,35 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class OrdinaryDPPaymentHandlerService {
 
-  private final OrdinaryInstallmentPaymentHandlerService installmentPaymentHandlerService;
-  private final OrdinaryPaidDPHierarchyUpdateService hierarchyUpdateService;
-  private final DebtPositionService debtPositionService;
   private final DebtPositionMapper mapper;
   private final DebtPositionSyncService syncService;
+  private final UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp;
+  private final PaymentFlowOrchestratorService paymentFlowOrchestratorService;
 
-  public OrdinaryDPPaymentHandlerService(OrdinaryInstallmentPaymentHandlerService installmentPaymentHandlerService, OrdinaryPaidDPHierarchyUpdateService hierarchyUpdateService, DebtPositionService debtPositionService, DebtPositionMapper mapper, DebtPositionSyncService syncService) {
-    this.installmentPaymentHandlerService = installmentPaymentHandlerService;
-    this.hierarchyUpdateService = hierarchyUpdateService;
-    this.debtPositionService = debtPositionService;
+  public OrdinaryDPPaymentHandlerService(DebtPositionMapper mapper,
+                                         DebtPositionSyncService syncService,
+                                         UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp, PaymentFlowOrchestratorService paymentFlowOrchestratorService) {
     this.mapper = mapper;
     this.syncService = syncService;
+    this.updateAndSynchronizeOrdinaryDp = updateAndSynchronizeOrdinaryDp;
+    this.paymentFlowOrchestratorService = paymentFlowOrchestratorService;
   }
 
   public void handlePayment(DebtPosition dp, InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    if (!InstallmentUtils.PAID_STATUSES.contains(installment.getStatus())) {
-      installmentPaymentHandlerService.updateInstallment(installment, receiptDTO, accessToken);
-      hierarchyUpdateService.updateHierarchy(dp, installment);
-      debtPositionService.saveDebtPosition(dp);
-    }
+    Runnable syncWorkflowAction = () -> invokeWorkflow(dp, receiptDTO, accessToken);
 
-    invokeWorkflow(dp, receiptDTO, accessToken);
+    if (!InstallmentUtils.PAID_STATUSES.contains(installment.getStatus())) {
+      paymentFlowOrchestratorService.performStandardUpdate(dp, installment, receiptDTO, accessToken);
+      syncWorkflowAction.run();
+    } else {
+      updateAndSynchronizeOrdinaryDp.handleOrdinaryDpAlreadyPaid(
+        installment,
+        receiptDTO,
+        dp,
+        syncWorkflowAction,
+        accessToken
+      );
+    }
   }
 
   private void invokeWorkflow(DebtPosition dp, ReceiptDTO receiptDTO, String accessToken) {

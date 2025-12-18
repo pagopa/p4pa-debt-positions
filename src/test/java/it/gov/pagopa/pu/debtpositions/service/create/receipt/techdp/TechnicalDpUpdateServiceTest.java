@@ -50,12 +50,13 @@ class TechnicalDpUpdateServiceTest {
   @Test
   void whenThenMapAndUpdateIt() {
     // Given
+    Long dpTypeOrgId = 10L;
     DebtPosition dp = new DebtPosition();
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
     Organization organization = new Organization();
     DebtPositionDTO expectedResult = new DebtPositionDTO();
 
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization)))
+    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(dpTypeOrgId)))
       .thenReturn(expectedResult);
 
     service = Mockito.spy(service);
@@ -64,7 +65,7 @@ class TechnicalDpUpdateServiceTest {
       .updateDp(Mockito.same(dp), Mockito.same(expectedResult));
 
     // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization);
+    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -116,7 +117,7 @@ class TechnicalDpUpdateServiceTest {
     // When
     service.updateDp(entity, dpDTO);
 
-    // Then: capture what was sent to save service and assert propagation
+    // Then
     ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
     Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture());
     DebtPositionDTO saved = captor.getValue();

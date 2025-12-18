@@ -435,6 +435,41 @@ paths:
               schema:
                 $ref: '#/components/schemas/DebtPositionErrorDTO'
       x-spring-paginated: true
+  /installments/debtor:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsByIuvOrNav
+      parameters:
+        - name: iuvOrNav
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: X-fiscal-code
+          in: header
+          required: false
+          schema:
+            type: string
+        - name: organizationId
+          in: query
+          required: false
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/InstallmentDebtorDTO"
+        "400":
+          description: Invalid request
+        "500":
+          description: Internal server error
   /installments/{organizationId}/{nav}:
     get:
       tags:
@@ -2140,6 +2175,7 @@ components:
         - debtor
         - debtPositionTypeOrgDescription
         - debtPositionId
+        - debtPositionOrigin
       properties:
         installmentId:
           type: integer
@@ -2171,6 +2207,8 @@ components:
         debtPositionId:
           type: integer
           format: int64
+        debtPositionOrigin:
+          type: 'DebtPositionOrigin'
         paymentDateTime:
           type: string
           format: date-time
@@ -2200,6 +2238,8 @@ components:
         - debtor
         - pspCompanyName
         - iud
+        - receiptOrigin
+        - debtPositionOrigin
       properties:
         receiptId:
           type: integer
@@ -2232,6 +2272,10 @@ components:
         notificationFeeCents:
           type: integer
           format: int64
+        receiptOrigin:
+          type: 'ReceiptOrigin'
+        debtPositionOrigin:
+          type: 'DebtPositionOrigin'
     ReceiptTransferDTO:
       required:
         - idTransfer
@@ -2879,3 +2923,41 @@ components:
         notificationDate:
           type: string
           format: date-time
+    InstallmentDebtorDTO:
+      type: object
+      required:
+        - installmentId
+        - organizationId
+        - debtor
+        - amountCents
+        - status
+        - remittanceInformation
+        - debtPositionTypeOrgDescription
+      properties:
+        installmentId:
+          type: integer
+          format: int64
+        iuv:
+          type: string
+        nav:
+          type: string
+        organizationId:
+          type: integer
+          format: int64
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
+        amountCents:
+          type: integer
+          format: int64
+        dueDate:
+          type: string
+          format: date
+        status:
+          $ref: "#/components/schemas/InstallmentStatus"
+        remittanceInformation:
+          type: string
+        receiptId:
+          type: integer
+          format: int64
+        debtPositionTypeOrgDescription:
+          type: string

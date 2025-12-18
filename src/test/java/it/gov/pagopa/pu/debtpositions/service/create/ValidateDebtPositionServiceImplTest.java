@@ -303,7 +303,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("[P4PA_INVALID_FISCAL_CODE] P. iva of legal person is not valid", invalidValueException.getMessage());
+    assertEquals("[P4PA_INVALID_FISCAL_CODE] Fiscal code or p. iva of legal person is not valid", invalidValueException.getMessage());
   }
 
   @Test

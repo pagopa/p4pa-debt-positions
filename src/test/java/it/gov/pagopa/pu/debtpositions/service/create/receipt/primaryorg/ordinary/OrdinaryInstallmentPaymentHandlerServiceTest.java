@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinar
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -21,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -59,6 +59,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     installment.setStatus(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance("BAL");
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(null);
@@ -67,63 +68,119 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     Assertions.assertThrows(NotFoundException.class, () -> service.updateInstallment(installment, receiptDTO, accessToken));
   }
 
-  //region desc=testBalanceAmountResolve
   @Test
-  void givenReceiptWithBalanceWhenUpdateInstallmentThenReplaceOnInstallmentBeforeToResolveIt() {
-    testBalanceAmountResolve("RECEIPTBALANCE");
-  }
-
-  @Test
-  void givenReceiptWithoutBalanceWhenUpdateInstallmentThenUseInstallmentToResolveIt() {
-    testBalanceAmountResolve(null);
-  }
-
-  void testBalanceAmountResolve(String receiptBalance) {
+  void givenPaidInstallmentAndNonReceiptFileOriginWhenUpdateInstallmentThenSkipResolveBalance() {
     // Given
     String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
-    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setStatus(InstallmentStatus.PAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
-    receiptDTO.setBalance(receiptBalance);
-    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
-    dpTypeOrg.setOrganizationId(-2L);
-
-    String expectedBalanceTemplate2resolve = Objects.requireNonNullElse(receiptBalance, installment.getBalance());
-
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
-      .thenReturn(dpTypeOrg);
-
-    Mockito.doNothing()
-      .when(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(
-        Mockito.argThat(i -> {
-          Assertions.assertSame(installment, i);
-          Assertions.assertSame(expectedBalanceTemplate2resolve, installment.getBalance());
-          return true;
-        }),
-        Mockito.same(dpTypeOrg.getOrganizationId()), Mockito.same(dpTypeOrg), Mockito.same(accessToken));
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+    receiptDTO.setBalance("BAL");
 
     // When
     service.updateInstallment(installment, receiptDTO, accessToken);
 
     // Then
-    assertPaymentDataUpdatesAndCommonMockInvocations(receiptDTO, installment, dpTypeOrg, accessToken);
-    Assertions.assertSame(expectedBalanceTemplate2resolve, installment.getBalance());
-  }
-
-  private void assertPaymentDataUpdatesAndCommonMockInvocations(ReceiptWithAdditionalNodeDataDTO receiptDTO, InstallmentNoPII installment, DebtPositionTypeOrg dpTypeOrg, String accessToken) {
     Assertions.assertSame(receiptDTO.getReceiptId(), installment.getReceiptId());
-    Assertions.assertSame(receiptDTO.getPaymentReceiptId(), installment.getIur());
     Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
-    Assertions.assertNull(installment.getSyncStatus());
 
-    Mockito.verify(balanceResolverServiceMock)
-      .updateBalanceResolvingAmount(
-        Mockito.same(installment), Mockito.same(dpTypeOrg.getOrganizationId()), Mockito.same(dpTypeOrg), Mockito.same(accessToken));
+    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
+    Mockito.verify(balanceResolverServiceMock, Mockito.never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
-//end region
 
-  //region desc=testAmountsUpdates
+  @Test
+  void givenUnpaidInstallmentWithBalanceWhenUpdateInstallmentThenSetBalanceAndResolve() {
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance("BAL");
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    // When
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    // Then
+    Assertions.assertEquals("BAL", installment.getBalance());
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
+  void givenUnpaidInstallmentWithoutBalanceWhenUpdateInstallmentThenResolveWithoutSettingBalance() {
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setBalance("OLD_BAL");
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance(null);
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    // When
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    // Then
+    Assertions.assertEquals("OLD_BAL", installment.getBalance());
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
+  void givenPaidInstallmentAndReceiptFileWithBalanceWhenUpdateInstallmentThenResolveBalance() {
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.PAID);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
+    receiptDTO.setBalance("NEW_BAL");
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    // When
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    // Then
+    Assertions.assertEquals("NEW_BAL", installment.getBalance());
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
+  void givenPaidInstallmentAndReceiptFileWithoutBalanceWhenUpdateInstallmentThenSkipResolve() {
+    // Given
+    String accessToken = "ACCESSTOKEN";
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.PAID);
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
+    receiptDTO.setBalance(null);
+
+    // When
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    // Then
+    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
+    Mockito.verify(balanceResolverServiceMock, Mockito.never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
   @Test
   void givenFeeWhenUpdateInstallmentThenModifyInstallmentAndTransfer1Amounts() {
     testAmountsUpdates(2L);
@@ -154,6 +211,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     installment.setAmountCents(installmentAmounts);
     installment.setTransfers(new TreeSet<>(Set.of(t1, t2)));
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance("BAL");
     receiptDTO.setPaymentAmountCents(receiptAmountsCents);
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
@@ -172,10 +230,10 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     Assertions.assertEquals(t1Amounts + notificationFeeAmounts, t1.getAmountCents());
     Assertions.assertEquals(t2Amounts, t2.getAmountCents());
   }
-//endregion
 
   @Test
   void givenMdbAttachmentWhenUpdateInstallmentThenSetItOnTransfer1() {
+    // Given
     String accessToken = "ACCESSTOKEN";
     Transfer t1 = podamFactory.manufacturePojo(Transfer.class);
     t1.setTransferIndex(1);
@@ -191,6 +249,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptTransferDTO rt2 = podamFactory.manufacturePojo(ReceiptTransferDTO.class);
     rt2.setIdTransfer(2);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance("BAL");
     receiptDTO.setTransfers(List.of(rt1, rt2));
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
@@ -206,5 +265,16 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
 
     Assertions.assertNotNull(t1.getMbdAttachment());
     Assertions.assertSame(rt2.getMbdAttachment(), t2.getMbdAttachment());
+  }
+
+  private void assertPaymentDataUpdatesAndCommonMockInvocations(ReceiptWithAdditionalNodeDataDTO receiptDTO, InstallmentNoPII installment, DebtPositionTypeOrg dpTypeOrg, String accessToken) {
+    Assertions.assertSame(receiptDTO.getReceiptId(), installment.getReceiptId());
+    Assertions.assertSame(receiptDTO.getPaymentReceiptId(), installment.getIur());
+    Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
+    Assertions.assertNull(installment.getSyncStatus());
+
+    Mockito.verify(balanceResolverServiceMock)
+      .updateBalanceResolvingAmount(
+        Mockito.same(installment), Mockito.same(dpTypeOrg.getOrganizationId()), Mockito.same(dpTypeOrg), Mockito.same(accessToken));
   }
 }

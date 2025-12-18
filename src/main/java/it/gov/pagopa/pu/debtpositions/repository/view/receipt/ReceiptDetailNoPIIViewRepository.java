@@ -16,32 +16,36 @@ import java.util.Optional;
 @RepositoryRestResource(path = "receipts-detail-view")
 public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDetailNoPIIView, Long> {
   @RestResource(exported = false)
-  @Query(value = "SELECT new ReceiptDetailNoPIIView("
-    + "r.receiptId as receiptId, "
-    + "i.iuv as iuv, "
-    + "i.nav as nav, "
-    + "r.paymentAmountCents as paymentAmountCents, "
-    + "i.remittanceInformation as remittanceInformation, "
-    + "dpto.description as debtPositionTypeOrgDescription, "
-    + "i.personalDataId as debtorPersonalDataId, "
-    + "r.paymentDateTime as paymentDateTime, "
-    + "r.pspCompanyName as pspCompanyName, "
-    + "i.iud as iud, "
-    + "i.iur as iur, "
-    + "r.feeCents as feeCents, "
-    + "i.notificationFeeCents as notificationFeeCents "
-    + ") "
-    + "FROM ReceiptDetailNoPIIView r "
-    + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
-    + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
-    + "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId "
-    + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
-    + "JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId "
-    + "WHERE r.receiptId = :receiptId "
-    + "AND dptoo.operatorExternalUserId = :operatorExternalUserId "
-    + "AND dp.organizationId = :organizationId "
-    + "AND (:iud IS NULL OR i.iud = :iud) "
-    + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
+  @Query("""
+    SELECT new ReceiptDetailNoPIIView(
+    r.receiptId as receiptId,
+    i.iuv as iuv,
+    i.nav as nav,
+    r.paymentAmountCents as paymentAmountCents,
+    i.remittanceInformation as remittanceInformation,
+    dpto.description as debtPositionTypeOrgDescription,
+    i.personalDataId as debtorPersonalDataId,
+    r.paymentDateTime as paymentDateTime,
+    r.pspCompanyName as pspCompanyName,
+    i.iud as iud,
+    i.iur as iur,
+    r.feeCents as feeCents,
+    i.notificationFeeCents as notificationFeeCents,
+    r.receiptOrigin as receiptOrigin,
+    dp.debtPositionOrigin as debtPositionOrigin
+    )
+    FROM ReceiptDetailNoPIIView r
+    JOIN InstallmentNoPII i ON r.receiptId = i.receiptId
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
+    WHERE r.receiptId = :receiptId
+    AND dptoo.operatorExternalUserId = :operatorExternalUserId
+    AND dp.organizationId = :organizationId
+    AND (:iud IS NULL OR i.iud = :iud)
+    AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE}
+  """)
   List<ReceiptDetailNoPIIView> findReceiptDetailViewInner(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
@@ -72,30 +76,34 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
   }
 
   @RestResource(exported = false)
-  @Query(value = "SELECT new ReceiptDetailNoPIIView("
-    + "r.receiptId as receiptId, "
-    + "i.iuv as iuv, "
-    + "i.nav as nav, "
-    + "r.paymentAmountCents as paymentAmountCents, "
-    + "i.remittanceInformation as remittanceInformation, "
-    + "dpto.description as debtPositionTypeOrgDescription, "
-    + "i.personalDataId as debtorPersonalDataId, "
-    + "r.paymentDateTime as paymentDateTime, "
-    + "r.pspCompanyName as pspCompanyName, "
-    + "i.iud as iud, "
-    + "i.iur as iur, "
-    + "r.feeCents as feeCents, "
-    + "i.notificationFeeCents as notificationFeeCents "
-    + ") "
-    + "FROM ReceiptDetailNoPIIView r "
-    + "JOIN InstallmentNoPII i ON r.receiptId = i.receiptId "
-    + "JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId "
-    + "JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId "
-    + "JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId "
-    + "WHERE r.receiptId = :receiptId "
-    + "AND dp.organizationId = :organizationId "
-    + "AND (:iud IS NULL OR i.iud = :iud) "
-    + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
+  @Query("""
+    SELECT new ReceiptDetailNoPIIView(
+    r.receiptId as receiptId,
+    i.iuv as iuv,
+    i.nav as nav,
+    r.paymentAmountCents as paymentAmountCents,
+    i.remittanceInformation as remittanceInformation,
+    dpto.description as debtPositionTypeOrgDescription,
+    i.personalDataId as debtorPersonalDataId,
+    r.paymentDateTime as paymentDateTime,
+    r.pspCompanyName as pspCompanyName,
+    i.iud as iud,
+    i.iur as iur,
+    r.feeCents as feeCents,
+    i.notificationFeeCents as notificationFeeCents,
+    r.receiptOrigin as receiptOrigin,
+    dp.debtPositionOrigin as debtPositionOrigin
+    )
+    FROM ReceiptDetailNoPIIView r
+    JOIN InstallmentNoPII i ON r.receiptId = i.receiptId
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    WHERE r.receiptId = :receiptId
+    AND dp.organizationId = :organizationId
+    AND (:iud IS NULL OR i.iud = :iud)
+    AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE}
+  """)
   List<ReceiptDetailNoPIIView> findReceiptDetailViewInner(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("organizationId") Long organizationId,

@@ -23,8 +23,10 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
 
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
+
   @Mock
   private OrdinaryDPPaymentHandlerService ordinaryDPPaymentHandlerServiceMock;
+
   @Mock
   private ReceiptBasedTechnicalDpHandlerService technicalDpHandlerServiceMock;
 
@@ -49,7 +51,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
   }
 
   @Test
-  void givenNotExistentDPWhenHandlePaymentThrow(){
+  void givenNotExistentDPWhenHandlePaymentThrow() {
     // Given
     String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
@@ -65,7 +67,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
   }
 
   @Test
-  void givenOrdinaryDpWhenHandlePaymentInvokeItsHandler(){
+  void givenOrdinaryDpWhenHandlePaymentInvokeItsHandler() {
     // Given
     String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
@@ -89,7 +91,7 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
   }
 
   @Test
-  void givenTechDpWhenHandlePaymentInvokeItsHandler(){
+  void givenTechDpWhenHandlePaymentInvokeItsHandler() {
     // Given
     String accessToken = "ACCESSTOKEN";
     InstallmentNoPII installment = new InstallmentNoPII();
@@ -103,7 +105,12 @@ class PrimaryOrgInstallmentPaymentHandlerServiceTest {
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installment.getInstallmentId()))
       .thenReturn(fetchedDp);
 
-    Mockito.when(technicalDpHandlerServiceMock.updateAndPublishTechDp(Mockito.same(organization), Mockito.same(fetchedDp), Mockito.same(receiptDTO)))
+    Mockito.when(technicalDpHandlerServiceMock.updateAndPublishTechDp(
+        Mockito.same(organization),
+        Mockito.same(fetchedDp),
+        Mockito.same(installment),
+        Mockito.same(receiptDTO),
+        Mockito.same(accessToken)))
       .thenReturn(expectedResult);
 
     // When

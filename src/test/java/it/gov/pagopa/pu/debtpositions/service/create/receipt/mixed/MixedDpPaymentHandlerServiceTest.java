@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
-import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.UpdateAndSynchronizeTechDp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,7 @@ class MixedDpPaymentHandlerServiceTest {
   @Mock
   private DebtPositionMapper mapperMock;
   @Mock
-  private ReceiptBasedTechnicalDpHandlerService technicalDpHandlerServiceMock;
+  private UpdateAndSynchronizeTechDp updateAndSynchronizeTechDpMock;
 
   private MixedDpPaymentHandlerService service;
 
@@ -32,7 +32,7 @@ class MixedDpPaymentHandlerServiceTest {
     service = new MixedDpPaymentHandlerService(
       technicalMixedDebtPositionUpdaterServiceMock,
       mapperMock,
-      technicalDpHandlerServiceMock
+      updateAndSynchronizeTechDpMock
     );
   }
 
@@ -41,7 +41,7 @@ class MixedDpPaymentHandlerServiceTest {
     Mockito.verifyNoMoreInteractions(
       technicalMixedDebtPositionUpdaterServiceMock,
       mapperMock,
-      technicalDpHandlerServiceMock);
+      updateAndSynchronizeTechDpMock);
   }
 
   @Test
@@ -58,7 +58,7 @@ class MixedDpPaymentHandlerServiceTest {
     service.handle(primaryOrgDp, receiptDTO, accessToken);
 
     // Then
-    Mockito.verifyNoInteractions(mapperMock, technicalDpHandlerServiceMock);
+    Mockito.verifyNoInteractions(mapperMock, updateAndSynchronizeTechDpMock);
   }
 
   @Test
@@ -84,9 +84,9 @@ class MixedDpPaymentHandlerServiceTest {
     service.handle(primaryOrgDp, receiptDTO, accessToken);
 
     // Then
-    Mockito.verify(technicalDpHandlerServiceMock)
+    Mockito.verify(updateAndSynchronizeTechDpMock)
       .publishTechDp(Mockito.same(techDpMixed1DTO), Mockito.same(receiptDTO));
-    Mockito.verify(technicalDpHandlerServiceMock)
+    Mockito.verify(updateAndSynchronizeTechDpMock)
       .publishTechDp(Mockito.same(techDpMixed2DTO), Mockito.same(receiptDTO));
   }
 }

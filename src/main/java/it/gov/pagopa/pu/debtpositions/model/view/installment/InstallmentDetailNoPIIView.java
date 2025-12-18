@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +41,9 @@ public class InstallmentDetailNoPIIView implements Serializable {
   private String debtPositionDescription;
   @NotNull
   private Long debtPositionId;
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private DebtPositionOrigin debtPositionOrigin;
   private OffsetDateTime paymentDateTime;
   @NotNull
   private Long receiptPersonalDataId;
