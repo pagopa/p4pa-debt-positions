@@ -2,8 +2,8 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
 import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
