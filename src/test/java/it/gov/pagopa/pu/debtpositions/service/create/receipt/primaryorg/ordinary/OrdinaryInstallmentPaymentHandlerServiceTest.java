@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -183,6 +184,47 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     // Then
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
     Mockito.verify(balanceResolverServiceMock, Mockito.never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
+  void givenPagoPaOriginWithFeeDifferenceWhenUpdateInstallmentThenParseFeeFromMetadata() {
+    String accessToken = "ACCESSTOKEN";
+    long initialInstallmentAmount = 1000L;
+    long receiptAmount = 1200L;
+    long metadataFeeValue = 150L;
+
+    Transfer t1 = podamFactory.manufacturePojo(Transfer.class);
+    t1.setTransferIndex(1);
+    t1.setAmountCents(500L);
+
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setAmountCents(initialInstallmentAmount);
+    installment.setNotificationFeeCents(0L);
+    installment.setTransfers(new TreeSet<>(Set.of(t1)));
+
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+    receiptDTO.setPaymentAmountCents(receiptAmount);
+    receiptDTO.setBalance("BAL");
+    receiptDTO.setMetadata(Map.of("NOTIFICATION_FEE", String.valueOf(metadataFeeValue)));
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    Assertions.assertEquals(metadataFeeValue, installment.getNotificationFeeCents());
+
+    Assertions.assertEquals(receiptAmount, installment.getAmountCents());
+
+    long expectedFeeDiff = receiptAmount - initialInstallmentAmount;
+    Assertions.assertEquals(500L + expectedFeeDiff, t1.getAmountCents());
+
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
