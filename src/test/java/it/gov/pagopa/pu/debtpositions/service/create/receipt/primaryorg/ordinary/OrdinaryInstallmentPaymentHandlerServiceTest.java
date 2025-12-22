@@ -59,6 +59,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     installment.setStatus(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
     receiptDTO.setBalance("BAL");
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
@@ -77,6 +78,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
     receiptDTO.setBalance("BAL");
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     // When
     service.updateInstallment(installment, receiptDTO, accessToken);
@@ -97,6 +99,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     installment.setStatus(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
@@ -122,6 +125,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     installment.setBalance("OLD_BAL");
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance(null);
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
@@ -213,6 +217,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
     receiptDTO.setPaymentAmountCents(receiptAmountsCents);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 
@@ -251,6 +256,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
     receiptDTO.setTransfers(List.of(rt1, rt2));
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 
