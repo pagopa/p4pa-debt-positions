@@ -1,14 +1,14 @@
 package it.gov.pagopa.pu.debtpositions.citizen.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Base64;
 
 class DataCipherServiceTest {
 
-  private final DataCipherService service = new DataCipherService("PSW","PEPPER", new ObjectMapper());
+  private final DataCipherService service = new DataCipherService("PSW","PEPPER", new JsonMapper());
 
   @Test
   void testEncrypt() {

@@ -57,7 +57,6 @@ public class ReceiptFileServiceImpl implements ReceiptFileService{
 
 
     public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId) {
-        //TODO P4ADEV-4218
         ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, SecurityUtils.getCurrentUserExternalId(), organizationId, null);
         if(receiptDetail==null){
           throw new NotFoundException("Receipt with ID "+receiptId+" not found");

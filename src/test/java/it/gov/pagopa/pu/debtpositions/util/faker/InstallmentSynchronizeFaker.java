@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
-import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
+import tools.jackson.databind.node.NullNode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;

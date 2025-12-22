@@ -21,7 +21,7 @@ public class TemporalAccessorConversionConfig {
     Converter<String, LocalDateTime> converter = new Converter<>() {
       @Override
       public LocalDateTime convert(@Nonnull String source) {
-        return OffsetDateTimeToLocalDateTimeDeserializer.string2LocalDateTime(source);
+        return OffsetDateTimeToLocalDateTimeDeserializer.parse(source);
       }
     };
     defaultConversionService.addConverter(converter);
@@ -34,7 +34,7 @@ public class TemporalAccessorConversionConfig {
     Converter<String, OffsetDateTime> converter = new Converter<>() {
       @Override
       public OffsetDateTime convert(@Nonnull String source) {
-        return LocalDateTimeToOffsetDateTimeDeserializer.string2OffsetDateTime(source);
+        return LocalDateTimeToOffsetDateTimeDeserializer.parseString(source);
       }
     };
     defaultConversionService.addConverter(converter);
