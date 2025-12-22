@@ -58,7 +58,12 @@ public class OrdinaryInstallmentPaymentHandlerService {
     long feeAmountCents = receiptDTO.getPaymentAmountCents() - installment.getAmountCents();
     if (feeAmountCents > 0) {
       log.debug("Set NotificationFeeCents for installmentId {} with amount: {}", installment.getInstallmentId(), feeAmountCents);
-      installment.setNotificationFeeCents(feeAmountCents);
+      long notificationFeeCents = ReceiptOriginType.RECEIPT_PAGOPA.equals(receiptDTO.getReceiptOrigin())
+        ? Long.parseLong(receiptDTO.getMetadata().get("NOTIFICATION_FEE"))
+        : feeAmountCents;
+
+      installment.setNotificationFeeCents(notificationFeeCents);
+
       installment.setAmountCents(installment.getAmountCents() + feeAmountCents);
       installment.getTransfers()
         .stream().filter(t -> t.getTransferIndex() == 1)
