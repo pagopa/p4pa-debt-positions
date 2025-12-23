@@ -1,11 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
 import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service
 public class IuvSequenceNumberServiceImpl implements IuvSequenceNumberService {
@@ -18,23 +15,7 @@ public class IuvSequenceNumberServiceImpl implements IuvSequenceNumberService {
 
   @Transactional
   public long getNextIuvSequenceNumber(Long organizationId) {
-    long nextSequenceNumber;
-
-    Optional<IuvSequenceNumber> currentEntity = iuvSequenceNumberRepository.findByOrganizationId(organizationId);
-
-    if (currentEntity.isEmpty()) {
-      nextSequenceNumber = 1;
-      IuvSequenceNumber newEntity = new IuvSequenceNumber();
-      newEntity.setOrganizationId(organizationId);
-      newEntity.setSequenceNumber(nextSequenceNumber);
-      iuvSequenceNumberRepository.save(newEntity);
-    } else {
-      IuvSequenceNumber existingISN = currentEntity.get();
-      nextSequenceNumber = existingISN.getSequenceNumber() + 1;
-      existingISN.setSequenceNumber(nextSequenceNumber);
-      iuvSequenceNumberRepository.save(existingISN);
-    }
-
-    return nextSequenceNumber;
+    return iuvSequenceNumberRepository.getNextIuvSequenceNumber(organizationId)
+      .getSequenceNumber();
   }
 }

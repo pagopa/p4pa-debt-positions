@@ -23,7 +23,16 @@ import java.util.*;
 @Slf4j
 public class TestUtils {
 
-  private TestUtils(){}
+  private TestUtils() {
+  }
+
+  static {
+    clearDefaultTimezone();
+  }
+
+  public static void clearDefaultTimezone() {
+    TimeZone.setDefault(Constants.DEFAULT_TIMEZONE);
+  }
 
   /**
    * It will assert not null on all o's fields
@@ -33,7 +42,7 @@ public class TestUtils {
     org.springframework.util.ReflectionUtils.doWithFields(o.getClass(),
       f -> {
         f.setAccessible(true);
-        Assertions.assertNotNull(f.get(o), "The field "+f.getName()+" of the input object of type "+o.getClass()+" is null!");
+        Assertions.assertNotNull(f.get(o), "The field " + f.getName() + " of the input object of type " + o.getClass() + " is null!");
       },
       f -> !excludedFieldsSet.contains(f.getName()));
   }
@@ -129,15 +138,16 @@ public class TestUtils {
   }
 
   private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.nnnnnnnnn");
+
   private static <T> boolean compareEquals(Comparable<T> v1, T v2) {
     try {
       //specific equality tests for TemporalAccessor classes
-      if(v1 instanceof TemporalAccessor v1Time && v2 instanceof TemporalAccessor v2Time){
+      if (v1 instanceof TemporalAccessor v1Time && v2 instanceof TemporalAccessor v2Time) {
         //ignore timezone (for localDate/Time objects)
         return StringUtils.equals(formatter.format(v1Time), formatter.format(v2Time));
       } else {
         //generic fallback
-        return v1.compareTo(v2)==0;
+        return v1.compareTo(v2) == 0;
       }
     } catch (ClassCastException cce) {
       log.warn("cannot compare {} with {}", ClassUtils.getName(v1), ClassUtils.getName(v2));
@@ -157,7 +167,7 @@ public class TestUtils {
 
   public static PodamFactory getPodamFactory() {
     PodamFactoryImpl podamFactory = new PodamFactoryImpl();
-    podamFactory.getStrategy().addOrReplaceTypeManufacturer(SortedSet.class, new AbstractTypeManufacturer<>(){
+    podamFactory.getStrategy().addOrReplaceTypeManufacturer(SortedSet.class, new AbstractTypeManufacturer<>() {
       @Override
       public SortedSet<?> getType(DataProviderStrategy strategy, AttributeMetadata attributeMetadata, ManufacturingContext manufacturingCtx) {
         return new TreeSet<>();

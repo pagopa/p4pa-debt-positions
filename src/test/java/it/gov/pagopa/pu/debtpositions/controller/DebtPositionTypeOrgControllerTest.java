@@ -1,11 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
@@ -16,12 +10,18 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.json.JsonMapper;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DebtPositionTypeOrgControllerImpl.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -31,7 +31,7 @@ class DebtPositionTypeOrgControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @MockitoBean
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
@@ -54,7 +54,7 @@ class DebtPositionTypeOrgControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    IONotificationDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), IONotificationDTO.class);
+    IONotificationDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), IONotificationDTO.class);
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -86,11 +86,11 @@ class DebtPositionTypeOrgControllerTest {
     MvcResult result = mockMvc.perform(
         post("/debt-position-type-org")
           .contentType(MediaType.APPLICATION_JSON)
-          .content(objectMapper.writeValueAsString(requestBody)))
+          .content(jsonMapper.writeValueAsString(requestBody)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionTypeOrg response = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionTypeOrg.class);
+    DebtPositionTypeOrg response = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionTypeOrg.class);
     assertEquals(expectedResult,response);
   }
 

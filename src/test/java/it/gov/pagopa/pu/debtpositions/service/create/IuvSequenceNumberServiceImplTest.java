@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.model.IuvSequenceNumber;
 import it.gov.pagopa.pu.debtpositions.repository.IuvSequenceNumberRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -10,45 +11,39 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Optional;
-
 @ExtendWith(MockitoExtension.class)
 class IuvSequenceNumberServiceImplTest {
 
   @Mock
-  private IuvSequenceNumberRepository iuvSequenceNumberRepository;
+  private IuvSequenceNumberRepository iuvSequenceNumberRepositoryMock;
 
   private IuvSequenceNumberServiceImpl iuvSequenceNumberService;
 
   @BeforeEach
   void setUp() {
-    iuvSequenceNumberService = new IuvSequenceNumberServiceImpl(iuvSequenceNumberRepository);
+    iuvSequenceNumberService = new IuvSequenceNumberServiceImpl(iuvSequenceNumberRepositoryMock);
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(iuvSequenceNumberRepositoryMock);
   }
 
   @Test
-  void givenValidOrgWhenGetNextIuvSequenceNumberThenOk(){
+  void whenGetNextIuvSequenceNumberThenOk(){
+    // GIven
     IuvSequenceNumber iuvSequenceNumber = new IuvSequenceNumber();
     iuvSequenceNumber.setId(1L);
     iuvSequenceNumber.setSequenceNumber(2L);
     iuvSequenceNumber.setOrganizationId(3L);
 
-    Mockito.when(iuvSequenceNumberRepository.findByOrganizationId(1L)).thenReturn(Optional.of(iuvSequenceNumber));
+    Mockito.when(iuvSequenceNumberRepositoryMock.getNextIuvSequenceNumber(1L)).thenReturn(iuvSequenceNumber);
 
+    // When
     long result = iuvSequenceNumberService.getNextIuvSequenceNumber(1L);
 
-    Assertions.assertEquals(3L, result);
-    Mockito.verify(iuvSequenceNumberRepository, Mockito.times(1))
-      .findByOrganizationId(1L);
+    // Then
+    Assertions.assertEquals(iuvSequenceNumber.getSequenceNumber(), result);
   }
 
-  @Test
-  void givenNonExistentOrgWhenGetNextIuvSequenceNumberThenOk(){
-    Mockito.when(iuvSequenceNumberRepository.findByOrganizationId(1L)).thenReturn(Optional.empty());
-
-    long result = iuvSequenceNumberService.getNextIuvSequenceNumber(1L);
-
-    Assertions.assertEquals(1L, result);
-    Mockito.verify(iuvSequenceNumberRepository, Mockito.times(1))
-      .findByOrganizationId(1L);
-  }
 }

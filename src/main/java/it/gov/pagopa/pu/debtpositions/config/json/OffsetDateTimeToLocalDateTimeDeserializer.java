@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.config.json;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
@@ -15,14 +16,13 @@ public class OffsetDateTimeToLocalDateTimeDeserializer extends JsonDeserializer<
 
   @Override
   public LocalDateTime deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
-
     String dateString = p.getValueAsString();
-    return string2LocalDateTime(dateString);
+    return parse(dateString);
   }
 
-  public static LocalDateTime string2LocalDateTime(String dateString) {
+  public static LocalDateTime parse(String dateString) {
     if(dateString.contains("+") || dateString.endsWith("Z")){
-      return OffsetDateTime.parse(dateString).toLocalDateTime();
+      return OffsetDateTime.parse(dateString).atZoneSameInstant(Constants.ZONEID).toLocalDateTime();
     } else {
       return LocalDateTime.parse(dateString);
     }
