@@ -7,10 +7,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.mapping.PersistentEntity;
 import org.springframework.data.mapping.context.PersistentEntities;
+import org.springframework.data.rest.webmvc.alps.AlpsJacksonJsonHttpMessageConverter;
+import org.springframework.data.rest.webmvc.alps.RootResourceInformationToAlpsDescriptorConverter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.MediaType;
+import tools.jackson.databind.json.JsonMapper;
 
 import java.util.List;
 import java.util.Objects;
@@ -41,6 +45,13 @@ public class RepositoryRestCustomConfiguration {
       renameSpringDataRestModels(openApi);
       renameSpringDataRestOperationIds(openApi);
     };
+  }
+
+  @Bean
+  @Primary
+  public AlpsJacksonJsonHttpMessageConverter alpsJsonHttpMessageCustomConverter(
+    RootResourceInformationToAlpsDescriptorConverter alpsConverter, JsonMapper jsonMapper) {
+    return new AlpsJacksonJsonHttpMessageConverter(jsonMapper, alpsConverter);
   }
 
   private void renameSpringDataRestModels(OpenAPI openApi) {
