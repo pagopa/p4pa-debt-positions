@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.UtilitiesTest;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.ServletException;
@@ -79,6 +80,11 @@ class DebtPositionExceptionHandlerTest {
     String testEndpoint(@RequestParam(DATA) String data, @Valid @RequestBody TestRequestBody body) {
       return "OK";
     }
+  }
+
+  @BeforeEach
+  void init() {
+    TestUtils.clearDefaultTimezone();
   }
 
   @RestController
