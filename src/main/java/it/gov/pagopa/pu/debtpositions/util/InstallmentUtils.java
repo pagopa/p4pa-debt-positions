@@ -49,6 +49,11 @@ public class InstallmentUtils {
     DebtPositionStatus.EXPIRED,
     DebtPositionStatus.PARTIALLY_PAID);
 
+  public static final Set<DebtPositionStatus> NOT_PAYABLE_DP_STATUSES = Set.of(
+    DebtPositionStatus.DRAFT,
+    DebtPositionStatus.EXPIRED,
+    DebtPositionStatus.CANCELLED);
+
   public static final Set<DebtPositionStatus> OPEN_DP_STATUSES = Set.of(
     DebtPositionStatus.UNPAID,
     DebtPositionStatus.PARTIALLY_PAID);
