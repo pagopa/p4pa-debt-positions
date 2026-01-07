@@ -95,7 +95,7 @@ class ReceiptArchivingPIIViewRepositoryImplTest {
       () -> receiptArchivingPIIViewRepository.getPagedReceiptsArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1))
     );
     //then
-    assertEquals("The number of ReceiptArchivingViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
+    assertEquals("[EXPORT_TOO_MANY_RECORDS] The number of ReceiptArchivingViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
 
   }
 }

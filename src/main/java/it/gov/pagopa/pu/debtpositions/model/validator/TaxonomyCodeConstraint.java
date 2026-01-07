@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface TaxonomyCodeConstraint {
 
-  String message() default "The taxonomy code is not valid";
+  String message() default "[INVALID_TAXONOMY_CODE] The taxonomy code is not valid";
   Class<?>[] groups() default { };
   Class<? extends Payload>[] payload() default { };
 }

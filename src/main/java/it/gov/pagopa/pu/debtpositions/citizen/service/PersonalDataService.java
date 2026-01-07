@@ -47,7 +47,7 @@ public class PersonalDataService {
   public <T> T get(long personalDataId, Class<T> classType) {
     return repository.findById(personalDataId)
       .map(personalData -> dataCipherService.decryptObj(personalData.getData(), classType))
-      .orElseThrow(() -> new NotFoundException("installment pii not found for id " + personalDataId));
+      .orElseThrow(() -> new NotFoundException("[PII_ENTITY_NOT_FOUND] PII Entity with id " + personalDataId + " not found"));
   }
 
 }
