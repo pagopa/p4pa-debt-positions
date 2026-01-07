@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubServ
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InstallmentCloningException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -29,7 +30,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ServerErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -125,29 +125,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
           }
           case M -> {
             InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
-            InstallmentDTO dryStoredInstallment;
-
-            try {
-              String json = objectMapper.writeValueAsString(storedInstallment);
-              dryStoredInstallment = objectMapper.readValue(json, InstallmentDTO.class);
-            } catch (JsonProcessingException e) {
-              throw new ServerErrorException("Error cloning installment", e);
-            }
-
-            debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
-
-            DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-              .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s was not found for organization id %s",
-                debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
-
-            validateDebtPositionService.validateInstallment(
-              dryStoredInstallment,
-              accessToken,
-              debtPositionTypeOrg,
-              debtPositionDTO.getDebtPositionOrigin(),
-              debtPositionDTO.getFlagPuPagoPaPayment()
-            );
-
+            validateDryInstallment(debtPositionDTO, accessToken, storedInstallment, manageInstallment);
             debtPositionManageApplierService.merge(manageInstallment, storedInstallment);
             installmentsToUpdate.add(storedInstallment);
           }
@@ -180,6 +158,31 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     installments2operate.addAll(installmentsToCancel);
 
     return installments2operate;
+  }
+
+  private void validateDryInstallment(DebtPositionDTO debtPositionDTO, String accessToken, InstallmentDTO storedInstallment, InstallmentDTO manageInstallment) {
+    InstallmentDTO dryStoredInstallment;
+
+    try {
+      String json = objectMapper.writeValueAsString(storedInstallment);
+      dryStoredInstallment = objectMapper.readValue(json, InstallmentDTO.class);
+    } catch (JsonProcessingException e) {
+      throw new InstallmentCloningException("Error cloning installment with id " + storedInstallment.getInstallmentId());
+    }
+
+    debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
+
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
+      .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s was not found for organization id %s",
+        debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
+
+    validateDebtPositionService.validateInstallment(
+      dryStoredInstallment,
+      accessToken,
+      debtPositionTypeOrg,
+      debtPositionDTO.getDebtPositionOrigin(),
+      debtPositionDTO.getFlagPuPagoPaPayment()
+    );
   }
 
   private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {

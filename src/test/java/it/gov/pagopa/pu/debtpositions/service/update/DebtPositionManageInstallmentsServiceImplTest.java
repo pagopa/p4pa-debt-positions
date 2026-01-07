@@ -8,10 +8,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -355,10 +352,10 @@ class DebtPositionManageInstallmentsServiceImplTest {
     Mockito.doThrow(new com.fasterxml.jackson.databind.JsonMappingException(null, "Error"))
       .when(objectMapper).writeValueAsString(Mockito.any());
 
-    org.springframework.web.server.ServerErrorException exception = assertThrows(org.springframework.web.server.ServerErrorException.class,
+    InstallmentCloningException exception = assertThrows(InstallmentCloningException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("500 INTERNAL_SERVER_ERROR \"Error cloning installment\"", exception.getMessage());
+    assertEquals("Error cloning installment with id 2", exception.getMessage());
   }
 
   @Test
