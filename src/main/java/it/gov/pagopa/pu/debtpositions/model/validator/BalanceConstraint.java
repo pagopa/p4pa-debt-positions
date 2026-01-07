@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface BalanceConstraint {
 
-  String message() default "The balance is not formally valid";
+  String message() default "[INVALID_BALANCE] The balance is not formally valid";
   Class<?>[] groups() default { };
   Class<? extends Payload>[] payload() default { };
 }
