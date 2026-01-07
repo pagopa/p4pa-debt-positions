@@ -48,6 +48,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   private final WorkflowHubService workflowHubService;
   private final int maxAttempts;
   private final int retryDelayMs;
+  private final ObjectMapper objectMapper;
 
   private static final String WORKFLOW_STATUS_COMPLETED_VALUE = "WORKFLOW_EXECUTION_STATUS_COMPLETED";
 
@@ -62,7 +63,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                                                       DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
                                                       DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, ValidateDebtPositionService validateDebtPositionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, WorkflowHubService workflowHubService,
                                                       @Value("${wf-await.max-waiting-minutes}") int maxWaitingMinutes,
-                                                      @Value("${wf-await.retry-delays-ms}") int retryDelayMs) {
+                                                      @Value("${wf-await.retry-delays-ms}") int retryDelayMs, ObjectMapper objectMapper) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
     this.debtPositionService = debtPositionService;
     this.debtPositionManageApplierService = debtPositionManageApplierService;
@@ -73,6 +74,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.workflowHubService = workflowHubService;
     this.retryDelayMs = retryDelayMs;
+    this.objectMapper = objectMapper;
     this.maxAttempts = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
   }
 
@@ -125,7 +127,6 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
             InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
             InstallmentDTO dryRunInstallment;
 
-            ObjectMapper objectMapper = new ObjectMapper();
             try {
               String json = objectMapper.writeValueAsString(storedInstallment);
               dryRunInstallment = objectMapper.readValue(json, InstallmentDTO.class);

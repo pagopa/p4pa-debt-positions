@@ -1,6 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
@@ -87,9 +91,14 @@ class DebtPositionManageInstallmentsServiceImplTest {
       organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionManageApplierServiceMock,
       debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock,
       validateDebtPositionServiceMock, debtPositionTypeOrgRepositoryMock,
-      workflowHubServiceMock, maxWaitingMinutes, retryDelayMs
+      workflowHubServiceMock, maxWaitingMinutes, retryDelayMs, objectMapper
       );
   }
+
+  @Spy
+  private ObjectMapper objectMapper = new ObjectMapper()
+    .registerModule(new JavaTimeModule())
+    .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
 
   @Test
   void givenDebtPositionInPaidStatusWhenManageThenException() {
