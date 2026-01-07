@@ -72,7 +72,7 @@ class DataCipherServiceTest {
 
     IllegalStateException ex = Assertions.assertThrows(
       IllegalStateException.class,
-      () -> brokenServiceWithMock.encryptObj("PLAIN")
+      () -> brokenServiceWithMock.encryptObj("PLAINTEXT")
     );
 
     assertEquals("[JSON_SERIALIZATION_ERROR] Cannot serialize object as JSON", ex.getMessage());
@@ -82,12 +82,12 @@ class DataCipherServiceTest {
   void givenJsonDeserializationExceptionWhenDecryptObjThenThrowIllegalStateException() {
     JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
 
-    Mockito.when(jsonMapperMock.readValue(any(String.class), any(Class.class)))
+    Mockito.when(jsonMapperMock.readValue(any(String.class), Mockito.eq(String.class)))
       .thenThrow(Mockito.mock(JacksonException.class));
 
     DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
 
-    byte[] validCipher = service.encryptObj("PLAIN");
+    byte[] validCipher = service.encryptObj("PLAINTEXT");
 
     IllegalStateException ex = Assertions.assertThrows(
       IllegalStateException.class,
