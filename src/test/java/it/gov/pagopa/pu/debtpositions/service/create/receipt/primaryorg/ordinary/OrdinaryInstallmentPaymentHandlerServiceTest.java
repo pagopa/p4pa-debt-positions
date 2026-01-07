@@ -22,6 +22,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -59,6 +60,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
     installment.setStatus(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
     receiptDTO.setBalance("BAL");
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
@@ -77,6 +79,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
     receiptDTO.setBalance("BAL");
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     // When
     service.updateInstallment(installment, receiptDTO, accessToken);
@@ -97,6 +100,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     installment.setStatus(InstallmentStatus.UNPAID);
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
@@ -122,6 +126,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     installment.setBalance("OLD_BAL");
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance(null);
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
 
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
@@ -182,6 +187,88 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
   }
 
   @Test
+  void givenPagoPaOriginWithFeeDifferenceWhenUpdateInstallmentThenParseFeeFromMetadata() {
+    String accessToken = "ACCESSTOKEN";
+    long initialInstallmentAmount = 1000L;
+    long receiptAmount = 1200L;
+    long metadataFeeValue = 150L;
+
+    Transfer t1 = podamFactory.manufacturePojo(Transfer.class);
+    t1.setTransferIndex(1);
+    t1.setAmountCents(500L);
+
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setAmountCents(initialInstallmentAmount);
+    installment.setNotificationFeeCents(0L);
+    installment.setTransfers(new TreeSet<>(Set.of(t1)));
+
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+    receiptDTO.setPaymentAmountCents(receiptAmount);
+    receiptDTO.setBalance("BAL");
+    receiptDTO.setMetadata(Map.of("NOTIFICATION_FEE", String.valueOf(metadataFeeValue)));
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    Assertions.assertEquals(metadataFeeValue, installment.getNotificationFeeCents());
+
+    Assertions.assertEquals(receiptAmount, installment.getAmountCents());
+
+    long expectedFeeDiff = receiptAmount - initialInstallmentAmount;
+    Assertions.assertEquals(500L + expectedFeeDiff, t1.getAmountCents());
+
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
+  void givenPagoPaOriginWithNullMetadataFeeWhenUpdateInstallmentThenUseCalculatedDifference() {
+    String accessToken = "ACCESSTOKEN";
+    long initialInstallmentAmount = 1000L;
+    long receiptAmount = 1200L;
+    long calculatedDiff = receiptAmount - initialInstallmentAmount;
+
+    Transfer t1 = podamFactory.manufacturePojo(Transfer.class);
+    t1.setTransferIndex(1);
+    t1.setAmountCents(500L);
+
+    InstallmentNoPII installment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    installment.setStatus(InstallmentStatus.UNPAID);
+    installment.setAmountCents(initialInstallmentAmount);
+    installment.setNotificationFeeCents(0L);
+    installment.setTransfers(new TreeSet<>(Set.of(t1)));
+
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setBalance("BAL");
+    receiptDTO.setPaymentAmountCents(receiptAmount);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+
+    receiptDTO.setMetadata(Map.of("OTHER_METADATA", "123"));
+
+    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
+    dpTypeOrg.setOrganizationId(1L);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+      .thenReturn(dpTypeOrg);
+
+    service.updateInstallment(installment, receiptDTO, accessToken);
+
+    Assertions.assertEquals(calculatedDiff, installment.getNotificationFeeCents());
+
+    Assertions.assertEquals(receiptAmount, installment.getAmountCents());
+    Assertions.assertEquals(500L + calculatedDiff, t1.getAmountCents());
+
+    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+  }
+
+  @Test
   void givenFeeWhenUpdateInstallmentThenModifyInstallmentAndTransfer1Amounts() {
     testAmountsUpdates(2L);
   }
@@ -213,6 +300,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
     receiptDTO.setPaymentAmountCents(receiptAmountsCents);
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 
@@ -251,6 +339,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setBalance("BAL");
     receiptDTO.setTransfers(List.of(rt1, rt2));
+    receiptDTO.setPaymentAmountCents(installment.getAmountCents());
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 

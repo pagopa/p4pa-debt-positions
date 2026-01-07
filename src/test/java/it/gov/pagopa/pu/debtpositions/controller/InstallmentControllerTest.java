@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
@@ -16,13 +14,15 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.List;
@@ -37,7 +37,7 @@ class InstallmentControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @MockitoBean
   private InstallmentService installmentServiceMock;
@@ -61,7 +61,7 @@ class InstallmentControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<InstallmentDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+    List<InstallmentDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
     });
     for(int idx = 0; idx < installmentDTOList.size(); idx++) {
       InstallmentDTO resultElem = resultResponse.get(idx);
@@ -96,7 +96,7 @@ class InstallmentControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<InstallmentDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+    List<InstallmentDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
     });
 
 
@@ -128,7 +128,7 @@ class InstallmentControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    InstallmentDetailDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), InstallmentDetailDTO.class);
+    InstallmentDetailDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), InstallmentDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
     Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
@@ -151,7 +151,7 @@ class InstallmentControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<InstallmentDebtorDTO> response = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
+    List<InstallmentDebtorDTO> response = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {});
 
     Assertions.assertEquals(expectedResponse,response);
   }

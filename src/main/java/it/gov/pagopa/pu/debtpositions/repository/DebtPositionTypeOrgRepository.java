@@ -168,5 +168,26 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   long countBySpontaneousFormId(Long spontaneousFormId);
 
   List<DebtPositionTypeOrg> findByUpdateDateGreaterThanOrderByUpdateDateAsc(LocalDateTime updateDate);
+
+  @Query(
+    """
+      SELECT dpto, COUNT(dp) as usageCount
+      FROM DebtPositionTypeOrg dpto
+      JOIN DebtPosition dp on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+      WHERE dpto.organizationId = :organizationId
+      AND dpto.flagSpontaneous = true
+      AND dpto.flagActive = true
+      AND dp.debtPositionOrigin = 'SPONTANEOUS'
+      AND dp.organizationId = :organizationId
+      AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
+      AND date_part('year', dp.creationDate) = date_part('year', CURRENT_DATE)
+      GROUP BY dpto
+      ORDER BY usageCount DESC
+      LIMIT 10
+    """
+  )
+  List<DebtPositionTypeOrg> getCurrentYearTopTenSpontaneousDebtPositionTypeOrgByOrganizationId(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
+  );
 }
 

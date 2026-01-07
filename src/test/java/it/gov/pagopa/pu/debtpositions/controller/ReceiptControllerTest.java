@@ -1,7 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
@@ -14,8 +12,8 @@ import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -24,6 +22,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.nio.charset.StandardCharsets;
@@ -38,7 +38,7 @@ class ReceiptControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @MockitoBean
   private CreateReceiptService createReceiptServiceMock;
@@ -62,12 +62,12 @@ class ReceiptControllerTest {
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.post("/receipts")
-          .content(objectMapper.writeValueAsString(receiptDTO))
+          .content(jsonMapper.writeValueAsString(receiptDTO))
           .contentType(MediaType.APPLICATION_JSON_VALUE))
       .andExpect(status().isOk())
       .andReturn();
 
-    ReceiptDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
+    ReceiptDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<>() {
     });
     TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate", "noPII");
 
@@ -89,7 +89,7 @@ class ReceiptControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    ReceiptDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
+    ReceiptDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response, "noPII");
 
     Mockito.verify(receiptServiceMock).getReceipt(receiptId);
@@ -114,7 +114,7 @@ class ReceiptControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    ReceiptDetailDTO response = objectMapper.readValue(result.getResponse().getContentAsString(), ReceiptDetailDTO.class);
+    ReceiptDetailDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), ReceiptDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
     Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);

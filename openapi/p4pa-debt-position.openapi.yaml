@@ -2550,6 +2550,7 @@ components:
         - flagPuPagoPaPayment
         - ingestionFlowFileName
       type: object
+      x-class-extra-annotation: '@io.swagger.v3.oas.annotations.media.SchemaProperty(name = "executionConfig", schema = @Schema(name = "JsonNode", type = "object", implementation = com.fasterxml.jackson.databind.JsonNode.class))'
       properties:
         ingestionFlowFileId:
           type: integer
@@ -2636,6 +2637,7 @@ components:
             $ref: "#/components/schemas/TransferSynchronizeDTO"
         executionConfig:
           type: object
+          x-field-extra-annotation: '@io.swagger.v3.oas.annotations.Hidden'
         ingestionFlowFileName:
           type: string
     TransferSynchronizeDTO:

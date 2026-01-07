@@ -1,8 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.NullNode;
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
@@ -26,13 +23,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.core.type.TypeReference;
+import tools.jackson.databind.json.JsonMapper;
+import tools.jackson.databind.node.NullNode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -62,7 +62,7 @@ class DebtPositionControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @MockitoBean
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
@@ -127,11 +127,11 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/finalize-sync-status")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(requestDTO)))
+          .content(jsonMapper.writeValueAsString(requestDTO)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -151,13 +151,13 @@ class DebtPositionControllerTest {
         post("/debt-positions")
           .param("massive", String.valueOf(massive))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(debtPosition)))
+          .content(jsonMapper.writeValueAsString(debtPosition)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -177,11 +177,11 @@ class DebtPositionControllerTest {
         post("/debt-positions")
           .param("massive", String.valueOf(massive))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(debtPosition)))
+          .content(jsonMapper.writeValueAsString(debtPosition)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), resultResponse);
   }
 
@@ -198,13 +198,13 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         post("/debt-positions/mixed")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(mixedDebtPositionDTO)))
+          .content(jsonMapper.writeValueAsString(mixedDebtPositionDTO)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(debtPositionDTO, resultResponse);
   }
 
@@ -218,11 +218,11 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         post("/debt-positions/mixed")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(mixedDebtPositionDTO)))
+          .content(jsonMapper.writeValueAsString(mixedDebtPositionDTO)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -242,7 +242,7 @@ class DebtPositionControllerTest {
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -259,7 +259,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -276,7 +276,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -294,7 +294,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    List<DebtPositionDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -312,7 +312,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    List<DebtPositionDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -338,7 +338,7 @@ class DebtPositionControllerTest {
           .param("partialChange", String.valueOf(partialChange))
           .param("origin", String.valueOf(debtPositionOrigin))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
+          .content(jsonMapper.writeValueAsString(installmentSynchronizeDTO)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
@@ -366,7 +366,7 @@ class DebtPositionControllerTest {
           .param("partialChange", String.valueOf(partialChange))
           .param("origin", String.valueOf(debtPositionOrigin))
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(installmentSynchronizeDTO)))
+          .content(jsonMapper.writeValueAsString(installmentSynchronizeDTO)))
       .andExpect(status().isOk())
       .andReturn();
   }
@@ -385,7 +385,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    PagedDebtPositions resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), PagedDebtPositions.class);
+    PagedDebtPositions resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), PagedDebtPositions.class);
     assertEquals(expectedPagedDebtPositions, resultResponse);
   }
 
@@ -408,7 +408,7 @@ class DebtPositionControllerTest {
     mockMvc.perform(
         put("/debt-positions/update-installment-notification-date")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isCreated())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
@@ -431,13 +431,13 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         put("/debt-positions/" + debtPositionId + "/manage-installments")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -456,11 +456,11 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         put("/debt-positions/" + debtPositionId + "/manage-installments")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), resultResponse);
   }
 
@@ -490,7 +490,7 @@ class DebtPositionControllerTest {
     mockMvc.perform(
         put("/debt-positions/update-notification-fee")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andReturn();
   }
@@ -541,13 +541,13 @@ class DebtPositionControllerTest {
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/publish")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(debtPosition)))
+          .content(jsonMapper.writeValueAsString(debtPosition)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -568,7 +568,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    List<DebtPositionDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
     assertEquals(expectedResult, resultResponse);
   }
 
@@ -595,7 +595,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    List<DebtPositionDTO> resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>() {
+    List<DebtPositionDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>() {
     });
     assertEquals(expectedResult, resultResponse);
   }
@@ -617,7 +617,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    PagedDebtorUnpaidDebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(),
+    PagedDebtorUnpaidDebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(),
       PagedDebtorUnpaidDebtPositionDTO.class);
 
     assertNotNull(resultResponse);
@@ -641,7 +641,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtorDebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(),
+    DebtorDebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(),
       DebtorDebtPositionDTO.class);
 
     assertNotNull(resultResponse);

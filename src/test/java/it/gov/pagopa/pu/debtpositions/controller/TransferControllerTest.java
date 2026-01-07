@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
@@ -13,12 +12,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import tools.jackson.databind.json.JsonMapper;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -37,7 +37,7 @@ class TransferControllerTest {
   private MockMvc mockMvc;
 
   @Autowired
-  private ObjectMapper objectMapper;
+  private JsonMapper jsonMapper;
 
   @MockitoBean
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
@@ -69,13 +69,13 @@ class TransferControllerTest {
     MvcResult result = mockMvc.perform(
         put("/transfers/1/reported")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andExpect(header().string("x-workflow-id", workflow.getWorkflowId()))
       .andExpect(header().string("x-run-id", workflow.getRunId()))
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -90,11 +90,11 @@ class TransferControllerTest {
     MvcResult result = mockMvc.perform(
         put("/transfers/1/reported")
           .contentType(MediaType.APPLICATION_JSON_VALUE)
-          .content(objectMapper.writeValueAsString(request)))
+          .content(jsonMapper.writeValueAsString(request)))
       .andExpect(status().isOk())
       .andReturn();
 
-    DebtPositionDTO resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
+    DebtPositionDTO resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), DebtPositionDTO.class);
     assertEquals(buildDebtPositionDTO(), resultResponse);
   }
 
@@ -112,7 +112,7 @@ class TransferControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    Boolean resultResponse = objectMapper.readValue(result.getResponse().getContentAsString(), Boolean.class);
+    Boolean resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), Boolean.class);
     assertTrue(resultResponse);
   }
 }
