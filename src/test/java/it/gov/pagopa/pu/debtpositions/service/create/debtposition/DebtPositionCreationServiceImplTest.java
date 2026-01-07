@@ -291,7 +291,7 @@ class DebtPositionCreationServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Duplicate records found: the provided data conflicts with existing records.", exception.getMessage());
+    assertEquals("[INSTALLMENT_ALREADY_EXISTS] Duplicate records found: the provided data conflicts with existing records", exception.getMessage());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
   }

@@ -91,7 +91,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     Organization organization = organizationService.getOrganizationById(
         mixedDebtPositionDTO.getOrganizationId(), accessToken)
       .orElseThrow(() -> new NotFoundException(
-        "Organization with id: [%s] not found.".formatted(
+        "[ORG_NOT_FOUND] Organization with id [%s] not found".formatted(
           mixedDebtPositionDTO.getOrganizationId())));
 
     checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
@@ -133,7 +133,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
           .ifPresent(workflowTypeOrg -> {
             throw new InvalidValueException(
-              "DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+              "[DPTO_ID_RELATED_TO_CUSTOM_WF] DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
                 dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
           });
       });
@@ -151,7 +151,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         mixedDebtPositionDTO.getOrganizationId(),
         iud, null, null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)) {
         throw new InvalidValueException(
-          "IUD: [%s] is not unique".formatted(iud));
+          "[INSTALLMENT_ALREADY_EXISTS] Installment with IUD [%s] already exists".formatted(iud));
       }
     }
   }

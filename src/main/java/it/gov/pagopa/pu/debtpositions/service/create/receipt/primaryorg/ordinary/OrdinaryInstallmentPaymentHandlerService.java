@@ -82,7 +82,7 @@ public class OrdinaryInstallmentPaymentHandlerService {
   public void resolveBalance(InstallmentNoPII installment, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
     if (debtPositionTypeOrg == null) {
-      throw new NotFoundException("The DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " was not found");
+      throw new NotFoundException("[DPTO_NOT_FOUND] DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " not found");
     }
     resolveBalance(installment, debtPositionTypeOrg, accessToken);
   }
