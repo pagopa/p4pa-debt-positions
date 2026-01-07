@@ -125,23 +125,23 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
           }
           case M -> {
             InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
-            InstallmentDTO dryRunInstallment;
+            InstallmentDTO dryStoredInstallment;
 
             try {
               String json = objectMapper.writeValueAsString(storedInstallment);
-              dryRunInstallment = objectMapper.readValue(json, InstallmentDTO.class);
+              dryStoredInstallment = objectMapper.readValue(json, InstallmentDTO.class);
             } catch (JsonProcessingException e) {
               throw new ServerErrorException("Error cloning installment", e);
             }
 
-            debtPositionManageApplierService.merge(manageInstallment, dryRunInstallment);
+            debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
 
             DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
               .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s was not found for organization id %s",
                 debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
             validateDebtPositionService.validateInstallment(
-              dryRunInstallment,
+              dryStoredInstallment,
               accessToken,
               debtPositionTypeOrg,
               debtPositionDTO.getDebtPositionOrigin(),
