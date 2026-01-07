@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.update;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.common.util.StringUtils;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
@@ -8,9 +10,12 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -24,6 +29,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ServerErrorException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,6 +43,8 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
+  private final ValidateDebtPositionService validateDebtPositionService;
+  private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final WorkflowHubService workflowHubService;
   private final int maxAttempts;
   private final int retryDelayMs;
@@ -52,7 +60,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                                                       DebtPositionManageApplierService debtPositionManageApplierService,
                                                       DebtPositionAddInstallmentService debtPositionAddInstallmentService,
                                                       DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
-                                                      DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, WorkflowHubService workflowHubService,
+                                                      DebtPositionCancelInstallmentService debtPositionCancelInstallmentService, ValidateDebtPositionService validateDebtPositionService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, WorkflowHubService workflowHubService,
                                                       @Value("${wf-await.max-waiting-minutes}") int maxWaitingMinutes,
                                                       @Value("${wf-await.retry-delays-ms}") int retryDelayMs) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
@@ -61,6 +69,8 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
+    this.validateDebtPositionService = validateDebtPositionService;
+    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.workflowHubService = workflowHubService;
     this.retryDelayMs = retryDelayMs;
     this.maxAttempts = (int) (((double) maxWaitingMinutes * 60_000) / retryDelayMs);
@@ -113,6 +123,30 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
           }
           case M -> {
             InstallmentDTO storedInstallment = findInstallmentToManage(paymentOptionDTO, manageInstallment.getInstallmentId());
+            InstallmentDTO dryRunInstallment;
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            try {
+              String json = objectMapper.writeValueAsString(storedInstallment);
+              dryRunInstallment = objectMapper.readValue(json, InstallmentDTO.class);
+            } catch (JsonProcessingException e) {
+              throw new ServerErrorException("Error cloning installment", e);
+            }
+
+            debtPositionManageApplierService.merge(manageInstallment, dryRunInstallment);
+
+            DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
+              .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s was not found for organization id %s",
+                debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
+
+            validateDebtPositionService.validateInstallment(
+              dryRunInstallment,
+              accessToken,
+              debtPositionTypeOrg,
+              debtPositionDTO.getDebtPositionOrigin(),
+              debtPositionDTO.getFlagPuPagoPaPayment()
+            );
+
             debtPositionManageApplierService.merge(manageInstallment, storedInstallment);
             installmentsToUpdate.add(storedInstallment);
           }

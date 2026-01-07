@@ -8,8 +8,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
+import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
@@ -58,6 +60,10 @@ class DebtPositionManageInstallmentsServiceImplTest {
   private DebtPositionCancelInstallmentService debtPositionCancelInstallmentServiceMock;
   @Mock
   private WorkflowHubService workflowHubServiceMock;
+  @Mock
+  private ValidateDebtPositionService validateDebtPositionServiceMock;
+  @Mock
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
 
@@ -80,6 +86,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
       debtPositionServiceMock, debtPositionSyncServiceMock, debtPositionProcessorServiceMock,
       organizationServiceMock, debtPositionHierarchyStatusAlignerServiceMock, debtPositionManageApplierServiceMock,
       debtPositionAddInstallmentServiceMock, debtPositionUpdateInstallmentServiceMock, debtPositionCancelInstallmentServiceMock,
+      validateDebtPositionServiceMock, debtPositionTypeOrgRepositoryMock,
       workflowHubServiceMock, maxWaitingMinutes, retryDelayMs
       );
   }
