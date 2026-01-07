@@ -28,11 +28,11 @@ public interface InstallmentDebtorDTOMapper {
 
   private DebtPositionTypeOrg getDebtPositionTypeOrg(Long installmentId, Map<Long, DebtPositionTypeOrg> debtPositionTypeOrgMap) {
     if (debtPositionTypeOrgMap == null) {
-      throw new IllegalArgumentException("debtPositionTypeOrgMap must not be null");
+      throw new IllegalArgumentException("[INSTALLMENT_MAPPING_ERROR] debtPositionTypeOrgMap must not be null");
     }
     DebtPositionTypeOrg dpto = debtPositionTypeOrgMap.get(installmentId);
     if (dpto == null) {
-      throw new IllegalStateException("Missing DebtPositionTypeOrg for installmentId " + installmentId);
+      throw new IllegalStateException("[INSTALLMENT_MAPPING_ERROR] Missing DebtPositionTypeOrg for installmentId " + installmentId);
     }
     return dpto;
   }
