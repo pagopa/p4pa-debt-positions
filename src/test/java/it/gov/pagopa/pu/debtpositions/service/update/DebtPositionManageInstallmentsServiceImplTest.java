@@ -365,7 +365,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
       .debtPositionDescription("Desc")
       .paymentOptionDescription("PoDesc")
       .paymentOptionId(10L)
-      .installments(new ArrayList<>(List.of(buildManageUpdateInstallmentDTO()))) // Action M su Installment ID 2
+      .installments(new ArrayList<>(List.of(buildManageUpdateInstallmentDTO())))
       .build();
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
 
