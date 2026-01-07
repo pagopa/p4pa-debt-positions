@@ -41,7 +41,7 @@ public class InstallmentPaidViewPIIViewRepositoryImpl implements InstallmentPaid
 
     if (pagedInstallmentPaidViewNoPIIDTO.getTotalElements() > maxTotalElements) {
       throw new ExportTooManyRecordsException(
-        "The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(
+        "[EXPORT_TOO_MANY_RECORDS] The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(
           pagedInstallmentPaidViewNoPIIDTO.getTotalElements(),
           maxTotalElements));
     }

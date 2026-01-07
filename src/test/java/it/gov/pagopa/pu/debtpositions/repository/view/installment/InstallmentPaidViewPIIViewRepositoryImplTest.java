@@ -135,7 +135,7 @@ class InstallmentPaidViewPIIViewRepositoryImplTest {
             executable
     );
     //then
-    assertEquals("The number of InstallmentPaidViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
+    assertEquals("[EXPORT_TOO_MANY_RECORDS] The number of InstallmentPaidViewNoPII records returned: 12 exceeds the maximum allowed: 10", ex.getMessage());
 
   }
 }
