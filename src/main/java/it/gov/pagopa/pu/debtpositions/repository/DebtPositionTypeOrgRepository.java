@@ -171,7 +171,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
 
   @Query(
     """
-      SELECT dpto, COUNT(dp) as usageCount
+      SELECT dpto
       FROM DebtPositionTypeOrg dpto
       JOIN DebtPosition dp on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
       WHERE dpto.organizationId = :organizationId
@@ -182,12 +182,12 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
       AND date_part('year', dp.creationDate) = date_part('year', CURRENT_DATE)
       GROUP BY dpto
-      ORDER BY usageCount DESC
-      LIMIT 10
+      ORDER BY COUNT(dp) DESC
     """
   )
-  List<DebtPositionTypeOrg> getCurrentYearTopTenSpontaneousDebtPositionTypeOrgByOrganizationId(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
+  Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationInCurrentYear(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    Pageable pageable
   );
 }
 
