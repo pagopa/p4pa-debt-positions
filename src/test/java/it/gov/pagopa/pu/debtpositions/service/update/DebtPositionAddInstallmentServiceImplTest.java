@@ -186,7 +186,7 @@ class DebtPositionAddInstallmentServiceImplTest {
 
     InvalidValueException result = assertThrows(InvalidValueException.class, () -> debtPositionAddInstallmentService.addInstallment(debtPositionDTO, installments2operate, wfExecutionParameters, accessToken, operatorExternalId));
 
-    Assertions.assertEquals("PaymentOption index duplicated: 1", result.getMessage());
+    Assertions.assertEquals("[DUPLICATED_PO_INDEX] PaymentOption index duplicated: 1", result.getMessage());
   }
 
   @Test
@@ -211,7 +211,7 @@ class DebtPositionAddInstallmentServiceImplTest {
 
     NotFoundException conflictException = assertThrows(NotFoundException.class, () ->
       debtPositionAddInstallmentService.addInstallment(debtPositionDTO,installments2Operate, wfExecutionParameters, accessToken, operatorExternalId));
-    assertEquals("The debt position type org with id 2 was not found for organization id 500", conflictException.getMessage());
+    assertEquals("[DPTO_NOT_FOUND] The debt position type org with id 2 was not found for organization id 500", conflictException.getMessage());
   }
 
 }
