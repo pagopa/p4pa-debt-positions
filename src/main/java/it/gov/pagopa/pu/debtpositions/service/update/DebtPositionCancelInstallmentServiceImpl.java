@@ -65,10 +65,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
       .map(installmentDTO -> {
         if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus())) {
-          throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
+          throw new ConflictErrorException("[INVALID_INSTALLMENT_STATUS] The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
         }
         if (StringUtils.isNotBlank(installmentDTO.getIun())) {
-          throw new ConflictErrorException("The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is been notified by SEND");
+          throw new ConflictErrorException("[INVALID_INSTALLMENT_STATUS] The installment with id " + installmentDTO.getInstallmentId() + " cannot be cancelled because is been notified by SEND");
         }
         return installmentDTO;
       })

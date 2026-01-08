@@ -155,6 +155,6 @@ class DebtPositionCancelInstallmentServiceImplTest {
       .thenReturn(debtPositionTypeOrg);
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () -> debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, installments, wfExecutionParameters, accessToken, operatorExternalId));
-    assertEquals("The installment with id 100 cannot be cancelled because is not in allowed status: PAID", exception.getMessage());
+    assertEquals("[INVALID_INSTALLMENT_STATUS] The installment with id 100 cannot be cancelled because is not in allowed status: PAID", exception.getMessage());
   }
 }
