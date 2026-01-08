@@ -38,7 +38,7 @@ public class PrimaryOrgInstallmentRetrieverService {
     if(installments.isEmpty()){
       return Optional.empty();
     } else if(installments.size() > 1){
-      throw new ConflictErrorException("There are too many Instalments having NAV " + nav + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
+      throw new ConflictErrorException("[TOO_MANY_INSTALLMENTS] There are too many Instalments having NAV " + nav + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
         getInstallmentDetails(installments)
       );
     } else {
@@ -52,13 +52,13 @@ public class PrimaryOrgInstallmentRetrieverService {
       return Optional.empty();
     }
     if(installments.size() > 1){
-      throw new ConflictErrorException("There are too many Instalments having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
+      throw new ConflictErrorException("[TOO_MANY_INSTALLMENTS] There are too many Instalments having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
         getInstallmentDetails(installments)
       );
     }
     InstallmentNoPII installment = installments.getFirst();
     if(!nav.equals(installment.getNav())){
-      throw new ConflictErrorException("The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
+      throw new ConflictErrorException("[INSTALLMENT_NAV_MISMATCH] The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
         " expected" + nav + " but found " + installment.getNav()
       );
     }
