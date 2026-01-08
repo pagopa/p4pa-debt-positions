@@ -8,7 +8,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -54,11 +53,11 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
     }
 
     if(isIunPresent(debtPosition)) {
-      throw new ConflictErrorException("[DP_ALREADY_NOTIFIED] DebtPosition with id " + debtPositionId + " cannot be deleted because it is been notified");
+      throw new ConflictErrorException("[INVALID_DP_STATUS] DebtPosition with id " + debtPositionId + " cannot be deleted because it is been notified");
     }
 
     if(!InstallmentUtils.DELETABLE_DP_STATUSES.contains(debtPosition.getStatus())){
-      throw new ConflictErrorException("[DP_STATUS_NOT_DELETABLE] DebtPosition with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
+      throw new ConflictErrorException("[INVALID_DP_STATUS] DebtPosition with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
     }
 
     DebtPositionDTO debtPositionDTO = debtPositionService.mapDebtPosition(debtPosition);
@@ -78,11 +77,11 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
 
 
   private void deleteDraftDebtPosition(DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
-    Organization org = organizationService.getOrganizationById(debtPosition.getOrganizationId(), accessToken)
-      .orElseThrow(() -> new NotFoundException("[ORG_NOT_FOUND] Organization with id " + debtPosition.getOrganizationId() + " not found"));
-
+    Long organizationId = debtPosition.getOrganizationId();
+    Organization org = organizationService.getOrganizationById(organizationId, accessToken)
+      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_ORG] Provided organization with id %s not found", organizationId)));
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
-      throw new InvalidValueException("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE");
+      throw new InvalidValueException("[INVALID_ORG_STATUS] Provided organization is not ACTIVE");
     }
     authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPosition.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
