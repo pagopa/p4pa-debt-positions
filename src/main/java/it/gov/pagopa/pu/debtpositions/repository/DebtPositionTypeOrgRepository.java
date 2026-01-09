@@ -180,8 +180,8 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       AND dp.debtPositionOrigin = 'SPONTANEOUS'
       AND dp.organizationId = :organizationId
       AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
-      AND dp.creationDate >= :creationDateFrom
-      AND dp.creationDate <= :creationDateTo
+      AND (cast(:creationDateFrom as date) IS NULL OR dp.creationDate >= :creationDateFrom)
+      AND (cast(:creationDateTo as date) IS NULL OR dp.creationDate <= :creationDateTo)
       GROUP BY dpto
       ORDER BY COUNT(dp) DESC
     """
