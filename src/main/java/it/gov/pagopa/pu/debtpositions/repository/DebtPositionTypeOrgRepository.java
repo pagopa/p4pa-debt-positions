@@ -180,13 +180,16 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       AND dp.debtPositionOrigin = 'SPONTANEOUS'
       AND dp.organizationId = :organizationId
       AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
-      AND date_part('year', dp.creationDate) = date_part('year', CURRENT_DATE)
+      AND dp.creationDate >= :creationDateFrom
+      AND dp.creationDate <= :creationDateTo
       GROUP BY dpto
       ORDER BY COUNT(dp) DESC
     """
   )
-  Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationInCurrentYear(
+  Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationByOrganizationIdAndDate(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateFrom") LocalDateTime creationDateFrom,
+    @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateTo") LocalDateTime creationDateTo,
     Pageable pageable
   );
 }
