@@ -41,11 +41,11 @@ public class DebtPositionManageApplierService {
     mergeDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("[P4PA_UNMODIFIABLE_FIELD] These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields));
+      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields));
     }
 
     if (storedInstallment.getTransfers().size() != updatedInstallment.getTransfers().size()) {
-      throw new ConflictErrorException(String.format("The number of beneficiary for installment having id %s cannot be modified", storedInstallment.getInstallmentId()));
+      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] The number of beneficiary for installment having id %s cannot be modified", storedInstallment.getInstallmentId()));
     }
 
     updateTransferList(storedInstallment, updatedInstallment);
@@ -81,7 +81,7 @@ public class DebtPositionManageApplierService {
     storedInstallment.getTransfers()
       .forEach(transferDTO -> {
         if (mapIndexTransferUpdated.get(transferDTO.getTransferId()) == null){
-          throw new ConflictErrorException(String.format("The transfer having id %s of installment having id %s does not found", transferDTO.getTransferId(), storedInstallment.getInstallmentId()));
+          throw new ConflictErrorException(String.format("[TRANSFER_NOT_FOUND] The transfer having id %s of installment having id %s does not found", transferDTO.getTransferId(), storedInstallment.getInstallmentId()));
         }
         if(transferDTO.getTransferIndex() == 1){
           mapIndexTransferUpdated.get(transferDTO.getTransferId()).setAmountCents(storedInstallment.getAmountCents() - totalAmountOtherTransfersUpdated);
@@ -109,7 +109,7 @@ public class DebtPositionManageApplierService {
     checkImmutableField("stampProvincialResidence", storedTransfer.getStampProvincialResidence(), updatedTransfer.getStampProvincialResidence(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("[P4PA_UNMODIFIABLE_FIELD] These fields for transfer with index %s of installment having id %s are not mutable: %s",
+      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] These fields for transfer with index %s of installment having id %s are not mutable: %s",
         storedTransfer.getTransferIndex(), installmentId, modifiedFields));
     }
   }

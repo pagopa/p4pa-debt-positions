@@ -37,10 +37,10 @@ public abstract class BaseInstallmentSynchronizeService {
   public Pair<PaymentOptionDTO, InstallmentDTO> findInstallmentAndThrowException(DebtPositionDTO debtPositionDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     Pair<PaymentOptionDTO, InstallmentDTO> result = findInstallment(debtPositionDTO, installmentSynchronizeDTO);
     if (result == null) {
-      throw new NotFoundException(String.format("[DP_NOT_FOUND] The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
+      throw new NotFoundException(String.format("[DEBT_POSITION_NOT_FOUND] The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()));
     }
     if (result.getLeft() == null) {
-      throw new NotFoundException(String.format("[PO_NOT_FOUND] The payment option with index %s of debt position with iupd %s not found",
+      throw new NotFoundException(String.format("[PAYMENT_OPTION_NOT_FOUND] The payment option with index %s of debt position with iupd %s not found",
         installmentSynchronizeDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg()));
     }
     if (result.getRight() == null) {
@@ -64,7 +64,7 @@ public abstract class BaseInstallmentSynchronizeService {
   public void validateStatus(InstallmentDTO installmentDTO, InstallmentSynchronizeDTO installmentSynchronizeDTO) {
     if (InstallmentStatus.TO_SYNC.equals(installmentDTO.getStatus())) {
       if (!installmentSynchronizeDTO.getIngestionFlowFileId().equals(installmentDTO.getIngestionFlowFileId())) {
-        throw new ConflictErrorException(String.format("The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization", installmentSynchronizeDTO.getIud()));
+        throw new ConflictErrorException(String.format("[INVALID_INSTALLMENT_STATUS] The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization", installmentSynchronizeDTO.getIud()));
       } else if (installmentDTO.getSyncStatus() != null && !InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getSyncStatus().getSyncStatusTo())) {
         throw new ConflictErrorException(String.format("[INVALID_INSTALLMENT_STATUS] The installment with iud %s cannot be updated or cancelled because is not in an allowed status to: %s",
           installmentSynchronizeDTO.getIud(), installmentDTO.getSyncStatus().getSyncStatusTo()));

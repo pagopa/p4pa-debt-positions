@@ -74,7 +74,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new NotFoundException(String.format("[DP_NOT_FOUND] Debt position related to the id %s was not found", debtPositionId));
+      throw new NotFoundException(String.format("[DEBT_POSITION_NOT_FOUND] Debt position related to the id %s was not found", debtPositionId));
     }
 
     Set<String> iupd2update = Stream.concat(
@@ -138,7 +138,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByTransferId(transferId);
 
     if (debtPosition == null) {
-      throw new NotFoundException(String.format("[DP_NOT_FOUND] Debt position related to the transfer with id %s was not found", transferId));
+      throw new NotFoundException(String.format("[DEBT_POSITION_NOT_FOUND] Debt position related to the transfer with id %s was not found", transferId));
     }
 
     String reportedIuds = debtPosition.getPaymentOptions().stream()
@@ -198,11 +198,11 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
 
     if (debtPosition == null) {
-      throw new NotFoundException(String.format("[DP_NOT_FOUND] Debt position related to the id %s was not found", debtPositionId));
+      throw new NotFoundException(String.format("[DEBT_POSITION_NOT_FOUND] Debt position related to the id %s was not found", debtPositionId));
     }
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DPTO_NOT_FOUND] DebtPositionTypeOrg with id %d was not found", debtPosition.getDebtPositionTypeOrgId())));
+      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg with id %d was not found", debtPosition.getDebtPositionTypeOrgId())));
 
     Set<String> expiredIuvs = new HashSet<>();
     String expiredIuds = updateExpiredInstallmentsStatus(debtPosition, i -> expiredIuvs.add(i.getIuv()))

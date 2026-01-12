@@ -38,7 +38,7 @@ class IuvServiceTest {
   private static final String WRONG_CHECK_IUV = "01000000000004286";
   private static final String WRONG_LENGTH_IUV = "010000000000004285";
 
-  private static final String INVALID_ORG_FISCAL_CODE = "INVALID_FISCAL_CODE";
+  private static final String INVALID_ORG_FISCAL_CODE = "INVALID_VAT_CODE";
   private static final String INVALID_ORG_IPA_CODE = "INVALID_IPA_CODE";
   private static final long INVALID_PAYMENT_INDEX = 0L;
   private static final Organization INVALID_ORG = OrganizationFaker.buildOrganization()
@@ -152,7 +152,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG, DebtPositionOrigin.ORDINARY));
 
-    Assertions.assertEquals("[P4PA_INVALID_IUV] The iuv must be 17 characters long", exception.getMessage());
+    Assertions.assertEquals("[INVALID_IUV] The iuv must be 17 characters long", exception.getMessage());
   }
 
   @Test
@@ -160,7 +160,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG, DebtPositionOrigin.ORDINARY));
 
-    Assertions.assertEquals("[P4PA_INVALID_IUV] The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
+    Assertions.assertEquals("[INVALID_IUV] The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
   }
 
   @ParameterizedTest
@@ -171,7 +171,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", IuvServiceTest.VALID_ORG, origin));
 
-    Assertions.assertEquals("[P4PA_INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
+    Assertions.assertEquals("[INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
   }
 
   @Test
@@ -179,7 +179,7 @@ class IuvServiceTest {
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
       () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG, DebtPositionOrigin.SECONDARY_ORG));
 
-    Assertions.assertEquals("[P4PA_INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
+    Assertions.assertEquals("[INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
   }
 
   @Test

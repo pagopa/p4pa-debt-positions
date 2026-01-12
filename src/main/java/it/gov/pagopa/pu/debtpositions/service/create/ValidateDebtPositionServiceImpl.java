@@ -54,25 +54,25 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId());
 
     if (debtPosition != null) {
-      throw new ConflictErrorException("Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
+      throw new ConflictErrorException("[DEBT_POSITION_ALREADY_EXISTS] Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
     }
 
     if (debtPositionTypeOrg == null ||
       StringUtils.isBlank(debtPositionTypeOrg.getCode())) {
-      throw new InvalidValueException("[P4PA_MISSING_DEBT_POS_TYPE_ORG] Debt position type organization is mandatory");
+      throw new InvalidValueException("[MISSING_DEBT_POSITION_TYPE_ORG] Debt position type organization is mandatory");
     }
 
     if (CollectionUtils.isEmpty(debtPositionDTO.getPaymentOptions())) {
-      throw new InvalidValueException("Debt position payment options is mandatory");
+      throw new InvalidValueException("[MISSING_PAYMENT_OPTION] Debt position payment options is mandatory");
     }
 
     Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
       if (!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())) {
-        throw new InvalidValueException("PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
+        throw new InvalidValueException("[DUPLICATED_PAYMENT_OPTION_INDEX] PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
       }
       if (CollectionUtils.isEmpty(paymentOptionDTO.getInstallments())) {
-        throw new InvalidValueException("At least one installment of the debt position is mandatory");
+        throw new InvalidValueException("[MISSING_INSTALLMENT] At least one installment of the debt position is mandatory");
       }
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
         validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
@@ -85,29 +85,29 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     if ((origin.equals(DebtPositionOrigin.ORDINARY) || origin.equals(DebtPositionOrigin.ORDINARY_SIL))
       && (debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID && debtPositionDTO.getStatus() != DebtPositionStatus.DRAFT)) {
-      throw new InvalidValueException("A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+      throw new InvalidValueException("[INVALID_DEBT_POSITION_STATUS] A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
     }
 
     if (origin.equals(DebtPositionOrigin.SPONTANEOUS) && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID) {
-      throw new InvalidValueException("A Debt Position with origin SPONTANEOUS can only be created in UNPAID state");
+      throw new InvalidValueException("[INVALID_DEBT_POSITION_STATUS] A Debt Position with origin SPONTANEOUS can only be created in UNPAID state");
     }
 
     if ((origin.equals(DebtPositionOrigin.SECONDARY_ORG) || origin.equals(DebtPositionOrigin.RECEIPT_PAGOPA)
       || origin.equals(DebtPositionOrigin.RECEIPT_FILE) || origin.equals(DebtPositionOrigin.REPORTING_PAGOPA))
       && debtPositionDTO.getStatus() != DebtPositionStatus.PAID) {
-      throw new InvalidValueException("A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+      throw new InvalidValueException("[INVALID_DEBT_POSITION_STATUS] A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
     }
   }
 
   public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
-      throw new InvalidValueException("[P4PA_MISSING_REMITTANCE_INFORMATION] Remittance information is mandatory");
+      throw new InvalidValueException("[MISSING_REMITTANCE_INFORMATION] Remittance information is mandatory");
     }
 
     validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin);
 
     if (installmentDTO.getAmountCents() <= 0) {
-      throw new InvalidValueException("[P4PA_INVALID_CENTS_AMOUNT] The installment amount must be greater than 0");
+      throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The installment amount must be greater than 0");
     }
     if (
         (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) ||
@@ -116,16 +116,16 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
          && debtPositionTypeOrg.getAmountCents() != null
          && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())
     ) {
-      throw new InvalidValueException("[P4PA_INVALID_AMOUNT] Amount is not valid for this debt position type org");
+      throw new InvalidValueException("[INVALID_AMOUNT] Amount is not valid for this debt position type org");
     }
     if (StringUtils.isNotBlank(installmentDTO.getBalance()) &&
       BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), accessToken))) {
-      throw new InvalidValueException("[P4PA_INVALID_BALANCE] Balance is not formally valid");
+      throw new InvalidValueException("[INVALID_BALANCE] Balance is not formally valid");
     }
 
     if (StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
       && !installmentDTO.getLegacyPaymentMetadata().matches("[0129]/\\S{3,138}")) {
-      throw new InvalidValueException("[P4PA_INVALID_LEGACY_PAYMENT_METADATA] Legacy payment metadata is not valid");
+      throw new InvalidValueException("[INVALID_LEGACY_PAYMENT_METADATA] Legacy payment metadata is not valid");
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
@@ -135,21 +135,21 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       .mapToLong(TransferDTO::getAmountCents).sum();
 
     if (!installmentDTO.getAmountCents().equals(totalAmountTransfers)) {
-      throw new InvalidValueException("The sum of transfers amounts has to be equal to installment amount");
+      throw new InvalidValueException("[INVALID_INSTALLMENT_AMOUNT_CENTS] The sum of transfers amounts has to be equal to installment amount");
     }
 
     if (Boolean.FALSE.equals(flagPuPagoPaPayment) && StringUtils.isBlank(installmentDTO.getIuv())) {
-      throw new InvalidValueException("Iuv cannot be empty if flagPuPagoPaPayment is false");
+      throw new InvalidValueException("[MISSING_IUV] Iuv cannot be empty if flagPuPagoPaPayment is false");
     }
   }
 
   private void validateDueDate(boolean flagMandatoryDueDate, InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin) {
     if (flagMandatoryDueDate) {
       if (installmentDTO.getDueDate() == null) {
-        throw new InvalidValueException("The due date is mandatory");
+        throw new InvalidValueException("[MISSING_DUE_DATE] The due date is mandatory");
       }
       if (installmentDTO.getDueDate().isBefore(LocalDate.now())) {
-        throw new InvalidValueException("The due date cannot be retroactive");
+        throw new InvalidValueException("[INVALID_DUE_DATE] The due date cannot be retroactive");
       }
     }
 
@@ -162,55 +162,55 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
   private void validatePersonData(PersonDTO personDTO, DebtPositionTypeOrg debtPositionTypeOrgDTO) {
     if (personDTO == null) {
-      throw new InvalidValueException("The debtor is mandatory for installment");
+      throw new InvalidValueException("[MISSING_DEBTOR] The debtor is mandatory for installment");
     }
     if (StringUtils.isBlank(personDTO.getFiscalCode())) {
-      throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] Fiscal code is mandatory");
+      throw new InvalidValueException("[INVALID_VAT_CODE] Fiscal code is mandatory");
     }
     if (PersonEntityType.F.equals(personDTO.getEntityType())) {
       if (Boolean.FALSE.equals(debtPositionTypeOrgDTO.isFlagAnonymousFiscalCode()) && personDTO.getFiscalCode().equals(ANONIMO)) {
-        throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] The debt position type org does not allow an anonymous unique identification code");
+        throw new InvalidValueException("[INVALID_VAT_CODE] The debt position type org does not allow an anonymous unique identification code");
       }
       if (!personDTO.getFiscalCode().equals(ANONIMO) && !isValidFiscalCode(personDTO.getFiscalCode())) {
-        throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] Fiscal code of person is not valid");
+        throw new InvalidValueException("[INVALID_VAT_CODE] Fiscal code of person is not valid");
       }
     } else {
       if (!isValidFiscalCodeOrPIVA(personDTO.getFiscalCode(), isOrgPIvaCheckEnabled)) {
-        throw new InvalidValueException("[P4PA_INVALID_FISCAL_CODE] Fiscal code or p. iva of legal person is not valid");
+        throw new InvalidValueException("[INVALID_VAT_CODE] Fiscal code or p. iva of legal person is not valid");
       }
     }
     if (StringUtils.isBlank(personDTO.getFullName())) {
-      throw new InvalidValueException("[P4PA_INVALID_PERSONAL_DATA] Beneficiary name is mandatory");
+      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Beneficiary name is mandatory");
     }
     if (StringUtils.isNotBlank(personDTO.getEmail()) && !Utilities.isValidEmail(personDTO.getEmail())) {
-      throw new InvalidValueException("[P4PA_INVALID_PERSONAL_DATA] Email is not valid");
+      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Email is not valid");
     }
   }
 
   private void validateTransfers(List<TransferDTO> transferDTOList, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
-      throw new InvalidValueException("At least one transfer is mandatory for installment");
+      throw new InvalidValueException("[MISSING_TRANSFER] At least one transfer is mandatory for installment");
     }
 
     if (transferDTOList.size() > TRANSFER_INDEX_MAX_SIZE) {
-      throw new InvalidValueException("[P4PA_MAX_TRANSFERS] At most 5 transfers is allowed for installment");
+      throw new InvalidValueException("[TOO_MANY_TRANSFERS_FOR_INSTALLMENT] At most 5 transfers is allowed for installment");
     }
 
     Set<Integer> transferIndexes = HashSet.newHashSet(transferDTOList.size());
     transferDTOList.forEach(transferDTO -> {
       Integer index = transferDTO.getTransferIndex();
       if (!transferIndexes.add(index)) {
-        throw new InvalidValueException("Transfer index duplicated: " + index);
+        throw new InvalidValueException("[DUPLICATED_TRANSFER_INDEX] Transfer index duplicated: " + index);
       }
       if (index < 1 || index > TRANSFER_INDEX_MAX_SIZE) {
-        throw new InvalidValueException("Transfer index should be between 1 and " + TRANSFER_INDEX_MAX_SIZE + ", provided: " + index);
+        throw new InvalidValueException("[INVALID_TRANSFER_INDEX] Transfer index should be between 1 and " + TRANSFER_INDEX_MAX_SIZE + ", provided: " + index);
       }
       if (transferDTO.getAmountCents() <= 0) {
-        throw new InvalidValueException("[P4PA_INVALID_CENTS_AMOUNT] The amount of transfer with index " + index + " must be greater than 0");
+        throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The amount of transfer with index " + index + " must be greater than 0");
       }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
         !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
-        throw new InvalidValueException("[P4PA_INVALID_VAT_CODE] Fiscal code of transfer with index " + index + " is not valid");
+        throw new InvalidValueException("[INVALID_VAT_CODE] Fiscal code of transfer with index " + index + " is not valid");
       }
       checkIbanOrStamp(transferDTO);
 
@@ -226,30 +226,30 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (StringUtils.isNotBlank(transferDTO.getStampType()) ||
         StringUtils.isNotBlank(transferDTO.getStampHashDocument()) ||
         StringUtils.isNotBlank(transferDTO.getStampProvincialResidence())) {
-        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
+        throw new InvalidValueException("[INVALID_FIELDS] Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be null when iban is valued");
       }
       if (!isValidIban(transferDTO.getIban())) {
-        throw new InvalidValueException("[P4PA_INVALID_IBAN] Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+        throw new InvalidValueException("[INVALID_IBAN] Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
       if (StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())) {
-        throw new InvalidValueException("[P4PA_INVALID_POSTAL_IBAN] Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+        throw new InvalidValueException("[INVALID_POSTAL_IBAN] Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     } else {
       if (StringUtils.isBlank(transferDTO.getStampType()) ||
         StringUtils.isBlank(transferDTO.getStampHashDocument()) ||
         StringUtils.isBlank(transferDTO.getStampProvincialResidence())) {
-        throw new InvalidValueException("Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
+        throw new InvalidValueException("[INVALID_FIELDS] Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
       }
     }
   }
 
   private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
-      throw new InvalidValueException("[P4PA_MISSING_TAXONOMY_CATEGORY] Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
+      throw new InvalidValueException("[MISSING_TAXONOMY_CATEGORY] Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
       String taxonomyCategory = transferDTO.getCategory();
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
-        throw new InvalidValueException("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
+        throw new InvalidValueException("[INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
     }
   }

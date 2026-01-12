@@ -27,7 +27,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       .map(Organization::getOrgTypeCode)
       .orElse(null);
     if (!isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
-      log.error("[P4PA_INVALID_TAXONOMY_CATEGORY] Taxonomy category is not valid");
+      log.error("Taxonomy category is not valid");
       return false;
     }
     return true;

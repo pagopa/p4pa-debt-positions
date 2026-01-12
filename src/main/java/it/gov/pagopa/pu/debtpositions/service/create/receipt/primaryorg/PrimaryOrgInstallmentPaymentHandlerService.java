@@ -27,7 +27,7 @@ public class PrimaryOrgInstallmentPaymentHandlerService {
   public DebtPosition handlePayment(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, String accessToken){
     DebtPosition dp = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     if (dp == null) {
-      throw new NotFoundException("[DP_NOT_FOUND] DebtPosition for installment with id " + installment.getInstallmentId() + " not found");
+      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition for installment with id " + installment.getInstallmentId() + " not found");
     }
 
     if (InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(dp.getDebtPositionOrigin())) {

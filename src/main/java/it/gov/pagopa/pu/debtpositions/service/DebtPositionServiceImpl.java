@@ -72,7 +72,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public DebtPositionDTO getDebtPositionByInstallmentId(Long installmentId) {
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByInstallmentId(installmentId);
     if (debtPosition == null) {
-      throw new NotFoundException("DebtPosition having installmentId %d not found".formatted(installmentId));
+      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition having installmentId %d not found".formatted(installmentId));
     }
     return mapDebtPosition(debtPosition);
   }
@@ -93,7 +93,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public DebtPosition getDebtPositionNoPII(Long debtPositionId) {
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByDebtPositionId(debtPositionId);
     if (debtPosition == null) {
-      throw new NotFoundException("DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
+      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition having debtPositionId %d not found".formatted(debtPositionId));
     }
     return debtPosition;
   }
@@ -118,7 +118,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public List<DebtPositionDTO> getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(String debtorFiscalCode, PersonEntityType debtorEntityType, List<InstallmentStatus> status, List<DebtPositionOrigin> debtPositionOrigin, List<String> debtPositionTypeOrgCodesToExclude, List<Long> organizationIds, LocalDateTimeIntervalFilter dateTimeIntervalFilter) {
     if (debtorFiscalCode == null || debtorEntityType == null) {
-      throw new IllegalArgumentException("debtorFiscalCode and debtorEntityType are required");
+      throw new IllegalArgumentException("[MISSING_FIELDS] debtorFiscalCode and debtorEntityType are required");
     }
 
     byte[] debtorFiscalCodeHash = dataCipherService.hash(debtorFiscalCode);
@@ -147,7 +147,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public DebtorDebtPositionDTO getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
     DebtPosition primaryDebtPositionDetail = debtPositionRepository.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(debtPositionId, xFiscalCode, organizationId);
     if (primaryDebtPositionDetail == null){
-      throw new NotFoundException("DebtPosition with id "+ debtPositionId + "not found");
+      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition with id "+ debtPositionId + "not found");
     }
     return debtorDebtPositionMapper.map(primaryDebtPositionDetail, retrieveDebtPositionTypeOrg(primaryDebtPositionDetail.getDebtPositionTypeOrgId()));
   }
@@ -164,7 +164,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
   private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long debtPositionTypeOrgId){
     return debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id "+ debtPositionTypeOrgId + "not found"));
+      .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg with id "+ debtPositionTypeOrgId + "not found"));
   }
 }
 

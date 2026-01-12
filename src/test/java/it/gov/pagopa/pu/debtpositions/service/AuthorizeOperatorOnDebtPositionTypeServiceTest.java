@@ -97,7 +97,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
     NotFoundException exception = assertThrows(NotFoundException.class, () ->
       authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId));
 
-    assertEquals("[P4PA_MISSING_DEBT_POS_TYPE_ORG] The DebtPositionTypeOrg with id 1 was not found", exception.getMessage());
+    assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The DebtPositionTypeOrg with id 1 was not found", exception.getMessage());
   }
 
   @Test
@@ -116,7 +116,7 @@ class AuthorizeOperatorOnDebtPositionTypeServiceTest {
     OperatorNotAuthorizedException exception = assertThrows(OperatorNotAuthorizedException.class, () ->
       authorizeOperatorOnDebtPositionTypeService.authorize(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId));
 
-    assertEquals("[P4PA_DEBT_POS_TYPE_ORG_UNAUTHORIZED] The operator operatorExternalUserId is not authorized on the DebtPositionTypeOrg 2", exception.getMessage());
+    assertEquals("[DEBT_POSITION_TYPE_ORG_UNAUTHORIZED] The operator operatorExternalUserId is not authorized on the DebtPositionTypeOrg 2", exception.getMessage());
   }
 }
 

@@ -91,7 +91,7 @@ class DebtPositionDeletionServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_ORG_STATUS] Provided organization is not ACTIVE", exception.getMessage());
+    assertEquals("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE", exception.getMessage());
 
   }
 
@@ -105,7 +105,7 @@ class DebtPositionDeletionServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_DP_STATUS] DebtPosition with id 1 cannot be deleted because it is been notified", exception.getMessage());
+    assertEquals("[INVALID_DEBT_POSITION_STATUS] DebtPosition with id 1 cannot be deleted because it is been notified", exception.getMessage());
 
     Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
       .cancelInstallment(Mockito.any(), Mockito.anyList(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
@@ -123,7 +123,7 @@ class DebtPositionDeletionServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_DP_STATUS] DebtPosition with id 1 cannot be deleted because is not in allowed status: PAID", exception.getMessage());
+    assertEquals("[INVALID_DEBT_POSITION_STATUS] DebtPosition with id 1 cannot be deleted because is not in allowed status: PAID", exception.getMessage());
 
     Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
       .cancelInstallment(Mockito.any(), Mockito.anyList(), Mockito.any(), Mockito.anyString(), Mockito.anyString());

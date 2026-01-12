@@ -84,7 +84,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!InstallmentUtils.MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_DP_STATUS] Debt position with id %s cannot be modified because it is not in an allowed status: %s",
+      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] Debt position with id %s cannot be modified because it is not in an allowed status: %s",
         debtPositionId, storedDebtPosition.getStatus()));
     }
 
@@ -94,10 +94,10 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
       .filter(paymentOptionDTO -> paymentOptionDTO.getPaymentOptionId().equals(manageDebtPositionDTO.getPaymentOptionId()))
       .findFirst()
-      .orElseThrow(() -> new NotFoundException(String.format("[PO_NOT_FOUND] Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
+      .orElseThrow(() -> new NotFoundException(String.format("[PAYMENT_OPTION_NOT_FOUND] Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
     if (!InstallmentUtils.MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_PO_STATUS] Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
+      throw new ConflictErrorException(String.format("[INVALID_PAYMENT_OPTION_STATUS] Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
     }
 
     storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
@@ -173,7 +173,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DPTO_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
     validateDebtPositionService.validateInstallment(
@@ -206,7 +206,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     if (workflowCreatedDTO != null) {
       String workflowStatus = workflowHubService.waitWorkflowCompletion(accessToken, workflowCreatedDTO.getWorkflowId(), maxAttempts, retryDelayMs);
       if (!WORKFLOW_STATUS_COMPLETED_VALUE.equals(workflowStatus)) {
-        throw new WorkflowErrorException("[WF_EXECUTION_ERROR] Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
+        throw new WorkflowErrorException("[WORKFLOW_EXECUTION_ERROR] Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
       }
     }
   }
