@@ -166,6 +166,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
         installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO_" + now);
       if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin))
         installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-SIL_" + now);
+      if (DebtPositionOrigin.SPONTANEOUS_PSP.equals(debtPositionOrigin))
+        installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-PSP_" + now);
     }
   }
 
