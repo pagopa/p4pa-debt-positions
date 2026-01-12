@@ -78,7 +78,7 @@ public class InstallmentSynchronizeApplierService {
   private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
     return debtPositionTypeOrgRepository.findByOrganizationIdAndCode(
         organizationId, debtPositionTypeCode)
-      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_DEBT_POSITION_CODE] The debt position type code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
+      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_DEBT_POSITION_TYPE_CODE] The debt position type code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
