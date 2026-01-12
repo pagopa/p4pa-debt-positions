@@ -72,7 +72,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, null, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals(String.format("[DP_NOT_FOUND] The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()), notFoundException.getMessage());
+    assertEquals(String.format("[DEBT_POSITION_NOT_FOUND] The debt position related to iupd %s was not found", installmentSynchronizeDTO.getIupdOrg()), notFoundException.getMessage());
   }
 
   @Test
@@ -86,7 +86,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     NotFoundException notFoundException = assertThrows(NotFoundException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals(String.format("[PO_NOT_FOUND] The payment option with index %s of debt position with iupd %s not found",
+    assertEquals(String.format("[PAYMENT_OPTION_NOT_FOUND] The payment option with index %s of debt position with iupd %s not found",
       installmentSynchronizeDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg()), notFoundException.getMessage());
   }
 
@@ -161,7 +161,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals(String.format("The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization",
+    assertEquals(String.format("[INVALID_INSTALLMENT_STATUS] The installment with iud %s cannot be updated or cancelled because there was an error in the previous synchronization",
       installmentSynchronizeDTO.getIud()), conflictException.getMessage());
   }
 

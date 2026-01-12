@@ -62,7 +62,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService{
           throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");
         }
         Organization organization = organizationService.getOrganizationById(organizationId, SecurityUtils.getAccessToken())
-          .orElseThrow(() -> new NotFoundException("[ORG_NOT_FOUND] Organization with id " + organizationId + " not found"));
+          .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
 
         byte[] receiptPdf;
         try {

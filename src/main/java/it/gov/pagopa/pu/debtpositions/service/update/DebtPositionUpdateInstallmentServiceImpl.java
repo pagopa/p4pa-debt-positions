@@ -61,7 +61,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
     log.debug("Updating status for installments with ids {}", installmentIds);
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DPTO_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
     debtPositionDTO.getPaymentOptions()

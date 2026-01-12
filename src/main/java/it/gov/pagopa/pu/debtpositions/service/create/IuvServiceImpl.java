@@ -58,7 +58,7 @@ public class IuvServiceImpl implements IuvService {
     long paymentIndex = iuvSequenceNumberService.getNextIuvSequenceNumber(org.getOrganizationId());
     if (paymentIndex < 1) {
       log.error("invalid payment index returned for org[{}/{}]: {}", org.getIpaCode(), org.getOrgFiscalCode(), paymentIndex);
-      throw new InvalidValueException("invalid payment index");
+      throw new InvalidValueException("[INVALID_PAYMENT_INDEX] invalid payment index");
     }
     return StringUtils.leftPad(String.valueOf(paymentIndex), 11, '0');
   }
@@ -80,7 +80,7 @@ public class IuvServiceImpl implements IuvService {
     if (isValidIuv(iuv))
       return AUX_DIGIT + iuv;
     else
-      throw new InvalidValueException("invalid iuv");
+      throw new InvalidValueException("[INVALID_IUV] invalid iuv");
   }
 
   /**
@@ -93,7 +93,7 @@ public class IuvServiceImpl implements IuvService {
     if (isValidNav(nav)) {
       return nav.substring(AUX_DIGIT.length());
     } else {
-      throw new InvalidValueException("invalid nav");
+      throw new InvalidValueException("[INVALID_NAV] invalid nav");
     }
   }
 
@@ -126,19 +126,19 @@ public class IuvServiceImpl implements IuvService {
 
   public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
-      throw new InvalidValueException("[P4PA_INVALID_IUV] The iuv must be 17 characters long");
+      throw new InvalidValueException("[INVALID_IUV] The iuv must be 17 characters long");
     }
     if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
-      throw new InvalidValueException("[P4PA_INVALID_IUV] The first two character of iuv must be the same of segregation code of organization");
+      throw new InvalidValueException("[INVALID_IUV] The first two character of iuv must be the same of segregation code of organization");
     }
 
     if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
       if (!iuv.startsWith(informationSystemId, 3)) {
-        throw new InvalidValueException("[P4PA_INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin);
+        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin);
       }
     } else {
       if (iuv.startsWith(informationSystemId, 3)) {
-        throw new InvalidValueException("[P4PA_INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + origin);
+        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + origin);
       }
     }
 

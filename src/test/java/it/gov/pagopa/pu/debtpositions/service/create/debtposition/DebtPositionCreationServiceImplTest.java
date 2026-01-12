@@ -382,7 +382,7 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Provided organization id not found on db.", exception.getMessage());
+    assertEquals("[INVALID_ORGANIZATION] Provided organization id not found on db.", exception.getMessage());
   }
 
   @Test
@@ -397,7 +397,7 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Provided organization is not ACTIVE", exception.getMessage());
+    assertEquals("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE", exception.getMessage());
   }
 
   @Test

@@ -62,7 +62,7 @@ public class UnknownDebtPositionTypeOrgRetrieverService {
   private DebtPositionType getDebtPositionTypeSecondaryOrg() {
     if(debtPositionType==null){
       debtPositionType = debtPositionTypeRepository.findById(DEBT_POSITION_TYPE_UNKNOWN)
-        .orElseThrow(() -> new NotFoundException("[DPT_NOT_FOUND] DebtPositionType with id " + DEBT_POSITION_TYPE_UNKNOWN + " not found"));
+        .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_NOT_FOUND] DebtPositionType with id " + DEBT_POSITION_TYPE_UNKNOWN + " not found"));
       log.info("debt position type code UNKNOWN: {}", debtPositionType.getCode());
     }
     return debtPositionType;

@@ -119,7 +119,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals("[INVALID_DP_STATUS] The installment cannot be created because the debt position with iupd IUPD_ORG is not in an allowed status: PAID", conflictException.getMessage());
+    assertEquals("[INVALID_DEBT_POSITION_STATUS] The installment cannot be created because the debt position with iupd IUPD_ORG is not in an allowed status: PAID", conflictException.getMessage());
   }
 
   @Test
@@ -135,7 +135,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals("[INVALID_DP_STATUS] The installment cannot be created because the debt position with iupd IUPD_ORG is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
+    assertEquals("[INVALID_DEBT_POSITION_STATUS] The installment cannot be created because the debt position with iupd IUPD_ORG is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
   }
 
   @Test
@@ -152,7 +152,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals("[INVALID_PO_STATUS] The installment cannot be created because the payment option with index 1 is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
+    assertEquals("[INVALID_PAYMENT_OPTION_STATUS] The installment cannot be created because the payment option with index 1 is in TO_SYNC status for a previous synchronization", conflictException.getMessage());
   }
 
   @Test
@@ -167,7 +167,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals("[INVALID_PO_STATUS] The installment cannot be created because the payment option with index 1 is not in an allowed status: PAID", conflictException.getMessage());
+    assertEquals("[INVALID_PAYMENT_OPTION_STATUS] The installment cannot be created because the payment option with index 1 is not in an allowed status: PAID", conflictException.getMessage());
   }
 
 

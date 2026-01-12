@@ -91,7 +91,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     Organization organization = organizationService.getOrganizationById(
         mixedDebtPositionDTO.getOrganizationId(), accessToken)
       .orElseThrow(() -> new NotFoundException(
-        "[ORG_NOT_FOUND] Organization with id [%s] not found".formatted(
+        "[ORGANIZATION_NOT_FOUND] Organization with id [%s] not found".formatted(
           mixedDebtPositionDTO.getOrganizationId())));
 
     checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
@@ -133,7 +133,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
           .ifPresent(workflowTypeOrg -> {
             throw new InvalidValueException(
-              "[DPTO_ID_RELATED_TO_CUSTOM_WF] DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+              "[DEBT_POSITION_TYPE_ORG_RELATED_TO_CUSTOM_WORKFLOW] DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
                 dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
           });
       });

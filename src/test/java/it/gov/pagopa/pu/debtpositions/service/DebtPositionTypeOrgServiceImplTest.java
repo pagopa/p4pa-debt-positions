@@ -69,7 +69,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED));
 
-    Assertions.assertEquals("DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
+    Assertions.assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock);
   }
 
@@ -291,7 +291,7 @@ class DebtPositionTypeOrgServiceImplTest {
     //when
     NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true));
     //then
-    Assertions.assertEquals("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found", ex.getMessage());
+    Assertions.assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found", ex.getMessage());
 
   }
 
@@ -305,7 +305,7 @@ class DebtPositionTypeOrgServiceImplTest {
     ValidationException ex = Assertions.assertThrows(ValidationException.class,
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
 
-    Assertions.assertEquals("DebtPositionTypeOrg must not be null", ex.getMessage());
+    Assertions.assertEquals("[MISSING_DEBT_POSITION_TYPE_ORG] DebtPositionTypeOrg must not be null", ex.getMessage());
     Mockito.verifyNoInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
   }
 
@@ -333,7 +333,7 @@ class DebtPositionTypeOrgServiceImplTest {
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
 
     Assertions.assertEquals(
-      "SpontaneousFormId %d is not tied to the organizationId %d"
+      "[INVALID_SPONTANEOUS_FORM] SpontaneousFormId %d is not tied to the organizationId %d"
         .formatted(debtPositionTypeOrg.getSpontaneousFormId(), debtPositionTypeOrg.getOrganizationId()),
       ex.getMessage()
     );
@@ -354,7 +354,7 @@ class DebtPositionTypeOrgServiceImplTest {
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
 
     Assertions.assertEquals(
-      "Provided iban is not valid",
+      "[INVALID_IBAN] Provided iban is not valid",
       ex.getMessage()
     );
   }
@@ -371,7 +371,7 @@ class DebtPositionTypeOrgServiceImplTest {
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
 
     Assertions.assertEquals(
-      "Provided postal iban is not valid",
+      "[INVALID_POSTAL_IBAN] Provided postal iban is not valid",
       ex.getMessage()
     );
   }
@@ -391,7 +391,7 @@ class DebtPositionTypeOrgServiceImplTest {
     ValidationException ex = Assertions.assertThrows(ValidationException.class,
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
 
-    Assertions.assertEquals("SpontaneousFormId 123 not found", ex.getMessage());
+    Assertions.assertEquals("[INVALID_SPONTANEOUS_FORM] SpontaneousFormId 123 not found", ex.getMessage());
 
     Mockito.verify(spontaneousFormRepositoryMock).findById(123L);
     Mockito.verifyNoMoreInteractions(spontaneousFormRepositoryMock);

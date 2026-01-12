@@ -124,11 +124,11 @@ public class InstallmentServiceImpl implements InstallmentService {
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
     if(installments.isEmpty())
-      throw new NotFoundException("The installment with NAV: "+nav+" was not found");
+      throw new NotFoundException("[INSTALLMENT_NOT_FOUND] The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
-      throw new ConflictErrorException("Found more than one installment processable with NAV: "+nav);
+      throw new ConflictErrorException("[TOO_MANY_INSTALLMENTS] Found more than one installment processable with NAV: "+nav);
     if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
-      throw new InvalidConditionException("The installment with NAV: " + nav + " is expired");
+      throw new InvalidConditionException("[INVALID_INSTALLMENT_STATUS] The installment with NAV: " + nav + " is expired");
 
     long notificationFeeCents = calculateFeeAlreadyPaid(actualizeAmountRequest.getNewFeeCents(), installments.getFirst().getIun());
 
@@ -183,7 +183,7 @@ public class InstallmentServiceImpl implements InstallmentService {
     }
 
     if (!transferUpdated)
-      throw new IllegalStateException("No eligible transfer found to update notification fee");
+      throw new IllegalStateException("[TRANSFER_NOT_FOUND] No eligible transfer found to update notification fee");
 
     long newInstallmentAmount = transfers.stream()
       .mapToLong(TransferDTO::getAmountCents)
@@ -196,7 +196,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   @Override
   public List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId) {
     if(organizationId==null && StringUtils.isBlank(debtorFiscalCode)){
-      throw new InvalidParamException("Either debtorFiscalCode or organizationId must be provided");
+      throw new InvalidParamException("[MISSING_FIELDS] Either debtorFiscalCode or organizationId must be provided");
     }
     List<InstallmentDTO> installments = installmentPIIRepository.findByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
     if(CollectionUtils.isEmpty(installments)){

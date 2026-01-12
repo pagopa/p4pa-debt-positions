@@ -52,7 +52,7 @@ class DebtPositionManageApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
-    assertEquals("[P4PA_UNMODIFIABLE_FIELD] These fields for installment having id 100 are not mutable: [iupdPagopa, iuv, debtor: [fiscalCode]]", exception.getMessage());
+    assertEquals("[UNMODIFIABLE_FIELD] These fields for installment having id 100 are not mutable: [iupdPagopa, iuv, debtor: [fiscalCode]]", exception.getMessage());
   }
 
   @Test
@@ -63,7 +63,7 @@ class DebtPositionManageApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
-    assertEquals("The number of beneficiary for installment having id 100 cannot be modified", exception.getMessage());
+    assertEquals("[UNMODIFIABLE_FIELD] The number of beneficiary for installment having id 100 cannot be modified", exception.getMessage());
   }
 
   @Test
@@ -74,7 +74,7 @@ class DebtPositionManageApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
-    assertEquals("The transfer having id 1000 of installment having id 100 does not found", exception.getMessage());
+    assertEquals("[TRANSFER_NOT_FOUND] The transfer having id 1000 of installment having id 100 does not found", exception.getMessage());
   }
 
   @Test
@@ -86,7 +86,7 @@ class DebtPositionManageApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
             () -> applier.merge(updatedInstallment, storedInstallment));
-    assertEquals("[P4PA_UNMODIFIABLE_FIELD] These fields for transfer with index 1 of installment having id 100 are not mutable: [orgFiscalCode, orgName]", exception.getMessage());
+    assertEquals("[UNMODIFIABLE_FIELD] These fields for transfer with index 1 of installment having id 100 are not mutable: [orgFiscalCode, orgName]", exception.getMessage());
   }
 
 }

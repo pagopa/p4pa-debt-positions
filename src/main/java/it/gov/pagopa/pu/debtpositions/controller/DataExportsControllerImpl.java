@@ -39,13 +39,13 @@ public class DataExportsControllerImpl implements DataExportsApi {
 
   @Override
   public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateTimeFrom, OffsetDateTime paymentDateTimeTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, List<DebtPositionOrigin> debtPositionOrigins, Pageable pageable) {
-    String invalidDateTimeIntervalErrorMessage = "[DATE_FILTER_INTERVAL_EXCEEDED] The date interval between %s and %s cannot exceed %d months";
+    String invalidDateTimeIntervalErrorMessage = "[INVALID_DATE_FILTER_INTERVAL] The date interval between %s and %s cannot exceed %d months";
     boolean hasPaymentDates = paymentDateTimeFrom != null && paymentDateTimeTo != null;
     boolean hasInstallmentDates = installmentUpdateDateTimeFrom != null && installmentUpdateDateTimeTo != null;
 
     if (hasPaymentDates == hasInstallmentDates) {
       throw new InvalidParamException(
-        "[EXPORT_PAID_INSTALLMENTS_INVALID_DATE_FILTER_COMBINATION] You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
+        "[INVALID_DATE_FILTER_COMBINATION] You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
       );
     }
 
@@ -75,7 +75,7 @@ public class DataExportsControllerImpl implements DataExportsApi {
   @Override
   public ResponseEntity<PagedReceiptsArchivingView> exportArchivingReceipts(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable) {
     if (!Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportArchivingMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException("[DATE_FILTER_INTERVAL_EXCEEDED] The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, exportArchivingMaxMonthsInterval));
+      throw new InvalidDateTimeIntervalException("[INVALID_DATE_FILTER_INTERVAL] The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, exportArchivingMaxMonthsInterval));
     }
 
     return ResponseEntity.ok(receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable));
