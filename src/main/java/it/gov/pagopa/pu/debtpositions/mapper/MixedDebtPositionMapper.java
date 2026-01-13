@@ -39,7 +39,7 @@ public class MixedDebtPositionMapper {
     for (int i = 0; i < requestTransfers.size(); i++) {
       MixedTransferDTO requestTransfer = requestTransfers.get(i);
       Long debtPositionTypeId = debtPositionTypeOrgRepository.findById(requestTransfer.getDebtPositionTypeOrgId())
-        .orElseThrow(() -> new NotFoundException(String.format("The debt position type org with id %s is not found", requestTransfer.getDebtPositionTypeOrgId())))
+        .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s is not found", requestTransfer.getDebtPositionTypeOrgId())))
         .getDebtPositionTypeId();
       String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId, organization.getOrgTypeCode());
       transfers.add(

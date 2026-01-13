@@ -38,7 +38,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
     }
 
     if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
@@ -46,7 +46,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     }
 
     if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
-      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
     }
 
     updateTransferList(installmentDTO, installmentSynchronizeDTO);
@@ -76,7 +76,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     checkImmutableField("category", transferDTO.getCategory(), transferSynchronizeDTO.getCategory(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("[UNMODIFIABLE_FIELD] These fields for transfer with index %s of installment with iud %s are not mutable: %s",
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] These fields for transfer with index %s of installment with iud %s are not mutable: %s",
         transferDTO.getTransferIndex(), iud, modifiedFields));
     }
   }

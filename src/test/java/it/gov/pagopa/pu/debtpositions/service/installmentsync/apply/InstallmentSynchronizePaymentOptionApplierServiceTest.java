@@ -40,6 +40,6 @@ class InstallmentSynchronizePaymentOptionApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierPaymentOptionService.merge(installmentSynchronizeDTO, paymentOptionDTO));
-    assertEquals("[UNMODIFIABLE_FIELD] These fields for payment option with index 1 of debt position with iupd IUPD_ORG are not mutable: [paymentOptionType]", exception.getMessage());
+    assertEquals("[IMMUTABLE_FIELD] These fields for payment option with index 1 of debt position with iupd IUPD_ORG are not mutable: [paymentOptionType]", exception.getMessage());
   }
 }

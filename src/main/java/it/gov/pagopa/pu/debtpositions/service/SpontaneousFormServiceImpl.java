@@ -73,7 +73,7 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
     checkImmutableField("organizationId", existingSpontaneousForm.getOrganizationId(), updatedSpontaneousForm.getOrganizationId(), modifiedFields);
     checkImmutableField("code", existingSpontaneousForm.getCode(), updatedSpontaneousForm.getCode(), modifiedFields);
     if(!CollectionUtils.isEmpty(modifiedFields)){
-      throw new ValidationException("[UNMODIFIABLE_FIELD] The following SpontaneousForm fields are readOnly. "+modifiedFields);
+      throw new ValidationException("[IMMUTABLE_FIELD] The following SpontaneousForm fields are readOnly. "+modifiedFields);
     }
   }
 }
