@@ -135,7 +135,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     checkImmutableField("flagAmountActualization", existingDebtPositionTypeOrg.isFlagAmountActualization(), updatedDebtPositionTypeOrg.isFlagAmountActualization(), modifiedFields);
     checkImmutableField("flagExternal", existingDebtPositionTypeOrg.isFlagExternal(), updatedDebtPositionTypeOrg.isFlagExternal(), modifiedFields);
     if (!CollectionUtils.isEmpty(modifiedFields)) {
-      throw new ValidationException("[UNMODIFIABLE_FIELD] The following DebtPositionTypeOrg fields are readOnly. " + modifiedFields);
+      throw new ValidationException("[IMMUTABLE_FIELD] The following DebtPositionTypeOrg fields are readOnly. " + modifiedFields);
     }
   }
 }
