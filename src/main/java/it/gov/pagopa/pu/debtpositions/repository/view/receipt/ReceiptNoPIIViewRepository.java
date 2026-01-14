@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.classification.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptNoPIIView;
 import org.springframework.data.domain.Page;
@@ -57,4 +58,41 @@ public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView,
     Pageable pageable
   );
 
+  @Query("""
+    SELECT new ReceiptNoPIIView(
+      r.receiptId as receiptId,
+      r.orgFiscalCode as orgFiscalCode,
+      r.paymentAmountCents as paymentAmountCents,
+      r.paymentDateTime as paymentDateTime,
+      r.receiptOrigin as receiptOrigin,
+      i.installmentId as installmentId,
+      i.remittanceInformation as remittanceInformation,
+      dpto.description as debtPositionTypeOrgDescription,
+      dpt.description as debtPositionTypeDescription,
+      dpt.serviceType as serviceType
+    )
+    FROM ReceiptNoPII r
+    JOIN InstallmentNoPII i ON r.receiptId = i.receiptId
+    JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
+    JOIN DebtPosition dp ON po.debtPositionId = dp.debtPositionId
+    JOIN DebtPositionTypeOrg dpto ON dp.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    JOIN DebtPositionType dpt ON dpto.debtPositionTypeId = dpt.debtPositionTypeId
+    WHERE
+      (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)})
+      AND dp.debtPositionOrigin in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED})
+      AND ((:receiptOrigins IS NULL) OR (r.receiptOrigin IN :receiptOrigins))
+      AND ((:installmentStatuses IS NULL) OR (i.status IN :installmentStatuses))
+      and dp.organizationId = :organizationId
+      AND po.paymentOptionId = :paymentOptionId
+      AND dp.debtPositionId = :debtPositionId
+   """
+  )
+  List<ReceiptNoPIIView> getDebtorReceipts(
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("paymentOptionId") Long paymentOptionId,
+    @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
+    @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses
+  );
 }
