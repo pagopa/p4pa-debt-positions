@@ -140,7 +140,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   public PagedDebtorUnpaidDebtPositionDTO getPagedDebtorUnpaidDebtPosition(String xFiscalCode, List<Long> organizationIds, Pageable pageable) {
     Page<DebtPosition> pagedPrimaryDebtPositionByFilters = debtPositionRepository.findPagedPrimaryDebtPositionByFilters(xFiscalCode, organizationIds, pageable);
 
-    return pagedDebtorUnpaidDebtPositionMapper.map(pagedPrimaryDebtPositionByFilters, retrieveDebtPositionTypeOrgMap(pagedPrimaryDebtPositionByFilters));
+    return pagedDebtorUnpaidDebtPositionMapper.map(pagedPrimaryDebtPositionByFilters, retrieveDebtPositionTypeOrgMap(pagedPrimaryDebtPositionByFilters), xFiscalCode, dataCipherService);
   }
 
   @Override

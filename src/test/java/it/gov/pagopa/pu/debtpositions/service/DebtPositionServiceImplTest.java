@@ -451,7 +451,7 @@ class DebtPositionServiceImplTest {
       .thenReturn(Optional.of(typeOrg));
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(page, Map.of(100L, typeOrg)))
+        .map(page, Map.of(100L, typeOrg), debtorFiscalCode, dataCipherServiceMock))
       .thenReturn(expected);
 
     // when
@@ -481,7 +481,7 @@ class DebtPositionServiceImplTest {
       .thenReturn(emptyPage);
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(emptyPage, Collections.emptyMap()))
+        .map(emptyPage, Collections.emptyMap(), debtorFiscalCode, dataCipherServiceMock))
       .thenReturn(expected);
 
     // when
@@ -536,7 +536,7 @@ class DebtPositionServiceImplTest {
       .thenReturn(page);
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(page, Collections.emptyMap()))
+        .map(page, Collections.emptyMap(),debtorFiscalCode, dataCipherServiceMock))
       .thenReturn(new PagedDebtorUnpaidDebtPositionDTO());
 
     // when

@@ -28,7 +28,7 @@ import java.util.SortedSet;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode(of = {"debtPositionId", "iupdOrg"}, callSuper = false)
 public class DebtPosition extends BaseEntity implements BaseDebtPosition, Serializable {
 
