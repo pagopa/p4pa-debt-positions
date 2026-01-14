@@ -42,30 +42,9 @@ public interface PagedDebtorUnpaidDebtPositionMapper {
     return debtPositions.stream()
       .map(dp -> {
         DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgMap != null ? debtPositionTypeOrgMap.get(dp.getDebtPositionId()) : null;
-
         String description = debtPositionTypeOrg != null ? debtPositionTypeOrg.getDescription() : null;
 
-        SortedSet<PaymentOption> filteredPaymentOptions =
-          dp.getPaymentOptions().stream()
-            .filter(po -> InstallmentUtils.PAYABLE_PO_STATUSES.contains(po.getStatus()))
-            .map(po -> po.toBuilder()
-              .installments(
-                po.getInstallments().stream()
-                  .filter(i ->
-                    InstallmentStatus.UNPAID.equals(i.getStatus()) &&
-                      Arrays.equals(i.getDebtorFiscalCodeHash(), dataCipherService.hash(debtorFiscalCode))
-                  )
-                  .collect(Collectors.toCollection(() ->
-                    new TreeSet<>(Comparator.comparing(InstallmentNoPII::getDueDate,
-                      Comparator.nullsFirst(Comparator.naturalOrder())
-                    ))
-                  ))
-              )
-              .build()
-            )
-            .filter(Objects::nonNull)
-            .filter(po -> !po.getInstallments().isEmpty())
-            .collect(Collectors.toCollection(TreeSet::new));
+        SortedSet<PaymentOption> filteredPaymentOptions = getFilteredPaymentOptions(debtorFiscalCode, dataCipherService, dp);
 
         DebtPosition filteredDp = dp.toBuilder()
           .paymentOptions(filteredPaymentOptions)
@@ -74,5 +53,32 @@ public interface PagedDebtorUnpaidDebtPositionMapper {
         return map(filteredDp, description, debtorFiscalCode);
       })
       .toList();
+  }
+
+  private static SortedSet<PaymentOption> getFilteredPaymentOptions(String debtorFiscalCode, DataCipherService dataCipherService, DebtPosition dp) {
+    return dp.getPaymentOptions().stream()
+      .filter(po -> InstallmentUtils.PAYABLE_PO_STATUSES.contains(po.getStatus()))
+      .map(po -> po.toBuilder()
+        .installments(
+          getFilteredInstallments(debtorFiscalCode, dataCipherService, po)
+        )
+        .build()
+      )
+      .filter(Objects::nonNull)
+      .filter(po -> !po.getInstallments().isEmpty())
+      .collect(Collectors.toCollection(TreeSet::new));
+  }
+
+  private static TreeSet<InstallmentNoPII> getFilteredInstallments(String debtorFiscalCode, DataCipherService dataCipherService, PaymentOption po) {
+    return po.getInstallments().stream()
+      .filter(i ->
+        InstallmentStatus.UNPAID.equals(i.getStatus()) &&
+          Arrays.equals(i.getDebtorFiscalCodeHash(), dataCipherService.hash(debtorFiscalCode))
+      )
+      .collect(Collectors.toCollection(() ->
+        new TreeSet<>(Comparator.comparing(InstallmentNoPII::getDueDate,
+          Comparator.nullsFirst(Comparator.naturalOrder())
+        ))
+      ));
   }
 }
