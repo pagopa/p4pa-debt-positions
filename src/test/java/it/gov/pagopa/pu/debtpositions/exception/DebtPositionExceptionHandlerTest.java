@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.exception;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.UtilitiesTest;
 import jakarta.persistence.RollbackException;
 import jakarta.servlet.ServletException;
@@ -79,6 +80,11 @@ class DebtPositionExceptionHandlerTest {
     String testEndpoint(@RequestParam(DATA) String data, @Valid @RequestBody TestRequestBody body) {
       return "OK";
     }
+  }
+
+  @BeforeEach
+  void init() {
+    TestUtils.clearDefaultTimezone();
   }
 
   @RestController
@@ -434,4 +440,14 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
+  @Test
+  void handleInstallmentCloningErrorException() throws Exception {
+    doThrow(new InstallmentCloningException("Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+  }
 }

@@ -4,12 +4,6 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import jakarta.transaction.Transactional;
-
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -18,6 +12,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 @RepositoryRestResource(path = "debt-position-type-orgs")
 public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositionTypeOrg, Long> {
@@ -171,7 +171,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
 
   @Query(
     """
-      SELECT dpto, COUNT(dp) as usageCount
+      SELECT dpto
       FROM DebtPositionTypeOrg dpto
       JOIN DebtPosition dp on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
       WHERE dpto.organizationId = :organizationId
@@ -180,14 +180,17 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       AND dp.debtPositionOrigin = 'SPONTANEOUS'
       AND dp.organizationId = :organizationId
       AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
-      AND date_part('year', dp.creationDate) = date_part('year', CURRENT_DATE)
+      AND dp.creationDate >= :creationDateFrom
+      AND dp.creationDate <= :creationDateTo
       GROUP BY dpto
-      ORDER BY usageCount DESC
-      LIMIT 10
+      ORDER BY COUNT(dp) DESC
     """
   )
-  List<DebtPositionTypeOrg> getCurrentYearTopTenSpontaneousDebtPositionTypeOrgByOrganizationId(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
+  Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationByOrganizationIdAndDate(
+    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateFrom") LocalDateTime creationDateFrom,
+    @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateTo") LocalDateTime creationDateTo,
+    Pageable pageable
   );
 }
 

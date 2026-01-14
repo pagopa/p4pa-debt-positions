@@ -2,9 +2,14 @@ package it.gov.pagopa.pu.debtpositions.citizen.service;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
+import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 
 import java.util.Base64;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 
 class DataCipherServiceTest {
 
@@ -55,5 +60,40 @@ class DataCipherServiceTest {
 
     // Then
     Assertions.assertNull(hash);
+  }
+
+  @Test
+  void givenJsonSerializationExceptionWhenEncryptObjThenThrowIllegalStateException() {
+    JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
+
+    Mockito.when(jsonMapperMock.writeValueAsString(any())).thenThrow(Mockito.mock(JacksonException.class));
+
+    DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
+
+    IllegalStateException ex = Assertions.assertThrows(
+      IllegalStateException.class,
+      () -> brokenServiceWithMock.encryptObj("PLAINTEXT")
+    );
+
+    assertEquals("[JSON_SERIALIZATION_ERROR] Cannot serialize object as JSON", ex.getMessage());
+  }
+
+  @Test
+  void givenJsonDeserializationExceptionWhenDecryptObjThenThrowIllegalStateException() {
+    JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
+
+    Mockito.when(jsonMapperMock.readValue(any(String.class), Mockito.eq(String.class)))
+      .thenThrow(Mockito.mock(JacksonException.class));
+
+    DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
+
+    byte[] validCipher = service.encryptObj("PLAINTEXT");
+
+    IllegalStateException ex = Assertions.assertThrows(
+      IllegalStateException.class,
+      () -> brokenServiceWithMock.decryptObj(validCipher, String.class)
+    );
+
+    assertEquals("[JSON_DESERIALIZATION_ERROR] Cannot deserialize object as JSON", ex.getMessage());
   }
 }

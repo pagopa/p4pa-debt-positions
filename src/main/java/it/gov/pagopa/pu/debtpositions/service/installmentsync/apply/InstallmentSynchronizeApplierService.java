@@ -67,7 +67,7 @@ public class InstallmentSynchronizeApplierService {
     } else {
       Long organizationId = installmentSynchronizeDTO.getOrganizationId();
       Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
-        .orElseThrow(() -> new InvalidValueException(String.format("Provided organization id %s not found", organizationId)));
+        .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_ORGANIZATION] Provided organization with id %s not found", organizationId)));
 
       populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg);
       applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
@@ -78,7 +78,7 @@ public class InstallmentSynchronizeApplierService {
   private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
     return debtPositionTypeOrgRepository.findByOrganizationIdAndCode(
         organizationId, debtPositionTypeCode)
-      .orElseThrow(() -> new InvalidValueException(String.format("The debt position type code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
+      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_DEBT_POSITION_TYPE_CODE] The debt position type code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {

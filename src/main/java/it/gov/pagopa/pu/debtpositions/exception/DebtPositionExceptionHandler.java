@@ -134,6 +134,11 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
+  @ExceptionHandler({InstallmentCloningException.class})
+  public ResponseEntity<DebtPositionErrorDTO> handleInstallmentCloningException(InstallmentCloningException ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
+  }
+
   static ResponseEntity<DebtPositionErrorDTO> handleException(Exception ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
     logException(ex, request, httpStatus);
 

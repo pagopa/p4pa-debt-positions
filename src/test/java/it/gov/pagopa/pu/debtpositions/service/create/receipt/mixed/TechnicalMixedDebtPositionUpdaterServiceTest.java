@@ -94,7 +94,7 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("paymentOptions size must be 1 for debtPositionId=" +  debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("[TOO_MANY_PAYMENT_OPTIONS] PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -110,7 +110,7 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("paymentOptions size must be 1 for debtPositionId=" +  debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("[TOO_MANY_PAYMENT_OPTIONS] PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -126,7 +126,7 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("[TOO_MANY_INSTALLMENTS] Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -142,7 +142,7 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("[TOO_MANY_INSTALLMENTS] Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test

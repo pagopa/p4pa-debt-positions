@@ -2377,6 +2377,7 @@ components:
         - SPONTANEOUS
         - SPONTANEOUS_SIL
         - SPONTANEOUS_MIXED
+        - SPONTANEOUS_PSP
         - SECONDARY_ORG
         - RECEIPT_FILE
         - RECEIPT_PAGOPA

@@ -30,7 +30,7 @@ public class ReceiptArchivingPIIViewRepositoryImpl implements ReceiptArchivingPI
     Page<ReceiptArchivingNoPIIView> receiptArchivingViewNoPIIDTO = receiptArchivingNoPIIViewRepository.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable);
 
     if (receiptArchivingViewNoPIIDTO.getTotalElements() > maxTotalElements){
-      throw new ExportTooManyRecordsException("The number of ReceiptArchivingViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(receiptArchivingViewNoPIIDTO.getTotalElements(), maxTotalElements));
+      throw new ExportTooManyRecordsException("[TOO_MANY_EXPORTED_RECORDS] The number of ReceiptArchivingViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(receiptArchivingViewNoPIIDTO.getTotalElements(), maxTotalElements));
     }
 
     return pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(receiptArchivingViewNoPIIDTO);

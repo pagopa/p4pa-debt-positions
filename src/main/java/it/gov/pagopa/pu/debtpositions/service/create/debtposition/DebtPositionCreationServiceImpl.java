@@ -21,11 +21,11 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -166,6 +166,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
         installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO_" + now);
       if (DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin))
         installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-SIL_" + now);
+      if (DebtPositionOrigin.SPONTANEOUS_PSP.equals(debtPositionOrigin))
+        installmentDTO.setSourceFlowName(orgIpaCode + "_SPONTANEO-PSP_" + now);
     }
   }
 
@@ -173,7 +175,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     boolean isInstallmentDuplicate = installmentNoPIIRepository.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS);
     if (isInstallmentDuplicate) {
       log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), debtPositionDTO.getOrganizationId());
-      throw new ConflictErrorException("Duplicate records found: the provided data conflicts with existing records.");
+      throw new ConflictErrorException("[INSTALLMENT_ALREADY_EXISTS] Duplicate records found: the provided data conflicts with existing records");
     }
   }
 

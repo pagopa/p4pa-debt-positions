@@ -95,6 +95,6 @@ class CategoryResolverServiceTest {
 
     NotFoundException exception = assertThrows(NotFoundException.class, () -> categoryResolverService.resolveCategory(null, debtPositionTypeId, null));
 
-    assertEquals("The debt position type with id 1 is not found", exception.getMessage());
+    assertEquals("[DEBT_POSITION_TYPE_NOT_FOUND] The debt position type with id 1 is not found", exception.getMessage());
   }
 }

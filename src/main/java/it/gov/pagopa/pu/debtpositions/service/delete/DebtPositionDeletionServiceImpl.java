@@ -16,10 +16,10 @@ import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -53,11 +53,11 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
     }
 
     if(isIunPresent(debtPosition)) {
-      throw new ConflictErrorException("The debt position with id " + debtPositionId + " cannot be deleted because it is been notified");
+      throw new ConflictErrorException("[INVALID_DEBT_POSITION_STATUS] DebtPosition with id " + debtPositionId + " cannot be deleted because it is been notified");
     }
 
     if(!InstallmentUtils.DELETABLE_DP_STATUSES.contains(debtPosition.getStatus())){
-      throw new ConflictErrorException("The debt position with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
+      throw new ConflictErrorException("[INVALID_DEBT_POSITION_STATUS] DebtPosition with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
     }
 
     DebtPositionDTO debtPositionDTO = debtPositionService.mapDebtPosition(debtPosition);
@@ -77,9 +77,11 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
 
 
   private void deleteDraftDebtPosition(DebtPosition debtPosition, String accessToken, String operatorExternalUserId) {
-    Organization org = organizationService.getOrganizationById(debtPosition.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("Provided organization id not found on db."));
+    Long organizationId = debtPosition.getOrganizationId();
+    Organization org = organizationService.getOrganizationById(organizationId, accessToken)
+      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_ORGANIZATION] Provided organization with id %s not found", organizationId)));
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
-      throw new InvalidValueException("Provided organization is not ACTIVE");
+      throw new InvalidValueException("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE");
     }
     authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPosition.getDebtPositionTypeOrgId(), operatorExternalUserId);
 

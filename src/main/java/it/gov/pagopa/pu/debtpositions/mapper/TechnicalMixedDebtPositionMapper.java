@@ -97,7 +97,7 @@ public class TechnicalMixedDebtPositionMapper {
           .filter(t -> mixedDpAdditionalData.getTransferIndex()
             .equals(t.getTransferIndex())).findFirst()
           .orElseThrow(() -> new IllegalStateException(
-            "There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
+            "[TRANSFER_NOT_FOUND] There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
               mixedDpAdditionalData.getTransferIndex(),
               installment.getInstallmentId())));
 

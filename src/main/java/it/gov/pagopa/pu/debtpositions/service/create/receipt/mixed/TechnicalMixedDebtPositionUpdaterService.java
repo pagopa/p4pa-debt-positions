@@ -12,10 +12,10 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionDeleteService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed.TechnicalMixedDebtPositionBuilderService;
 import it.gov.pagopa.pu.debtpositions.util.Constants;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -34,18 +34,18 @@ public class TechnicalMixedDebtPositionUpdaterService  {
 
   @Transactional
   public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DebtPositionTypeOrg with id=" + debtPosition.getDebtPositionTypeOrgId() + " not found"));
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg with id " + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
     if (!Constants.MIXED_DP_TYPE_ORG_CODE.equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
       return List.of();
     }
 
     if (debtPosition.getPaymentOptions().size() != 1) {
-      throw new InvalidValueException("paymentOptions size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId());
+      throw new InvalidValueException("[TOO_MANY_PAYMENT_OPTIONS] PaymentOptions size must be 1 for debtPositionId " + debtPosition.getDebtPositionId());
     }
 
     if (debtPosition.getPaymentOptions().getFirst().getInstallments().size() != 1) {
-      throw new InvalidValueException("installments size must be 1 for debtPositionId=" + debtPosition.getDebtPositionId());
+      throw new InvalidValueException("[TOO_MANY_INSTALLMENTS] Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId());
     }
 
     List<DebtPosition> oldMixedDebtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(

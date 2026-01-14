@@ -291,7 +291,7 @@ class DebtPositionCreationServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Duplicate records found: the provided data conflicts with existing records.", exception.getMessage());
+    assertEquals("[INSTALLMENT_ALREADY_EXISTS] Duplicate records found: the provided data conflicts with existing records", exception.getMessage());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
   }
@@ -382,7 +382,7 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Provided organization id not found on db.", exception.getMessage());
+    assertEquals("[INVALID_ORGANIZATION] Provided organization id not found on db.", exception.getMessage());
   }
 
   @Test
@@ -397,7 +397,7 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("Provided organization is not ACTIVE", exception.getMessage());
+    assertEquals("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE", exception.getMessage());
   }
 
   @Test
@@ -491,5 +491,30 @@ class DebtPositionCreationServiceImplTest {
 
     assertNull(result);
     assertEquals(organization.getIpaCode() + "_SPONTANEO-SIL_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
+  }
+
+  @Test
+  void givenDPWithSpontaneousPspOriginAndInstallmentWithNullSourceFlowNameWhenCreateDebtPositionThenSetDefaultValue() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_PSP);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, null, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
+
+    assertNull(result);
+    assertEquals(organization.getIpaCode() + "_SPONTANEO-PSP_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
   }
 }

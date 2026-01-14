@@ -69,7 +69,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     if (!debtPositionOrigin.equals(debtPosition.getDebtPositionOrigin())) {
-      throw new ConflictErrorException(String.format("There is another debt position with iupd %s requested but different origin", iupdOrg));
+      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION] There is another debt position with iupd %s requested but different origin", iupdOrg));
     }
 
     return debtPositionMapper.mapToDto(debtPosition);
@@ -83,7 +83,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     if (debtPositions.size() > 1) {
-      throw new ConflictErrorException(String.format("Multiple debt positions found for iud %s", iud));
+      throw new ConflictErrorException(String.format("[TOO_MANY_DEBT_POSITIONS] Multiple debt positions found for iud %s", iud));
     }
 
     return debtPositionMapper.mapToDto(debtPositions.getFirst());

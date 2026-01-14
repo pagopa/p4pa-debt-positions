@@ -6,9 +6,10 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -35,7 +36,7 @@ public class MixedDebtPositionTypeOrgRetrieverService {
     this.debtPositionTypeOrgMapper = debtPositionTypeOrgMapper;
   }
 
-  @Transactional(Transactional.TxType.NOT_SUPPORTED)
+  @Transactional(propagation = Propagation.NOT_SUPPORTED)
   public DebtPositionTypeOrg getMixedDebtPositionTypeOrg(Long organizationId) {
     return debtPositionTypeOrgSecondaryOrgMap.computeIfAbsent(organizationId,this::retrieveDebtPositionTypeOrg);
   }
@@ -59,7 +60,7 @@ public class MixedDebtPositionTypeOrgRetrieverService {
   private DebtPositionType getDebtPositionTypeSecondaryOrg() {
     if(debtPositionType==null){
       debtPositionType = debtPositionTypeRepository.findById(DEBT_POSITION_TYPE_MIXED)
-        .orElseThrow(() -> new NotFoundException("Debt position type MIXED with id[" + DEBT_POSITION_TYPE_MIXED + "] not found"));
+        .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_NOT_FOUND] DebtPositionType with id " + DEBT_POSITION_TYPE_MIXED + " not found"));
       log.info("debt position type code MIXED: {}", debtPositionType.getCode());
     }
     return debtPositionType;

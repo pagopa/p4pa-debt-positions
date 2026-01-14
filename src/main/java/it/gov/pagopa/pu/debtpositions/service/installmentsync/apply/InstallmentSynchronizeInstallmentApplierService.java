@@ -38,15 +38,15 @@ public class InstallmentSynchronizeInstallmentApplierService {
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
     }
 
     if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
-      throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
+      throw new ConflictErrorException(String.format("[INVALID_INSTALLMENT] The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
     }
 
     if (installmentDTO.getTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
-      throw new ConflictErrorException(String.format("The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] The number of beneficiary for installment with iud %s cannot be modified", installmentDTO.getIud()));
     }
 
     updateTransferList(installmentDTO, installmentSynchronizeDTO);
@@ -59,7 +59,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.getTransfers()
       .forEach(transferDTO -> {
         if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null){
-          throw new ConflictErrorException(String.format("The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
+          throw new ConflictErrorException(String.format("[TRANSFER_NOT_FOUND] The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
         }
         mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()), installmentDTO.getIud());
       });
@@ -76,7 +76,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     checkImmutableField("category", transferDTO.getCategory(), transferSynchronizeDTO.getCategory(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
+      throw new ConflictErrorException(String.format("[IMMUTABLE_FIELD] These fields for transfer with index %s of installment with iud %s are not mutable: %s",
         transferDTO.getTransferIndex(), iud, modifiedFields));
     }
   }

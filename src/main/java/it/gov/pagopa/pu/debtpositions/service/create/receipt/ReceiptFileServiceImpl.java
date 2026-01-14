@@ -59,10 +59,10 @@ public class ReceiptFileServiceImpl implements ReceiptFileService{
     public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId) {
         ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, SecurityUtils.getCurrentUserExternalId(), organizationId, null);
         if(receiptDetail==null){
-          throw new NotFoundException("Receipt with ID "+receiptId+" not found");
+          throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");
         }
         Organization organization = organizationService.getOrganizationById(organizationId, SecurityUtils.getAccessToken())
-          .orElseThrow(() -> new NotFoundException("Organization with ID "+organizationId+" not found"));
+          .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
 
         byte[] receiptPdf;
         try {

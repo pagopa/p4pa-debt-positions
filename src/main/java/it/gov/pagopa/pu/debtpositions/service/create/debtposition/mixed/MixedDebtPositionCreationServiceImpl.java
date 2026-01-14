@@ -27,9 +27,9 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import jakarta.transaction.Transactional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -91,7 +91,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     Organization organization = organizationService.getOrganizationById(
         mixedDebtPositionDTO.getOrganizationId(), accessToken)
       .orElseThrow(() -> new NotFoundException(
-        "Organization with id: [%s] not found.".formatted(
+        "[ORGANIZATION_NOT_FOUND] Organization with id [%s] not found".formatted(
           mixedDebtPositionDTO.getOrganizationId())));
 
     checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
@@ -133,7 +133,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
           .ifPresent(workflowTypeOrg -> {
             throw new InvalidValueException(
-              "DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+              "[DEBT_POSITION_TYPE_ORG_RELATED_TO_CUSTOM_WORKFLOW] DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
                 dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
           });
       });
@@ -151,7 +151,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         mixedDebtPositionDTO.getOrganizationId(),
         iud, null, null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)) {
         throw new InvalidValueException(
-          "IUD: [%s] is not unique".formatted(iud));
+          "[INSTALLMENT_ALREADY_EXISTS] Installment with IUD [%s] already exists".formatted(iud));
       }
     }
   }

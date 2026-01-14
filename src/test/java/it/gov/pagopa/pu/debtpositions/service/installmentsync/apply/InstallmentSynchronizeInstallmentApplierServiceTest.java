@@ -69,7 +69,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("These fields for installment with iud iud are not mutable: [iuv, debtor: [fiscalCode]]", exception.getMessage());
+    assertEquals("[IMMUTABLE_FIELD] These fields for installment with iud iud are not mutable: [iuv, debtor: [fiscalCode]]", exception.getMessage());
   }
 
   @Test
@@ -80,7 +80,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("The number of beneficiary for installment with iud iud does not match with the size of the list", exception.getMessage());
+    assertEquals("[INVALID_INSTALLMENT] The number of beneficiary for installment with iud iud does not match with the size of the list", exception.getMessage());
   }
 
   @Test
@@ -91,7 +91,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("The number of beneficiary for installment with iud iud cannot be modified", exception.getMessage());
+    assertEquals("[IMMUTABLE_FIELD] The number of beneficiary for installment with iud iud cannot be modified", exception.getMessage());
   }
 
   @Test
@@ -105,7 +105,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("The transfer with index 1 for installment with iud iud does not found", exception.getMessage());
+    assertEquals("[TRANSFER_NOT_FOUND] The transfer with index 1 for installment with iud iud does not found", exception.getMessage());
   }
 
   @Test
@@ -120,7 +120,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("These fields for transfer with index 1 of installment with iud iud are not mutable: [orgFiscalCode, orgName, iban, category]", exception.getMessage());
+    assertEquals("[IMMUTABLE_FIELD] These fields for transfer with index 1 of installment with iud iud are not mutable: [orgFiscalCode, orgName, iban, category]", exception.getMessage());
   }
 
 }

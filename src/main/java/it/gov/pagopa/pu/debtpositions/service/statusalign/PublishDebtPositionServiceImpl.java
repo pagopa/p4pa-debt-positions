@@ -19,10 +19,10 @@ import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -49,7 +49,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!DRAFT.equals(debtPositionDTO.getStatus())) {
-      throw new ConflictErrorException(String.format("The debt position with id %s cannot be published because is not in an allowed status: %s"
+      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] The debt position with id %s cannot be published because is not in an allowed status: %s"
         ,debtPositionId, debtPositionDTO.getStatus()));
     }
 
@@ -67,7 +67,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException("The DebtPositionTypeOrg with id " + debtPositionDTO.getDebtPositionTypeOrgId() + " was not found"));
+      .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The DebtPositionTypeOrg with id " + debtPositionDTO.getDebtPositionTypeOrgId() + " was not found"));
 
     debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().forEach(installment -> {
