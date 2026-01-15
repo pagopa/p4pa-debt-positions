@@ -15,7 +15,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -48,14 +47,14 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     typeOrg.setDescription("TYPE_DESCRIPTION");
 
     Map<Long, DebtPositionTypeOrg> map = Map.of(10L, typeOrg);
-    String debtorFiscalCode = "debtorFiscalCode";
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
 
     Page<DebtPosition> page =
       new PageImpl<>(List.of(dp), PageRequest.of(0, 1), 1);
 
     // when
     PagedDebtorUnpaidDebtPositionDTO result =
-      mapper.map(page, map, debtorFiscalCode, dataCipherServiceMock);
+      mapper.map(page, map, hashedDebtorFiscalCode);
 
     // then
     assertNotNull(result);
@@ -76,7 +75,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
 
     // when
     PagedDebtorUnpaidDebtPositionDTO result =
-      mapper.map(emptyPage, Map.of(), null, dataCipherServiceMock);
+      mapper.map(emptyPage, Map.of(), null);
 
     // then
     assertNotNull(result);
@@ -104,9 +103,11 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
       2L, t2
     );
 
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
+
     // when
     List<DebtorDebtPositionDTO> result =
-      mapper.map(List.of(dp1, dp2), typeMap, "fc", dataCipherServiceMock);
+      mapper.map(List.of(dp1, dp2), typeMap, hashedDebtorFiscalCode);
 
     // then
     assertEquals(2, result.size());
@@ -121,11 +122,6 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     // given
     byte[] correctHash = {1, 2, 3};
     byte[] wrongHash = {9, 9, 9};
-
-    String debtorFiscalCode = "DEBTOR_FC";
-
-    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode))
-      .thenReturn(correctHash);
 
     InstallmentNoPII correctInstallment = InstallmentNoPII.builder()
       .status(InstallmentStatus.UNPAID)
@@ -160,7 +156,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
 
     // when
     PagedDebtorUnpaidDebtPositionDTO result =
-      mapper.map(page, Map.of(), debtorFiscalCode, dataCipherServiceMock);
+      mapper.map(page, Map.of(), correctHash);
 
     // then
     DebtorDebtPositionDTO dto = result.getContent().getFirst();
@@ -191,7 +187,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     Page<DebtPosition> page = new PageImpl<>(List.of(dp));
 
     // when
-    PagedDebtorUnpaidDebtPositionDTO result = mapper.map(page, null, null, dataCipherServiceMock);
+    PagedDebtorUnpaidDebtPositionDTO result = mapper.map(page, null, null);
 
     // then
     assertNotNull(result);
