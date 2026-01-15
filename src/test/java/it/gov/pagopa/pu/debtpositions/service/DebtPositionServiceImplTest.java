@@ -430,6 +430,7 @@ class DebtPositionServiceImplTest {
   void givenValidInputWhenGetPagedDebtorUnpaidDebtPositionThenReturnMappedResult() {
     // given
     String debtorFiscalCode = "debtorFiscalCode";
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
     List<Long> organizationIds = List.of(1L);
     Pageable pageable = Pageable.ofSize(10);
 
@@ -443,6 +444,8 @@ class DebtPositionServiceImplTest {
 
     PagedDebtorUnpaidDebtPositionDTO expected = podamFactory.manufacturePojo(PagedDebtorUnpaidDebtPositionDTO.class);
 
+    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
+
     Mockito.when(debtPositionRepositoryMock
         .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
@@ -451,7 +454,7 @@ class DebtPositionServiceImplTest {
       .thenReturn(Optional.of(typeOrg));
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(page, Map.of(100L, typeOrg)))
+        .map(page, Map.of(100L, typeOrg), hashedDebtorFiscalCode ))
       .thenReturn(expected);
 
     // when
@@ -468,6 +471,7 @@ class DebtPositionServiceImplTest {
   void givenEmptyPageWhenGetPagedDebtorUnpaidDebtPositionThenReturnMappedResultWithEmptyMap() {
     // given
     String debtorFiscalCode = "fiscal";
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
     List<Long> organizationIds = List.of(1L);
     Pageable pageable = Pageable.ofSize(5);
 
@@ -476,12 +480,14 @@ class DebtPositionServiceImplTest {
     PagedDebtorUnpaidDebtPositionDTO expected =
       podamFactory.manufacturePojo(PagedDebtorUnpaidDebtPositionDTO.class);
 
+    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
+
     Mockito.when(debtPositionRepositoryMock
         .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(emptyPage);
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(emptyPage, Collections.emptyMap()))
+        .map(emptyPage, Collections.emptyMap(), hashedDebtorFiscalCode))
       .thenReturn(expected);
 
     // when
@@ -526,17 +532,20 @@ class DebtPositionServiceImplTest {
   void givenParamsWhenGetPagedDebtorUnpaidDebtPositionThenVerifyRepositoryCall() {
     // given
     String debtorFiscalCode = "CODE";
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
     List<Long> organizationIds = List.of(10L, 20L);
     Pageable pageable = Pageable.ofSize(2);
 
     Page<DebtPosition> page = new PageImpl<>(List.of());
+
+    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
     Mockito.when(debtPositionRepositoryMock
         .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
-        .map(page, Collections.emptyMap()))
+        .map(page, Collections.emptyMap(), hashedDebtorFiscalCode))
       .thenReturn(new PagedDebtorUnpaidDebtPositionDTO());
 
     // when
