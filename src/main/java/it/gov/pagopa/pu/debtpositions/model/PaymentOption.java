@@ -17,7 +17,7 @@ import java.util.SortedSet;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-@Builder
+@Builder(toBuilder = true)
 @EqualsAndHashCode(of = {"paymentOptionId", "paymentOptionIndex"}, callSuper = false)
 public class PaymentOption extends BaseEntity implements BasePaymentOption, Serializable, Comparable<PaymentOption> {
 
