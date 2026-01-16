@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.formatCategoryTransferFromTaxonomyCode;
 
 @Service
 @Slf4j
@@ -82,8 +81,6 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       log.error("The taxonomy category code [{}] does not meet the required length or format", taxonomyCategory);
       return false;
     }
-
-    formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryPrefix, categorySuffix);
     return true;
   }
 }
