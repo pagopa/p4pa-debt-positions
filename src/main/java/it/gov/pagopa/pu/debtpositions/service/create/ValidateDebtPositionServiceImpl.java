@@ -34,17 +34,23 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final BalanceService balanceService;
   private final boolean isOrgPIvaCheckEnabled;
   private final OrganizationService organizationService;
+  private final String categoryPrefix;
+  private final String categorySuffix;
 
   public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
                                          OrganizationService organizationService,
-                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
+                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled,
+                                         @Value("${category.prefix}") String categoryPrefix,
+                                         @Value("${category.suffix}") String categorySuffix) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
     this.organizationService = organizationService;
+    this.categoryPrefix = categoryPrefix;
+    this.categorySuffix = categorySuffix;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -251,6 +257,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
         throw new InvalidValueException("[INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
+      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryPrefix, categorySuffix));
     }
   }
 }

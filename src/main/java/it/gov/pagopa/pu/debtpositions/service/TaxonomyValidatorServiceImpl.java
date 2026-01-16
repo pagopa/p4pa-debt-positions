@@ -3,12 +3,14 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
 
 @Service
 @Slf4j
@@ -16,10 +18,17 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   private final TaxonomyService taxonomyService;
   private final OrganizationService organizationService;
+  private final String categoryPrefix;
+  private final String categorySuffix;
 
-  public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService, OrganizationService organizationService) {
+  public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService,
+                                      OrganizationService organizationService,
+                                      @Value("${category.prefix}") String categoryPrefix,
+                                      @Value("${category.suffix}") String categorySuffix) {
     this.taxonomyService = taxonomyService;
     this.organizationService = organizationService;
+    this.categoryPrefix = categoryPrefix;
+    this.categorySuffix = categorySuffix;
   }
 
   public boolean validateTaxonomyCategory(String taxonomyCategory, String orgFiscalCode) {
@@ -34,16 +43,15 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
   }
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
-      if(!taxonomyCode.startsWith("9/") || !taxonomyCode.endsWith("/")) {
+      if(!taxonomyCode.startsWith(categoryPrefix) || !taxonomyCode.endsWith(categorySuffix)) {
         log.error("The taxonomy code [{}] does not meet the required format", taxonomyCode);
         return false;
       }
-      String taxonomyCategory = Utilities.taxonomyCodeToTransferCategory(taxonomyCode);
-      return isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode);
+      return isTaxonomyCategoryValid(taxonomyCode, orgTypeCode);
   }
 
   public boolean isTaxonomyCategoryValid(String taxonomyCategory, String orgTypeCode) {
-    String formattedTaxonomyCategory = getTaxonomyCategory(taxonomyCategory);
+    String formattedTaxonomyCategory = getTaxonomyCodeFromCategory(taxonomyCategory, categoryPrefix, categorySuffix);
 
     try {
       String organizationType = formattedTaxonomyCategory.substring(0, 2);
@@ -75,12 +83,4 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
     }
     return true;
   }
-
-  private String getTaxonomyCategory(String taxonomyCategory) {
-    boolean isTaxonomyCodeFormat = taxonomyCategory.startsWith("9/") && taxonomyCategory.endsWith("/");
-    return isTaxonomyCodeFormat ?
-      Utilities.taxonomyCodeToTransferCategory(taxonomyCategory)
-      : taxonomyCategory;
-  }
-
 }

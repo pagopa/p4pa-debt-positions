@@ -5,12 +5,12 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 
 @Slf4j
 @Service
@@ -18,10 +18,17 @@ public class CategoryResolverService {
 
   private final TaxonomyValidatorService taxonomyValidatorService;
   private final DebtPositionTypeRepository debtPositionTypeRepository;
+  private final String categoryPrefix;
+  private final String categorySuffix;
 
-  public CategoryResolverService(DebtPositionTypeRepository debtPositionTypeRepository, TaxonomyValidatorService taxonomyValidatorService) {
+  public CategoryResolverService(DebtPositionTypeRepository debtPositionTypeRepository,
+                                 TaxonomyValidatorService taxonomyValidatorService,
+                                 @Value("${category.prefix}") String categoryPrefix,
+                                 @Value("${category.suffix}") String categorySuffix) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionTypeRepository = debtPositionTypeRepository;
+    this.categoryPrefix = categoryPrefix;
+    this.categorySuffix = categorySuffix;
   }
 
   public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId, String orgTypeCode) {
@@ -46,7 +53,7 @@ public class CategoryResolverService {
       taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
     }
 
-    return taxonomyCodeToTransferCategory(taxonomyCode);
+    return getTaxonomyCodeFromCategory(taxonomyCode, categoryPrefix, categorySuffix);
   }
 
   private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {

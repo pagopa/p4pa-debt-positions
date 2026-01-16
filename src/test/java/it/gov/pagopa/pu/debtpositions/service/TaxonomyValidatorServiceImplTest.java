@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -34,13 +33,14 @@ class TaxonomyValidatorServiceImplTest {
   private TaxonomyService taxonomyServiceMock;
   @Mock
   private OrganizationService organizationServiceMock;
-  @InjectMocks
-  private TaxonomyValidatorServiceImpl service;
+
+  private TaxonomyValidatorService service;
 
   private final String accessToken = "ACCESSTOKEN";
 
   @BeforeEach
   void init() {
+    service = new TaxonomyValidatorServiceImpl(taxonomyServiceMock, organizationServiceMock, "9/", "/");
     SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
   }
 

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.MDC;
@@ -263,4 +264,42 @@ public class UtilitiesTest {
       Arguments.of(657893L,"6.578,93\u00A0€")
     );
   }
+
+  @ParameterizedTest
+  @CsvSource({
+    "'9/12345678/', '12345678'",
+    "'12345678', '12345678'",
+    "'9/12345678', '9/12345678'",
+    "'12345678/', '12345678/'",
+    "'9/12345678/', '12345678'",
+    "'12345678', '12345678'",
+    "'9//', ''",
+    "'', ''"
+  })
+  void testGetTaxonomyCodeFromCategory(String input, String expected) {
+    String result = Utilities.getTaxonomyCodeFromCategory(input, "9/", "/");
+    assertEquals(expected, result);
+  }
+
+  @ParameterizedTest
+  @MethodSource("provideTaxonomyCodeFormattingCases")
+  void testFormatCategoryTransferFromTaxonomyCode(String input, String expected) {
+    String result = Utilities.formatCategoryTransferFromTaxonomyCode(input, "9/", "/");
+    assertEquals(expected, result);
+  }
+
+  private static Stream<Arguments> provideTaxonomyCodeFormattingCases() {
+    return Stream.of(
+      Arguments.of("12345678", "9/12345678/"),
+      Arguments.of("9/12345678/", "9/12345678/"),
+      Arguments.of("9/12345678", "9/12345678/"),
+      Arguments.of("12345678/", "9/12345678/"),
+      Arguments.of("12345678", "9/12345678/"),
+      Arguments.of("9/12345678/", "9/12345678/"),
+      Arguments.of("", "9//"),
+      Arguments.of("9/", "9//"),
+      Arguments.of("/", "9//")
+    );
+  }
+
 }
