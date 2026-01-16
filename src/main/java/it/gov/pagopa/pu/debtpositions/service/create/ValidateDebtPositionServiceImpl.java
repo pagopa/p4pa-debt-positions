@@ -247,9 +247,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException("[MISSING_TAXONOMY_CATEGORY] Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
-      if(!taxonomyValidatorService.isTaxonomyCategoryValid(transferDTO.getCategory(), orgTypeCode)) {
+      String taxonomyCategory = transferDTO.getCategory();
+      boolean isTaxonomyCategoryValid = taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode);
+      if(!isTaxonomyCategoryValid) {
         throw new InvalidValueException("[INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
+      transferDTO.setCategory(taxonomyCategory);
     }
   }
 }
