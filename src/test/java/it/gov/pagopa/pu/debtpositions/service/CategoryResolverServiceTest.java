@@ -30,7 +30,7 @@ class CategoryResolverServiceTest {
 
   @BeforeEach
   void setUp() {
-    categoryResolverService = new CategoryResolverService(debtPositionTypeRepositoryMock, taxonomyValidatorServiceMock);
+    categoryResolverService = new CategoryResolverService(debtPositionTypeRepositoryMock, taxonomyValidatorServiceMock, "9/", "/");
   }
 
   @Test

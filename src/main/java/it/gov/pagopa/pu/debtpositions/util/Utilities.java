@@ -61,7 +61,7 @@ public class Utilities {
       if (pi.charAt(i) < '0' || pi.charAt(i) > '9')
         return false;
     }
-    if(isOrgPIvaCheckEnabled) {
+    if (isOrgPIvaCheckEnabled) {
       s = 0;
       for (i = 0; i <= 9; i += 2)
         s += pi.charAt(i) - '0';
@@ -76,12 +76,12 @@ public class Utilities {
     return true;
   }
 
-  public static boolean isValidFiscalCode(String fiscalCode){
+  public static boolean isValidFiscalCode(String fiscalCode) {
     Matcher matcher = FISCAL_CODE_STRUCTURE_REGEX.matcher(fiscalCode.toUpperCase());
     return matcher.matches();
   }
 
-  public static boolean isValidFiscalCodeOrPIVA(String fiscalCode, boolean isOrgPIvaCheckEnabled){
+  public static boolean isValidFiscalCodeOrPIVA(String fiscalCode, boolean isOrgPIvaCheckEnabled) {
     return isValidFiscalCode(fiscalCode) || isValidPIVA(fiscalCode, isOrgPIvaCheckEnabled);
   }
 
@@ -102,24 +102,24 @@ public class Utilities {
     );
   }
 
-  public static <T> void checkImmutableField(String fieldName, T original, T updated, List<String> modifiedFields){
+  public static <T> void checkImmutableField(String fieldName, T original, T updated, List<String> modifiedFields) {
     @SuppressWarnings("unchecked") // suppressing: same type due to same Generic type
     boolean fieldUpdated =
       (original instanceof OffsetDateTime o1 && updated instanceof OffsetDateTime o2)
-      ? o1.toEpochSecond() != o2.toEpochSecond()
-      : (original instanceof @SuppressWarnings("rawtypes")Comparable c1 && updated instanceof Comparable<?> c2)
-      ? c1.compareTo(c2) != 0
-      : !Objects.equals(original, updated);
-    if(fieldUpdated){
+        ? o1.toEpochSecond() != o2.toEpochSecond()
+        : (original instanceof @SuppressWarnings("rawtypes")Comparable c1 && updated instanceof Comparable<?> c2)
+        ? c1.compareTo(c2) != 0
+        : !Objects.equals(original, updated);
+    if (fieldUpdated) {
       modifiedFields.add(fieldName);
     }
   }
 
-  public static boolean isValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, long maxInterval){
+  public static boolean isValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, long maxInterval) {
     return chronoUnit.between(dateFrom, dateTo) <= maxInterval;
   }
 
-  public static String getTraceId(){
+  public static String getTraceId() {
     return MDC.get("traceId");
   }
 
@@ -131,12 +131,27 @@ public class Utilities {
     return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
   }
 
-  public static String taxonomyCodeToTransferCategory(String taxonomyCode){
-    return taxonomyCode.replace("9/", "").replace("/", "");
+  public static String getTaxonomyCodeFromCategory(String category, String prefix, String suffix) {
+    boolean isTaxonomyCodeFormat = category.startsWith(prefix) && category.endsWith(suffix);
+    return isTaxonomyCodeFormat ?
+      category.replace(prefix, "").replace(suffix, "")
+      : category;
+  }
+
+  public static String formatCategoryTransferFromTaxonomyCode(String taxonomyCode, String prefix, String suffix){
+    String cleaned = taxonomyCode;
+    if (cleaned.startsWith(prefix)) {
+      cleaned = cleaned.substring(prefix.length());
+    }
+    if (cleaned.endsWith(suffix)) {
+      cleaned = cleaned.substring(0, cleaned.length() - suffix.length());
+    }
+
+    return prefix + cleaned + suffix;
   }
 
   public static String formatPrice(Long priceInCents) {
-    if (priceInCents == null){
+    if (priceInCents == null) {
       return "";
     }
     double price = priceInCents / 100.0;
