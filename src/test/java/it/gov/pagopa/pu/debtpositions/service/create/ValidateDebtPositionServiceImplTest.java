@@ -320,7 +320,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("[INVALID_PERSONAL_DATA] Beneficiary name is mandatory", invalidValueException.getMessage());
+    assertEquals("[INVALID_FULLNAME] Beneficiary name is mandatory", invalidValueException.getMessage());
   }
 
   @Test
@@ -337,7 +337,7 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
-    assertEquals("[INVALID_PERSONAL_DATA] Email is not valid", invalidValueException.getMessage());
+    assertEquals("[INVALID_EMAIL] Email is not valid", invalidValueException.getMessage());
   }
 
   @Test

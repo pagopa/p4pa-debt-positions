@@ -180,10 +180,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       }
     }
     if (StringUtils.isBlank(personDTO.getFullName())) {
-      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Beneficiary name is mandatory");
+      throw new InvalidValueException("[INVALID_FULLNAME] Beneficiary name is mandatory");
     }
     if (StringUtils.isNotBlank(personDTO.getEmail()) && !Utilities.isValidEmail(personDTO.getEmail())) {
-      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Email is not valid");
+      throw new InvalidValueException("[INVALID_EMAIL] Email is not valid");
     }
   }
 
