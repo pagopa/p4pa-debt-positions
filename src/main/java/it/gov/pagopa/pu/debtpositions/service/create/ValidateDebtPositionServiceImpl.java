@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
@@ -71,6 +72,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (CollectionUtils.isEmpty(debtPositionDTO.getPaymentOptions())) {
       throw new InvalidValueException("[MISSING_PAYMENT_OPTION] Debt position payment options is mandatory");
     }
+    PersonDTO dpReferenceDebtor = null;
 
     Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
@@ -80,10 +82,30 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (CollectionUtils.isEmpty(paymentOptionDTO.getInstallments())) {
         throw new InvalidValueException("[MISSING_INSTALLMENT] At least one installment of the debt position is mandatory");
       }
+
+      PersonDTO poReferenceDebtor = null;
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
+        PersonDTO currentDebtor = installmentDTO.getDebtor();
+        if (poReferenceDebtor == null) {
+          poReferenceDebtor = currentDebtor;
+        } else if (!isSameDebtor(poReferenceDebtor, currentDebtor)) {
+          throw new InvalidValueException("[DIFFERENT_DEBTORS_IN_SAME_PO] All installments in a PaymentOption must have the same debtor. PO Index: " + paymentOptionDTO.getPaymentOptionIndex());
+        }
+        if (Boolean.FALSE.equals(debtPositionDTO.getMultiDebtor())) {
+          if (dpReferenceDebtor == null) {
+            dpReferenceDebtor = currentDebtor;
+          } else if (!isSameDebtor(dpReferenceDebtor, currentDebtor)) {
+            throw new InvalidValueException("[MULTIDEBTOR_DISABLED] Different debtors found but multiDebtor flag is False for this Debt Position");
+          }
+        }
         validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
       }
     }
+  }
+
+  private boolean isSameDebtor(PersonDTO d1, PersonDTO d2) {
+    if (d1 == null || d2 == null) return d1 == d2;
+    return Objects.equals(d1.getFiscalCode(), d2.getFiscalCode());
   }
 
   private void validateDebtPositionOrigin(DebtPositionDTO debtPositionDTO) {

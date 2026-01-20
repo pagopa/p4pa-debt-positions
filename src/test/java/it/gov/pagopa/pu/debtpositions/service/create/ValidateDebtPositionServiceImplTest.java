@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,6 +33,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @ExtendWith(MockitoExtension.class)
 class ValidateDebtPositionServiceImplTest {
@@ -764,6 +767,71 @@ class ValidateDebtPositionServiceImplTest {
 
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
     assertEquals(errorMessage, invalidValueException.getMessage());
+  }
+
+  @Test
+  void givenDifferentDebtorsInSamePOThenThrowInvalidValueException() {
+    // Given
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    // Creiamo una PO con 2 rate aventi debitori diversi
+    PaymentOptionDTO po = PaymentOptionFaker.buildPaymentOptionDTO();
+    po.setPaymentOptionIndex(1);
+
+    InstallmentDTO inst1 = InstallmentFaker.buildInstallmentDTO();
+    inst1.getDebtor().setFiscalCode("AAAAAA00A00A000A");
+
+    InstallmentDTO inst2 = InstallmentFaker.buildInstallmentDTO();
+    inst2.getDebtor().setFiscalCode("BBBBBB11B11B111B");
+
+    po.setInstallments(List.of(inst1, inst2));
+    debtPositionDTO.setPaymentOptions(List.of(po));
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(anyString(), anyLong())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(anyString(), anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
+    // When & Then
+    InvalidValueException exception = assertThrows(InvalidValueException.class,
+      () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+
+    assertTrue(exception.getMessage().contains("[DIFFERENT_DEBTORS_IN_SAME_PO]"));
+    assertEquals("[DIFFERENT_DEBTORS_IN_SAME_PO] All installments in a PaymentOption must have the same debtor. PO Index: 1", exception.getMessage());
+  }
+
+  @Test
+  void givenMultiDebtorFalseWithDifferentDebtorsAcrossPOsThenThrowInvalidValueException() {
+    // Given
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setMultiDebtor(false); // Vincolo attivato
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    // PO 1 con Debitore A
+    PaymentOptionDTO po1 = PaymentOptionFaker.buildPaymentOptionDTO();
+    po1.setPaymentOptionIndex(1);
+    po1.getInstallments().get(0).getDebtor().setFiscalCode("AAAAAA00A00A000A");
+
+    // PO 2 con Debitore B
+    PaymentOptionDTO po2 = PaymentOptionFaker.buildPaymentOptionDTO();
+    po2.setPaymentOptionIndex(2);
+    po2.getInstallments().get(0).getDebtor().setFiscalCode("BBBBBB11B11B111B");
+
+    debtPositionDTO.setPaymentOptions(List.of(po1, po2));
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(anyString(), anyLong())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(anyString(), anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
+    // When & Then
+    InvalidValueException exception = assertThrows(InvalidValueException.class,
+      () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+
+    assertEquals("[MULTIDEBTOR_DISABLED] Different debtors found but multiDebtor flag is False for this Debt Position", exception.getMessage());
   }
 }
 
