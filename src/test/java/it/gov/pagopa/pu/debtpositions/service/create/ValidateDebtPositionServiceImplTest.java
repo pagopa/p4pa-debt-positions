@@ -776,7 +776,6 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
 
-    // Creiamo una PO con 2 rate aventi debitori diversi
     PaymentOptionDTO po = PaymentOptionFaker.buildPaymentOptionDTO();
     po.setPaymentOptionIndex(1);
 
@@ -806,16 +805,14 @@ class ValidateDebtPositionServiceImplTest {
   void givenMultiDebtorFalseWithDifferentDebtorsAcrossPOsThenThrowInvalidValueException() {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setMultiDebtor(false); // Vincolo attivato
+    debtPositionDTO.setMultiDebtor(false);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
 
-    // PO 1 con Debitore A
     PaymentOptionDTO po1 = PaymentOptionFaker.buildPaymentOptionDTO();
     po1.setPaymentOptionIndex(1);
     po1.getInstallments().get(0).getDebtor().setFiscalCode("AAAAAA00A00A000A");
 
-    // PO 2 con Debitore B
     PaymentOptionDTO po2 = PaymentOptionFaker.buildPaymentOptionDTO();
     po2.setPaymentOptionIndex(2);
     po2.getInstallments().get(0).getDebtor().setFiscalCode("BBBBBB11B11B111B");
@@ -838,7 +835,7 @@ class ValidateDebtPositionServiceImplTest {
   void givenValidDebtPositionWithSameDebtorAcrossAllInstallmentsThenSuccess() {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setMultiDebtor(false);
+    debtPositionDTO.setMultiDebtor(true);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
     String commonFiscalCode = "RSSMRA80A01H501U";
