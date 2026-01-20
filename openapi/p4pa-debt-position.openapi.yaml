@@ -1987,6 +1987,8 @@ components:
           type: string
         updateTraceId:
           type: string
+        originalRemittanceInformation:
+          type: string
         noPII:
           x-field-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnore @io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
           x-setter-extra-annotation: "@io.swagger.v3.oas.annotations.media.Schema(hidden = true)"
@@ -2228,6 +2230,8 @@ components:
         notificationFeeCents:
           type: integer
           format: int64
+        originalRemittanceInformation:
+          type: string
     ReceiptDetailDTO:
       type: object
       required:
@@ -2276,6 +2280,8 @@ components:
           type: 'ReceiptOrigin'
         debtPositionOrigin:
           type: 'DebtPositionOrigin'
+        originalRemittanceInformation:
+          type: string
     ReceiptTransferDTO:
       required:
         - idTransfer
