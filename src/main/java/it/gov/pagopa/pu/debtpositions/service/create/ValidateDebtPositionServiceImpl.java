@@ -104,7 +104,6 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   }
 
   private boolean isSameDebtor(PersonDTO d1, PersonDTO d2) {
-    if (d1 == null || d2 == null) return d1 == d2;
     return Objects.equals(d1.getFiscalCode(), d2.getFiscalCode());
   }
 
