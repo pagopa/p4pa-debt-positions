@@ -832,30 +832,30 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenValidDebtPositionWithSameDebtorAcrossAllInstallmentsThenSuccess() {
+  void givenMultiDebtorFalseAndSameDebtorAcrossDifferentPOsThenSuccess() {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setMultiDebtor(true);
+    debtPositionDTO.setMultiDebtor(false);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
+
     String commonFiscalCode = "RSSMRA80A01H501U";
 
     PaymentOptionDTO po1 = PaymentOptionFaker.buildPaymentOptionDTO();
     po1.setPaymentOptionIndex(1);
+    po1.getInstallments().get(0).getDebtor().setFiscalCode(commonFiscalCode);
 
-    InstallmentDTO inst1 = InstallmentFaker.buildInstallmentDTO();
-    inst1.getDebtor().setFiscalCode(commonFiscalCode);
+    PaymentOptionDTO po2 = PaymentOptionFaker.buildPaymentOptionDTO();
+    po2.setPaymentOptionIndex(2);
+    po2.getInstallments().get(0).getDebtor().setFiscalCode(commonFiscalCode);
 
-    InstallmentDTO inst2 = InstallmentFaker.buildInstallmentDTO();
-    inst2.getDebtor().setFiscalCode(commonFiscalCode);
-
-    po1.setInstallments(List.of(inst1, inst2));
-    debtPositionDTO.setPaymentOptions(List.of(po1));
+    debtPositionDTO.setPaymentOptions(List.of(po1, po2));
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(anyString(), anyLong())).thenReturn(null);
     Mockito.when(balanceServiceMock.isValidBalance(anyString(), anyString())).thenReturn(Boolean.TRUE);
     Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
     Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
 
     // When & Then
     assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
