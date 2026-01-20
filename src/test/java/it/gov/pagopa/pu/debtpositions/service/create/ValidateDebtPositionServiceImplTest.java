@@ -835,7 +835,7 @@ class ValidateDebtPositionServiceImplTest {
   void givenMultiDebtorFalseAndSameDebtorAcrossDifferentPOsThenSuccess() {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setMultiDebtor(false);
+    debtPositionDTO.setMultiDebtor(true);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
 
