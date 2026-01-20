@@ -12,5 +12,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class InstallmentPIIDTO implements PIIDTO {
     private PersonDTO debtor;
-    private String originalRemittangeInformation;
+    private String originalRemittanceInformation;
 }

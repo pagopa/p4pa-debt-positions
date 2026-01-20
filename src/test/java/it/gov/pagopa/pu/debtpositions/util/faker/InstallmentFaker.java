@@ -69,7 +69,7 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
-      .originalRemittangeInformation("originalRemittanceInformation")
+      .originalRemittanceInformation("originalRemittanceInformation")
       .build();
   }
 

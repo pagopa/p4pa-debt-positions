@@ -34,7 +34,7 @@ public class ReceiptDetailPIIViewMapper {
       .debtor(pii.getDebtor())
       .receiptOrigin(receiptDetailNoPIIView.getReceiptOrigin())
       .debtPositionOrigin(receiptDetailNoPIIView.getDebtPositionOrigin())
-      .originalRemittanceInformation(pii.getOriginalRemittangeInformation())
+      .originalRemittanceInformation(pii.getOriginalRemittanceInformation())
       .build();
   }
 }

@@ -96,7 +96,7 @@ class InstallmentPIIMapperTest {
     //then
     TestUtils.checkNotNullFields(result);
     TestUtils.checkNotNullFields(result.getSyncStatus());
-    assertEquals(installmentPIIDTO.getOriginalRemittangeInformation(),result.getOriginalRemittanceInformation());
+    assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(),result.getOriginalRemittanceInformation());
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
   }
   //endregion
