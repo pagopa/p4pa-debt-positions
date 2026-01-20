@@ -42,6 +42,7 @@ public class InstallmentDetailPIIViewMapper {
       .iun(installmentDetailNoPIIView.getIun())
       .notificationDate(installmentDetailNoPIIView.getNotificationDate())
       .notificationFeeCents(installmentDetailNoPIIView.getNotificationFeeCents())
+      .originalRemittanceInformation(installmentPii.getOriginalRemittangeInformation())
       .build();
   }
 

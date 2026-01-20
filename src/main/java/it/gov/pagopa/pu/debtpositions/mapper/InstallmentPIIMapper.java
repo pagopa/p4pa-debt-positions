@@ -73,6 +73,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
   protected InstallmentPIIDTO extractPiiDto(InstallmentDTO fullDTO) {
     return InstallmentPIIDTO.builder()
       .debtor(fullDTO.getDebtor())
+      .originalRemittangeInformation(fullDTO.getOriginalRemittanceInformation())
       .build();
   }
 
@@ -113,6 +114,7 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
       .transfers(Optional.ofNullable(noPii.getTransfers())
         .map(ts -> ts.stream().map(transferMapper::mapToDto).toList())
         .orElse(List.of()))
+      .originalRemittanceInformation(pii.getOriginalRemittangeInformation())
       .noPII(noPii)
       .build();
   }
