@@ -840,5 +840,54 @@ class ValidateDebtPositionServiceImplTest {
 
     assertEquals("[MULTIDEBTOR_DISABLED] Different debtors found but multiDebtor flag is False for this Debt Position", ex.getMessage());
   }
+
+  @Test
+  void givenSameDebtorInMultipleInstallmentsWhenValidateThenSuccess() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setMultiDebtor(false);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    String commonCf = "RSSMRA80A01H501U";
+    PaymentOptionDTO po = debtPositionDTO.getPaymentOptions().getFirst();
+    po.getInstallments().getFirst().getDebtor().setFiscalCode(commonCf);
+
+    InstallmentDTO inst2 = InstallmentFaker.buildInstallmentDTO();
+    inst2.getDebtor().setFiscalCode(commonCf);
+    po.setInstallments(List.of(po.getInstallments().getFirst(), inst2));
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+
+    assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+  }
+
+  @Test
+  void givenMultiDebtorTrueWhenValidateThenSuccess() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setMultiDebtor(true);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
+    Mockito.when(balanceServiceMock.isValidBalance(Mockito.anyString(), Mockito.anyString())).thenReturn(Boolean.TRUE);
+    Mockito.when(organizationService.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid(Mockito.anyString(), Mockito.anyString())).thenReturn(true);
+
+    assertDoesNotThrow(() -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+  }
+
+  @Test
+  void givenNullDebtorWhenIsDifferentDebtorThenReturnCorrectBoolean() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDebtor(null);
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
+    assertThrows(Exception.class, () -> service.validate(debtPositionDTO, accessToken, debtPositionTypeOrg));
+  }
 }
 
