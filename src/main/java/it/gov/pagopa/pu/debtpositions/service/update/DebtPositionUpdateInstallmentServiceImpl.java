@@ -57,6 +57,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
+    validateDebtPositionService.validateDebtorConsistency(debtPositionDTO);
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
     log.debug("Updating status for installments with ids {}", installmentIds);
 

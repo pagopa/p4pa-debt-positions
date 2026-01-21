@@ -29,4 +29,10 @@ public interface ValidateDebtPositionService {
    * @throws InvalidValueException if a value does not comply with business rules
    */
     void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment);
+
+    /**
+     * Validates if exists difference debtor into same PaymentOption or if multiDebtor is disabled
+     * @param debtPositionDTO representing the debt position to be validated
+     */
+    void validateDebtorConsistency(DebtPositionDTO debtPositionDTO);
 }
