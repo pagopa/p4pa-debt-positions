@@ -24,7 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.taxonomyCodeToTransferCategory;
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
@@ -106,7 +106,7 @@ class MixedDebtPositionMapperTest {
 
     try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
       utilities.when(Utilities::getRandomIUD).thenReturn(iud);
-      utilities.when(() -> taxonomyCodeToTransferCategory("9/01234567/")).thenReturn(category);
+      utilities.when(() -> getTaxonomyCodeFromCategory("9/01234567/", "9/", "/")).thenReturn(category);
 
       when(
         mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(

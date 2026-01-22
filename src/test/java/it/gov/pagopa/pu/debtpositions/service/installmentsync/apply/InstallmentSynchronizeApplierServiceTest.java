@@ -216,7 +216,7 @@ class InstallmentSynchronizeApplierServiceTest {
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
       installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
         paymentOptionDTO, installmentDTO, accessToken));
-    assertEquals(String.format("[INVALID_DEBT_POSITION_TYPE_CODE] The debt position type code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
+    assertEquals(String.format("[INVALID_DEBT_POSITION_TYPE_ORG_CODE] The debt position type org with code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
       invalidValueException.getMessage());
   }
 

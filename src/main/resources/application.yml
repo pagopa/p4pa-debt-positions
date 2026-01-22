@@ -184,6 +184,10 @@ rest:
 iuv:
   informationSystemId: "00"
 
+category:
+  prefix: "9/"
+  suffix: "/"
+
 data-export:
   default:
     max-total-elements: "\${DATA_EXPORT_MAX_TOTAL_ELEMENTS: 100000}"

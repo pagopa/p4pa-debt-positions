@@ -1,12 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.util.faker;
 
-import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
-import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildMixedTransferList;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildSyncTransferDTO;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransfer;
-import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.buildTransferDTO;
-
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -14,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -21,6 +15,10 @@ import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
+
+import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSyncStatusFaker.buildInstallmentSyncStatus;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
+import static it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker.*;
 
 public class InstallmentFaker {
 
@@ -71,6 +69,7 @@ public class InstallmentFaker {
   public static InstallmentPIIDTO buildInstallmentPIIDTO(){
     return InstallmentPIIDTO.builder()
       .debtor(buildPerson())
+      .originalRemittanceInformation("originalRemittanceInformation")
       .build();
   }
 
@@ -107,6 +106,7 @@ public class InstallmentFaker {
       .updateDate(DATETIME)
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .updateTraceId("TRACEID")
+      .originalRemittanceInformation("originalRemittanceInformation")
       .build();
   }
 

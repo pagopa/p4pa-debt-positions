@@ -45,6 +45,7 @@ class InstallmentDetailPIIViewMapperTest {
     Assertions.assertNotNull(response);
     TestUtils.reflectionEqualsByName(installmentDetailNoPIIView, response);
     TestUtils.checkNotNullFields(response);
+    Assertions.assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(),response.getOriginalRemittanceInformation());
   }
 
   @Test
@@ -63,5 +64,6 @@ class InstallmentDetailPIIViewMapperTest {
     Assertions.assertNotNull(response);
     TestUtils.reflectionEqualsByName(installmentDetailNoPIIView, response);
     TestUtils.checkNotNullFields(response, "payer");
+    Assertions.assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(),response.getOriginalRemittanceInformation());
   }
 }

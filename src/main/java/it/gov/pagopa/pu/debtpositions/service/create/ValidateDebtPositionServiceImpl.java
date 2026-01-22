@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
@@ -34,17 +35,23 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final BalanceService balanceService;
   private final boolean isOrgPIvaCheckEnabled;
   private final OrganizationService organizationService;
+  private final String categoryPrefix;
+  private final String categorySuffix;
 
   public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
                                          OrganizationService organizationService,
-                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
+                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled,
+                                         @Value("${category.prefix}") String categoryPrefix,
+                                         @Value("${category.suffix}") String categorySuffix) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
     this.organizationService = organizationService;
+    this.categoryPrefix = categoryPrefix;
+    this.categorySuffix = categorySuffix;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -66,6 +73,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("[MISSING_PAYMENT_OPTION] Debt position payment options is mandatory");
     }
 
+    validateDebtorConsistency(debtPositionDTO);
+
     Set<Integer> poIndexes = HashSet.newHashSet(debtPositionDTO.getPaymentOptions().size());
     for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
       if (!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())) {
@@ -74,10 +83,41 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (CollectionUtils.isEmpty(paymentOptionDTO.getInstallments())) {
         throw new InvalidValueException("[MISSING_INSTALLMENT] At least one installment of the debt position is mandatory");
       }
+
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
         validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
       }
     }
+  }
+
+  public void validateDebtorConsistency(DebtPositionDTO debtPositionDTO) {
+    PersonDTO dpReferenceDebtor = null;
+    boolean isMultiDebtorFalse = Boolean.FALSE.equals(debtPositionDTO.getMultiDebtor());
+
+    for (PaymentOptionDTO paymentOptionDTO : debtPositionDTO.getPaymentOptions()) {
+      PersonDTO poReferenceDebtor = null;
+
+      for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
+        PersonDTO currentDebtor = installmentDTO.getDebtor();
+        if (poReferenceDebtor == null) {
+          poReferenceDebtor = currentDebtor;
+        } else if (isDifferentDebtor(poReferenceDebtor, currentDebtor)) {
+          throw new InvalidValueException("[DIFFERENT_DEBTORS_IN_SAME_PO] All installments in a PaymentOption must have the same debtor. PO Index: " + paymentOptionDTO.getPaymentOptionIndex());
+        }
+        if (isMultiDebtorFalse) {
+          if (dpReferenceDebtor == null) {
+            dpReferenceDebtor = currentDebtor;
+          } else if (isDifferentDebtor(dpReferenceDebtor, currentDebtor)) {
+            throw new InvalidValueException("[MULTIDEBTOR_DISABLED] Different debtors found but multiDebtor flag is False for this Debt Position");
+          }
+        }
+      }
+    }
+  }
+
+  private boolean isDifferentDebtor(PersonDTO d1, PersonDTO d2) {
+    if (d1 == null || d2 == null) return d1 != d2;
+    return !Objects.equals(d1.getFiscalCode(), d2.getFiscalCode());
   }
 
   private void validateDebtPositionOrigin(DebtPositionDTO debtPositionDTO) {
@@ -180,10 +220,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       }
     }
     if (StringUtils.isBlank(personDTO.getFullName())) {
-      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Beneficiary name is mandatory");
+      throw new InvalidValueException("[INVALID_FULLNAME] Beneficiary name is mandatory");
     }
     if (StringUtils.isNotBlank(personDTO.getEmail()) && !Utilities.isValidEmail(personDTO.getEmail())) {
-      throw new InvalidValueException("[INVALID_PERSONAL_DATA] Email is not valid");
+      throw new InvalidValueException("[INVALID_EMAIL] Email is not valid");
     }
   }
 
@@ -251,6 +291,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
         throw new InvalidValueException("[INVALID_TAXONOMY_CATEGORY] Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
+      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryPrefix, categorySuffix));
     }
   }
 }

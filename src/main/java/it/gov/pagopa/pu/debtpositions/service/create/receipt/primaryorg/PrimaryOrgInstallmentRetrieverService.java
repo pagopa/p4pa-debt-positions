@@ -58,8 +58,8 @@ public class PrimaryOrgInstallmentRetrieverService {
     }
     InstallmentNoPII installment = installments.getFirst();
     if(!nav.equals(installment.getNav())){
-      throw new ConflictErrorException("[INVALID_INSTALLMENT] The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
-        " expected" + nav + " but found " + installment.getNav()
+      throw new ConflictErrorException("[INVALID_INSTALLMENT_NAV_MISMATCH] The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
+        " expected " + nav + " but found " + installment.getNav()
       );
     }
     return Optional.of(installment);
