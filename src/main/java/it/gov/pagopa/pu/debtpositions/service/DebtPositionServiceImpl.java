@@ -150,7 +150,9 @@ public class DebtPositionServiceImpl implements DebtPositionService {
     if (primaryDebtPositionDetail == null){
       throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition with id "+ debtPositionId + "not found");
     }
-    return debtorDebtPositionMapper.map(primaryDebtPositionDetail, retrieveDebtPositionTypeOrg(primaryDebtPositionDetail.getDebtPositionTypeOrgId()));
+
+    byte[] hashedDebtorFiscalCode = dataCipherService.hash(xFiscalCode);
+    return debtorDebtPositionMapper.map(primaryDebtPositionDetail, retrieveDebtPositionTypeOrg(primaryDebtPositionDetail.getDebtPositionTypeOrgId()), hashedDebtorFiscalCode);
   }
 
   private Map<Long, DebtPositionTypeOrg> retrieveDebtPositionTypeOrgMap(Page<DebtPosition> pagedPrimaryDebtPositionByFilters){

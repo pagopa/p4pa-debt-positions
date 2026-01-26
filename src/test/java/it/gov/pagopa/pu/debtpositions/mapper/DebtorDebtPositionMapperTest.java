@@ -28,13 +28,14 @@ class DebtorDebtPositionMapperTest {
   void givenDebtPositionWithPaymentOptionsWhenMapThenPaymentOptionsAreMapped() {
     // given
     DebtPosition dp = podam.manufacturePojo(DebtPosition.class);
-
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
     PaymentOption po1 = new PaymentOption();
     po1.setPaymentOptionId(1L);
     InstallmentNoPII i1 = new InstallmentNoPII();
     i1.setInstallmentId(1L);
     i1.setStatus(InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.iterator().next());
     i1.setDueDate(LocalDate.of(2025, 1, 1));
+    i1.setDebtorFiscalCodeHash(hashedDebtorFiscalCode);
 
     InstallmentNoPII i2 = new InstallmentNoPII();
     i2.setInstallmentId(2L);
@@ -61,7 +62,7 @@ class DebtorDebtPositionMapperTest {
     typeOrg.setDescription("TYPE_ORG_DESC");
 
     // when
-    DebtorDebtPositionDTO result = mapper.map(dp, typeOrg);
+    DebtorDebtPositionDTO result = mapper.map(dp, typeOrg, hashedDebtorFiscalCode);
 
     // then
     assertNotNull(result.getPaymentOptions());
@@ -85,6 +86,8 @@ class DebtorDebtPositionMapperTest {
   void givenInstallmentsUnsortedWhenMapThenInstallmentsAreSortedByDueDate() {
     // given
     DebtPosition dp = podam.manufacturePojo(DebtPosition.class);
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
+    byte[] wrongHashedDebtorFiscalCode = {1};
 
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setDescription("TYPE_ORG_DESC");
@@ -95,31 +98,36 @@ class DebtorDebtPositionMapperTest {
     InstallmentNoPII i1 = new InstallmentNoPII();
     i1.setInstallmentId(3L);
     i1.setDueDate(LocalDate.of(2025, 5, 10));
-    i1.setStatus(InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.iterator().next());
+    i1.setStatus(InstallmentStatus.UNPAID);
+    i1.setDebtorFiscalCodeHash(hashedDebtorFiscalCode);
 
     InstallmentNoPII i2 = new InstallmentNoPII();
     i2.setInstallmentId(4L);
     i2.setDueDate(LocalDate.of(2025, 1, 10));
-    i2.setStatus(InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.iterator().next());
+    i2.setStatus(InstallmentStatus.UNPAID);
+    i2.setDebtorFiscalCodeHash(hashedDebtorFiscalCode);
 
     InstallmentNoPII i3 = new InstallmentNoPII();
     i3.setInstallmentId(5L);
     i3.setDueDate(LocalDate.of(2025, 3, 10));
-    i3.setStatus(InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.iterator().next());
+    i3.setStatus(InstallmentStatus.UNPAID);
+    i3.setDebtorFiscalCodeHash(wrongHashedDebtorFiscalCode);
 
-    SortedSet<InstallmentNoPII> unsorted = new TreeSet<>(Comparator.comparing(InstallmentNoPII::getInstallmentId));
+    SortedSet<InstallmentNoPII> unsorted =
+      new TreeSet<>(Comparator.comparing(InstallmentNoPII::getInstallmentId));
     unsorted.add(i1);
     unsorted.add(i2);
     unsorted.add(i3);
 
     po.setInstallments(unsorted);
 
-    SortedSet<PaymentOption> options = new TreeSet<>(Comparator.comparing(PaymentOption::getPaymentOptionId));
+    SortedSet<PaymentOption> options =
+      new TreeSet<>(Comparator.comparing(PaymentOption::getPaymentOptionId));
     options.add(po);
     dp.setPaymentOptions(options);
 
     // when
-    DebtorDebtPositionDTO result = mapper.map(dp, typeOrg);
+    DebtorDebtPositionDTO result = mapper.map(dp, typeOrg, hashedDebtorFiscalCode);
 
     // then
     List<? extends BaseInstallment> sortedInstallments = result.getPaymentOptions()
@@ -128,9 +136,11 @@ class DebtorDebtPositionMapperTest {
       .stream()
       .toList();
 
+    assertEquals(2, sortedInstallments.size());
+
     assertEquals(LocalDate.of(2025, 1, 10), sortedInstallments.get(0).getDueDate());
-    assertEquals(LocalDate.of(2025, 3, 10), sortedInstallments.get(1).getDueDate());
-    assertEquals(LocalDate.of(2025, 5, 10), sortedInstallments.get(2).getDueDate());
+    assertEquals(LocalDate.of(2025, 5, 10), sortedInstallments.get(1).getDueDate());
+
   }
 
   @Test
@@ -140,7 +150,7 @@ class DebtorDebtPositionMapperTest {
     dp.setPaymentOptions(null);
 
     // when
-    DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg());
+    DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg(), null);
 
     // then
     assertNotNull(result.getPaymentOptions());
@@ -161,7 +171,7 @@ class DebtorDebtPositionMapperTest {
     dp.setPaymentOptions(options);
 
     // when
-    DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg());
+    DebtorDebtPositionDTO result = mapper.map(dp, new DebtPositionTypeOrg(), null);
 
     // then
     assertNull(result.getPaymentOptions().getFirst().getInstallments());
