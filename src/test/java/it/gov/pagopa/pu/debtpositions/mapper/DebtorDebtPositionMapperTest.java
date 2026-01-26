@@ -87,6 +87,7 @@ class DebtorDebtPositionMapperTest {
     // given
     DebtPosition dp = podam.manufacturePojo(DebtPosition.class);
     byte[] hashedDebtorFiscalCode = {1, 2, 3};
+    byte[] wrongHashedDebtorFiscalCode = {1};
 
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setDescription("TYPE_ORG_DESC");
@@ -110,7 +111,7 @@ class DebtorDebtPositionMapperTest {
     i3.setInstallmentId(5L);
     i3.setDueDate(LocalDate.of(2025, 3, 10));
     i3.setStatus(InstallmentStatus.UNPAID);
-    i3.setDebtorFiscalCodeHash(hashedDebtorFiscalCode);
+    i3.setDebtorFiscalCodeHash(wrongHashedDebtorFiscalCode);
 
     SortedSet<InstallmentNoPII> unsorted =
       new TreeSet<>(Comparator.comparing(InstallmentNoPII::getInstallmentId));
@@ -135,11 +136,10 @@ class DebtorDebtPositionMapperTest {
       .stream()
       .toList();
 
-    assertEquals(3, sortedInstallments.size());
+    assertEquals(2, sortedInstallments.size());
 
     assertEquals(LocalDate.of(2025, 1, 10), sortedInstallments.get(0).getDueDate());
-    assertEquals(LocalDate.of(2025, 3, 10), sortedInstallments.get(1).getDueDate());
-    assertEquals(LocalDate.of(2025, 5, 10), sortedInstallments.get(2).getDueDate());
+    assertEquals(LocalDate.of(2025, 5, 10), sortedInstallments.get(1).getDueDate());
 
   }
 
