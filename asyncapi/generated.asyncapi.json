@@ -114,6 +114,18 @@
               {
                 "creationDate": "2015-07-20T15:49:04-07:00",
                 "debtPositionId": 0,
+                "debtor": {
+                  "address": "string",
+                  "civic": "string",
+                  "email": "string",
+                  "entityType": "F",
+                  "fiscalCode": "string",
+                  "fullName": "string",
+                  "location": "string",
+                  "nation": "string",
+                  "postalCode": "string",
+                  "province": "string"
+                },
                 "description": "string",
                 "installments": [
                   {
@@ -538,6 +550,18 @@
                 {
                   "creationDate": "2015-07-20T15:49:04-07:00",
                   "debtPositionId": 0,
+                  "debtor": {
+                    "address": "string",
+                    "civic": "string",
+                    "email": "string",
+                    "entityType": "F",
+                    "fiscalCode": "string",
+                    "fullName": "string",
+                    "location": "string",
+                    "nation": "string",
+                    "postalCode": "string",
+                    "province": "string"
+                  },
                   "description": "string",
                   "installments": [
                     {
@@ -666,6 +690,9 @@
             "type": "integer",
             "format": "int64"
           },
+          "debtor": {
+            "$ref": "#/components/schemas/PersonDTO"
+          },
           "description": {
             "type": "string"
           },
@@ -708,6 +735,18 @@
           {
             "creationDate": "2015-07-20T15:49:04-07:00",
             "debtPositionId": 0,
+            "debtor": {
+              "address": "string",
+              "civic": "string",
+              "email": "string",
+              "entityType": "F",
+              "fiscalCode": "string",
+              "fullName": "string",
+              "location": "string",
+              "nation": "string",
+              "postalCode": "string",
+              "province": "string"
+            },
             "description": "string",
             "installments": [
               {
@@ -792,6 +831,7 @@
           }
         ],
         "required": [
+          "debtor",
           "installments",
           "paymentOptionType",
           "totalAmountCents"

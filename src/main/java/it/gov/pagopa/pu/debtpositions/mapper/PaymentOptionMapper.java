@@ -54,6 +54,8 @@ public class PaymentOptionMapper {
       .description(paymentOption.getDescription())
       .paymentOptionType(paymentOption.getPaymentOptionType())
       .paymentOptionIndex(paymentOption.getPaymentOptionIndex())
+      .debtor(installmentMapper.map(paymentOption.getInstallments().getFirst())
+        .getDebtor())
       .installments(
         paymentOption.getInstallments().stream()
           .map(installmentMapper::map)

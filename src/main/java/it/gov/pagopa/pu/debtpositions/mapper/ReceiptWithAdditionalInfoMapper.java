@@ -33,6 +33,7 @@ public class ReceiptWithAdditionalInfoMapper {
         .description(receiptDTO.getDescription())
         .paymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT)
         .paymentOptionIndex(1)
+        .debtor(receiptDTO.getDebtor())
         .installments(List.of(InstallmentDTO.builder()
           .status(InstallmentStatus.PAID)
           .syncStatus(null)

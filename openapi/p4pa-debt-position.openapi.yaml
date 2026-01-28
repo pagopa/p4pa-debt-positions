@@ -1865,6 +1865,7 @@ components:
         - installments
         - totalAmountCents
         - paymentOptionType
+        - debtor
       type: object
       x-implements: [ "it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption" ]
       properties:
@@ -1874,6 +1875,8 @@ components:
         debtPositionId:
           type: integer
           format: int64
+        debtor:
+          $ref: "#/components/schemas/PersonDTO"
         totalAmountCents:
           type: integer
           format: int64

@@ -5,6 +5,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildIn
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildMixedInstallmentNoPII;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildSyncInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker.buildPerson;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
@@ -52,6 +53,7 @@ public class PaymentOptionFaker {
     paymentOptionDTO.setUpdateDate(DATETIME);
     paymentOptionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     paymentOptionDTO.setUpdateTraceId("TRACEID");
+    paymentOptionDTO.setDebtor(buildPerson());
     paymentOptionDTO.setInstallments(new ArrayList<>(List.of(buildInstallmentDTO())));
     return paymentOptionDTO;
   }
