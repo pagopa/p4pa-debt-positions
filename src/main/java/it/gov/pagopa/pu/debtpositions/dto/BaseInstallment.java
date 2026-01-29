@@ -21,4 +21,5 @@ public interface BaseInstallment extends Serializable {
   String getIuv();
   String getNav();
   String getRemittanceInformation();
+  Long getReceiptId();
 }

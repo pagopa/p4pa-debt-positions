@@ -8,6 +8,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.List;
+import java.util.Set;
+
 @RepositoryRestResource(path = "receipts")
 public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long> {
 
@@ -50,4 +53,7 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
   long validateReceiptDebtor(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
                         @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode);
+
+  List<ReceiptNoPII> findAllByReceiptIdIn(Set<Long> receiptIds);
+
 }

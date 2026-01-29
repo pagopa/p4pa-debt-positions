@@ -562,6 +562,7 @@ class DebtPositionServiceImplTest {
     Long debtPositionId = 1L;
     String fiscalCode = "debtorFiscalCode";
     Long organizationId = 10L;
+    byte[] hashedDebtorFiscalCode = {1, 2, 3};
 
     DebtPosition entity = podamFactory.manufacturePojo(DebtPosition.class);
     entity.setDebtPositionTypeOrgId(99L);
@@ -579,8 +580,10 @@ class DebtPositionServiceImplTest {
       debtPositionTypeOrgRepositoryMock.findById(99L)
     ).thenReturn(Optional.of(typeOrg));
 
+    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(hashedDebtorFiscalCode);
+
     Mockito.when(
-      debtorDebtPositionMapperMock.map(entity, typeOrg)
+      debtorDebtPositionMapperMock.map(entity, typeOrg, hashedDebtorFiscalCode)
     ).thenReturn(expected);
 
     // When
