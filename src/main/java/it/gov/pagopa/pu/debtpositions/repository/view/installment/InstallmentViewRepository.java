@@ -30,6 +30,7 @@ public interface InstallmentViewRepository extends Repository<InstallmentView, L
     i.dueDate as dueDate,
     i.amountCents as amountCents,
     i.remittanceInformation as remittanceInformation,
+    i.originalRemittanceInformation as originalRemittanceInformation,
     i.debtorFiscalCodeHash as debtorFiscalCodeHash,
     dpto.description as debtPositionTypeOrgDescription
     )

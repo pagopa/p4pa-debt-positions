@@ -36,6 +36,7 @@ public class InstallmentView {
   private Long amountCents;
   @NotNull
   private String remittanceInformation;
+  private String originalRemittanceInformation;
   @NotNull
   private byte[] debtorFiscalCodeHash;
   @NotNull
