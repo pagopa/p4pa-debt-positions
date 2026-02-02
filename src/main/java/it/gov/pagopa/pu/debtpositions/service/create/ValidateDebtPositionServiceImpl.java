@@ -184,13 +184,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   }
 
   private void validateDueDate(boolean flagMandatoryDueDate, InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin) {
-    if (flagMandatoryDueDate) {
-      if (installmentDTO.getDueDate() == null) {
+    LocalDate dueDate = installmentDTO.getDueDate();
+    if (flagMandatoryDueDate && dueDate == null) {
         throw new InvalidValueException("[MISSING_DUE_DATE] The due date is mandatory");
-      }
-      if (installmentDTO.getDueDate().isBefore(LocalDate.now())) {
-        throw new InvalidValueException("[INVALID_DUE_DATE] The due date cannot be retroactive");
-      }
+    }
+    if (dueDate != null && dueDate.isBefore(LocalDate.now())) {
+      throw new InvalidValueException("[INVALID_DUE_DATE] The due date cannot be retroactive");
     }
 
     boolean switchToExpired = flagMandatoryDueDate
