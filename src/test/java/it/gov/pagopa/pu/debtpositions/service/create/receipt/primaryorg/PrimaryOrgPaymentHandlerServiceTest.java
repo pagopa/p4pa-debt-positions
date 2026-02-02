@@ -119,4 +119,19 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Assertions.assertTrue(result.isPresent());
     Assertions.assertSame(dp, result.get());
   }
+
+  @Test
+  void givenReceiptWithTechnicalOrgWhenHandlePaymentThenReturnEmpty() {
+    String accessToken = "ACCESSTOKEN";
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    Organization organization = new Organization();
+    organization.setOrganizationId(-1L);
+
+    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
+      .thenReturn(Optional.of(organization));
+
+    Optional<DebtPosition> result = service.handlePayment(receiptDTO, accessToken);
+
+    Assertions.assertTrue(result.isEmpty());
+  }
 }
