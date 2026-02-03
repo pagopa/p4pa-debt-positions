@@ -3077,35 +3077,3 @@ components:
           format: int64
         debtPositionTypeOrgDescription:
           type: string
-    InstallmentsSearchFilterDTO:
-      type: object
-      required:
-        - organizationId
-        - operatorExternalUserId
-      properties:
-        organizationId:
-          type: integer
-          format: int64
-        operatorExternalUserId:
-          type: string
-        dueDateFrom:
-          type: string
-          format: date
-        dueDateTo:
-          type: string
-          format: date
-        iuv:
-          type: string
-        iud:
-          type: string
-        fiscalCode:
-          type: string
-        debtPositionOrigins:
-          type: array
-          items:
-            $ref: "#/components/schemas/DebtPositionOrigin"
-        debtPositionTypeOrgId:
-          type: integer
-          format: int64
-        status:
-          $ref: "#/components/schemas/InstallmentStatus"
