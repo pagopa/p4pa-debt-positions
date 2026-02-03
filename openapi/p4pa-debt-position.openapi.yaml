@@ -510,6 +510,88 @@ paths:
           description: Invalid request
         "500":
           description: Internal server error
+  /installments/by-filters:
+    get:
+      tags:
+        - installment
+      operationId: getInstallmentsByFilters
+      parameters:
+        - name: organizationId
+          in: query
+          required: true
+          schema:
+            type: integer
+            format: int64
+        - name: operatorExternalUserId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: dueDateTimeFrom
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: dueDateTimeTo
+          in: query
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: iuv
+          in: query
+          schema:
+            type: string
+        - name: iud
+          in: query
+          schema:
+            type: string
+        - name: fiscalCode
+          in: query
+          schema:
+            type: string
+        - name: debtPositionOrigins
+          in: query
+          schema:
+            type: array
+            items:
+              type: 'DebtPositionOrigin'
+        - name: debtPositionTypeOrgId
+          in: query
+          schema:
+            type: integer
+            format: int64
+        - name: status
+          in: query
+          schema:
+            type: 'InstallmentStatus'
+      responses:
+        "200":
+          description: Ok
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagedInstallmentsView'
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+        '500':
+          description: Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DebtPositionErrorDTO'
+      x-spring-paginated: true
   /installments/by-organizationId-and-receiptId:
     get:
       tags:
@@ -2674,6 +2756,31 @@ components:
         transferIndex:
           type: integer
           format: int32
+    PagedInstallmentsView:
+      type: object
+      required:
+        - content
+        - size
+        - totalElements
+        - totalPages
+        - number
+      properties:
+        content:
+          type: array
+          items:
+            type: 'InstallmentView'
+        size:
+          type: integer
+          format: int64
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int64
+        number:
+          type: integer
+          format: int64
     PagedInstallmentsPaidView:
       type: object
       required:
@@ -2970,3 +3077,35 @@ components:
           format: int64
         debtPositionTypeOrgDescription:
           type: string
+    InstallmentsSearchFilterDTO:
+      type: object
+      required:
+        - organizationId
+        - operatorExternalUserId
+      properties:
+        organizationId:
+          type: integer
+          format: int64
+        operatorExternalUserId:
+          type: string
+        dueDateFrom:
+          type: string
+          format: date
+        dueDateTo:
+          type: string
+          format: date
+        iuv:
+          type: string
+        iud:
+          type: string
+        fiscalCode:
+          type: string
+        debtPositionOrigins:
+          type: array
+          items:
+            $ref: "#/components/schemas/DebtPositionOrigin"
+        debtPositionTypeOrgId:
+          type: integer
+          format: int64
+        status:
+          $ref: "#/components/schemas/InstallmentStatus"

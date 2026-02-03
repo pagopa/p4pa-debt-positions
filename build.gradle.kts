@@ -210,7 +210,8 @@ openApiGenerate {
       "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm",
       "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
       "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO",
-      "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType"
+      "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType",
+      "InstallmentView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentViewDTO",
     )
   )
   configOptions.set(
