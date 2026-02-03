@@ -18,10 +18,12 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
+import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -34,6 +36,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
+@AllArgsConstructor
 public class InstallmentServiceImpl implements InstallmentService {
   private final InstallmentPIIRepository installmentPIIRepository;
   private final InstallmentNoPIIRepository installmentNoPIIRepository;
@@ -45,27 +48,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final InstallmentDebtorDTOMapper installmentDebtorDTOMapper;
-
-  public InstallmentServiceImpl(
-    InstallmentPIIRepository installmentPIIRepository,
-    InstallmentNoPIIRepository installmentNoPIIRepository,
-    InstallmentDetailPIIViewRepository installmentDetailPIIViewRepository,
-    InstallmentPaidViewPIIViewRepository installmentPaidViewPIIViewRepository,
-    DebtPositionService debtPositionService,
-    DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService,
-    DebtPositionRepository debtPositionRepository,
-    DebtPositionMapper debtPositionMapper, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, InstallmentDebtorDTOMapper installmentDebtorDTOMapper) {
-    this.installmentPIIRepository = installmentPIIRepository;
-    this.installmentNoPIIRepository = installmentNoPIIRepository;
-    this.installmentDetailPIIViewRepository = installmentDetailPIIViewRepository;
-    this.installmentPaidViewPIIViewRepository = installmentPaidViewPIIViewRepository;
-    this.debtPositionService = debtPositionService;
-    this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
-    this.debtPositionRepository = debtPositionRepository;
-    this.debtPositionMapper = debtPositionMapper;
-    this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
-    this.installmentDebtorDTOMapper = installmentDebtorDTOMapper;
-  }
+  private final InstallmentPIIViewRepository installmentPIIViewRepository;
 
   @Override
   public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
@@ -203,6 +186,11 @@ public class InstallmentServiceImpl implements InstallmentService {
       return Collections.emptyList();
     }
     return installmentDebtorDTOMapper.map(installments,buildDebtPositionTypeOrgMap(installments));
+  }
+
+  @Override
+  public PagedInstallmentsView getPagedInstallmentsByFilters(InstallmentsSearchFiltersDTO installmentsSearchFiltersDTO, Pageable pageable) {
+    return installmentPIIViewRepository.getPagedInstallmentsByFilters(installmentsSearchFiltersDTO, pageable);
   }
 
   private Map<Long, DebtPositionTypeOrg> buildDebtPositionTypeOrgMap(List<InstallmentDTO> installments) {

@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
+import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -70,6 +71,8 @@ class InstallmentServiceImplTest {
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
   private InstallmentDebtorDTOMapper installmentDebtorDTOMapperMock;
+  @Mock
+  private InstallmentPIIViewRepository installmentPIIViewRepositoryMock;
 
   private InstallmentServiceImpl installmentService;
 
@@ -91,7 +94,8 @@ class InstallmentServiceImplTest {
       debtPositionRepositoryMock,
       debtPositionMapperMock,
       debtPositionTypeOrgRepositoryMock,
-      installmentDebtorDTOMapperMock);
+      installmentDebtorDTOMapperMock,
+      installmentPIIViewRepositoryMock);
 
       wfExecutionParameters = WfExecutionParameters.builder()
       .massive(false)
@@ -613,5 +617,22 @@ class InstallmentServiceImplTest {
     assertThrows(InvalidParamException.class,() -> installmentService.getInstallmentsByIuvOrNav(iuvOrNav, null, null));
 
     Mockito.verifyNoInteractions(installmentNoPIIRepositoryMock,debtPositionTypeOrgRepositoryMock,installmentDebtorDTOMapperMock);
+  }
+
+  @Test
+  void givenInstallmentsSearchFiltersWhenGetPagedInstallmentsByFiltersThenReturnPagedView() {
+    // Given
+    InstallmentsSearchFiltersDTO filters = podamFactory.manufacturePojo(InstallmentsSearchFiltersDTO.class);
+    PagedInstallmentsView expectedPagedView = podamFactory.manufacturePojo(PagedInstallmentsView.class);
+
+    Mockito.when(installmentPIIViewRepositoryMock.getPagedInstallmentsByFilters(filters, Pageable.ofSize(10)))
+      .thenReturn(expectedPagedView);
+
+    // When
+    PagedInstallmentsView result = installmentService.getPagedInstallmentsByFilters(filters, Pageable.ofSize(10));
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(expectedPagedView, result);
   }
 }

@@ -1,24 +1,22 @@
-package it.gov.pagopa.pu.debtpositions.model.view.installment;
+package it.gov.pagopa.pu.debtpositions.dto;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import jakarta.persistence.*;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Entity
-@Table(name = "installment")
 @Data
-@AllArgsConstructor
+@Builder(toBuilder = true)
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class InstallmentView {
+@AllArgsConstructor
+public class InstallmentViewDTO {
 
-  @Id
   private Long installmentId;
   @NotNull
   private Long debtPositionId;
@@ -41,5 +39,4 @@ public class InstallmentView {
   private byte[] debtorFiscalCodeHash;
   @NotNull
   private String debtPositionTypeOrgDescription;
-
 }
