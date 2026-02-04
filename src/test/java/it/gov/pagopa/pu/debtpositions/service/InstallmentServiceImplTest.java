@@ -3,7 +3,19 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
-import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
@@ -18,6 +30,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
+import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentViewPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -70,6 +83,8 @@ class InstallmentServiceImplTest {
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
   private InstallmentDebtorDTOMapper installmentDebtorDTOMapperMock;
+  @Mock
+  private InstallmentViewPIIRepository installmentViewPIIRepositoryMock;
 
   private InstallmentServiceImpl installmentService;
 
@@ -91,7 +106,8 @@ class InstallmentServiceImplTest {
       debtPositionRepositoryMock,
       debtPositionMapperMock,
       debtPositionTypeOrgRepositoryMock,
-      installmentDebtorDTOMapperMock);
+      installmentDebtorDTOMapperMock,
+      installmentViewPIIRepositoryMock);
 
       wfExecutionParameters = WfExecutionParameters.builder()
       .massive(false)
@@ -615,5 +631,22 @@ class InstallmentServiceImplTest {
     assertThrows(InvalidParamException.class,() -> installmentService.getInstallmentsByIuvOrNav(iuvOrNav, null, null, null));
 
     Mockito.verifyNoInteractions(installmentNoPIIRepositoryMock,debtPositionTypeOrgRepositoryMock,installmentDebtorDTOMapperMock);
+  }
+
+  @Test
+  void givenInstallmentsSearchFiltersWhenGetPagedInstallmentsByFiltersThenReturnPagedView() {
+    // Given
+    InstallmentsSearchFiltersDTO filters = podamFactory.manufacturePojo(InstallmentsSearchFiltersDTO.class);
+    PagedInstallmentsView expectedPagedView = podamFactory.manufacturePojo(PagedInstallmentsView.class);
+
+    Mockito.when(installmentViewPIIRepositoryMock.getPagedInstallmentsByFilters(filters, Pageable.ofSize(10)))
+      .thenReturn(expectedPagedView);
+
+    // When
+    PagedInstallmentsView result = installmentService.getPagedInstallmentsByFilters(filters, Pageable.ofSize(10));
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertEquals(expectedPagedView, result);
   }
 }

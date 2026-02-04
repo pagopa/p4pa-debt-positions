@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
@@ -22,4 +23,6 @@ public interface InstallmentService {
   List<InstallmentDTO> getInstallmentsByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin);
 
   List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId, List<InstallmentStatus> statuses);
+
+  PagedInstallmentsView getPagedInstallmentsByFilters(InstallmentsSearchFiltersDTO installmentsSearchFiltersDTO, Pageable pageable);
 }
