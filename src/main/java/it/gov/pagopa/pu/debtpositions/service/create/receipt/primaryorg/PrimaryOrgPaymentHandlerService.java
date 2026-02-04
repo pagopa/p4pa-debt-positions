@@ -35,11 +35,6 @@ public class PrimaryOrgPaymentHandlerService {
       return Optional.empty();
     }
 
-    // If is a technical organization skip primary org handling
-    if (primaryOrg.getOrganizationId() == -1L) {
-      return Optional.empty();
-    }
-
     return Optional.of(handlePuPrimaryOrgPayment(receiptDTO, primaryOrg, accessToken));
   }
 

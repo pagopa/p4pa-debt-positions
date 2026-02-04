@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
@@ -38,6 +39,8 @@ class CreateReceiptServiceTest {
   private SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerServiceMock;
   @Mock
   private MixedDpPaymentHandlerService mixedDpPaymentHandlerServiceMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
 
   private CreateReceiptService service;
 
@@ -50,7 +53,8 @@ class CreateReceiptServiceTest {
       receiptPIIRepositoryMock,
       primaryOrgPaymentHandlerServiceMock,
       secondaryOrgPaymentHandlerServiceMock,
-      mixedDpPaymentHandlerServiceMock
+      mixedDpPaymentHandlerServiceMock,
+      organizationServiceMock
     );
   }
 
