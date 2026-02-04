@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
 import org.slf4j.MDC;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -10,12 +11,11 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class Utilities {
 
@@ -156,5 +156,13 @@ public class Utilities {
     }
     double price = priceInCents / 100.0;
     return currencyFormat.format(price);
+  }
+
+  public static <T> String mapToString(Map<String, T> map, Function<T, String> entry2String) {
+    return CollectionUtils.isEmpty(map)
+      ? ""
+      : map.entrySet().stream()
+      .map(e -> e.getKey() + ":" + entry2String.apply(e.getValue()))
+      .collect(Collectors.joining(", "));
   }
 }
