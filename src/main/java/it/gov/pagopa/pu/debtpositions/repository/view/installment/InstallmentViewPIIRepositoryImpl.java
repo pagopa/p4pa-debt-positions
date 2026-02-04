@@ -7,14 +7,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 
 @Component
-public class InstallmentPIIViewRepositoryImpl implements InstallmentPIIViewRepository {
+public class InstallmentViewPIIRepositoryImpl implements InstallmentViewPIIRepository {
 
-  private final InstallmentNoPIIViewRepository installmentNoPIIViewRepository;
+  private final InstallmentViewNoPIIRepository installmentViewNoPIIRepository;
   private final PagedInstallmentsViewMapper pagedInstallmentsViewMapper;
 
-  public InstallmentPIIViewRepositoryImpl(InstallmentNoPIIViewRepository installmentNoPIIViewRepository,
+  public InstallmentViewPIIRepositoryImpl(InstallmentViewNoPIIRepository installmentViewNoPIIRepository,
                                           PagedInstallmentsViewMapper pagedInstallmentsViewMapper) {
-    this.installmentNoPIIViewRepository = installmentNoPIIViewRepository;
+    this.installmentViewNoPIIRepository = installmentViewNoPIIRepository;
     this.pagedInstallmentsViewMapper = pagedInstallmentsViewMapper;
   }
 
@@ -22,7 +22,7 @@ public class InstallmentPIIViewRepositoryImpl implements InstallmentPIIViewRepos
   public PagedInstallmentsView getPagedInstallmentsByFilters(InstallmentsSearchFiltersDTO installmentsSearchFiltersDTO,
                                                              Pageable pageable) {
     return pagedInstallmentsViewMapper.mapToPagedInstallmentsView(
-      installmentNoPIIViewRepository.findInstallmentsByFilters(installmentsSearchFiltersDTO, pageable)
+      installmentViewNoPIIRepository.findInstallmentsByFilters(installmentsSearchFiltersDTO, pageable)
     );
   }
 }

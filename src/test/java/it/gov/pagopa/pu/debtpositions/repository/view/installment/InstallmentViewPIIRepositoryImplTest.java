@@ -22,20 +22,20 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
-class InstallmentPIIViewRepositoryImplTest {
+class InstallmentViewPIIRepositoryImplTest {
 
   @Mock
-  private InstallmentNoPIIViewRepository installmentNoPIIViewRepositoryMock;
+  private InstallmentViewNoPIIRepository installmentViewNoPIIRepositoryMock;
   @Mock
   private PagedInstallmentsViewMapper pagedInstallmentsViewMapperMock;
 
-  private InstallmentPIIViewRepository installmentPIIViewRepository;
+  private InstallmentViewPIIRepository installmentViewPIIRepository;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void setUp() {
-    installmentPIIViewRepository = new InstallmentPIIViewRepositoryImpl(installmentNoPIIViewRepositoryMock, pagedInstallmentsViewMapperMock);
+    installmentViewPIIRepository = new InstallmentViewPIIRepositoryImpl(installmentViewNoPIIRepositoryMock, pagedInstallmentsViewMapperMock);
   }
 
   @Test
@@ -49,11 +49,11 @@ class InstallmentPIIViewRepositoryImplTest {
 
     PagedInstallmentsView expectedPagedView = podamFactory.manufacturePojo(PagedInstallmentsView.class);
 
-    Mockito.when(installmentNoPIIViewRepositoryMock.findInstallmentsByFilters(filters, pageable)).thenReturn(installmentPaidViewNoPIIS);
+    Mockito.when(installmentViewNoPIIRepositoryMock.findInstallmentsByFilters(filters, pageable)).thenReturn(installmentPaidViewNoPIIS);
     Mockito.when(pagedInstallmentsViewMapperMock.mapToPagedInstallmentsView(installmentPaidViewNoPIIS)).thenReturn(expectedPagedView);
 
     //when
-    PagedInstallmentsView result = installmentPIIViewRepository.getPagedInstallmentsByFilters(filters, pageable);
+    PagedInstallmentsView result = installmentViewPIIRepository.getPagedInstallmentsByFilters(filters, pageable);
 
     //then
     assertNotNull(result);

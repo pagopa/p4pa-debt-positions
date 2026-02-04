@@ -29,7 +29,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
-import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPIIViewRepository;
+import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentViewPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -59,7 +59,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   private final DebtPositionMapper debtPositionMapper;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final InstallmentDebtorDTOMapper installmentDebtorDTOMapper;
-  private final InstallmentPIIViewRepository installmentPIIViewRepository;
+  private final InstallmentViewPIIRepository installmentViewPIIRepository;
 
   @Override
   public List<InstallmentDTO> getInstallmentsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
@@ -201,7 +201,7 @@ public class InstallmentServiceImpl implements InstallmentService {
 
   @Override
   public PagedInstallmentsView getPagedInstallmentsByFilters(InstallmentsSearchFiltersDTO installmentsSearchFiltersDTO, Pageable pageable) {
-    return installmentPIIViewRepository.getPagedInstallmentsByFilters(installmentsSearchFiltersDTO, pageable);
+    return installmentViewPIIRepository.getPagedInstallmentsByFilters(installmentsSearchFiltersDTO, pageable);
   }
 
   private Map<Long, DebtPositionTypeOrg> buildDebtPositionTypeOrgMap(List<InstallmentDTO> installments) {

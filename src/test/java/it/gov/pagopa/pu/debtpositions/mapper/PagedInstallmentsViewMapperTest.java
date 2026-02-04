@@ -48,6 +48,29 @@ class PagedInstallmentsViewMapperTest {
     PagedInstallmentsView result = mapper.mapToPagedInstallmentsView(page);
     //then
     assertNotNull(result);
+    assertFalse(result.getContent().isEmpty());
+    assertEquals(0, result.getTotalElements());
+    assertEquals(0, result.getTotalPages());
+    assertEquals(10, result.getSize());
+    assertEquals(0, result.getNumber());
+
+    TestUtils.checkNotNullFields(result);
+  }
+
+  @Test
+  void givenEmptyPagedWhenMapThenReturnEmptyCollection() {
+    //given
+    int pageSize = 10;
+    long totalElements = 0;
+
+    Pageable pageable = PageRequest.of(0, pageSize);
+
+    Page<InstallmentViewNoPII> pagedInstallmentViewNoPIIs = new PageImpl<>(List.of(), pageable, totalElements);
+
+    //when
+    PagedInstallmentsView result =  mapper.mapToPagedInstallmentsView(pagedInstallmentViewNoPIIs);
+    //then
+    assertNotNull(result);
     assertTrue(result.getContent().isEmpty());
     assertEquals(0, result.getTotalElements());
     assertEquals(0, result.getTotalPages());
@@ -63,16 +86,16 @@ class PagedInstallmentsViewMapperTest {
     InstallmentViewNoPII installmentViewNoPII = podamFactory.manufacturePojo(InstallmentViewNoPII.class);
     List<InstallmentViewNoPII> content = List.of(installmentViewNoPII);
 
-    Page<InstallmentViewNoPII> page = new PageImpl<>(content);
+    Page<InstallmentViewNoPII> pagedInstallmentViewNoPIIs = new PageImpl<>(content);
     InstallmentViewDTO installmentViewDTO = podamFactory.manufacturePojo(InstallmentViewDTO.class);
 
     when(installmentViewDTOMapperMock.map(installmentViewNoPII)).thenReturn(installmentViewDTO);
     //when
-    PagedInstallmentsView result = mapper.mapToPagedInstallmentsView(page);
+    PagedInstallmentsView result = mapper.mapToPagedInstallmentsView(pagedInstallmentViewNoPIIs);
 
     //then
     assertNotNull(result);
-    assertTrue(result.getContent().isEmpty());
+    assertFalse(result.getContent().isEmpty());
 
     TestUtils.checkNotNullFields(result, "size","totalPages", "totalElements", "number");
   }

@@ -2768,7 +2768,7 @@ components:
         content:
           type: array
           items:
-            type: 'InstallmentView'
+            type: 'InstallmentViewDTO'
         size:
           type: integer
           format: int64

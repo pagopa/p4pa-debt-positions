@@ -60,7 +60,7 @@ class InstallmentViewDTOMapperTest {
     //then
     assertNotNull(result);
     TestUtils.reflectionEqualsByName(noPII, result);
-    TestUtils.reflectionEqualsByName(pii.getOriginalRemittanceInformation(), result.getOriginalRemittanceInformation());
+    assertEquals(pii.getOriginalRemittanceInformation(), result.getOriginalRemittanceInformation());
     TestUtils.checkNotNullFields(result);
   }
 }

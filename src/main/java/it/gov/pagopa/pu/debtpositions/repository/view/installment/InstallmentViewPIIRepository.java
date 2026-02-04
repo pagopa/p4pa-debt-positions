@@ -4,6 +4,6 @@ import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
 import org.springframework.data.domain.Pageable;
 
-public interface InstallmentPIIViewRepository {
+public interface InstallmentViewPIIRepository {
   PagedInstallmentsView getPagedInstallmentsByFilters(InstallmentsSearchFiltersDTO installmentsSearchFiltersDTO, Pageable pageable);
 }
