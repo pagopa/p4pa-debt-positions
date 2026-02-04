@@ -192,7 +192,7 @@ class InstallmentControllerTest {
       .thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
-        MockMvcRequestBuilders.get("/installments/by-filters")
+        MockMvcRequestBuilders.get("/installments")
           .param("organizationId", String.valueOf(organizationId))
           .param("operatorExternalUserId", operatorExternalUserId)
           .param("dueDateTimeFrom", String.valueOf(dueDateTimeFrom))
