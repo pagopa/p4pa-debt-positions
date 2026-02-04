@@ -77,7 +77,6 @@ class PrimaryOrgPaymentHandlerServiceTest {
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = new Organization();
-    organization.setOrganizationId(2L);
     InstallmentNoPII installment = new InstallmentNoPII();
     DebtPosition dp = new DebtPosition();
 
@@ -102,7 +101,6 @@ class PrimaryOrgPaymentHandlerServiceTest {
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = new Organization();
-    organization.setOrganizationId(2L);
     DebtPosition dp = new DebtPosition();
 
     Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
