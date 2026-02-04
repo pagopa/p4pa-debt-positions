@@ -581,18 +581,19 @@ class InstallmentServiceImplTest {
   void whenGetInstallmentsByIuvOrNavThenOk(String debtorFiscalCode, Long organizationId) {
     String iuvOrNav = "iuvOrNav";
     List<InstallmentDTO> installments = podamFactory.manufacturePojo(List.class,InstallmentDTO.class);
+    List<InstallmentStatus> statuses = List.of(InstallmentStatus.PAID);
     Map<Long, DebtPositionTypeOrg> dptoMap = new HashMap<>();
     for (InstallmentDTO installment : installments) {
       dptoMap.put(installment.getInstallmentId(),podamFactory.manufacturePojo(DebtPositionTypeOrg.class));
     }
     List<InstallmentDebtorDTO> expectedResult = podamFactory.manufacturePojo(List.class,InstallmentDebtorDTO.class);
 
-    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(installments);
+    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(installments);
     Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong()))
       .thenAnswer(invocation -> dptoMap.get(invocation.getArgument(0, Long.class)));
     Mockito.when(installmentDebtorDTOMapperMock.map(installments,dptoMap)).thenReturn(expectedResult);
 
-    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId, statuses);
 
     Assertions.assertNotNull(result);
     Assertions.assertEquals(expectedResult,result);
@@ -612,10 +613,11 @@ class InstallmentServiceImplTest {
     String iuvOrNav = "iuvOrNav";
     String debtorFiscalCode = "debtorFiscalCode";
     Long organizationId = 1L;
+    List<InstallmentStatus> statuses = List.of(InstallmentStatus.PAID);
 
-    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(Collections.emptyList());
+    Mockito.when(installmentPIIRepositoryMock.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(Collections.emptyList());
 
-    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+    List<InstallmentDebtorDTO> result = installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId, statuses);
 
     Assertions.assertNotNull(result);
     Assertions.assertTrue(result.isEmpty());
@@ -626,7 +628,7 @@ class InstallmentServiceImplTest {
   void givenNoDebtorFiscalCodeAndNoOrganizationIdWhenGetInstallmentsByIuvOrNavThenInvalidParamException() {
     String iuvOrNav = "iuvOrNav";
 
-    assertThrows(InvalidParamException.class,() -> installmentService.getInstallmentsByIuvOrNav(iuvOrNav, null, null));
+    assertThrows(InvalidParamException.class,() -> installmentService.getInstallmentsByIuvOrNav(iuvOrNav, null, null, null));
 
     Mockito.verifyNoInteractions(installmentNoPIIRepositoryMock,debtPositionTypeOrgRepositoryMock,installmentDebtorDTOMapperMock);
   }

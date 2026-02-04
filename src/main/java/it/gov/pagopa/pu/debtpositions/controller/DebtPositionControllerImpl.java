@@ -93,7 +93,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
   @Override
   public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, SyncStatusUpdateRequestDTO requestBody) {
-    log.info("Finalizing debtPosition TO_SYNC installment status on debtPosition {}: {}", debtPositionId, requestBody);
+    log.info("Finalizing debtPosition TO_SYNC installment status on debtPosition {}: iupd2finalize:{}; iupdSyncError: {}",
+      debtPositionId,
+      Utilities.mapToString(requestBody.getIupd2finalize(), i -> i.getNewStatus().toString()),
+      Utilities.mapToString(requestBody.getIupdSyncError(), SyncErrorDTO::getErrorDescription));
     DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(debtPositionId, requestBody);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
