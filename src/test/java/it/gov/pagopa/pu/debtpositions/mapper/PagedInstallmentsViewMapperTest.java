@@ -50,7 +50,7 @@ class PagedInstallmentsViewMapperTest {
     assertNotNull(result);
     assertFalse(result.getContent().isEmpty());
     assertEquals(1, result.getTotalElements());
-    assertEquals(0, result.getTotalPages());
+    assertEquals(1, result.getTotalPages());
     assertEquals(10, result.getSize());
     assertEquals(0, result.getNumber());
 
