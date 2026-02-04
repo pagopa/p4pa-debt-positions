@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -259,11 +260,12 @@ class InstallmentPIIRepositoryImplTest {
     String debtorFiscalCode = "debtorFiscalCode";
     Long organizationId = 1L;
     List<InstallmentNoPII> installments = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+    List<InstallmentStatus> statuses = List.of(InstallmentStatus.PAID);
 
-    Mockito.when(installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId)).thenReturn(installments);
+    Mockito.when(installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(installments);
     Mockito.when(mapperMock.map((InstallmentNoPII) Mockito.argThat(installments::contains))).thenAnswer(invocationOnMock -> new InstallmentDTO());
 
-    List<InstallmentDTO> result = installmentPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId);
+    List<InstallmentDTO> result = installmentPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses);
 
     Assertions.assertNotNull(result);
     Assertions.assertEquals(installments.size(), result.size());

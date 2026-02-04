@@ -194,11 +194,11 @@ public class InstallmentServiceImpl implements InstallmentService {
   }
 
   @Override
-  public List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId) {
+  public List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId, List<InstallmentStatus> statuses) {
     if(organizationId==null && StringUtils.isBlank(debtorFiscalCode)){
       throw new InvalidParamException("[MISSING_FIELDS] Either debtorFiscalCode or organizationId must be provided");
     }
-    List<InstallmentDTO> installments = installmentPIIRepository.findByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId);
+    List<InstallmentDTO> installments = installmentPIIRepository.findByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId, statuses);
     if(CollectionUtils.isEmpty(installments)){
       return Collections.emptyList();
     }

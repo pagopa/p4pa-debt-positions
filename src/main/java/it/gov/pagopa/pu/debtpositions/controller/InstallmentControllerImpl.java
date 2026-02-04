@@ -1,10 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.InstallmentApi;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +35,8 @@ public class InstallmentControllerImpl implements InstallmentApi {
   }
 
   @Override
-  public ResponseEntity<List<InstallmentDebtorDTO>> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId) {
+  public ResponseEntity<List<InstallmentDebtorDTO>> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId, List<InstallmentStatus> statuses) {
     log.info("Retrieve installments by iuvOrNav {}", iuvOrNav);
-    return ResponseEntity.ok(installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId));
+    return ResponseEntity.ok(installmentService.getInstallmentsByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId, statuses));
   }
 }
