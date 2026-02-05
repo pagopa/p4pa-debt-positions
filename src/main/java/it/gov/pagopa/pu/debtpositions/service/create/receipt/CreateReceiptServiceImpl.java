@@ -44,6 +44,8 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     logReceiptData("createReceipt", receiptDTO);
 
+    Organization primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken).orElse(null);
+
     ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
     boolean shouldSave;
 
@@ -54,8 +56,6 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     }
 
     if (shouldSave) {
-      Organization primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken).orElse(null);
-
       // If primaryOrg is null, add UNKNOWN prefix to fiscal code
       if(primaryOrg == null) {
         receiptDTO.setOrgFiscalCode("UNKNOWN_" + receiptDTO.getOrgFiscalCode());
@@ -64,7 +64,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       saveReceipt(receiptDTO);
     }
 
-    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
+    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(primaryOrg, receiptDTO, accessToken);
     secondaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
     primaryOrgDp.ifPresent(dp -> mixedDpPaymentHandlerService.handle(dp, receiptDTO, accessToken));
 
