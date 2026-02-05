@@ -1,11 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.InstallmentPaidViewFaker;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,8 +39,11 @@ class InstallmentPaidPIIMapperTest {
     //given
     InstallmentPaidViewNoPII installmentPaidViewNoPII = InstallmentPaidViewFaker.mockInstanceInstallmentPaidViewNoPII();
     ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
+    InstallmentPIIDTO installmentPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
 
     Mockito.when(personalDataServiceMock.get(installmentPaidViewNoPII.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    Mockito.when(personalDataServiceMock.get(installmentPaidViewNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
+
     //when
     InstallmentPaidViewDTO result = installmentPaidPIIMapper.map(installmentPaidViewNoPII);
 
@@ -47,6 +52,7 @@ class InstallmentPaidPIIMapperTest {
     TestUtils.reflectionEqualsByName(installmentPaidViewNoPII, result);
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getDebtor(), result.getDebtor());
     TestUtils.reflectionEqualsByName(receiptPIIDTO.getPayer(), result.getPayer());
+    Assertions.assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(), result.getOriginalRemittanceInformation());
     TestUtils.checkNotNullFields(result);
   }
 

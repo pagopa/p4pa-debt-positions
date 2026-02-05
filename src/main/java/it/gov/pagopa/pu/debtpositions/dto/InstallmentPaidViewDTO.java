@@ -66,4 +66,5 @@ public class InstallmentPaidViewDTO {
   private String iun;
   private OffsetDateTime notificationDate;
   private Long notificationFeeCents;
+  private String originalRemittanceInformation;
 }
