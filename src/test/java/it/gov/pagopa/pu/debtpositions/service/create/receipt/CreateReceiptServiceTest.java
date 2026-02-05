@@ -183,4 +183,36 @@ class CreateReceiptServiceTest {
     Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
       .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
+
+  @Test
+  void givenUnknownOrganizationWhenCreateReceiptThenUpdateFiscalCodeWithPrefix() {
+    String originalFiscalCode = "12345678901";
+    String expectedFiscalCode = "UNKNOWN_" + originalFiscalCode;
+    String accessToken = "ACCESSTOKEN";
+
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrgFiscalCode(originalFiscalCode);
+
+    ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
+    storedReceipt.setReceiptId(999L);
+
+    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(originalFiscalCode, accessToken))
+      .thenReturn(Optional.empty());
+
+    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
+      .thenReturn(null);
+
+    Mockito.when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
+      .thenReturn(storedReceipt);
+
+    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.isNull(), Mockito.same(receiptDTO), Mockito.same(accessToken)))
+      .thenReturn(Optional.empty());
+
+    ReceiptDTO result = service.createReceipt(receiptDTO, accessToken);
+
+    Assertions.assertEquals(expectedFiscalCode, receiptDTO.getOrgFiscalCode());
+    Assertions.assertEquals(storedReceipt.getReceiptId(), result.getReceiptId());
+
+    Mockito.verify(secondaryOrgPaymentHandlerServiceMock).handle(receiptDTO, accessToken);
+  }
 }
