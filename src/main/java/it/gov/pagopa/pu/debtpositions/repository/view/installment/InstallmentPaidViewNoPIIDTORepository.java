@@ -40,7 +40,8 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       r.rtFilePath as rtFilePath,
       i.iun as iun,
       i.notificationDate as notificationDate,
-      i.notificationFeeCents as notificationFeeCents
+      i.notificationFeeCents as notificationFeeCents,
+      i.personalDataId as personalDataId
     )
     FROM InstallmentNoPII i
     JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId
@@ -94,7 +95,8 @@ public interface InstallmentPaidViewNoPIIDTORepository extends Repository<Instal
       r.rtFilePath as rtFilePath,
       i.iun as iun,
       i.notificationDate as notificationDate,
-      i.notificationFeeCents as notificationFeeCents
+      i.notificationFeeCents as notificationFeeCents,
+      i.personalDataId as personalDataId
     )
     FROM InstallmentNoPII i
     JOIN PaymentOption po ON i.paymentOptionId = po.paymentOptionId

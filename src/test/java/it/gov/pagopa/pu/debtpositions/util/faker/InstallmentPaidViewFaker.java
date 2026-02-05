@@ -35,6 +35,7 @@ public class InstallmentPaidViewFaker {
       .iun("iun")
       .notificationDate(OFFSET_DATE_TIME)
       .notificationFeeCents(999L)
+      .personalDataId(456L)
       .build();
   }
 
