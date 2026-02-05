@@ -26,7 +26,6 @@ public interface InstallmentViewNoPIIRepository extends Repository<InstallmentVi
     i.dueDate as dueDate,
     i.amountCents as amountCents,
     i.remittanceInformation as remittanceInformation,
-    i.originalRemittanceInformation as originalRemittanceInformation,
     i.debtorFiscalCodeHash as debtorFiscalCodeHash,
     i.personalDataId as personalDataId,
     dpto.description as debtPositionTypeOrgDescription
