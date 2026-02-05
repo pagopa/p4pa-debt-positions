@@ -37,10 +37,10 @@ public interface InstallmentViewNoPIIRepository extends Repository<InstallmentVi
     JOIN DebtPositionTypeOrgOperators dptoo ON dpto.debtPositionTypeOrgId = dptoo.debtPositionTypeOrgId
     WHERE dp.organizationId = :#{#filter.organizationId}
     AND dptoo.operatorExternalUserId = :#{#filter.operatorExternalUserId}
-    AND (cast(:#{#filter.dueDateFrom} as date) IS NULL OR i.dueDate >= :#{#filter.dueDateFrom})
-    AND (cast(:#{#filter.dueDateTo} as date) IS NULL OR i.dueDate <= :#{#filter.dueDateTo})
+    AND (:#{#filter.dueDateFrom} IS NULL OR i.dueDate >= :#{#filter.dueDateFrom})
+    AND (:#{#filter.dueDateTo} IS NULL OR i.dueDate <= :#{#filter.dueDateTo})
     AND (:#{#filter.iuv} IS NULL OR i.iuv = :#{#filter.iuv})
-    AND (:#{#filter.iud} is NULL or i.iud = :#{#filter.iud})
+    AND (:#{#filter.iud} is NULL OR i.iud = :#{#filter.iud})
     AND ((:#{#filter.fiscalCode} IS NULL) OR i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#filter.fiscalCode)})
     AND (:#{#filter.debtPositionOrigins} IS NULL OR dp.debtPositionOrigin IN (:#{#filter.debtPositionOrigins}))
     AND ((:#{#filter.debtPositionTypeOrgId} IS NULL) OR (dpto.debtPositionTypeOrgId = :#{#filter.debtPositionTypeOrgId} ))
