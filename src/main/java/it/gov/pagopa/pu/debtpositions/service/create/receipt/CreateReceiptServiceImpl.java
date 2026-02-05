@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
@@ -11,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.repository.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -28,23 +26,19 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private final PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService;
   private final SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService;
   private final MixedDpPaymentHandlerService mixedDpPaymentHandlerService;
-  private final OrganizationService organizationService;
 
-  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService, SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService, MixedDpPaymentHandlerService mixedDpPaymentHandlerService, OrganizationService organizationService) {
+  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService, SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService, MixedDpPaymentHandlerService mixedDpPaymentHandlerService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
     this.primaryOrgPaymentHandlerService = primaryOrgPaymentHandlerService;
     this.secondaryOrgPaymentHandlerService = secondaryOrgPaymentHandlerService;
     this.mixedDpPaymentHandlerService = mixedDpPaymentHandlerService;
-    this.organizationService = organizationService;
   }
 
   @Override
   @Transactional
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     logReceiptData("createReceipt", receiptDTO);
-
-    Organization primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken).orElse(null);
 
     ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
     boolean shouldSave;
@@ -56,15 +50,10 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     }
 
     if (shouldSave) {
-      // If primaryOrg is null, add UNKNOWN prefix to fiscal code
-      if(primaryOrg == null) {
-        receiptDTO.setOrgFiscalCode("UNKNOWN_" + receiptDTO.getOrgFiscalCode());
-      }
-
       saveReceipt(receiptDTO);
     }
 
-    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(primaryOrg, receiptDTO, accessToken);
+    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(receiptDTO, accessToken);
     secondaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
     primaryOrgDp.ifPresent(dp -> mixedDpPaymentHandlerService.handle(dp, receiptDTO, accessToken));
 
