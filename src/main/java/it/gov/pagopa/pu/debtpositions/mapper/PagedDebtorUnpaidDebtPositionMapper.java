@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtorUnpaidDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -71,7 +70,7 @@ public interface PagedDebtorUnpaidDebtPositionMapper {
   private static TreeSet<InstallmentNoPII> getFilteredInstallments(byte[] hashedDebtorFiscalCode, PaymentOption po) {
     return po.getInstallments().stream()
       .filter(i ->
-        InstallmentStatus.UNPAID.equals(i.getStatus()) &&
+        InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.contains(i.getStatus()) &&
           Arrays.equals(i.getDebtorFiscalCodeHash(), hashedDebtorFiscalCode)
       )
       .collect(Collectors.toCollection(() ->

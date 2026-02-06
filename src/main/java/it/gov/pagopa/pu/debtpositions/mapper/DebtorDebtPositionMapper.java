@@ -33,9 +33,12 @@ public interface DebtorDebtPositionMapper {
     if (sortedSet == null) {
       return Collections.emptyList();
     }
-    List<BasePaymentOption> list = new ArrayList<>(sortedSet.size());
+    Set<PaymentOption> filteredSortedSet = sortedSet.stream()
+      .filter(po -> InstallmentUtils.PAYABLE_AND_EXPIRED_PO_STATUSES.contains(po.getStatus()))
+      .collect(Collectors.toSet());
+    List<BasePaymentOption> list = new ArrayList<>(filteredSortedSet.size());
 
-    for (PaymentOption paymentOption : sortedSet) {
+    for (PaymentOption paymentOption : filteredSortedSet) {
 
       SortedSet<InstallmentNoPII> installments = paymentOption.getInstallments();
       if (installments != null) {
