@@ -55,12 +55,20 @@ public interface DebtorDebtPositionMapper {
   }
 
   private static SortedSet<InstallmentNoPII> getFilteredInstallments(byte[] hashedDebtorFiscalCode, SortedSet<InstallmentNoPII> installments) {
-    return installments.stream()
-      .filter(i -> InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.contains(i.getStatus())
-        &&  Arrays.equals(i.getDebtorFiscalCodeHash(), hashedDebtorFiscalCode))
-      .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(InstallmentNoPII::getDueDate,
-          Comparator.nullsFirst(Comparator.naturalOrder())
-        ))));
+    return installments.stream().filter(i ->
+        InstallmentUtils.UNPAID_OR_PAID_INSTALLMENT_STATUSES.contains(i.getStatus())
+          && Arrays.equals(i.getDebtorFiscalCodeHash(), hashedDebtorFiscalCode)
+      )
+      .collect(Collectors.toCollection(() ->
+        new TreeSet<>(
+          Comparator
+            .comparing(
+              InstallmentNoPII::getDueDate,
+              Comparator.nullsFirst(Comparator.naturalOrder())
+            )
+            .thenComparing(InstallmentNoPII::getInstallmentId)
+        )
+      ));
   }
 
 }

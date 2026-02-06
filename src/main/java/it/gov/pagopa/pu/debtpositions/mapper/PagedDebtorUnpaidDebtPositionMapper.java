@@ -74,9 +74,13 @@ public interface PagedDebtorUnpaidDebtPositionMapper {
           Arrays.equals(i.getDebtorFiscalCodeHash(), hashedDebtorFiscalCode)
       )
       .collect(Collectors.toCollection(() ->
-        new TreeSet<>(Comparator.comparing(InstallmentNoPII::getDueDate,
-          Comparator.nullsFirst(Comparator.naturalOrder())
-        ))
+        new TreeSet<>(
+          Comparator.comparing(
+              InstallmentNoPII::getDueDate,
+              Comparator.nullsFirst(Comparator.naturalOrder())
+            )
+            .thenComparing(InstallmentNoPII::getInstallmentId)
+        )
       ));
   }
 }

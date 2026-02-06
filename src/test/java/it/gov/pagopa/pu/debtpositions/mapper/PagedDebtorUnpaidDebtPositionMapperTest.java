@@ -130,12 +130,34 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
       .dueDate(LocalDate.now())
       .build();
 
-    InstallmentNoPII wrongInstallmentPo1 = InstallmentNoPII.builder()
+    InstallmentNoPII invalidInstallment = InstallmentNoPII.builder()
       .installmentId(2L)
       .status(InstallmentStatus.INVALID)
       .debtorFiscalCodeHash(correctHash)
       .dueDate(LocalDate.now())
       .build();
+
+    InstallmentNoPII paidInstallment = InstallmentNoPII.builder()
+      .installmentId(3L)
+      .status(InstallmentStatus.PAID)
+      .debtorFiscalCodeHash(correctHash)
+      .dueDate(LocalDate.now())
+      .build();
+
+    InstallmentNoPII expiredInstallment = InstallmentNoPII.builder()
+      .installmentId(4L)
+      .status(InstallmentStatus.EXPIRED)
+      .debtorFiscalCodeHash(correctHash)
+      .dueDate(LocalDate.now())
+      .build();
+
+    InstallmentNoPII reportedInstallment = InstallmentNoPII.builder()
+      .installmentId(5L)
+      .status(InstallmentStatus.REPORTED)
+      .debtorFiscalCodeHash(correctHash)
+      .dueDate(LocalDate.now())
+      .build();
+
 
     InstallmentNoPII wrongInstallment = InstallmentNoPII.builder()
       .status(InstallmentStatus.UNPAID)
@@ -146,7 +168,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     PaymentOption validPo = PaymentOption.builder()
       .paymentOptionIndex(1)
       .status(PaymentOptionStatus.UNPAID)
-      .installments(new TreeSet<>(Set.of(correctInstallment, wrongInstallmentPo1)))
+      .installments(new TreeSet<>(Set.of(correctInstallment, invalidInstallment, paidInstallment, expiredInstallment, reportedInstallment)))
       .build();
 
     PaymentOption invalidPo = PaymentOption.builder()
@@ -174,15 +196,21 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     BasePaymentOption remainingPo = dto.getPaymentOptions().getFirst();
 
     assertEquals(
-      1,
+      4,
       remainingPo.getInstallments().size());
 
     Collection<InstallmentNoPII> installments = (Collection<InstallmentNoPII>) remainingPo.getInstallments();
 
-    assertArrayEquals(
-      correctHash,
-      installments.stream().findFirst().get().getDebtorFiscalCodeHash()
+    assertTrue(
+      installments.stream()
+        .allMatch(i -> correctHash.equals(i.getDebtorFiscalCodeHash()))
     );
+
+    List<Long> actualIds = installments.stream()
+      .map(InstallmentNoPII::getInstallmentId)
+      .toList();
+
+    assertEquals(List.of(1L,3L,4L,5L), actualIds);
 
   }
 
