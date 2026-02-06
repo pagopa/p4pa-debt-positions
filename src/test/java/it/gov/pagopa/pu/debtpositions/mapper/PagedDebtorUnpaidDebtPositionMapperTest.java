@@ -124,7 +124,15 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     byte[] wrongHash = {9, 9, 9};
 
     InstallmentNoPII correctInstallment = InstallmentNoPII.builder()
+      .installmentId(1L)
       .status(InstallmentStatus.UNPAID)
+      .debtorFiscalCodeHash(correctHash)
+      .dueDate(LocalDate.now())
+      .build();
+
+    InstallmentNoPII wrongInstallmentPo1 = InstallmentNoPII.builder()
+      .installmentId(2L)
+      .status(InstallmentStatus.INVALID)
       .debtorFiscalCodeHash(correctHash)
       .dueDate(LocalDate.now())
       .build();
@@ -138,7 +146,7 @@ class PagedDebtorUnpaidDebtPositionMapperTest {
     PaymentOption validPo = PaymentOption.builder()
       .paymentOptionIndex(1)
       .status(PaymentOptionStatus.UNPAID)
-      .installments(new TreeSet<>(Set.of(correctInstallment)))
+      .installments(new TreeSet<>(Set.of(correctInstallment, wrongInstallmentPo1)))
       .build();
 
     PaymentOption invalidPo = PaymentOption.builder()
