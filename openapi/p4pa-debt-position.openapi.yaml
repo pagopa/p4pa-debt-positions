@@ -2876,6 +2876,8 @@ components:
           $ref: "#/components/schemas/PersonDTO"
         payer:
           $ref: "#/components/schemas/PersonDTO"
+        originalRemittanceInformation:
+            type: string
     PagedDebtPositions:
       type: object
       required:
