@@ -22,6 +22,7 @@ public interface ReceiptArchivingNoPIIViewRepository extends Repository<ReceiptA
       r.paymentDateTime as paymentDateTime,
       r.creditorReferenceId as creditorReferenceId,
       i.iuv as iuv,
+      i.personalDataId as installmentPersonalDataId,
       t.remittanceInformation as remittanceInformation,
       dp.organizationId as organizationId,
       t.orgFiscalCode as orgFiscalCode,
