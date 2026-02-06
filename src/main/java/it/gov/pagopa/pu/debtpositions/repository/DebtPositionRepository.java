@@ -96,6 +96,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
                                                                             List<InstallmentStatus> statusToExclude,
                                                                             Pageable pageable);
 
+  @RestResource(exported = false)
   @Query("""
    SELECT d
    FROM DebtPosition d
@@ -105,6 +106,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
       AND i.nav = :nav
    """)
+  @EntityGraph(value = "completeDebtPosition")
   List<DebtPosition> findByOrganizationIdAndInstallmentNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)

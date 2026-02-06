@@ -182,6 +182,27 @@ class DebtPositionServiceImplTest {
   }
 
   @Test
+  void givenExistingDebtPositionWhenGetDebtPositionsByOrganizationIdAndInstallmentNavThenOk() {
+    // Given
+    Long organizationId = 1L;
+    String nav = "301000000000000245";
+    List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
+    List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
+
+    Mockito.when(debtPositionRepositoryMock.findByOrganizationIdAndInstallmentNav(organizationId, nav, null)).thenReturn(debtPositions);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPositions.getFirst())).thenReturn(expectedResult.getFirst());
+
+    // When
+    List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndInstallmentNav(
+      organizationId, nav, null);
+
+    // Then
+    Assertions.assertNotNull(result);
+    Assertions.assertIterableEquals(expectedResult, result);
+    Mockito.verifyNoMoreInteractions(debtPositionRepositoryMock, debtPositionMapperMock);
+  }
+
+  @Test
   void givenExistingDebtPositionWhenGetDebtPositionsByOrganizationIdAndIuvThenOk() {
     // Given
     Long organizationId = 1L;

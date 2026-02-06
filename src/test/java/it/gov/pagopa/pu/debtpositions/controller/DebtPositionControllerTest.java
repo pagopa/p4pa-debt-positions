@@ -281,6 +281,24 @@ class DebtPositionControllerTest {
   }
 
   @Test
+  void whenGetDebtPositionsByOrganizationIdAndInstallmentNavThenOk() throws Exception {
+    Long organizationId = 1L;
+    String nav = "301000000000000245";
+
+    List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
+    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndInstallmentNav(organizationId, nav, null)).thenReturn(expectedResult);
+
+    MvcResult result = mockMvc.perform(
+        get("/debt-positions/by-nav/" + organizationId + "/" + nav)
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    List<DebtPositionDTO> resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), new TypeReference<ArrayList<DebtPositionDTO>>(){});
+    assertEquals(expectedResult, resultResponse);
+  }
+
+  @Test
   void whenGetDebtPositionsByOrganizationIdAndIuvThenOk() throws Exception {
     Long organizationId = 1L;
     String iuv = "12345678901234567";

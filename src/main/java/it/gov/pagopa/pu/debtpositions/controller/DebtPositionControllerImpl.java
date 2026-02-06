@@ -131,6 +131,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   }
 
   @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndInstallmentNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPositions by organizationId {} and nav {}", organizationId, nav);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndInstallmentNav(organizationId, nav, debtPositionOrigin));
+  }
+
+  @Override
   public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
     log.info("Retrieving DebtPosition by orgId[{}] and iuv [{}]", organizationId, iuv);
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, debtPositionOrigin));
