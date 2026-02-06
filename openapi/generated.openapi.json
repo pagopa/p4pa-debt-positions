@@ -11643,6 +11643,9 @@
           },
           "payer" : {
             "$ref" : "#/components/schemas/PersonDTO"
+          },
+          "originalRemittanceInformation" : {
+            "type" : "string"
           }
         },
         "required" : [ "creditorReferenceId", "orgFiscalCode", "organizationId", "paymentReceiptId", "remittanceInformation" ]
@@ -11803,13 +11806,10 @@
       "BaseInstallment" : {
         "type" : "object",
         "properties" : {
-          "status" : {
-            "$ref" : "#/components/schemas/InstallmentStatus"
-          },
-          "iud" : {
+          "nav" : {
             "type" : "string"
           },
-          "nav" : {
+          "iud" : {
             "type" : "string"
           },
           "iuv" : {
@@ -11819,21 +11819,24 @@
             "type" : "string",
             "format" : "date"
           },
+          "status" : {
+            "$ref" : "#/components/schemas/InstallmentStatus"
+          },
           "remittanceInformation" : {
             "type" : "string"
           },
-          "installmentId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "receiptId" : {
+          "amountCents" : {
             "type" : "integer",
             "format" : "int64"
           },
           "syncStatus" : {
             "$ref" : "#/components/schemas/InstallmentSyncStatus"
           },
-          "amountCents" : {
+          "receiptId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "installmentId" : {
             "type" : "integer",
             "format" : "int64"
           }
@@ -11842,9 +11845,6 @@
       "BasePaymentOption" : {
         "type" : "object",
         "properties" : {
-          "status" : {
-            "$ref" : "#/components/schemas/PaymentOptionStatus"
-          },
           "paymentOptionType" : {
             "$ref" : "#/components/schemas/PaymentOptionType"
           },
@@ -11852,6 +11852,9 @@
             "type" : "integer",
             "format" : "int64",
             "writeOnly" : true
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/PaymentOptionStatus"
           },
           "installments" : {
             "type" : "array",
