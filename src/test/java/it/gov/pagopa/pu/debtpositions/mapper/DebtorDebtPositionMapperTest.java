@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -30,6 +31,7 @@ class DebtorDebtPositionMapperTest {
     DebtPosition dp = podam.manufacturePojo(DebtPosition.class);
     byte[] hashedDebtorFiscalCode = {1, 2, 3};
     PaymentOption po1 = new PaymentOption();
+    po1.setStatus(PaymentOptionStatus.PARTIALLY_PAID);
     po1.setPaymentOptionId(1L);
     InstallmentNoPII i1 = new InstallmentNoPII();
     i1.setInstallmentId(1L);
@@ -94,6 +96,7 @@ class DebtorDebtPositionMapperTest {
 
     PaymentOption po = new PaymentOption();
     po.setPaymentOptionId(1L);
+    po.setStatus(PaymentOptionStatus.PARTIALLY_PAID);
 
     InstallmentNoPII i1 = new InstallmentNoPII();
     i1.setInstallmentId(3L);
@@ -165,6 +168,7 @@ class DebtorDebtPositionMapperTest {
     PaymentOption po = new PaymentOption();
     po.setPaymentOptionId(1L);
     po.setInstallments(null);
+    po.setStatus(PaymentOptionStatus.UNPAID);
 
     SortedSet<PaymentOption> options = new TreeSet<>(Comparator.comparing(PaymentOption::getPaymentOptionId));
     options.add(po);
