@@ -9,6 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 @Slf4j
 public abstract class BaseInstallmentSynchronizeService {
@@ -19,7 +21,7 @@ public abstract class BaseInstallmentSynchronizeService {
     }
 
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().stream()
-      .filter(po -> po.getPaymentOptionIndex().equals(installmentSynchronizeDTO.getPaymentOptionIndex()))
+      .filter(po -> Objects.equals(po.getPaymentOptionIndex(), installmentSynchronizeDTO.getPaymentOptionIndex()))
       .findFirst()
       .orElse(null);
 
@@ -27,7 +29,7 @@ public abstract class BaseInstallmentSynchronizeService {
 
     if (paymentOptionDTO != null) {
       installmentDTO = paymentOptionDTO.getInstallments().stream()
-        .filter(inst -> inst.getIud().equals(installmentSynchronizeDTO.getIud()))
+        .filter(inst -> Objects.equals(inst.getIud(), installmentSynchronizeDTO.getIud()))
         .findFirst()
         .orElse(null);
     }
@@ -57,7 +59,7 @@ public abstract class BaseInstallmentSynchronizeService {
 
   public void checkIunPresence(InstallmentDTO installmentDTO) {
     if (StringUtils.isNotBlank(installmentDTO.getIun())) {
-      throw new ConflictErrorException("[INVALID_INSTALLMENT_STATUS] The installment with id " + installmentDTO.getInstallmentId() + " cannot be updated or cancelled because is been notified by SEND");
+      throw new ConflictErrorException("[INVALID_INSTALLMENT_STATUS] The installment with iud " + installmentDTO.getIud() + " cannot be updated or cancelled because is been notified by SEND");
     }
   }
 
