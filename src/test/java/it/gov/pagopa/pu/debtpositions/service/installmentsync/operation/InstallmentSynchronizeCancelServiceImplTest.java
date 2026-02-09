@@ -124,7 +124,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
 
     ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
-    assertEquals("[INVALID_INSTALLMENT_STATUS] The installment with id 100 cannot be updated or cancelled because is been notified by SEND", conflictException.getMessage());
+    assertEquals("[INVALID_INSTALLMENT_STATUS] The installment with iud "+installmentSynchronizeDTO.getIud()+" cannot be updated or cancelled because is been notified by SEND", conflictException.getMessage());
   }
 
   @Test
