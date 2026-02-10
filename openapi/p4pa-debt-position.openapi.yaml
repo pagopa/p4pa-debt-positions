@@ -2590,10 +2590,10 @@ components:
     DebtPositionErrorDTO:
       type: object
       required:
-        - code
+        - category
         - message
       properties:
-        code:
+        category:
           type: string
           enum:
             - DEBT_POSITION_BAD_REQUEST

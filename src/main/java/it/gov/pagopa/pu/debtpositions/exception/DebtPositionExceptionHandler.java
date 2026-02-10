@@ -45,75 +45,75 @@ public class DebtPositionExceptionHandler {
 
   @ExceptionHandler({InvalidValueException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInternalError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({OperatorNotAuthorizedException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleForbiddenError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_FORBIDDEN);
+    return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_FORBIDDEN);
   }
 
   @ExceptionHandler({NotFoundException.class, ResourceNotFoundException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleNotFoundError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_NOT_FOUND);
+    return handleException(ex, request, HttpStatus.NOT_FOUND, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_NOT_FOUND);
   }
 
   @ExceptionHandler({ConflictErrorException.class, DataIntegrityViolationException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleConflictError(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_CONFLICT);
+    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_CONFLICT);
   }
 
   @ExceptionHandler({InvalidStatusTransitionException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidStatusTransitionException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({InvalidInstallmentStatusException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidInstallmentStatusException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({ExportTooManyRecordsException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleExportTooManyRecordsException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({InvalidDateTimeIntervalException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidDateTimeIntervalException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({ValidationException.class, HttpMessageNotReadableException.class, MethodArgumentNotValidException.class, MethodArgumentTypeMismatchException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleViolationException(Exception ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({WorkflowErrorException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleWorkflowErrorException(Exception ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
   @ExceptionHandler({InvalidParamException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidParamException(Exception ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.BAD_REQUEST, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
   @ExceptionHandler({InvalidConditionException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvalidConditionException(Exception ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST);
+    return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
 
   @ExceptionHandler({ServletException.class, ErrorResponseException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleServletException(Exception ex, HttpServletRequest request) {
     HttpStatus httpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    DebtPositionErrorDTO.CodeEnum errorCode = DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR;
+    DebtPositionErrorDTO.CategoryEnum errorCode = DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_GENERIC_ERROR;
     if (ex instanceof ErrorResponse errorResponse) {
       httpStatus = HttpStatus.valueOf((errorResponse.getStatusCode().value()));
       if(httpStatus.isSameCodeAs(HttpStatus.NOT_FOUND)) {
-        errorCode = DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_NOT_FOUND;
+        errorCode = DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_NOT_FOUND;
       } else if (httpStatus.is4xxClientError()) {
-        errorCode = DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST;
+        errorCode = DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST;
       }
     }
     return handleException(ex, request, httpStatus, errorCode);
@@ -131,15 +131,15 @@ public class DebtPositionExceptionHandler {
 
   @ExceptionHandler({RuntimeException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
   @ExceptionHandler({InstallmentCloningException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInstallmentCloningException(InstallmentCloningException ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_GENERIC_ERROR);
+    return handleException(ex, request, HttpStatus.INTERNAL_SERVER_ERROR, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_GENERIC_ERROR);
   }
 
-  static ResponseEntity<DebtPositionErrorDTO> handleException(Exception ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CodeEnum errorEnum) {
+  static ResponseEntity<DebtPositionErrorDTO> handleException(Exception ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CategoryEnum errorEnum) {
     logException(ex, request, httpStatus);
 
     String message = Optional.of(request.getRequestURI())
@@ -173,17 +173,17 @@ public class DebtPositionExceptionHandler {
     switch (ex) {
       case HttpMessageNotReadableException httpMessageNotReadableException -> {
         if (httpMessageNotReadableException.getCause() instanceof DatabindException jsonMappingException) {
-          return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST.name(),
+          return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
             "Cannot parse body. " +
             jsonMappingException.getPath().stream()
               .map(JacksonException.Reference::getPropertyName)
               .collect(Collectors.joining(".")) +
             ": " + jsonMappingException.getOriginalMessage());
         }
-        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST.name(), "Required request body is missing");
+        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(), "Required request body is missing");
       }
       case MethodArgumentNotValidException methodArgumentNotValidException -> {
-        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST.name(),
+        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
           "Invalid request content." +
           methodArgumentNotValidException.getBindingResult()
             .getAllErrors().stream()
@@ -194,7 +194,7 @@ public class DebtPositionExceptionHandler {
             .collect(Collectors.joining(";")));
       }
       case ConstraintViolationException constraintViolationException -> {
-        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST.name(),
+        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
           "Invalid request content." +
           constraintViolationException.getConstraintViolations()
             .stream()
@@ -203,7 +203,7 @@ public class DebtPositionExceptionHandler {
             .collect(Collectors.joining(";")));
       }
       case MissingServletRequestParameterException missingServletRequestParameterException -> {
-        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CodeEnum.DEBT_POSITION_BAD_REQUEST.name(),
+        return String.format(ERROR_MESSAGE_FORMAT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
           missingServletRequestParameterException.getMessage());
       }
       default -> {
