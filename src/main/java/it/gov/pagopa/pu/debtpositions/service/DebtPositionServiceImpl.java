@@ -78,8 +78,8 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndInstallmentNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins) {
-    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndInstallmentNav(organizationId, nav, debtPositionOrigins);
+  public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins) {
+    List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndNav(organizationId, nav, debtPositionOrigins);
     return debtPositions.stream().map(this::mapDebtPosition).toList();
   }
 

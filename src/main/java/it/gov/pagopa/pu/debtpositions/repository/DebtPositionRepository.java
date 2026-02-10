@@ -99,15 +99,19 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @RestResource(exported = false)
   @Query("""
    SELECT d
-   FROM DebtPosition d
-      JOIN d.paymentOptions p
-      JOIN p.installments i
-   WHERE d.organizationId = :organizationId
+     FROM DebtPosition d
+    WHERE d.organizationId = :organizationId
       AND (:debtPositionOrigins IS NULL OR d.debtPositionOrigin IN :debtPositionOrigins)
-      AND i.nav = :nav
-   """)
+      AND EXISTS (
+        SELECT 1
+          FROM PaymentOption p
+          JOIN p.installments i
+         WHERE p.debtPositionId = d.debtPositionId
+           AND i.nav = :nav
+      )
+  """)
   @EntityGraph(value = "completeDebtPosition")
-  List<DebtPosition> findByOrganizationIdAndInstallmentNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
+  List<DebtPosition> findByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""

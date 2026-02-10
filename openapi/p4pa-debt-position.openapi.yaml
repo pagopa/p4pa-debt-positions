@@ -165,7 +165,7 @@ paths:
     get:
       tags:
         - debt-position
-      operationId: getDebtPositionsByOrganizationIdAndInstallmentNav
+      operationId: getDebtPositionsByOrganizationIdAndNav
       parameters:
         - name: organizationId
           in: path

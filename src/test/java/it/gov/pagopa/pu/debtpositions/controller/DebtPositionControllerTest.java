@@ -281,12 +281,12 @@ class DebtPositionControllerTest {
   }
 
   @Test
-  void whenGetDebtPositionsByOrganizationIdAndInstallmentNavThenOk() throws Exception {
+  void whenGetDebtPositionsByOrganizationIdAndNavThenOk() throws Exception {
     Long organizationId = 1L;
     String nav = "301000000000000245";
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndInstallmentNav(organizationId, nav, null)).thenReturn(expectedResult);
+    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-nav/" + organizationId + "/" + nav)
