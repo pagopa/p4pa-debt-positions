@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
+import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -16,6 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
@@ -42,6 +44,8 @@ class ReceiptFileServiceImplTest {
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   private final String accessToken = "fakeAccessToken";
   private final String userId = "USERID";
+
+  private static final String FAKE_BARCODE_BASE64 = "data:image/png;base64,fakeBarcode";
 
   @BeforeEach
   void setUp() {
@@ -72,35 +76,41 @@ class ReceiptFileServiceImplTest {
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
       "RECEIPT_"+organization.getOrgFiscalCode()+"_"+receiptId+".pdf");
 
-    Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
-      o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_IUV).equals(receiptDetailDTO.getIuv())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
-        && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
-        && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
-        && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-        && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-        && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
-    ))).thenReturn(expectedContent);
+    try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
+        .thenReturn(FAKE_BARCODE_BASE64);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
-      .thenReturn(receiptDetailDTO);
+      Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
+        o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
+          && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
+          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+      ))).thenReturn(expectedContent);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
-      .thenReturn(Optional.of(organization));
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+        .thenReturn(receiptDetailDTO);
 
-    FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+      Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+        .thenReturn(Optional.of(organization));
 
-    assertNotNull(result);
-    assertEquals(expectedResult, result);
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+
+      assertNotNull(result);
+      assertEquals(expectedResult, result);
+    }
   }
 
   @Test
@@ -113,32 +123,38 @@ class ReceiptFileServiceImplTest {
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
-      .thenReturn(receiptDetailDTO);
+    try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
+        .thenReturn(FAKE_BARCODE_BASE64);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
-      .thenReturn(Optional.of(organization));
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+        .thenReturn(receiptDetailDTO);
 
-    Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
-      o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_IUV).equals(receiptDetailDTO.getIuv())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
-        && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
-        && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
-        && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-        && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-        && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
-    ))).thenThrow(new IOException());
+      Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+        .thenReturn(Optional.of(organization));
 
-    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+      Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
+        o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
+          && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
+          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+      ))).thenThrow(new IOException());
+
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+    }
   }
 
   @Test
@@ -151,32 +167,37 @@ class ReceiptFileServiceImplTest {
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
-      .thenReturn(receiptDetailDTO);
+    try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
+        .thenReturn(FAKE_BARCODE_BASE64);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
-      .thenReturn(Optional.of(organization));
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+        .thenReturn(receiptDetailDTO);
 
+      Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+        .thenReturn(Optional.of(organization));
 
-    Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT),Mockito.argThat((Map<String,Object> o) ->
-      o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_IUV).equals(receiptDetailDTO.getIuv())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
-        && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
-        && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
-        && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
-        && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
-        && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-        && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-        && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-        && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
-    ))).thenThrow(new TemplateException(null));
+      Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
+        o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
+          && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
+          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+      ))).thenThrow(new TemplateException(null));
 
-    Assertions.assertThrows(IllegalStateException.class,()-> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+    }
   }
 }

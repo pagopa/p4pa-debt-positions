@@ -81,6 +81,31 @@
 <td><a href='https://opensource.org/licenses/BSD-3-Clause'>BSD-3-Clause</a></td>
 </tr>
 <tr>
+<td><a href='https://itextpdf.com/'>com.itextpdf:barcodes</a></td>
+<td>8.0.5</td>
+<td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
+</tr>
+<tr>
+<td><a href='https://itextpdf.com/'>com.itextpdf:bouncy-castle-connector</a></td>
+<td>8.0.5</td>
+<td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
+</tr>
+<tr>
+<td><a href='https://itextpdf.com/'>com.itextpdf:commons</a></td>
+<td>8.0.5</td>
+<td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
+</tr>
+<tr>
+<td><a href='https://itextpdf.com/'>com.itextpdf:io</a></td>
+<td>8.0.5</td>
+<td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
+</tr>
+<tr>
+<td><a href='https://itextpdf.com/'>com.itextpdf:kernel</a></td>
+<td>8.0.5</td>
+<td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
+</tr>
+<tr>
 <td><a href='https://github.com/jayway/JsonPath'>com.jayway.jsonpath:json-path</a></td>
 <td>2.9.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
