@@ -30,6 +30,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   public static final String RECEIPT_ORG_NAME = "orgName";
   public static final String RECEIPT_NAV = "nav";
   public static final String RECEIPT_NAV_BARCODE = "navBarcode";
+  public static final String RECEIPT_ORG_FISCAL_CODE_BARCODE = "orgFiscalCodeBarcode";
   public static final String RECEIPT_DEBTOR_NAME = "debtorName";
   public static final String RECEIPT_DEBTOR_FISCAL_CODE = "debtorFiscalCode";
   public static final String RECEIPT_PAYMENT_DATE = "paymentDate";
@@ -87,12 +88,15 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
     templateModel.put(RECEIPT_NAV, nav);
     templateModel.put(RECEIPT_NAV_BARCODE, BarcodeUtils.generateCode128AsBase64(nav));
 
+    String orgFiscalCode = StringUtils.defaultString(organization.getOrgFiscalCode());
+    templateModel.put(RECEIPT_ORG_FISCAL_CODE, orgFiscalCode);
+    templateModel.put(RECEIPT_ORG_FISCAL_CODE_BARCODE, BarcodeUtils.generateCode128AsBase64(orgFiscalCode));
+
     templateModel.put(RECEIPT_DEBTOR_NAME, receiptDetail.getDebtor().getFullName());
     templateModel.put(RECEIPT_DEBTOR_FISCAL_CODE, receiptDetail.getDebtor().getFiscalCode());
     templateModel.put(RECEIPT_PAYMENT_DATE, receiptDetail.getPaymentDateTime() != null ? receiptDetail.getPaymentDateTime().format(DATE_TIME_FORMATTER) : "");
     templateModel.put(RECEIPT_PSP_NAME, receiptDetail.getPspCompanyName());
     templateModel.put(RECEIPT_AMOUNT, Utilities.formatPrice(receiptDetail.getPaymentAmountCents()));
-    templateModel.put(RECEIPT_ORG_FISCAL_CODE, organization.getOrgFiscalCode());
     templateModel.put(REMITTANCE_INFORMATION, StringUtils.defaultString(receiptDetail.getRemittanceInformation()));
     templateModel.put(IUR, receiptDetail.getIur());
     templateModel.put(IUD, receiptDetail.getIud());

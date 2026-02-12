@@ -45,7 +45,8 @@ class ReceiptFileServiceImplTest {
   private final String accessToken = "fakeAccessToken";
   private final String userId = "USERID";
 
-  private static final String FAKE_BARCODE_BASE64 = "data:image/png;base64,fakeBarcode";
+  private static final String FAKE_NAV_BARCODE_BASE64 = "data:image/png;base64,fakeNavBarcode";
+  private static final String FAKE_ORG_BARCODE_BASE64 = "data:image/png;base64,fakeOrgBarcode";
 
   @BeforeEach
   void setUp() {
@@ -77,14 +78,17 @@ class ReceiptFileServiceImplTest {
       "RECEIPT_"+organization.getOrgFiscalCode()+"_"+receiptId+".pdf");
 
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
-      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
-        .thenReturn(FAKE_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
+        .thenReturn(FAKE_NAV_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
+        .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
           && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
@@ -124,8 +128,10 @@ class ReceiptFileServiceImplTest {
     organization.setOrgFiscalCode("FISCALCODE");
 
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
-      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
-        .thenReturn(FAKE_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
+        .thenReturn(FAKE_NAV_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
+        .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
       Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
         .thenReturn(receiptDetailDTO);
@@ -137,7 +143,8 @@ class ReceiptFileServiceImplTest {
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
           && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
@@ -168,8 +175,10 @@ class ReceiptFileServiceImplTest {
     organization.setOrgFiscalCode("FISCALCODE");
 
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
-      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(Mockito.eq(receiptDetailDTO.getNav())))
-        .thenReturn(FAKE_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
+        .thenReturn(FAKE_NAV_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
+        .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
       Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
         .thenReturn(receiptDetailDTO);
@@ -181,7 +190,8 @@ class ReceiptFileServiceImplTest {
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
           && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
