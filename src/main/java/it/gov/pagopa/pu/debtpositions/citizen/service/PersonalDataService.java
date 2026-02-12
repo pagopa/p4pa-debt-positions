@@ -5,13 +5,17 @@ import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -20,12 +24,12 @@ public class PersonalDataService {
 
   private final PersonalDataRepository repository;
   private final DataCipherService dataCipherService;
-  private final CacheManager cacheManager;
+  private final Cache piiCache;
 
   public PersonalDataService(PersonalDataRepository repository, DataCipherService dataCipherService, CacheManager cacheManager) {
     this.repository = repository;
     this.dataCipherService = dataCipherService;
-    this.cacheManager = cacheManager;
+    piiCache = Objects.requireNonNull(cacheManager.getCache(it.gov.pagopa.pu.debtpositions.config.CacheConfig.Fields.pii));
   }
 
   public long insert(Object pii, PersonalDataType type) {
@@ -33,8 +37,7 @@ public class PersonalDataService {
       .type(type.name())
       .data(dataCipherService.encryptObj(pii))
       .build()).getId();
-    Objects.requireNonNull(cacheManager.getCache(it.gov.pagopa.pu.debtpositions.config.CacheConfig.Fields.pii))
-      .put(personalDataId, pii);
+    piiCache.put(personalDataId, pii);
     return personalDataId;
   }
 
@@ -48,6 +51,30 @@ public class PersonalDataService {
     return repository.findById(personalDataId)
       .map(personalData -> dataCipherService.decryptObj(personalData.getData(), classType))
       .orElseThrow(() -> new NotFoundException("[PII_ENTITY_NOT_FOUND] PII Entity with id " + personalDataId + " not found"));
+  }
+
+  public <T> Map<Long, T> getAll(Set<Long> personalDataIds, Class<T> classType) {
+    Map<Long, T> result = repository.findAllById(personalDataIds).stream()
+      .collect(Collectors.toMap(
+        PersonalData::getId,
+        personalData -> {
+          T cachedValue = piiCache.get(personalData.getId(), classType);
+          if (cachedValue != null) {
+            return cachedValue;
+          } else {
+            return dataCipherService.decryptObj(personalData.getData(), classType);
+          }
+        })
+      );
+
+    if(result.size() != personalDataIds.size()) {
+      String personalDataIdsNotFound = personalDataIds.stream()
+        .filter(id -> result.get(id) == null)
+        .map(String::valueOf)
+        .collect(Collectors.joining(","));
+      throw new NotFoundException("[PII_ENTITY_NOT_FOUND] PII Entities with ids " + personalDataIdsNotFound + " not found");
+    }
+    return result;
   }
 
 }

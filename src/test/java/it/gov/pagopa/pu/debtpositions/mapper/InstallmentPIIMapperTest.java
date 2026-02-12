@@ -14,6 +14,11 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
+import uk.co.jemos.podam.api.PodamFactory;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -29,6 +34,8 @@ class InstallmentPIIMapperTest {
   private PersonalDataService personalDataServiceMock;
 
   private InstallmentPIIMapper mapper;
+
+  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void init() {
@@ -100,6 +107,42 @@ class InstallmentPIIMapperTest {
     Mockito.verify(personalDataServiceMock, Mockito.times(1)).get(installmentNoPII.getPersonalDataId(), InstallmentPIIDTO.class);
   }
   //endregion
+
+  @Test
+  void testMapAll() {
+    //given
+    InstallmentNoPII noPii1 = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    InstallmentNoPII noPii2 = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    List<InstallmentNoPII> noPiiDtos = List.of(noPii1, noPii2);
+
+    InstallmentPIIDTO piiDto1 = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    InstallmentPIIDTO piiDto2 = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    Mockito.when(personalDataServiceMock.getAll(Set.of(noPii1.getPersonalDataId(), noPii2.getPersonalDataId()), InstallmentPIIDTO.class))
+      .thenReturn(Map.of(
+        noPii1.getPersonalDataId(), piiDto1,
+        noPii2.getPersonalDataId(), piiDto2
+      ));
+
+    mapper = Mockito.spy(mapper);
+
+    InstallmentDTO expectedFullDto1 = podamFactory.manufacturePojo(InstallmentDTO.class);
+    Mockito.doReturn(expectedFullDto1)
+      .when(mapper)
+      .map(noPii1, piiDto1);
+
+    InstallmentDTO expectedFullDto2 = podamFactory.manufacturePojo(InstallmentDTO.class);
+    Mockito.doReturn(expectedFullDto2)
+      .when(mapper)
+      .map(noPii2, piiDto2);
+
+    //when
+    List<InstallmentDTO> result = mapper.mapAll(noPiiDtos);
+    //then
+    assertEquals(
+      List.of(expectedFullDto1, expectedFullDto2),
+      result
+    );
+  }
 
   @Test
   void testMapInstallmentWithNullSyncStatus() {

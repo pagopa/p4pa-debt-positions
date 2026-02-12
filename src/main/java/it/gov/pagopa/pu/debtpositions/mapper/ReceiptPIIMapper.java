@@ -12,11 +12,10 @@ import org.springframework.stereotype.Service;
 public class ReceiptPIIMapper extends BasePIIMapper<ReceiptDTO, ReceiptNoPII, ReceiptPIIDTO> {
 
   private final DataCipherService dataCipherService;
-  private final PersonalDataService personalDataService;
 
   public ReceiptPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService) {
+    super(ReceiptPIIDTO.class, personalDataService);
     this.dataCipherService = dataCipherService;
-    this.personalDataService = personalDataService;
   }
 
   @Override
@@ -70,6 +69,11 @@ public class ReceiptPIIMapper extends BasePIIMapper<ReceiptDTO, ReceiptNoPII, Re
   @Override
   public ReceiptDTO map(ReceiptNoPII noPii) {
     ReceiptPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), ReceiptPIIDTO.class);
+    return map(noPii, pii);
+  }
+
+  @Override
+  protected ReceiptDTO map(ReceiptNoPII noPii, ReceiptPIIDTO pii) {
     return ReceiptDTO.builder()
       .receiptId(noPii.getReceiptId())
       .ingestionFlowFileId(noPii.getIngestionFlowFileId())

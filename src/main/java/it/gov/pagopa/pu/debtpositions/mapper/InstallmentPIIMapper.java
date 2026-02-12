@@ -19,13 +19,12 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffse
 public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, InstallmentNoPII, InstallmentPIIDTO> {
 
   private final DataCipherService dataCipherService;
-  private final PersonalDataService personalDataService;
 
   private final TransferMapper transferMapper;
 
   public InstallmentPIIMapper(DataCipherService dataCipherService, PersonalDataService personalDataService, TransferMapper transferMapper) {
+    super(InstallmentPIIDTO.class, personalDataService);
     this.dataCipherService = dataCipherService;
-    this.personalDataService = personalDataService;
     this.transferMapper = transferMapper;
   }
 
@@ -80,6 +79,11 @@ public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, Installm
   @Override
   public InstallmentDTO map(InstallmentNoPII noPii) {
     InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
+    return map(noPii, pii);
+  }
+
+  @Override
+  protected InstallmentDTO map(InstallmentNoPII noPii, InstallmentPIIDTO pii) {
     return InstallmentDTO.builder()
       .installmentId(noPii.getInstallmentId())
       .paymentOptionId(noPii.getPaymentOptionId())

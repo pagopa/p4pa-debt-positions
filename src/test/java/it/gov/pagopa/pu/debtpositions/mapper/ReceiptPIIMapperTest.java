@@ -18,6 +18,11 @@ import org.springframework.data.util.Pair;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
 class ReceiptPIIMapperTest {
@@ -31,7 +36,7 @@ class ReceiptPIIMapperTest {
   private PersonalDataService personalDataServiceMock;
 
   @InjectMocks
-  private ReceiptPIIMapper receiptPIIMapper;
+  private ReceiptPIIMapper mapper;
 
   @AfterEach
   void verifyNoMoreInteractions(){
@@ -48,7 +53,7 @@ class ReceiptPIIMapperTest {
     Mockito.when(dataCipherServiceMock.hash(receipt.getDebtor().getFiscalCode())).thenReturn(fiscalCodeHash);
 
     //when
-    Pair<ReceiptNoPII, ReceiptPIIDTO> response = receiptPIIMapper.map(receipt);
+    Pair<ReceiptNoPII, ReceiptPIIDTO> response = mapper.map(receipt);
 
     //verify
     Assertions.assertNotNull(response);
@@ -69,7 +74,7 @@ class ReceiptPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(receipt.getPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
 
     //when
-    ReceiptDTO response = receiptPIIMapper.map(receipt);
+    ReceiptDTO response = mapper.map(receipt);
 
     //verify
     Assertions.assertNotNull(response);
@@ -79,4 +84,40 @@ class ReceiptPIIMapperTest {
     TestUtils.checkNotNullFields(response);
   }
 
+
+  @Test
+  void testMapAll() {
+    //given
+    ReceiptNoPII noPii1 = podamFactory.manufacturePojo(ReceiptNoPII.class);
+    ReceiptNoPII noPii2 = podamFactory.manufacturePojo(ReceiptNoPII.class);
+    List<ReceiptNoPII> noPiiDtos = List.of(noPii1, noPii2);
+
+    ReceiptPIIDTO piiDto1 = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
+    ReceiptPIIDTO piiDto2 = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
+    Mockito.when(personalDataServiceMock.getAll(Set.of(noPii1.getPersonalDataId(), noPii2.getPersonalDataId()), ReceiptPIIDTO.class))
+      .thenReturn(Map.of(
+        noPii1.getPersonalDataId(), piiDto1,
+        noPii2.getPersonalDataId(), piiDto2
+      ));
+
+    mapper = Mockito.spy(mapper);
+
+    ReceiptDTO expectedFullDto1 = podamFactory.manufacturePojo(ReceiptDTO.class);
+    Mockito.doReturn(expectedFullDto1)
+      .when(mapper)
+      .map(noPii1, piiDto1);
+
+    ReceiptDTO expectedFullDto2 = podamFactory.manufacturePojo(ReceiptDTO.class);
+    Mockito.doReturn(expectedFullDto2)
+      .when(mapper)
+      .map(noPii2, piiDto2);
+
+    //when
+    List<ReceiptDTO> result = mapper.mapAll(noPiiDtos);
+    //then
+    assertEquals(
+      List.of(expectedFullDto1, expectedFullDto2),
+      result
+    );
+  }
 }

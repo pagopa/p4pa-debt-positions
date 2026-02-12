@@ -20,7 +20,10 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import uk.co.jemos.podam.api.PodamFactory;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 @ExtendWith(MockitoExtension.class)
 class PersonalDataServiceTest {
@@ -34,18 +37,29 @@ class PersonalDataServiceTest {
 
   private PersonalDataService service;
 
+  private ConcurrentMapCache cache;
+
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void init() {
-    service = new PersonalDataService(repositoryMock, cipherServiceMock, cacheManagerMock);
+    cache = new ConcurrentMapCache(CacheConfig.Fields.pii);
+    Mockito.when(cacheManagerMock.getCache(CacheConfig.Fields.pii)).thenReturn(cache);
+
+    service = new PersonalDataService(
+      repositoryMock,
+      cipherServiceMock,
+      cacheManagerMock
+    );
   }
 
   @AfterEach
   void verifyNotMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       repositoryMock,
-      cipherServiceMock);
+      cipherServiceMock,
+      cacheManagerMock
+    );
   }
 
   @Test
@@ -68,8 +82,6 @@ class PersonalDataServiceTest {
       .build();
 
     Mockito.when(repositoryMock.save(personalDataInput)).thenReturn(personalDataOutput);
-    ConcurrentMapCache cache = new ConcurrentMapCache(CacheConfig.Fields.pii);
-    Mockito.when(cacheManagerMock.getCache(CacheConfig.Fields.pii)).thenReturn(cache);
 
     // When
     long insert = service.insert(pii, PersonalDataType.INSTALLMENT);
@@ -79,35 +91,76 @@ class PersonalDataServiceTest {
     Assertions.assertSame(pii, cache.get(piiId, pii.getClass()));
   }
 
-  //region get
-
+//region get
   @Test
   void givenValidPersonalDataIdWhenGetThenOk(){
-    //given
+    // Given
+    long personalDataId = 1L;
     InstallmentPIIDTO expected = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
-    Mockito.when(repositoryMock.findById(1L)).thenReturn(
-      Optional.of(PersonalData.builder().id(1L).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build()));
+    Mockito.when(repositoryMock.findById(personalDataId)).thenReturn(
+      Optional.of(PersonalData.builder().id(personalDataId).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build()));
     Mockito.when(cipherServiceMock.decryptObj(new byte[0], InstallmentPIIDTO.class)).thenReturn(expected);
-    //when
-    InstallmentPIIDTO installmentPIIDTO = service.get(1L, InstallmentPIIDTO.class);
-    //then
+
+    // When
+    InstallmentPIIDTO installmentPIIDTO = service.get(personalDataId, InstallmentPIIDTO.class);
+
+    //Then
     Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, installmentPIIDTO,true, null, true));
-    Mockito.verify(repositoryMock, Mockito.times(1)).findById(1L);
-    Mockito.verify(cipherServiceMock, Mockito.times(1)).decryptObj(new byte[0], InstallmentPIIDTO.class);
   }
 
   @Test
   void givenNotFoundPersonalDataIdWhenGetThenException(){
-    //given
-    Mockito.when(repositoryMock.findById(1L)).thenReturn(Optional.empty());
-    //when
-    NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.get(1L, InstallmentPIIDTO.class));
-    //then
+    // Given
+    long personalDataId = 1L;
+    Mockito.when(repositoryMock.findById(personalDataId)).thenReturn(Optional.empty());
+
+    // When
+    NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.get(personalDataId, InstallmentPIIDTO.class));
+
+    // Then
     Assertions.assertEquals("[PII_ENTITY_NOT_FOUND] PII Entity with id 1 not found", notFoundException.getMessage());
-    Mockito.verify(repositoryMock, Mockito.times(1)).findById(1L);
-    Mockito.verifyNoInteractions(cipherServiceMock);
   }
-  //endregion
+//endregion
+
+//region getAll
+  @Test
+  void givenValidPersonalDataIdsWhenGetAllThenOk(){
+    // Given
+    long pId1 = 1L;
+    long pId2 = 2L;
+    Set<Long> personalDataIds = Set.of(pId1, pId2);
+    InstallmentPIIDTO pii1 = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    InstallmentPIIDTO pii2 = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
+    cache.put(pId2, pii2);
+
+    Mockito.when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
+      PersonalData.builder().id(pId1).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build(),
+      PersonalData.builder().id(pId2).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build()
+    ));
+    Mockito.when(cipherServiceMock.decryptObj(new byte[0], InstallmentPIIDTO.class)).thenReturn(pii1);
+
+    // When
+    Map<Long, InstallmentPIIDTO> results = service.getAll(personalDataIds, InstallmentPIIDTO.class);
+
+    //Then
+    Assertions.assertTrue(EqualsBuilder.reflectionEquals(pii1, results.get(pId1),true, null, true));
+  }
+
+  @Test
+  void givenNotFoundPersonalDataIdsWhenGetAllThenException(){
+    // Given
+    Set<Long> personalDataIds = Set.of(1L,2L);
+    Mockito.when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
+      PersonalData.builder().id(1L).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build()));
+    Mockito.when(cipherServiceMock.decryptObj(new byte[0], InstallmentPIIDTO.class)).thenReturn(podamFactory.manufacturePojo(InstallmentPIIDTO.class));
+
+    // When
+    NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.getAll(personalDataIds, InstallmentPIIDTO.class));
+
+    // Then
+    Assertions.assertEquals("[PII_ENTITY_NOT_FOUND] PII Entities with ids 2 not found", notFoundException.getMessage());
+  }
+//endregion
 
   @Test
   void testDelete(){
