@@ -155,7 +155,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     from InstallmentNoPII i
     join PaymentOption po on i.paymentOptionId = po.paymentOptionId
     join DebtPosition dp on po.debtPositionId = dp.debtPositionId
-    where i.status in (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).UNPAID_OR_PAID_INSTALLMENT_STATUSES})
+    where (:statuses IS NULL OR i.status IN (:statuses))
     AND (i.iuv = :iuvOrNav OR i.nav = :iuvOrNav)
     AND ((:debtorFiscalCode is null) OR (i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)} ))
     AND ((:organizationId is null) OR (dp.organizationId = :organizationId))
@@ -164,7 +164,8 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   List<InstallmentNoPII> findByIuvOrNav(
     @Parameter(required = true) @Param("iuvOrNav") String iuvOrNav,
     String debtorFiscalCode,
-    Long organizationId);
+    Long organizationId,
+    List<InstallmentStatus> statuses);
 
   @Query("""
     SELECT i

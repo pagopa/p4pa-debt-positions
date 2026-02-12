@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
@@ -14,8 +15,9 @@ public class ReceiptArchivingPIIMapper {
     this.personalDataService = personalDataService;
   }
 
-  public ReceiptArchivingView map(ReceiptArchivingNoPIIView noPII){
-    ReceiptPIIDTO pii = personalDataService.get(noPII.getReceiptPersonalDataId(), ReceiptPIIDTO.class);
+  public ReceiptArchivingView map(ReceiptArchivingNoPIIView noPII) {
+    ReceiptPIIDTO receiptPIIDTO = personalDataService.get(noPII.getReceiptPersonalDataId(), ReceiptPIIDTO.class);
+    InstallmentPIIDTO installmentPIIDTO = personalDataService.get(noPII.getInstallmentPersonalDataId(), InstallmentPIIDTO.class);
 
     return ReceiptArchivingView.builder()
       .receiptId(noPII.getReceiptId())
@@ -27,8 +29,9 @@ public class ReceiptArchivingPIIMapper {
       .organizationId(noPII.getOrganizationId())
       .orgFiscalCode(noPII.getOrgFiscalCode())
       .rtFilePath(noPII.getRtFilePath())
-      .debtor(pii.getDebtor())
-      .payer(pii.getPayer())
+      .debtor(receiptPIIDTO.getDebtor())
+      .payer(receiptPIIDTO.getPayer())
+      .originalRemittanceInformation(installmentPIIDTO.getOriginalRemittanceInformation())
       .build();
   }
 }

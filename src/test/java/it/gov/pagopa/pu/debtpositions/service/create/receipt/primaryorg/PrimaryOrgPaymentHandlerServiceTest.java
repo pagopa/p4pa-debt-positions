@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -23,8 +22,6 @@ import java.util.Optional;
 class PrimaryOrgPaymentHandlerServiceTest {
 
   @Mock
-  private OrganizationService organizationServiceMock;
-  @Mock
   private PrimaryOrgInstallmentRetrieverService installmentRetrieverServiceMock;
   @Mock
   private PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerServiceMock;
@@ -38,7 +35,6 @@ class PrimaryOrgPaymentHandlerServiceTest {
   @BeforeEach
   void init(){
     service = new PrimaryOrgPaymentHandlerService(
-      organizationServiceMock,
       installmentRetrieverServiceMock,
       installmentPaymentHandlerServiceMock,
       technicalDpCreationServiceMock
@@ -48,7 +44,6 @@ class PrimaryOrgPaymentHandlerServiceTest {
   @AfterEach
   void verifyNoMoreInteractions(){
     Mockito.verifyNoMoreInteractions(
-      organizationServiceMock,
       installmentRetrieverServiceMock,
       installmentPaymentHandlerServiceMock,
       technicalDpCreationServiceMock
@@ -61,11 +56,8 @@ class PrimaryOrgPaymentHandlerServiceTest {
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
-    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
-      .thenReturn(Optional.empty());
-
     // When
-    Optional<DebtPosition> result = service.handlePayment(receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(null, receiptDTO, accessToken);
 
     // Then
     Assertions.assertTrue(result.isEmpty());
@@ -80,15 +72,13 @@ class PrimaryOrgPaymentHandlerServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     DebtPosition dp = new DebtPosition();
 
-    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
-      .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.of(installment));
     Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(accessToken)))
       .thenReturn(dp);
 
     // When
-    Optional<DebtPosition> result = service.handlePayment(receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());
@@ -103,18 +93,17 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Organization organization = new Organization();
     DebtPosition dp = new DebtPosition();
 
-    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken))
-      .thenReturn(Optional.of(organization));
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.empty());
     Mockito.when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO)))
       .thenReturn(dp);
 
     // When
-    Optional<DebtPosition> result = service.handlePayment(receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());
     Assertions.assertSame(dp, result.get());
   }
+
 }

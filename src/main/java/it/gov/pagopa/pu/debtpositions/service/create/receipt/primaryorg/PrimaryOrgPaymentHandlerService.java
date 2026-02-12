@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -15,20 +14,17 @@ import java.util.Optional;
 @Slf4j
 public class PrimaryOrgPaymentHandlerService {
 
-  private final OrganizationService organizationService;
   private final PrimaryOrgInstallmentRetrieverService installmentRetrieverService;
   private final PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService;
   private final ReceiptBasedTechnicalDpHandlerService technicalDpCreationService;
 
-  public PrimaryOrgPaymentHandlerService(OrganizationService organizationService, PrimaryOrgInstallmentRetrieverService installmentRetrieverService, PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService, ReceiptBasedTechnicalDpHandlerService technicalDpCreationService) {
-    this.organizationService = organizationService;
+  public PrimaryOrgPaymentHandlerService(PrimaryOrgInstallmentRetrieverService installmentRetrieverService, PrimaryOrgInstallmentPaymentHandlerService installmentPaymentHandlerService, ReceiptBasedTechnicalDpHandlerService technicalDpCreationService) {
     this.installmentRetrieverService = installmentRetrieverService;
     this.installmentPaymentHandlerService = installmentPaymentHandlerService;
     this.technicalDpCreationService = technicalDpCreationService;
   }
 
-  public Optional<DebtPosition> handlePayment(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    Organization primaryOrg = organizationService.getOrganizationByFiscalCode(receiptDTO.getOrgFiscalCode(), accessToken).orElse(null);
+  public Optional<DebtPosition> handlePayment(Organization primaryOrg, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     if(primaryOrg==null){
       log.info("Received a Receipt (paymentReceiptId {}) on a not handled primary organization {}",
         receiptDTO.getPaymentReceiptId(), receiptDTO.getOrgFiscalCode());

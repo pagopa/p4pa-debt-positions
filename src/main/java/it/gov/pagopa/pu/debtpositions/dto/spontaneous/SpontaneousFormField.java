@@ -69,4 +69,6 @@ public class SpontaneousFormField implements Serializable {
   private String enabledDependsOnUids;
   private String errorMessage;
   private String helpMessage;
+  private String source;
+  private List<String> sourceParams;
 }

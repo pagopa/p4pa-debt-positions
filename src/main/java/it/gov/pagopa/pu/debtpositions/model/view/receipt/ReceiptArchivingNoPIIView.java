@@ -27,6 +27,8 @@ public class ReceiptArchivingNoPIIView implements Serializable {
   private String creditorReferenceId;
   private String iuv;
   @NotNull
+  private Long installmentPersonalDataId;
+  @NotNull
   private String remittanceInformation;
   @NotNull
   private Long organizationId;

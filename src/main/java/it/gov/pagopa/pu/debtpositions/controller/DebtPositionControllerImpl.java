@@ -93,7 +93,10 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
   @Override
   public ResponseEntity<DebtPositionDTO> finalizeSyncStatus(Long debtPositionId, SyncStatusUpdateRequestDTO requestBody) {
-    log.info("Finalizing debtPosition TO_SYNC installment status on debtPosition {}: {}", debtPositionId, requestBody);
+    log.info("Finalizing debtPosition TO_SYNC installment status on debtPosition {}: iupd2finalize:{}; iupdSyncError: {}",
+      debtPositionId,
+      Utilities.mapToString(requestBody.getIupd2finalize(), i -> i.getNewStatus().toString()),
+      Utilities.mapToString(requestBody.getIupdSyncError(), SyncErrorDTO::getErrorDescription));
     DebtPositionDTO body = debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(debtPositionId, requestBody);
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
@@ -125,6 +128,12 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
     log.info("Retrieving DebtPosition by orgId[{}] and iud [{}]", organizationId, iud);
     return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, debtPositionOrigin));
+  }
+
+  @Override
+  public ResponseEntity<List<DebtPositionDTO>> getDebtPositionsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
+    log.info("Retrieving DebtPositions by organizationId {} and nav {}", organizationId, nav);
+    return ResponseEntity.ok(debtPositionService.getDebtPositionsByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin));
   }
 
   @Override

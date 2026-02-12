@@ -53,27 +53,29 @@
 
   <div class="debtor-grid">
     <div class="debtor-row">
-      <div class="info-item">
-        <div class="info-label">Debitore</div>
-        <div class="info-value">
-          ${debtorName}<br></br>
-          <span class="fiscal-code">${debtorFiscalCode}</span>
+      <div class="debtor-cell debtor-cell-left">
+        <div class="debtor-block">
+          <div class="info-label">Debitore</div>
+          <div class="info-value">
+            ${debtorName}<br/>
+            <span class="fiscal-code">${debtorFiscalCode}</span>
+          </div>
+        </div>
+        <div class="debtor-block">
+          <div class="info-label">Ente Creditore</div>
+          <div class="info-value">
+            ${orgName}<br/>
+            <span class="org-fiscal-code">${orgFiscalCode}</span>
+          </div>
         </div>
       </div>
-      <div class="info-item">
+      <div class="debtor-cell debtor-cell-right">
         <div class="info-label">Codice Avviso</div>
         <div class="info-value">
-          <span class="payment-code">${iuv}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="debtor-row">
-      <div class="info-item">
-        <div class="info-label">Ente Creditore</div>
-        <div class="info-value">
-          ${orgName}<br></br>
-          <span class="org-fiscal-code">${orgFiscalCode}</span>
+          <span class="payment-code">${nav}</span>
+          <div class="barcode-container">
+            <img src="${navBarcode}" alt="Barcode Codice Avviso" class="barcode-image" />
+          </div>
         </div>
       </div>
     </div>

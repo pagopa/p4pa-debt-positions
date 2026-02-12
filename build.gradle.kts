@@ -66,6 +66,7 @@ val openHtmlToPdfVersion = "1.0.10"
 val springCloudDepsVersion = "2025.1.0"
 val commonsLang3Version = "3.20.0"
 val lz4JavaVersion = "1.10.1"
+val itextVersion = "8.0.5"
 
 dependencyManagement {
   imports {
@@ -108,6 +109,8 @@ dependencies {
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
   implementation("org.springframework.boot:spring-boot-starter-freemarker")
   implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:${openHtmlToPdfVersion}")
+  implementation("com.itextpdf:kernel:${itextVersion}")
+  implementation("com.itextpdf:barcodes:${itextVersion}")
 
   compileOnly("org.projectlombok:lombok")
 
@@ -210,7 +213,8 @@ openApiGenerate {
       "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm",
       "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
       "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO",
-      "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType"
+      "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType",
+      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentViewDTO",
     )
   )
   configOptions.set(
