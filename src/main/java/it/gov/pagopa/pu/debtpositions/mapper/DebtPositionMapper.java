@@ -1,9 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
@@ -18,11 +21,13 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffse
 public class DebtPositionMapper {
 
   private final PaymentOptionMapper paymentOptionMapper;
+  private final InstallmentPIIMapper installmentPIIMapper;
 
   private static final Collector<PaymentOption, ?, SortedSet<PaymentOption>> toPaymentOptionTreeSet = Collectors.toCollection(TreeSet::new);
 
-  public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper) {
+  public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper, InstallmentPIIMapper installmentPIIMapper) {
     this.paymentOptionMapper = paymentOptionMapper;
+    this.installmentPIIMapper = installmentPIIMapper;
   }
 
   public DebtPosition mapToModel(DebtPositionDTO dto) {
@@ -47,7 +52,38 @@ public class DebtPositionMapper {
     return debtPosition;
   }
 
+  public List<DebtPositionDTO> mapAllToDto(List<DebtPosition> debtPosition) {
+    Map<Long, ArrayList<InstallmentDTO>> poId2InstallmentDTO = buildPo2InstallmentDTOMap(debtPosition.stream());
+
+    return debtPosition.stream()
+      .map(dp -> mapToDto(dp, poId2InstallmentDTO))
+      .toList();
+  }
+
+  private Map<Long, ArrayList<InstallmentDTO>> buildPo2InstallmentDTOMap(Stream<DebtPosition> dpStream) {
+    List<InstallmentNoPII> installments = dpStream
+      .flatMap(dp -> dp.getPaymentOptions().stream())
+      .flatMap(po -> po.getInstallments().stream())
+      .toList();
+    @SuppressWarnings("DataFlowIssue") // paymentOptionId cannot be null when building noPII into FullDTO
+    Map<Long, ArrayList<InstallmentDTO>> poId2InstallmentDTO = installmentPIIMapper.mapAll(installments).stream()
+      .collect(Collectors.groupingBy(InstallmentDTO::getPaymentOptionId, Collectors.toCollection(ArrayList<InstallmentDTO>::new)));
+    return poId2InstallmentDTO;
+  }
+
   public DebtPositionDTO mapToDto(DebtPosition debtPosition) {
+    return mapToDto(debtPosition, null);
+  }
+
+  private DebtPositionDTO mapToDto(DebtPosition debtPosition, Map<Long, ArrayList<InstallmentDTO>> poId2InstallmentDTO) {
+    @SuppressWarnings("unchecked") // type check verified by construction
+    Map<Long, ArrayList<InstallmentDTO>>[] poId2InstallmentDTOHolder = new Map[1];
+    if(poId2InstallmentDTO == null) {
+      poId2InstallmentDTOHolder[0] = buildPo2InstallmentDTOMap(Stream.of(debtPosition));
+    } else {
+      poId2InstallmentDTOHolder[0] = poId2InstallmentDTO;
+    }
+
     DebtPositionDTO dto = DebtPositionDTO.builder()
       .iupdOrg(debtPosition.getIupdOrg())
       .description(debtPosition.getDescription())
@@ -60,7 +96,7 @@ public class DebtPositionMapper {
       .flagPuPagoPaPayment(debtPosition.isFlagPuPagoPaPayment())
       .paymentOptions(
         debtPosition.getPaymentOptions().stream()
-          .map(paymentOptionMapper::mapToDto)
+          .map(po -> paymentOptionMapper.mapToDto(po, poId2InstallmentDTOHolder[0].get(po.getPaymentOptionId())))
           .collect(Collectors.toCollection(ArrayList<PaymentOptionDTO>::new))
       )
       .build();
@@ -81,7 +117,7 @@ public class DebtPositionMapper {
     PagedDebtPositions mappedPagedDebtPositions = new PagedDebtPositions();
     if (pagedDebtPositionsDTO != null) {
       if (!pagedDebtPositionsDTO.getContent().isEmpty()) {
-        mappedPagedDebtPositions.setContent(pagedDebtPositionsDTO.stream().map(this::mapToDto).toList());
+        mappedPagedDebtPositions.setContent(mapAllToDto(pagedDebtPositionsDTO.getContent()));
       } else {
         mappedPagedDebtPositions.setContent(Collections.emptyList());
       }

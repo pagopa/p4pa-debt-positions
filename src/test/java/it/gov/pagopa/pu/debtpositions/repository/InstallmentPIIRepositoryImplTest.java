@@ -212,16 +212,17 @@ class InstallmentPIIRepositoryImplTest {
   void givenValidOrganizationAndNavWhenGetByOrganizationIdAndNavThenOk(String debtPositionOrigin) {
     // Given
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
-    List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
-    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
+    List<InstallmentNoPII> installments = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+    List<InstallmentDTO> expectedResult = List.of();
+
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installments);
+    Mockito.when(mapperMock.mapAll(Mockito.same(installments))).thenReturn(expectedResult);
 
     // When
     List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndNav(1L, "NAV", originList);
 
     // Then
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(installmentDTOList.size(), result.size());
-    installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
+    Assertions.assertSame(expectedResult, result);
   }
 
   @Test
@@ -242,16 +243,17 @@ class InstallmentPIIRepositoryImplTest {
   void givenValidOrganizationAndReceiptIdWhenGetByOrganizationIdAndReceiptIdThenOk(String debtPositionOrigin) {
     // Given
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
-    List<InstallmentNoPII> installmentDTOList = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
-    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+    List<InstallmentNoPII> installments = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
+    List<InstallmentDTO> expectedResult = List.of();
+
+    Mockito.when(installmentNoPIIRepository.getByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installments);
+    Mockito.when(mapperMock.mapAll(Mockito.same(installments))).thenReturn(expectedResult);
 
     // When
     List<InstallmentDTO> result = installmentPIIRepository.getByOrganizationIdAndReceiptId(1L, 999L, originList);
 
     // Then
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(installmentDTOList.size(), result.size());
-    installmentDTOList.forEach(installmentNoPII -> Mockito.verify(mapperMock, Mockito.times(1)).map(installmentNoPII));
+    Assertions.assertSame(expectedResult, result);
   }
 
   @Test
@@ -261,15 +263,13 @@ class InstallmentPIIRepositoryImplTest {
     Long organizationId = 1L;
     List<InstallmentNoPII> installments = podamFactory.manufacturePojo(List.class, InstallmentNoPII.class);
     List<InstallmentStatus> statuses = List.of(InstallmentStatus.PAID);
+    List<InstallmentDTO> expectedResult = List.of();
 
     Mockito.when(installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(installments);
-    Mockito.when(mapperMock.map((InstallmentNoPII) Mockito.argThat(installments::contains))).thenAnswer(invocationOnMock -> new InstallmentDTO());
+    Mockito.when(mapperMock.mapAll(Mockito.same(installments))).thenReturn(expectedResult);
 
     List<InstallmentDTO> result = installmentPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses);
 
-    Assertions.assertNotNull(result);
-    Assertions.assertEquals(installments.size(), result.size());
-    Mockito.verify(mapperMock, Mockito.times(installments.size())).map(Mockito.any(InstallmentNoPII.class));
-    installments.forEach(i -> Mockito.verify(mapperMock).map(i));
+    Assertions.assertSame(expectedResult, result);
   }
 }

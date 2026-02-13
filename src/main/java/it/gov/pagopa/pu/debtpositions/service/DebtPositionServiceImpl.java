@@ -58,6 +58,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
+  public List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition) {
+    return debtPositionMapper.mapAllToDto(debtPosition);
+  }
+
+  @Override
   public DebtPositionDTO mapDebtPosition(DebtPosition debtPosition) {
     return debtPositionMapper.mapToDto(debtPosition);
   }
@@ -80,19 +85,19 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins) {
     List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndNav(organizationId, nav, debtPositionOrigins);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
     List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(organizationId, iuv, debtPositionOrigin);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
     List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(organizationId, iud, debtPositionOrigin);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
@@ -139,7 +144,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       dateTimeIntervalFilter
     );
 
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override

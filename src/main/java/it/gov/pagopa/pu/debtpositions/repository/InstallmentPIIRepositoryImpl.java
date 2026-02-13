@@ -26,20 +26,17 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentD
 
   @Override
   public List<InstallmentDTO> getByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigin) {
-    return installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin)
-      .stream().map(installmentPIIMapper::map).toList();
+    return installmentPIIMapper.mapAll(installmentNoPIIRepository.getByOrganizationIdAndNav(organizationId, nav, debtPositionOrigin));
   }
 
   @Override
   public List<InstallmentDTO> getByOrganizationIdAndReceiptId(Long organizationId, Long receiptId, List<DebtPositionOrigin> debtPositionOrigin) {
-    return installmentNoPIIRepository.getByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin)
-      .stream().map(installmentPIIMapper::map).toList();
+    return installmentPIIMapper.mapAll(installmentNoPIIRepository.getByOrganizationIdAndReceiptId(organizationId, receiptId, debtPositionOrigin));
   }
 
   @Override
   public List<InstallmentDTO> findByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId, List<InstallmentStatus> statuses) {
-    return installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)
-      .stream().map(installmentPIIMapper::map).toList();
+    return installmentPIIMapper.mapAll(installmentNoPIIRepository.findByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses));
   }
 
   @Override

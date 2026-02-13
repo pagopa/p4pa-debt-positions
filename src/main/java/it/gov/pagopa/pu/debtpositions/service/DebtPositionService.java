@@ -13,6 +13,7 @@ public interface DebtPositionService {
 
   void saveDebtPosition(DebtPositionDTO debtPositionDTO);
   void saveDebtPosition(DebtPosition debtPosition);
+  List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition);
   DebtPositionDTO mapDebtPosition(DebtPosition debtPosition);
   DebtPositionDTO getDebtPosition(Long debtPositionId);
   DebtPosition getDebtPositionNoPII(Long debtPositionId);
