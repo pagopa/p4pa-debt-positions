@@ -39,7 +39,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private String postalAccountCode;
   private String holderPostalCc;
   private String orgSector;
-  private String xsdDefinitionRef;
   private Long amountCents;
   private String externalPaymentUrl;
   private boolean flagAnonymousFiscalCode;
