@@ -9,7 +9,7 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ReceiptPIIMapper extends BasePIIMapper<ReceiptDTO, ReceiptNoPII, ReceiptPIIDTO> {
+public class ReceiptPIIMapper extends BaseEntityPIIMapper<ReceiptDTO, ReceiptNoPII, ReceiptPIIDTO> {
 
   private final DataCipherService dataCipherService;
 

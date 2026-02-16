@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
 
 @Service
-public class InstallmentPIIMapper extends BasePIIMapper<InstallmentDTO, InstallmentNoPII, InstallmentPIIDTO> {
+public class InstallmentPIIMapper extends BaseEntityPIIMapper<InstallmentDTO, InstallmentNoPII, InstallmentPIIDTO> {
 
   private final DataCipherService dataCipherService;
 

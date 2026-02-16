@@ -2,9 +2,9 @@ package it.gov.pagopa.pu.debtpositions.repository.pii;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.FullEntityPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.PIIDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.BaseEntityPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.NoPIIEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.Pair;
@@ -14,15 +14,15 @@ import java.util.Optional;
 
 /**
  * A repository which will handle the PII segregation.<<BR/>
- * It will split the full representation of the entity ({@link FullPIIDTO} into {@link NoPIIEntity} and {@link PIIDTO}, storing the PII on a separate DB and setting its identifier on the {@link NoPIIEntity}'s personalDataId field.
+ * It will split the full representation of the entity ({@link FullEntityPIIDTO} into {@link NoPIIEntity} and {@link PIIDTO}, storing the PII on a separate DB and setting its identifier on the {@link NoPIIEntity}'s personalDataId field.
  */
-public abstract class BasePIIRepository<F extends FullPIIDTO<E, P>, E extends NoPIIEntity<P>, P extends PIIDTO, I extends Serializable> {
+public abstract class BasePIIRepository<F extends FullEntityPIIDTO<E, P>, E extends NoPIIEntity<P>, P extends PIIDTO, I extends Serializable> {
 
-  private final BasePIIMapper<F, E, P> piiMapper;
+  private final BaseEntityPIIMapper<F, E, P> piiMapper;
   private final PersonalDataService personalDataService;
   private final JpaRepository<E, I> noPIIRepository;
 
-  BasePIIRepository(BasePIIMapper<F, E, P> piiMapper, PersonalDataService personalDataService, JpaRepository<E, I> noPIIRepository) {
+  BasePIIRepository(BaseEntityPIIMapper<F, E, P> piiMapper, PersonalDataService personalDataService, JpaRepository<E, I> noPIIRepository) {
     this.piiMapper = piiMapper;
     this.personalDataService = personalDataService;
     this.noPIIRepository = noPIIRepository;

@@ -2043,7 +2043,7 @@ components:
       type: object
       x-implements: [
         "it.gov.pagopa.pu.debtpositions.dto.BaseInstallment",
-        "it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO>"
+        "it.gov.pagopa.pu.debtpositions.dto.pii.FullEntityPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO>"
       ]
       x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       properties:
@@ -2183,7 +2183,7 @@ components:
     ReceiptDTO:
       type: object
       x-implements: [
-        "it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
+        "it.gov.pagopa.pu.debtpositions.dto.pii.FullEntityPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
       ]
       x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       required:

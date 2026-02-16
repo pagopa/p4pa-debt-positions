@@ -1,6 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.dto.view;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotNull;
@@ -15,7 +18,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentViewDTO {
+public class InstallmentViewDTO implements FullPIIDTO<InstallmentViewNoPII, InstallmentPIIDTO> {
 
   private Long installmentId;
   @NotNull
