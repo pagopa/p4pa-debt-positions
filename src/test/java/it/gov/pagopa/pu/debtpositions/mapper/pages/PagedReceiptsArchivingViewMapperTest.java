@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.mapper;
+package it.gov.pagopa.pu.debtpositions.mapper.pages;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;

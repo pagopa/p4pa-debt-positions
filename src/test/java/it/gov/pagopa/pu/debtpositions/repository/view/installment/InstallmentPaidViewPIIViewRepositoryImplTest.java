@@ -9,7 +9,7 @@ import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersD
 import it.gov.pagopa.pu.debtpositions.dto.filters.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
-import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedInstallmentsPaidViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import java.time.OffsetDateTime;

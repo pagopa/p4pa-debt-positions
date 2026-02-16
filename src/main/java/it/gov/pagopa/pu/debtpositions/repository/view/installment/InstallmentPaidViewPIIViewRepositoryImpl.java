@@ -5,7 +5,7 @@ import static it.gov.pagopa.pu.debtpositions.util.Constants.WS_USER_PREFIX;
 import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
-import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedInstallmentsPaidViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
