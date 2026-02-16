@@ -97,7 +97,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
     debtPositionProcessorService.updateAmounts(debtPositionDTO);
     checkAllInstallments(debtPositionDTO, org, debtPositionTypeOrg, accessToken);
-    validateDebtPositionService.validate(debtPositionDTO, accessToken, debtPositionTypeOrg);
+    validateDebtPositionService.validate(debtPositionDTO, org,  accessToken, debtPositionTypeOrg);
 
     if (DebtPositionStatus.UNPAID.equals(debtPositionDTO.getStatus())) {
       updateDebtPositionStatus(debtPositionDTO, DebtPositionStatus.TO_SYNC, PaymentOptionStatus.TO_SYNC, InstallmentStatus.TO_SYNC);
