@@ -39,7 +39,7 @@ public class Transfer extends BaseEntity implements Serializable, Comparable<Tra
   @NotNull
   private Integer transferIndex;
   private String mbdAttachment;
-  private boolean flagOwner;
+  private Boolean flagOwner;
 
   @Override
   public int compareTo(@Nonnull Transfer o) {

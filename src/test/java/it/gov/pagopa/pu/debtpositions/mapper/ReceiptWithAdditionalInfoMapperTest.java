@@ -61,7 +61,7 @@ class ReceiptWithAdditionalInfoMapperTest {
       "ingestionFlowFileId", "ingestionFlowFileLineNumber", "ingestionFlowFileAction", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId",
       "noPII", "originalRemittanceInformation");
     TestUtils.checkNotNullFields(installmentDTO.getDebtor());
-    installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO, "transferId", "installmentId", "postalIban", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"));
+    installmentDTO.getTransfers().forEach(transferDTO -> TestUtils.checkNotNullFields(transferDTO, "transferId", "installmentId", "postalIban", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId", "flagOwner"));
     return installmentDTO;
   }
 

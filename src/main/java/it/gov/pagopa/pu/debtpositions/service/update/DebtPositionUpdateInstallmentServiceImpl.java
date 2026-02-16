@@ -69,7 +69,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
         .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))
         .forEach(installmentDTO -> {
-          validateDebtPositionService.validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
+          validateDebtPositionService.validateInstallment(installmentDTO, org, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
 
           InstallmentStatus statusTo = installmentDTO.getStatus();
           if (InstallmentStatus.EXPIRED.equals(installmentDTO.getStatus()) && installmentDTO.getDueDate() != null &&

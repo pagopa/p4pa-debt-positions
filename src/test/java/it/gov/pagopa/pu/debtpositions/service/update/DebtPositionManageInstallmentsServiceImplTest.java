@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
@@ -37,6 +38,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageUpdateInstallmentDTO;
+import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -223,6 +225,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(buildOrganization()));
+
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
 
@@ -262,6 +267,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId))
       .thenReturn(debtPositionDTO);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(buildOrganization()));
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
@@ -311,11 +319,15 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setCode("ORG_TYPE_CODE");
 
+    Organization org = buildOrganization();
+
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(org));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
     Mockito.doThrow(new InvalidValueException("Taxonomy invalid"))
-      .when(validateDebtPositionServiceMock).validateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+      .when(validateDebtPositionServiceMock).validateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
     InvalidValueException exception = assertThrows(InvalidValueException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
@@ -381,6 +393,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
 
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(buildOrganization()));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(99L)).thenReturn(Optional.empty());
 
     NotFoundException exception = assertThrows(NotFoundException.class,

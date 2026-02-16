@@ -267,7 +267,7 @@ class TechnicalMixedDebtPositionMapperTest {
 
   private static void checkTransfer(Transfer expected, Transfer result) {
     TestUtils.checkNotNullFields(result, "transferId", "creationDate", "updateDate",
-      "updateOperatorExternalId", "updateTraceId");
+      "updateOperatorExternalId", "updateTraceId", "flagOwner");
 
     assertEquals(expected.getTransferIndex(),
       result.getTransferIndex());
