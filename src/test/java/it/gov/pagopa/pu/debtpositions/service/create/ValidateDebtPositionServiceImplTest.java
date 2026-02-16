@@ -774,9 +774,9 @@ class ValidateDebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setMultiDebtor(false);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setFlagOwner(null);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setOrgFiscalCode("98765432109");
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     Organization org = buildOrganization();
-    org.setOrgFiscalCode("98765432109");
 
     String commonFiscalCode = "RSSMRA80A01H501U";
     debtPositionDTO.getPaymentOptions().forEach(po ->
