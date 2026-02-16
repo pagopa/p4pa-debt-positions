@@ -10,10 +10,10 @@ import java.util.Collections;
 
 @Component
 public class PagedInstallmentsViewMapper {
-  private final InstallmentViewDTOMapper installmentViewDTOMapper;
+  private final InstallmentViewDTOMapper mapper;
 
-  public PagedInstallmentsViewMapper(InstallmentViewDTOMapper installmentViewDTOMapper) {
-    this.installmentViewDTOMapper = installmentViewDTOMapper;
+  public PagedInstallmentsViewMapper(InstallmentViewDTOMapper mapper) {
+    this.mapper = mapper;
   }
 
   public PagedInstallmentsView mapToPagedInstallmentsView(Page<InstallmentViewNoPII> pagedInstallmentViewNoPII) {
@@ -21,7 +21,7 @@ public class PagedInstallmentsViewMapper {
     if (pagedInstallmentViewNoPII != null) {
       if (!pagedInstallmentViewNoPII.getContent().isEmpty()) {
         mappedPagedInstallmentsView.setContent(
-          pagedInstallmentViewNoPII.stream().map(installmentViewDTOMapper::map).toList()
+          mapper.mapAll(pagedInstallmentViewNoPII.getContent())
         );
       } else {
         mappedPagedInstallmentsView.setContent(Collections.emptyList());

@@ -11,10 +11,10 @@ import java.util.Collections;
 @Component
 public class PagedReceiptsArchivingViewMapper {
 
-    private final ReceiptArchivingPIIMapper receiptArchivingPIIMapper;
+    private final ReceiptArchivingPIIMapper mapper;
 
-  public PagedReceiptsArchivingViewMapper(ReceiptArchivingPIIMapper receiptArchivingPIIMapper) {
-    this.receiptArchivingPIIMapper = receiptArchivingPIIMapper;
+  public PagedReceiptsArchivingViewMapper(ReceiptArchivingPIIMapper mapper) {
+    this.mapper = mapper;
   }
 
 
@@ -22,7 +22,7 @@ public class PagedReceiptsArchivingViewMapper {
       PagedReceiptsArchivingView mappedPagedReceiptsArchivingView = new PagedReceiptsArchivingView();
       if(pagedReceiptArchivingViewNoPIIDTO != null){
         if (!pagedReceiptArchivingViewNoPIIDTO.getContent().isEmpty()){
-          mappedPagedReceiptsArchivingView.setContent(pagedReceiptArchivingViewNoPIIDTO.stream().map(receiptArchivingPIIMapper::map).toList());
+          mappedPagedReceiptsArchivingView.setContent(mapper.mapAll(pagedReceiptArchivingViewNoPIIDTO.getContent()));
         }else {
           mappedPagedReceiptsArchivingView.setContent(Collections.emptyList());
         }

@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.view.ReceiptArchivingPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -37,29 +38,31 @@ class PagedReceiptsArchivingViewMapperTest {
     pagedReceiptsArchivingViewMapper = new PagedReceiptsArchivingViewMapper(receiptArchivingPIIMapperMock);
   }
 
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(receiptArchivingPIIMapperMock);
+  }
+
   @Test
   void givenValidPagedReceiptArchivingViewNoPIIDTO_whenMapToPagedReceiptsArchivingView_thenReturnPagedReceiptsArchivingView(){
-    //given
+    // Given
     int pageSize = 10;
     long totalElements = 1;
 
-    ReceiptArchivingNoPIIView receiptArchivingNoPIIView = podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class);
-
-    List<ReceiptArchivingNoPIIView> content = List.of(receiptArchivingNoPIIView);
-
     Pageable pageable = PageRequest.of(0, pageSize);
-
+    List<ReceiptArchivingNoPIIView> content = List.of(podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class));
     Page<ReceiptArchivingNoPIIView> pagedReceiptArchivingNoPII = new PageImpl<>(content, pageable, totalElements);
+    List<ReceiptArchivingView> expectedContent = List.of(podamFactory.manufacturePojo(ReceiptArchivingView.class));
 
-    ReceiptArchivingView receiptArchivingView = podamFactory.manufacturePojo(ReceiptArchivingView.class);
+    Mockito.when(receiptArchivingPIIMapperMock.mapAll(content))
+      .thenReturn(expectedContent);
 
-    Mockito.when(receiptArchivingPIIMapperMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
-    //when
-
+    // When
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(pagedReceiptArchivingNoPII);
-    //then
+
+    // Then
     assertNotNull(result);
-    assertFalse(result.getContent().isEmpty());
+    assertSame(expectedContent, result.getContent());
     assertEquals(1, result.getTotalElements());
     assertEquals(1, result.getTotalPages());
     assertEquals(10, result.getSize());
@@ -70,16 +73,17 @@ class PagedReceiptsArchivingViewMapperTest {
 
   @Test
   void givenEmptyPagedReceiptArchivingViewNoPIIDTO_whenMapToPagedReceiptsArchivingView_thenReturnEmptyCollection(){
-    //given
+    // Given
     int pageSize = 10;
     long totalElements = 0;
 
     Pageable pageable = PageRequest.of(0, pageSize);
     Page<ReceiptArchivingNoPIIView> pagedReceiptArchivingNoPII = new PageImpl<>(Collections.emptyList(), pageable, totalElements);
 
-    //when
+    // When
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(pagedReceiptArchivingNoPII);
-    //then
+
+    // Then
     assertNotNull(result);
     assertTrue(result.getContent().isEmpty());
     assertEquals(0, result.getTotalElements());
@@ -92,31 +96,31 @@ class PagedReceiptsArchivingViewMapperTest {
 
   @Test
   void givenNullPagedReceiptArchivingViewNoPIIDTO_whenMapToPagedReceiptArchivingView_thenReturnNewPagedReceiptArchivingView(){
-    //when
+    // When
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(null);
-    //then
+
+    // Then
     assertNotNull(result);
   }
 
   @Test
   void givenUnpagedPagedReceiptArchivingViewNoPIIDTO_whenMapToPagedReceiptArchivingView_thenReturnPagedReceiptArchivingView(){
-    //given
-    ReceiptArchivingNoPIIView receiptArchivingNoPIIView = podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class);
-
-    List<ReceiptArchivingNoPIIView> content = List.of(receiptArchivingNoPIIView);
+    // Given
+    List<ReceiptArchivingNoPIIView> content = List.of(podamFactory.manufacturePojo(ReceiptArchivingNoPIIView.class));
 
     Page<ReceiptArchivingNoPIIView> unpagedReceiptArchivingNoPIIView = new PageImpl<>(content);
 
-    ReceiptArchivingView receiptArchivingView = podamFactory.manufacturePojo(ReceiptArchivingView.class);
 
-    Mockito.when(receiptArchivingPIIMapperMock.map(receiptArchivingNoPIIView)).thenReturn(receiptArchivingView);
+    List<ReceiptArchivingView> expectedContent = List.of(podamFactory.manufacturePojo(ReceiptArchivingView.class));
+    Mockito.when(receiptArchivingPIIMapperMock.mapAll(content))
+      .thenReturn(expectedContent);
 
-    //when
+    // When
     PagedReceiptsArchivingView result = pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(unpagedReceiptArchivingNoPIIView);
 
-    //then
+    // Then
     assertNotNull(result);
-    assertFalse(result.getContent().isEmpty());
+    assertSame(expectedContent, result.getContent());
 
     TestUtils.checkNotNullFields(result, "size","totalPages", "totalElements", "number");
   }

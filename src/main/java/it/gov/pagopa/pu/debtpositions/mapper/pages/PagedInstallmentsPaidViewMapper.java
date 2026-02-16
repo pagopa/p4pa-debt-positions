@@ -11,17 +11,17 @@ import java.util.Collections;
 @Component
 public class PagedInstallmentsPaidViewMapper {
 
-  private final InstallmentPaidPIIMapper installmentPaidPIIMapper;
+  private final InstallmentPaidPIIMapper mapper;
 
-  public PagedInstallmentsPaidViewMapper(InstallmentPaidPIIMapper installmentPaidPIIMapper) {
-    this.installmentPaidPIIMapper = installmentPaidPIIMapper;
+  public PagedInstallmentsPaidViewMapper(InstallmentPaidPIIMapper mapper) {
+    this.mapper = mapper;
   }
 
   public PagedInstallmentsPaidView mapToPagedInstallmentsPaidView(Page<InstallmentPaidViewNoPII> pagedInstallmentPaidViewNoPIIDTO){
     PagedInstallmentsPaidView mappedPagedInstallmentsPaidView = new PagedInstallmentsPaidView();
     if(pagedInstallmentPaidViewNoPIIDTO != null){
       if (!pagedInstallmentPaidViewNoPIIDTO.getContent().isEmpty()){
-        mappedPagedInstallmentsPaidView.setContent(pagedInstallmentPaidViewNoPIIDTO.stream().map(installmentPaidPIIMapper::map).toList());
+        mappedPagedInstallmentsPaidView.setContent(mapper.mapAll(pagedInstallmentPaidViewNoPIIDTO.getContent()));
       }else {
         mappedPagedInstallmentsPaidView.setContent(Collections.emptyList());
       }
