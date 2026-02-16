@@ -2641,8 +2641,6 @@ components:
           type: string
         orgSector:
           type: string
-        xsdDefinitionRef:
-          type: string
         amountCents:
           type: integer
           format: int64
