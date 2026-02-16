@@ -21,7 +21,7 @@ import java.nio.file.StandardOpenOption;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest("it.gor.pagopa.pu")
+@SpringBootTest
 @AutoConfigureMockMvc(print = MockMvcPrint.NONE, addFilters = false)
 @TestPropertySource(properties = {
   "spring.datasource.debt-position.driver-class-name=org.h2.Driver",
