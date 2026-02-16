@@ -51,6 +51,7 @@ public class DataCipherService {
         }
     }
 
+    @SuppressWarnings("squid:S1168") // null String if hashed should return still null
     public byte[] hash(String value) {
         if (value == null) {
             return null;
