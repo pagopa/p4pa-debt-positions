@@ -27,7 +27,7 @@ public interface ValidateDebtPositionService {
    * Validates a new installment values
    *
    * @param installmentDTO      representing the new installment to be validated
-   * @param org org representing the organization owner of debt position
+   * @param org representing the organization owner of debt position
    * @param accessToken         the access token
    * @param debtPositionTypeOrg representing the debt position type org
    * @param debtPositionOrigin  representing the debt position origin
