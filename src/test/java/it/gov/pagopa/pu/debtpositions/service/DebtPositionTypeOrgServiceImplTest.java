@@ -257,7 +257,6 @@ class DebtPositionTypeOrgServiceImplTest {
               .postalIban(debtPositionTypeOrg.getPostalIban()+1)
               .postalAccountCode(debtPositionTypeOrg.getPostalAccountCode()+1)
               .holderPostalCc(debtPositionTypeOrg.getHolderPostalCc()+1)
-              .xsdDefinitionRef(debtPositionTypeOrg.getXsdDefinitionRef()+1)
               .amountCents(debtPositionTypeOrg.getAmountCents()+1)
               .externalPaymentUrl(debtPositionTypeOrg.getExternalPaymentUrl()+1)
               .flagSpontaneous(!debtPositionTypeOrg.isFlagSpontaneous())
