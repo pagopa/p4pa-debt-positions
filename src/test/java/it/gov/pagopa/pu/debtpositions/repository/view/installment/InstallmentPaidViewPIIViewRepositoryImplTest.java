@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
-import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.PagedInstallmentsPaidViewMapper;

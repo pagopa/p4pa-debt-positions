@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
-import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
-import it.gov.pagopa.pu.debtpositions.dto.OffsetDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.OffsetDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;

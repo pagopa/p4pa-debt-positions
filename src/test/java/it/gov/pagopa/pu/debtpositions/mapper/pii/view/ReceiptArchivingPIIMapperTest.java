@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;

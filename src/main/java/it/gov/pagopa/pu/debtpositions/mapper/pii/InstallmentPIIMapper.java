@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper.pii;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.TransferMapper;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;

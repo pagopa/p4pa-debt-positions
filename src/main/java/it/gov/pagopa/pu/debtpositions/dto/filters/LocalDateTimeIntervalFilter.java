@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.dto;
+package it.gov.pagopa.pu.debtpositions.dto.filters;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

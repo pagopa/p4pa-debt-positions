@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.PIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.PIIDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
 
 /**

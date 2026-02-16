@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.dto;
+package it.gov.pagopa.pu.debtpositions.dto.pii;
 
 import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
 

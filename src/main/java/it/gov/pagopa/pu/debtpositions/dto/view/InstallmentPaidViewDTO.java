@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.dto;
+package it.gov.pagopa.pu.debtpositions.dto.view;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import jakarta.validation.constraints.Max;

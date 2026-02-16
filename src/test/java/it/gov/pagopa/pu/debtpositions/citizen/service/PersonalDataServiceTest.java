@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
 import it.gov.pagopa.pu.debtpositions.config.CacheConfig;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;

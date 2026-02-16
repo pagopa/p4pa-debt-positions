@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO;
+import it.gov.pagopa.pu.debtpositions.dto.view.InstallmentPaidViewDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.view.InstallmentPaidPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
