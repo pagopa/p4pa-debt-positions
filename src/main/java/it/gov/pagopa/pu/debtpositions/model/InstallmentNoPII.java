@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.common.pii.model.NoPIIEntity;
 import it.gov.pagopa.pu.debtpositions.dto.BaseInstallment;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.Action;

@@ -1,7 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.repository.pii;
 
-import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.citizen.enums.PersonalDataType;
+import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.repository.BasePIIRepository;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
@@ -23,27 +24,27 @@ public class ReceiptPIIRepositoryImpl extends BasePIIRepository<ReceiptDTO, Rece
   }
 
   @Override
-  void setId(ReceiptDTO fullDTO, Long id) {
+  protected void setId(ReceiptDTO fullDTO, Long id) {
     fullDTO.setReceiptId(id);
   }
 
   @Override
-  void setId(ReceiptNoPII noPii, Long id) {
+  protected void setId(ReceiptNoPII noPii, Long id) {
     noPii.setReceiptId(id);
   }
 
   @Override
-  Long getId(ReceiptNoPII noPii) {
+  protected Long getId(ReceiptNoPII noPii) {
     return noPii.getReceiptId();
   }
 
   @Override
-  Class<ReceiptPIIDTO> getPIITDTOClass() {
+  protected Class<ReceiptPIIDTO> getPIITDTOClass() {
     return ReceiptPIIDTO.class;
   }
 
   @Override
-  PersonalDataType getPIIPersonalDataType() {
+  protected PersonalDataType getPIIPersonalDataType() {
     return PersonalDataType.RECEIPT;
   }
 

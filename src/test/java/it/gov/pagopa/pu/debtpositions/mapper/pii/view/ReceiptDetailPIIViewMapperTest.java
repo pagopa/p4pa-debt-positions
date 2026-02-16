@@ -1,36 +1,26 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.common.pii.mapper.BasePIIMapperTest;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.jemos.podam.api.PodamFactory;
 
 @ExtendWith(MockitoExtension.class)
-class ReceiptDetailPIIViewMapperTest {
-
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
-
-  @Mock
-  private PersonalDataService personalDataServiceMock;
+class ReceiptDetailPIIViewMapperTest extends BasePIIMapperTest<ReceiptDetailDTO, ReceiptDetailNoPIIView, InstallmentPIIDTO> {
 
   @InjectMocks
-  private ReceiptDetailPIIViewMapper receiptDetailPIIViewMapper;
+  private ReceiptDetailPIIViewMapper mapper;
 
-  @AfterEach
-  void verifyNoMoreInteractions() {
-    Mockito.verifyNoMoreInteractions(
-            personalDataServiceMock
-    );
+  @Override
+  protected ReceiptDetailPIIViewMapper getMapper() {
+    return mapper;
   }
 
   @Test
@@ -40,7 +30,7 @@ class ReceiptDetailPIIViewMapperTest {
     InstallmentPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
     Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(receiptPIIDTO);
     //when
-    ReceiptDetailDTO response = receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
+    ReceiptDetailDTO response = mapper.map(receiptDetailNoPIIView);
 
     //verify
     Assertions.assertNotNull(response);
@@ -56,7 +46,7 @@ class ReceiptDetailPIIViewMapperTest {
     installmentPIIDTO.setOriginalRemittanceInformation("originalRemittanceInformation");
     Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     //when
-    ReceiptDetailDTO response = receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
+    ReceiptDetailDTO response = mapper.map(receiptDetailNoPIIView);
 
     //verify
     Assertions.assertNotNull(response);

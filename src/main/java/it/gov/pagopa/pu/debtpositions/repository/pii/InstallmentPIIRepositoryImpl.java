@@ -1,7 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.repository.pii;
 
-import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.citizen.enums.PersonalDataType;
+import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.repository.BasePIIRepository;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -41,27 +42,27 @@ public class InstallmentPIIRepositoryImpl extends BasePIIRepository<InstallmentD
   }
 
   @Override
-  void setId(InstallmentDTO fullDTO, Long id) {
+  protected void setId(InstallmentDTO fullDTO, Long id) {
     fullDTO.setInstallmentId(id);
   }
 
   @Override
-  void setId(InstallmentNoPII noPii, Long id) {
+  protected void setId(InstallmentNoPII noPii, Long id) {
   noPii.setInstallmentId(id);
   }
 
   @Override
-  Long getId(InstallmentNoPII noPii) {
+  protected Long getId(InstallmentNoPII noPii) {
     return noPii.getInstallmentId();
   }
 
   @Override
-  Class<InstallmentPIIDTO> getPIITDTOClass() {
+  protected Class<InstallmentPIIDTO> getPIITDTOClass() {
     return InstallmentPIIDTO.class;
   }
 
   @Override
-  PersonalDataType getPIIPersonalDataType() {
+  protected PersonalDataType getPIIPersonalDataType() {
     return PersonalDataType.INSTALLMENT;
   }
 }

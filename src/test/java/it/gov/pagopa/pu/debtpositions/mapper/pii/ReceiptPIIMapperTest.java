@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
-import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
+import it.gov.pagopa.pu.common.pii.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.common.pii.mapper.BasePIIMapperTest;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -15,34 +15,28 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.util.Pair;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(MockitoExtension.class)
-class ReceiptPIIMapperTest {
-
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+class ReceiptPIIMapperTest extends BasePIIMapperTest<ReceiptDTO, ReceiptNoPII, ReceiptPIIDTO> {
 
   @Mock
   private DataCipherService dataCipherServiceMock;
-
-  @Mock
-  private PersonalDataService personalDataServiceMock;
 
   @InjectMocks
   private ReceiptPIIMapper mapper;
 
   @AfterEach
-  void verifyNoMoreInteractions(){
+  void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
-      dataCipherServiceMock,
-      personalDataServiceMock);
+      dataCipherServiceMock
+    );
+  }
+
+  @Override
+  public ReceiptPIIMapper getMapper() {
+    return mapper;
   }
 
   @Test
@@ -71,7 +65,7 @@ class ReceiptPIIMapperTest {
     //given
     ReceiptNoPII receipt = podamFactory.manufacturePojo(ReceiptNoPII.class);
     ReceiptPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
-    Mockito.when(personalDataServiceMock.get(receipt.getPersonalDataId(),ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
+    Mockito.when(personalDataServiceMock.get(receipt.getPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
 
     //when
     ReceiptDTO response = mapper.map(receipt);
@@ -84,40 +78,4 @@ class ReceiptPIIMapperTest {
     TestUtils.checkNotNullFields(response);
   }
 
-
-  @Test
-  void testMapAll() {
-    //given
-    ReceiptNoPII noPii1 = podamFactory.manufacturePojo(ReceiptNoPII.class);
-    ReceiptNoPII noPii2 = podamFactory.manufacturePojo(ReceiptNoPII.class);
-    List<ReceiptNoPII> noPiiDtos = List.of(noPii1, noPii2);
-
-    ReceiptPIIDTO piiDto1 = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
-    ReceiptPIIDTO piiDto2 = podamFactory.manufacturePojo(ReceiptPIIDTO.class);
-    Mockito.when(personalDataServiceMock.getAll(Set.of(noPii1.getPersonalDataId(), noPii2.getPersonalDataId()), ReceiptPIIDTO.class))
-      .thenReturn(Map.of(
-        noPii1.getPersonalDataId(), piiDto1,
-        noPii2.getPersonalDataId(), piiDto2
-      ));
-
-    mapper = Mockito.spy(mapper);
-
-    ReceiptDTO expectedFullDto1 = podamFactory.manufacturePojo(ReceiptDTO.class);
-    Mockito.doReturn(expectedFullDto1)
-      .when(mapper)
-      .map(noPii1, piiDto1);
-
-    ReceiptDTO expectedFullDto2 = podamFactory.manufacturePojo(ReceiptDTO.class);
-    Mockito.doReturn(expectedFullDto2)
-      .when(mapper)
-      .map(noPii2, piiDto2);
-
-    //when
-    List<ReceiptDTO> result = mapper.mapAll(noPiiDtos);
-    //then
-    assertEquals(
-      List.of(expectedFullDto1, expectedFullDto2),
-      result
-    );
-  }
 }

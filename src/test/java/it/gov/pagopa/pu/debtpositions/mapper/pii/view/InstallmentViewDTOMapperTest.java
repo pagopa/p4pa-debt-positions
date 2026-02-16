@@ -1,36 +1,36 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.mapper.BasePIIMapperTest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class InstallmentViewDTOMapperTest {
-  @Mock
-  private PersonalDataService personalDataServiceMock;
+class InstallmentViewDTOMapperTest extends BasePIIMapperTest<InstallmentViewDTO, InstallmentViewNoPII, InstallmentPIIDTO> {
 
   private InstallmentViewDTOMapper mapper;
-
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
   @BeforeEach
   void setUp() {
     mapper = new InstallmentViewDTOMapper(personalDataServiceMock);
+  }
+
+  @Override
+  public InstallmentViewDTOMapper getMapper() {
+    return mapper;
   }
 
   @Test

@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.pii;
 
-import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.citizen.enums.PersonalDataType;
+import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;

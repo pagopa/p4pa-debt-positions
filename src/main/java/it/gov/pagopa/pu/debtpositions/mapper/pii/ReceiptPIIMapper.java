@@ -1,7 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.mapper.BaseEntityPIIMapper;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;

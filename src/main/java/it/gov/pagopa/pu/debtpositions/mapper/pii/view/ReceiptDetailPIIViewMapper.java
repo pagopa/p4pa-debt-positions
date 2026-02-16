@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
+import it.gov.pagopa.pu.common.pii.mapper.BasePIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
 import org.springframework.stereotype.Service;
 

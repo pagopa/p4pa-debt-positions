@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.dto.view;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO;
+import it.gov.pagopa.pu.common.pii.dto.FullPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import jakarta.persistence.EnumType;

@@ -7,7 +7,10 @@ import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfigura
 
 import java.util.TimeZone;
 
-@SpringBootApplication(exclude = {ErrorMvcAutoConfiguration.class})
+@SpringBootApplication(
+  exclude = {ErrorMvcAutoConfiguration.class},
+  scanBasePackages = "it.gov.pagopa.pu"
+)
 public class DebtPositionsApplication {
 
 	public static void main(String[] args) {
