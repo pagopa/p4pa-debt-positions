@@ -24,7 +24,7 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d and operatorExternalUserId %s not found".formatted(
           receiptId, operatorExternalUserId)));
-    return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    return receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
   }
 
   @Override
@@ -33,6 +33,6 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d not found".formatted(
           receiptId)));
-    return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    return receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
   }
 }

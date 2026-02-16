@@ -40,7 +40,7 @@ class ReceiptDetailPIIViewMapperTest {
     InstallmentPIIDTO receiptPIIDTO = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
     Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(receiptPIIDTO);
     //when
-    ReceiptDetailDTO response = receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    ReceiptDetailDTO response = receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
 
     //verify
     Assertions.assertNotNull(response);
@@ -56,7 +56,7 @@ class ReceiptDetailPIIViewMapperTest {
     installmentPIIDTO.setOriginalRemittanceInformation("originalRemittanceInformation");
     Mockito.when(personalDataServiceMock.get(receiptDetailNoPIIView.getDebtorPersonalDataId(),InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     //when
-    ReceiptDetailDTO response = receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    ReceiptDetailDTO response = receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
 
     //verify
     Assertions.assertNotNull(response);

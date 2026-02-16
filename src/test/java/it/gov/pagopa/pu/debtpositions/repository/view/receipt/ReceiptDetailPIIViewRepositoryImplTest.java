@@ -47,7 +47,7 @@ class ReceiptDetailPIIViewRepositoryImplTest {
 
     Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(
       Optional.of(receiptDetailNoPIIView));
-    Mockito.when(receiptDetailPIIViewMapperMock.mapToReceiptDetailDTO(receiptDetailNoPIIView)).thenReturn(receiptDetail);
+    Mockito.when(receiptDetailPIIViewMapperMock.map(receiptDetailNoPIIView)).thenReturn(receiptDetail);
 
     // When
     ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
@@ -55,7 +55,7 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     // Then
     Assertions.assertEquals(receiptDetail, result);
     Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, operatorExternalUserId, organizationId, iud);
-    Mockito.verify(receiptDetailPIIViewMapperMock).mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    Mockito.verify(receiptDetailPIIViewMapperMock).map(receiptDetailNoPIIView);
   }
 
   @Test
@@ -88,7 +88,7 @@ class ReceiptDetailPIIViewRepositoryImplTest {
 
     Mockito.when(receiptDetailNoPIIViewRepositoryMock.findReceiptDetailView(receiptId, organizationId, iud)).thenReturn(
       Optional.of(receiptDetailNoPIIView));
-    Mockito.when(receiptDetailPIIViewMapperMock.mapToReceiptDetailDTO(receiptDetailNoPIIView)).thenReturn(receiptDetail);
+    Mockito.when(receiptDetailPIIViewMapperMock.map(receiptDetailNoPIIView)).thenReturn(receiptDetail);
 
     // When
     ReceiptDetailDTO result = receiptDetailPIIViewRepository.getReceiptDetail(receiptId, organizationId, iud);
@@ -96,7 +96,7 @@ class ReceiptDetailPIIViewRepositoryImplTest {
     // Then
     Assertions.assertEquals(receiptDetail, result);
     Mockito.verify(receiptDetailNoPIIViewRepositoryMock).findReceiptDetailView(receiptId, organizationId, iud);
-    Mockito.verify(receiptDetailPIIViewMapperMock).mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    Mockito.verify(receiptDetailPIIViewMapperMock).map(receiptDetailNoPIIView);
   }
 
   @Test

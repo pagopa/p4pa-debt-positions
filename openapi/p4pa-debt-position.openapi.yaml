@@ -2369,6 +2369,9 @@ components:
           type: string
     ReceiptDetailDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO>"
+      ]
       required:
         - receiptId
         - paymentAmountCents
