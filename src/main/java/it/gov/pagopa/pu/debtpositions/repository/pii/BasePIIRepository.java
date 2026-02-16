@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.repository;
+package it.gov.pagopa.pu.debtpositions.repository.pii;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;

@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.repository;
+package it.gov.pagopa.pu.debtpositions.repository.pii;
 
 import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import org.springframework.stereotype.Service;
 
 @Service

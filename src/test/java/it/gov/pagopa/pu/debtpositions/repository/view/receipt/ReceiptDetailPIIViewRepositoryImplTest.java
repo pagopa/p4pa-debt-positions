@@ -1,12 +1,9 @@
-package it.gov.pagopa.pu.debtpositions.repository;
+package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.view.ReceiptDetailPIIViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
-import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailNoPIIViewRepository;
-import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepository;
-import it.gov.pagopa.pu.debtpositions.repository.view.receipt.ReceiptDetailPIIViewRepositoryImpl;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;

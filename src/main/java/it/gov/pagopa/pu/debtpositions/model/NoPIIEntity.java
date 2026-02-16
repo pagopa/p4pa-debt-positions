@@ -3,10 +3,11 @@ package it.gov.pagopa.pu.debtpositions.model;
 import it.gov.pagopa.pu.debtpositions.dto.pii.FullPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.PIIDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
+import it.gov.pagopa.pu.debtpositions.repository.pii.BasePIIRepository;
 
 /**
  * A no PII representation of the entity.<BR />
- * Through the related {@link it.gov.pagopa.pu.debtpositions.repository.BasePIIRepository}, it's PII information will be stored on the related {@link PIIDTO}, of which it will store its identifier.
+ * Through the related {@link BasePIIRepository}, it's PII information will be stored on the related {@link PIIDTO}, of which it will store its identifier.
  * The related {@link BasePIIMapper} will use the related {@link PIIDTO} to build its full representation ({@link FullPIIDTO}.
  */
 @SuppressWarnings("unused") // Even if not used here, it's useful in order to relate it with the PIIDTO class which will store its PII data
