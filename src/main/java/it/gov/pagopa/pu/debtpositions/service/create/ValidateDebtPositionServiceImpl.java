@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -10,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -35,6 +37,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final BalanceService balanceService;
   private final boolean isOrgPIvaCheckEnabled;
   private final OrganizationService organizationService;
+  private final BrokerService brokerService;
   private final String categoryPrefix;
   private final String categorySuffix;
 
@@ -42,6 +45,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
                                          OrganizationService organizationService,
+                                         BrokerService brokerService,
                                          @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled,
                                          @Value("${category.prefix}") String categoryPrefix,
                                          @Value("${category.suffix}") String categorySuffix) {
@@ -50,6 +54,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
     this.organizationService = organizationService;
+    this.brokerService = brokerService;
     this.categoryPrefix = categoryPrefix;
     this.categorySuffix = categorySuffix;
   }
@@ -244,24 +249,37 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (index < 1 || index > TRANSFER_INDEX_MAX_SIZE) {
         throw new InvalidValueException("[INVALID_TRANSFER_INDEX] Transfer index should be between 1 and " + TRANSFER_INDEX_MAX_SIZE + ", provided: " + index);
       }
-      if (transferDTO.getAmountCents() <= 0) {
-        throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The amount of transfer with index " + index + " must be greater than 0");
-      }
       if (StringUtils.isBlank(transferDTO.getOrgFiscalCode()) ||
         !isValidPIVA(transferDTO.getOrgFiscalCode(), isOrgPIvaCheckEnabled)) {
         throw new InvalidValueException("[INVALID_VAT_CODE] Fiscal code of transfer with index " + index + " is not valid");
       }
       checkIbanOrStamp(transferDTO);
 
-      String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
-        .map(Organization::getOrgTypeCode)
-        .orElse(null);
-      checkTaxonomyCategory(transferDTO, orgTypeCode);
-
       if(transferDTO.getFlagOwner() == null && org.getOrgFiscalCode().equals(transferDTO.getOrgFiscalCode())) {
         transferDTO.setFlagOwner(Boolean.TRUE);
       }
+      Broker broker = brokerService.findById(org.getBrokerId(), accessToken);
+      checkTransferAmount(broker, transferDTO);
+
+      if(!Boolean.TRUE.equals(broker.getFlagDelegate())) {
+        String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
+          .map(Organization::getOrgTypeCode)
+          .orElse(null);
+        checkTaxonomyCategory(transferDTO, orgTypeCode);
+      }
     });
+  }
+
+  private void checkTransferAmount(Broker broker, TransferDTO transferDTO){
+    if (Boolean.TRUE.equals(broker.getFlagDelegate()) && Boolean.TRUE.equals(transferDTO.getFlagOwner())) {
+      if (transferDTO.getAmountCents() < 0) {
+        throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The amount of transfer with index " + transferDTO.getTransferIndex() + " must be greater than or equal to 0");
+      }
+    } else {
+      if (transferDTO.getAmountCents() <= 0) {
+        throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The amount of transfer with index " + transferDTO.getTransferIndex() + " must be greater than 0");
+      }
+    }
   }
 
   private void checkIbanOrStamp(TransferDTO transferDTO) {
