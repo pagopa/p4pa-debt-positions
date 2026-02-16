@@ -14,6 +14,7 @@ public class InstallmentViewDTOMapper extends BasePIIMapper<InstallmentViewDTO, 
     super(InstallmentPIIDTO.class, personalDataService);
   }
 
+  @Override
   public InstallmentViewDTO map(InstallmentViewNoPII noPii) {
     InstallmentPIIDTO pii = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
     return map(noPii, pii);

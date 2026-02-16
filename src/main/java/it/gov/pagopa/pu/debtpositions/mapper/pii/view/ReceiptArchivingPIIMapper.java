@@ -15,6 +15,7 @@ public class ReceiptArchivingPIIMapper extends Base2PIIMapper<ReceiptArchivingVi
     super(InstallmentPIIDTO.class, ReceiptPIIDTO.class, personalDataService);
   }
 
+  @Override
   public ReceiptArchivingView map(ReceiptArchivingNoPIIView noPii) {
     InstallmentPIIDTO installmentPIIDTO = personalDataService.get(noPii.getInstallmentPersonalDataId(), InstallmentPIIDTO.class);
     ReceiptPIIDTO receiptPIIDTO = personalDataService.get(noPii.getReceiptPersonalDataId(), ReceiptPIIDTO.class);

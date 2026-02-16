@@ -15,6 +15,7 @@ public class InstallmentPaidPIIMapper extends Base2PIIMapper<InstallmentPaidView
     super(InstallmentPIIDTO.class, ReceiptPIIDTO.class, personalDataService);
   }
 
+  @Override
   public InstallmentPaidViewDTO map(InstallmentPaidViewNoPII noPii) {
     InstallmentPIIDTO installmentPIIDTO = personalDataService.get(noPii.getPersonalDataId(), InstallmentPIIDTO.class);
     ReceiptPIIDTO receiptPIIDTO = personalDataService.get(noPii.getReceiptPersonalDataId(), ReceiptPIIDTO.class);
