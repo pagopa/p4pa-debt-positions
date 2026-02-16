@@ -1,6 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.dto.view;
 
+import it.gov.pagopa.pu.common.pii.dto.Full2PIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -16,7 +20,7 @@ import java.time.OffsetDateTime;
 @Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
-public class InstallmentPaidViewDTO {
+public class InstallmentPaidViewDTO implements Full2PIIDTO<InstallmentPaidViewNoPII, InstallmentPIIDTO, ReceiptPIIDTO> {
 
   private Long installmentId;
   private String iuf;

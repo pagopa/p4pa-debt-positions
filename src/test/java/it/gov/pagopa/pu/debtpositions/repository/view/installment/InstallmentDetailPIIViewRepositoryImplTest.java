@@ -43,13 +43,13 @@ class InstallmentDetailPIIViewRepositoryImplTest {
 
     Mockito.when(installmentDetailNoPIIViewRepositoryMock.findInstallmentDetailView(installmentId, operatorExternalUserId)).thenReturn(
       Optional.of(installmentDetailNoPIIView));
-    Mockito.when(installmentDetailPIIViewMapperMock.mapToInstallmentDetailDTO(installmentDetailNoPIIView)).thenReturn(installmentDetail);
+    Mockito.when(installmentDetailPIIViewMapperMock.map(installmentDetailNoPIIView)).thenReturn(installmentDetail);
 
     InstallmentDetailDTO result = installmentDetailPIIViewRepository.getInstallmentDetail(installmentId, operatorExternalUserId);
 
     Assertions.assertEquals(installmentDetail, result);
     Mockito.verify(installmentDetailNoPIIViewRepositoryMock).findInstallmentDetailView(installmentId, operatorExternalUserId);
-    Mockito.verify(installmentDetailPIIViewMapperMock).mapToInstallmentDetailDTO(installmentDetailNoPIIView);
+    Mockito.verify(installmentDetailPIIViewMapperMock).map(installmentDetailNoPIIView);
   }
 
   @Test

@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
-import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.mapper.Base2PIIMapperTest;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.view.InstallmentPaidViewDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.view.InstallmentPaidViewDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.InstallmentPaidViewFaker;
@@ -11,27 +11,25 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.jemos.podam.api.PodamFactory;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 
 @ExtendWith(MockitoExtension.class)
-class InstallmentPaidPIIMapperTest {
+class InstallmentPaidPIIMapperTest extends Base2PIIMapperTest<InstallmentPaidViewDTO, InstallmentPaidViewNoPII, InstallmentPIIDTO, ReceiptPIIDTO> {
 
-  private InstallmentPaidPIIMapper installmentPaidPIIMapper;
-
-  @Mock
-  private PersonalDataService personalDataServiceMock;
-
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+  private InstallmentPaidPIIMapper mapper;
 
   @BeforeEach
   void setUp() {
-    installmentPaidPIIMapper = new InstallmentPaidPIIMapper(personalDataServiceMock);
+    mapper = new InstallmentPaidPIIMapper(personalDataServiceMock);
+  }
+
+  @Override
+  protected InstallmentPaidPIIMapper getMapper() {
+    return mapper;
   }
 
   @Test
@@ -45,7 +43,7 @@ class InstallmentPaidPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(installmentPaidViewNoPII.getPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
 
     //when
-    InstallmentPaidViewDTO result = installmentPaidPIIMapper.map(installmentPaidViewNoPII);
+    InstallmentPaidViewDTO result = mapper.map(installmentPaidViewNoPII);
 
     //then
     assertNotNull(result);
@@ -55,5 +53,4 @@ class InstallmentPaidPIIMapperTest {
     Assertions.assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(), result.getOriginalRemittanceInformation());
     TestUtils.checkNotNullFields(result);
   }
-
 }

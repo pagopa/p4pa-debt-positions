@@ -25,7 +25,7 @@ public class InstallmentDetailPIIViewRepositoryImpl implements InstallmentDetail
       .orElseThrow(() -> new NotFoundException(
         "InstallmentDetailNoPIIView having installmentId %d and operatorExternalUserId %s not found".formatted(
           installmentId, operatorExternalUserId)));
-    return installmentDetailPIIViewMapper.mapToInstallmentDetailDTO(installmentDetailNoPIIView);
+    return installmentDetailPIIViewMapper.map(installmentDetailNoPIIView);
   }
 
 }

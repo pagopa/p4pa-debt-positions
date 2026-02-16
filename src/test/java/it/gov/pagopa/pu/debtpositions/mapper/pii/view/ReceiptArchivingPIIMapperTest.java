@@ -1,40 +1,31 @@
 package it.gov.pagopa.pu.debtpositions.mapper.pii.view;
 
-import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
+import it.gov.pagopa.pu.common.pii.mapper.Base2PIIMapperTest;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptArchivingView;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import uk.co.jemos.podam.api.PodamFactory;
 
 @ExtendWith(MockitoExtension.class)
-class ReceiptArchivingPIIMapperTest {
+class ReceiptArchivingPIIMapperTest extends Base2PIIMapperTest<ReceiptArchivingView, ReceiptArchivingNoPIIView, InstallmentPIIDTO, ReceiptPIIDTO> {
 
-  @Mock
-  private PersonalDataService personalDataServiceMock;
-
-  private final PodamFactory podamFactory = TestUtils.getPodamFactory();
-
-  ReceiptArchivingPIIMapper receiptArchivingPIIMapper;
+  private ReceiptArchivingPIIMapper mapper;
 
   @BeforeEach
   void setUp() {
-    receiptArchivingPIIMapper = new ReceiptArchivingPIIMapper(personalDataServiceMock);
+    mapper = new ReceiptArchivingPIIMapper(personalDataServiceMock);
   }
 
-  @AfterEach
-  void verifyNoMoreInteractions(){
-    Mockito.verifyNoMoreInteractions(
-      personalDataServiceMock);
+  @Override
+  public ReceiptArchivingPIIMapper getMapper() {
+    return mapper;
   }
 
   @Test
@@ -47,7 +38,7 @@ class ReceiptArchivingPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getInstallmentPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     //when
-    ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
+    ReceiptArchivingView result = mapper.map(receiptArchivingNoPIIView);
     //then
     Assertions.assertNotNull(result);
     Assertions.assertEquals(installmentPIIDTO.getOriginalRemittanceInformation(), result.getOriginalRemittanceInformation());
@@ -67,7 +58,7 @@ class ReceiptArchivingPIIMapperTest {
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getReceiptPersonalDataId(), ReceiptPIIDTO.class)).thenReturn(receiptPIIDTO);
     Mockito.when(personalDataServiceMock.get(receiptArchivingNoPIIView.getInstallmentPersonalDataId(), InstallmentPIIDTO.class)).thenReturn(installmentPIIDTO);
     //when
-    ReceiptArchivingView result = receiptArchivingPIIMapper.map(receiptArchivingNoPIIView);
+    ReceiptArchivingView result = mapper.map(receiptArchivingNoPIIView);
     //then
     Assertions.assertNotNull(result);
     Assertions.assertNull(result.getPayer());

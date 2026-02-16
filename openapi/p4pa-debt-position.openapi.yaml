@@ -2304,6 +2304,9 @@ components:
           format: int64
     InstallmentDetailDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.common.pii.dto.Full2PIIDTO<it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentDetailNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
+      ]
       required:
         - installmentId
         - status
@@ -2898,6 +2901,9 @@ components:
           type: string
     ReceiptArchivingView:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.common.pii.dto.Full2PIIDTO<it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
+      ]
       required:
         - paymentReceiptId
         - creditorReferenceId
