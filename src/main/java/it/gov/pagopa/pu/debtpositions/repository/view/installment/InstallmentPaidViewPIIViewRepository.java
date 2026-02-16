@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
-import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import org.springframework.data.domain.Pageable;
 

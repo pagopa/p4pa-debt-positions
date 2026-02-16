@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
 import it.gov.pagopa.pu.debtpositions.controller.generated.InstallmentApi;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import lombok.extern.slf4j.Slf4j;

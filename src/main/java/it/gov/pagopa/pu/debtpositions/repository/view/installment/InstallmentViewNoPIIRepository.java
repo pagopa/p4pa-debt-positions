@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

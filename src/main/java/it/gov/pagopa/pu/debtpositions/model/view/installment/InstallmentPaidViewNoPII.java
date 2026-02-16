@@ -1,5 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
+import it.gov.pagopa.pu.common.pii.dto.No2PIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
@@ -9,7 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -19,7 +21,7 @@ import java.time.OffsetDateTime;
 @NoArgsConstructor
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class InstallmentPaidViewNoPII implements Serializable {
+public class InstallmentPaidViewNoPII implements No2PIIDTO<InstallmentPIIDTO, ReceiptPIIDTO> {
 
   @Id
   private Long installmentId;
@@ -71,4 +73,9 @@ public class InstallmentPaidViewNoPII implements Serializable {
   private Long notificationFeeCents;
   @NotNull
   private Long personalDataId;
+
+  @Override
+  public Long getPersonalDataId2() {
+    return receiptPersonalDataId;
+  }
 }

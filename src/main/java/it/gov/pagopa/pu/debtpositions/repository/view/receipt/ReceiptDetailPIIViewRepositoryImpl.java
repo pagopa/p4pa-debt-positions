@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.mapper.ReceiptDetailPIIViewMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.view.ReceiptDetailPIIViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +24,7 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d and operatorExternalUserId %s not found".formatted(
           receiptId, operatorExternalUserId)));
-    return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    return receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
   }
 
   @Override
@@ -33,6 +33,6 @@ public class ReceiptDetailPIIViewRepositoryImpl implements ReceiptDetailPIIViewR
       .orElseThrow(() -> new NotFoundException(
         "ReceiptDetailNoPIIView having receiptId %d not found".formatted(
           receiptId)));
-    return receiptDetailPIIViewMapper.mapToReceiptDetailDTO(receiptDetailNoPIIView);
+    return receiptDetailPIIViewMapper.map(receiptDetailNoPIIView);
   }
 }

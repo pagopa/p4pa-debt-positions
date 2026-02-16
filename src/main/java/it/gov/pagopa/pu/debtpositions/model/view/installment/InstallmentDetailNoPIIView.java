@@ -1,7 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
+import it.gov.pagopa.pu.common.pii.dto.No2PIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,7 +12,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
@@ -19,7 +21,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class InstallmentDetailNoPIIView implements Serializable {
+public class InstallmentDetailNoPIIView implements No2PIIDTO<InstallmentPIIDTO, ReceiptPIIDTO> {
 
   @Id
   private Long installmentId;
@@ -56,4 +58,8 @@ public class InstallmentDetailNoPIIView implements Serializable {
   private OffsetDateTime notificationDate;
   private Long notificationFeeCents;
 
+  @Override
+  public Long getPersonalDataId2() {
+    return receiptPersonalDataId;
+  }
 }

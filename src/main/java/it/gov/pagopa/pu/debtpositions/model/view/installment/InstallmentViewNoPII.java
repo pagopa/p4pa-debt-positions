@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model.view.installment;
 
+import it.gov.pagopa.pu.common.pii.model.NoPIIEntity;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -14,7 +16,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class InstallmentViewNoPII {
+public class InstallmentViewNoPII implements NoPIIEntity<InstallmentPIIDTO> {
 
   @Id
   private Long installmentId;
@@ -36,7 +38,6 @@ public class InstallmentViewNoPII {
   private String remittanceInformation;
   @NotNull
   private byte[] debtorFiscalCodeHash;
-  @NotNull
   @NotNull
   private Long personalDataId;
   private String debtPositionTypeOrgDescription;
