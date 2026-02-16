@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.InstallmentViewDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.view.InstallmentViewDTOMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Test;

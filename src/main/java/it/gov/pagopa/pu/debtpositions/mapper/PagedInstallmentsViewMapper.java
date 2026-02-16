@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.view.InstallmentViewDTOMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentViewNoPII;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;

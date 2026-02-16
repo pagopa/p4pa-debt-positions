@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.view.ReceiptArchivingPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
