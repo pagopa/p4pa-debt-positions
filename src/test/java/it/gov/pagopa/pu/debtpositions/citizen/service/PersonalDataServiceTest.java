@@ -5,9 +5,11 @@ import it.gov.pagopa.pu.debtpositions.citizen.model.PersonalData;
 import it.gov.pagopa.pu.debtpositions.citizen.repository.PersonalDataRepository;
 import it.gov.pagopa.pu.debtpositions.config.CacheConfig;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.LongStream;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class PersonalDataServiceTest {
@@ -91,9 +96,9 @@ class PersonalDataServiceTest {
     Assertions.assertSame(pii, cache.get(piiId, pii.getClass()));
   }
 
-//region get
+  //region get
   @Test
-  void givenValidPersonalDataIdWhenGetThenOk(){
+  void givenValidPersonalDataIdWhenGetThenOk() {
     // Given
     long personalDataId = 1L;
     InstallmentPIIDTO expected = podamFactory.manufacturePojo(InstallmentPIIDTO.class);
@@ -105,11 +110,11 @@ class PersonalDataServiceTest {
     InstallmentPIIDTO installmentPIIDTO = service.get(personalDataId, InstallmentPIIDTO.class);
 
     //Then
-    Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, installmentPIIDTO,true, null, true));
+    Assertions.assertTrue(EqualsBuilder.reflectionEquals(expected, installmentPIIDTO, true, null, true));
   }
 
   @Test
-  void givenNotFoundPersonalDataIdWhenGetThenException(){
+  void givenNotFoundPersonalDataIdWhenGetThenException() {
     // Given
     long personalDataId = 1L;
     Mockito.when(repositoryMock.findById(personalDataId)).thenReturn(Optional.empty());
@@ -122,9 +127,9 @@ class PersonalDataServiceTest {
   }
 //endregion
 
-//region getAll
+  //region getAll
   @Test
-  void givenValidPersonalDataIdsWhenGetAllThenOk(){
+  void givenValidPersonalDataIdsWhenGetAllThenOk() {
     // Given
     long pId1 = 1L;
     long pId2 = 2L;
@@ -143,13 +148,13 @@ class PersonalDataServiceTest {
     Map<Long, InstallmentPIIDTO> results = service.getAll(personalDataIds, InstallmentPIIDTO.class);
 
     //Then
-    Assertions.assertTrue(EqualsBuilder.reflectionEquals(pii1, results.get(pId1),true, null, true));
+    Assertions.assertTrue(EqualsBuilder.reflectionEquals(pii1, results.get(pId1), true, null, true));
   }
 
   @Test
-  void givenNotFoundPersonalDataIdsWhenGetAllThenException(){
+  void givenNotFoundPersonalDataIdsWhenGetAllThenException() {
     // Given
-    Set<Long> personalDataIds = Set.of(1L,2L);
+    Set<Long> personalDataIds = Set.of(1L, 2L);
     Mockito.when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
       PersonalData.builder().id(1L).data(new byte[0]).type(PersonalDataType.INSTALLMENT.name()).build()));
     Mockito.when(cipherServiceMock.decryptObj(new byte[0], InstallmentPIIDTO.class)).thenReturn(podamFactory.manufacturePojo(InstallmentPIIDTO.class));
@@ -163,7 +168,47 @@ class PersonalDataServiceTest {
 //endregion
 
   @Test
-  void testDelete(){
+  void whenGet2AllThenOk() {
+    // Given
+    Set<Long> pDataIds1 = LongStream.range(0, 10).boxed().collect(Collectors.toSet());
+    Class<InstallmentPIIDTO> classType1 = InstallmentPIIDTO.class;
+    Map<Long, InstallmentPIIDTO> expectedPData1Dtos = Map.of();
+
+    Set<Long> pDataIds2 = LongStream.range(pDataIds1.size(), 10).boxed().collect(Collectors.toSet());
+    Class<ReceiptPIIDTO> classType2 = ReceiptPIIDTO.class;
+    Map<Long, ReceiptPIIDTO> expectedPData2Dtos = Map.of();
+
+    service = Mockito.spy(service);
+
+    List<PersonalData> pData = List.of();
+
+    Mockito.when(repositoryMock.findAllById(Stream.concat(
+        pDataIds1.stream(),
+        pDataIds2.stream()
+      ).toList()))
+      .thenReturn(pData);
+
+    Mockito.doReturn(expectedPData1Dtos)
+      .when(service)
+      .getAll(Mockito.same(pData), Mockito.same(pDataIds1), Mockito.same(classType1));
+
+    Mockito.doReturn(expectedPData2Dtos)
+      .when(service)
+      .getAll(Mockito.same(pData), Mockito.same(pDataIds2), Mockito.same(classType2));
+
+    // When
+    Pair<Map<Long, InstallmentPIIDTO>, Map<Long, ReceiptPIIDTO>> results = service.get2All(
+      pDataIds1, classType1,
+      pDataIds2, classType2
+    );
+
+    //Then
+    Assertions.assertSame(results.getLeft(), expectedPData1Dtos);
+    Assertions.assertSame(results.getRight(), expectedPData2Dtos);
+  }
+
+  @Test
+  void testDelete() {
     // Given
     long id = 1L;
 
