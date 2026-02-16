@@ -1,4 +1,4 @@
-package it.gov.pagopa.pu.debtpositions.mapper;
+package it.gov.pagopa.pu.debtpositions.mapper.pii;
 
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO;

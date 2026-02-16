@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.debtpositions.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.PIIDTO;
-import it.gov.pagopa.pu.debtpositions.mapper.BasePIIMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.BasePIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.NoPIIEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.util.Pair;
