@@ -24,6 +24,7 @@ public class TransferMapper {
     transfer.setCategory(dto.getCategory());
     transfer.setTransferIndex(dto.getTransferIndex());
     transfer.setMbdAttachment(dto.getMbdAttachment());
+    transfer.setFlagOwner(dto.getFlagOwner());
     return transfer;
   }
 
@@ -39,6 +40,7 @@ public class TransferMapper {
       .category(transfer.getCategory())
       .transferIndex(transfer.getTransferIndex())
       .mbdAttachment(transfer.getMbdAttachment())
+      .flagOwner(transfer.getFlagOwner())
       .build();
 
     if (transfer.getStamp() != null) {

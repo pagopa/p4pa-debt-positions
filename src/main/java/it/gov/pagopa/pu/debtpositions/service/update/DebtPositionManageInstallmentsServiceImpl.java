@@ -7,10 +7,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InstallmentCloningException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.WorkflowErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -23,6 +20,7 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -44,6 +42,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
   private final DebtPositionCancelInstallmentService debtPositionCancelInstallmentService;
   private final ValidateDebtPositionService validateDebtPositionService;
+  private final OrganizationService organizationService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final WorkflowHubService workflowHubService;
   private final int maxAttempts;
@@ -71,6 +70,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
     this.debtPositionCancelInstallmentService = debtPositionCancelInstallmentService;
     this.validateDebtPositionService = validateDebtPositionService;
+    this.organizationService = organizationService;
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.workflowHubService = workflowHubService;
     this.retryDelayMs = retryDelayMs;
@@ -92,7 +92,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     storedDebtPosition.setValidityDate(manageDebtPositionDTO.getValidityDate());
 
     PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
-      .filter(paymentOptionDTO -> paymentOptionDTO.getPaymentOptionId().equals(manageDebtPositionDTO.getPaymentOptionId()))
+      .filter(paymentOptionDTO -> manageDebtPositionDTO.getPaymentOptionId().equals(paymentOptionDTO.getPaymentOptionId()))
       .findFirst()
       .orElseThrow(() -> new NotFoundException(String.format("[PAYMENT_OPTION_NOT_FOUND] Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
@@ -172,14 +172,17 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
     debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
 
+    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("[INVALID_ORGANIZATION] Provided organization id not found on db."));
+    if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
+      throw new InvalidValueException("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE");
+    }
+
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
       .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
     validateDebtPositionService.validateInstallment(
-      dryStoredInstallment,
-      accessToken,
-      debtPositionTypeOrg,
+      dryStoredInstallment, org, accessToken, debtPositionTypeOrg,
       debtPositionDTO.getDebtPositionOrigin(),
       debtPositionDTO.getFlagPuPagoPaPayment()
     );

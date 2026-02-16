@@ -54,7 +54,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     this.categorySuffix = categorySuffix;
   }
 
-  public void validate(DebtPositionDTO debtPositionDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
+  public void validate(DebtPositionDTO debtPositionDTO, Organization org, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
 
     validateDebtPositionOrigin(debtPositionDTO);
 
@@ -85,7 +85,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       }
 
       for (InstallmentDTO installmentDTO : paymentOptionDTO.getInstallments()) {
-        validateInstallment(installmentDTO, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
+        validateInstallment(installmentDTO, org, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
       }
     }
   }
@@ -139,7 +139,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  public void validateInstallment(InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
+  public void validateInstallment(InstallmentDTO installmentDTO, Organization org, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
     if (StringUtils.isBlank(installmentDTO.getRemittanceInformation())) {
       throw new InvalidValueException("[MISSING_REMITTANCE_INFORMATION] Remittance information is mandatory");
     }
@@ -169,7 +169,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-    validateTransfers(installmentDTO.getTransfers(), accessToken);
+    validateTransfers(installmentDTO.getTransfers(), org, accessToken);
 
     Long totalAmountTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
@@ -226,7 +226,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateTransfers(List<TransferDTO> transferDTOList, String accessToken) {
+  private void validateTransfers(List<TransferDTO> transferDTOList, Organization org, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
       throw new InvalidValueException("[MISSING_TRANSFER] At least one transfer is mandatory for installment");
     }
@@ -257,6 +257,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         .map(Organization::getOrgTypeCode)
         .orElse(null);
       checkTaxonomyCategory(transferDTO, orgTypeCode);
+
+      if(transferDTO.getFlagOwner() == null && org.getOrgFiscalCode().equals(transferDTO.getOrgFiscalCode())) {
+        transferDTO.setFlagOwner(Boolean.TRUE);
+      }
     });
   }
 

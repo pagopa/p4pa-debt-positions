@@ -2180,6 +2180,8 @@ components:
           type: string
         mbdAttachment:
           type: string
+        flagOwner:
+          type: boolean
     ReceiptDTO:
       type: object
       x-implements: [
