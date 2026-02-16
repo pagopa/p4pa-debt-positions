@@ -2180,6 +2180,8 @@ components:
           type: string
         mbdAttachment:
           type: string
+        flagOwner:
+          type: boolean
     ReceiptDTO:
       type: object
       x-implements: [
@@ -2638,8 +2640,6 @@ components:
         holderPostalCc:
           type: string
         orgSector:
-          type: string
-        xsdDefinitionRef:
           type: string
         amountCents:
           type: integer

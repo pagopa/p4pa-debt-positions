@@ -28,8 +28,8 @@ class DebtPositionTypeOrgMapperTest {
     //verify
     Assertions.assertNotNull(response);
     TestUtils.checkNotNullFields(response, "debtPositionTypeOrgId", "balance", "iban", "postalIban",
-      "postalAccountCode", "holderPostalCc", "orgSector", "xsdDefinitionRef", "amountCents", "externalPaymentUrl",
+      "postalAccountCode", "holderPostalCc", "orgSector", "amountCents", "externalPaymentUrl",
       "notifyOutcomePushOrgSilServiceId", "amountActualizationOrgSilServiceId", "serviceId", "ioTemplateSubject",
-      "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId", "spontaneousFormId");
+      "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId", "spontaneousFormId", "allowedEntityType");
   }
 }

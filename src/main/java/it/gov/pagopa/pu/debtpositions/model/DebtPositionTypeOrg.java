@@ -1,12 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.validator.BalanceConstraint;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.io.Serializable;
 import lombok.AllArgsConstructor;
@@ -43,7 +39,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private String postalAccountCode;
   private String holderPostalCc;
   private String orgSector;
-  private String xsdDefinitionRef;
   private Long amountCents;
   private String externalPaymentUrl;
   private boolean flagAnonymousFiscalCode;
@@ -60,4 +55,6 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private Long amountActualizationOrgSilServiceId;
   private boolean flagExternal;
   private Long spontaneousFormId;
+  @Enumerated(EnumType.STRING)
+  private PersonEntityType allowedEntityType;
 }

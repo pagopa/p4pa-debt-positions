@@ -33,6 +33,7 @@ public class TransferFaker {
     transfer.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     transfer.setUpdateTraceId("TRACEID");
     transfer.setMbdAttachment("MBD_ATTACHMENT");
+    transfer.setFlagOwner(true);
     return transfer;
   }
 
@@ -53,6 +54,7 @@ public class TransferFaker {
       .updateOperatorExternalId("OPERATOREXTERNALUSERID")
       .updateTraceId("TRACEID")
       .mbdAttachment("MBD_ATTACHMENT")
+      .flagOwner(true)
       .build();
   }
 

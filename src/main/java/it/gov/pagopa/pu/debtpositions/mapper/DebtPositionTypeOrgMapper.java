@@ -18,7 +18,6 @@ public class DebtPositionTypeOrgMapper {
       .postalAccountCode(null)
       .holderPostalCc(null)
       .orgSector(null)
-      .xsdDefinitionRef(null)
       .amountCents(null)
       .externalPaymentUrl(null)
       .flagAnonymousFiscalCode(debtPositionType.isFlagAnonymousFiscalCode())

@@ -51,32 +51,32 @@
     <h2 class="remittance-title">${remittanceInformation}</h2>
   </div>
 
-  <div class="debtor-grid">
-    <div class="debtor-row">
-      <div class="debtor-cell debtor-cell-left">
-        <div class="debtor-block">
-          <div class="info-label">Debitore</div>
-          <div class="info-value">
-            ${debtorName}<br/>
-            <span class="fiscal-code">${debtorFiscalCode}</span>
-          </div>
-        </div>
-        <div class="debtor-block">
-          <div class="info-label">Ente Creditore</div>
-          <div class="info-value">
-            ${orgName}<br/>
-            <span class="org-fiscal-code">${orgFiscalCode}</span>
-          </div>
-        </div>
+  <div class="details-row">
+    <div class="details-cell details-cell-debtor">
+      <div class="barcode-spacer"></div>
+      <div class="info-label">Debitore</div>
+      <div class="info-value">
+        ${debtorName}<br/>
+        <span class="fiscal-code">${debtorFiscalCode}</span>
       </div>
-      <div class="debtor-cell debtor-cell-right">
-        <div class="info-label">Codice Avviso</div>
-        <div class="info-value">
-          <span class="payment-code">${nav}</span>
-          <div class="barcode-container">
-            <img src="${navBarcode}" alt="Barcode Codice Avviso" class="barcode-image" />
-          </div>
-        </div>
+    </div>
+    <div class="details-cell details-cell-org">
+      <div class="barcode-container">
+        <img src="${orgFiscalCodeBarcode}" alt="Barcode Ente Creditore" class="barcode-image" />
+      </div>
+      <div class="info-label">Ente Creditore</div>
+      <div class="info-value">
+        ${orgName}<br/>
+        <span class="org-fiscal-code">${orgFiscalCode}</span>
+      </div>
+    </div>
+    <div class="details-cell details-cell-nav">
+      <div class="barcode-container">
+        <img src="${navBarcode}" alt="Barcode Codice Avviso" class="barcode-image" />
+      </div>
+      <div class="info-label">Codice Avviso</div>
+      <div class="info-value">
+        <span class="payment-code">${nav}</span>
       </div>
     </div>
   </div>

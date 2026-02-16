@@ -18,7 +18,6 @@ public class DebtPositionTypeOrgFaker {
     debtPositionTypeOrg.setPostalAccountCode("12345678");
     debtPositionTypeOrg.setHolderPostalCc("Test Holder");
     debtPositionTypeOrg.setOrgSector("Finance");
-    debtPositionTypeOrg.setXsdDefinitionRef("definition.xsd");
     debtPositionTypeOrg.setAmountCents(100L);
     debtPositionTypeOrg.setExternalPaymentUrl("https://payment.example.com");
     debtPositionTypeOrg.setFlagAnonymousFiscalCode(true);
@@ -48,7 +47,6 @@ public class DebtPositionTypeOrgFaker {
     debtPositionTypeOrg.setPostalAccountCode("12345678");
     debtPositionTypeOrg.setHolderPostalCc("Test Holder");
     debtPositionTypeOrg.setOrgSector("Finance");
-    debtPositionTypeOrg.setXsdDefinitionRef("definition.xsd");
     debtPositionTypeOrg.setAmountCents(100L);
     debtPositionTypeOrg.setExternalPaymentUrl("https://payment.example.com");
     debtPositionTypeOrg.setFlagAnonymousFiscalCode(true);

@@ -71,7 +71,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
 
     debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().forEach(installment -> {
-        validateDebtPositionService.validateInstallment(installment, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
+        validateDebtPositionService.validateInstallment(installment, org, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
         InstallmentUtils.setStatus(installment, UNPAID);
       }));
   }
