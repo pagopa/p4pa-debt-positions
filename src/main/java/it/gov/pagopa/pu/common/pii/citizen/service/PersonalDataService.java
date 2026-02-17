@@ -79,6 +79,7 @@ public class PersonalDataService {
 
   protected <T> Map<Long, T> getAll(List<PersonalData> pData, Set<Long> personalDataIds, Class<T> classType) {
     Map<Long, T> result = pData.stream()
+      .filter(p -> personalDataIds.contains(p.getId()))
       .collect(Collectors.toMap(
         PersonalData::getId,
         personalData -> {
