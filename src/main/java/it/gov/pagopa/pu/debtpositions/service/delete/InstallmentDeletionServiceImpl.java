@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.pii.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.PaymentOptionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;

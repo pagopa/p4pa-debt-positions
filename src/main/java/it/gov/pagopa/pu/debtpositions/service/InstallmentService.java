@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
-import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.InstallmentsSearchFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;

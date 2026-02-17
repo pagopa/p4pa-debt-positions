@@ -203,7 +203,7 @@ openApiGenerate {
   typeMappings.set(
     mapOf(
       "ReceiptOrigin" to "it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType",
-      "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentPaidViewDTO",
+      "InstallmentPaidView" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentPaidViewDTO",
       "PaymentEventType" to "it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType",
       "object" to "tools.jackson.databind.JsonNode",
       "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
@@ -214,7 +214,7 @@ openApiGenerate {
       "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
       "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO",
       "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType",
-      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.InstallmentViewDTO",
+      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO",
     )
   )
   configOptions.set(

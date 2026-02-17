@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.InstallmentPIIMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.PaymentOptionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.TransferMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.*;
+import it.gov.pagopa.pu.debtpositions.repository.pii.InstallmentPIIRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

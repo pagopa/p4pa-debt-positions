@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import io.micrometer.common.util.StringUtils;
-import it.gov.pagopa.pu.debtpositions.dto.ExportPaidInstallmentsFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ActualizeAmountRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
@@ -10,7 +10,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.dto.InstallmentsSearchFiltersDTO;
+import it.gov.pagopa.pu.debtpositions.dto.filters.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
@@ -27,7 +27,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
-import it.gov.pagopa.pu.debtpositions.repository.InstallmentPIIRepository;
+import it.gov.pagopa.pu.debtpositions.repository.pii.InstallmentPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDetailPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentViewPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;

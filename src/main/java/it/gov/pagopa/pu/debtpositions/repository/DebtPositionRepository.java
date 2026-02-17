@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.repository;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
-import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;

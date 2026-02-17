@@ -1,13 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.citizen.service.DataCipherService;
+import it.gov.pagopa.pu.common.pii.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtorDebtPositionMapper;
-import it.gov.pagopa.pu.debtpositions.mapper.PagedDebtorUnpaidDebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedDebtorUnpaidDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -58,6 +58,11 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
+  public List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition) {
+    return debtPositionMapper.mapAllToDto(debtPosition);
+  }
+
+  @Override
   public DebtPositionDTO mapDebtPosition(DebtPosition debtPosition) {
     return debtPositionMapper.mapToDto(debtPosition);
   }
@@ -80,19 +85,19 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins) {
     List<DebtPosition> debtPositions = debtPositionRepository.findByOrganizationIdAndNav(organizationId, nav, debtPositionOrigins);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIuv(Long organizationId, String iuv, List<DebtPositionOrigin> debtPositionOrigin) {
     List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIuv(organizationId, iuv, debtPositionOrigin);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
   public List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndIud(Long organizationId, String iud, List<DebtPositionOrigin> debtPositionOrigin) {
     List<DebtPosition> debtPositions = debtPositionRepository.findEntityGraphByOrganizationIdAndInstallmentIud(organizationId, iud, debtPositionOrigin);
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override
@@ -139,7 +144,7 @@ public class DebtPositionServiceImpl implements DebtPositionService {
       dateTimeIntervalFilter
     );
 
-    return debtPositions.stream().map(this::mapDebtPosition).toList();
+    return mapAllDebtPosition(debtPositions);
   }
 
   @Override

@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.LocalDateTimeIntervalFilter;
+import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import org.springframework.data.domain.Pageable;
@@ -13,6 +13,7 @@ public interface DebtPositionService {
 
   void saveDebtPosition(DebtPositionDTO debtPositionDTO);
   void saveDebtPosition(DebtPosition debtPosition);
+  List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition);
   DebtPositionDTO mapDebtPosition(DebtPosition debtPosition);
   DebtPositionDTO getDebtPosition(Long debtPositionId);
   DebtPosition getDebtPositionNoPII(Long debtPositionId);

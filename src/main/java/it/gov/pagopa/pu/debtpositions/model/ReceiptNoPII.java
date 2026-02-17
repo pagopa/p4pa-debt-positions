@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO;
+import it.gov.pagopa.pu.common.pii.model.NoPIIEntity;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.*;

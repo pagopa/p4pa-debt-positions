@@ -1,6 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.model.view.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.common.pii.dto.NoPIIDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -9,7 +11,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.OffsetDateTime;
 
 @Entity
@@ -18,7 +19,7 @@ import java.time.OffsetDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class ReceiptDetailNoPIIView implements Serializable {
+public class ReceiptDetailNoPIIView implements NoPIIDTO<InstallmentPIIDTO> {
   @Id
   private Long receiptId;
   private String iuv;
@@ -45,4 +46,9 @@ public class ReceiptDetailNoPIIView implements Serializable {
   @Enumerated(EnumType.STRING)
   @NotNull
   private DebtPositionOrigin debtPositionOrigin;
+
+  @Override
+  public Long getPersonalDataId() {
+    return this.debtorPersonalDataId;
+  }
 }

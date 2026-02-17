@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.repository.view.receipt;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
-import it.gov.pagopa.pu.debtpositions.mapper.PagedReceiptsArchivingViewMapper;
+import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedReceiptsArchivingViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.BeforeEach;

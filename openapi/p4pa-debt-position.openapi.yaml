@@ -2043,7 +2043,7 @@ components:
       type: object
       x-implements: [
         "it.gov.pagopa.pu.debtpositions.dto.BaseInstallment",
-        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.InstallmentPIIDTO>"
+        "it.gov.pagopa.pu.common.pii.dto.FullEntityPIIDTO<it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO>"
       ]
       x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       properties:
@@ -2185,7 +2185,7 @@ components:
     ReceiptDTO:
       type: object
       x-implements: [
-        "it.gov.pagopa.pu.debtpositions.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.ReceiptPIIDTO>"
+        "it.gov.pagopa.pu.common.pii.dto.FullEntityPIIDTO<it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
       ]
       x-class-extra-annotation: "@com.fasterxml.jackson.annotation.JsonIgnoreProperties(\"noPII\")"
       required:
@@ -2306,6 +2306,9 @@ components:
           format: int64
     InstallmentDetailDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.common.pii.dto.Full2PIIDTO<it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentDetailNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
+      ]
       required:
         - installmentId
         - status
@@ -2371,6 +2374,9 @@ components:
           type: string
     ReceiptDetailDTO:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.common.pii.dto.FullPIIDTO<it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptDetailNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO>"
+      ]
       required:
         - receiptId
         - paymentAmountCents
@@ -2895,6 +2901,9 @@ components:
           type: string
     ReceiptArchivingView:
       type: object
+      x-implements: [
+        "it.gov.pagopa.pu.common.pii.dto.Full2PIIDTO<it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView, it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO, it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO>"
+      ]
       required:
         - paymentReceiptId
         - creditorReferenceId
