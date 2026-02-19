@@ -1,15 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import freemarker.template.TemplateException;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -38,6 +41,10 @@ class ReceiptFileServiceImplTest {
   private OrganizationService organizationServiceMock;
   @Mock
   private ReceiptService receiptServiceMock;
+  @Mock
+  private BrokerService brokerServiceMock;
+  @Mock
+  private TransferRepository transferRepositoryMock;
 
   private ReceiptFileService receiptFileService;
 
@@ -50,7 +57,14 @@ class ReceiptFileServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    receiptFileService = new ReceiptFileServiceImpl(documentCompositionMock, organizationServiceMock, receiptServiceMock);
+    receiptFileService = new ReceiptFileServiceImpl(
+      documentCompositionMock,
+      organizationServiceMock,
+      receiptServiceMock,
+      brokerServiceMock,
+      transferRepositoryMock
+    );
+
     SecurityUtilsTest.configureSecurityContext(accessToken, userId);
   }
 
@@ -67,11 +81,19 @@ class ReceiptFileServiceImplTest {
   void givenValidUserWhenGetReceiptPdfThenOk() throws TemplateException, IOException {
     Long receiptId = 123L;
     Long organizationId = 1L;
+    Long brokerId = 1L;
+
     ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
     receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
+    organization.setBrokerId(brokerId);
+
+    Broker broker = podamFactory.manufacturePojo(Broker.class);
+    broker.setBrokerId(brokerId);
+    broker.setFlagDelegate(false);
+
     byte[] expectedContent = "PDF-DATA".getBytes();
 
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
@@ -82,6 +104,9 @@ class ReceiptFileServiceImplTest {
         .thenReturn(FAKE_NAV_BARCODE_BASE64);
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
         .thenReturn(FAKE_ORG_BARCODE_BASE64);
+
+      Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+        .thenReturn(broker);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
@@ -121,11 +146,18 @@ class ReceiptFileServiceImplTest {
   void givenIOExceptionWhenGetReceiptPdfThenIllegalStateException() throws TemplateException, IOException {
     Long receiptId = 123L;
     Long organizationId = 1L;
+    Long brokerId = 1L;
+
     ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
     receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
+    organization.setBrokerId(brokerId);
+
+    Broker broker = podamFactory.manufacturePojo(Broker.class);
+    broker.setBrokerId(brokerId);
+    broker.setFlagDelegate(false);
 
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
@@ -138,6 +170,9 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
         .thenReturn(Optional.of(organization));
+
+      Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+        .thenReturn(broker);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
@@ -168,11 +203,18 @@ class ReceiptFileServiceImplTest {
   void givenTemplateExceptionWhenGetReceiptPdfThenIllegalStateException() throws TemplateException, IOException {
     Long receiptId = 123L;
     Long organizationId = 1L;
+    Long brokerId = 1L;
+
     ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
     receiptDetailDTO.setReceiptId(receiptId);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
+    organization.setBrokerId(brokerId);
+
+    Broker broker = podamFactory.manufacturePojo(Broker.class);
+    broker.setBrokerId(brokerId);
+    broker.setFlagDelegate(false);
 
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
@@ -185,6 +227,9 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
         .thenReturn(Optional.of(organization));
+
+      Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+        .thenReturn(broker);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())

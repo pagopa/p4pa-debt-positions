@@ -1,15 +1,19 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt;
 
 import freemarker.template.TemplateException;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -49,13 +53,19 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   private final DocumentComposition documentComposition;
   private final OrganizationService organizationService;
   private final ReceiptService receiptService;
+  private final BrokerService brokerService;
+  private final TransferRepository transferRepository;
 
   public ReceiptFileServiceImpl(DocumentComposition documentComposition,
                                 OrganizationService organizationService,
-                                ReceiptService receiptService) {
+                                ReceiptService receiptService,
+                                BrokerService brokerService,
+                                TransferRepository transferRepository) {
     this.documentComposition = documentComposition;
     this.organizationService = organizationService;
     this.receiptService = receiptService;
+    this.brokerService = brokerService;
+    this.transferRepository = transferRepository;
   }
 
 
@@ -64,12 +74,36 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
     if (receiptDetail == null) {
       throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");
     }
-    Organization organization = organizationService.getOrganizationById(organizationId, SecurityUtils.getAccessToken())
+
+    String accessToken = SecurityUtils.getAccessToken();
+
+    Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
       .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
+
+    Broker broker = brokerService.findById(organization.getBrokerId(), accessToken);
+
+    String orgName = organization.getOrgName();
+    String orgFiscalCode = organization.getOrgFiscalCode();
+
+    if (broker.getFlagDelegate()) {
+      Transfer ownerTransfer = transferRepository.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId)
+        .orElseThrow(() -> new NotFoundException("[TRANSFER_NOT_FOUND] Transfer with flag owner not found for receiptId " + receiptId));
+
+      orgName = ownerTransfer.getOrgName();
+      orgFiscalCode = ownerTransfer.getOrgFiscalCode();
+    }
 
     byte[] receiptPdf;
     try {
-      receiptPdf = documentComposition.executePdfTemplate(DocumentComposition.TemplateType.RECEIPT, buildTemplateModel(receiptDetail, organization));
+      receiptPdf = documentComposition.executePdfTemplate(
+        DocumentComposition.TemplateType.RECEIPT,
+        buildTemplateModel(
+          receiptDetail,
+          organization.getOrgLogo(),
+          orgName,
+          orgFiscalCode
+        )
+      );
     } catch (IOException | TemplateException e) {
       throw new IllegalStateException(e);
     }
@@ -78,17 +112,17 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       "RECEIPT_" + organization.getOrgFiscalCode() + "_" + receiptId + ".pdf");
   }
 
-  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, Organization organization) {
+  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, String logo, String orgName, String fiscalCode) {
     Map<String, Object> templateModel = new HashMap<>();
 
-    templateModel.put(RECEIPT_LOGO, StringUtils.defaultString(organization.getOrgLogo()));
-    templateModel.put(RECEIPT_ORG_NAME, organization.getOrgName());
+    templateModel.put(RECEIPT_LOGO, StringUtils.defaultString(logo));
+    templateModel.put(RECEIPT_ORG_NAME, orgName);
 
     String nav = StringUtils.defaultString(receiptDetail.getNav());
     templateModel.put(RECEIPT_NAV, nav);
     templateModel.put(RECEIPT_NAV_BARCODE, BarcodeUtils.generateCode128AsBase64(nav));
 
-    String orgFiscalCode = StringUtils.defaultString(organization.getOrgFiscalCode());
+    String orgFiscalCode = StringUtils.defaultString(fiscalCode);
     templateModel.put(RECEIPT_ORG_FISCAL_CODE, orgFiscalCode);
     templateModel.put(RECEIPT_ORG_FISCAL_CODE_BARCODE, BarcodeUtils.generateCode128AsBase64(orgFiscalCode));
 
