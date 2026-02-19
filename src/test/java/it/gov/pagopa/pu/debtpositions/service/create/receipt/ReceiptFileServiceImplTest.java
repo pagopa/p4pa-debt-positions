@@ -5,6 +5,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerServi
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
@@ -73,7 +75,9 @@ class ReceiptFileServiceImplTest {
     Mockito.verifyNoMoreInteractions(
       documentCompositionMock,
       organizationServiceMock,
-      receiptServiceMock
+      receiptServiceMock,
+      brokerServiceMock,
+      transferRepositoryMock
     );
   }
 
@@ -254,5 +258,110 @@ class ReceiptFileServiceImplTest {
 
       Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
     }
+  }
+
+  @Test
+  void givenFlagBrokerDelegateTrueWhenGetReceiptPdfThenOk() throws TemplateException, IOException {
+    Long receiptId = 123L;
+    Long organizationId = 1L;
+    Long brokerId = 1L;
+
+    ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+    receiptDetailDTO.setReceiptId(receiptId);
+
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(organizationId);
+    organization.setOrgFiscalCode("FISCALCODE");
+    organization.setBrokerId(brokerId);
+
+    Broker broker = podamFactory.manufacturePojo(Broker.class);
+    broker.setBrokerId(brokerId);
+    broker.setFlagDelegate(true);
+
+    Transfer ownerTransfer = podamFactory.manufacturePojo(Transfer.class);
+    ownerTransfer.setOrgName("OWNER_ORG_NAME");
+    ownerTransfer.setOrgFiscalCode("OWNER_FISCAL_CODE");
+
+    byte[] expectedContent = "PDF-DATA".getBytes();
+
+    FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
+      "RECEIPT_"+organization.getOrgFiscalCode()+"_"+receiptId+".pdf");
+
+    try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
+        .thenReturn(FAKE_NAV_BARCODE_BASE64);
+      barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(ownerTransfer.getOrgFiscalCode()))
+        .thenReturn(FAKE_ORG_BARCODE_BASE64);
+
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+        .thenReturn(receiptDetailDTO);
+
+      Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+        .thenReturn(Optional.of(organization));
+
+      Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+        .thenReturn(broker);
+
+      Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
+        .thenReturn(Optional.of(ownerTransfer));
+
+      Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
+        o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(ownerTransfer.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_NAME).equals(receiptDetailDTO.getDebtor().getFullName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_DEBTOR_FISCAL_CODE).equals(receiptDetailDTO.getDebtor().getFiscalCode())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PAYMENT_DATE).equals(receiptDetailDTO.getPaymentDateTime().format(DATE_TIME_FORMATTER))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
+          && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(ownerTransfer.getOrgFiscalCode())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
+          && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
+          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
+          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+      ))).thenReturn(expectedContent);
+
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+
+      assertNotNull(result);
+      assertEquals(expectedResult, result);
+    }
+  }
+
+  @Test
+  void givenBrokerDelegateTrueAndTransferNotFoundWhenGetReceiptPdfThenThrowNotFoundException() {
+    Long receiptId = 123L;
+    Long organizationId = 1L;
+    Long brokerId = 1L;
+
+    ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
+    receiptDetailDTO.setReceiptId(receiptId);
+
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(organizationId);
+    organization.setBrokerId(brokerId);
+
+    Broker broker = podamFactory.manufacturePojo(Broker.class);
+    broker.setBrokerId(brokerId);
+    broker.setFlagDelegate(true);
+
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+      .thenReturn(receiptDetailDTO);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
+      .thenReturn(Optional.of(organization));
+
+    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+      .thenReturn(broker);
+
+    Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
+      .thenReturn(Optional.empty());
+
+    Assertions.assertThrows(NotFoundException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
   }
 }
