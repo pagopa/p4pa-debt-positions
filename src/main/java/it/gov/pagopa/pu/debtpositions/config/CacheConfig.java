@@ -27,6 +27,8 @@ public class CacheConfig {
   @NestedConfigurationProperty
   private CacheConfigurationProperties pii;
   @NestedConfigurationProperty
+  private CacheConfigurationProperties broker;
+  @NestedConfigurationProperty
   private CacheConfigurationProperties organization;
   @NestedConfigurationProperty
   private CacheConfigurationProperties taxonomy;
