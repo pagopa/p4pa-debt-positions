@@ -134,6 +134,8 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 |----------------------------|---------------------------------------------|---------|
 | CACHE_PII_SIZE             | PII cache size                              | 1000    |
 | CACHE_PII_MINUTES          | PII cache retention (minutes)               | 60      |
+| CACHE_BROKER_SIZE          | Broker data cache size                      | 100     |
+| CACHE_BROKER_MINUTES       | Broker data cache retention (minutes)       | 10      |
 | CACHE_ORGANIZATION_SIZE    | Organization data cache size                | 100     |
 | CACHE_ORGANIZATION_MINUTES | Organization data cache retention (minutes) | 60      |
 | CACHE_TAXONOMY_SIZE        | Taxonomy data cache size                    | 100     |

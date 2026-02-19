@@ -204,6 +204,9 @@ cache:
   pii:
     size: "\${CACHE_PII_SIZE:1000}"
     expire-in: "\${CACHE_PII_MINUTES:60}"
+  broker:
+    size: "\${CACHE_BROKER_SIZE:100}"
+    expire-in: "\${CACHE_BROKER_MINUTES:10}"
   organization:
     size: "\${CACHE_ORGANIZATION_SIZE:100}"
     expire-in: "\${CACHE_ORGANIZATION_MINUTES:60}"
