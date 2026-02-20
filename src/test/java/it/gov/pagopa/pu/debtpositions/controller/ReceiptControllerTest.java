@@ -7,7 +7,6 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.ReceiptFileService;
-import it.gov.pagopa.pu.debtpositions.service.create.receipt.ReceiptFileServiceImpl;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.hamcrest.Matchers;
