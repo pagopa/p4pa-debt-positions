@@ -68,7 +68,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   }
 
 
-  public FileResourceDTO generateReceiptPdf(String accessToken, String operatorExternalUserId, Long receiptId, Long organizationId) {
+  public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId, String accessToken, String operatorExternalUserId) {
     ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null);
     if (receiptDetail == null) {
       throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");

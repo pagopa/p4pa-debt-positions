@@ -136,7 +136,7 @@ class ReceiptFileServiceImplTest {
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
         .thenReturn(Optional.of(organization));
 
-      FileResourceDTO result = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
 
       assertNotNull(result);
       assertEquals(expectedResult, result);
@@ -196,7 +196,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenThrow(new IOException());
 
-      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId));
     }
   }
 
@@ -253,7 +253,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenThrow(new TemplateException(null));
 
-      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId));
     }
   }
 
@@ -323,7 +323,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenReturn(expectedContent);
 
-      FileResourceDTO result = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
 
       assertNotNull(result);
       assertEquals(expectedResult, result);
@@ -359,6 +359,6 @@ class ReceiptFileServiceImplTest {
     Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
       .thenReturn(Optional.empty());
 
-    Assertions.assertThrows(NotFoundException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
+    Assertions.assertThrows(NotFoundException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId));
   }
 }

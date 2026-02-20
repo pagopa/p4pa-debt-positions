@@ -137,7 +137,7 @@ class ReceiptControllerTest {
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(pdfBytes),
       "RECEIPT_CFENTE_"+receiptId+".pdf");
 
-    Mockito.when(receiptFileServiceMock.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId)).thenReturn(expectedResult);
+    Mockito.when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId)).thenReturn(expectedResult);
 
     String urlPattern = "/receipts/{receiptId}/pdf";
     String expectedFileName = "RECEIPT_CFENTE_"+receiptId+".pdf";
@@ -155,6 +155,6 @@ class ReceiptControllerTest {
       .andExpect(MockMvcResultMatchers.content().bytes(pdfBytes))
       .andReturn();
 
-    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
+    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
   }
 }

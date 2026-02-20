@@ -52,7 +52,7 @@ public class ReceiptControllerImpl implements ReceiptApi {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
 
-    FileResourceDTO fileResourceDTO = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
+    FileResourceDTO fileResourceDTO = receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.attachment()
       .filename(fileResourceDTO.getFileName())
