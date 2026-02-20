@@ -73,4 +73,16 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     """)
   Optional<Transfer> findByOrganizationIdAndIuvAndTransferIndex(Long organizationId, String iuv, int transferIndex);
 
+  @RestResource(exported = false)
+  @Query("""
+    SELECT t
+    FROM Transfer t
+    JOIN InstallmentNoPII i ON t.installmentId = i.installmentId
+    JOIN PaymentOption p ON i.paymentOptionId = p.paymentOptionId
+    JOIN DebtPosition d ON p.debtPositionId = d.debtPositionId
+    WHERE d.organizationId = :organizationId
+    AND i.receiptId = :receiptId
+    AND t.flagOwner = true
+    """)
+  Optional<Transfer> findOwnerTransferByOrganizationIdAndReceiptId(Long organizationId, Long receiptId);
 }
