@@ -108,7 +108,6 @@ class ReceiptControllerTest {
     //given
     Long organizationId = 1L;
     Long receiptId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
     String iud = "iud";
     ReceiptDetailDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
