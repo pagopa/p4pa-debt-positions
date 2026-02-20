@@ -140,7 +140,7 @@ class DebtPositionCreationServiceImplTest {
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .category("001122233")
+      .category("9/001122233/")
       .iban(debtPositionTypeOrg.getIban())
       .amountCents(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents())
       .remittanceInformation(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getRemittanceInformation())
