@@ -48,7 +48,11 @@ public class ReceiptControllerImpl implements ReceiptApi {
   @Override
   public ResponseEntity<Resource> getReceiptPdf(Long receiptId, Long organizationId) {
     log.info("Request receipt pdf for receiptId {} and organizationId {}", receiptId, organizationId);
-    FileResourceDTO fileResourceDTO = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+
+    String accessToken = SecurityUtils.getAccessToken();
+    String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
+
+    FileResourceDTO fileResourceDTO = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
     HttpHeaders headers = new HttpHeaders();
     headers.setContentDisposition(ContentDisposition.attachment()
       .filename(fileResourceDTO.getFileName())

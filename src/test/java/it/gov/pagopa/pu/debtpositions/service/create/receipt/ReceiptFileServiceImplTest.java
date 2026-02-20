@@ -52,7 +52,7 @@ class ReceiptFileServiceImplTest {
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   private final String accessToken = "fakeAccessToken";
-  private final String userId = "USERID";
+  private final String operatorExternalUserId = "operatorExternalUserId";
 
   private static final String FAKE_NAV_BARCODE_BASE64 = "data:image/png;base64,fakeNavBarcode";
   private static final String FAKE_ORG_BARCODE_BASE64 = "data:image/png;base64,fakeOrgBarcode";
@@ -66,8 +66,6 @@ class ReceiptFileServiceImplTest {
       brokerServiceMock,
       transferRepositoryMock
     );
-
-    SecurityUtilsTest.configureSecurityContext(accessToken, userId);
   }
 
   @AfterEach
@@ -133,13 +131,13 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenReturn(expectedContent);
 
-      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
         .thenReturn(receiptDetailDTO);
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
         .thenReturn(Optional.of(organization));
 
-      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
 
       assertNotNull(result);
       assertEquals(expectedResult, result);
@@ -169,7 +167,7 @@ class ReceiptFileServiceImplTest {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
         .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
-      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
         .thenReturn(receiptDetailDTO);
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -199,7 +197,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenThrow(new IOException());
 
-      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
     }
   }
 
@@ -226,7 +224,7 @@ class ReceiptFileServiceImplTest {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(organization.getOrgFiscalCode()))
         .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
-      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
         .thenReturn(receiptDetailDTO);
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -256,7 +254,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenThrow(new TemplateException(null));
 
-      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+      Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
     }
   }
 
@@ -293,7 +291,7 @@ class ReceiptFileServiceImplTest {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(ownerTransfer.getOrgFiscalCode()))
         .thenReturn(FAKE_ORG_BARCODE_BASE64);
 
-      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+      Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
         .thenReturn(receiptDetailDTO);
 
       Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -326,7 +324,7 @@ class ReceiptFileServiceImplTest {
           && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
       ))).thenReturn(expectedContent);
 
-      FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId);
+      FileResourceDTO result = receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId);
 
       assertNotNull(result);
       assertEquals(expectedResult, result);
@@ -350,7 +348,7 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(true);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, userId, organizationId, null))
+    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
       .thenReturn(receiptDetailDTO);
 
     Mockito.when(organizationServiceMock.getOrganizationById(organizationId, accessToken))
@@ -362,6 +360,6 @@ class ReceiptFileServiceImplTest {
     Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
       .thenReturn(Optional.empty());
 
-    Assertions.assertThrows(NotFoundException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId));
+    Assertions.assertThrows(NotFoundException.class, () -> receiptFileService.generateReceiptPdf(accessToken, operatorExternalUserId, receiptId, organizationId));
   }
 }

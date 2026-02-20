@@ -11,7 +11,6 @@ import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -69,13 +68,11 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   }
 
 
-  public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId) {
-    ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, SecurityUtils.getCurrentUserExternalId(), organizationId, null);
+  public FileResourceDTO generateReceiptPdf(String accessToken, String operatorExternalUserId, Long receiptId, Long organizationId) {
+    ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null);
     if (receiptDetail == null) {
       throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");
     }
-
-    String accessToken = SecurityUtils.getAccessToken();
 
     Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
       .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
