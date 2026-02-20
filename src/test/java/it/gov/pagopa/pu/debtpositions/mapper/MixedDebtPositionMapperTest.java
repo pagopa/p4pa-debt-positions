@@ -60,7 +60,7 @@ class MixedDebtPositionMapperTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setDebtPositionTypeOrgId(100L);
     String iud = "IUD";
-    String category = "01234567";
+    String category = "9/01234567/";
 
     TransferDTO expectedTransfer = TransferDTO.builder()
       .transferIndex(1)
@@ -119,7 +119,7 @@ class MixedDebtPositionMapperTest {
         .thenReturn(Optional.of(debtPositionTypeOrg));
 
       when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
-        .thenReturn("01234567");
+        .thenReturn("9/01234567/");
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
           mixedDebtPositionDTO);
