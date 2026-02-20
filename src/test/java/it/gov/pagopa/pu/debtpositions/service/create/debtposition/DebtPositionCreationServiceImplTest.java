@@ -140,7 +140,7 @@ class DebtPositionCreationServiceImplTest {
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .category("001122233")
+      .category("9/001122233/")
       .iban(debtPositionTypeOrg.getIban())
       .amountCents(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents())
       .remittanceInformation(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getRemittanceInformation())
@@ -151,7 +151,7 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
     Mockito.when(categoryResolverServiceMock.resolveCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
-      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("001122233");
+      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("9/001122233/");
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, accessToken, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav(), InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:" + iud, accessToken))
