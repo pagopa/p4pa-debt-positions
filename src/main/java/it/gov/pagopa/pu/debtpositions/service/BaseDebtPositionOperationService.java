@@ -99,7 +99,7 @@ public abstract class BaseDebtPositionOperationService {
 
   protected WorkflowCreatedDTO invokeWorkflow(DebtPositionDTO debtPositionDTO, PaymentEventType eventType, List<InstallmentDTO> installments2operate, String accessToken, WfExecutionParameters wfExecutionParameters) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      log.info("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
+      log.debug("Invoking alignment workflow for debt position with id {}", debtPositionDTO.getDebtPositionId());
       return debtPositionSyncService.syncDebtPosition(
         debtPositionDTO,
         wfExecutionParameters,

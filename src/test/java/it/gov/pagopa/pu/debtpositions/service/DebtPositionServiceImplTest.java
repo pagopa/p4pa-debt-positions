@@ -184,7 +184,7 @@ class DebtPositionServiceImplTest {
     List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
     List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
 
-    Mockito.when(debtPositionRepositoryMock.findByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(debtPositions);
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(debtPositions);
     Mockito.when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
 
     // When
