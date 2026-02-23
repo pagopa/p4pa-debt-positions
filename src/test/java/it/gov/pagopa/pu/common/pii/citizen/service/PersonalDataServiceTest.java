@@ -22,10 +22,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
@@ -133,23 +130,69 @@ class PersonalDataServiceTest {
 
   //region getAll
   @Test
-  void givenValidPersonalDataIdsWhenGetAllThenOk() {
+  void givenPartialCachedPDataIdsWhenGetAllThenOk() {
     // Given
     long pId1 = 1L;
     long pId2 = 2L;
     Set<Long> personalDataIds = Set.of(pId1, pId2);
     InstallmentPIIDTO pii1 = podamFactory.manufacturePojo(CLASS_PII_DTO);
     InstallmentPIIDTO pii2 = podamFactory.manufacturePojo(CLASS_PII_DTO);
+
+    Set<Long> cacheMissedPIds = Set.of(pId1);
     cache.put(pId2, pii2);
 
-    Mockito.when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
-      PersonalData.builder().id(pId1).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build(),
-      PersonalData.builder().id(pId2).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()
+    Mockito.when(repositoryMock.findAllById(cacheMissedPIds)).thenReturn(List.of(
+      PersonalData.builder().id(pId1).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()
     ));
     Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
 
     // When
     Map<Long, InstallmentPIIDTO> results = service.getAll(personalDataIds, CLASS_PII_DTO);
+
+    //Then
+    Assertions.assertTrue(EqualsBuilder.reflectionEquals(pii1, results.get(pId1), true, null, true));
+    Assertions.assertSame(pii2, results.get(pId2));
+  }
+
+  @Test
+  void givenCompleteCachedPDataIdsWhenGetAllThenOk() {
+    // Given
+    long pId1 = 1L;
+    long pId2 = 2L;
+    Set<Long> personalDataIds = Set.of(pId1, pId2);
+    InstallmentPIIDTO pii1 = podamFactory.manufacturePojo(CLASS_PII_DTO);
+    InstallmentPIIDTO pii2 = podamFactory.manufacturePojo(CLASS_PII_DTO);
+
+    cache.put(pId1, pii1);
+    cache.put(pId2, pii2);
+
+    // When
+    Map<Long, InstallmentPIIDTO> results = service.getAll(personalDataIds, CLASS_PII_DTO);
+
+    //Then
+    Assertions.assertSame(pii1, results.get(pId1));
+    Assertions.assertSame(pii2, results.get(pId2));
+  }
+
+  @Test
+  void givenCachedPiiWhenGetAllProtectedThenOk() {
+    // Given
+    long pId1 = 1L;
+    long pId2 = 2L;
+    Set<Long> pDataIds = Set.of(pId1, pId2);
+    InstallmentPIIDTO pii1 = podamFactory.manufacturePojo(CLASS_PII_DTO);
+    InstallmentPIIDTO pii2 = podamFactory.manufacturePojo(CLASS_PII_DTO);
+    cache.put(pId2, pii2);
+
+    List<PersonalData> pData = List.of(
+      PersonalData.builder().id(pId1).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build(),
+      PersonalData.builder().id(pId2).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()
+    );
+
+    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
+
+    // When
+    Map<Long, InstallmentPIIDTO> results = service.getAll(pData, pDataIds, CLASS_PII_DTO);
 
     //Then
     Assertions.assertTrue(EqualsBuilder.reflectionEquals(pii1, results.get(pId1), true, null, true));
@@ -211,33 +254,50 @@ class PersonalDataServiceTest {
 //endregion
 
   @Test
-  void whenGet2AllThenOk() {
+  void givenPartialCacheHitWhenGet2AllThenOk() {
     // Given
     Set<Long> pDataIds1 = LongStream.range(0, 10).boxed().collect(Collectors.toSet());
     Class<InstallmentPIIDTO> classType1 = CLASS_PII_DTO;
-    Map<Long, InstallmentPIIDTO> expectedPData1Dtos = Map.of();
+    Map<Long, InstallmentPIIDTO> expectedPData1Retrieved = Map.of(0L, new InstallmentPIIDTO());
+    long pDataId1Cached = 5;
+    InstallmentPIIDTO pData1Cached = new InstallmentPIIDTO();
+    cache.put(pDataId1Cached, pData1Cached);
 
-    Set<Long> pDataIds2 = LongStream.range(pDataIds1.size(), 10).boxed().collect(Collectors.toSet());
+    Set<Long> pDataIds2 = LongStream.range(pDataIds1.size(), 20).boxed().collect(Collectors.toSet());
     Class<ReceiptPIIDTO> classType2 = CLASS_PII_DTO2;
-    Map<Long, ReceiptPIIDTO> expectedPData2Dtos = Map.of();
+    Map<Long, ReceiptPIIDTO> expectedPData2Retrieved = Map.of(10L, new ReceiptPIIDTO());
+    long pDataId2Cached = 15;
+    ReceiptPIIDTO pData2Cached = new ReceiptPIIDTO();
+    cache.put(pDataId2Cached, pData2Cached);
+
+    Map<Long, InstallmentPIIDTO> expectedPData1Result = new HashMap<>();
+    expectedPData1Result.put(pDataId1Cached, pData1Cached);
+    expectedPData1Result.putAll(expectedPData1Retrieved);
+
+    Map<Long, ReceiptPIIDTO> expectedPData2Result = new HashMap<>();
+    expectedPData2Result.put(pDataId2Cached, pData2Cached);
+    expectedPData2Result.putAll(expectedPData2Retrieved);
 
     service = Mockito.spy(service);
 
     List<PersonalData> pData = List.of();
 
+    Set<Long> expectedPii1CacheMiss = pDataIds1.stream().filter(id -> id != pDataId1Cached).collect(Collectors.toSet());
+    Set<Long> expectedPii2CacheMiss = pDataIds2.stream().filter(id -> id != pDataId2Cached).collect(Collectors.toSet());
+
     Mockito.when(repositoryMock.findAllById(Stream.concat(
-        pDataIds1.stream(),
-        pDataIds2.stream()
+        expectedPii1CacheMiss.stream(),
+        expectedPii2CacheMiss.stream()
       ).toList()))
       .thenReturn(pData);
 
-    Mockito.doReturn(expectedPData1Dtos)
+    Mockito.doReturn(expectedPData1Retrieved)
       .when(service)
-      .getAll(Mockito.same(pData), Mockito.same(pDataIds1), Mockito.same(classType1));
+      .getAll(Mockito.same(pData), Mockito.eq(expectedPii1CacheMiss), Mockito.same(classType1));
 
-    Mockito.doReturn(expectedPData2Dtos)
+    Mockito.doReturn(expectedPData2Retrieved)
       .when(service)
-      .getAll(Mockito.same(pData), Mockito.same(pDataIds2), Mockito.same(classType2));
+      .getAll(Mockito.same(pData), Mockito.eq(expectedPii2CacheMiss), Mockito.same(classType2));
 
     // When
     Pair<Map<Long, InstallmentPIIDTO>, Map<Long, ReceiptPIIDTO>> results = service.get2All(
@@ -246,8 +306,40 @@ class PersonalDataServiceTest {
     );
 
     //Then
-    Assertions.assertSame(results.getLeft(), expectedPData1Dtos);
-    Assertions.assertSame(results.getRight(), expectedPData2Dtos);
+    Assertions.assertEquals(expectedPData1Result, results.getLeft());
+    Assertions.assertEquals(expectedPData2Result, results.getRight());
+  }
+
+  @Test
+  void givenCompleteCacheHitWhenGet2AllThenDontRetrievethem() {
+    // Given
+    Map<Long, InstallmentPIIDTO> pData1CacheHit = new HashMap<>();
+    Set<Long> pDataIds1 = LongStream.range(0, 10).boxed()
+      .peek(id -> {
+        InstallmentPIIDTO pii = new InstallmentPIIDTO();
+        pData1CacheHit.put(id, pii);
+        cache.put(id, pii);
+      })
+      .collect(Collectors.toSet());
+
+    Map<Long, ReceiptPIIDTO> pData2CacheHit = new HashMap<>();
+    Set<Long> pDataIds2 = LongStream.range(pDataIds1.size(), 20).boxed()
+      .peek(id -> {
+        ReceiptPIIDTO pii = new ReceiptPIIDTO();
+        pData2CacheHit.put(id, pii);
+        cache.put(id, pii);
+      })
+      .collect(Collectors.toSet());
+
+    // When
+    Pair<Map<Long, InstallmentPIIDTO>, Map<Long, ReceiptPIIDTO>> results = service.get2All(
+      pDataIds1, CLASS_PII_DTO,
+      pDataIds2, CLASS_PII_DTO2
+    );
+
+    //Then
+    Assertions.assertEquals(pData1CacheHit, results.getLeft());
+    Assertions.assertEquals(pData2CacheHit, results.getRight());
   }
 
   @Test

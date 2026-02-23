@@ -12,11 +12,9 @@ import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -56,25 +54,63 @@ public class PersonalDataService {
       .orElseThrow(() -> new NotFoundException("[PII_ENTITY_NOT_FOUND] PII Entity with id " + personalDataId + " not found"));
   }
 
-  public <T> Map<Long, T> getAll(Set<Long> personalDataIds, Class<T> classType) {
-    List<PersonalData> pData = repository.findAllById(personalDataIds);
-    return getAll(pData, personalDataIds, classType);
+  /**
+   * It will inspect the cache in order to resolve the personalDataIds provided, returning the results and the missing ids
+   */
+  private <T> Pair<HashMap<Long, T>, Set<Long>> getAllThroughCache(Set<Long> personalDataIds, Class<T> classType) {
+    HashMap<Long, T> cacheHit = HashMap.newHashMap(personalDataIds.size());
+    Set<Long> missingIds = personalDataIds.stream()
+      .filter(pId -> {
+        T pii = piiCache.get(pId, classType);
+        if (pii != null) {
+          cacheHit.put(pId, pii);
+          return false;
+        } else {
+          return true;
+        }
+      })
+      .collect(Collectors.toSet());
+    return Pair.of(cacheHit, missingIds);
   }
 
-  public <T,P> Pair<Map<Long, T>, Map<Long, P>> get2All(
+  public <T> Map<Long, T> getAll(Set<Long> personalDataIds, Class<T> classType) {
+    Pair<HashMap<Long, T>, Set<Long>> cacheHit2MissingIds = getAllThroughCache(personalDataIds, classType);
+    HashMap<Long, T> result = cacheHit2MissingIds.getLeft();
+    Set<Long> cacheMissIds = cacheHit2MissingIds.getRight();
+
+    if(result.size() != personalDataIds.size()) {
+      List<PersonalData> pData = repository.findAllById(cacheMissIds);
+      result.putAll(getAll(pData, cacheMissIds, classType));
+    }
+
+    return result;
+  }
+
+  public <T, P> Pair<Map<Long, T>, Map<Long, P>> get2All(
     Set<Long> personalDataIds1, Class<T> classType1,
     Set<Long> personalDataIds2, Class<P> classType2
   ) {
-    List<Long> ids = Stream.concat(
-      personalDataIds1.stream(),
-      personalDataIds2.stream()
+    Pair<HashMap<Long, T>, Set<Long>> result1CacheHit2MissingIds = getAllThroughCache(personalDataIds1, classType1);
+    Pair<HashMap<Long, P>, Set<Long>> result2CacheHit2MissingIds = getAllThroughCache(personalDataIds2, classType2);
+
+    HashMap<Long, T> result1 = result1CacheHit2MissingIds.getLeft();
+    Set<Long> cacheMissIds1 = result1CacheHit2MissingIds.getRight();
+    HashMap<Long, P> result2 = result2CacheHit2MissingIds.getLeft();
+    Set<Long> cacheMissIds2 = result2CacheHit2MissingIds.getRight();
+
+
+    List<Long> cacheMissIds = Stream.concat(
+      cacheMissIds1.stream(),
+      cacheMissIds2.stream()
     ).toList();
 
-    List<PersonalData> pData = repository.findAllById(ids);
-    Map<Long, T> out1 = getAll(pData, personalDataIds1, classType1);
-    Map<Long, P> out2 = getAll(pData, personalDataIds2, classType2);
+    if(!CollectionUtils.isEmpty(cacheMissIds)) {
+      List<PersonalData> pData = repository.findAllById(cacheMissIds);
+      result1.putAll(getAll(pData, cacheMissIds1, classType1));
+      result2.putAll(getAll(pData, cacheMissIds2, classType2));
+    }
 
-    return Pair.of(out1, out2);
+    return Pair.of(result1, result2);
   }
 
   protected <T> Map<Long, T> getAll(List<PersonalData> pData, Set<Long> personalDataIds, Class<T> classType) {
@@ -92,7 +128,7 @@ public class PersonalDataService {
         })
       );
 
-    if(result.size() != personalDataIds.size()) {
+    if (result.size() != personalDataIds.size()) {
       String personalDataIdsNotFound = personalDataIds.stream()
         .filter(id -> result.get(id) == null)
         .map(String::valueOf)

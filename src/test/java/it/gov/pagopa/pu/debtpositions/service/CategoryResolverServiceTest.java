@@ -43,7 +43,7 @@ class CategoryResolverServiceTest {
 
     String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId, orgTypeCode);
 
-    assertEquals("001122233", result);
+    assertEquals("9/001122233/", result);
 
     verify(debtPositionTypeRepositoryMock, times(0)).findById(debtPositionTypeId);
   }
@@ -59,7 +59,7 @@ class CategoryResolverServiceTest {
 
     String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId, orgTypeCode);
 
-    assertEquals("001122233", result);
+    assertEquals("9/001122233/", result);
   }
 
   @Test
@@ -72,7 +72,7 @@ class CategoryResolverServiceTest {
 
     String result = categoryResolverService.resolveCategory(legacyPaymentMetadata, debtPositionTypeId, orgTypeCode);
 
-    assertEquals("001122233", result);
+    assertEquals("9/001122233/", result);
   }
 
   @Test
@@ -84,7 +84,7 @@ class CategoryResolverServiceTest {
 
     String result = categoryResolverService.resolveCategory(null, debtPositionTypeId, orgTypeCode);
 
-    assertEquals("001122233", result);
+    assertEquals("9/001122233/", result);
   }
 
   @Test

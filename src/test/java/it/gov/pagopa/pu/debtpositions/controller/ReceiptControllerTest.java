@@ -7,8 +7,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.CreateReceiptService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.ReceiptFileService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.hamcrest.Matchers;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +52,13 @@ class ReceiptControllerTest {
   private ReceiptFileService receiptFileServiceMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
+  private final String accessToken = "accessToken";
+  private final String operatorExternalUserId = "operatorExternalUserId";
 
+  @BeforeEach
+  void setUp() {
+    SecurityUtilsTest.configureSecurityContext(accessToken, operatorExternalUserId);
+  }
 
   @Test
   void whenCreateReceiptThenOk() throws Exception {
@@ -100,7 +108,6 @@ class ReceiptControllerTest {
     //given
     Long organizationId = 1L;
     Long receiptId = 1L;
-    String operatorExternalUserId = "operatorExternalUserId";
     String iud = "iud";
     ReceiptDetailDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
@@ -125,11 +132,12 @@ class ReceiptControllerTest {
     // GIVEN
     Long organizationId = 1L;
     Long receiptId = 99L;
+
     byte[] pdfBytes = "PDF_CONTENT".getBytes(StandardCharsets.UTF_8);
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(pdfBytes),
       "RECEIPT_CFENTE_"+receiptId+".pdf");
 
-    Mockito.when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId)).thenReturn(expectedResult);
+    Mockito.when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId)).thenReturn(expectedResult);
 
     String urlPattern = "/receipts/{receiptId}/pdf";
     String expectedFileName = "RECEIPT_CFENTE_"+receiptId+".pdf";
@@ -147,6 +155,6 @@ class ReceiptControllerTest {
       .andExpect(MockMvcResultMatchers.content().bytes(pdfBytes))
       .andReturn();
 
-    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(receiptId, organizationId);
+    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
   }
 }
