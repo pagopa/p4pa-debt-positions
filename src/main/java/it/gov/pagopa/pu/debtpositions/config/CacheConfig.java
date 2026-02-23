@@ -46,6 +46,7 @@ public class CacheConfig {
   public CacheManager localCacheManager() {
     CaffeineCacheManager cacheManager = new CaffeineCacheManager();
     cacheManager.registerCustomCache(Fields.pii, buildCache(pii));
+    cacheManager.registerCustomCache(Fields.broker, buildCache(broker));
     cacheManager.registerCustomCache(Fields.organization, buildCache(organization));
     cacheManager.registerCustomCache(Fields.taxonomy, buildCache(taxonomy));
     return cacheManager;
