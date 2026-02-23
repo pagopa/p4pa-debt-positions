@@ -56,7 +56,7 @@ class TechnicalDpUpdateServiceTest {
     Organization organization = new Organization();
     DebtPositionDTO expectedResult = new DebtPositionDTO();
 
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(dpTypeOrgId)))
+    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(dpTypeOrgId), Mockito.any()))
       .thenReturn(expectedResult);
 
     service = Mockito.spy(service);

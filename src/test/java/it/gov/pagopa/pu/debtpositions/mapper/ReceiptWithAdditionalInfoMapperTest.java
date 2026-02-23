@@ -36,7 +36,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     Long providedTypeOrgId = 12345L;
 
     //when
-    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization, providedTypeOrgId);
+    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization, providedTypeOrgId, null);
 
     //verify
     DebtPositionOrigin debtPositionOrigin = switch (receiptOrigin) {
@@ -83,7 +83,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     Long providedTypeOrgId = 67890L;
 
     // When
-    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, secondaryOrganization, providedTypeOrgId);
+    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, secondaryOrganization, providedTypeOrgId, null);
 
     // Then
     InstallmentDTO installmentDTO = commonAsserts(debtPositionDTO, DebtPositionOrigin.SECONDARY_ORG, providedTypeOrgId);
