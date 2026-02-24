@@ -30,7 +30,7 @@ public class ReceiptBasedTechnicalDpHandlerService {
     public DebtPosition createAndPublishTechDp(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
         Long debtPositionTypeOrgId = extractDebtPositionTypeOrgId(organization, receiptDTO);
 
-        DebtPositionDTO debtPositionDTO = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId);
+        DebtPositionDTO debtPositionDTO = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId, null);
         debtPositionService.saveDebtPosition(debtPositionDTO);
         return updateAndSynchronizeTechDp.publishTechDp(debtPositionDTO, receiptDTO);
     }

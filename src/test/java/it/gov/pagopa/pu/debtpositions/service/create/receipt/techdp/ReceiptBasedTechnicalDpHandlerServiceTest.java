@@ -72,7 +72,7 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
     Mockito.when(paymentFlowOrchestratorServiceMock.resolveDebtPositionTypeOrgId(1L, "CODE", null))
       .thenReturn(resolvedId);
 
-    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(resolvedId)))
+    Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(resolvedId), Mockito.any()))
       .thenReturn(dpDto);
 
     Mockito.when(updateAndSynchronizeTechDpMock.publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO)))
