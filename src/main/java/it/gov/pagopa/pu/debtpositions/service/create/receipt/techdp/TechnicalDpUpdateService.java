@@ -30,7 +30,7 @@ public class TechnicalDpUpdateService {
   }
 
   public DebtPositionDTO updateDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId) {
-    DebtPositionDTO updatedTechDp = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId);
+    DebtPositionDTO updatedTechDp = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId, dp);
     updateDp(dp, updatedTechDp);
     return updatedTechDp;
   }

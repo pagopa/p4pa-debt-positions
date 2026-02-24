@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
@@ -14,8 +16,20 @@ import java.util.stream.Stream;
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
 
-  public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId) {
+  public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId, DebtPosition existingDp) {
     List<TransferDTO> techTransfers = buildTechTransfers(receiptDTO, organization);
+
+    String iupdPagopa;
+    String iud;
+
+    if (existingDp != null && !existingDp.getPaymentOptions().isEmpty() && !existingDp.getPaymentOptions().getFirst().getInstallments().isEmpty()) {
+      InstallmentNoPII existingInstallment = existingDp.getPaymentOptions().getFirst().getInstallments().getFirst();
+      iupdPagopa = existingInstallment.getIupdPagopa();
+      iud = existingInstallment.getIud();
+    } else {
+      iupdPagopa = Utilities.generateRandomIupd(organization.getOrgFiscalCode());
+      iud = receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD();
+    }
 
     return DebtPositionDTO.builder()
       .organizationId(organization.getOrganizationId())
@@ -36,9 +50,9 @@ public class ReceiptWithAdditionalInfoMapper {
         .installments(List.of(InstallmentDTO.builder()
           .status(InstallmentStatus.PAID)
           .syncStatus(null)
-          .iupdPagopa(Utilities.generateRandomIupd(organization.getOrgFiscalCode()))
+          .iupdPagopa(iupdPagopa)
           .generateNotice(true)
-          .iud(receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD())
+          .iud(iud)
           .iuv(receiptDTO.getCreditorReferenceId())
           .iuf(null)
           .iur(receiptDTO.getPaymentReceiptId())
