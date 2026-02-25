@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
@@ -39,8 +40,15 @@ public class PrimaryOrgPaymentHandlerService {
     Optional<InstallmentNoPII> installment = installmentRetrieverService.retrieve(primaryOrg, receiptDTO.getNoticeNumber(), receiptDTO.getIud());
     if(installment.isPresent()){
       if (broker.getFlagDelegate()) {
-        // TODO: implementa check
+        boolean isDelegateValid = installment.get().getTransfers().stream()
+          .anyMatch(transfer -> Boolean.TRUE.equals(transfer.getFlagOwner())
+            && receiptDTO.getOrgFiscalCode().equals(transfer.getOrgFiscalCode()));
+
+        if (!isDelegateValid) {
+          throw new InvalidValueException("[INVALID_RECEIPT_ORG_MISMATCH] Receipt org fiscal code doesn't match the transfer owner org fiscal code.");
+        }
       }
+
       return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO, primaryOrg, accessToken);
     } else {
       return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO);

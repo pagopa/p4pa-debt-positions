@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -55,9 +56,10 @@ class PrimaryOrgPaymentHandlerServiceTest {
     // Given
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    Broker broker = new Broker();
 
     // When
-    Optional<DebtPosition> result = service.handlePayment(null, receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(null, receiptDTO, broker, accessToken);
 
     // Then
     Assertions.assertTrue(result.isEmpty());
@@ -69,6 +71,8 @@ class PrimaryOrgPaymentHandlerServiceTest {
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = new Organization();
+    Broker broker = new Broker();
+    broker.setFlagDelegate(false);
     InstallmentNoPII installment = new InstallmentNoPII();
     DebtPosition dp = new DebtPosition();
 
@@ -78,7 +82,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
       .thenReturn(dp);
 
     // When
-    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, broker, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());
@@ -91,6 +95,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
     String accessToken = "ACCESSTOKEN";
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     Organization organization = new Organization();
+    Broker broker = new Broker();
     DebtPosition dp = new DebtPosition();
 
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
@@ -99,7 +104,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
       .thenReturn(dp);
 
     // When
-    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, accessToken);
+    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, broker, accessToken);
 
     // Then
     Assertions.assertTrue(result.isPresent());
