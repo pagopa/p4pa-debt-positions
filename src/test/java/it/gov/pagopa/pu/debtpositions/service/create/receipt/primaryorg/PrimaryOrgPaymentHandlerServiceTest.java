@@ -165,7 +165,31 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
       .thenReturn(Optional.of(installment));
 
-   Assertions.assertThrows(InvalidValueException.class, () ->
+    Assertions.assertThrows(InvalidValueException.class, () ->
+      service.handlePayment(organization, receiptDTO, broker, accessToken)
+    );
+  }
+
+  @Test
+  void givenBrokerDelegateAndNoOwnerTransferWhenHandlePaymentThenThrowInvalidValueException() {
+    String accessToken = "ACCESSTOKEN";
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+
+    Organization organization = new Organization();
+    Broker broker = new Broker();
+    broker.setFlagDelegate(true);
+
+    Transfer transfer = new Transfer();
+    transfer.setFlagOwner(false);
+    transfer.setOrgFiscalCode(receiptDTO.getOrgFiscalCode());
+
+    InstallmentNoPII installment = new InstallmentNoPII();
+    installment.setTransfers(new TreeSet<>(Set.of(transfer)));
+
+    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+      .thenReturn(Optional.of(installment));
+
+    Assertions.assertThrows(InvalidValueException.class, () ->
       service.handlePayment(organization, receiptDTO, broker, accessToken)
     );
   }
