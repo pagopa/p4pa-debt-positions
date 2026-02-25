@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
@@ -244,5 +245,27 @@ class CreateReceiptServiceTest {
     Assertions.assertEquals(storedReceipt.getReceiptId(), result.getReceiptId());
 
     Mockito.verify(secondaryOrgPaymentHandlerServiceMock).handle(receiptDTO, accessToken);
+  }
+
+  @Test
+  void givenOrgMismatchAndNotDelegateWhenCreateReceiptThenThrowInvalidValueException() {
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrgFiscalCode("FISCAL_CODE");
+    String accessToken = "ACCESSTOKEN";
+
+    Organization organization = new Organization();
+    organization.setOrganizationId(receiptDTO.getOrganizationId());
+    organization.setOrgFiscalCode("FISCAL_CODE2");
+    organization.setBrokerId(1L);
+    Broker broker = new Broker();
+    broker.setFlagDelegate(false);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+      .thenReturn(broker);
+
+    Assertions.assertThrows(InvalidValueException.class,
+      () -> service.createReceipt(receiptDTO, accessToken));
   }
 }

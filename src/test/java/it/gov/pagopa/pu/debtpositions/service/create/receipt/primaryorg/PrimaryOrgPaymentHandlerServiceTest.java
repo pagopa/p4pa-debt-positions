@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
@@ -17,7 +18,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.Optional;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class PrimaryOrgPaymentHandlerServiceTest {
@@ -111,4 +112,35 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Assertions.assertSame(dp, result.get());
   }
 
+  @Test
+  void givenBrokerDelegateAndValidOrgWhenHandlePaymentThenOk() {
+    String accessToken = "ACCESSTOKEN";
+    String fiscalCode = "FISCAL_CODE_123";
+
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrgFiscalCode(fiscalCode);
+
+    Organization organization = new Organization();
+    Broker broker = new Broker();
+    broker.setFlagDelegate(true);
+
+    Transfer transfer = new Transfer();
+    transfer.setFlagOwner(true);
+    transfer.setOrgFiscalCode(fiscalCode);
+
+    InstallmentNoPII installment = new InstallmentNoPII();
+    installment.setTransfers(new TreeSet<>(Set.of(transfer)));
+
+    DebtPosition dp = new DebtPosition();
+
+    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+      .thenReturn(Optional.of(installment));
+    Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(installment, receiptDTO, organization, accessToken))
+      .thenReturn(dp);
+
+    Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, broker, accessToken);
+
+    Assertions.assertTrue(result.isPresent());
+    Assertions.assertSame(dp, result.get());
+  }
 }
