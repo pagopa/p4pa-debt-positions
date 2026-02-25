@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
@@ -142,5 +143,30 @@ class PrimaryOrgPaymentHandlerServiceTest {
 
     Assertions.assertTrue(result.isPresent());
     Assertions.assertSame(dp, result.get());
+  }
+
+  @Test
+  void givenBrokerDelegateAndInvalidOrgWhenHandlePaymentThenThrowInvalidValueException() {
+    String accessToken = "ACCESSTOKEN";
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrgFiscalCode("EXPECTED_ORG");
+
+    Organization organization = new Organization();
+    Broker broker = new Broker();
+    broker.setFlagDelegate(true);
+
+    Transfer transfer = new Transfer();
+    transfer.setFlagOwner(true);
+    transfer.setOrgFiscalCode("DIFFERENT_ORG");
+
+    InstallmentNoPII installment = new InstallmentNoPII();
+    installment.setTransfers(new TreeSet<>(Set.of(transfer)));
+
+    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+      .thenReturn(Optional.of(installment));
+
+   Assertions.assertThrows(InvalidValueException.class, () ->
+      service.handlePayment(organization, receiptDTO, broker, accessToken)
+    );
   }
 }

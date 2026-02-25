@@ -86,10 +86,11 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     }
 
     Broker broker = brokerService.findById(org.getBrokerId(), accessToken);
-    if (!Boolean.TRUE.equals(broker.getFlagDelegate())) {
-      if (!org.getOrgFiscalCode().equals("UNKNOWN") && !org.getOrgFiscalCode().equals(receiptOrgFiscalCode)) {
-        throw new InvalidValueException("[INVALID_RECEIPT_ORG_MISMATCH] Org fiscal code doesn't match receipt org fiscal code.");
-      }
+
+    if (!Boolean.TRUE.equals(broker.getFlagDelegate())
+      && !org.getOrgFiscalCode().equals("UNKNOWN")
+      && !org.getOrgFiscalCode().equals(receiptOrgFiscalCode)) {
+      throw new InvalidValueException("[INVALID_RECEIPT_ORG_MISMATCH] Org fiscal code doesn't match receipt org fiscal code.");
     }
 
     return Pair.of(broker, org);
