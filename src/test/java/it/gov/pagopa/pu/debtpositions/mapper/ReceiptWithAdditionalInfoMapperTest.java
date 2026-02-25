@@ -2,6 +2,9 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.Assertions;
@@ -13,7 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.List;
+import java.util.*;
 
 @ExtendWith(MockitoExtension.class)
 class ReceiptWithAdditionalInfoMapperTest {
@@ -36,7 +39,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     Long providedTypeOrgId = 12345L;
 
     //when
-    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization, providedTypeOrgId);
+    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, organization, providedTypeOrgId, null);
 
     //verify
     DebtPositionOrigin debtPositionOrigin = switch (receiptOrigin) {
@@ -83,7 +86,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     Long providedTypeOrgId = 67890L;
 
     // When
-    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, secondaryOrganization, providedTypeOrgId);
+    DebtPositionDTO debtPositionDTO = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptWithAdditionalNodeDataDTO, secondaryOrganization, providedTypeOrgId, null);
 
     // Then
     InstallmentDTO installmentDTO = commonAsserts(debtPositionDTO, DebtPositionOrigin.SECONDARY_ORG, providedTypeOrgId);
@@ -91,5 +94,35 @@ class ReceiptWithAdditionalInfoMapperTest {
     Assertions.assertEquals(1, installmentDTO.getTransfers().size());
     Assertions.assertEquals(2, installmentDTO.getTransfers().getFirst().getTransferIndex());
     Assertions.assertEquals(secondaryOrganization.getOrgFiscalCode(), installmentDTO.getTransfers().getFirst().getOrgFiscalCode());
+  }
+
+  @Test
+  void givenExistingDebtPositionWhenMapToDTOThenUseExistingIupdAndIud() {
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+
+    receiptDTO.setOrgFiscalCode(organization.getOrgFiscalCode());
+    receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_PAGOPA);
+    Long providedTypeOrgId = 1L;
+
+    String expectedIupdPagopa = "EXISTING_IUPD";
+    String expectedIud = "EXISTING_IUD";
+
+    InstallmentNoPII existingInstallment = podamFactory.manufacturePojo(InstallmentNoPII.class);
+    existingInstallment.setIupdPagopa(expectedIupdPagopa);
+    existingInstallment.setIud(expectedIud);
+
+   PaymentOption existingPaymentOption = podamFactory.manufacturePojo(PaymentOption.class);
+    existingPaymentOption.setInstallments(new TreeSet<>(List.of(existingInstallment)));
+
+    DebtPosition existingDp = podamFactory.manufacturePojo(DebtPosition.class);
+    existingDp.setPaymentOptions(new TreeSet<>(List.of(existingPaymentOption)));
+
+    DebtPositionDTO result = receiptWithAdditionalInfoMapper.mapToDebtPosition(receiptDTO, organization, providedTypeOrgId, existingDp);
+
+    InstallmentDTO mappedInstallment = commonAsserts(result, DebtPositionOrigin.RECEIPT_PAGOPA, providedTypeOrgId);
+
+    Assertions.assertEquals(expectedIupdPagopa, mappedInstallment.getIupdPagopa());
+    Assertions.assertEquals(expectedIud, mappedInstallment.getIud());
   }
 }

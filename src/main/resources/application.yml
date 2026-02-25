@@ -19,11 +19,23 @@ spring:
       username: "\${DEBT_POSITIONS_DB_USER}"
       password: "\${DEBT_POSITIONS_DB_PASSWORD}"
       driverClassName: org.postgresql.Driver
+      idle-timeout: "\${DEBT_POSITIONS_DB_CONNECTION_IDLE_TIMEOUT_MILLISECONDS:600000}"
+      connection-timeout: "\${DEBT_POSITIONS_DB_CONNECTION_TIMEOUT_MILLISECONDS:30000}"
+      keepalive-time: "\${DEBT_POSITIONS_DB_CONNECTION_KEEPALIVE_TIME_MILLISECONDS:120000}"
+      max-lifetime: "\${DEBT_POSITIONS_DB_CONNECTION_MAX_LIFETIME_MILLISECONDS:1800000}"
+      maximum-pool-size: "\${DEBT_POSITIONS_DB_CONNECTION_MAX_POOL_SIZE:10}"
+      minimum-idle: "\${DEBT_POSITIONS_DB_CONNECTION_MIN_IDLE:10}"
     citizen:
       jdbc-url: "\${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:\${CITIZENDB_PORT:5432}/citizen}"
       username: "\${CITIZENDB_USER}"
       password: "\${CITIZENDB_PASSWORD}"
       driverClassName: org.postgresql.Driver
+      idle-timeout: "\${CITIZENDB_CONNECTION_IDLE_TIMEOUT_MILLISECONDS:600000}"
+      connection-timeout: "\${CITIZENDB_CONNECTION_TIMEOUT_MILLISECONDS:30000}"
+      keepalive-time: "\${CITIZENDB_CONNECTION_KEEPALIVE_TIME_MILLISECONDS:120000}"
+      max-lifetime: "\${CITIZENDB_CONNECTION_MAX_LIFETIME_MILLISECONDS:1800000}"
+      maximum-pool-size: "\${CITIZENDB_CONNECTION_MAX_POOL_SIZE:10}"
+      minimum-idle: "\${CITIZENDB_CONNECTION_MIN_IDLE:10}"
   data:
     rest:
       basePath: crud

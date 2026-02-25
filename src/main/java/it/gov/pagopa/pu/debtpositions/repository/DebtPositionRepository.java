@@ -111,7 +111,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
       )
   """)
   @EntityGraph(value = "completeDebtPosition")
-  List<DebtPosition> findByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
+  List<DebtPosition> findEntityGraphByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""

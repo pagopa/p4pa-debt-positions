@@ -53,7 +53,7 @@ public class CategoryResolverService {
       taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
     }
 
-    return getTaxonomyCodeFromCategory(taxonomyCode, categoryPrefix, categorySuffix);
+    return formatCategoryTransferFromTaxonomyCode(taxonomyCode, categoryPrefix, categorySuffix);
   }
 
   private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
