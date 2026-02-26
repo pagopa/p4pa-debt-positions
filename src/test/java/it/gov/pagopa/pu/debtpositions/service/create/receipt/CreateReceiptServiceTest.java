@@ -267,4 +267,18 @@ class CreateReceiptServiceTest {
     Assertions.assertThrows(InvalidValueException.class,
       () -> service.createReceipt(receiptDTO, accessToken));
   }
+
+  @Test
+  void givenOrganizationIdNotFoundWhenCreateReceiptThenThrowInvalidValueException() {
+    Long orgId = 123L;
+    String accessToken = "ACCESSTOKEN";
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrganizationId(orgId);
+
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.empty());
+
+    Assertions.assertThrows(InvalidValueException.class,
+      () -> service.createReceipt(receiptDTO, accessToken));
+  }
 }
