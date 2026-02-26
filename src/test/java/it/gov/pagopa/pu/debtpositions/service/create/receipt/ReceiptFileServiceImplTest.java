@@ -112,6 +112,7 @@ class ReceiptFileServiceImplTest {
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -178,6 +179,7 @@ class ReceiptFileServiceImplTest {
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -235,6 +237,7 @@ class ReceiptFileServiceImplTest {
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -305,6 +308,7 @@ class ReceiptFileServiceImplTest {
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(ownerTransfer.getOrgName())
+          && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals("")
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
