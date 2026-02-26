@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.repository.pii.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
@@ -80,15 +81,18 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   }
 
   private Pair<Broker, Organization> validateAndRetriveBrokerOrgPair(Long receiptOrgId, String receiptOrgFiscalCode, String accessToken) {
+    if (Objects.equals(receiptOrgId, Constants.TECHNICAL_ORG_ID)) {
+      return Pair.of(null, null);
+    }
+
     Organization org = organizationService.getOrganizationById(receiptOrgId, accessToken).orElse(null);
-    if (org == null || Objects.equals(org.getOrganizationId(), -1L)) {
+    if (org == null) {
       return Pair.of(null, null);
     }
 
     Broker broker = brokerService.findById(org.getBrokerId(), accessToken);
 
     if (!Boolean.TRUE.equals(broker.getFlagDelegate())
-      && !org.getOrgFiscalCode().equals("UNKNOWN")
       && !org.getOrgFiscalCode().equals(receiptOrgFiscalCode)) {
       throw new InvalidValueException("[INVALID_RECEIPT_ORG_MISMATCH] Org fiscal code doesn't match receipt org fiscal code.");
     }
