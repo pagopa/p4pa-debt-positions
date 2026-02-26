@@ -52,7 +52,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   public ReceiptDTO createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     logReceiptData("createReceipt", receiptDTO);
 
-    Pair<Broker, Organization> brokerOrgPair = validateAndRetriveBrokerOrgPair(receiptDTO.getOrganizationId(), receiptDTO.getOrgFiscalCode(), accessToken);
+    Pair<Broker, Organization> brokerOrgPair = validateAndRetrieveBrokerOrgPair(receiptDTO.getOrganizationId(), receiptDTO.getOrgFiscalCode(), accessToken);
     Organization primaryOrg = brokerOrgPair.getRight();
 
     ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
@@ -80,14 +80,14 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     return receiptDTO;
   }
 
-  private Pair<Broker, Organization> validateAndRetriveBrokerOrgPair(Long receiptOrgId, String receiptOrgFiscalCode, String accessToken) {
-    if (Objects.equals(receiptOrgId, Constants.TECHNICAL_ORG_ID)) {
+  private Pair<Broker, Organization> validateAndRetrieveBrokerOrgPair(Long receiptOrgId, String receiptOrgFiscalCode, String accessToken) {
+    if (Objects.equals(receiptOrgId, Constants.TECHNICAL_UNKNOWN_ORG_ID)) {
       return Pair.of(null, null);
     }
 
     Organization org = organizationService.getOrganizationById(receiptOrgId, accessToken).orElse(null);
     if (org == null) {
-      return Pair.of(null, null);
+      throw new InvalidValueException(String.format("[INVALID_RECEIPT_ORG] Organization with id %s not found", receiptOrgId));
     }
 
     Broker broker = brokerService.findById(org.getBrokerId(), accessToken);

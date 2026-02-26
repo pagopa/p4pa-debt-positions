@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.repository.pii.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -222,13 +223,11 @@ class CreateReceiptServiceTest {
     String accessToken = "ACCESSTOKEN";
 
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+    receiptDTO.setOrganizationId(Constants.TECHNICAL_UNKNOWN_ORG_ID);
     receiptDTO.setOrgFiscalCode(originalFiscalCode);
 
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptId(999L);
-
-    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.empty());
 
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(null);
