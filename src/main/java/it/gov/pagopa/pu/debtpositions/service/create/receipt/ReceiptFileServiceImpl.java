@@ -31,6 +31,8 @@ import java.util.Map;
 public class ReceiptFileServiceImpl implements ReceiptFileService {
   public static final String RECEIPT_LOGO = "logo";
   public static final String RECEIPT_ORG_NAME = "orgName";
+  public static final String RECEIPT_HEADER_ORG_NAME = "headerOrgName";
+  public static final String RECEIPT_FOOTER_ORG_NAME = "footerOrgName";
   public static final String RECEIPT_NAV = "nav";
   public static final String RECEIPT_NAV_BARCODE = "navBarcode";
   public static final String RECEIPT_ORG_FISCAL_CODE_BARCODE = "orgFiscalCodeBarcode";
@@ -80,6 +82,8 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
     Broker broker = brokerService.findById(organization.getBrokerId(), accessToken);
 
     String orgName = organization.getOrgName();
+    String headerOrgName = orgName;
+    String footerOrgName = orgName;
     String orgFiscalCode = organization.getOrgFiscalCode();
 
     if (broker.getFlagDelegate()) {
@@ -87,6 +91,8 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
         .orElseThrow(() -> new NotFoundException("[TRANSFER_NOT_FOUND] Transfer with flag owner not found for receiptId " + receiptId));
 
       orgName = ownerTransfer.getOrgName();
+      headerOrgName = "";
+      footerOrgName = broker.getBrokerName();
       orgFiscalCode = ownerTransfer.getOrgFiscalCode();
     }
 
@@ -97,6 +103,8 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
         buildTemplateModel(
           receiptDetail,
           organization.getOrgLogo(),
+          headerOrgName,
+          footerOrgName,
           orgName,
           orgFiscalCode
         )
@@ -109,10 +117,12 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       "RECEIPT_" + organization.getOrgFiscalCode() + "_" + receiptId + ".pdf");
   }
 
-  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, String logo, String orgName, String fiscalCode) {
+  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, String logo, String headerOrgName, String footerOrgName, String orgName, String fiscalCode) {
     Map<String, Object> templateModel = new HashMap<>();
 
     templateModel.put(RECEIPT_LOGO, StringUtils.defaultString(logo));
+    templateModel.put(RECEIPT_HEADER_ORG_NAME, headerOrgName);
+    templateModel.put(RECEIPT_FOOTER_ORG_NAME, footerOrgName);
     templateModel.put(RECEIPT_ORG_NAME, orgName);
 
     String nav = StringUtils.defaultString(receiptDetail.getNav());
