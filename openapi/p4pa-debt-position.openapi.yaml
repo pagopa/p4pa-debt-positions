@@ -2461,8 +2461,12 @@ components:
         - $ref: "#/components/schemas/ReceiptDTO"
         - type: object
           required:
+            - organizationId
             - transfers
           properties:
+            organizationId:
+              type: integer
+              format: int64
             transfers:
               type: array
               minItems: 1
