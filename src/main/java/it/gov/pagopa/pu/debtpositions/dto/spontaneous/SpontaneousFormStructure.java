@@ -21,5 +21,5 @@ public class SpontaneousFormStructure implements Serializable {
   @JsonAlias("campoTotaleInclusoInXSD")
   private String amountFieldName;
   private List<String> summaryFields;
-  private List<String> submitFields;
+  private List<SpontaneousFormItemDTO> submitFields;
 }
