@@ -62,6 +62,7 @@ val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.3"
 val httpClientVersion = "5.6"
+val httpCoreVersion = "5.4.1"
 val openHtmlToPdfVersion = "1.0.10"
 val commonsLang3Version = "3.20.0"
 val lz4JavaVersion = "1.10.4"
@@ -112,6 +113,7 @@ dependencies {
   implementation("org.bouncycastle:bcprov-jdk18on:$bouncycastleVersion")
   implementation("org.postgresql:postgresql:$postgresJdbcVersion")
   implementation("org.apache.httpcomponents.client5:httpclient5:$httpClientVersion")
+  implementation("org.apache.httpcomponents.core5:httpcore5:$httpCoreVersion")
   implementation("org.springframework.boot:spring-boot-starter-freemarker")
   implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:${openHtmlToPdfVersion}")
   implementation("com.itextpdf:kernel:${itextVersion}")
