@@ -2,13 +2,14 @@ package it.gov.pagopa.pu.debtpositions.dto.spontaneous;
 
 import it.gov.pagopa.pu.debtpositions.enums.RenderType;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Map;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.Map;
 
 @Data
 @AllArgsConstructor
@@ -70,5 +71,5 @@ public class SpontaneousFormField implements Serializable {
   private String errorMessage;
   private String helpMessage;
   private String source;
-  private List<String> sourceParams;
+  private List<SpontaneousFormItemDTO> sourceParams;
 }
