@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +51,7 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Param("iud") String iud);
+    @RequestParam(required = false) @Param("iud") String iud);
 
   default Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     Long receiptId,
@@ -107,7 +108,7 @@ public interface ReceiptDetailNoPIIViewRepository extends Repository<ReceiptDeta
   List<ReceiptDetailNoPIIView> findReceiptDetailViewInner(
     @Parameter(required = true) @Param("receiptId") Long receiptId,
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Param("iud") String iud);
+    @RequestParam(required = false) @Param("iud") String iud);
 
   default Optional<ReceiptDetailNoPIIView> findReceiptDetailView(
     Long receiptId,

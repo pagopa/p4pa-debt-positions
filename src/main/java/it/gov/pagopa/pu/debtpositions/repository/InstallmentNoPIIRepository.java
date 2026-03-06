@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -83,7 +84,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true) @Param("iur") String iur,
     @Parameter(required = true) @Param("transferIndex") int transferIndex,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+    @RequestParam(required = false) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query(" select i" +
@@ -147,7 +148,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   List<InstallmentNoPII> getByOrganizationIdAndReceiptId(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
-    @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
+    @RequestParam(required = false) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
   @Query("""

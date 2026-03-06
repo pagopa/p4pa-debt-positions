@@ -13,6 +13,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +35,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     + "AND (:flagActive IS NULL OR dpto.flagActive= :flagActive) ")
   List<DebtPositionTypeOrg> findDebtPositionTypeOrgs(@Parameter(required = true) @Param("organizationId") Long organizationId,
                                                      @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-                                                     @Param("flagActive")  Boolean flagActive);
+                                                     @RequestParam(required = false) @Param("flagActive")  Boolean flagActive);
 
   Page<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
                                                      Pageable pageable);
@@ -120,9 +121,9 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   Page<DebtPositionTypeOrg> findPagedDebtPositionTypeOrg(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Param("code") String code,
-    @Param("description") String description,
-    @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+    @RequestParam(required = false) @Param("code") String code,
+    @RequestParam(required = false) @Param("description") String description,
+    @RequestParam(required = false) @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
     Pageable pageable);
 
   @Query("""
@@ -155,9 +156,9 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
   Page<DebtPositionTypeOrg> findDebtPositionTypeOrgNotEnabledForOperator(
       @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
       @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-      @Param("code") String code,
-      @Param("description") String description,
-      @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+      @RequestParam(required = false) @Param("code") String code,
+      @RequestParam(required = false) @Param("description") String description,
+      @RequestParam(required = false) @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
       Pageable pageable);
 
   @Query("""
