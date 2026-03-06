@@ -19,6 +19,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Optional;
@@ -223,11 +224,11 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   List<DebtPosition> findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
     @Param("debtorFiscalCodeHash") byte[] debtorFiscalCodeHash,
     @Param("debtorEntityType") PersonEntityType debtorEntityType,
-    @Param("status") List<InstallmentStatus> status,
+    @RequestParam(required = false) @Param("status") List<InstallmentStatus> status,
     @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
     @Param("debtPositionTypeOrgCodesToExclude") List<String> debtPositionTypeOrgCodesToExclude,
     @Param("organizationIds") List<Long> organizationIds,
-    @Param("dateTimeIntervalFilter") LocalDateTimeIntervalFilter dateTimeIntervalFilter
+    @RequestParam(required = false) @Param("dateTimeIntervalFilter") LocalDateTimeIntervalFilter dateTimeIntervalFilter
   );
 
   @RestResource(exported = false)

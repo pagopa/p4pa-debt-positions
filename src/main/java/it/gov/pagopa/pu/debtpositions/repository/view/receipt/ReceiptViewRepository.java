@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RepositoryRestResource(path = "receipts-view")
 public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
@@ -37,14 +38,14 @@ public interface ReceiptViewRepository extends Repository<ReceiptView, Long> {
     + "AND dpto.code <> :#{T(it.gov.pagopa.pu.debtpositions.util.Constants).MIXED_DP_TYPE_ORG_CODE} ")
   Page<ReceiptView> findReceiptsByFilters(
     @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
+    @RequestParam(required = false) @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
-    @Param("iuv") String iuv,
-    @Param("iur") String iur,
-    @Param("iud") String iud,
-    @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
-    @Param("paymentDateTimeFrom") OffsetDateTime fromDate,
-    @Param("paymentDateTimeTo") OffsetDateTime toDate,
+    @RequestParam(required = false) @Param("iuv") String iuv,
+    @RequestParam(required = false) @Param("iur") String iur,
+    @RequestParam(required = false) @Param("iud") String iud,
+    @RequestParam(required = false) @Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId,
+    @RequestParam(required = false) @Param("paymentDateTimeFrom") OffsetDateTime fromDate,
+    @RequestParam(required = false) @Param("paymentDateTimeTo") OffsetDateTime toDate,
     String fiscalCode,
     Pageable pageable);
 

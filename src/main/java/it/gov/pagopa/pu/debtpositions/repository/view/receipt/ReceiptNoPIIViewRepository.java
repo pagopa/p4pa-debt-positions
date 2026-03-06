@@ -12,6 +12,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -51,10 +52,10 @@ public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView,
   Page<ReceiptNoPIIView> getPagedPrimaryReceiptByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(required = true, array = @ArraySchema(schema = @Schema(type = "string"))) @Param("organizationsFiscalCode") List<String> organizationsFiscalCode,
-    @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
-    @Param("noticeNumberOrIuv") String noticeNumberOrIuv,
-    @Param("paymentDateTimeFrom") OffsetDateTime paymentDateTimeFrom,
-    @Param("paymentDateTimeTo") OffsetDateTime paymentDateTimeTo,
+    @RequestParam(required = false) @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
+    @RequestParam(required = false) @Param("noticeNumberOrIuv") String noticeNumberOrIuv,
+    @RequestParam(required = false) @Param("paymentDateTimeFrom") OffsetDateTime paymentDateTimeFrom,
+    @RequestParam(required = false) @Param("paymentDateTimeTo") OffsetDateTime paymentDateTimeTo,
     Pageable pageable
   );
 
@@ -92,7 +93,7 @@ public interface ReceiptNoPIIViewRepository extends Repository<ReceiptNoPIIView,
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("paymentOptionId") Long paymentOptionId,
-    @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
-    @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses
+    @RequestParam(required = false) @Param("receiptOrigins") List<ReceiptOriginType> receiptOrigins,
+    @RequestParam(required = false) @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses
   );
 }

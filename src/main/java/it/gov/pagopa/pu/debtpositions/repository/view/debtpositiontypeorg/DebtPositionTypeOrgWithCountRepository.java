@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RepositoryRestResource(path = "debt-position-type-orgs-with-count")
 public interface DebtPositionTypeOrgWithCountRepository extends Repository<DebtPositionTypeOrgWithCount, Long> {
@@ -23,9 +24,9 @@ public interface DebtPositionTypeOrgWithCountRepository extends Repository<DebtP
     """)
   Page<DebtPositionTypeOrgWithCount> findByCodeAndDescription(
     @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-    @Param("code") String code,
-    @Param("description") String description,
-    @Param("flagActive")  Boolean flagActive,
+    @RequestParam(required = false) @Param("code") String code,
+    @RequestParam(required = false) @Param("description") String description,
+    @RequestParam(required = false) @Param("flagActive")  Boolean flagActive,
     Pageable pageable);
 
 }
