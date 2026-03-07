@@ -56,7 +56,17 @@
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
+<td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8'>com.fasterxml.jackson.datatype:jackson-datatype-jdk8</a></td>
+<td>2.20.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
 <td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310'>com.fasterxml.jackson.datatype:jackson-datatype-jsr310</a></td>
+<td>2.20.2</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-module-parameter-names'>com.fasterxml.jackson.module:jackson-module-parameter-names</a></td>
 <td>2.20.2</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
@@ -162,32 +172,32 @@
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-asyncapi</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-cloud-stream</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-core</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-kafka</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-kafka-binding</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-ui</a></td>
-<td>1.20.0</td>
+<td>2.1.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -556,8 +566,8 @@
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
-<td><a href='https://hibernate.org/orm/releases/7.2'>org.hibernate.orm:hibernate-core</a></td>
-<td>7.2.4.Final</td>
+<td><a href='https://hibernate.org/orm/releases/7.1'>org.hibernate.orm:hibernate-core</a></td>
+<td>7.1.18.Final</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -792,7 +802,7 @@
 </tr>
 <tr>
 <td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-dependencies</a></td>
-<td>3.5.7</td>
+<td>4.0.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -832,6 +842,11 @@
 </tr>
 <tr>
 <td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-jackson</a></td>
+<td>4.0.3</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-jackson2</a></td>
 <td>4.0.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
