@@ -54,7 +54,7 @@ repositories {
 val springDocOpenApiVersion = "3.0.2"
 val janinoVersion = "3.1.12"
 val openApiToolsVersion = "0.2.9"
-val springWolfAsyncApiVersion = "1.20.0"
+val springWolfAsyncApiVersion = "2.1.0"
 val micrometerVersion = "1.6.3"
 val postgresJdbcVersion = "42.7.10"
 val bouncycastleVersion = "1.83"
@@ -67,6 +67,9 @@ val openHtmlToPdfVersion = "1.0.10"
 val commonsLang3Version = "3.20.0"
 val lz4JavaVersion = "1.10.4"
 val itextVersion = "8.0.5"
+
+// Downgrading in order to handle List of enums in SpringDataRest exposed queries
+val hibernateCoreVersion = "7.1.18.Final"
 
 // fix cve
 val jackson2CoreVersion = "2.21.1"
@@ -89,6 +92,7 @@ dependencies {
   implementation("org.springframework.boot:spring-boot-starter-actuator")
   implementation("org.springframework.boot:spring-boot-starter-hateoas")
   implementation("org.springframework.boot:spring-boot-starter-data-rest")
+  implementation("org.hibernate.orm:hibernate-core:$hibernateCoreVersion")
   implementation("org.springframework.boot:spring-boot-starter-data-jpa")
   implementation("org.springframework.boot:spring-boot-starter-cache")
   implementation("com.github.ben-manes.caffeine:caffeine:$caffeineVersion")
