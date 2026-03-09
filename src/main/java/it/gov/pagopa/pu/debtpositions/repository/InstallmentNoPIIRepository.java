@@ -200,8 +200,8 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     and t.flagOwner = true
 """)
   Page<InstallmentNoPII> findDistinctByOrgFiscalCodeAndDebtorFiscalCode(
-    @Param("orgFiscalCode") String orgFiscalCode,
-    @Param("debtorFiscalCode") String debtorFiscalCode,
+    @Parameter(required = true) @Param("orgFiscalCode") String orgFiscalCode,
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     Pageable pageable
   );
 }
