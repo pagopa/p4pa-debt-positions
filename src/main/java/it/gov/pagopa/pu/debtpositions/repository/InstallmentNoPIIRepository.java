@@ -7,6 +7,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -188,4 +190,18 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
   @Modifying
   @Query("UPDATE InstallmentNoPII i SET i.balance = :balance WHERE i.installmentId = :installmentId")
   void updateBalance(Long installmentId, String balance);
+
+  @Query("""
+    select distinct i
+    from InstallmentNoPII i
+    join Transfer t on t.installmentId = i.installmentId
+    where t.orgFiscalCode = :orgFiscalCode
+    and i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+    and t.flagOwner = true
+""")
+  Page<InstallmentNoPII> findDistinctByOrgFiscalCodeAndDebtorFiscalCode(
+    @Parameter(required = true) @Param("orgFiscalCode") String orgFiscalCode,
+    @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    Pageable pageable
+  );
 }
