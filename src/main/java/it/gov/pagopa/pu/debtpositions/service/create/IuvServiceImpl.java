@@ -133,11 +133,11 @@ public class IuvServiceImpl implements IuvService {
     }
 
     if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
-      if (!iuv.startsWith(informationSystemId, 3)) {
+      if (!iuv.substring(2,4).equals(informationSystemId)) {
         throw new InvalidValueException("[INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin);
       }
     } else {
-      if (iuv.startsWith(informationSystemId, 3)) {
+      if (iuv.substring(2,4).equals(informationSystemId)) {
         throw new InvalidValueException("[INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + origin);
       }
     }
