@@ -14,21 +14,27 @@ import org.springframework.data.rest.webmvc.alps.AlpsJacksonJsonHttpMessageConve
 import org.springframework.data.rest.webmvc.alps.RootResourceInformationToAlpsDescriptorConverter;
 import org.springframework.data.rest.webmvc.config.RepositoryRestConfigurer;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.JacksonJsonHttpMessageConverter;
+import org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver;
 import tools.jackson.databind.json.JsonMapper;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
 @Configuration
-public class RepositoryRestCustomConfiguration {
+public class RepositoryRestCustomConfiguration implements RepositoryRestConfigurer {
 
   public static final String SPRING_DATA_REST_MODEL_PREFIX = "EntityModel";
 
   private final PersistentEntities persistentEntities;
+  private final JsonMapper jsonMapper;
 
-  public RepositoryRestCustomConfiguration(PersistentEntities persistentEntities) {
+  public RepositoryRestCustomConfiguration(PersistentEntities persistentEntities, JsonMapper jsonMapper) {
     this.persistentEntities = persistentEntities;
+    this.jsonMapper = jsonMapper;
   }
 
   @Bean
@@ -47,11 +53,21 @@ public class RepositoryRestCustomConfiguration {
     };
   }
 
+
+  // overriding because the default implementation is not using the right JsonMapper
   @Bean
   @Primary
   public AlpsJacksonJsonHttpMessageConverter alpsJsonHttpMessageCustomConverter(
-    RootResourceInformationToAlpsDescriptorConverter alpsConverter, JsonMapper jsonMapper) {
+    RootResourceInformationToAlpsDescriptorConverter alpsConverter) {
     return new AlpsJacksonJsonHttpMessageConverter(jsonMapper, alpsConverter);
+  }
+
+  @Override
+  public void configureExceptionHandlerExceptionResolver(ExceptionHandlerExceptionResolver exceptionResolver) {
+    List<HttpMessageConverter<?>> messageConverters = new ArrayList<>(exceptionResolver.getMessageConverters());
+    // ErrorDTO is not an Entity, thus we have to register a generic converter
+    messageConverters.add(new JacksonJsonHttpMessageConverter(jsonMapper));
+    exceptionResolver.setMessageConverters(messageConverters);
   }
 
   private void renameSpringDataRestModels(OpenAPI openApi) {

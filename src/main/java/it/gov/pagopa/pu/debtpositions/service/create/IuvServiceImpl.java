@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -114,7 +115,7 @@ public class IuvServiceImpl implements IuvService {
    * @return true if valid, otherwise false
    */
   public boolean isValidNav(String nav) {
-    if (StringUtils.length(nav) == 18 && StringUtils.startsWith(nav, AUX_DIGIT)) {
+    if (StringUtils.length(nav) == 18 && Strings.CS.startsWith(nav, AUX_DIGIT)) {
       try {
         return Long.parseLong(nav.substring(0, 16)) % CHECK_DIGIT_BASE == Long.parseLong(nav.substring(16));
       } catch (Exception e) {
@@ -134,11 +135,11 @@ public class IuvServiceImpl implements IuvService {
 
     if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
       if (!iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters must be '00' for the origin: " + origin);
+        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters must be '" + informationSystemId + "' for the origin: " + origin);
       }
     } else {
       if (iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters cannot be '00' for the origin: " + origin);
+        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters cannot be '" + informationSystemId + "' for the origin: " + origin);
       }
     }
 
