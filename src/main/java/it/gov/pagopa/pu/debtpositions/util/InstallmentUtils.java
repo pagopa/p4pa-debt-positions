@@ -95,7 +95,8 @@ public class InstallmentUtils {
     DebtPositionOrigin.ORDINARY,
     DebtPositionOrigin.ORDINARY_SIL,
     DebtPositionOrigin.SPONTANEOUS,
-    DebtPositionOrigin.SPONTANEOUS_SIL
+    DebtPositionOrigin.SPONTANEOUS_SIL,
+    DebtPositionOrigin.SPONTANEOUS_PSP
   );
 
   public static final List<DebtPositionOrigin> PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED = Stream.concat(
