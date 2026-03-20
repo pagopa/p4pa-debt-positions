@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -21,6 +22,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +32,10 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @RestResource(exported = false)
   @EntityGraph(value = "completeDebtPosition")
   DebtPosition findEntityGraphByDebtPositionId(Long debtPositionId);
+
+  @RestResource(exported = false)
+  @EntityGraph(value = "completeDebtPosition")
+  List<DebtPosition> findEntityGraphByDebtPositionIdIn(Collection<Long> debtPositionId);
 
   @RestResource(exported = false)
   @Transactional
@@ -81,21 +87,28 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
 
   @RestResource(exported = false)
   @Query("""
-   SELECT DISTINCT d
+   SELECT DISTINCT d.debtPositionId
    FROM DebtPosition d
-   WHERE EXISTS (
-      SELECT 1
-      FROM PaymentOption p
-         JOIN p.installments i
-      WHERE p.debtPositionId = d.debtPositionId
-        AND i.ingestionFlowFileId = :ingestionFlowFileId
-        AND (:statusToExclude IS NULL OR i.status NOT IN :statusToExclude)
-      )
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+   WHERE  i.ingestionFlowFileId = :ingestionFlowFileId
+      AND (:statusToExclude IS NULL OR i.status NOT IN :statusToExclude)
    """)
-  @EntityGraph(value = "completeDebtPosition")
-  Page<DebtPosition> findEntityGraphByIngestionFlowFileIdAndStatusToExclude(Long ingestionFlowFileId,
-                                                                            List<InstallmentStatus> statusToExclude,
-                                                                            Pageable pageable);
+  Page<Long> findDebtPositionIdsByIngestionFlowFileIdAndStatusToExclude(
+    Long ingestionFlowFileId,
+    List<InstallmentStatus> statusToExclude,
+    Pageable pageable);
+
+  @RestResource(exported = false)
+  default Page<DebtPosition> findEntityGraphByIngestionFlowFileIdAndStatusToExclude(
+    Long ingestionFlowFileId,
+    List<InstallmentStatus> statusToExclude,
+    Pageable pageable)
+  {
+    Page<Long> dpIdsPage = findDebtPositionIdsByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, statusToExclude, pageable);
+    List<DebtPosition> dps = findEntityGraphByDebtPositionIdIn(dpIdsPage.getContent());
+    return new PageImpl<>(dps, dpIdsPage.getPageable(), dpIdsPage.getTotalElements());
+  }
 
   @RestResource(exported = false)
   @Query("""
