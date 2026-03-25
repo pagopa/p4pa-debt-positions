@@ -17,9 +17,11 @@ public class BalanceClient {
     this.classificationApisHolder = classificationApisHolder;
   }
 
-  public Boolean validateBalance(String balance, String accessToken){
+  public Boolean validateBalance(String balance, Long amountCents, String accessToken){
     ValidateBalanceRequest validateBalanceRequest = ValidateBalanceRequest.builder()
-      .balance(balance).build();
+      .balance(balance)
+      .amountCents(amountCents)
+      .build();
     return classificationApisHolder.getBalanceApi(accessToken).validateBalance(validateBalanceRequest);
   }
 
