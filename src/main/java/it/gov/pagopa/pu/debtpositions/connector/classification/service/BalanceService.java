@@ -10,10 +10,11 @@ public interface BalanceService {
   /***
    *
    * @param balance the value of balance to be validated
+   * @param amountCents the installment's amount
    * @param accessToken the access token
    * @return a Boolean based on whether the value is formally valid or not
    */
-  Boolean isValidBalance(String balance, String accessToken);
+  Boolean isValidBalance(String balance, Long amountCents, String accessToken);
 
   /***
    *
