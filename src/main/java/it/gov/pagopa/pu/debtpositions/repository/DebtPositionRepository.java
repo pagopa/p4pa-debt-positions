@@ -298,4 +298,47 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @Modifying
   @Query("UPDATE DebtPosition d SET d.debtPositionTypeOrgId = :newTypeOrgId WHERE d.debtPositionId = :debtPositionId")
   Integer updateDebtPositionTypeOrgId(Long debtPositionId, Long newTypeOrgId);
+
+  @Query("""
+    SELECT DISTINCT d
+    FROM DebtPosition d
+      JOIN d.paymentOptions p
+      JOIN p.installments i
+      JOIN i.transfers t
+      JOIN DebtPositionTypeOrg dpto on d.debtPositionTypeOrgId = dpto.debtPositionTypeOrgId
+    WHERE d.organizationId = :organizationId
+      AND dpto.debtPositionTypeId <> -2
+      AND d.debtPositionOrigin <> :#{T(it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin).SPONTANEOUS_MIXED}
+      AND i.status IN :installmentStatuses
+      AND (
+        (i.status = :#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).TO_SYNC}
+          AND (:syncError IS NULL OR (:syncError = true AND i.syncStatus.syncError IS NOT NULL) OR (:syncError = false AND i.syncStatus.syncError IS NULL))
+        )
+        OR (i.status = :#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).EXPIRED} AND i.updateDate >= :#{T(java.time.LocalDateTime).now().minusYears(@environment.getProperty('massive-update.expired-threshold-years', T(java.lang.Integer)))})
+        OR (i.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).TO_SYNC}, :#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).EXPIRED}))
+      )
+      AND (
+        (:dptoId IS NULL
+          AND (
+            (dpto.postalIban IS NULL AND t.postalIban = :oldPostalIban AND :isPostalIbanChanged = true) OR
+            (dpto.iban IS NULL AND t.iban = :oldIban AND :isIbanChanged = true)
+          )
+        )
+        OR (:dptoId IS NOT NULL AND d.debtPositionTypeOrgId = :dptoId AND (
+          (t.postalIban = :oldPostalIban AND :isPostalIbanChanged = true) OR
+          (t.iban = :oldIban AND :isIbanChanged = true))
+        )
+      )
+  """)
+  Page<DebtPosition> getDebtPositionIdsByIbansAndDptoId(
+    @Param("organizationId") Long organizationId,
+    @Param(("oldIban")) String oldIban,
+    @Param("isIbanChanged") boolean isIbanChanged,
+    @Param(("oldPostalIban")) String oldPostalIban,
+    @Param("isPostalIbanChanged") boolean isPostalIbanChanged,
+    @RequestParam(value = "syncError", required = false) Boolean syncError,
+    @RequestParam(value = "dptoId", required = false) Long dptoId,
+    @Param(("installmentStatuses")) List<InstallmentStatus> installmentStatuses,
+    Pageable pageable
+  );
 }
