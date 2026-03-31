@@ -13,6 +13,23 @@ import java.util.List;
 
 @RepositoryRestResource(path = "debt-position-id-view")
 public interface DebtPositionIdViewRepository extends JpaRepository<DebtPositionIdView, Long> {
+  /**
+   * Retrieves a paginated list of debt position identifiers (DebtPositionIdView).
+   * The query excludes debt positions with dpto of type MIXED and origin SPONTANEOUS_MIXED, and applies
+   * filtering logic based on the installment status (e.g., TO_SYNC, EXPIRED) and
+   * the presence of synchronization errors.
+   * If a dptoId is provided, the query checks IBAN and postal IBAN on transfers.
+   * If dptoId is null, the query checks that the dpto IBAN is null, and also checks the IBAN and postal IBAN on the transfers.
+   *
+   * @param organizationId the id of organization
+   * @param iban The bank IBAN associated with the transfer
+   * @param postalIban The postal IBAN associated with the transfer
+   * @param syncError Indicates whether to filter by installments with synchronization errors (true) or without (false)
+   * @param dptoId The DebtPositionTypeOrg identifier (optional)
+   * @param installmentStatuses The list of target installment statuses
+   * @param pageable The pagination and sorting information for the request
+   * @return A list of {@link DebtPositionIdView} matching the search criteria
+   */
   @Query("""
     SELECT DISTINCT new DebtPositionIdView(d.debtPositionId as debtPositionId)
     FROM DebtPosition d
