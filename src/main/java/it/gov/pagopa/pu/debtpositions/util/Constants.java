@@ -15,5 +15,7 @@ public class Constants {
   public static final String WS_USER_PREFIX = "WS_USER-";
 
   public static final Long TECHNICAL_UNKNOWN_ORG_ID = -1L;
+
+  public static final Long DEBT_POSITION_TYPE_MIXED = -2L;
 }
 
