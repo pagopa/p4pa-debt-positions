@@ -18,8 +18,10 @@ public interface DebtPositionIdViewRepository extends JpaRepository<DebtPosition
    * The query excludes debt positions with dpto of type MIXED and origin SPONTANEOUS_MIXED, and applies
    * filtering logic based on the installment status (e.g., TO_SYNC, EXPIRED) and
    * the presence of synchronization errors.
-   * If a dptoId is provided, the query checks IBAN and postal IBAN on transfers.
-   * If dptoId is null, the query checks that the dpto IBAN is null, and also checks the IBAN and postal IBAN on the transfers.
+   * The query filters by the provided transfer IBAN and postal IBAN. If the postalIban
+   * parameter is null, it searches for transfers where the postal IBAN is absent (NULL in the database).
+   * Regarding the DebtPositionTypeOrg (dpto): if a dptoId is provided, it filters by this identifier;
+   * if dptoId is null, it requires the dpto IBAN to be null.
    *
    * @param organizationId the id of organization
    * @param iban The bank IBAN associated with the transfer
@@ -49,14 +51,16 @@ public interface DebtPositionIdViewRepository extends JpaRepository<DebtPosition
         OR (i.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).TO_SYNC}, :#{T(it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus).EXPIRED}))
       )
       AND (
-        (:dptoId IS NULL AND dpto.iban IS NULL AND t.postalIban = :postalIban AND t.iban= :iban)
-        OR (:dptoId IS NOT NULL AND d.debtPositionTypeOrgId = :dptoId AND t.postalIban = :postalIban AND t.iban = :iban)
+        (:dptoId IS NULL AND dpto.iban IS NULL)
+        OR (:dptoId IS NOT NULL AND d.debtPositionTypeOrgId = :dptoId)
       )
+      AND ((:postalIban IS NULL AND t.postalIban IS NULL) OR t.postalIban = :postalIban)
+      AND t.iban = :iban
   """)
   List<DebtPositionIdView> getDebtPositionIdsByIbansAndDptoId(
     @Param("organizationId") Long organizationId,
     @Param(("iban")) String iban,
-    @Param("postalIban") String postalIban,
+    @RequestParam(value = "postalIban", required = false) String postalIban,
     @Param(value = "syncError") Boolean syncError,
     @RequestParam(value = "dptoId", required = false) Long dptoId,
     @Param(("installmentStatuses")) List<InstallmentStatus> installmentStatuses,
