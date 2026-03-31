@@ -14,10 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.DEBT_POSITION_TYPE_MIXED;
+
 @Service
 @Slf4j
 public class MixedDebtPositionTypeOrgRetrieverService {
-  public static final Long DEBT_POSITION_TYPE_MIXED = -2L;
   private DebtPositionType debtPositionType;
 
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
