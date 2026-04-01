@@ -2,11 +2,11 @@ package it.gov.pagopa.pu.debtpositions.service.update.massive;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -49,20 +49,22 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
               if (oldIban.equals(t.getIban()) && Objects.equals(oldPostalIban, t.getPostalIban())) {
                 t.setIban(newIban);
                 t.setPostalIban(newPostalIban);
-                i.setStatus(InstallmentStatus.TO_SYNC);
+                InstallmentUtils.setStatus(i, i.getStatus());
                 collectedIuds.add(i.getIud());
               }
             })));
 
-    debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
-    debtPositionService.saveDebtPosition(debtPositionDTO);
+    if (!collectedIuds.isEmpty()) {
+      debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
+      debtPositionService.saveDebtPosition(debtPositionDTO);
 
-    debtPositionSyncService.syncDebtPosition(
-      debtPositionDTO,
-      new WfExecutionParameters(),
-      PaymentEventType.DP_UPDATED,
-      "IUD: " + String.join(", ", collectedIuds),
-      accessToken
-    );
+      debtPositionSyncService.syncDebtPosition(
+        debtPositionDTO,
+        new WfExecutionParameters(),
+        PaymentEventType.DPI_UPDATED,
+        "IUD: " + String.join(", ", collectedIuds),
+        accessToken
+      );
+    }
   }
 }
