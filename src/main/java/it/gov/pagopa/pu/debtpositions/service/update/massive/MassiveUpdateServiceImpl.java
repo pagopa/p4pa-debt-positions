@@ -7,8 +7,11 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
@@ -34,6 +37,14 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
   @Override
   public void updateTransferIbansAndSyncDebtPosition(Long debtPositionId, String oldIban, String newIban, String oldPostalIban, String newPostalIban, String accessToken) {
+    if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
+    }
+
+    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
+    }
+
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
     if (debtPositionDTO == null) {
       throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition with id %d not found".formatted(debtPositionId));

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.update.massive;
 
+import jakarta.validation.ValidationException;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
@@ -29,6 +30,9 @@ class MassiveUpdateServiceImplTest {
   @Mock
   private DebtPositionSyncService debtPositionSyncServiceMock;
 
+  private static final String VALID_IBAN = "IT0000000000000000000000000";
+  private static final String VALID_POSTAL_IBAN = "IT0000000000000000000000000";
+
   private MassiveUpdateService massiveUpdateService;
 
   @BeforeEach
@@ -50,6 +54,33 @@ class MassiveUpdateServiceImplTest {
   }
 
   @Test
+  void givenBlankNewIbanWhenUpdateTransferIbansThenThrowsValidationException() {
+    Assertions.assertThrows(ValidationException.class, () ->
+      massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
+        1L, "oldIban", "", "oldPostalIban", VALID_POSTAL_IBAN, "accessToken"
+      )
+    );
+  }
+
+  @Test
+  void givenInvalidNewIbanWhenUpdateTransferIbansThenThrowsValidationException() {
+    Assertions.assertThrows(ValidationException.class, () ->
+      massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
+        1L, "oldIban", "INVALID_IBAN", "oldPostalIban", VALID_POSTAL_IBAN, "accessToken"
+      )
+    );
+  }
+
+  @Test
+  void givenInvalidNewPostalIbanWhenUpdateTransferIbansThenThrowsValidationException() {
+    Assertions.assertThrows(ValidationException.class, () ->
+      massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
+        1L, "oldIban", VALID_IBAN, "oldPostalIban", "INVALID_POSTAL_IBAN", "accessToken"
+      )
+    );
+  }
+
+  @Test
   void givenNonExistentDebtPositionIdWhenUpdateTransferIbansThenThrowsException() {
     Long nonExistentDebtPositionId = 1L;
 
@@ -57,7 +88,7 @@ class MassiveUpdateServiceImplTest {
 
     Assertions.assertThrows(NotFoundException.class, () ->
       massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
-        nonExistentDebtPositionId, "oldIban", "newIban", "oldPostalIban", "newPostalIban", "token"
+        nonExistentDebtPositionId, "oldIban", VALID_IBAN, "oldPostalIban", VALID_POSTAL_IBAN, "accessToken"
       )
     );
   }
@@ -65,9 +96,7 @@ class MassiveUpdateServiceImplTest {
   @Test
   void givenMatchingTransferIbansWhenUpdateTransferIbansThenUpdatesAndSyncs() {
     String oldIban = "oldIban";
-    String newIban = "newIban";
     String oldPostalIban = "oldPostalIban";
-    String newPostalIban = "newPostalIban";
     String accessToken = "accessToken";
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -82,11 +111,11 @@ class MassiveUpdateServiceImplTest {
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionDTO.getDebtPositionId())).thenReturn(debtPositionDTO);
 
     massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
-      debtPositionDTO.getDebtPositionId(), oldIban, newIban, oldPostalIban, newPostalIban, accessToken
+      debtPositionDTO.getDebtPositionId(), oldIban, VALID_IBAN, oldPostalIban, VALID_POSTAL_IBAN, accessToken
     );
 
-    Assertions.assertEquals(newIban, transferDTO.getIban());
-    Assertions.assertEquals(newPostalIban, transferDTO.getPostalIban());
+    Assertions.assertEquals(VALID_IBAN, transferDTO.getIban());
+    Assertions.assertEquals(VALID_POSTAL_IBAN, transferDTO.getPostalIban());
 
     Mockito.verify(debtPositionServiceMock).getDebtPosition(debtPositionDTO.getDebtPositionId());
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
@@ -103,9 +132,7 @@ class MassiveUpdateServiceImplTest {
   @Test
   void givenNoMatchingTransferIbansWhenUpdateTransferIbansThenNotUpdateAndNotSync() {
     String oldIban = "oldIban";
-    String newIban = "newIban";
     String oldPostalIban = "oldPostalIban";
-    String newPostalIban = "newPostalIban";
     String accessToken = "accessToken";
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -118,7 +145,7 @@ class MassiveUpdateServiceImplTest {
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionDTO.getDebtPositionId())).thenReturn(debtPositionDTO);
 
     massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
-      debtPositionDTO.getDebtPositionId(), oldIban, newIban, oldPostalIban, newPostalIban, accessToken
+      debtPositionDTO.getDebtPositionId(), oldIban, VALID_IBAN, oldPostalIban, VALID_POSTAL_IBAN, accessToken
     );
 
     Mockito.verify(debtPositionServiceMock).getDebtPosition(debtPositionDTO.getDebtPositionId());
