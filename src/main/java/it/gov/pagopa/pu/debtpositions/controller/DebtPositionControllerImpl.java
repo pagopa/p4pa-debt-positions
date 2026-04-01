@@ -318,12 +318,20 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
     String accessToken = SecurityUtils.getAccessToken();
 
+    String oldPostalIban = updateTransferIbansAndSyncDebtPositionRequestDTO.getOldPostalIban() != null ?
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getOldPostalIban().get()
+      : null;
+
+    String newPostalIban = updateTransferIbansAndSyncDebtPositionRequestDTO.getNewPostalIban() != null ?
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getNewPostalIban().get()
+      : null;
+
     massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
       debtPositionId,
       updateTransferIbansAndSyncDebtPositionRequestDTO.getOldIban(),
       updateTransferIbansAndSyncDebtPositionRequestDTO.getNewIban(),
-      updateTransferIbansAndSyncDebtPositionRequestDTO.getOldPostalIban(),
-      updateTransferIbansAndSyncDebtPositionRequestDTO.getNewPostalIban(),
+      oldPostalIban,
+      newPostalIban,
       accessToken
     );
 

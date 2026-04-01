@@ -3190,5 +3190,7 @@ components:
           type: string
         oldPostalIban:
           type: string
+          nullable: true
         newPostalIban:
           type: string
+          nullable: true
