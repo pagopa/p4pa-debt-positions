@@ -57,12 +57,12 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
     debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
     debtPositionService.saveDebtPosition(debtPositionDTO);
 
-//    debtPositionSyncService.syncDebtPosition(
-//      debtPositionDTO,
-//      new WfExecutionParameters(),
-//      PaymentEventType.DP_UPDATED,
-//      "IUD: " + String.join(", ", collectedIuds),
-//      accessToken
-//    );
+    debtPositionSyncService.syncDebtPosition(
+      debtPositionDTO,
+      new WfExecutionParameters(),
+      PaymentEventType.DP_UPDATED,
+      "IUD: " + String.join(", ", collectedIuds),
+      accessToken
+    );
   }
 }
