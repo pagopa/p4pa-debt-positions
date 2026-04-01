@@ -681,12 +681,12 @@ class DebtPositionControllerTest {
     requestDTO.setNewPostalIban("newPostalIban");
 
     Mockito.doNothing().when(massiveUpdateService).updateTransferIbansAndSyncDebtPosition(
-      Mockito.eq(debtPositionId),
-      Mockito.eq(requestDTO.getOldIban()),
-      Mockito.eq(requestDTO.getNewIban()),
-      Mockito.eq(requestDTO.getOldPostalIban()),
-      Mockito.eq(requestDTO.getNewPostalIban()),
-      Mockito.eq(accessToken)
+      debtPositionId,
+      requestDTO.getOldIban(),
+      requestDTO.getNewIban(),
+      requestDTO.getOldPostalIban(),
+      requestDTO.getNewPostalIban(),
+      accessToken
     );
 
     mockMvc.perform(
