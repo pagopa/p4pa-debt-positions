@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
+import it.gov.pagopa.pu.debtpositions.service.update.massive.MassiveUpdateService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -93,6 +94,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private TaxonomyValidatorService taxonomyValidatorService;
+
+  @MockitoBean
+  private MassiveUpdateService massiveUpdateService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
