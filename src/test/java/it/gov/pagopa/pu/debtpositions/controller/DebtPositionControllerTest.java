@@ -670,4 +670,39 @@ class DebtPositionControllerTest {
     assertEquals(expectedResult, resultResponse);
   }
 
+  @Test
+  void whenUpdateTransferIbansAndSyncDebtPositionThenOk() throws Exception {
+    Long debtPositionId = 1L;
+
+    UpdateTransferIbansAndSyncDebtPositionRequestDTO requestDTO = new UpdateTransferIbansAndSyncDebtPositionRequestDTO();
+    requestDTO.setOldIban("oldIban");
+    requestDTO.setNewIban("newIban");
+    requestDTO.setOldPostalIban("oldPostalIban");
+    requestDTO.setNewPostalIban("newPostalIban");
+
+    Mockito.doNothing().when(massiveUpdateService).updateTransferIbansAndSyncDebtPosition(
+      Mockito.eq(debtPositionId),
+      Mockito.eq(requestDTO.getOldIban()),
+      Mockito.eq(requestDTO.getNewIban()),
+      Mockito.eq(requestDTO.getOldPostalIban()),
+      Mockito.eq(requestDTO.getNewPostalIban()),
+      Mockito.eq(accessToken)
+    );
+
+    mockMvc.perform(
+        put("/debt-positions/{debtPositionId}/massive/transfer-ibans", debtPositionId)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(jsonMapper.writeValueAsString(requestDTO)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    Mockito.verify(massiveUpdateService, Mockito.times(1)).updateTransferIbansAndSyncDebtPosition(
+      debtPositionId,
+      requestDTO.getOldIban(),
+      requestDTO.getNewIban(),
+      requestDTO.getOldPostalIban(),
+      requestDTO.getNewPostalIban(),
+      accessToken
+    );
+  }
 }
