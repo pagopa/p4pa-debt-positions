@@ -3181,8 +3181,6 @@ components:
       required:
         - oldIban
         - newIban
-        - oldPostalIban
-        - newPostalIban
       properties:
         oldIban:
           type: string
@@ -3190,7 +3188,5 @@ components:
           type: string
         oldPostalIban:
           type: string
-          nullable: true
         newPostalIban:
           type: string
-          nullable: true
