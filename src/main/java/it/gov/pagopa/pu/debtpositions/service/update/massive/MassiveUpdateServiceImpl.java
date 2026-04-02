@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.update.massive;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -60,7 +61,12 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
               if (oldIban.equals(t.getIban()) && Objects.equals(oldPostalIban, t.getPostalIban())) {
                 t.setIban(newIban);
                 t.setPostalIban(newPostalIban);
-                InstallmentUtils.setStatus(i, i.getStatus());
+
+                // Not use InstallmentUtils for TO_SYNC status to preserve syncStatusFrom/to
+                if (!InstallmentStatus.TO_SYNC.equals(i.getStatus())) {
+                  InstallmentUtils.setStatus(i, i.getStatus());
+                }
+
                 collectedIuds.add(i.getIud());
               }
             })));
