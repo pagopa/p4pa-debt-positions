@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.update.massive;
 
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -37,13 +38,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
   @Override
   public void updateTransferIbansAndSyncDebtPosition(Long debtPositionId, String oldIban, String newIban, String oldPostalIban, String newPostalIban, String accessToken) {
-    if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
-    }
-
-    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
-    }
+    validateNewIbans(newIban, newPostalIban);
 
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
     if (debtPositionDTO == null) {
@@ -60,7 +55,12 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
               if (oldIban.equals(t.getIban()) && Objects.equals(oldPostalIban, t.getPostalIban())) {
                 t.setIban(newIban);
                 t.setPostalIban(newPostalIban);
-                InstallmentUtils.setStatus(i, i.getStatus());
+
+                // Not use InstallmentUtils for TO_SYNC status to preserve syncStatusFrom/to
+                if (!InstallmentStatus.TO_SYNC.equals(i.getStatus())) {
+                  InstallmentUtils.setStatus(i, i.getStatus());
+                }
+
                 collectedIuds.add(i.getIud());
               }
             })));
@@ -76,6 +76,16 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
         "IUD: " + String.join(", ", collectedIuds),
         accessToken
       );
+    }
+  }
+
+  private void validateNewIbans(String newIban, String newPostalIban) {
+    if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
+    }
+
+    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
     }
   }
 }
