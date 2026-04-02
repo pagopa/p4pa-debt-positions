@@ -38,13 +38,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
   @Override
   public void updateTransferIbansAndSyncDebtPosition(Long debtPositionId, String oldIban, String newIban, String oldPostalIban, String newPostalIban, String accessToken) {
-    if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
-    }
-
-    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
-    }
+    validateNewIbans(newIban, newPostalIban);
 
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
     if (debtPositionDTO == null) {
@@ -82,6 +76,16 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
         "IUD: " + String.join(", ", collectedIuds),
         accessToken
       );
+    }
+  }
+
+  private void validateNewIbans(String newIban, String newPostalIban) {
+    if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
+    }
+
+    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
+      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
     }
   }
 }
