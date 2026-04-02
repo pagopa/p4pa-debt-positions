@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
+import it.gov.pagopa.pu.debtpositions.service.update.massive.MassiveUpdateService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -44,6 +45,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   private final DebtPositionDeletionService debtPositionDeletionService;
   private final PublishDebtPositionService publishDebtPositionService;
   private final MixedDebtPositionCreationService mixedDebtPositionCreationService;
+  private final MassiveUpdateService massiveUpdateService;
 
   @Override
   public ResponseEntity<DebtPositionDTO> createDebtPosition(DebtPositionDTO debtPositionDTO, Boolean massive) {
@@ -308,5 +310,23 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
   public ResponseEntity<DebtorDebtPositionDTO> getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId) {
     log.info("User requested getDebtorUnpaidDebtPositionOverview with organizationId %s and debtPositionId %s".formatted(organizationId, debtPositionId));
     return ResponseEntity.ok(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, xFiscalCode, organizationId));
+  }
+
+  @Override
+  public ResponseEntity<Void> updateTransferIbansAndSyncDebtPosition(Long debtPositionId, UpdateTransferIbansAndSyncDebtPositionRequestDTO updateTransferIbansAndSyncDebtPositionRequestDTO) {
+    log.info("Update and sync dp ibans for debt position with id: %s".formatted(debtPositionId));
+
+    String accessToken = SecurityUtils.getAccessToken();
+
+    massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
+      debtPositionId,
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getOldIban(),
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getNewIban(),
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getOldPostalIban(),
+      updateTransferIbansAndSyncDebtPositionRequestDTO.getNewPostalIban(),
+      accessToken
+    );
+
+    return ResponseEntity.ok().build();
   }
 }
