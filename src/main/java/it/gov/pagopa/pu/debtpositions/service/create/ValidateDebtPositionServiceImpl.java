@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -155,8 +156,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException("[INVALID_CENTS_AMOUNT] The installment amount must be greater than 0");
     }
     if (
-        (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin) ||
-         DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin) ||
+        (InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED.contains(debtPositionOrigin) ||
          DebtPositionOrigin.ORDINARY_SIL.equals(debtPositionOrigin))
          && debtPositionTypeOrg.getAmountCents() != null
          && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())
@@ -198,8 +198,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     boolean switchToExpired = flagMandatoryDueDate
-        || DebtPositionOrigin.SPONTANEOUS_SIL.equals(debtPositionOrigin)
-        || DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin);
+        || InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED.contains(debtPositionOrigin);
 
     installmentDTO.setSwitchToExpired(switchToExpired);
   }
