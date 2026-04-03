@@ -16,17 +16,19 @@ import org.springframework.stereotype.Service;
 @Slf4j
 public class IuvServiceImpl implements IuvService {
 
-  public static final String AUX_DIGIT = "3";
   private static final int CHECK_DIGIT_BASE = 93;
   private static final int IUV_LENGTH = 17;
 
   private final String informationSystemId;
+  private final String auxDigit;
 
   private final IuvSequenceNumberService iuvSequenceNumberService;
 
-  public IuvServiceImpl(@Value("${iuv.informationSystemId}") String informationSystemId,
+  public IuvServiceImpl(@Value("${iuv.information-system-id}") String informationSystemId,
+                        @Value("${nav.aux-digit}") String auxDigit,
                         IuvSequenceNumberService iuvSequenceNumberService) {
     this.informationSystemId = informationSystemId;
+    this.auxDigit = auxDigit;
     this.iuvSequenceNumberService = iuvSequenceNumberService;
   }
 
@@ -65,7 +67,7 @@ public class IuvServiceImpl implements IuvService {
   }
 
   private String generateCheckDigit(String paymentIndex) {
-    String digitString = AUX_DIGIT + paymentIndex;
+    String digitString = auxDigit + paymentIndex;
     long digit = Long.parseLong(digitString);
     long reminder = digit % CHECK_DIGIT_BASE;
     return StringUtils.leftPad(String.valueOf(reminder), 2, '0');
@@ -79,7 +81,7 @@ public class IuvServiceImpl implements IuvService {
    */
   public String iuv2Nav(String iuv) {
     if (isValidIuv(iuv))
-      return AUX_DIGIT + iuv;
+      return auxDigit + iuv;
     else
       throw new InvalidValueException("[INVALID_IUV] invalid iuv");
   }
@@ -92,7 +94,7 @@ public class IuvServiceImpl implements IuvService {
    */
   public String nav2Iuv(String nav) {
     if (isValidNav(nav)) {
-      return nav.substring(AUX_DIGIT.length());
+      return nav.substring(auxDigit.length());
     } else {
       throw new InvalidValueException("[INVALID_NAV] invalid nav");
     }
@@ -105,7 +107,7 @@ public class IuvServiceImpl implements IuvService {
    * @return true if valid, otherwise false
    */
   public boolean isValidIuv(String iuv) {
-    return isValidNav(StringUtils.join(AUX_DIGIT, iuv));
+    return isValidNav(StringUtils.join(auxDigit, iuv));
   }
 
   /**
@@ -115,7 +117,7 @@ public class IuvServiceImpl implements IuvService {
    * @return true if valid, otherwise false
    */
   public boolean isValidNav(String nav) {
-    if (StringUtils.length(nav) == 18 && Strings.CS.startsWith(nav, AUX_DIGIT)) {
+    if (StringUtils.length(nav) == 18 && Strings.CS.startsWith(nav, auxDigit)) {
       try {
         return Long.parseLong(nav.substring(0, 16)) % CHECK_DIGIT_BASE == Long.parseLong(nav.substring(16));
       } catch (Exception e) {
@@ -143,6 +145,6 @@ public class IuvServiceImpl implements IuvService {
       }
     }
 
-    return AUX_DIGIT + iuv;
+    return auxDigit + iuv;
   }
 }

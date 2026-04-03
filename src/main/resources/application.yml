@@ -195,7 +195,9 @@ rest:
     print-body-when-error: "\${CLASSIFICATION_PRINT_BODY_WHEN_ERROR:true}"
 
 iuv:
-  informationSystemId: "00"
+  information-system-id: "\${IUV_INFORMATION_SYSTEM_ID:00}"
+nav:
+  aux-digit: "\${NAV_AUX_DIGIT:3}"
 
 category:
   prefix: "9/"
