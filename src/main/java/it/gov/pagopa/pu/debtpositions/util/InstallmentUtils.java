@@ -113,6 +113,12 @@ public class InstallmentUtils {
       DebtPositionOrigin.SPONTANEOUS_MIXED)
   ).toList();
 
+  public static final List<DebtPositionOrigin> SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED = List.of(
+    DebtPositionOrigin.SPONTANEOUS,
+    DebtPositionOrigin.SPONTANEOUS_SIL,
+    DebtPositionOrigin.SPONTANEOUS_PSP
+  );
+
   /**
    * It will check if the Installment is in a payable status
    */

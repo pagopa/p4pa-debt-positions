@@ -48,9 +48,11 @@ class IuvServiceTest {
     .orgFiscalCode(INVALID_ORG_FISCAL_CODE)
     .ipaCode(INVALID_ORG_IPA_CODE);
 
+  private static final String AUX_DIGIT = "3";
+
   @BeforeEach
   void setUp() {
-    iuvService = new IuvServiceImpl("00", iuvSequenceNumberService);
+    iuvService = new IuvServiceImpl("00", "3", iuvSequenceNumberService);
   }
 
   //region test generateIuv
@@ -80,7 +82,7 @@ class IuvServiceTest {
     //When
     String result = iuvService.iuv2Nav(VALID_IUV);
     //Verify
-    Assertions.assertEquals(IuvServiceImpl.AUX_DIGIT+VALID_IUV, result);
+    Assertions.assertEquals(AUX_DIGIT+VALID_IUV, result);
   }
 
   @Test
@@ -94,7 +96,7 @@ class IuvServiceTest {
   @Test
   void givenValidNavWhenNav2IuvThenOk(){
     //When
-    String result = iuvService.nav2Iuv(IuvServiceImpl.AUX_DIGIT+VALID_IUV);
+    String result = iuvService.nav2Iuv(AUX_DIGIT+VALID_IUV);
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
   }
@@ -110,7 +112,7 @@ class IuvServiceTest {
   @Test
   void givenValidNavWhenIsValidNavThenOk(){
     //When
-    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+VALID_IUV);
+    boolean result = iuvService.isValidNav(AUX_DIGIT+VALID_IUV);
     //Verify
     Assertions.assertTrue(result);
   }
@@ -126,7 +128,7 @@ class IuvServiceTest {
   @Test
   void givenWrongLengthNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+WRONG_LENGTH_IUV);
+    boolean result = iuvService.isValidNav(AUX_DIGIT+WRONG_LENGTH_IUV);
     //Verify
     Assertions.assertFalse(result);
   }
@@ -134,7 +136,7 @@ class IuvServiceTest {
   @Test
   void givenWrongCheckDigitNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+WRONG_CHECK_IUV);
+    boolean result = iuvService.isValidNav(AUX_DIGIT+WRONG_CHECK_IUV);
     //Verify
     Assertions.assertFalse(result);
   }
@@ -142,7 +144,7 @@ class IuvServiceTest {
   @Test
   void givenNotNumericNavWhenIsValidNavThenException(){
     //When
-    boolean result = iuvService.isValidNav(IuvServiceImpl.AUX_DIGIT+"NOT_NUMERIC_12345");
+    boolean result = iuvService.isValidNav(AUX_DIGIT+"NOT_NUMERIC_12345");
     //Verify
     Assertions.assertFalse(result);
   }

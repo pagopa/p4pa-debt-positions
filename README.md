@@ -212,6 +212,8 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 | RECEIPT_ARCHIVING_VIEW_MAX_TOTAL_ELEMENTS  | Receipt archiving: Maximum number of elements that could be exported | ${DATA_EXPORT_MAX_TOTAL_ELEMENTS}  |
 | RECEIPT_ARCHIVING_VIEW_MAX_MONTHS_INTERVAL | Receipt archiving: Maximum number of months that could be exported   | ${DATA_EXPORT_MAX_MONTHS_INTERVAL} |
 | FEATURE_ORGANIZATION_PIVA_CHECK            | To enable Organization tax code check                                | true                               |
+| NAV_AUX_DIGIT                              | The aux digit of NAV                                                 | 3                                  |
+| IUV_INFORMATION_SYSTEM_ID                  | The third and fourth character of IUV                                | 00                                 |
 
 #### 🔑 keys
 | ENV                          | DESCRIPTION                                         | DEFAULT |

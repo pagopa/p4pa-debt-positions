@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.InstallmentSynchro
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.PublishDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionManageInstallmentsService;
+import it.gov.pagopa.pu.debtpositions.service.update.massive.MassiveUpdateService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -93,6 +94,9 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private TaxonomyValidatorService taxonomyValidatorService;
+
+  @MockitoBean
+  private MassiveUpdateService massiveUpdateService;
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
@@ -666,4 +670,39 @@ class DebtPositionControllerTest {
     assertEquals(expectedResult, resultResponse);
   }
 
+  @Test
+  void whenUpdateTransferIbansAndSyncDebtPositionThenOk() throws Exception {
+    Long debtPositionId = 1L;
+
+    UpdateTransferIbansAndSyncDebtPositionRequestDTO requestDTO = new UpdateTransferIbansAndSyncDebtPositionRequestDTO();
+    requestDTO.setOldIban("oldIban");
+    requestDTO.setNewIban("newIban");
+    requestDTO.setOldPostalIban("oldPostalIban");
+    requestDTO.setNewPostalIban("newPostalIban");
+
+    Mockito.doNothing().when(massiveUpdateService).updateTransferIbansAndSyncDebtPosition(
+      debtPositionId,
+      requestDTO.getOldIban(),
+      requestDTO.getNewIban(),
+      requestDTO.getOldPostalIban(),
+      requestDTO.getNewPostalIban(),
+      accessToken
+    );
+
+    mockMvc.perform(
+        put("/debt-positions/{debtPositionId}/massive/transfer-ibans", debtPositionId)
+          .contentType(MediaType.APPLICATION_JSON_VALUE)
+          .content(jsonMapper.writeValueAsString(requestDTO)))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    Mockito.verify(massiveUpdateService, Mockito.times(1)).updateTransferIbansAndSyncDebtPosition(
+      debtPositionId,
+      requestDTO.getOldIban(),
+      requestDTO.getNewIban(),
+      requestDTO.getOldPostalIban(),
+      requestDTO.getNewPostalIban(),
+      accessToken
+    );
+  }
 }

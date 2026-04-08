@@ -74,6 +74,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
   @Override
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
+      .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
+
+    if (flagActive && debtPositionTypeOrg.getDebtPositionTypeId() < 0) {
+      throw new ValidationException("[INVALID_FLAG_ACTIVE] Technical debtPositionTypeOrg cannot be enabled");
+    }
+
     if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0) {
       throw new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found");
     }
@@ -96,6 +103,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private void validateDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
     if (debtPositionTypeOrg == null) {
       throw new ValidationException("[MISSING_DEBT_POSITION_TYPE_ORG] DebtPositionTypeOrg must not be null");
+    }
+    if (debtPositionTypeOrg.getDebtPositionTypeId() < 0 && debtPositionTypeOrg.isFlagActive()) {
+      throw new ValidationException("[INVALID_FLAG_ACTIVE] Technical debtPositionTypeOrg cannot be enabled");
     }
     if (StringUtils.isNotBlank(debtPositionTypeOrg.getIban()) && !Utilities.isValidIban(debtPositionTypeOrg.getIban())) {
       throw new ValidationException("[INVALID_IBAN] Provided iban is not valid");

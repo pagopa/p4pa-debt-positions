@@ -195,7 +195,9 @@ rest:
     print-body-when-error: "\${CLASSIFICATION_PRINT_BODY_WHEN_ERROR:true}"
 
 iuv:
-  informationSystemId: "00"
+  information-system-id: "\${IUV_INFORMATION_SYSTEM_ID:00}"
+nav:
+  aux-digit: "\${NAV_AUX_DIGIT:3}"
 
 category:
   prefix: "9/"
@@ -233,3 +235,6 @@ features:
 wf-await:
   max-waiting-minutes: "\${WORKFLOW_AWAIT_MAX_WAITING_MINUTES:5}"
   retry-delays-ms: "\${WORKFLOW_AWAIT_RETRY_DELAYS_MS:1000}"
+
+massive-update:
+  expired-threshold-years: "\${EXPIRED_THRESHOLD_YEARS_FOR_MASSIVE_IBAN_UPDATE:1}"

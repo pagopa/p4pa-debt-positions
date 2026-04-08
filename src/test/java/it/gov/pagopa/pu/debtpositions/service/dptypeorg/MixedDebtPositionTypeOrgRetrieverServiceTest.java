@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.dptypeorg;
 
-import static it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService.DEBT_POSITION_TYPE_MIXED;
+import static it.gov.pagopa.pu.debtpositions.util.Constants.DEBT_POSITION_TYPE_MIXED;
 
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionTypeOrgMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;

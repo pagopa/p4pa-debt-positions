@@ -1,15 +1,20 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
 import it.gov.pagopa.pu.debtpositions.model.validator.BalanceConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import java.io.Serializable;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.io.Serializable;
+import java.util.Map;
 
 @Entity
 @Table(name = "debt_position_type_org")
@@ -57,4 +62,16 @@ public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
   private Long spontaneousFormId;
   @Enumerated(EnumType.STRING)
   private PersonEntityType allowedEntityType;
+  @Schema(
+    description = """
+            This map contains the localized description of the DebtPositionTypeOrg.
+
+            Example:
+            {
+              "EN": "DebtPositionTypeOrg description"
+            }
+            """
+  )
+  @JdbcTypeCode(SqlTypes.JSON)
+  private Map<String,String> descriptionI18n;
 }
