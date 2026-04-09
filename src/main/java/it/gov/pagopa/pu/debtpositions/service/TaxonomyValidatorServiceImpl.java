@@ -36,7 +36,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       .map(Organization::getOrgTypeCode)
       .orElse(null);
     if (!isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
-      log.error("Taxonomy category is not valid");
+      log.info("Taxonomy category is not valid");
       return false;
     }
     return true;
@@ -44,7 +44,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
       if(!taxonomyCode.startsWith(categoryPrefix) || !taxonomyCode.endsWith(categorySuffix)) {
-        log.error("The taxonomy code [{}] does not meet the required format", taxonomyCode);
+        log.info("The taxonomy code [{}] does not meet the required format", taxonomyCode);
         return false;
       }
       return isTaxonomyCategoryValid(taxonomyCode, orgTypeCode);
@@ -60,7 +60,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       String collectionReason = formattedTaxonomyCategory.substring(7, 9);
 
       if (orgTypeCode != null && !orgTypeCode.equals(organizationType)) {
-        log.error("The taxonomy category code [{}] is not valid for the organization type [{}]", taxonomyCategory, orgTypeCode);
+        log.info("The taxonomy category code [{}] is not valid for the organization type [{}]", taxonomyCategory, orgTypeCode);
         return false;
       }
 
@@ -74,11 +74,11 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
       );
 
       if (pagedModelTaxonomy == null || pagedModelTaxonomy.getEmbedded() == null || CollectionUtils.isEmpty(pagedModelTaxonomy.getEmbedded().getTaxonomies())) {
-        log.error("The taxonomy category code [{}] does not exist in the archive", taxonomyCategory);
+        log.info("The taxonomy category code [{}] does not exist in the archive", taxonomyCategory);
         return false;
       }
     } catch (IndexOutOfBoundsException exception) {
-      log.error("The taxonomy category code [{}] does not meet the required length or format", taxonomyCategory);
+      log.info("The taxonomy category code [{}] does not meet the required length or format", taxonomyCategory);
       return false;
     }
     return true;
