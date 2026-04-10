@@ -953,7 +953,7 @@
   "variable": [
     {
       "key": "debtPositionTypeOrgCode",
-      "value": "CODE001"
+      "value": "FEATURE_TEST"
     },
     {
       "key": "amountCents",
