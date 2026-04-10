@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class PrimaryOrgPaymentHandlerService {
             && receiptDTO.getOrgFiscalCode().equals(transfer.getOrgFiscalCode()));
 
         if (!isDelegateValid) {
-          throw new InvalidValueException("[INVALID_RECEIPT_ORG_MISMATCH] Receipt org fiscal code doesn't match the transfer owner org fiscal code.");
+          throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_RECEIPT_ORG_MISMATCH, "Receipt org fiscal code doesn't match the transfer owner org fiscal code.");
         }
       }
 

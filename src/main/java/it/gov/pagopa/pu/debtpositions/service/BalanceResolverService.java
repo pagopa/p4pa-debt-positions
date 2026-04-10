@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -36,7 +37,7 @@ public class BalanceResolverService {
 
   public String resolveAmountBalance(Long organizationId, InstallmentNoPII installment, String accessToken) {
     Organization org = organizationService.getOrganizationById(organizationId, accessToken)
-      .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + organizationId + " not found"));
 
     Long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
       .filter(transfer -> transfer.getOrgFiscalCode().equals(org.getOrgFiscalCode()))

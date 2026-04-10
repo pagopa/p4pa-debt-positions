@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 
 import java.util.List;
 
@@ -40,7 +41,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
     } else if (isExpired(paymentOptionStatusList)) {
       return DebtPositionStatus.EXPIRED;
     } else {
-      throw new InvalidValueException("[UNDETERMINED_DEBT_POSITION_STATUS] Unable to determine status for DebtPosition having paymentOptionStatuses: " + paymentOptionStatusList);
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_UNDETERMINED_DEBT_POSITION_STATUS, "Unable to determine status for DebtPosition having paymentOptionStatuses: " + paymentOptionStatusList);
     }
   }
 

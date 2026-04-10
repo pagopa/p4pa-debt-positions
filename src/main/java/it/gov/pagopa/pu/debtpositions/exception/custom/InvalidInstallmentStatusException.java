@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.exception.custom;
 
-public class InvalidInstallmentStatusException extends RuntimeException{
-  public InvalidInstallmentStatusException(String message) {
-    super(message);
+public class InvalidInstallmentStatusException extends BaseBusinessException{
+  public InvalidInstallmentStatusException(String code, String message) {
+    super(code, message);
   }
 }

@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -61,7 +62,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, String.format("The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
 
@@ -69,7 +70,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> {
           if(!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())){
-            throw new InvalidValueException("[DUPLICATED_PAYMENT_OPTION_INDEX] PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
+            throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_DUPLICATED_PAYMENT_OPTION_INDEX, "PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
           }
           paymentOptionDTO.getInstallments().stream()
             .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))

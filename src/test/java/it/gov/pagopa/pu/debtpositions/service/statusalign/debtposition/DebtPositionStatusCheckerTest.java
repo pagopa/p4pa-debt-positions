@@ -169,8 +169,10 @@ class DebtPositionStatusCheckerTest {
   @Test
   void testCalculateNewStatus_InvalidStatus() {
     List<PaymentOptionStatus> paymentOptionStatusList = List.of();
-    Exception exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(paymentOptionStatusList));
-    assertEquals("[UNDETERMINED_DEBT_POSITION_STATUS] Unable to determine status for DebtPosition having paymentOptionStatuses: []", exception.getMessage());
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> checker.calculateNewStatus(paymentOptionStatusList));
+
+    assertEquals("UNDETERMINED_DEBT_POSITION_STATUS",exception.getCode());
+    assertEquals("Unable to determine status for DebtPosition having paymentOptionStatuses: []", exception.getMessage());
   }
 
   @Test

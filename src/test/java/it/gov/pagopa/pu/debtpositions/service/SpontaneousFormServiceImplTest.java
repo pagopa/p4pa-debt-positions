@@ -1,12 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,10 +68,10 @@ class SpontaneousFormServiceImplTest {
   }
 
   @Test
-  void givenSpontaneousFormIdNotNullWhenCreateSpontaneousFormThenValidationException() {
+  void givenSpontaneousFormIdNotNullWhenCreateSpontaneousFormThenInvalidValueException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
-    Assertions.assertThrows(ValidationException.class,()-> spontaneousFormService.createSpontaneousForm(spontaneousForm));
+    Assertions.assertThrows(InvalidValueException.class,()-> spontaneousFormService.createSpontaneousForm(spontaneousForm));
 
     Mockito.verifyNoInteractions(spontaneousFormRepositoryMock);
   }
@@ -124,7 +124,7 @@ class SpontaneousFormServiceImplTest {
   }
 
   @Test
-  void givenUpdatedReadOnlyFieldWhenUpdateSpontaneousFormThenValidationException() {
+  void givenUpdatedReadOnlyFieldWhenUpdateSpontaneousFormThenInvalidValueException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     SpontaneousForm updatedSpontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     updatedSpontaneousForm.setSpontaneousFormId(spontaneousForm.getSpontaneousFormId());
@@ -133,7 +133,7 @@ class SpontaneousFormServiceImplTest {
 
     Mockito.when(spontaneousFormRepositoryMock.findById(updatedSpontaneousForm.getSpontaneousFormId())).thenReturn(Optional.of(spontaneousForm));
 
-    Assertions.assertThrows(ValidationException.class, () -> spontaneousFormService.updateSpontaneousForm(updatedSpontaneousForm));
+    Assertions.assertThrows(InvalidValueException.class, () -> spontaneousFormService.updateSpontaneousForm(updatedSpontaneousForm));
   }
 
   @Test
@@ -146,11 +146,11 @@ class SpontaneousFormServiceImplTest {
   }
 
   @Test
-  void givenNullSpontaneousFormIdWhenUpdateSpontaneousFormThenValidationException() {
+  void givenNullSpontaneousFormIdWhenUpdateSpontaneousFormThenInvalidValueException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     spontaneousForm.setSpontaneousFormId(null);
 
-    Assertions.assertThrows(ValidationException.class, () -> spontaneousFormService.updateSpontaneousForm(spontaneousForm));
+    Assertions.assertThrows(InvalidValueException.class, () -> spontaneousFormService.updateSpontaneousForm(spontaneousForm));
 
     Mockito.verifyNoInteractions(spontaneousFormRepositoryMock);
   }

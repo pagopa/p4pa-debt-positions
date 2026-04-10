@@ -16,10 +16,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidConditionException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentDebtorDTOMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -436,7 +433,7 @@ class InstallmentServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.findPaidByIun(installmentDTO.getIun())).thenReturn(null);
 
     // When Then
-    assertThrows(IllegalStateException.class, () ->
+    assertThrows(IllegalStateBusinessException.class, () ->
       installmentService.updateInstallmentNotificationFee(actualizeAmountRequest,
         wfExecutionParameters, accessToken, operatorExternalUserId));
   }

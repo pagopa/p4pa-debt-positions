@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -49,7 +50,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!DRAFT.equals(debtPositionDTO.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] The debt position with id %s cannot be published because is not in an allowed status: %s"
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("The debt position with id %s cannot be published because is not in an allowed status: %s"
         ,debtPositionId, debtPositionDTO.getStatus()));
     }
 
@@ -67,7 +68,7 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
   @Override
   protected void applyOperation(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, String accessToken, Organization org) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The DebtPositionTypeOrg with id " + debtPositionDTO.getDebtPositionTypeOrgId() + " was not found"));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "The DebtPositionTypeOrg with id " + debtPositionDTO.getDebtPositionTypeOrgId() + " was not found"));
 
     debtPositionDTO.getPaymentOptions().forEach(paymentOption ->
       paymentOption.getInstallments().forEach(installment -> {

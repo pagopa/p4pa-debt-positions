@@ -167,6 +167,7 @@ class DebtPositionUpdateInstallmentServiceImplTest {
 
     NotFoundException exception = assertThrows(NotFoundException.class, () -> debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installments, wfExecutionParameters, accessToken, operatorExternalId));
 
-    assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id 2 was not found for organization id 500", exception.getMessage());
+    assertEquals("DEBT_POSITION_TYPE_ORG_NOT_FOUND",exception.getCode());
+    assertEquals("The debt position type org with id 2 was not found for organization id 500", exception.getMessage());
   }
 }

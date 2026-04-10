@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
 import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -73,11 +74,11 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   public FileResourceDTO generateReceiptPdf(Long receiptId, Long organizationId, String accessToken, String operatorExternalUserId) {
     ReceiptDetailDTO receiptDetail = receiptService.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null);
     if (receiptDetail == null) {
-      throw new NotFoundException("[RECEIPT_NOT_FOUND] Receipt with id " + receiptId + " not found");
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_RECEIPT_NOT_FOUND, "Receipt with id " + receiptId + " not found");
     }
 
     Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
-      .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + organizationId + " not found"));
 
     Broker broker = brokerService.findById(organization.getBrokerId(), accessToken);
 
@@ -88,7 +89,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
 
     if (broker.getFlagDelegate()) {
       Transfer ownerTransfer = transferRepository.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId)
-        .orElseThrow(() -> new NotFoundException("[TRANSFER_NOT_FOUND] Transfer with flag owner not found for receiptId " + receiptId));
+        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, "Transfer with flag owner not found for receiptId " + receiptId));
 
       orgName = ownerTransfer.getOrgName();
       headerOrgName = "";

@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
@@ -31,12 +32,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @Slf4j
 public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionOperationService implements DebtPositionManageInstallmentsService {
 
-  private final DebtPositionService debtPositionService;
   private final DebtPositionManageApplierService debtPositionManageApplierService;
   private final DebtPositionAddInstallmentService debtPositionAddInstallmentService;
   private final DebtPositionUpdateInstallmentService debtPositionUpdateInstallmentService;
@@ -64,7 +65,6 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
                                                       @Value("${wf-await.max-waiting-minutes}") int maxWaitingMinutes,
                                                       @Value("${wf-await.retry-delays-ms}") int retryDelayMs, ObjectMapper objectMapper) {
     super(authorizeOperatorOnDebtPositionTypeService, debtPositionService, debtPositionSyncService, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService);
-    this.debtPositionService = debtPositionService;
     this.debtPositionManageApplierService = debtPositionManageApplierService;
     this.debtPositionAddInstallmentService = debtPositionAddInstallmentService;
     this.debtPositionUpdateInstallmentService = debtPositionUpdateInstallmentService;
@@ -84,7 +84,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!InstallmentUtils.MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] Debt position with id %s cannot be modified because it is not in an allowed status: %s",
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
         debtPositionId, storedDebtPosition.getStatus()));
     }
 
@@ -94,10 +94,10 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     PaymentOptionDTO storedPaymentOption = storedDebtPosition.getPaymentOptions().stream()
       .filter(paymentOptionDTO -> manageDebtPositionDTO.getPaymentOptionId().equals(paymentOptionDTO.getPaymentOptionId()))
       .findFirst()
-      .orElseThrow(() -> new NotFoundException(String.format("[PAYMENT_OPTION_NOT_FOUND] Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_PAYMENT_OPTION_NOT_FOUND, String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
     if (!InstallmentUtils.MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_PAYMENT_OPTION_STATUS] Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_PAYMENT_OPTION_STATUS, String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
     }
 
     storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
@@ -167,18 +167,19 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
       String json = objectMapper.writeValueAsString(storedInstallment);
       dryStoredInstallment = objectMapper.readValue(json, InstallmentDTO.class);
     } catch (JsonProcessingException e) {
-      throw new InstallmentCloningException("[INSTALLMENT_CLONING_ERROR] Error cloning installment with id " + storedInstallment.getInstallmentId());
+      throw new InstallmentCloningException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_CLONING_ERROR, "Error cloning installment with id " + storedInstallment.getInstallmentId());
     }
 
     debtPositionManageApplierService.merge(manageInstallment, dryStoredInstallment);
 
-    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("[INVALID_ORGANIZATION] Provided organization id not found on db."));
+    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)
+      .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION, "Provided organization id not found on db."));
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
-      throw new InvalidValueException("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION_STATUS, "Provided organization is not ACTIVE");
     }
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, String.format("The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
     validateDebtPositionService.validateInstallment(
@@ -190,16 +191,16 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
 
   private InstallmentDTO findInstallmentToManage(PaymentOptionDTO paymentOptionDTO, Long installmentId) {
     InstallmentDTO installment = paymentOptionDTO.getInstallments().stream()
-      .filter(installmentDTO -> installmentDTO.getInstallmentId().equals(installmentId))
+      .filter(installmentDTO -> Objects.equals(installmentDTO.getInstallmentId(), installmentId))
       .findFirst()
-      .orElseThrow(() -> new NotFoundException(String.format("[INSTALLMENT_NOT_FOUND] The installment with id %s not found", installmentId)));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_NOT_FOUND, String.format("The installment with id %s not found", installmentId)));
 
     if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_INSTALLMENT_STATUS] Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
     }
 
     if (StringUtils.isNotBlank(installment.getIun())) {
-      throw new ConflictErrorException("[INVALID_INSTALLMENT_STATUS] The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
     }
 
     return installment;
@@ -209,7 +210,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     if (workflowCreatedDTO != null) {
       String workflowStatus = workflowHubService.waitWorkflowCompletion(accessToken, workflowCreatedDTO.getWorkflowId(), maxAttempts, retryDelayMs);
       if (!WORKFLOW_STATUS_COMPLETED_VALUE.equals(workflowStatus)) {
-        throw new WorkflowErrorException("[WORKFLOW_EXECUTION_ERROR] Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
+        throw new WorkflowErrorException(ErrorCodeConstants.ERROR_CODE_WORKFLOW_EXECUTION_ERROR, "Workflow with id " + workflowCreatedDTO.getWorkflowId() + " terminated with error");
       }
     }
   }

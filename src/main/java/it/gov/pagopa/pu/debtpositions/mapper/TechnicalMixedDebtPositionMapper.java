@@ -6,11 +6,13 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -96,8 +98,9 @@ public class TechnicalMixedDebtPositionMapper {
         Transfer transfer = installment.getTransfers().stream()
           .filter(t -> mixedDpAdditionalData.getTransferIndex()
             .equals(t.getTransferIndex())).findFirst()
-          .orElseThrow(() -> new IllegalStateException(
-            "[TRANSFER_NOT_FOUND] There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
+          .orElseThrow(() -> new IllegalStateBusinessException(
+            ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND,
+            "There is no Transfer having transferIndex: [%s] associated with Installment having id: [%d].".formatted(
               mixedDpAdditionalData.getTransferIndex(),
               installment.getInstallmentId())));
 
@@ -150,7 +153,7 @@ public class TechnicalMixedDebtPositionMapper {
 
         if (!isUnpaid) {
           DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-            .orElseThrow(() -> new NotFoundException("The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
+            .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
           balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, debtPositionTypeOrg, accessToken);
         }
         set.add(technicalMixedDpInstallment);

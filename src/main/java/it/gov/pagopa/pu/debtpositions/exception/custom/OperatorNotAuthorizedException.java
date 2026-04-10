@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.exception.custom;
 
 
-public class OperatorNotAuthorizedException extends RuntimeException {
+public class OperatorNotAuthorizedException extends BaseBusinessException {
 
-    public OperatorNotAuthorizedException(String message) {
-        super(message);
+    public OperatorNotAuthorizedException(String code, String message) {
+        super(code, message);
     }
 }

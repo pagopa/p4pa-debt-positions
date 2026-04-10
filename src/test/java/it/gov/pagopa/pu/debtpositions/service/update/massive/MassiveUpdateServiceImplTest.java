@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.service.update.massive;
 
-import jakarta.validation.ValidationException;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -54,8 +54,8 @@ class MassiveUpdateServiceImplTest {
   }
 
   @Test
-  void givenBlankNewIbanWhenUpdateTransferIbansThenThrowsValidationException() {
-    Assertions.assertThrows(ValidationException.class, () ->
+  void givenBlankNewIbanWhenUpdateTransferIbansThenThrowsInvalidValueException() {
+    Assertions.assertThrows(InvalidValueException.class, () ->
       massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
         1L, "oldIban", "", "oldPostalIban", VALID_POSTAL_IBAN, "accessToken"
       )
@@ -63,8 +63,8 @@ class MassiveUpdateServiceImplTest {
   }
 
   @Test
-  void givenInvalidNewIbanWhenUpdateTransferIbansThenThrowsValidationException() {
-    Assertions.assertThrows(ValidationException.class, () ->
+  void givenInvalidNewIbanWhenUpdateTransferIbansThenThrowsInvalidValueException() {
+    Assertions.assertThrows(InvalidValueException.class, () ->
       massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
         1L, "oldIban", "INVALID_IBAN", "oldPostalIban", VALID_POSTAL_IBAN, "accessToken"
       )
@@ -72,8 +72,8 @@ class MassiveUpdateServiceImplTest {
   }
 
   @Test
-  void givenInvalidNewPostalIbanWhenUpdateTransferIbansThenThrowsValidationException() {
-    Assertions.assertThrows(ValidationException.class, () ->
+  void givenInvalidNewPostalIbanWhenUpdateTransferIbansThenThrowsInvalidValueException() {
+    Assertions.assertThrows(InvalidValueException.class, () ->
       massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
         1L, "oldIban", VALID_IBAN, "oldPostalIban", "INVALID_POSTAL_IBAN", "accessToken"
       )

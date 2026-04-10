@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -52,6 +53,7 @@ public class ReceiptPIIRepositoryImpl extends BasePIIRepository<ReceiptDTO, Rece
   public ReceiptDTO findById(Long receiptId) {
     ReceiptNoPII receiptNoPII = receiptNoPIIRepository.findById(receiptId)
       .orElseThrow(() -> new NotFoundException(
+        ErrorCodeConstants.ERROR_CODE_RECEIPT_NOT_FOUND,
         "ReceiptNoPII having receiptId %d not found".formatted(
           receiptId)));
     return receiptPIIMapper.map(receiptNoPII);

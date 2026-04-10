@@ -152,7 +152,8 @@ class PublishDebtPositionServiceTest {
     // When & Then
     ConflictErrorException conflictErrorException = assertThrows(ConflictErrorException.class,
       () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId));
-    assertEquals("[INVALID_DEBT_POSITION_STATUS] The debt position with id 1 cannot be published because is not in an allowed status: UNPAID", conflictErrorException.getMessage());
+    assertEquals("INVALID_DEBT_POSITION_STATUS",conflictErrorException.getCode());
+    assertEquals("The debt position with id 1 cannot be published because is not in an allowed status: UNPAID", conflictErrorException.getMessage());
   }
 
   @Test
@@ -177,6 +178,8 @@ class PublishDebtPositionServiceTest {
     // When & Then
     NotFoundException notFoundException = assertThrows(NotFoundException.class,
       () -> service.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, operatorExternalId));
-    assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The DebtPositionTypeOrg with id 2 was not found", notFoundException.getMessage());
+
+    assertEquals("DEBT_POSITION_TYPE_ORG_NOT_FOUND",notFoundException.getCode());
+    assertEquals("The DebtPositionTypeOrg with id 2 was not found", notFoundException.getMessage());
   }
 }

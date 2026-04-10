@@ -22,6 +22,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.function.Executable;
@@ -171,6 +172,7 @@ class MixedDebtPositionCreationServiceTest {
     String accessToken = "TOKEN";
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
     String operatorExternalUserId = "USERID";
+    OperatorNotAuthorizedException expectedException = new OperatorNotAuthorizedException("CODE", "ERROR");
 
     Organization organization = new Organization();
     organization.setIpaCode("ipaCode");
@@ -181,14 +183,16 @@ class MixedDebtPositionCreationServiceTest {
     // checkWorkflowTypeOrgExists
     when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(
       eq(organization.getIpaCode()), anyLong(), eq(operatorExternalUserId)))
-      .thenThrow(new OperatorNotAuthorizedException("ERROR"));
+      .thenThrow(expectedException);
 
-    // When
     Executable exec = () -> mixedDebtPositionCreationService.createMixedDebtPosition(
       mixedDebtPositionDTO, accessToken, operatorExternalUserId);
 
+    // When
+    OperatorNotAuthorizedException resultException = assertThrows(OperatorNotAuthorizedException.class, exec);
+
     // Then
-    assertThrows(OperatorNotAuthorizedException.class, exec);
+    Assertions.assertSame(expectedException, resultException);
   }
 
   @Test
