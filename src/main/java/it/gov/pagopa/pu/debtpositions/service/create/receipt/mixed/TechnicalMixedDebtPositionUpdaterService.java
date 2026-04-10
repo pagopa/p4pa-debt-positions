@@ -35,7 +35,7 @@ public class TechnicalMixedDebtPositionUpdaterService  {
 
   @Transactional
   public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException("DEBT_POSITION_TYPE_ORG_NOT_FOUND", "DebtPositionTypeOrg with id " + debtPosition.getDebtPositionTypeOrgId() + " not found"));
+    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg with id " + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
     if (!Constants.MIXED_DP_TYPE_ORG_CODE.equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
       return List.of();

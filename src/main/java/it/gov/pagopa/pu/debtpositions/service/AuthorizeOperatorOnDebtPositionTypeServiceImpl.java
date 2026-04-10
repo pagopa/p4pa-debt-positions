@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -27,10 +28,10 @@ public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements Authorize
 
   public DebtPositionTypeOrg authorize(String orgIpaCode, Long debtPositionTypeOrgId, String operatorExternalUserId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException("DEBT_POSITION_TYPE_ORG_NOT_FOUND", "The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
 
     if (!isOperatorAuthorized(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId)) {
-      throw new OperatorNotAuthorizedException("DEBT_POSITION_TYPE_ORG_UNAUTHORIZED", "The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
+      throw new OperatorNotAuthorizedException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_UNAUTHORIZED, "The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
     }
 
     return debtPositionTypeOrg;

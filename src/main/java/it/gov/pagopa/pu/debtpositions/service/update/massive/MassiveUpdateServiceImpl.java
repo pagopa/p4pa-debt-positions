@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -42,7 +43,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
     if (debtPositionDTO == null) {
-      throw new NotFoundException("DEBT_POSITION_NOT_FOUND", "DebtPosition with id %d not found".formatted(debtPositionId));
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_NOT_FOUND, "DebtPosition with id %d not found".formatted(debtPositionId));
     }
 
     Set<String> collectedIuds = new HashSet<>();
@@ -81,11 +82,11 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
   private void validateNewIbans(String newIban, String newPostalIban) {
     if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
-      throw new InvalidValueException("INVALID_IBAN", "Provided newIban is not valid");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Provided newIban is not valid");
     }
 
     if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
-      throw new InvalidValueException("INVALID_IBAN", "Provided newPostalIban is not valid");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Provided newPostalIban is not valid");
     }
   }
 }

@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -62,7 +63,7 @@ public class UnknownDebtPositionTypeOrgRetrieverService {
   private DebtPositionType getDebtPositionTypeSecondaryOrg() {
     if(debtPositionType==null){
       debtPositionType = debtPositionTypeRepository.findById(DEBT_POSITION_TYPE_UNKNOWN)
-        .orElseThrow(() -> new NotFoundException("DEBT_POSITION_TYPE_NOT_FOUND", "DebtPositionType with id " + DEBT_POSITION_TYPE_UNKNOWN + " not found"));
+        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_NOT_FOUND, "DebtPositionType with id " + DEBT_POSITION_TYPE_UNKNOWN + " not found"));
       log.info("debt position type code UNKNOWN: {}", debtPositionType.getCode());
     }
     return debtPositionType;

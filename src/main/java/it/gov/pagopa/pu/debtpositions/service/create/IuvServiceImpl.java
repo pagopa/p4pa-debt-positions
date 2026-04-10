@@ -97,7 +97,7 @@ public class IuvServiceImpl implements IuvService {
     if (isValidNav(nav)) {
       return nav.substring(auxDigit.length());
     } else {
-      throw new InvalidValueException("INVALID_NAV", "invalid nav");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_NAV, "invalid nav");
     }
   }
 

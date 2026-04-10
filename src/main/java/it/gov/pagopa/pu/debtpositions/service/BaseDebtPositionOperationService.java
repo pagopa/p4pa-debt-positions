@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -73,14 +74,15 @@ public abstract class BaseDebtPositionOperationService {
   public WorkflowCreatedDTO execute(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate,
                                                WfExecutionParameters wfExecutionParameters, PaymentEventType eventType,
                                                String accessToken, String operatorExternalUserId) {
-    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken).orElseThrow(() -> new InvalidValueException("INVALID_ORGANIZATION", "Provided organization id not found on db."));
+    Organization org = organizationService.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)
+      .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION, "Provided organization id not found on db."));
     if(!OrganizationStatus.ACTIVE.equals(org.getStatus())){
-      throw new InvalidValueException("INVALID_ORGANIZATION_STATUS", "Provided organization is not ACTIVE");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION_STATUS, "Provided organization is not ACTIVE");
     }
     DebtPositionTypeOrg debtPositionTypeOrg = authorizeOperatorOnDebtPositionTypeService.authorize(org.getIpaCode(), debtPositionDTO.getDebtPositionTypeOrgId(), operatorExternalUserId);
 
     if (!isDebtPositionTypeOrgDisabledAllowed() && !debtPositionTypeOrg.isFlagActive()) {
-      throw new OperatorNotAuthorizedException("DEBT_POSITION_TYPE_ORG_UNAUTHORIZED", "The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
+      throw new OperatorNotAuthorizedException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_UNAUTHORIZED, "The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionDTO.getDebtPositionTypeOrgId() + " because it is inactive");
     }
 
     applyOperation(debtPositionDTO, installments2operate, accessToken, org);

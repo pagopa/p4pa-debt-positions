@@ -29,6 +29,7 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDet
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentViewPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.AllArgsConstructor;
@@ -115,11 +116,11 @@ public class InstallmentServiceImpl implements InstallmentService {
       .filter(installment -> InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus()))
       .toList();
     if(installments.isEmpty())
-      throw new NotFoundException("INSTALLMENT_NOT_FOUND", "The installment with NAV: "+nav+" was not found");
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_NOT_FOUND, "The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
-      throw new ConflictErrorException("TOO_MANY_INSTALLMENTS", "Found more than one installment processable with NAV: "+nav);
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_INSTALLMENTS, "Found more than one installment processable with NAV: "+nav);
     if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
-      throw new InvalidConditionException("INVALID_INSTALLMENT_STATUS", "The installment with NAV: " + nav + " is expired");
+      throw new InvalidConditionException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with NAV: " + nav + " is expired");
 
     long notificationFeeCents = calculateFeeAlreadyPaid(actualizeAmountRequest.getNewFeeCents(), installments.getFirst().getIun());
 
@@ -174,7 +175,7 @@ public class InstallmentServiceImpl implements InstallmentService {
     }
 
     if (!transferUpdated)
-      throw new IllegalStateBusinessException("TRANSFER_NOT_FOUND", "No eligible transfer found to update notification fee");
+      throw new IllegalStateBusinessException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, "No eligible transfer found to update notification fee");
 
     long newInstallmentAmount = transfers.stream()
       .mapToLong(TransferDTO::getAmountCents)
@@ -187,7 +188,7 @@ public class InstallmentServiceImpl implements InstallmentService {
   @Override
   public List<InstallmentDebtorDTO> getInstallmentsByIuvOrNav(String iuvOrNav, String debtorFiscalCode, Long organizationId, List<InstallmentStatus> statuses) {
     if(organizationId==null && StringUtils.isBlank(debtorFiscalCode)){
-      throw new InvalidParamException("MISSING_FIELDS", "Either debtorFiscalCode or organizationId must be provided");
+      throw new InvalidParamException(ErrorCodeConstants.ERROR_CODE_MISSING_FIELDS, "Either debtorFiscalCode or organizationId must be provided");
     }
     List<InstallmentDTO> installments = installmentPIIRepository.findByIuvOrNav(iuvOrNav, debtorFiscalCode, organizationId, statuses);
     if(CollectionUtils.isEmpty(installments)){

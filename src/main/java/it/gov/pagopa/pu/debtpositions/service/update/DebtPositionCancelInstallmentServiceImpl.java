@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.service.delete.InstallmentDeletionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -65,10 +66,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
       .map(installmentDTO -> {
         if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus())) {
-          throw new ConflictErrorException("INVALID_INSTALLMENT_STATUS", "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
+          throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
         }
         if (StringUtils.isNotBlank(installmentDTO.getIun())) {
-          throw new ConflictErrorException("INVALID_INSTALLMENT_STATUS", "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is been notified by SEND");
+          throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is been notified by SEND");
         }
         return installmentDTO;
       })
