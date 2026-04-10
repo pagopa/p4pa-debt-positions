@@ -40,7 +40,7 @@ public class DebtPositionStatusChecker extends StatusRulesHandler<PaymentOptionS
     } else if (isExpired(paymentOptionStatusList)) {
       return DebtPositionStatus.EXPIRED;
     } else {
-      throw new InvalidValueException("[UNDETERMINED_DEBT_POSITION_STATUS] Unable to determine status for DebtPosition having paymentOptionStatuses: " + paymentOptionStatusList);
+      throw new InvalidValueException("UNDETERMINED_DEBT_POSITION_STATUS", "Unable to determine status for DebtPosition having paymentOptionStatuses: " + paymentOptionStatusList);
     }
   }
 

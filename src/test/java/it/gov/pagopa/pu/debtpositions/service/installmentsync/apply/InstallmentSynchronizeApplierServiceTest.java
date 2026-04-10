@@ -198,7 +198,8 @@ class InstallmentSynchronizeApplierServiceTest {
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
       installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
         paymentOptionDTO, installmentDTO, accessToken));
-    assertEquals(String.format("[INVALID_ORGANIZATION] Provided organization with id %s not found", installmentSynchronizeDTO.getOrganizationId()), invalidValueException.getMessage());
+    assertEquals("INVALID_ORGANIZATION", invalidValueException.getCode());
+    assertEquals(String.format("Provided organization with id %s not found", installmentSynchronizeDTO.getOrganizationId()), invalidValueException.getMessage());
   }
 
   @Test
@@ -216,7 +217,8 @@ class InstallmentSynchronizeApplierServiceTest {
     InvalidValueException invalidValueException = assertThrows(InvalidValueException.class, () ->
       installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
         paymentOptionDTO, installmentDTO, accessToken));
-    assertEquals(String.format("[INVALID_DEBT_POSITION_TYPE_ORG_CODE] The debt position type org with code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
+    assertEquals("INVALID_DEBT_POSITION_TYPE_ORG_CODE", invalidValueException.getCode());
+    assertEquals(String.format("The debt position type org with code %s is not valid for this organizationId %s", installmentSynchronizeDTO.getDebtPositionTypeCode(), installmentSynchronizeDTO.getOrganizationId()),
       invalidValueException.getMessage());
   }
 

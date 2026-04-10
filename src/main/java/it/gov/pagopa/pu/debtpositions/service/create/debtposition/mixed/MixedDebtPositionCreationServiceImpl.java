@@ -24,6 +24,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCr
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -91,7 +92,7 @@ public class MixedDebtPositionCreationServiceImpl implements
     Organization organization = organizationService.getOrganizationById(
         mixedDebtPositionDTO.getOrganizationId(), accessToken)
       .orElseThrow(() -> new NotFoundException(
-        "[ORGANIZATION_NOT_FOUND] Organization with id [%s] not found".formatted(
+        ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id [%s] not found".formatted(
           mixedDebtPositionDTO.getOrganizationId())));
 
     checkWorkflowTypeOrgExistsAndAuthorization(organization.getIpaCode(),
@@ -133,7 +134,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         workflowTypeOrgService.getById(dpTypeOrgId, accessToken)
           .ifPresent(workflowTypeOrg -> {
             throw new InvalidValueException(
-              "[DEBT_POSITION_TYPE_ORG_RELATED_TO_CUSTOM_WORKFLOW] DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
+              "DEBT_POSITION_TYPE_ORG_RELATED_TO_CUSTOM_WORKFLOW", "DebtPositionTypeOrgId [%s] is related to custom workflow having id [%d]".formatted(
                 dpTypeOrgId, workflowTypeOrg.getWorkflowTypeId()));
           });
       });
@@ -151,7 +152,7 @@ public class MixedDebtPositionCreationServiceImpl implements
         mixedDebtPositionDTO.getOrganizationId(),
         iud, null, null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)) {
         throw new InvalidValueException(
-          "[INSTALLMENT_ALREADY_EXISTS] Installment with IUD [%s] already exists".formatted(iud));
+          "INSTALLMENT_ALREADY_EXISTS", "Installment with IUD [%s] already exists".formatted(iud));
       }
     }
   }

@@ -55,24 +55,24 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
   private void checkStatus(DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, Long ingestionFlowFileId) {
     if (storedDebtPosition != null) {
       if (DebtPositionStatus.TO_SYNC.equals(storedDebtPosition.getStatus()) && !isDPToSyncAllowed(storedDebtPosition, ingestionFlowFileId)) {
-        throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] The installment cannot be created because the debt position with iupd %s is in TO_SYNC status for a previous synchronization",
+        throw new ConflictErrorException("INVALID_DEBT_POSITION_STATUS", String.format("The installment cannot be created because the debt position with iupd %s is in TO_SYNC status for a previous synchronization",
           storedDebtPosition.getIupdOrg()));
       } else if (!debtPositionStatusesValidForInsertion.contains(storedDebtPosition.getStatus())) {
-        throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION_STATUS] The installment cannot be created because the debt position with iupd %s is not in an allowed status: %s",
+        throw new ConflictErrorException("INVALID_DEBT_POSITION_STATUS", String.format("The installment cannot be created because the debt position with iupd %s is not in an allowed status: %s",
           storedDebtPosition.getIupdOrg(), storedDebtPosition.getStatus()));
       }
     }
     if (storedPaymentOption != null) {
       if (PaymentOptionStatus.TO_SYNC.equals(storedPaymentOption.getStatus()) && !isPOToSyncAllowed(storedPaymentOption, ingestionFlowFileId)) {
-        throw new ConflictErrorException(String.format("[INVALID_PAYMENT_OPTION_STATUS] The installment cannot be created because the payment option with index %s is in TO_SYNC status for a previous synchronization",
+        throw new ConflictErrorException("INVALID_PAYMENT_OPTION_STATUS", String.format("The installment cannot be created because the payment option with index %s is in TO_SYNC status for a previous synchronization",
           storedPaymentOption.getPaymentOptionIndex()));
       } else if (!paymentOptionStatusesValidForInsertion.contains(storedPaymentOption.getStatus())) {
-        throw new ConflictErrorException(String.format("[INVALID_PAYMENT_OPTION_STATUS] The installment cannot be created because the payment option with index %s is not in an allowed status: %s",
+        throw new ConflictErrorException("INVALID_PAYMENT_OPTION_STATUS", String.format("The installment cannot be created because the payment option with index %s is not in an allowed status: %s",
           storedPaymentOption.getPaymentOptionIndex(), storedPaymentOption.getStatus()));
       }
     }
     if (storedInstallment != null && !installmentStatusesValidForInsertion.contains(storedInstallment.getStatus())) {
-      throw new ConflictErrorException(String.format("[INVALID_INSTALLMENT_STATUS] The installment with iud %s cannot be created because it already exists in a not modifiable status: %s",
+      throw new ConflictErrorException("INVALID_INSTALLMENT_STATUS", String.format("The installment with iud %s cannot be created because it already exists in a not modifiable status: %s",
         storedInstallment.getIud(), storedInstallment.getStatus()));
     }
   }

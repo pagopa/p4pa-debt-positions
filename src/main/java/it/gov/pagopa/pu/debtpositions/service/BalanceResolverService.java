@@ -36,7 +36,7 @@ public class BalanceResolverService {
 
   public String resolveAmountBalance(Long organizationId, InstallmentNoPII installment, String accessToken) {
     Organization org = organizationService.getOrganizationById(organizationId, accessToken)
-      .orElseThrow(() -> new NotFoundException("[ORGANIZATION_NOT_FOUND] Organization with id " + organizationId + " not found"));
+      .orElseThrow(() -> new NotFoundException("ORGANIZATION_NOT_FOUND", "Organization with id " + organizationId + " not found"));
 
     Long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
       .filter(transfer -> transfer.getOrgFiscalCode().equals(org.getOrgFiscalCode()))

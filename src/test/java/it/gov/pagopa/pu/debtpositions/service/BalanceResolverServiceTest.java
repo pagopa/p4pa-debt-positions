@@ -93,7 +93,8 @@ class BalanceResolverServiceTest {
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> service.resolveAmountBalance(orgId, installment, accessToken));
 
-    assertEquals("[ORGANIZATION_NOT_FOUND] Organization with id 1 not found", exception.getMessage());
+    assertEquals("ORGANIZATION_NOT_FOUND",exception.getCode());
+    assertEquals("Organization with id 1 not found", exception.getMessage());
     Mockito.verify(balanceServiceMock, times(0)).calculateAmountBalance(Mockito.any(), Mockito.anyString());
   }
 

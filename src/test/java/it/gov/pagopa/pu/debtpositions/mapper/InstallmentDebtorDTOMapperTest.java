@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDebtorDTO;
+import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Test;
@@ -47,22 +48,22 @@ class InstallmentDebtorDTOMapperTest {
   }
 
   @Test
-  void givenNoMatchingDebtPositionTypeOrgWhenMapThenIllegalStateException() {
+  void givenNoMatchingDebtPositionTypeOrgWhenMapThenIllegalStateBusinessException() {
     InstallmentDTO installment = podam.manufacturePojo(InstallmentDTO.class);
     installment.setInstallmentId(1L);
     List<InstallmentDTO> installments = List.of(installment);
     Map<Long,DebtPositionTypeOrg> dptoMap = new HashMap<>();
     dptoMap.put(2L,podam.manufacturePojo(DebtPositionTypeOrg.class));
 
-    assertThrows(IllegalStateException.class,()-> mapper.map(installments,dptoMap));
+    assertThrows(IllegalStateBusinessException.class,()-> mapper.map(installments,dptoMap));
   }
 
   @Test
-  void givenNoDebtPositionTypeOrgMapWhenMapThenIllegalStateException() {
+  void givenNoDebtPositionTypeOrgMapWhenMapThenIllegalStateBusinessException() {
     InstallmentDTO installment = podam.manufacturePojo(InstallmentDTO.class);
     installment.setInstallmentId(1L);
     List<InstallmentDTO> installments = List.of(installment);
 
-    assertThrows(IllegalArgumentException.class,()-> mapper.map(installments,null));
+    assertThrows(IllegalStateBusinessException.class,()-> mapper.map(installments,null));
   }
 }

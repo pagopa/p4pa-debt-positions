@@ -27,10 +27,10 @@ public class AuthorizeOperatorOnDebtPositionTypeServiceImpl implements Authorize
 
   public DebtPositionTypeOrg authorize(String orgIpaCode, Long debtPositionTypeOrgId, String operatorExternalUserId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
+      .orElseThrow(() -> new NotFoundException("DEBT_POSITION_TYPE_ORG_NOT_FOUND", "The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
 
     if (!isOperatorAuthorized(orgIpaCode, debtPositionTypeOrgId, operatorExternalUserId)) {
-      throw new OperatorNotAuthorizedException("[DEBT_POSITION_TYPE_ORG_UNAUTHORIZED] The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
+      throw new OperatorNotAuthorizedException("DEBT_POSITION_TYPE_ORG_UNAUTHORIZED", "The operator " + operatorExternalUserId + " is not authorized on the DebtPositionTypeOrg " + debtPositionTypeOrgId);
     }
 
     return debtPositionTypeOrg;

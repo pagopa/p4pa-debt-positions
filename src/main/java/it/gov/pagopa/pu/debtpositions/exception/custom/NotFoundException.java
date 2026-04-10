@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.exception.custom;
 
-public class NotFoundException extends RuntimeException {
+public class NotFoundException extends BaseBusinessException {
 
-    public NotFoundException(String message) {
-            super(message);
+    public NotFoundException(String code, String message) {
+            super(code, message);
         }
 }

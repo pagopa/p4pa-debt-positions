@@ -61,7 +61,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException("DEBT_POSITION_TYPE_ORG_NOT_FOUND", String.format("The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
 
@@ -69,7 +69,7 @@ public class DebtPositionAddInstallmentServiceImpl extends BaseDebtPositionOpera
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> {
           if(!poIndexes.add(paymentOptionDTO.getPaymentOptionIndex())){
-            throw new InvalidValueException("[DUPLICATED_PAYMENT_OPTION_INDEX] PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
+            throw new InvalidValueException("DUPLICATED_PAYMENT_OPTION_INDEX", "PaymentOption index duplicated: " + paymentOptionDTO.getPaymentOptionIndex());
           }
           paymentOptionDTO.getInstallments().stream()
             .filter(installmentDTO -> installmentIds.contains(installmentDTO.getInstallmentId()))

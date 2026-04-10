@@ -222,6 +222,9 @@ public class DebtPositionExceptionHandler {
         return Pair.of(DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
           missingServletRequestParameterException.getMessage());
       }
+      case BaseBusinessException businessException -> {
+        return Pair.of(businessException.getCode(), businessException.getMessage());
+      }
       default -> {
         if (ex.getCause() instanceof HttpHostConnectException) {
           return Pair.of("DEBT_POSITION_CONNECTION_ERROR", ex.getMessage());

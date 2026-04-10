@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -61,7 +62,7 @@ public class IuvServiceImpl implements IuvService {
     long paymentIndex = iuvSequenceNumberService.getNextIuvSequenceNumber(org.getOrganizationId());
     if (paymentIndex < 1) {
       log.error("invalid payment index returned for org[{}/{}]: {}", org.getIpaCode(), org.getOrgFiscalCode(), paymentIndex);
-      throw new InvalidValueException("[INVALID_PAYMENT_INDEX] invalid payment index");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_PAYMENT_INDEX, "invalid payment index");
     }
     return StringUtils.leftPad(String.valueOf(paymentIndex), 11, '0');
   }
@@ -83,7 +84,7 @@ public class IuvServiceImpl implements IuvService {
     if (isValidIuv(iuv))
       return auxDigit + iuv;
     else
-      throw new InvalidValueException("[INVALID_IUV] invalid iuv");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "invalid iuv");
   }
 
   /**
@@ -96,7 +97,7 @@ public class IuvServiceImpl implements IuvService {
     if (isValidNav(nav)) {
       return nav.substring(auxDigit.length());
     } else {
-      throw new InvalidValueException("[INVALID_NAV] invalid nav");
+      throw new InvalidValueException("INVALID_NAV", "invalid nav");
     }
   }
 
@@ -129,19 +130,19 @@ public class IuvServiceImpl implements IuvService {
 
   public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
-      throw new InvalidValueException("[INVALID_IUV] The iuv must be 17 characters long");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
     if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
-      throw new InvalidValueException("[INVALID_IUV] The first two character of iuv must be the same of segregation code of organization");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The first two character of iuv must be the same of segregation code of organization");
     }
 
     if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
       if (!iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters must be '" + informationSystemId + "' for the origin: " + origin);
+        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters must be '" + informationSystemId + "' for the origin: " + origin);
       }
     } else {
       if (iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException("[INVALID_IUV] The third and fourth characters cannot be '" + informationSystemId + "' for the origin: " + origin);
+        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + informationSystemId + "' for the origin: " + origin);
       }
     }
 

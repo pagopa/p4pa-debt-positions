@@ -124,7 +124,8 @@ class PersonalDataServiceTest {
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.get(personalDataId, CLASS_PII_DTO));
 
     // Then
-    Assertions.assertEquals("[PII_ENTITY_NOT_FOUND] PII Entity with id 1 not found", notFoundException.getMessage());
+    Assertions.assertEquals("PII Entity with id 1 not found", notFoundException.getMessage());
+    Assertions.assertEquals("PII_ENTITY_NOT_FOUND", notFoundException.getCode());
   }
 //endregion
 
@@ -211,7 +212,8 @@ class PersonalDataServiceTest {
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.getAll(personalDataIds, CLASS_PII_DTO));
 
     // Then
-    Assertions.assertEquals("[PII_ENTITY_NOT_FOUND] PII Entities with ids 2 not found", notFoundException.getMessage());
+    Assertions.assertEquals("PII_ENTITY_NOT_FOUND", notFoundException.getCode());
+    Assertions.assertEquals("PII Entities with ids 2 not found", notFoundException.getMessage());
   }
 
   @Test

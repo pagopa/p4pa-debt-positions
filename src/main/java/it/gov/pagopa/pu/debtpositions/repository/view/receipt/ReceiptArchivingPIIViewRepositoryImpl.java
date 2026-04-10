@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PagedReceiptsArchivingView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedReceiptsArchivingViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.receipt.ReceiptArchivingNoPIIView;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class ReceiptArchivingPIIViewRepositoryImpl implements ReceiptArchivingPI
     Page<ReceiptArchivingNoPIIView> receiptArchivingViewNoPIIDTO = receiptArchivingNoPIIViewRepository.findReceiptArchivingViewNoPIIDTO(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable);
 
     if (receiptArchivingViewNoPIIDTO.getTotalElements() > maxTotalElements){
-      throw new ExportTooManyRecordsException("[TOO_MANY_EXPORTED_RECORDS] The number of ReceiptArchivingViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(receiptArchivingViewNoPIIDTO.getTotalElements(), maxTotalElements));
+      throw new ExportTooManyRecordsException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_EXPORTED_RECORDS, "The number of ReceiptArchivingViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(receiptArchivingViewNoPIIDTO.getTotalElements(), maxTotalElements));
     }
 
     return pagedReceiptsArchivingViewMapper.mapToPagedReceiptsArchivingView(receiptArchivingViewNoPIIDTO);

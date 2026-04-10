@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.update.massive;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
@@ -10,7 +11,6 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
-import jakarta.validation.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -42,7 +42,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
     if (debtPositionDTO == null) {
-      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition with id %d not found".formatted(debtPositionId));
+      throw new NotFoundException("DEBT_POSITION_NOT_FOUND", "DebtPosition with id %d not found".formatted(debtPositionId));
     }
 
     Set<String> collectedIuds = new HashSet<>();
@@ -81,11 +81,11 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
   private void validateNewIbans(String newIban, String newPostalIban) {
     if (StringUtils.isBlank(newIban) || !Utilities.isValidIban(newIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newIban is not valid");
+      throw new InvalidValueException("INVALID_IBAN", "Provided newIban is not valid");
     }
 
     if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
-      throw new ValidationException("[INVALID_IBAN] Provided newPostalIban is not valid");
+      throw new InvalidValueException("INVALID_IBAN", "Provided newPostalIban is not valid");
     }
   }
 }
