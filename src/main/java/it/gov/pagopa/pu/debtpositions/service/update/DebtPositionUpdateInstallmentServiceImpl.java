@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -62,7 +63,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
     log.debug("Updating status for installments with ids {}", installmentIds);
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionDTO.getDebtPositionTypeOrgId())
-      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id %s was not found for organization id %s",
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, String.format("The debt position type org with id %s was not found for organization id %s",
         debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getOrganizationId())));
 
     debtPositionDTO.getPaymentOptions()

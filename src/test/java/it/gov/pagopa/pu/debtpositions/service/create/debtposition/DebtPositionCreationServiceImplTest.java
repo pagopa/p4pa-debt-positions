@@ -291,7 +291,8 @@ class DebtPositionCreationServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("[INSTALLMENT_ALREADY_EXISTS] Duplicate records found: the provided data conflicts with existing records", exception.getMessage());
+    assertEquals("INSTALLMENT_ALREADY_EXISTS",exception.getCode());
+    assertEquals("Duplicate records found: the provided data conflicts with existing records", exception.getMessage());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
   }
@@ -382,7 +383,8 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("[INVALID_ORGANIZATION] Provided organization id not found on db.", exception.getMessage());
+    assertEquals("INVALID_ORGANIZATION",exception.getCode());
+    assertEquals("Provided organization id not found on db.", exception.getMessage());
   }
 
   @Test
@@ -397,7 +399,8 @@ class DebtPositionCreationServiceImplTest {
     InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null)
     );
-    assertEquals("[INVALID_ORGANIZATION_STATUS] Provided organization is not ACTIVE", exception.getMessage());
+    assertEquals("INVALID_ORGANIZATION_STATUS",exception.getCode());
+    assertEquals("Provided organization is not ACTIVE", exception.getMessage());
   }
 
   @Test

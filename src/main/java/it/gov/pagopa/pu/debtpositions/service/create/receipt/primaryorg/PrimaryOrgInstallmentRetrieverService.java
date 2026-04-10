@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
@@ -38,7 +39,7 @@ public class PrimaryOrgInstallmentRetrieverService {
     if(installments.isEmpty()){
       return Optional.empty();
     } else if(installments.size() > 1){
-      throw new ConflictErrorException("[TOO_MANY_INSTALLMENTS] There are too many Instalments having NAV " + nav + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_INSTALLMENTS, "There are too many Instalments having NAV " + nav + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
         getInstallmentDetails(installments)
       );
     } else {
@@ -52,13 +53,13 @@ public class PrimaryOrgInstallmentRetrieverService {
       return Optional.empty();
     }
     if(installments.size() > 1){
-      throw new ConflictErrorException("[TOO_MANY_INSTALLMENTS] There are too many Instalments having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_INSTALLMENTS, "There are too many Instalments having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + ":" +
         getInstallmentDetails(installments)
       );
     }
     InstallmentNoPII installment = installments.getFirst();
     if(!nav.equals(installment.getNav())){
-      throw new ConflictErrorException("[INVALID_INSTALLMENT_NAV_MISMATCH] The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_NAV_MISMATCH, "The found Instalment having IUD " + iud + " on organizationId " + primaryOrg.getOrganizationId() + " has a different NAV:" +
         " expected " + nav + " but found " + installment.getNav()
       );
     }

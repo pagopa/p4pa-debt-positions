@@ -11,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidDateTimeIntervalEx
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import java.time.OffsetDateTime;
 import java.time.temporal.ChronoUnit;
@@ -22,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 public class DataExportsControllerImpl implements DataExportsApi {
+  public static final String INVALID_DATE_TIME_INTERVAL_ERROR_MESSAGE = "The date interval between %s and %s cannot exceed %d months";
 
   private final InstallmentService installmentService;
   private final ReceiptService receiptService;
@@ -39,22 +41,21 @@ public class DataExportsControllerImpl implements DataExportsApi {
 
   @Override
   public ResponseEntity<PagedInstallmentsPaidView> exportPaidInstallments(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateTimeFrom, OffsetDateTime paymentDateTimeTo, OffsetDateTime installmentUpdateDateTimeFrom, OffsetDateTime installmentUpdateDateTimeTo, Long debtPositionTypeOrgId, List<DebtPositionOrigin> debtPositionOrigins, Pageable pageable) {
-    String invalidDateTimeIntervalErrorMessage = "[INVALID_DATE_FILTER_INTERVAL] The date interval between %s and %s cannot exceed %d months";
     boolean hasPaymentDates = paymentDateTimeFrom != null && paymentDateTimeTo != null;
     boolean hasInstallmentDates = installmentUpdateDateTimeFrom != null && installmentUpdateDateTimeTo != null;
 
     if (hasPaymentDates == hasInstallmentDates) {
       throw new InvalidParamException(
-        "[INVALID_DATE_FILTER_COMBINATION] You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
+        "INVALID_DATE_FILTER_COMBINATION", "You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"
       );
     }
 
     if (hasPaymentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateTimeFrom, paymentDateTimeTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(paymentDateTimeFrom, paymentDateTimeTo, exportPaidMaxMonthsInterval));
+      throw new InvalidDateTimeIntervalException(ErrorCodeConstants.ERROR_CODE_INVALID_DATE_TIME_INTERVAL, INVALID_DATE_TIME_INTERVAL_ERROR_MESSAGE.formatted(paymentDateTimeFrom, paymentDateTimeTo, exportPaidMaxMonthsInterval));
     }
 
     if (hasInstallmentDates && !Utilities.isValidIntervalBetweenOffsetDateTime(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, ChronoUnit.MONTHS, exportPaidMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException(invalidDateTimeIntervalErrorMessage.formatted(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, exportPaidMaxMonthsInterval));
+      throw new InvalidDateTimeIntervalException(ErrorCodeConstants.ERROR_CODE_INVALID_DATE_TIME_INTERVAL, INVALID_DATE_TIME_INTERVAL_ERROR_MESSAGE.formatted(installmentUpdateDateTimeFrom, installmentUpdateDateTimeTo, exportPaidMaxMonthsInterval));
     }
 
     OffsetDateTimeIntervalFilter paymentDateTime = new OffsetDateTimeIntervalFilter(paymentDateTimeFrom, paymentDateTimeTo);
@@ -75,7 +76,7 @@ public class DataExportsControllerImpl implements DataExportsApi {
   @Override
   public ResponseEntity<PagedReceiptsArchivingView> exportArchivingReceipts(Long organizationId, String operatorExternalUserId, OffsetDateTime paymentDateFrom, OffsetDateTime paymentDateTo, Pageable pageable) {
     if (!Utilities.isValidIntervalBetweenOffsetDateTime(paymentDateFrom, paymentDateTo, ChronoUnit.MONTHS, exportArchivingMaxMonthsInterval)) {
-      throw new InvalidDateTimeIntervalException("[INVALID_DATE_FILTER_INTERVAL] The date interval between %s and %s cannot exceed %d months".formatted(paymentDateFrom, paymentDateTo, exportArchivingMaxMonthsInterval));
+      throw new InvalidDateTimeIntervalException(ErrorCodeConstants.ERROR_CODE_INVALID_DATE_TIME_INTERVAL, INVALID_DATE_TIME_INTERVAL_ERROR_MESSAGE.formatted(paymentDateFrom, paymentDateTo, exportArchivingMaxMonthsInterval));
     }
 
     return ResponseEntity.ok(receiptService.getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, pageable));

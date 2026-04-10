@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,14 +60,14 @@ public class CategoryResolverService {
   private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
     Matcher matcher = LEGACY_PAYMENT_METADATA_REGEX.matcher(legacyPaymentMetadata);
     if (!matcher.find()) {
-      throw new InvalidValueException(String.format("[INVALID_LEGACY_PAYMENT_METADATA] The legacy payment metadata [%s] is not valid to extract taxonomy code", legacyPaymentMetadata));
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_LEGACY_PAYMENT_METADATA, String.format("The legacy payment metadata [%s] is not valid to extract taxonomy code", legacyPaymentMetadata));
     }
     return matcher.group(1);
   }
 
   private String getTaxonomyFromRepository(Long debtPositionTypeId) {
     return debtPositionTypeRepository.findById(debtPositionTypeId)
-      .orElseThrow(() -> new NotFoundException(String.format("[DEBT_POSITION_TYPE_NOT_FOUND] The debt position type with id %s is not found", debtPositionTypeId)))
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_NOT_FOUND, String.format("The debt position type with id %s is not found", debtPositionTypeId)))
       .getTaxonomyCode();
   }
 }

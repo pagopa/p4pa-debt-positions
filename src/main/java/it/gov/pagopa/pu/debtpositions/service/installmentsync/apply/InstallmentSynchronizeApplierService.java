@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -67,7 +68,7 @@ public class InstallmentSynchronizeApplierService {
     } else {
       Long organizationId = installmentSynchronizeDTO.getOrganizationId();
       Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
-        .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_ORGANIZATION] Provided organization with id %s not found", organizationId)));
+        .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION, String.format("Provided organization with id %s not found", organizationId)));
 
       populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg);
       applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
@@ -78,7 +79,7 @@ public class InstallmentSynchronizeApplierService {
   private DebtPositionTypeOrg retrieveDebtPositionTypeOrg(Long organizationId, String debtPositionTypeCode) {
     return debtPositionTypeOrgRepository.findByOrganizationIdAndCode(
         organizationId, debtPositionTypeCode)
-      .orElseThrow(() -> new InvalidValueException(String.format("[INVALID_DEBT_POSITION_TYPE_ORG_CODE] The debt position type org with code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
+      .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_TYPE_ORG_CODE, String.format("The debt position type org with code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
   }
 
   private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {

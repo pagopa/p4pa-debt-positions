@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinary.OrdinaryDPPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.techdp.ReceiptBasedTechnicalDpHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class PrimaryOrgInstallmentPaymentHandlerService {
   public DebtPosition handlePayment(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, String accessToken){
     DebtPosition dp = debtPositionRepository.findEntityGraphByInstallmentId(installment.getInstallmentId());
     if (dp == null) {
-      throw new NotFoundException("[DEBT_POSITION_NOT_FOUND] DebtPosition for installment with id " + installment.getInstallmentId() + " not found");
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_NOT_FOUND, "DebtPosition for installment with id " + installment.getInstallmentId() + " not found");
     }
 
     if (InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(dp.getDebtPositionOrigin())) {

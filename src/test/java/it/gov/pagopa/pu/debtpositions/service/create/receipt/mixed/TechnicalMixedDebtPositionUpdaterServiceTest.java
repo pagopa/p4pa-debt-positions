@@ -94,7 +94,8 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("[TOO_MANY_PAYMENT_OPTIONS] PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("TOO_MANY_PAYMENT_OPTIONS", exception.getCode());
+    assertEquals("PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -110,7 +111,8 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("[TOO_MANY_PAYMENT_OPTIONS] PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("TOO_MANY_PAYMENT_OPTIONS", exception.getCode());
+    assertEquals("PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -126,7 +128,8 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("[TOO_MANY_INSTALLMENTS] Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("TOO_MANY_INSTALLMENTS", exception.getCode());
+    assertEquals("Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test
@@ -142,7 +145,8 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     // Then
     InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
-    assertEquals("[TOO_MANY_INSTALLMENTS] Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
+    assertEquals("TOO_MANY_INSTALLMENTS", exception.getCode());
+    assertEquals("Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
   }
 
   @Test

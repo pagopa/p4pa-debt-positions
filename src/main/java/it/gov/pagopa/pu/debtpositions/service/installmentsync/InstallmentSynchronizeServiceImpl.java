@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     if (!debtPositionOrigin.equals(debtPosition.getDebtPositionOrigin())) {
-      throw new ConflictErrorException(String.format("[INVALID_DEBT_POSITION] There is another debt position with iupd %s requested but different origin", iupdOrg));
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION, String.format("There is another debt position with iupd %s requested but different origin", iupdOrg));
     }
 
     return debtPositionMapper.mapToDto(debtPosition);
@@ -83,7 +84,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     if (debtPositions.size() > 1) {
-      throw new ConflictErrorException(String.format("[TOO_MANY_DEBT_POSITIONS] Multiple debt positions found for iud %s", iud));
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_DEBT_POSITIONS, String.format("Multiple debt positions found for iud %s", iud));
     }
 
     return debtPositionMapper.mapToDto(debtPositions.getFirst());

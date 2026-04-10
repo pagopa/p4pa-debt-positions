@@ -115,7 +115,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_DEBT_POSITION_STATUS] Debt position with id 1 cannot be modified because it is not in an allowed status: PAID", exception.getMessage());
+    assertEquals("INVALID_DEBT_POSITION_STATUS",exception.getCode());
+    assertEquals("Debt position with id 1 cannot be modified because it is not in an allowed status: PAID", exception.getMessage());
   }
 
   @Test
@@ -131,7 +132,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[PAYMENT_OPTION_NOT_FOUND] Payment option having id 1111 not found", exception.getMessage());
+    assertEquals("PAYMENT_OPTION_NOT_FOUND",exception.getCode());
+    assertEquals("Payment option having id 1111 not found", exception.getMessage());
   }
 
   @Test
@@ -147,7 +149,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_PAYMENT_OPTION_STATUS] Payment option having id 10 cannot be modified because is not in allowed status: PAID", exception.getMessage());
+    assertEquals("INVALID_PAYMENT_OPTION_STATUS",exception.getCode());
+    assertEquals("Payment option having id 10 cannot be modified because is not in allowed status: PAID", exception.getMessage());
   }
 
   @Test
@@ -165,7 +168,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_INSTALLMENT_STATUS] Installment having id 2 cannot be modified because is not in allowed status: PAID", exception.getMessage());
+    assertEquals("INVALID_INSTALLMENT_STATUS",exception.getCode());
+    assertEquals("Installment having id 2 cannot be modified because is not in allowed status: PAID", exception.getMessage());
   }
 
   @Test
@@ -180,7 +184,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INSTALLMENT_NOT_FOUND] The installment with id 2 not found", exception.getMessage());
+    assertEquals("INSTALLMENT_NOT_FOUND",exception.getCode());
+    assertEquals("The installment with id 2 not found", exception.getMessage());
   }
 
   @Test
@@ -199,7 +204,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INVALID_INSTALLMENT_STATUS] The installment with id 2 cannot be modified because is been notified by SEND", exception.getMessage());
+    assertEquals("INVALID_INSTALLMENT_STATUS",exception.getCode());
+    assertEquals("The installment with id 2 cannot be modified because is been notified by SEND", exception.getMessage());
   }
 
   @Test
@@ -238,7 +244,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     WorkflowErrorException exception = assertThrows(WorkflowErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[WORKFLOW_EXECUTION_ERROR] Workflow with id workflowId_UPDATE terminated with error", exception.getMessage());
+    assertEquals("WORKFLOW_EXECUTION_ERROR",exception.getCode());
+    assertEquals("Workflow with id workflowId_UPDATE terminated with error", exception.getMessage());
   }
 
   @Test
@@ -297,6 +304,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
   @Test
   void givenInvalidInstallmentDataWhenManageUpdateThenValidationException() {
+    // Given
     Long debtPositionId = 1L;
     ManageDebtPositionDTO manageDebtPositionDTO = ManageDebtPositionDTO.builder()
       .debtPositionDescription("Desc")
@@ -321,17 +329,22 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     Organization org = buildOrganization();
 
+    InvalidValueException expectedException = new InvalidValueException("CODE", "Taxonomy invalid");
+
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
       .thenReturn(Optional.of(org));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
-    Mockito.doThrow(new InvalidValueException("Taxonomy invalid"))
+    Mockito.doThrow(expectedException)
       .when(validateDebtPositionServiceMock).validateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
-    InvalidValueException exception = assertThrows(InvalidValueException.class,
+
+    // When
+    InvalidValueException resultException = assertThrows(InvalidValueException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("Taxonomy invalid", exception.getMessage());
+    // Then
+    assertSame(expectedException, resultException);
 
     Mockito.verify(debtPositionUpdateInstallmentServiceMock, Mockito.never())
       .updateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
@@ -367,7 +380,8 @@ class DebtPositionManageInstallmentsServiceImplTest {
     InstallmentCloningException exception = assertThrows(InstallmentCloningException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[INSTALLMENT_CLONING_ERROR] Error cloning installment with id 2", exception.getMessage());
+    assertEquals("INSTALLMENT_CLONING_ERROR",exception.getCode());
+    assertEquals("Error cloning installment with id 2", exception.getMessage());
   }
 
   @Test
@@ -400,6 +414,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
-    assertEquals("[DEBT_POSITION_TYPE_ORG_NOT_FOUND] The debt position type org with id 99 was not found for organization id 500", exception.getMessage());
+    assertEquals("DEBT_POSITION_TYPE_ORG_NOT_FOUND",exception.getCode());
+    assertEquals("The debt position type org with id 99 was not found for organization id 500", exception.getMessage());
   }
 }

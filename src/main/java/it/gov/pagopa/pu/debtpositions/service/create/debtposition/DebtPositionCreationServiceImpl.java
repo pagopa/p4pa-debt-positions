@@ -16,6 +16,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -175,7 +176,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     boolean isInstallmentDuplicate = installmentNoPIIRepository.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS);
     if (isInstallmentDuplicate) {
       log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), debtPositionDTO.getOrganizationId());
-      throw new ConflictErrorException("[INSTALLMENT_ALREADY_EXISTS] Duplicate records found: the provided data conflicts with existing records");
+      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_ALREADY_EXISTS, "Duplicate records found: the provided data conflicts with existing records");
     }
   }
 

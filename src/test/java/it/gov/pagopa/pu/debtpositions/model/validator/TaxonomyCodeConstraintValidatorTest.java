@@ -42,15 +42,19 @@ class TaxonomyCodeConstraintValidatorTest {
   @Test
   void givenInvalidTaxonomyCodeWhenIsValidThenThrowInvalidValueException() {
     //Given
+    InvalidValueException expectedException = new InvalidValueException("CODE", "Error");
     Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
-      .thenThrow(new InvalidValueException("Error"));
+      .thenThrow(expectedException);
 
     DebtPositionType debtPositionType = buildDebtPositionType();
-    //When, then
-    InvalidValueException actualException = Assertions.assertThrows(
+
+    //When
+    InvalidValueException resultException = Assertions.assertThrows(
       InvalidValueException.class,
       () -> validator.isValid(debtPositionType, null));
-    Assertions.assertEquals("Error", actualException.getMessage());
+
+    // Then
+    Assertions.assertSame(expectedException, resultException);
   }
 
 }

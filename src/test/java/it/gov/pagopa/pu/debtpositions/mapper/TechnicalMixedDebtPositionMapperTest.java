@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
@@ -134,7 +135,7 @@ class TechnicalMixedDebtPositionMapperTest {
       .build();
     Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData), accessToken);
 
-    assertThrows(IllegalStateException.class, exec);
+    assertThrows(IllegalStateBusinessException.class, exec);
   }
 
   @Test

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.common.pii.citizen.service;
 
+import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -63,23 +64,24 @@ class DataCipherServiceTest {
   }
 
   @Test
-  void givenJsonSerializationExceptionWhenEncryptObjThenThrowIllegalStateException() {
+  void givenJsonSerializationExceptionWhenEncryptObjThenThrowIllegalStateBusinessException() {
     JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
 
     Mockito.when(jsonMapperMock.writeValueAsString(any())).thenThrow(Mockito.mock(JacksonException.class));
 
     DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
 
-    IllegalStateException ex = Assertions.assertThrows(
-      IllegalStateException.class,
+    IllegalStateBusinessException ex = Assertions.assertThrows(
+      IllegalStateBusinessException.class,
       () -> brokenServiceWithMock.encryptObj("PLAINTEXT")
     );
 
-    assertEquals("[JSON_SERIALIZATION_ERROR] Cannot serialize object as JSON", ex.getMessage());
+    assertEquals("JSON_SERIALIZATION_ERROR",ex.getCode());
+    assertEquals("Cannot serialize object as JSON", ex.getMessage());
   }
 
   @Test
-  void givenJsonDeserializationExceptionWhenDecryptObjThenThrowIllegalStateException() {
+  void givenJsonDeserializationExceptionWhenDecryptObjThenThrowIllegalStateBusinessException() {
     JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
 
     Mockito.when(jsonMapperMock.readValue(any(String.class), Mockito.eq(String.class)))
@@ -89,11 +91,12 @@ class DataCipherServiceTest {
 
     byte[] validCipher = service.encryptObj("PLAINTEXT");
 
-    IllegalStateException ex = Assertions.assertThrows(
-      IllegalStateException.class,
+    IllegalStateBusinessException ex = Assertions.assertThrows(
+      IllegalStateBusinessException.class,
       () -> brokenServiceWithMock.decryptObj(validCipher, String.class)
     );
 
-    assertEquals("[JSON_DESERIALIZATION_ERROR] Cannot deserialize object as JSON", ex.getMessage());
+    assertEquals("JSON_DESERIALIZATION_ERROR",ex.getCode());
+    assertEquals("Cannot deserialize object as JSON", ex.getMessage());
   }
 }

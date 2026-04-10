@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.view.InstallmentDetailPIIViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentDetailNoPIIView;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -23,6 +24,7 @@ public class InstallmentDetailPIIViewRepositoryImpl implements InstallmentDetail
   public InstallmentDetailDTO getInstallmentDetail(Long installmentId, String operatorExternalUserId) {
     InstallmentDetailNoPIIView installmentDetailNoPIIView = installmentDetailNoPIIViewRepository.findInstallmentDetailView(installmentId, operatorExternalUserId)
       .orElseThrow(() -> new NotFoundException(
+        ErrorCodeConstants.ERROR_CODE_INSTALLMENT_NOT_FOUND,
         "InstallmentDetailNoPIIView having installmentId %d and operatorExternalUserId %s not found".formatted(
           installmentId, operatorExternalUserId)));
     return installmentDetailPIIViewMapper.map(installmentDetailNoPIIView);

@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ExportTooManyRecordsException;
 import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedInstallmentsPaidViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentPaidViewNoPII;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,7 +42,8 @@ public class InstallmentPaidViewPIIViewRepositoryImpl implements InstallmentPaid
 
     if (pagedInstallmentPaidViewNoPIIDTO.getTotalElements() > maxTotalElements) {
       throw new ExportTooManyRecordsException(
-        "[TOO_MANY_EXPORTED_RECORDS] The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(
+        ErrorCodeConstants.ERROR_CODE_TOO_MANY_EXPORTED_RECORDS,
+        "The number of InstallmentPaidViewNoPII records returned: %d exceeds the maximum allowed: %d".formatted(
           pagedInstallmentPaidViewNoPIIDTO.getTotalElements(),
           maxTotalElements));
     }
