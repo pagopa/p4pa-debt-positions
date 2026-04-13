@@ -489,7 +489,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @Test
   void givenDebtPositionTypeOrgWithEmptyPostalIbanWhenSaveDebtPositionTypeOrgThenThrowInvalidValueException() {
-    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();;
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setDebtPositionTypeId(1L);
     debtPositionTypeOrg.setFlagActive(true);
     debtPositionTypeOrg.setPostalIban("");
