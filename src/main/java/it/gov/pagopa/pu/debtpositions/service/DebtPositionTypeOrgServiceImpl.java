@@ -111,9 +111,19 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     if (StringUtils.isNotBlank(debtPositionTypeOrg.getIban()) && !Utilities.isValidIban(debtPositionTypeOrg.getIban())) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Provided iban is not valid");
     }
-    if (StringUtils.isNotBlank(debtPositionTypeOrg.getPostalIban()) && !Utilities.isValidIban(debtPositionTypeOrg.getPostalIban())) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Provided postal iban is not valid");
+
+    String postalIban = debtPositionTypeOrg.getPostalIban();
+    // Postal IBAN is optional, but if provided, it must not be blank
+    if (postalIban != null) {
+      if (StringUtils.isBlank(postalIban)) {
+        throw new InvalidValueException("", "Postal IBAN is optional, but if provided, it must not be blank");
+      }
+
+      if (!Utilities.isValidIban(postalIban)) {
+        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Provided postal iban is not valid");
+      }
     }
+
     if (debtPositionTypeOrg.getDebtPositionTypeOrgId() != null) {
       DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
