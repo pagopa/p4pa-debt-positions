@@ -1033,11 +1033,21 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenEmptyPostalIbanWhenValidateThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setPostalIban("");
-
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    assertThrows(Exception.class, () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg));
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    TransferDTO firstTransfer = firstInstallment.getTransfers().getFirst();
+
+    firstTransfer.setPostalIban("");
+
+    Mockito.when(balanceServiceMock.isValidBalance(firstInstallment.getBalance(), firstInstallment.getAmountCents(), accessToken)).thenReturn(Boolean.TRUE);
+
+    InvalidValueException invalidValueException = assertThrows(
+      InvalidValueException.class,
+      () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg)
+    );
+
+    assertEquals("MISSING_POSTAL_IBAN", invalidValueException.getCode());
   }
 }
 
