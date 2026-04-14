@@ -228,7 +228,7 @@ openApiGenerate {
       "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
       "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO",
       "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType",
-      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO",
+      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO"
     )
   )
   configOptions.set(
@@ -243,6 +243,12 @@ openApiGenerate {
       "generatedConstructorWithRequiredArgs" to "true",
       "enumPropertyNaming" to "original",
       "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
+    )
+  )
+
+  importMappings.set(
+    mapOf(
+      "PostalIbanVerifyResponse" to "it.gov.pagopa.pu.debtpositions.dto.PostalIbanVerifyResponse"
     )
   )
 }

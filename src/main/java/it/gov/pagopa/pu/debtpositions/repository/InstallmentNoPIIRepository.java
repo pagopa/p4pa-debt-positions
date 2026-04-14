@@ -204,4 +204,12 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     Pageable pageable
   );
+
+  @RestResource(exported = false)
+  @Query("""
+    SELECT DISTINCT i.installmentId
+    FROM InstallmentNoPII i
+    WHERE i.installmentId IN :installmentIds
+   """)
+  Set<Long> findExistingInstallmentIds(List<Long> installmentIds);
 }
