@@ -6,7 +6,10 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +42,18 @@ class DebtPositionTypeOrgControllerTest {
   private BalanceService balanceServiceMock;
   @MockitoBean
   private DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
+
+  private final String accessToken = "ACCESSTOKEN";
+
+  @BeforeEach
+  void init() {
+    SecurityUtilsTest.configureSecurityContext(accessToken, "userId");
+  }
+
+  @AfterEach
+  void clear() {
+    SecurityUtilsTest.clearSecurityContext();
+  }
 
   @Test
   void whenGetIONotificationThenOk() throws Exception {
@@ -81,7 +96,7 @@ class DebtPositionTypeOrgControllerTest {
     debtPositionTypeOrg.setIban("iban");
     requestBody.setDebtPositionTypeOrg(debtPositionTypeOrg);
     DebtPositionTypeOrg expectedResult = new DebtPositionTypeOrg();
-    when(debtPositionTypeOrgService.saveDebtPositionTypeOrg(requestBody)).thenReturn(expectedResult);
+    when(debtPositionTypeOrgService.saveDebtPositionTypeOrg(requestBody, accessToken)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         post("/debt-position-type-org")

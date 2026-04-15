@@ -9,6 +9,6 @@ public interface DebtPositionTypeOrgService {
   IONotificationDTO getIONotificationDetails(Long debtPositionTypeId, PaymentEventType context);
 
   void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId);
-  DebtPositionTypeOrg saveDebtPositionTypeOrg(SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO);
+  DebtPositionTypeOrg saveDebtPositionTypeOrg(SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO, String accessToken);
   void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive);
 }

@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowDebtPositionApiClient;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -56,4 +57,18 @@ class WorkflowDebtPositionServiceTest {
     Assertions.assertSame(expectedResult, result);
   }
 
+  @Test
+  void whenMassiveDpIbanUpdateThenOk() {
+    String accessToken = "accessToken";
+    Long orgId = 1L;
+    MassiveDebtPositionIbanUpdateRequestDTO requestDTO = new MassiveDebtPositionIbanUpdateRequestDTO();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
+
+    Mockito.when(workflowApiClientMock.massiveDpIbanUpdate(orgId, requestDTO, accessToken))
+      .thenReturn(expectedResult);
+
+    WorkflowCreatedDTO result = workflowService.massiveDpIbanUpdate(orgId, requestDTO, accessToken);
+
+    Assertions.assertSame(expectedResult, result);
+  }
 }
