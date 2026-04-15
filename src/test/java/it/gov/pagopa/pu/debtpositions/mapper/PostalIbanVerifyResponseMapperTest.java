@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PostalIbanVerifyResponse;
+import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -27,9 +28,11 @@ class PostalIbanVerifyResponseMapperTest {
     Map<String, Boolean> map = result.getInstallmentPostalIbanCheck();
 
     assertEquals(3, map.size());
-    assertTrue(map.get("1"));   // non è in idsWithNull
-    assertFalse(map.get("2"));  // è in idsWithNull
+    assertTrue(map.get("1"));
+    assertFalse(map.get("2"));
     assertTrue(map.get("3"));
+
+    TestUtils.checkNotNullFields(result);
   }
 
   @Test
@@ -46,6 +49,7 @@ class PostalIbanVerifyResponseMapperTest {
 
     assertTrue(map.get("10"));
     assertTrue(map.get("20"));
+    TestUtils.checkNotNullFields(result);
   }
 
   @Test
@@ -62,6 +66,7 @@ class PostalIbanVerifyResponseMapperTest {
 
     assertFalse(map.get("5"));
     assertFalse(map.get("6"));
+    TestUtils.checkNotNullFields(result);
   }
 
   @Test

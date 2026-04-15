@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.PostalIbanVerifyResponseMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,6 +39,16 @@ class TransferServiceImplTest {
     );
   }
 
+
+  @AfterEach
+  void verifyNoMoreInteractions(){
+    Mockito.verifyNoMoreInteractions(
+      transferRepositoryMock,
+      installmentNoPIIRepositoryMock,
+      postalIbanVerifyResponseMapperMock
+    );
+  }
+
   @Test
   void givenValidInstallmentIdsWhenVerifyPostalIbanThenReturnMappedResponse() {
     // given
@@ -61,15 +72,6 @@ class TransferServiceImplTest {
     // then
     assertNotNull(result);
     assertEquals(expectedResponse, result);
-
-    Mockito.verify(installmentNoPIIRepositoryMock).findExistingInstallmentIds(installmentIds);
-    Mockito.verify(transferRepositoryMock).findInstallmentIdsWithNullPostalIban(installmentIds);
-    Mockito.verify(postalIbanVerifyResponseMapperMock).map(installmentIds, idsWithNull);
-    Mockito.verifyNoMoreInteractions(
-      installmentNoPIIRepositoryMock,
-      transferRepositoryMock,
-      postalIbanVerifyResponseMapperMock
-    );
   }
 
   @Test
@@ -78,7 +80,7 @@ class TransferServiceImplTest {
     List<Long> installmentIds = List.of(1L, 2L, 3L);
 
     Mockito.when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
-      .thenReturn(Set.of(1L, 2L)); // manca 3
+      .thenReturn(Set.of(1L, 2L));
 
     // when & then
     NotFoundException ex = assertThrows(NotFoundException.class,
@@ -86,7 +88,6 @@ class TransferServiceImplTest {
 
     assertTrue(ex.getMessage().contains("3"));
 
-    Mockito.verify(installmentNoPIIRepositoryMock).findExistingInstallmentIds(installmentIds);
     Mockito.verifyNoInteractions(transferRepositoryMock, postalIbanVerifyResponseMapperMock);
   }
 
