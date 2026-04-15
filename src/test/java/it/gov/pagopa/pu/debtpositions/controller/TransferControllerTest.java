@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
-import it.gov.pagopa.pu.debtpositions.dto.PostalIbanVerifyResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PostalIbanVerifyResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.service.TransferService;
@@ -129,7 +129,7 @@ class TransferControllerTest {
     //given
     List<Long> installmentIds = List.of(1L,2L);
     PostalIbanVerifyResponse expectedResult  = new PostalIbanVerifyResponse();
-    expectedResult.putAll(Map.of(1L, false, 2L, true));
+    expectedResult.setInstallmentPostalIbanCheck(Map.of("1", false, "2", true));
 
     Mockito.when(transferServiceMock.verifyPostalIban(installmentIds)).thenReturn(expectedResult);
     //when

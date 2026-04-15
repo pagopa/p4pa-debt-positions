@@ -246,11 +246,6 @@ openApiGenerate {
     )
   )
 
-  importMappings.set(
-    mapOf(
-      "PostalIbanVerifyResponse" to "it.gov.pagopa.pu.debtpositions.dto.PostalIbanVerifyResponse"
-    )
-  )
 }
 
 var targetEnv = when (Objects.requireNonNullElse(

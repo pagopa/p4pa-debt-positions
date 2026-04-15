@@ -1990,7 +1990,7 @@ paths:
           content:
             application/json:
               schema:
-                type: 'PostalIbanVerifyResponse'
+                $ref: '#/components/schemas/PostalIbanVerifyResponse'
         "400":
           description: Invalid request parameters
         "404":
@@ -3220,3 +3220,13 @@ components:
           type: string
         newPostalIban:
           type: string
+    PostalIbanVerifyResponse:
+      type: object
+      required:
+        - installmentPostalIbanCheck
+      properties:
+        installmentPostalIbanCheck:
+          type: object
+          additionalProperties:
+            type: boolean
+
