@@ -21,7 +21,7 @@ public class TransferServiceImpl implements TransferService{
   }
 
   @Override
-  public PostalIbanVerifyResponse checkAllTransfersHavePostalIban(List<Long> installmentIds) {
+  public PostalIbanVerifyResponse verifyPostalIban(List<Long> installmentIds) {
 
     Set<Long> existingIds = installmentNoPIIRepository.findExistingInstallmentIds(installmentIds);
 

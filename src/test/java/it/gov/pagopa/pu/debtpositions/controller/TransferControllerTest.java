@@ -1,8 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import it.gov.pagopa.pu.debtpositions.dto.PostalIbanVerifyResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.service.TransferService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -19,6 +21,9 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import tools.jackson.databind.json.JsonMapper;
+
+import java.util.List;
+import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -44,6 +49,9 @@ class TransferControllerTest {
 
   @MockitoBean
   private TaxonomyValidatorService taxonomyValidatorService;
+
+  @MockitoBean
+  private TransferService transferServiceMock;
 
   private final String accessToken = "ACCESSTOKEN";
 
@@ -114,5 +122,26 @@ class TransferControllerTest {
 
     Boolean resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), Boolean.class);
     assertTrue(resultResponse);
+  }
+
+  @Test
+  void whenVerifyPostalIbanThenOk() throws Exception {
+    //given
+    List<Long> installmentIds = List.of(1L,2L);
+    PostalIbanVerifyResponse expectedResult  = new PostalIbanVerifyResponse();
+    expectedResult.putAll(Map.of(1L, false, 2L, true));
+
+    Mockito.when(transferServiceMock.verifyPostalIban(installmentIds)).thenReturn(expectedResult);
+    //when
+    MvcResult result = mockMvc.perform(
+        get("/transfers/postal-iban/verify")
+          .queryParam("installmentIds", "1,2")
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isOk())
+      .andReturn();
+
+    //then
+    PostalIbanVerifyResponse resultResponse = jsonMapper.readValue(result.getResponse().getContentAsString(), PostalIbanVerifyResponse.class);
+    assertEquals(expectedResult, resultResponse);
   }
 }

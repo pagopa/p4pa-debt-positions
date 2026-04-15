@@ -54,8 +54,8 @@ public class TransferControllerImpl implements TransferApi {
   }
 
   @Override
-  public ResponseEntity<PostalIbanVerifyResponse> checkAllTransfersHavePostalIban(List<Long> installmentIds) {
-    log.info("User requested checkAllTransfersHavePostalIban with installmentIds {}", installmentIds);
-    return ResponseEntity.ofNullable(transferService.checkAllTransfersHavePostalIban(installmentIds));
+  public ResponseEntity<PostalIbanVerifyResponse> verifyPostalIban(List<Long> installmentIds) {
+    log.info("User requested verifyPostalIban with installmentIds {}", installmentIds);
+    return ResponseEntity.ofNullable(transferService.verifyPostalIban(installmentIds));
   }
 }
