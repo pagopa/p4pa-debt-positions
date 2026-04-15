@@ -77,7 +77,7 @@ class DebtPositionTypeOrgServiceImplTest {
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.getIONotificationDetails(debtPositionTypeOrgId, PaymentEventType.DP_CREATED));
 
     Assertions.assertEquals("DEBT_POSITION_TYPE_ORG_NOT_FOUND", notFoundException.getCode());
-    Assertions.assertEquals("DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
+    Assertions.assertEquals("DebtPositionTypeOrg with id %d not found".formatted(debtPositionTypeOrgId), notFoundException.getMessage());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock);
   }
 
@@ -324,7 +324,7 @@ class DebtPositionTypeOrgServiceImplTest {
     NotFoundException ex = Assertions.assertThrows(NotFoundException.class, () -> debtPositionTypeOrgService.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, true));
     //then
     Assertions.assertEquals("DEBT_POSITION_TYPE_ORG_NOT_FOUND",ex.getCode());
-    Assertions.assertEquals("DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found", ex.getMessage());
+    Assertions.assertEquals("DebtPositionTypeOrg with id %d not found".formatted(debtPositionTypeOrgId), ex.getMessage());
 
     Mockito.verify(debtPositionTypeOrgRepositoryMock).findById(debtPositionTypeOrgId);
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).updateFlagActiveDebtPositionTypeOrg(Mockito.anyLong(), Mockito.anyBoolean());

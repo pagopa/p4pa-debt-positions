@@ -35,6 +35,8 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private final WorkflowDebtPositionService workflowDebtPositionService;
   private final OrganizationService organizationService;
 
+  private static final String DPTO_NOT_FOUND_MSG = "DebtPositionTypeOrg with id %d not found";
+
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
                                         DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
                                         SpontaneousFormRepository spontaneousFormRepository,
@@ -51,7 +53,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Override
   public IONotificationDTO getIONotificationDetails(Long debtPositionTypeOrgId, PaymentEventType paymentEventType) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId)));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, DPTO_NOT_FOUND_MSG.formatted(debtPositionTypeOrgId)));
 
     if (debtPositionTypeOrg.isFlagNotifyIo() && PaymentEventType.DP_CREATED.equals(paymentEventType)) {
       return IONotificationDTO.builder()
@@ -68,7 +70,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(
       debtPositionTypeOrgId).orElseThrow(
-      () -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
+      () -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, DPTO_NOT_FOUND_MSG.formatted(debtPositionTypeOrgId)));
     debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
@@ -90,13 +92,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
 
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, DPTO_NOT_FOUND_MSG.formatted(debtPositionTypeOrgId)));
     if (flagActive && debtPositionTypeOrg.getDebtPositionTypeId() < 0) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_FLAG_ACTIVE, "Technical debtPositionTypeOrg cannot be enabled");
     }
 
     if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0) {
-      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found");
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, DPTO_NOT_FOUND_MSG.formatted(debtPositionTypeOrgId));
     }
   }
 
@@ -131,10 +133,12 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Provided postal iban is not valid");
     }
 
+    Long dptoId = debtPositionTypeOrg.getDebtPositionTypeOrgId();
+
     DebtPositionTypeOrg existingDpto = null;
-    if (debtPositionTypeOrg.getDebtPositionTypeOrgId() != null) {
-      existingDpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
-        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
+    if (dptoId != null) {
+      existingDpto = debtPositionTypeOrgRepository.findById(dptoId)
+        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, DPTO_NOT_FOUND_MSG.formatted(dptoId)));
       checkReadOnlyFields(existingDpto, debtPositionTypeOrg);
     }
 
