@@ -68,7 +68,6 @@ public class ErrorCodeConstants {
   public static final String ERROR_CODE_MISSING_DUE_DATE = "MISSING_DUE_DATE";
   public static final String ERROR_CODE_IMMUTABLE_FIELD = "IMMUTABLE_FIELD";
   public static final String ERROR_CODE_MULTIDEBTOR_DISABLED = "MULTIDEBTOR_DISABLED";
-  public static final String ERROR_CODE_MISSING_POSTAL_IBAN = "MISSING_POSTAL_IBAN";
 
   public static final String ERROR_CODE_INVALID_IBAN = "INVALID_IBAN";
   public static final String ERROR_CODE_INVALID_POSTAL_IBAN = "INVALID_POSTAL_IBAN";

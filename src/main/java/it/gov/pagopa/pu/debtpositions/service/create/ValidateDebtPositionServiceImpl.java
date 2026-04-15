@@ -307,10 +307,6 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     String postalIban = transferDTO.getPostalIban();
     // Postal IBAN is optional, but if provided, it must not be blank
     if (postalIban != null) {
-      if (StringUtils.isBlank(postalIban)) {
-        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_POSTAL_IBAN, "Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is blank");
-      }
-
       if (!Utilities.isValidIban(postalIban)) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }

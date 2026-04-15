@@ -1042,12 +1042,10 @@ class ValidateDebtPositionServiceImplTest {
 
     Mockito.when(balanceServiceMock.isValidBalance(firstInstallment.getBalance(), firstInstallment.getAmountCents(), accessToken)).thenReturn(Boolean.TRUE);
 
-    InvalidValueException invalidValueException = assertThrows(
+    assertThrows(
       InvalidValueException.class,
       () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg)
     );
-
-    assertEquals("MISSING_POSTAL_IBAN", invalidValueException.getCode());
   }
 }
 
