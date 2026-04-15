@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
@@ -10,6 +11,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +33,19 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private final DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
   private final SpontaneousFormRepository spontaneousFormRepository;
   private final WorkflowDebtPositionService workflowDebtPositionService;
+  private final OrganizationService organizationService;
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
                                         DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
                                         SpontaneousFormRepository spontaneousFormRepository,
-                                        WorkflowDebtPositionService workflowDebtPositionService) {
+                                        WorkflowDebtPositionService workflowDebtPositionService,
+                                        OrganizationService organizationService
+  ) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionTypeOrgOperatorsService = debtPositionTypeOrgOperatorsService;
     this.spontaneousFormRepository = spontaneousFormRepository;
     this.workflowDebtPositionService = workflowDebtPositionService;
+    this.organizationService = organizationService;
   }
 
   @Override
@@ -170,22 +176,30 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
       return;
     }
 
+    Long orgId = debtPositionTypeOrg.getOrganizationId();
+    Organization org = organizationService.getOrganizationById(orgId, accessToken)
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + orgId + " not found"));
+
     String oldIban = existingDpto.getIban();
     String newIban = debtPositionTypeOrg.getIban();
     String oldPostalIban = existingDpto.getPostalIban();
     String newPostalIban = debtPositionTypeOrg.getPostalIban();
 
+    String fallbackIban = org.getIban();
+    if (fallbackIban == null) {
+      return;
+    }
+
     if (!Objects.equals(oldIban, newIban) || !Objects.equals(oldPostalIban, newPostalIban)) {
-      // TODO: if iban is null, use org iban
       MassiveDebtPositionIbanUpdateRequestDTO requestDTO = MassiveDebtPositionIbanUpdateRequestDTO.builder()
-        .oldIban(oldIban)
-        .newIban(newIban)
+        .oldIban(oldIban == null ? fallbackIban : oldIban)
+        .newIban(newIban == null ? fallbackIban: newIban)
         .oldPostalIban(oldPostalIban)
         .newPostalIban(newPostalIban)
         .debtPositionTypeOrgId(dptoId)
         .build();
 
-//      workflowDebtPositionService.massiveDpIbanUpdate(existingDpto.getOrganizationId(), requestDTO, accessToken);
+      workflowDebtPositionService.massiveDpIbanUpdate(existingDpto.getOrganizationId(), requestDTO, accessToken);
     }
   }
 }

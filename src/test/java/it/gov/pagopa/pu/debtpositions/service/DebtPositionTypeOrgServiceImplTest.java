@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
@@ -35,6 +36,8 @@ class DebtPositionTypeOrgServiceImplTest {
   private SpontaneousFormRepository spontaneousFormRepositoryMock;
   @Mock
   private WorkflowDebtPositionService workflowDebtPositionServiceMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
 
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
 
@@ -42,7 +45,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock));
+    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock, organizationServiceMock));
   }
 
   @Test
