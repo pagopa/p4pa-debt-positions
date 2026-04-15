@@ -292,15 +292,22 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if (!isValidIban(transferDTO.getIban())) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
-      if (StringUtils.isNotBlank(transferDTO.getPostalIban()) && !isValidIban(transferDTO.getPostalIban())) {
-        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
-      }
+
+      validateTransferPostalIban(transferDTO);
     } else {
       if (StringUtils.isBlank(transferDTO.getStampType()) ||
         StringUtils.isBlank(transferDTO.getStampHashDocument()) ||
         StringUtils.isBlank(transferDTO.getStampProvincialResidence())) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_FIELDS, "Stamp attributes of transfer with index " + transferDTO.getTransferIndex() + " has to be all valued when iban is null");
       }
+    }
+  }
+
+  private void validateTransferPostalIban(TransferDTO transferDTO) {
+    String postalIban = transferDTO.getPostalIban();
+    // Postal IBAN is optional, but if provided, it must not be blank
+    if (postalIban != null && !Utilities.isValidIban(postalIban)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Postal iban of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
     }
   }
 

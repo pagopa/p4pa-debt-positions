@@ -1029,5 +1029,23 @@ class ValidateDebtPositionServiceImplTest {
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(Mockito.anyString(), Mockito.anyLong())).thenReturn(null);
     assertThrows(Exception.class, () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg));
   }
+
+  @Test
+  void givenEmptyPostalIbanWhenValidateThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    TransferDTO firstTransfer = firstInstallment.getTransfers().getFirst();
+
+    firstTransfer.setPostalIban("");
+
+    Mockito.when(balanceServiceMock.isValidBalance(firstInstallment.getBalance(), firstInstallment.getAmountCents(), accessToken)).thenReturn(Boolean.TRUE);
+
+    assertThrows(
+      InvalidValueException.class,
+      () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg)
+    );
+  }
 }
 

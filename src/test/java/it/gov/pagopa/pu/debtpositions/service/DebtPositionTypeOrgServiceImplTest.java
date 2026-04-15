@@ -487,5 +487,18 @@ class DebtPositionTypeOrgServiceImplTest {
     Mockito.verify(debtPositionTypeOrgRepositoryMock).save(debtPositionTypeOrg);
   }
 
+  @Test
+  void givenDebtPositionTypeOrgWithEmptyPostalIbanWhenSaveDebtPositionTypeOrgThenThrowInvalidValueException() {
+    DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
+    debtPositionTypeOrg.setDebtPositionTypeId(1L);
+    debtPositionTypeOrg.setFlagActive(true);
+    debtPositionTypeOrg.setPostalIban("");
 
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    Assertions.assertThrows(InvalidValueException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO)
+    );
+  }
 }
