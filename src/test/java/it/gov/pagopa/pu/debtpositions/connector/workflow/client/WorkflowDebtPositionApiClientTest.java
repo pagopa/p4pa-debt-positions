@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHold
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -63,4 +64,20 @@ class WorkflowDebtPositionApiClientTest {
     Assertions.assertSame(expectedResult.getWorkflowId(), result.getWorkflowId());
   }
 
+  @Test
+  void whenMassiveDpIbanUpdateThenInvokeWithAccessToken() {
+    String accessToken = "accessToken";
+    Long orgId = 1L;
+    MassiveDebtPositionIbanUpdateRequestDTO requestDTO = new MassiveDebtPositionIbanUpdateRequestDTO();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
+
+    Mockito.when(workflowApisHolderMock.getDebtPositionApi(accessToken))
+      .thenReturn(debtPositionApiMock);
+    Mockito.when(debtPositionApiMock.massiveDpIbanUpdate(orgId, requestDTO))
+      .thenReturn(expectedResult);
+
+    WorkflowCreatedDTO result = workflowApiClient.massiveDpIbanUpdate(orgId, requestDTO, accessToken);
+
+    Assertions.assertEquals(expectedResult, result);
+  }
 }
