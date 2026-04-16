@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
@@ -181,9 +182,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     String newIban = debtPositionTypeOrg.getIban();
     String oldPostalIban = existingDpto.getPostalIban();
     String newPostalIban = debtPositionTypeOrg.getPostalIban();
-
     String orgIban = org.getIban();
-    if (orgIban == null) {
+
+    if (!OrganizationStatus.ACTIVE.equals(org.getStatus())) {
       return;
     }
 
