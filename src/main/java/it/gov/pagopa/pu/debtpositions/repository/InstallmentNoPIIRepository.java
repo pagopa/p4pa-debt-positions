@@ -195,13 +195,12 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     select distinct i
     from InstallmentNoPII i
     join Transfer t on t.installmentId = i.installmentId
-    where t.orgFiscalCode = :orgFiscalCode
-    and i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
-    and t.flagOwner = true
+    where i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+    and ((:orgFiscalCode is null) OR (t.orgFiscalCode = :orgFiscalCode and t.flagOwner = true))
 """)
-  Page<InstallmentNoPII> findDistinctByOrgFiscalCodeAndDebtorFiscalCode(
-    @Parameter(required = true) @Param("orgFiscalCode") String orgFiscalCode,
+  Page<InstallmentNoPII> findDistinctByDebtorFiscalCodeAndOrgFiscalCode(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
+    String orgFiscalCode,
     Pageable pageable
   );
 
