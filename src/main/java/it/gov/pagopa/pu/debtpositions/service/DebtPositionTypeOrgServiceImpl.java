@@ -50,7 +50,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
   @Override
   public IONotificationDTO getIONotificationDetails(Long debtPositionTypeOrgId, PaymentEventType paymentEventType) {
-    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdByIdOrThrow(debtPositionTypeOrgId);
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
 
     if (debtPositionTypeOrg.isFlagNotifyIo() && PaymentEventType.DP_CREATED.equals(paymentEventType)) {
       return IONotificationDTO.builder()
@@ -65,7 +65,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Transactional
   @Override
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
-    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdByIdOrThrow(debtPositionTypeOrgId);
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
     debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
@@ -86,7 +86,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Override
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
 
-    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdByIdOrThrow(debtPositionTypeOrgId);
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
     if (flagActive && debtPositionTypeOrg.getDebtPositionTypeId() < 0) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_FLAG_ACTIVE, "Technical debtPositionTypeOrg cannot be enabled");
     }
@@ -131,7 +131,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
     DebtPositionTypeOrg existingDpto = null;
     if (dptoId != null) {
-      existingDpto = findDptoByIdByIdOrThrow(dptoId);
+      existingDpto = findDptoByIdOrThrow(dptoId);
       checkReadOnlyFields(existingDpto, debtPositionTypeOrg);
     }
 
@@ -200,7 +200,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     }
   }
 
-  private DebtPositionTypeOrg findDptoByIdByIdOrThrow(Long dptoId) {
+  private DebtPositionTypeOrg findDptoByIdOrThrow(Long dptoId) {
     return debtPositionTypeOrgRepository.findById(dptoId)
       .orElseThrow(() -> new NotFoundException(
         ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND,
