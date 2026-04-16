@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.DebtPositionTypeOrgTechHandlerService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,7 +46,8 @@ public class DebtPositionTypeOrgControllerImpl implements DebtPositionTypeOrgApi
   @Override
   public ResponseEntity<DebtPositionTypeOrg> saveDebtPositionTypeOrg(
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
-    return ResponseEntity.ok(debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO));
+    String accessToken = SecurityUtils.getAccessToken();
+    return ResponseEntity.ok(debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
   }
 
   @Override

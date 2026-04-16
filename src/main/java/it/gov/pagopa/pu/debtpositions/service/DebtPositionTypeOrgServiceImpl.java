@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
@@ -9,6 +11,9 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
+import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -28,19 +33,25 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
   private final SpontaneousFormRepository spontaneousFormRepository;
+  private final WorkflowDebtPositionService workflowDebtPositionService;
+  private final OrganizationService organizationService;
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
                                         DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
-                                        SpontaneousFormRepository spontaneousFormRepository) {
+                                        SpontaneousFormRepository spontaneousFormRepository,
+                                        WorkflowDebtPositionService workflowDebtPositionService,
+                                        OrganizationService organizationService
+  ) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionTypeOrgOperatorsService = debtPositionTypeOrgOperatorsService;
     this.spontaneousFormRepository = spontaneousFormRepository;
+    this.workflowDebtPositionService = workflowDebtPositionService;
+    this.organizationService = organizationService;
   }
 
   @Override
   public IONotificationDTO getIONotificationDetails(Long debtPositionTypeOrgId, PaymentEventType paymentEventType) {
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id %d was not found".formatted(debtPositionTypeOrgId)));
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
 
     if (debtPositionTypeOrg.isFlagNotifyIo() && PaymentEventType.DP_CREATED.equals(paymentEventType)) {
       return IONotificationDTO.builder()
@@ -55,9 +66,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Transactional
   @Override
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(
-      debtPositionTypeOrgId).orElseThrow(
-      () -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
     debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
@@ -65,10 +74,12 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Transactional
   @Override
   public DebtPositionTypeOrg saveDebtPositionTypeOrg(
-    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
-    validateDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
-    DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(
-      saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg());
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO,
+    String accessToken
+  ) {
+    DebtPositionTypeOrg dpto = saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg();
+    validateDptoAndTriggerMassiveIbanUpdateIfNeeded(dpto, accessToken);
+    DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(dpto);
     handleOperators(savedDebtPositionTypeOrg, saveDebtPositionTypeOrgDTO);
     return savedDebtPositionTypeOrg;
   }
@@ -76,14 +87,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Override
   public void updateFlagActiveDebtPositionTypeOrg(Long debtPositionTypeOrgId, boolean flagActive) {
 
-    DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
-      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found"));
+    DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
     if (flagActive && debtPositionTypeOrg.getDebtPositionTypeId() < 0) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_FLAG_ACTIVE, "Technical debtPositionTypeOrg cannot be enabled");
     }
 
     if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0) {
-      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having id " + debtPositionTypeOrgId + " not found");
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND,"DebtPositionTypeOrg with id %d not found".formatted(debtPositionTypeOrgId));
     }
   }
 
@@ -101,7 +111,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     }
   }
 
-  private void validateDebtPositionTypeOrg(DebtPositionTypeOrg debtPositionTypeOrg) {
+  private void validateDptoAndTriggerMassiveIbanUpdateIfNeeded(DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
     if (debtPositionTypeOrg == null) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_DEBT_POSITION_TYPE_ORG, "DebtPositionTypeOrg must not be null");
     }
@@ -118,11 +128,14 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Provided postal iban is not valid");
     }
 
-    if (debtPositionTypeOrg.getDebtPositionTypeOrgId() != null) {
-      DebtPositionTypeOrg dpto = debtPositionTypeOrgRepository.findById(debtPositionTypeOrg.getDebtPositionTypeOrgId())
-        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg having ID %d not found".formatted(debtPositionTypeOrg.getDebtPositionTypeOrgId())));
-      checkReadOnlyFields(dpto, debtPositionTypeOrg);
+    Long dptoId = debtPositionTypeOrg.getDebtPositionTypeOrgId();
+
+    DebtPositionTypeOrg existingDpto = null;
+    if (dptoId != null) {
+      existingDpto = findDptoByIdOrThrow(dptoId);
+      checkReadOnlyFields(existingDpto, debtPositionTypeOrg);
     }
+
     if (debtPositionTypeOrg.getSpontaneousFormId() != null) {
       spontaneousFormRepository.findById(debtPositionTypeOrg.getSpontaneousFormId())
         .ifPresentOrElse(spontaneousForm -> {
@@ -134,8 +147,9 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
           throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_SPONTANEOUS_FORM, "SpontaneousFormId %d not found"
             .formatted(debtPositionTypeOrg.getSpontaneousFormId()));
         });
-
     }
+
+   triggerMassiveIbanUpdateIfNeeded(debtPositionTypeOrg, existingDpto, accessToken);
   }
 
   private void checkReadOnlyFields(DebtPositionTypeOrg existingDebtPositionTypeOrg, DebtPositionTypeOrg updatedDebtPositionTypeOrg) {
@@ -152,5 +166,46 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     if (!CollectionUtils.isEmpty(modifiedFields)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "The following DebtPositionTypeOrg fields are readOnly. " + modifiedFields);
     }
+  }
+
+  private void triggerMassiveIbanUpdateIfNeeded(DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionTypeOrg existingDpto, String accessToken) {
+    Long dptoId = debtPositionTypeOrg.getDebtPositionTypeOrgId();
+    if (dptoId == null) {
+      return;
+    }
+
+    Long orgId = debtPositionTypeOrg.getOrganizationId();
+    Organization org = organizationService.getOrganizationById(orgId, accessToken)
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + orgId + " not found"));
+
+    String oldIban = existingDpto.getIban();
+    String newIban = debtPositionTypeOrg.getIban();
+    String oldPostalIban = existingDpto.getPostalIban();
+    String newPostalIban = debtPositionTypeOrg.getPostalIban();
+    String orgIban = org.getIban();
+
+    if (!OrganizationStatus.ACTIVE.equals(org.getStatus())) {
+      return;
+    }
+
+    if (!Objects.equals(oldIban, newIban) || !Objects.equals(oldPostalIban, newPostalIban)) {
+      MassiveDebtPositionIbanUpdateRequestDTO requestDTO = MassiveDebtPositionIbanUpdateRequestDTO.builder()
+        .oldIban(oldIban == null ? orgIban : oldIban)
+        .newIban(newIban == null ? orgIban: newIban)
+        .oldPostalIban(oldPostalIban)
+        .newPostalIban(newPostalIban)
+        .debtPositionTypeOrgId(dptoId)
+        .build();
+
+      workflowDebtPositionService.massiveDpIbanUpdate(existingDpto.getOrganizationId(), requestDTO, accessToken);
+    }
+  }
+
+  private DebtPositionTypeOrg findDptoByIdOrThrow(Long dptoId) {
+    return debtPositionTypeOrgRepository.findById(dptoId)
+      .orElseThrow(() -> new NotFoundException(
+        ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND,
+        "DebtPositionTypeOrg with id %d not found".formatted(dptoId)
+      ));
   }
 }

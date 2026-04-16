@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.service;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.client.WorkflowDebtPositionApiClient;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.springframework.stereotype.Service;
@@ -20,4 +21,12 @@ public class WorkflowDebtPositionServiceImpl implements WorkflowDebtPositionServ
     return this.workflowApiClient.syncDebtPosition(debtPositionDTO, wfExecutionParameters, paymentEventType, eventDescription, accessToken);
   }
 
+  @Override
+  public WorkflowCreatedDTO massiveDpIbanUpdate(
+    Long orgId,
+    MassiveDebtPositionIbanUpdateRequestDTO massiveDebtPositionIbanUpdateRequestDTO,
+    String accessToken
+  ) {
+    return this.workflowApiClient.massiveDpIbanUpdate(orgId, massiveDebtPositionIbanUpdateRequestDTO, accessToken);
+  }
 }
