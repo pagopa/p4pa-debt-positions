@@ -60,10 +60,8 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
                 // Not use InstallmentUtils for TO_SYNC status to preserve syncStatusFrom/to
                 if (!InstallmentStatus.TO_SYNC.equals(i.getStatus())) {
                   InstallmentUtils.setStatus(i, i.getStatus());
-                }
-
-                if (InstallmentStatus.TO_SYNC.equals(i.getStatus())) {
-                  i.getSyncStatus().setSyncError(null);
+                } else {
+                 i.getSyncStatus().setSyncError(null);
                 }
 
                 collectedIuds.add(i.getIud());
