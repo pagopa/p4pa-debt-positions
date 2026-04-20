@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
+import it.gov.pagopa.pu.organization.dto.generated.BrokerConfiguration;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -33,7 +34,6 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   public static final String RECEIPT_LOGO = "logo";
   public static final String RECEIPT_ORG_NAME = "orgName";
   public static final String RECEIPT_HEADER_ORG_NAME = "headerOrgName";
-  public static final String RECEIPT_FOOTER_ORG_NAME = "footerOrgName";
   public static final String RECEIPT_NAV = "nav";
   public static final String RECEIPT_NAV_BARCODE = "navBarcode";
   public static final String RECEIPT_ORG_FISCAL_CODE_BARCODE = "orgFiscalCodeBarcode";
@@ -43,14 +43,13 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   public static final String RECEIPT_PSP_NAME = "pspName";
   public static final String RECEIPT_AMOUNT = "amount";
   public static final String RECEIPT_ORG_FISCAL_CODE = "orgFiscalCode";
+  public static final String RECEIPT_FOOTER = "receiptFooter";
   public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm", Locale.ITALIAN);
   public static final DateTimeFormatter DATE_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ITALIAN);
   public static final DateTimeFormatter TIME_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("HH:mm", Locale.ITALIAN);
   public static final String REMITTANCE_INFORMATION = "remittanceInformation";
   public static final String IUD = "iud";
   public static final String IUR = "iur";
-  public static final String EMISSION_DATE = "emissionDate";
-  public static final String EMISSION_TIME = "emissionTime";
 
   private final DocumentComposition documentComposition;
   private final OrganizationService organizationService;
@@ -81,6 +80,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + organizationId + " not found"));
 
     Broker broker = brokerService.findById(organization.getBrokerId(), accessToken);
+    BrokerConfiguration brokerConfiguration = brokerService.getBrokerConfigurationsById(organization.getBrokerId(), accessToken);
 
     String orgName = organization.getOrgName();
     String headerOrgName = orgName;
@@ -97,6 +97,8 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       orgFiscalCode = ownerTransfer.getOrgFiscalCode();
     }
 
+    String receiptFooter = buildReceiptFooter(brokerConfiguration, footerOrgName);
+
     byte[] receiptPdf;
     try {
       receiptPdf = documentComposition.executePdfTemplate(
@@ -105,9 +107,9 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
           receiptDetail,
           organization.getOrgLogo(),
           headerOrgName,
-          footerOrgName,
           orgName,
-          orgFiscalCode
+          orgFiscalCode,
+          receiptFooter
         )
       );
     } catch (IOException | TemplateException e) {
@@ -118,12 +120,27 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       "RECEIPT_" + organization.getOrgFiscalCode() + "_" + receiptId + ".pdf");
   }
 
-  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, String logo, String headerOrgName, String footerOrgName, String orgName, String fiscalCode) {
+  private String buildReceiptFooter(BrokerConfiguration brokerConfiguration, String orgName) {
+    String receiptFooter = brokerConfiguration.getReceiptFooter();
+    if (receiptFooter == null) {
+      return "";
+    }
+
+    LocalDateTime now = LocalDateTime.now();
+    String emissionDateStr = now.format(DATE_FORMATTER_FOOTER);
+    String emissionTimeStr = now.format(TIME_FORMATTER_FOOTER);
+
+    return receiptFooter
+      .replace("{{emissionDate}}", emissionDateStr)
+      .replace("{{emissionTime}}", emissionTimeStr)
+      .replace("{{orgName}}", orgName);
+  }
+
+  private Map<String, Object> buildTemplateModel(ReceiptDetailDTO receiptDetail, String logo, String headerOrgName, String orgName, String fiscalCode, String footer) {
     Map<String, Object> templateModel = new HashMap<>();
 
     templateModel.put(RECEIPT_LOGO, StringUtils.defaultString(logo));
     templateModel.put(RECEIPT_HEADER_ORG_NAME, headerOrgName);
-    templateModel.put(RECEIPT_FOOTER_ORG_NAME, footerOrgName);
     templateModel.put(RECEIPT_ORG_NAME, orgName);
 
     String nav = StringUtils.defaultString(receiptDetail.getNav());
@@ -142,8 +159,8 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
     templateModel.put(REMITTANCE_INFORMATION, StringUtils.defaultString(receiptDetail.getRemittanceInformation()));
     templateModel.put(IUR, receiptDetail.getIur());
     templateModel.put(IUD, receiptDetail.getIud());
-    templateModel.put(EMISSION_DATE, LocalDateTime.now().format(DATE_FORMATTER_FOOTER));
-    templateModel.put(EMISSION_TIME, LocalDateTime.now().format(TIME_FORMATTER_FOOTER));
+    templateModel.put(RECEIPT_FOOTER, footer);
+
     return templateModel;
   }
 }

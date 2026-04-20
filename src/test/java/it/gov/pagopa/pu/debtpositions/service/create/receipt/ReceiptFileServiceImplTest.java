@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
+import it.gov.pagopa.pu.organization.dto.generated.BrokerConfiguration;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -95,6 +96,10 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(false);
 
+    BrokerConfiguration brokerConfiguration = podamFactory.manufacturePojo(BrokerConfiguration.class);
+    brokerConfiguration.setReceiptFooter("Test footer {{orgName}}");
+
+    String expectedFooter = "Test footer " + organization.getOrgName();
     byte[] expectedContent = "PDF-DATA".getBytes();
 
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
@@ -108,12 +113,13 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
         .thenReturn(broker);
+      Mockito.when(brokerServiceMock.getBrokerConfigurationsById(organization.getBrokerId(), accessToken))
+        .thenReturn(brokerConfiguration);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -126,10 +132,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(expectedFooter)
       ))).thenReturn(expectedContent);
 
       Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
@@ -162,6 +165,8 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(false);
 
+    BrokerConfiguration brokerConfiguration = podamFactory.manufacturePojo(BrokerConfiguration.class);
+
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
         .thenReturn(FAKE_NAV_BARCODE_BASE64);
@@ -176,12 +181,13 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
         .thenReturn(broker);
+      Mockito.when(brokerServiceMock.getBrokerConfigurationsById(organization.getBrokerId(), accessToken))
+        .thenReturn(brokerConfiguration);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -194,10 +200,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(brokerConfiguration.getReceiptFooter())
       ))).thenThrow(new IOException());
 
       Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId));
@@ -221,6 +224,8 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(false);
 
+    BrokerConfiguration brokerConfiguration = podamFactory.manufacturePojo(BrokerConfiguration.class);
+
     try (MockedStatic<BarcodeUtils> barcodeUtilsMock = Mockito.mockStatic(BarcodeUtils.class)) {
       barcodeUtilsMock.when(() -> BarcodeUtils.generateCode128AsBase64(receiptDetailDTO.getNav()))
         .thenReturn(FAKE_NAV_BARCODE_BASE64);
@@ -235,12 +240,13 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
         .thenReturn(broker);
+      Mockito.when(brokerServiceMock.getBrokerConfigurationsById(organization.getBrokerId(), accessToken))
+        .thenReturn(brokerConfiguration);
 
       Mockito.when(documentCompositionMock.executePdfTemplate(Mockito.eq(DocumentComposition.TemplateType.RECEIPT), Mockito.argThat((Map<String, Object> o) ->
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals(organization.getOrgName())
-          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER_ORG_NAME).equals(organization.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -253,10 +259,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(brokerConfiguration.getReceiptFooter())
       ))).thenThrow(new TemplateException(null));
 
       Assertions.assertThrows(IllegalStateException.class, () -> receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId));
@@ -281,10 +284,14 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(true);
 
+    BrokerConfiguration brokerConfiguration = podamFactory.manufacturePojo(BrokerConfiguration.class);
+    brokerConfiguration.setReceiptFooter("Delegate footer per {{orgName}}");
+
     Transfer ownerTransfer = podamFactory.manufacturePojo(Transfer.class);
     ownerTransfer.setOrgName("OWNER_ORG_NAME");
     ownerTransfer.setOrgFiscalCode("OWNER_FISCAL_CODE");
 
+    String expectedFooter = "Delegate footer per " + broker.getBrokerName();
     byte[] expectedContent = "PDF-DATA".getBytes();
 
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(expectedContent),
@@ -304,6 +311,8 @@ class ReceiptFileServiceImplTest {
 
       Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
         .thenReturn(broker);
+      Mockito.when(brokerServiceMock.getBrokerConfigurationsById(organization.getBrokerId(), accessToken))
+        .thenReturn(brokerConfiguration);
 
       Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
         .thenReturn(Optional.of(ownerTransfer));
@@ -312,7 +321,6 @@ class ReceiptFileServiceImplTest {
         o.get(ReceiptFileServiceImpl.RECEIPT_LOGO).equals(organization.getOrgLogo())
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_NAME).equals(ownerTransfer.getOrgName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_HEADER_ORG_NAME).equals("")
-          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER_ORG_NAME).equals(broker.getBrokerName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV).equals(receiptDetailDTO.getNav())
           && o.get(ReceiptFileServiceImpl.RECEIPT_NAV_BARCODE).equals(FAKE_NAV_BARCODE_BASE64)
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE_BARCODE).equals(FAKE_ORG_BARCODE_BASE64)
@@ -325,10 +333,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
-          && o.get(ReceiptFileServiceImpl.EMISSION_DATE) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_DATE).toString().isEmpty()
-          && o.get(ReceiptFileServiceImpl.EMISSION_TIME) != null
-          && !o.get(ReceiptFileServiceImpl.EMISSION_TIME).toString().isEmpty()
+          && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(expectedFooter)
       ))).thenReturn(expectedContent);
 
       FileResourceDTO result = receiptFileService.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
@@ -355,6 +360,8 @@ class ReceiptFileServiceImplTest {
     broker.setBrokerId(brokerId);
     broker.setFlagDelegate(true);
 
+    BrokerConfiguration brokerConfiguration = podamFactory.manufacturePojo(BrokerConfiguration.class);
+
     Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, null))
       .thenReturn(receiptDetailDTO);
 
@@ -363,6 +370,8 @@ class ReceiptFileServiceImplTest {
 
     Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
       .thenReturn(broker);
+    Mockito.when(brokerServiceMock.getBrokerConfigurationsById(organization.getBrokerId(), accessToken))
+      .thenReturn(brokerConfiguration);
 
     Mockito.when(transferRepositoryMock.findOwnerTransferByOrganizationIdAndReceiptId(organizationId, receiptId))
       .thenReturn(Optional.empty());
