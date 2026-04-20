@@ -91,7 +91,6 @@ class BrokerServiceTest {
   @Test
   void givenValidBrokerIdWhenGetBrokerConfigurationsByIdThenOk() {
     Long brokerId = 1L;
-    String accessToken = "accessToken";
     BrokerConfiguration expectedBrokerConfiguration = mock(BrokerConfiguration.class);
 
     when(brokerClientMock.getBrokerConfigurationById(brokerId, accessToken)).thenReturn(expectedBrokerConfiguration);
