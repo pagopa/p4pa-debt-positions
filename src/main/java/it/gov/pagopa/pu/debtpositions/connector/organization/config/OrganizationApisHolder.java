@@ -18,6 +18,7 @@ public class OrganizationApisHolder {
   private final TaxonomySearchControllerApi taxonomySearchControllerApi;
   private final BrokerEntityControllerApi brokerEntityControllerApi;
   private final BrokerSearchControllerApi brokerSearchControllerApi;
+  private final BrokerConfigurationEntityControllerApi brokerConfigurationEntityControllerApi;
 
   private final ThreadLocal<String> bearerTokenHolder = new ThreadLocal<>();
 
@@ -39,6 +40,7 @@ public class OrganizationApisHolder {
     this.organizationEntityControllerApi = new OrganizationEntityControllerApi(apiClient);
     this.brokerEntityControllerApi = new BrokerEntityControllerApi(apiClient);
     this.brokerSearchControllerApi = new BrokerSearchControllerApi(apiClient);
+    this.brokerConfigurationEntityControllerApi = new BrokerConfigurationEntityControllerApi(apiClient);
   }
 
   @PreDestroy
@@ -67,6 +69,10 @@ public class OrganizationApisHolder {
 
   public BrokerSearchControllerApi getBrokerSearchControllerApi(String accessToken) {
     return getApi(accessToken, brokerSearchControllerApi);
+  }
+
+  public BrokerConfigurationEntityControllerApi getBrokerConfigurationEntityControllerApi(String accessToken){
+    return getApi(accessToken, brokerConfigurationEntityControllerApi);
   }
 
   private <T extends BaseApi> T getApi(String accessToken, T api) {
