@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerClient;
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.BrokerSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
+import it.gov.pagopa.pu.organization.dto.generated.BrokerConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,10 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class BrokerServiceTest {
@@ -82,5 +87,18 @@ class BrokerServiceTest {
     // Then
     Assertions.assertNotNull(result);
     Assertions.assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenValidBrokerIdWhenGetBrokerConfigurationsByIdThenOk() {
+    Long brokerId = 1L;
+    String accessToken = "accessToken";
+    BrokerConfiguration expectedBrokerConfiguration = mock(BrokerConfiguration.class);
+
+    when(brokerClientMock.getBrokerConfigurationById(brokerId, accessToken)).thenReturn(expectedBrokerConfiguration);
+
+    BrokerConfiguration result = brokerService.getBrokerConfigurationsById(brokerId, accessToken);
+
+    assertEquals(expectedBrokerConfiguration, result);
   }
 }
