@@ -142,6 +142,7 @@ class DebtPositionCreationServiceImplTest {
       .orgName(organization.getOrgName())
       .category("9/001122233/")
       .iban(debtPositionTypeOrg.getIban())
+      .postalIban(debtPositionTypeOrg.getPostalIban())
       .amountCents(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents())
       .remittanceInformation(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getRemittanceInformation())
       .build();

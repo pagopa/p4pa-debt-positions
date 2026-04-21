@@ -93,11 +93,16 @@ public class InstallmentSynchronizeApplierService {
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();
 
+    boolean isDptoIbanEmpty = StringUtils.isEmpty(debtPositionTypeOrg.getIban());
+    String resolvedIban = isDptoIbanEmpty ? organization.getIban() : debtPositionTypeOrg.getIban();
+    String resolvedPostalIban = isDptoIbanEmpty ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
+
     TransferSynchronizeDTO firstTransfer = TransferSynchronizeDTO.builder()
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
+      .iban(resolvedIban)
+      .postalIban(resolvedPostalIban)
       .category(category)
       .amountCents(installmentSynchronizeDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())
