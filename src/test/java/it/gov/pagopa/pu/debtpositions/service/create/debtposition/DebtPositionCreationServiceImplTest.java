@@ -169,6 +169,60 @@ class DebtPositionCreationServiceImplTest {
   }
 
   @Test
+  void givenDebtPositionWithNoTransferAndEmptyDptoIbanWhenCreateThenPopulateFirstTransferWithOrgIban() {
+    String accessToken = "ACCESSTOKEN";
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    String operatorExternalId = "OPERATOREXTERNALID";
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Organization organization = buildOrganization();
+    organization.setIban("iban");
+    organization.setPostalIban("postalIban");
+
+    DebtPosition debtPosition = buildDebtPosition();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setIban(null);
+    debtPositionTypeOrg.setPostalIban(null);
+
+    InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
+
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(new ArrayList<>());
+
+    TransferDTO expectedTransferDTO = TransferDTO.builder()
+      .transferIndex(1)
+      .orgFiscalCode(organization.getOrgFiscalCode())
+      .orgName(organization.getOrgName())
+      .category("9/001122233/")
+      .iban(organization.getIban())
+      .postalIban(organization.getPostalIban())
+      .amountCents(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getAmountCents())
+      .remittanceInformation(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getRemittanceInformation())
+      .build();
+
+    String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, operatorExternalId)).thenReturn(debtPositionTypeOrg);
+    Mockito.when(categoryResolverServiceMock.resolveCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
+      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("9/001122233/");
+    Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, accessToken, debtPositionTypeOrg);
+    Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), installmentNoPII.getNav(), InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:" + iud, accessToken))
+      .thenReturn(workflow);
+
+    WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalId);
+
+    assertSame(workflow, result);
+    assertEquals(expectedTransferDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst());
+
+    Mockito.verify(debtPositionProcessorServiceMock, Mockito.times(2)).updateAmounts(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
+  }
+
+  @Test
   void givenDebtPositionOrdinarySilWhenCreateThenOk() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPuPagoPaPayment(true);
