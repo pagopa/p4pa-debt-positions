@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
+import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -544,5 +545,96 @@ class DebtPositionTypeOrgServiceImplTest {
     Assertions.assertThrows(InvalidValueException.class,
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken)
     );
+  }
+
+  @Test
+  void givenOldIbanNullAndNewIbanNotNullWhenSaveThenTriggerMassiveIbanUpdate() {
+    Long orgId = 1L;
+    String orgIban = "IT0000000000000000000000000";
+    String newIban = "IT0000000000000000000000001";
+    String accessToken = "accessToken";
+
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(orgId);
+    organization.setStatus(OrganizationStatus.ACTIVE);
+    organization.setIban(orgIban);
+
+    DebtPositionTypeOrg existingDpto = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    existingDpto.setDebtPositionTypeOrgId(1L);
+    existingDpto.setOrganizationId(orgId);
+    existingDpto.setIban(null);
+    existingDpto.setSpontaneousFormId(null);
+
+    DebtPositionTypeOrg updatedDpto = buildUpdatedDebtPositionTypeOrg(existingDpto);
+    updatedDpto.setIban(newIban);
+    updatedDpto.setPostalIban(null);
+
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(updatedDpto);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(updatedDpto.getDebtPositionTypeOrgId()))
+      .thenReturn(Optional.of(existingDpto));
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.save(updatedDpto))
+      .thenReturn(updatedDpto);
+
+    debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
+
+    MassiveDebtPositionIbanUpdateRequestDTO expectedRequest = MassiveDebtPositionIbanUpdateRequestDTO.builder()
+      .oldIban(orgIban)
+      .newIban(newIban)
+      .oldPostalIban(existingDpto.getPostalIban())
+      .newPostalIban(updatedDpto.getPostalIban())
+      .debtPositionTypeOrgId(updatedDpto.getDebtPositionTypeOrgId())
+      .build();
+
+    Mockito.verify(workflowDebtPositionServiceMock).massiveDpIbanUpdate(orgId, expectedRequest, accessToken);
+  }
+
+  @Test
+  void givenUnchangedIbanAndChangedPostalIbanWhenSaveThenTriggerMassiveIbanUpdate() {
+    Long orgId = 1L;
+    String iban = "IT0000000000000000000000001";
+    String oldPostalIban = null;
+    String newPostalIban = "IT0000000000000000000000002";
+    String accessToken = "accessToken";
+
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    organization.setOrganizationId(orgId);
+    organization.setStatus(OrganizationStatus.ACTIVE);
+
+    DebtPositionTypeOrg existingDpto = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    existingDpto.setDebtPositionTypeOrgId(1L);
+    existingDpto.setOrganizationId(orgId);
+    existingDpto.setIban(iban);
+    existingDpto.setPostalIban(oldPostalIban);
+    existingDpto.setSpontaneousFormId(null);
+
+    DebtPositionTypeOrg updatedDpto = buildUpdatedDebtPositionTypeOrg(existingDpto);
+    updatedDpto.setIban(iban);
+    updatedDpto.setPostalIban(newPostalIban);
+
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(updatedDpto);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(updatedDpto.getDebtPositionTypeOrgId()))
+      .thenReturn(Optional.of(existingDpto));
+    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.save(updatedDpto))
+      .thenReturn(updatedDpto);
+
+    debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
+
+    MassiveDebtPositionIbanUpdateRequestDTO expectedRequest = MassiveDebtPositionIbanUpdateRequestDTO.builder()
+      .oldIban(iban)
+      .newIban(iban)
+      .oldPostalIban(oldPostalIban)
+      .newPostalIban(newPostalIban)
+      .debtPositionTypeOrgId(updatedDpto.getDebtPositionTypeOrgId())
+      .build();
+
+    Mockito.verify(workflowDebtPositionServiceMock).massiveDpIbanUpdate(orgId, expectedRequest, accessToken);
   }
 }
