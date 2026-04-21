@@ -188,10 +188,13 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
       return;
     }
 
-    if (!Objects.equals(oldIban, newIban) || !Objects.equals(oldPostalIban, newPostalIban)) {
+    String resolvedOldIban = oldIban == null ? orgIban : oldIban;
+    String resolvedNewIban = newIban == null ? orgIban : newIban;
+
+    if (!Objects.equals(resolvedOldIban, resolvedNewIban) || !Objects.equals(oldPostalIban, newPostalIban)) {
       MassiveDebtPositionIbanUpdateRequestDTO requestDTO = MassiveDebtPositionIbanUpdateRequestDTO.builder()
-        .oldIban(oldIban == null ? orgIban : oldIban)
-        .newIban(newIban == null ? orgIban: newIban)
+        .oldIban(resolvedOldIban)
+        .newIban(resolvedNewIban)
         .oldPostalIban(oldPostalIban)
         .newPostalIban(newPostalIban)
         .debtPositionTypeOrgId(dptoId)
