@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.debtpositions.util.IbansUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -93,15 +94,19 @@ public class InstallmentSynchronizeApplierService {
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();
 
-    String resolvedIban = StringUtils.firstNonBlank(debtPositionTypeOrg.getIban(), organization.getIban());
-    String resolvedPostalIban = resolvedIban.equals(organization.getIban()) ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
+    Pair<String, String> resolvedIbanAndPostalIban = IbansUtils.resolveIbanAndPostalIban(
+      debtPositionTypeOrg.getIban(),
+      debtPositionTypeOrg.getPostalIban(),
+      organization.getIban(),
+      organization.getPostalIban()
+    );
 
     TransferSynchronizeDTO firstTransfer = TransferSynchronizeDTO.builder()
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(resolvedIban)
-      .postalIban(resolvedPostalIban)
+      .iban(resolvedIbanAndPostalIban.getLeft())
+      .postalIban(resolvedIbanAndPostalIban.getRight())
       .category(category)
       .amountCents(installmentSynchronizeDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentSynchronizeDTO.getRemittanceInformation())

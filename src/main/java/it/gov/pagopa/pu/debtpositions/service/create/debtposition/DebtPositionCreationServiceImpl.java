@@ -17,6 +17,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.debtpositions.util.IbansUtils;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -24,6 +25,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -197,15 +199,19 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
 
-    String resolvedIban = StringUtils.firstNonBlank(debtPositionTypeOrg.getIban(), organization.getIban());
-    String resolvedPostalIban = resolvedIban.equals(organization.getIban()) ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
+    Pair<String, String> resolvedIbanAndPostalIban = IbansUtils.resolveIbanAndPostalIban(
+      debtPositionTypeOrg.getIban(),
+      debtPositionTypeOrg.getPostalIban(),
+      organization.getIban(),
+      organization.getPostalIban()
+    );
 
     TransferDTO firstTransfer = TransferDTO.builder()
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(resolvedIban)
-      .postalIban(resolvedPostalIban)
+      .iban(resolvedIbanAndPostalIban.getLeft())
+      .postalIban(resolvedIbanAndPostalIban.getRight())
       .category(category)
       .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentDTO.getRemittanceInformation())
