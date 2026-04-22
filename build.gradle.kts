@@ -152,6 +152,12 @@ dependencies {
   mockitoAgent("org.mockito:mockito-core") { isTransitive = false }
 }
 tasks {
+  jar {
+      from("${rootProject.projectDir}") {
+          include("LICENSE.md")
+          into("META-INF")
+      }
+  }
   test {
     jvmArgs("-javaagent:${mockitoAgent.asPath}")
     testLogging.events = setOf(TestLogEvent.FAILED)
@@ -228,7 +234,7 @@ openApiGenerate {
       "BaseDebtPosition" to "it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition",
       "DebtorDebtPositionDTO" to "it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO",
       "PaymentOptionType" to "it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType",
-      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO",
+      "InstallmentViewDTO" to "it.gov.pagopa.pu.debtpositions.dto.view.InstallmentViewDTO"
     )
   )
   configOptions.set(
@@ -245,6 +251,7 @@ openApiGenerate {
       "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
     )
   )
+
 }
 
 var targetEnv = when (Objects.requireNonNullElse(

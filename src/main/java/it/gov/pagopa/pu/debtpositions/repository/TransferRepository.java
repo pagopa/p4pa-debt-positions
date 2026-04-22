@@ -85,4 +85,13 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     AND t.flagOwner = true
     """)
   Optional<Transfer> findOwnerTransferByOrganizationIdAndReceiptId(Long organizationId, Long receiptId);
+
+  @RestResource(exported = false)
+  @Query("""
+    SELECT DISTINCT t.installmentId
+    FROM Transfer t
+    WHERE t.installmentId IN :installmentIds
+      AND t.postalIban IS NULL
+  """)
+  Set<Long> findInstallmentIdsWithNullPostalIban(List<Long> installmentIds);
 }
