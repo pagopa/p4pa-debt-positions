@@ -1,5 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
 import org.springframework.util.CollectionUtils;
 
@@ -164,5 +166,18 @@ public class Utilities {
       : map.entrySet().stream()
       .map(e -> e.getKey() + ":" + entry2String.apply(e.getValue()))
       .collect(Collectors.joining(", "));
+  }
+
+  /**
+   * Resolves iban and postalIban based on the presence of dptoIban.
+   * If dptoIban is present, it is used as the resolvedIban and dptoPostalIban is used as the resolvedPostalIban.
+   * If dptoIban is not present, orgIban is used as the resolvedIban and orgPostalIban is used as the resolvedPostalIban.
+   */
+  public static Pair<String, String> resolveIbanAndPostalIban(String dptoIban, String dptoPostalIban, String orgIban, String orgPostalIban) {
+    boolean isDptoIbanEmpty = StringUtils.isEmpty(dptoIban);
+    String resolvedIban = isDptoIbanEmpty ? orgIban : dptoIban;
+    String resolvedPostalIban = isDptoIbanEmpty ? orgPostalIban : dptoPostalIban;
+
+    return Pair.of(resolvedIban, resolvedPostalIban);
   }
 }

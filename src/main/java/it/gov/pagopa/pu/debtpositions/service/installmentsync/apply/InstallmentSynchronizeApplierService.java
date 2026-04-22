@@ -8,7 +8,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.IbansUtils;
+import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
@@ -93,7 +93,7 @@ public class InstallmentSynchronizeApplierService {
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();
 
-    Pair<String, String> resolvedIbanAndPostalIban = IbansUtils.resolveIbanAndPostalIban(
+    Pair<String, String> resolvedIbanAndPostalIban = Utilities.resolveIbanAndPostalIban(
       debtPositionTypeOrg.getIban(),
       debtPositionTypeOrg.getPostalIban(),
       organization.getIban(),

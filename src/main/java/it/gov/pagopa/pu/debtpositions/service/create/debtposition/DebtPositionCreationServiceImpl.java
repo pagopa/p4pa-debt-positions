@@ -17,7 +17,6 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.IbansUtils;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -199,7 +198,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
 
-    Pair<String, String> resolvedIbanAndPostalIban = IbansUtils.resolveIbanAndPostalIban(
+    Pair<String, String> resolvedIbanAndPostalIban = Utilities.resolveIbanAndPostalIban(
       debtPositionTypeOrg.getIban(),
       debtPositionTypeOrg.getPostalIban(),
       organization.getIban(),
