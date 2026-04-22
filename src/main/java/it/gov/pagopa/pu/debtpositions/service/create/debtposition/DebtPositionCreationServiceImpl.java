@@ -197,9 +197,9 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
 
-    boolean isDptoIbanEmpty = StringUtils.isEmpty(debtPositionTypeOrg.getIban());
-    String resolvedIban = isDptoIbanEmpty ? organization.getIban() : debtPositionTypeOrg.getIban();
-    String resolvedPostalIban = isDptoIbanEmpty ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
+    String resolvedIban = StringUtils.firstNonBlank(debtPositionTypeOrg.getIban(), organization.getIban());
+    boolean useFallback = resolvedIban.equals(organization.getIban());
+    String resolvedPostalIban = useFallback ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
 
     TransferDTO firstTransfer = TransferDTO.builder()
       .transferIndex(1)

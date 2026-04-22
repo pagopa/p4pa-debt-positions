@@ -93,9 +93,9 @@ public class InstallmentSynchronizeApplierService {
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();
 
-    boolean isDptoIbanEmpty = StringUtils.isEmpty(debtPositionTypeOrg.getIban());
-    String resolvedIban = isDptoIbanEmpty ? organization.getIban() : debtPositionTypeOrg.getIban();
-    String resolvedPostalIban = isDptoIbanEmpty ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
+    String resolvedIban = StringUtils.firstNonBlank(debtPositionTypeOrg.getIban(), organization.getIban());
+    boolean useFallback = resolvedIban.equals(organization.getIban());
+    String resolvedPostalIban = useFallback ? organization.getPostalIban() : debtPositionTypeOrg.getPostalIban();
 
     TransferSynchronizeDTO firstTransfer = TransferSynchronizeDTO.builder()
       .transferIndex(1)
