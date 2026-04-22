@@ -67,6 +67,7 @@ public class InstallmentSynchronizeMapper {
       .amountCents(transferSynchronizeDTO.getAmountCents())
       .remittanceInformation(transferSynchronizeDTO.getRemittanceInformation())
       .iban(transferSynchronizeDTO.getIban())
+      .postalIban(transferSynchronizeDTO.getPostalIban())
       .category(transferSynchronizeDTO.getCategory())
       .transferIndex(transferSynchronizeDTO.getTransferIndex())
       .build();

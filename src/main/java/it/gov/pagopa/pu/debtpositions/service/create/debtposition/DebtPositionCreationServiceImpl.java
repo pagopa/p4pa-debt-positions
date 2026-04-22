@@ -24,6 +24,7 @@ import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -197,11 +198,19 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
 
+    Pair<String, String> resolvedIbanAndPostalIban = Utilities.resolveIbanAndPostalIban(
+      debtPositionTypeOrg.getIban(),
+      debtPositionTypeOrg.getPostalIban(),
+      organization.getIban(),
+      organization.getPostalIban()
+    );
+
     TransferDTO firstTransfer = TransferDTO.builder()
       .transferIndex(1)
       .orgFiscalCode(organization.getOrgFiscalCode())
       .orgName(organization.getOrgName())
-      .iban(StringUtils.isEmpty(debtPositionTypeOrg.getIban()) ? organization.getIban() : debtPositionTypeOrg.getIban())
+      .iban(resolvedIbanAndPostalIban.getLeft())
+      .postalIban(resolvedIbanAndPostalIban.getRight())
       .category(category)
       .amountCents(installmentDTO.getAmountCents() - totalAmountOtherTransfers)
       .remittanceInformation(installmentDTO.getRemittanceInformation())

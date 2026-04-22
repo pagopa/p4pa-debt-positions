@@ -250,4 +250,46 @@ class InstallmentSynchronizeApplierServiceTest {
     Mockito.verifyNoInteractions(applierDebtPositionServiceMock, applierPaymentOptionServiceMock, applierInstallmentServiceMock);
 
   }
+
+  @Test
+  void givenEmptyDptoIbanWhenApplyThenPopulateFirstTransferWithOrgIban() {
+    String accessToken = "ACCESSTOKEN";
+
+    Organization organization = buildOrganization();
+    organization.setIban("iban");
+    organization.setPostalIban("postalIban");
+
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setIban(null);
+    debtPositionTypeOrg.setPostalIban(null);
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    if (installmentSynchronizeDTO.getAdditionalTransfers() != null) {
+      installmentSynchronizeDTO.getAdditionalTransfers().removeIf(t -> t.getTransferIndex() == 1);
+    }
+
+    Mockito.when(organizationServiceMock.getOrganizationById(installmentSynchronizeDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
+      .thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(categoryResolverServiceMock.resolveCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(),
+      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("resolvedCategory");
+
+    Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
+    Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
+    Mockito.doNothing().when(applierInstallmentServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
+
+    installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, debtPositionDTO,
+      debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken);
+
+    TransferSynchronizeDTO addedTransfer = installmentSynchronizeDTO.getAdditionalTransfers().stream()
+      .filter(t -> t.getTransferIndex() == 1)
+      .findFirst().get();
+
+    assertEquals("iban", addedTransfer.getIban());
+    assertEquals("postalIban", addedTransfer.getPostalIban());
+    assertEquals("resolvedCategory", addedTransfer.getCategory());
+  }
 }
