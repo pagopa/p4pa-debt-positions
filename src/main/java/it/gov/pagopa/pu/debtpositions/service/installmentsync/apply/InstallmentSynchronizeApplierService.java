@@ -10,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.Installment
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.IbansUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
