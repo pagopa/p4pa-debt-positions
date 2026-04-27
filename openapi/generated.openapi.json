@@ -1,5 +1,5 @@
 {
-  "openapi" : "3.1.0",
+  "openapi" : "3.0.1",
   "info" : {
     "title" : "p4pa-debt-positions",
     "description" : "Api and Models",
@@ -58,9 +58,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -68,9 +68,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -192,9 +192,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -202,9 +202,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -383,9 +383,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -393,9 +393,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -475,11 +475,11 @@
           "name" : "operatorExternalUserIds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -544,11 +544,11 @@
           "name" : "operatorExternalUserIds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -841,9 +841,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -851,9 +851,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -989,9 +989,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -999,9 +999,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -1141,9 +1141,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -1151,9 +1151,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -1192,12 +1192,12 @@
           "name" : "debtPositionTypeOrgIds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "integer",
               "format" : "int64"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -1420,11 +1420,11 @@
           "name" : "iuds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -1491,9 +1491,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -1501,9 +1501,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -1610,9 +1610,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -1620,9 +1620,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -1700,9 +1700,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -1710,9 +1710,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -1899,9 +1899,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -1909,9 +1909,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -2006,9 +2006,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -2016,9 +2016,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -2129,12 +2129,12 @@
           "name" : "debtPositionTypeIds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "integer",
               "format" : "int64"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -2367,9 +2367,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -2377,9 +2377,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -2524,9 +2524,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -2534,9 +2534,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -2585,9 +2585,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -2595,9 +2595,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -3113,9 +3113,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -3123,9 +3123,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -3314,11 +3314,11 @@
           "name" : "iuds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -3415,9 +3415,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -3425,9 +3425,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -3981,9 +3981,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -3991,9 +3991,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -4853,9 +4853,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -4863,9 +4863,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -4907,9 +4907,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -4917,9 +4917,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -5070,9 +5070,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -5080,9 +5080,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -5121,12 +5121,12 @@
           "name" : "receiptIds",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "integer",
               "format" : "int64"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -5433,9 +5433,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -5443,9 +5443,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -5562,9 +5562,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -5572,9 +5572,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -5767,9 +5767,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -5777,9 +5777,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -5945,11 +5945,11 @@
           "name" : "installmentStatusSet",
           "in" : "query",
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/InstallmentStatus"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -7086,7 +7086,8 @@
           "description" : "Indicates if the operation is massive (true) or single (false).",
           "required" : false,
           "schema" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           }
         } ],
         "requestBody" : {
@@ -7349,12 +7350,12 @@
           "in" : "query",
           "required" : true,
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "integer",
               "format" : "int64"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -7717,14 +7718,16 @@
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }, {
           "name" : "iud",
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         } ],
         "responses" : {
@@ -7800,7 +7803,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           }
         }, {
           "name" : "dueDateTimeTo",
@@ -7808,28 +7812,32 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           }
         }, {
           "name" : "iuv",
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }, {
           "name" : "iud",
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }, {
           "name" : "fiscalCode",
           "in" : "query",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }, {
           "name" : "debtPositionOrigins",
@@ -7837,6 +7845,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -7847,7 +7856,8 @@
           "required" : false,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           }
         }, {
           "name" : "status",
@@ -7862,9 +7872,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -7872,9 +7882,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -7952,6 +7962,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -8086,7 +8097,8 @@
           "in" : "header",
           "required" : false,
           "schema" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }, {
           "name" : "organizationId",
@@ -8094,7 +8106,8 @@
           "required" : false,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           }
         }, {
           "name" : "statuses",
@@ -8102,6 +8115,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/InstallmentStatus"
             }
@@ -8181,6 +8195,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -8275,9 +8290,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -8285,9 +8300,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -8375,7 +8390,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         }, {
           "name" : "paymentDateTimeTo",
@@ -8383,7 +8399,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         }, {
           "name" : "installmentUpdateDateTimeFrom",
@@ -8391,7 +8408,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         }, {
           "name" : "installmentUpdateDateTimeTo",
@@ -8399,7 +8417,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         }, {
           "name" : "debtPositionTypeOrgId",
@@ -8407,7 +8426,8 @@
           "required" : false,
           "schema" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           }
         }, {
           "name" : "debtPositionOrigins",
@@ -8415,6 +8435,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -8425,9 +8446,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -8435,9 +8456,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -8641,6 +8662,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/InstallmentStatus"
             }
@@ -8651,9 +8673,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -8661,9 +8683,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -8752,9 +8774,9 @@
           "description" : "Zero-based page index (0..N)",
           "required" : false,
           "schema" : {
+            "minimum" : 0,
             "type" : "integer",
-            "default" : 0,
-            "minimum" : 0
+            "default" : 0
           }
         }, {
           "name" : "size",
@@ -8762,9 +8784,9 @@
           "description" : "The size of the page to be returned",
           "required" : false,
           "schema" : {
+            "minimum" : 1,
             "type" : "integer",
-            "default" : 20,
-            "minimum" : 1
+            "default" : 20
           }
         }, {
           "name" : "sort",
@@ -8935,6 +8957,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -9017,6 +9040,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -9089,6 +9113,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -9223,6 +9248,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/InstallmentStatus"
             }
@@ -9233,6 +9259,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -9243,6 +9270,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "type" : "string"
             }
@@ -9254,7 +9282,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         }, {
           "name" : "dateTo",
@@ -9263,7 +9292,8 @@
           "required" : false,
           "schema" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
         } ],
         "responses" : {
@@ -9453,6 +9483,7 @@
           "required" : false,
           "schema" : {
             "type" : "array",
+            "nullable" : true,
             "items" : {
               "$ref" : "#/components/schemas/DebtPositionOrigin"
             }
@@ -9553,11 +9584,11 @@
           "in" : "query",
           "required" : true,
           "schema" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           }
         } ],
         "responses" : {
@@ -9626,6 +9657,7 @@
   "components" : {
     "schemas" : {
       "AbstractJsonSchemaPropertyObject" : {
+        "title" : "AbstractJsonSchemaProperty",
         "type" : "object",
         "properties" : {
           "title" : {
@@ -9637,6 +9669,7 @@
         }
       },
       "Item" : {
+        "title" : "Item",
         "type" : "object",
         "properties" : {
           "type" : {
@@ -9657,6 +9690,7 @@
         }
       },
       "JsonSchema" : {
+        "title" : "JsonSchema",
         "type" : "object",
         "properties" : {
           "title" : {
@@ -9692,6 +9726,7 @@
         }
       },
       "RepresentationModelObject" : {
+        "title" : "RepresentationModel",
         "type" : "object",
         "properties" : {
           "_links" : {
@@ -9699,36 +9734,14 @@
           }
         }
       },
-      "PageMetadata" : {
-        "type" : "object",
-        "properties" : {
-          "size" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "totalElements" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "totalPages" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "number" : {
-            "type" : "integer",
-            "format" : "int64"
-          }
-        }
-      },
-      "InstallmentStatus" : {
-        "type" : "string",
-        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "UNPAYABLE", "DRAFT" ]
-      },
       "RenderType" : {
+        "title" : "RenderType",
         "type" : "string",
         "enum" : [ "TEXT", "INTEGER", "DOUBLE", "BOOLEAN", "DATE", "DATETIME", "TEXTAREA", "HTMLAREA", "IMAGE", "SELECT", "MULTILINK", "FILE", "NONE", "SINGLESELECT", "MULTISELECT", "MULTIFIELD", "ASSOCIATION", "LINKGENERATOR", "TAGS", "TAB", "LABEL", "CURRENCY", "CURRENCY_LABEL", "DYNAMIC_SELECT", "DYNAMIC_AMOUNT_LABEL" ]
       },
       "SpontaneousForm" : {
+        "title" : "EntityModel",
+        "required" : [ "code", "organizationId", "structure" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -9770,19 +9783,23 @@
               "additionalProperties" : {
                 "type" : "object",
                 "additionalProperties" : {
-                  "type" : "string"
-                }
-              }
+                  "type" : "string",
+                  "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
+                },
+                "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
+              },
+              "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
             },
             "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "code", "organizationId", "structure" ]
+        }
       },
       "SpontaneousFormField" : {
+        "title" : "SpontaneousFormField",
+        "required" : [ "association", "detailLink", "htmlRender", "indexable", "insertable", "insertableOrder", "listable", "listableOrder", "maxOccurences", "minOccurences", "name", "renderable", "renderableOrder", "searchable", "searchableOrder" ],
         "type" : "object",
         "properties" : {
           "name" : {
@@ -9926,10 +9943,10 @@
               "$ref" : "#/components/schemas/SpontaneousFormItemDTO"
             }
           }
-        },
-        "required" : [ "association", "detailLink", "htmlRender", "indexable", "insertable", "insertableOrder", "listable", "listableOrder", "maxOccurences", "minOccurences", "name", "renderable", "renderableOrder", "searchable", "searchableOrder" ]
+        }
       },
       "SpontaneousFormItemDTO" : {
+        "title" : "SpontaneousFormItemDTO",
         "type" : "object",
         "properties" : {
           "name" : {
@@ -9941,6 +9958,7 @@
         }
       },
       "SpontaneousFormStructure" : {
+        "title" : "SpontaneousFormStructure",
         "type" : "object",
         "properties" : {
           "fields" : {
@@ -9966,119 +9984,36 @@
           }
         }
       },
+      "PageMetadata" : {
+        "title" : "PageMetadata",
+        "type" : "object",
+        "properties" : {
+          "size" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalElements" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalPages" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "number" : {
+            "type" : "integer",
+            "format" : "int64"
+          }
+        }
+      },
       "ReceiptOriginType" : {
+        "title" : "ReceiptOriginType",
         "type" : "string",
         "enum" : [ "RECEIPT_PAGOPA", "RECEIPT_FILE", "PAYMENTS_REPORTING" ]
       },
-      "Action" : {
-        "type" : "string",
-        "enum" : [ "I", "M", "A" ]
-      },
-      "DebtPositionOrigin" : {
-        "type" : "string",
-        "enum" : [ "ORDINARY", "ORDINARY_SIL", "SPONTANEOUS", "SPONTANEOUS_SIL", "SPONTANEOUS_MIXED", "SPONTANEOUS_PSP", "SECONDARY_ORG", "RECEIPT_FILE", "RECEIPT_PAGOPA", "REPORTING_PAGOPA" ]
-      },
-      "DebtPositionStatus" : {
-        "type" : "string",
-        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "PARTIALLY_PAID", "CANCELLED", "EXPIRED", "UNPAID", "DRAFT" ]
-      },
-      "InstallmentSyncStatus" : {
-        "type" : "object",
-        "properties" : {
-          "syncStatusFrom" : {
-            "$ref" : "#/components/schemas/InstallmentStatus"
-          },
-          "syncStatusTo" : {
-            "$ref" : "#/components/schemas/InstallmentStatus"
-          },
-          "syncError" : {
-            "type" : "string"
-          }
-        },
-        "required" : [ "syncStatusFrom", "syncStatusTo" ]
-      },
-      "PaymentOptionStatus" : {
-        "type" : "string",
-        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "PARTIALLY_PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "UNPAYABLE", "DRAFT" ]
-      },
-      "PaymentOptionType" : {
-        "type" : "string",
-        "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT", "REDUCED_SINGLE_INSTALLMENT" ]
-      },
-      "PersonEntityType" : {
-        "type" : "string",
-        "enum" : [ "F", "G" ]
-      },
-      "Stamp" : {
-        "type" : "object",
-        "properties" : {
-          "stampType" : {
-            "type" : "string"
-          },
-          "stampHashDocument" : {
-            "type" : "string"
-          },
-          "stampProvincialResidence" : {
-            "type" : "string"
-          }
-        }
-      },
-      "CollectionModelPaymentOption" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "paymentOptions" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/PaymentOptionResponse"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "CollectionModelObject" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "objects" : {
-                "type" : "array",
-                "items" : { }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "CollectionModelInstallmentNoPII" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "installmentNoPIIs" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/InstallmentNoPII"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
       "DebtPositionTypeOrg" : {
+        "title" : "EntityModel",
+        "required" : [ "code", "debtPositionTypeId", "description", "organizationId" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10189,17 +10124,145 @@
           "descriptionI18n" : {
             "type" : "object",
             "additionalProperties" : {
-              "type" : "string"
+              "type" : "string",
+              "description" : "This map contains the localized description of the DebtPositionTypeOrg.\n\nExample:\n{\n  \"EN\": \"DebtPositionTypeOrg description\"\n}\n"
             },
             "description" : "This map contains the localized description of the DebtPositionTypeOrg.\n\nExample:\n{\n  \"EN\": \"DebtPositionTypeOrg description\"\n}\n"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "code", "debtPositionTypeId", "description", "organizationId" ]
+        }
+      },
+      "PersonEntityType" : {
+        "title" : "PersonEntityType",
+        "type" : "string",
+        "enum" : [ "F", "G" ]
+      },
+      "DebtPositionOrigin" : {
+        "title" : "DebtPositionOrigin",
+        "type" : "string",
+        "enum" : [ "ORDINARY", "ORDINARY_SIL", "SPONTANEOUS", "SPONTANEOUS_SIL", "SPONTANEOUS_MIXED", "SPONTANEOUS_PSP", "SECONDARY_ORG", "RECEIPT_FILE", "RECEIPT_PAGOPA", "REPORTING_PAGOPA" ]
+      },
+      "Action" : {
+        "title" : "Action",
+        "type" : "string",
+        "nullable" : true,
+        "enum" : [ "I", "M", "A" ]
+      },
+      "DebtPositionStatus" : {
+        "title" : "DebtPositionStatus",
+        "type" : "string",
+        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "PARTIALLY_PAID", "CANCELLED", "EXPIRED", "UNPAID", "DRAFT" ]
+      },
+      "InstallmentStatus" : {
+        "title" : "InstallmentStatus",
+        "type" : "string",
+        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "UNPAYABLE", "DRAFT" ]
+      },
+      "InstallmentSyncStatus" : {
+        "title" : "InstallmentSyncStatus",
+        "required" : [ "syncStatusFrom", "syncStatusTo" ],
+        "type" : "object",
+        "properties" : {
+          "syncStatusFrom" : {
+            "$ref" : "#/components/schemas/InstallmentStatus"
+          },
+          "syncStatusTo" : {
+            "$ref" : "#/components/schemas/InstallmentStatus"
+          },
+          "syncError" : {
+            "type" : "string"
+          }
+        }
+      },
+      "PaymentOptionStatus" : {
+        "title" : "PaymentOptionStatus",
+        "type" : "string",
+        "enum" : [ "TO_SYNC", "REPORTED", "PAID", "PARTIALLY_PAID", "CANCELLED", "INVALID", "EXPIRED", "UNPAID", "UNPAYABLE", "DRAFT" ]
+      },
+      "PaymentOptionType" : {
+        "title" : "PaymentOptionType",
+        "type" : "string",
+        "enum" : [ "SINGLE_INSTALLMENT", "INSTALLMENTS", "DOWN_PAYMENT", "REDUCED_SINGLE_INSTALLMENT" ]
+      },
+      "Stamp" : {
+        "title" : "Stamp",
+        "type" : "object",
+        "properties" : {
+          "stampType" : {
+            "type" : "string"
+          },
+          "stampHashDocument" : {
+            "type" : "string"
+          },
+          "stampProvincialResidence" : {
+            "type" : "string"
+          }
+        }
+      },
+      "CollectionModelPaymentOption" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "paymentOptions" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/PaymentOptionResponse"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelObject" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "objects" : {
+                "type" : "array",
+                "items" : {
+                  "type" : "object"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "CollectionModelInstallmentNoPII" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "installmentNoPIIs" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/InstallmentNoPII"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
       },
       "CollectionModelTransfer" : {
+        "title" : "CollectionModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -10228,6 +10291,7 @@
         }
       },
       "DebtPositionTypeOrgOperatorsRequestBody" : {
+        "required" : [ "debtPositionTypeOrgId", "operatorExternalUserId" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10255,10 +10319,10 @@
           "operatorExternalUserId" : {
             "type" : "string"
           }
-        },
-        "required" : [ "debtPositionTypeOrgId", "operatorExternalUserId" ]
+        }
       },
       "DebtPositionTypeOrgRequestBody" : {
+        "required" : [ "code", "debtPositionTypeId", "description", "organizationId" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10369,14 +10433,15 @@
           "descriptionI18n" : {
             "type" : "object",
             "additionalProperties" : {
-              "type" : "string"
+              "type" : "string",
+              "description" : "This map contains the localized description of the DebtPositionTypeOrg.\n\nExample:\n{\n  \"EN\": \"DebtPositionTypeOrg description\"\n}\n"
             },
             "description" : "This map contains the localized description of the DebtPositionTypeOrg.\n\nExample:\n{\n  \"EN\": \"DebtPositionTypeOrg description\"\n}\n"
           }
-        },
-        "required" : [ "code", "debtPositionTypeId", "description", "organizationId" ]
+        }
       },
       "DebtPositionTypeRequestBody" : {
+        "required" : [ "brokerId", "code", "collectingReason", "description", "macroArea", "orgType", "serviceType", "taxonomyCode" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10437,10 +10502,10 @@
           "ioTemplateSubject" : {
             "type" : "string"
           }
-        },
-        "required" : [ "brokerId", "code", "collectingReason", "description", "macroArea", "orgType", "serviceType", "taxonomyCode" ]
+        }
       },
       "DebtPositionRequestBody" : {
+        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "iupdOrg", "organizationId", "status" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10497,10 +10562,11 @@
               "type" : "string"
             }
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "iupdOrg", "organizationId", "status" ]
+        }
       },
       "InstallmentNoPIIRequestBody" : {
+        "title" : "InstallmentNoPII",
+        "required" : [ "amountCents", "debtorEntityType", "debtorFiscalCodeHash", "iud", "paymentOptionId", "personalDataId", "remittanceInformation", "status" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10618,10 +10684,10 @@
               "type" : "string"
             }
           }
-        },
-        "required" : [ "amountCents", "debtorEntityType", "debtorFiscalCodeHash", "iud", "paymentOptionId", "personalDataId", "remittanceInformation", "status" ]
+        }
       },
       "PaymentOptionRequestBody" : {
+        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10669,10 +10735,10 @@
               "type" : "string"
             }
           }
-        },
-        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ]
+        }
       },
       "TransferRequestBody" : {
+        "required" : [ "amountCents", "category", "installmentId", "orgFiscalCode", "remittanceInformation", "transferIndex" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10732,10 +10798,10 @@
           "flagOwner" : {
             "type" : "boolean"
           }
-        },
-        "required" : [ "amountCents", "category", "installmentId", "orgFiscalCode", "remittanceInformation", "transferIndex" ]
+        }
       },
       "PaymentOptionResponse" : {
+        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10777,10 +10843,10 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ]
+        }
       },
       "ReceiptNoPIIRequestBody" : {
+        "required" : [ "companyName", "creditorReferenceId", "debtorEntityType", "debtorFiscalCodeHash", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "personalDataId", "pspCompanyName", "receiptOrigin" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10893,10 +10959,10 @@
             "type" : "string",
             "format" : "byte"
           }
-        },
-        "required" : [ "companyName", "creditorReferenceId", "debtorEntityType", "debtorFiscalCodeHash", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "personalDataId", "pspCompanyName", "receiptOrigin" ]
+        }
       },
       "SpontaneousFormRequestBody" : {
+        "required" : [ "code", "organizationId", "structure" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -10938,27 +11004,33 @@
               "additionalProperties" : {
                 "type" : "object",
                 "additionalProperties" : {
-                  "type" : "string"
-                }
-              }
+                  "type" : "string",
+                  "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
+                },
+                "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
+              },
+              "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
             },
             "description" : "Dictionary of localized messages for spontaneous form fields.\nThe map has three levels of nesting:\n1. First level: language code (e.g. \"EN\")\n2. Second level: field name (e.g. \"payment_field\")\n3. Third level: attribute name and message for that field (e.g. \"label\", \"error\", \"help\")\n\nExample:\n{\n  \"EN\": {\n    \"payment_field\": {\n      \"label\": \"Payment description\",\n      \"error\": \"Specify the payment description\",\n      \"help\": \"Specify the payment description\"\n    }\n  }\n}\n"
           }
-        },
-        "required" : [ "code", "organizationId", "structure" ]
+        }
       },
       "DebtPositionDTO" : {
+        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "flagPuPagoPaPayment", "organizationId", "paymentOptions" ],
         "type" : "object",
         "properties" : {
           "debtPositionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "iupdOrg" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "description" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "status" : {
             "$ref" : "#/components/schemas/DebtPositionStatus"
@@ -10976,27 +11048,33 @@
           },
           "validityDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "multiDebtor" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "flagPuPagoPaPayment" : {
             "type" : "boolean"
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentOptions" : {
             "type" : "array",
@@ -11004,19 +11082,22 @@
               "$ref" : "#/components/schemas/PaymentOptionDTO"
             }
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "flagPuPagoPaPayment", "organizationId", "paymentOptions" ]
+        }
       },
       "InstallmentDTO" : {
+        "title" : "InstallmentDTO",
+        "required" : [ "amountCents", "debtor", "remittanceInformation" ],
         "type" : "object",
         "properties" : {
           "installmentId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "paymentOptionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "status" : {
             "$ref" : "#/components/schemas/InstallmentStatus"
@@ -11025,39 +11106,50 @@
             "$ref" : "#/components/schemas/InstallmentSyncStatus"
           },
           "iupdPagopa" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "generateNotice" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "iud" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iuv" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iur" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iuf" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "nav" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iun" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "dueDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "switchToExpired" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "notificationFeeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "amountCents" : {
             "type" : "integer",
@@ -11067,10 +11159,12 @@
             "type" : "string"
           },
           "balance" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "legacyPaymentMetadata" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -11083,56 +11177,69 @@
           },
           "notificationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "ingestionFlowFileId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "ingestionFlowFileLineNumber" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "ingestionFlowFileAction" : {
             "$ref" : "#/components/schemas/Action"
           },
           "sourceFlowName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "originalRemittanceInformation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "amountCents", "debtor", "remittanceInformation" ]
+        }
       },
       "PaymentOptionDTO" : {
+        "title" : "PaymentOptionDTO",
+        "required" : [ "installments", "paymentOptionType", "totalAmountCents" ],
         "type" : "object",
         "properties" : {
           "paymentOptionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "debtPositionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "totalAmountCents" : {
             "type" : "integer",
@@ -11142,28 +11249,34 @@
             "$ref" : "#/components/schemas/PaymentOptionStatus"
           },
           "description" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentOptionType" : {
             "$ref" : "#/components/schemas/PaymentOptionType"
           },
           "paymentOptionIndex" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "nullable" : true
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "installments" : {
             "type" : "array",
@@ -11171,10 +11284,11 @@
               "$ref" : "#/components/schemas/InstallmentDTO"
             }
           }
-        },
-        "required" : [ "installments", "paymentOptionType", "totalAmountCents" ]
+        }
       },
       "PersonDTO" : {
+        "title" : "PersonDTO",
+        "required" : [ "entityType", "fiscalCode", "fullName" ],
         "type" : "object",
         "properties" : {
           "entityType" : {
@@ -11187,39 +11301,49 @@
             "type" : "string"
           },
           "address" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "civic" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "postalCode" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "location" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "province" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "nation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "email" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "entityType", "fiscalCode", "fullName" ]
+        }
       },
       "TransferDTO" : {
+        "title" : "TransferDTO",
+        "required" : [ "amountCents", "category", "orgFiscalCode", "orgName", "remittanceInformation", "transferIndex" ],
         "type" : "object",
         "properties" : {
           "transferId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "installmentId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "orgFiscalCode" : {
             "type" : "string"
@@ -11235,19 +11359,24 @@
             "type" : "string"
           },
           "stampType" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "stampHashDocument" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "stampProvincialResidence" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "postalIban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "category" : {
             "type" : "string"
@@ -11258,32 +11387,39 @@
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "mbdAttachment" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "flagOwner" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           }
-        },
-        "required" : [ "amountCents", "category", "orgFiscalCode", "orgName", "remittanceInformation", "transferIndex" ]
+        }
       },
       "CategoryEnum" : {
+        "title" : "CategoryEnum",
         "type" : "string",
         "enum" : [ "DEBT_POSITION_BAD_REQUEST", "DEBT_POSITION_CONFLICT", "DEBT_POSITION_FORBIDDEN", "DEBT_POSITION_GENERIC_ERROR", "DEBT_POSITION_NOT_FOUND" ]
       },
       "DebtPositionErrorDTO" : {
+        "required" : [ "category", "code", "message" ],
         "type" : "object",
         "properties" : {
           "category" : {
@@ -11296,21 +11432,25 @@
             "type" : "string"
           },
           "traceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "category", "code", "message" ]
+        }
       },
       "TransferReportedRequest" : {
+        "title" : "TransferReportedRequest",
+        "required" : [ "iuf" ],
         "type" : "object",
         "properties" : {
           "iuf" : {
             "type" : "string"
           }
         },
-        "required" : [ "iuf" ]
+        "nullable" : true
       },
       "UpdateTransferIbansAndSyncDebtPositionRequestDTO" : {
+        "title" : "UpdateTransferIbansAndSyncDebtPositionRequestDTO",
+        "required" : [ "newIban", "oldIban" ],
         "type" : "object",
         "properties" : {
           "oldIban" : {
@@ -11320,30 +11460,36 @@
             "type" : "string"
           },
           "oldPostalIban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "newPostalIban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "newIban", "oldIban" ]
+        }
       },
       "ManageDebtPositionDTO" : {
+        "title" : "ManageDebtPositionDTO",
+        "required" : [ "installments", "paymentOptionId" ],
         "type" : "object",
         "properties" : {
           "debtPositionDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "validityDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "paymentOptionId" : {
             "type" : "integer",
             "format" : "int64"
           },
           "paymentOptionDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "installments" : {
             "type" : "array",
@@ -11351,10 +11497,11 @@
               "$ref" : "#/components/schemas/ManageInstallmentDTO"
             }
           }
-        },
-        "required" : [ "installments", "paymentOptionId" ]
+        }
       },
       "ManageInstallmentDTO" : {
+        "title" : "ManageInstallmentDTO",
+        "required" : [ "action", "installment" ],
         "type" : "object",
         "properties" : {
           "action" : {
@@ -11363,28 +11510,31 @@
           "installment" : {
             "$ref" : "#/components/schemas/InstallmentDTO"
           }
-        },
-        "required" : [ "action", "installment" ]
+        }
       },
       "SyncCompleteDTO" : {
+        "title" : "SyncCompleteDTO",
+        "required" : [ "newStatus" ],
         "type" : "object",
         "properties" : {
           "newStatus" : {
             "$ref" : "#/components/schemas/InstallmentStatus"
           }
-        },
-        "required" : [ "newStatus" ]
+        }
       },
       "SyncErrorDTO" : {
+        "title" : "SyncErrorDTO",
+        "required" : [ "error_description" ],
         "type" : "object",
         "properties" : {
           "error_description" : {
             "type" : "string"
           }
-        },
-        "required" : [ "error_description" ]
+        }
       },
       "SyncStatusUpdateRequestDTO" : {
+        "title" : "SyncStatusUpdateRequestDTO",
+        "required" : [ "iupd2finalize", "iupdSyncError" ],
         "type" : "object",
         "properties" : {
           "iupd2finalize" : {
@@ -11399,10 +11549,11 @@
               "$ref" : "#/components/schemas/SyncErrorDTO"
             }
           }
-        },
-        "required" : [ "iupd2finalize", "iupdSyncError" ]
+        }
       },
       "ActualizeAmountRequestDTO" : {
+        "title" : "ActualizeAmountRequestDTO",
+        "required" : [ "actualizedFromPuSil", "nav", "newFeeCents", "organizationId" ],
         "type" : "object",
         "properties" : {
           "organizationId" : {
@@ -11420,28 +11571,33 @@
             "type" : "boolean"
           },
           "iun" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "balance" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "notificationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           }
-        },
-        "required" : [ "actualizedFromPuSil", "nav", "newFeeCents", "organizationId" ]
+        }
       },
       "UpdateInstallmentNotificationDateRequest" : {
+        "title" : "UpdateInstallmentNotificationDateRequest",
         "type" : "object",
         "properties" : {
           "debtPositionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "notificationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "nav" : {
             "type" : "array",
@@ -11452,6 +11608,8 @@
         }
       },
       "InstallmentSynchronizeDTO" : {
+        "title" : "InstallmentSynchronizeDTO",
+        "required" : [ "action", "amountCents", "debtPositionTypeCode", "description", "entityType", "fiscalCode", "flagPuPagoPaPayment", "fullName", "ingestionFlowFileId", "ingestionFlowFileLineNumber", "ingestionFlowFileName", "organizationId", "paymentOptionIndex", "paymentOptionType", "remittanceInformation" ],
         "type" : "object",
         "properties" : {
           "ingestionFlowFileId" : {
@@ -11470,24 +11628,29 @@
             "$ref" : "#/components/schemas/Action"
           },
           "draft" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "iupdOrg" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "description" : {
             "type" : "string"
           },
           "validityDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "multiDebtor" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "notificationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "paymentOptionIndex" : {
             "type" : "integer",
@@ -11497,13 +11660,16 @@
             "type" : "string"
           },
           "paymentOptionDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iud" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iuv" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "entityType" : {
             "$ref" : "#/components/schemas/PersonEntityType"
@@ -11515,29 +11681,37 @@
             "type" : "string"
           },
           "address" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "civic" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "postalCode" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "location" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "province" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "nation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "email" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "dueDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "amountCents" : {
             "type" : "integer",
@@ -11550,23 +11724,28 @@
             "type" : "string"
           },
           "legacyPaymentMetadata" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "flagPuPagoPaPayment" : {
             "type" : "boolean"
           },
           "generateNotice" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "balance" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "flagMultibeneficiary" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "numberBeneficiary" : {
             "type" : "integer",
-            "format" : "int32"
+            "format" : "int32",
+            "nullable" : true
           },
           "additionalTransfers" : {
             "type" : "array",
@@ -11580,11 +11759,15 @@
           "executionConfig" : {
             "$ref" : "#/components/schemas/JsonNode"
           }
-        },
-        "required" : [ "action", "amountCents", "debtPositionTypeCode", "description", "entityType", "fiscalCode", "flagPuPagoPaPayment", "fullName", "ingestionFlowFileId", "ingestionFlowFileLineNumber", "ingestionFlowFileName", "organizationId", "paymentOptionIndex", "paymentOptionType", "remittanceInformation" ]
+        }
       },
-      "JsonNode" : { },
+      "JsonNode" : {
+        "title" : "JsonNode",
+        "type" : "object"
+      },
       "TransferSynchronizeDTO" : {
+        "title" : "TransferSynchronizeDTO",
+        "required" : [ "amountCents", "category", "iban", "orgFiscalCode", "orgName", "remittanceInformation", "transferIndex" ],
         "type" : "object",
         "properties" : {
           "orgFiscalCode" : {
@@ -11604,7 +11787,8 @@
             "type" : "string"
           },
           "postalIban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "category" : {
             "type" : "string"
@@ -11613,25 +11797,28 @@
             "type" : "integer",
             "format" : "int32"
           }
-        },
-        "required" : [ "amountCents", "category", "iban", "orgFiscalCode", "orgName", "remittanceInformation", "transferIndex" ]
+        }
       },
       "ReceiptDTO" : {
+        "required" : [ "companyName", "creditorReferenceId", "debtor", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "ingestionFlowFileId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "receiptOrigin" : {
             "$ref" : "#/components/schemas/ReceiptOriginType"
           },
           "rtFilePath" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentReceiptId" : {
             "type" : "string"
@@ -11640,7 +11827,8 @@
             "type" : "string"
           },
           "paymentNote" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "orgFiscalCode" : {
             "type" : "string"
@@ -11662,47 +11850,58 @@
             "type" : "string"
           },
           "officeName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "idPsp" : {
             "type" : "string"
           },
           "pspFiscalCode" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "pspPartitaIva" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "pspCompanyName" : {
             "type" : "string"
           },
           "idChannel" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "channelDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentMethod" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "feeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "paymentDateTime" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "applicationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "transferDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "standin" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -11712,22 +11911,27 @@
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "companyName", "creditorReferenceId", "debtor", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin" ]
+        }
       },
       "ReceiptTransferDTO" : {
+        "title" : "ReceiptTransferDTO",
+        "required" : [ "fiscalCodePA", "idTransfer", "remittanceInformation", "transferAmountCents", "transferCategory" ],
         "type" : "object",
         "properties" : {
           "idTransfer" : {
@@ -11742,13 +11946,16 @@
             "type" : "string"
           },
           "companyName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "mbdAttachment" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "remittanceInformation" : {
             "type" : "string"
@@ -11762,25 +11969,29 @@
               "type" : "string"
             }
           }
-        },
-        "required" : [ "fiscalCodePA", "idTransfer", "remittanceInformation", "transferAmountCents", "transferCategory" ]
+        }
       },
       "ReceiptWithAdditionalNodeDataDTO" : {
+        "title" : "ReceiptWithAdditionalNodeDataDTO",
+        "required" : [ "companyName", "creditorReferenceId", "debtor", "description", "idPsp", "noticeNumber", "orgFiscalCode", "organizationId", "outcome", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin", "transfers" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "ingestionFlowFileId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "receiptOrigin" : {
             "$ref" : "#/components/schemas/ReceiptOriginType"
           },
           "rtFilePath" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentReceiptId" : {
             "type" : "string"
@@ -11789,7 +12000,8 @@
             "type" : "string"
           },
           "paymentNote" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "orgFiscalCode" : {
             "type" : "string"
@@ -11811,47 +12023,58 @@
             "type" : "string"
           },
           "officeName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "idPsp" : {
             "type" : "string"
           },
           "pspFiscalCode" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "pspPartitaIva" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "pspCompanyName" : {
             "type" : "string"
           },
           "idChannel" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "channelDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentMethod" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "feeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "paymentDateTime" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "applicationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "transferDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "standin" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -11861,29 +12084,33 @@
           },
           "creationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "updateOperatorExternalId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "updateTraceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "organizationId" : {
             "type" : "integer",
             "format" : "int64"
           },
           "transfers" : {
+            "maxItems" : 2147483647,
+            "minItems" : 1,
             "type" : "array",
             "items" : {
               "$ref" : "#/components/schemas/ReceiptTransferDTO"
-            },
-            "maxItems" : 2147483647,
-            "minItems" : 1
+            }
           },
           "metadata" : {
             "type" : "object",
@@ -11892,21 +12119,26 @@
             }
           },
           "sourceFlowName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iud" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "debtPositionTypeOrgCode" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "balance" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "companyName", "creditorReferenceId", "debtor", "description", "idPsp", "noticeNumber", "orgFiscalCode", "organizationId", "outcome", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "receiptOrigin", "transfers" ]
+        }
       },
       "MixedDebtPositionDTO" : {
+        "title" : "MixedDebtPositionDTO",
+        "required" : [ "debtPositionOrigin", "debtor", "organizationId", "sourceFlowName", "transfers" ],
         "type" : "object",
         "properties" : {
           "organizationId" : {
@@ -11920,11 +12152,13 @@
             "type" : "string"
           },
           "description" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "dueDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -11935,10 +12169,11 @@
               "$ref" : "#/components/schemas/MixedTransferDTO"
             }
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtor", "organizationId", "sourceFlowName", "transfers" ]
+        }
       },
       "MixedTransferDTO" : {
+        "title" : "MixedTransferDTO",
+        "required" : [ "amountCents", "debtPositionTypeOrgId", "iud", "remittanceInformation" ],
         "type" : "object",
         "properties" : {
           "iud" : {
@@ -11953,59 +12188,69 @@
             "format" : "int64"
           },
           "balance" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "stampType" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "stampHashDocument" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "stampProvincialResidence" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "postalIban" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "legacyPaymentMetadata" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "remittanceInformation" : {
             "type" : "string"
           }
-        },
-        "required" : [ "amountCents", "debtPositionTypeOrgId", "iud", "remittanceInformation" ]
+        }
       },
       "SaveDebtPositionTypeOrgDTO" : {
+        "title" : "SaveDebtPositionTypeOrgDTO",
+        "required" : [ "debtPositionTypeOrg" ],
         "type" : "object",
         "properties" : {
           "debtPositionTypeOrg" : {
             "$ref" : "#/components/schemas/DebtPositionTypeOrg"
           },
           "enabledOperators" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           },
           "disabledOperators" : {
+            "uniqueItems" : true,
             "type" : "array",
             "items" : {
               "type" : "string"
-            },
-            "uniqueItems" : true
+            }
           },
           "removeEnabledOperators" : {
-            "type" : "boolean"
+            "type" : "boolean",
+            "nullable" : true
           }
         },
-        "required" : [ "debtPositionTypeOrg" ]
+        "nullable" : true
       },
       "PostalIbanVerifyResponse" : {
+        "required" : [ "installmentPostalIbanCheck" ],
         "type" : "object",
         "properties" : {
           "installmentPostalIbanCheck" : {
@@ -12014,10 +12259,10 @@
               "type" : "boolean"
             }
           }
-        },
-        "required" : [ "installmentPostalIbanCheck" ]
+        }
       },
       "ReceiptDetailDTO" : {
+        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtor", "iud", "paymentAmountCents", "pspCompanyName", "receiptId", "receiptOrigin", "remittanceInformation" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
@@ -12025,10 +12270,12 @@
             "format" : "int64"
           },
           "iuv" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "nav" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "paymentAmountCents" : {
             "type" : "integer",
@@ -12045,7 +12292,8 @@
           },
           "paymentDateTime" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "pspCompanyName" : {
             "type" : "string"
@@ -12054,15 +12302,18 @@
             "type" : "string"
           },
           "iur" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "feeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "notificationFeeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "receiptOrigin" : {
             "$ref" : "#/components/schemas/ReceiptOriginType"
@@ -12071,12 +12322,14 @@
             "$ref" : "#/components/schemas/DebtPositionOrigin"
           },
           "originalRemittanceInformation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtor", "iud", "paymentAmountCents", "pspCompanyName", "receiptId", "receiptOrigin", "remittanceInformation" ]
+        }
       },
       "InstallmentViewDTO" : {
+        "title" : "InstallmentViewDTO",
+        "required" : [ "amountCents", "debtPositionId", "debtPositionTypeOrgDescription", "debtorFiscalCodeHash", "paymentOptionId", "remittanceInformation", "status" ],
         "type" : "object",
         "properties" : {
           "installmentId" : {
@@ -12128,10 +12381,10 @@
           "debtPositionTypeOrgDescription" : {
             "type" : "string"
           }
-        },
-        "required" : [ "amountCents", "debtPositionId", "debtPositionTypeOrgDescription", "debtorFiscalCodeHash", "paymentOptionId", "remittanceInformation", "status" ]
+        }
       },
       "PagedInstallmentsView" : {
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
         "type" : "object",
         "properties" : {
           "content" : {
@@ -12156,10 +12409,10 @@
             "type" : "integer",
             "format" : "int64"
           }
-        },
-        "required" : [ "content", "number", "size", "totalElements", "totalPages" ]
+        }
       },
       "InstallmentDetailDTO" : {
+        "required" : [ "amountCents", "debtPositionId", "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtor", "installmentId", "iuv", "status" ],
         "type" : "object",
         "properties" : {
           "installmentId" : {
@@ -12168,11 +12421,13 @@
           },
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "paymentOptionId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "status" : {
             "$ref" : "#/components/schemas/InstallmentStatus"
@@ -12181,7 +12436,8 @@
             "type" : "string"
           },
           "nav" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "amountCents" : {
             "type" : "integer",
@@ -12189,7 +12445,8 @@
           },
           "dueDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -12198,7 +12455,8 @@
             "type" : "string"
           },
           "debtPositionDescription" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "debtPositionId" : {
             "type" : "integer",
@@ -12209,38 +12467,46 @@
           },
           "paymentDateTime" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "payer" : {
             "$ref" : "#/components/schemas/PersonDTO"
           },
           "pspCompanyName" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iud" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iur" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "iun" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "notificationDate" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "notificationFeeCents" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "originalRemittanceInformation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "amountCents", "debtPositionId", "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtor", "installmentId", "iuv", "status" ]
+        }
       },
       "InstallmentDebtorDTO" : {
+        "required" : [ "amountCents", "debtPositionTypeOrgDescription", "debtor", "installmentId", "organizationId", "remittanceInformation", "status" ],
         "type" : "object",
         "properties" : {
           "installmentId" : {
@@ -12248,10 +12514,12 @@
             "format" : "int64"
           },
           "iuv" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "nav" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "organizationId" : {
             "type" : "integer",
@@ -12266,7 +12534,8 @@
           },
           "dueDate" : {
             "type" : "string",
-            "format" : "date"
+            "format" : "date",
+            "nullable" : true
           },
           "status" : {
             "$ref" : "#/components/schemas/InstallmentStatus"
@@ -12276,15 +12545,16 @@
           },
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "debtPositionTypeOrgDescription" : {
             "type" : "string"
           }
-        },
-        "required" : [ "amountCents", "debtPositionTypeOrgDescription", "debtor", "installmentId", "organizationId", "remittanceInformation", "status" ]
+        }
       },
       "PagedReceiptsArchivingView" : {
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
         "type" : "object",
         "properties" : {
           "content" : {
@@ -12309,28 +12579,32 @@
             "type" : "integer",
             "format" : "int64"
           }
-        },
-        "required" : [ "content", "number", "size", "totalElements", "totalPages" ]
+        }
       },
       "ReceiptArchivingView" : {
+        "title" : "ReceiptArchivingView",
+        "required" : [ "creditorReferenceId", "orgFiscalCode", "organizationId", "paymentReceiptId", "remittanceInformation" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
             "type" : "integer",
-            "format" : "int64"
+            "format" : "int64",
+            "nullable" : true
           },
           "paymentReceiptId" : {
             "type" : "string"
           },
           "paymentDateTime" : {
             "type" : "string",
-            "format" : "date-time"
+            "format" : "date-time",
+            "nullable" : true
           },
           "creditorReferenceId" : {
             "type" : "string"
           },
           "iuv" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "remittanceInformation" : {
             "type" : "string"
@@ -12343,7 +12617,8 @@
             "type" : "string"
           },
           "rtFilePath" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "debtor" : {
             "$ref" : "#/components/schemas/PersonDTO"
@@ -12352,12 +12627,14 @@
             "$ref" : "#/components/schemas/PersonDTO"
           },
           "originalRemittanceInformation" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
-        },
-        "required" : [ "creditorReferenceId", "orgFiscalCode", "organizationId", "paymentReceiptId", "remittanceInformation" ]
+        }
       },
       "InstallmentPaidViewDTO" : {
+        "title" : "InstallmentPaidViewDTO",
+        "required" : [ "amountCents", "category", "code", "companyName", "creditorReferenceId", "debtor", "idPsp", "iud", "noticeNumber", "orgFiscalCode", "organizationId", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "remittanceInformation", "transferIndex" ],
         "type" : "object",
         "properties" : {
           "installmentId" : {
@@ -12417,8 +12694,8 @@
             "type" : "string"
           },
           "code" : {
-            "type" : "string",
-            "minLength" : 1
+            "minLength" : 1,
+            "type" : "string"
           },
           "transferIndex" : {
             "type" : "integer",
@@ -12451,10 +12728,10 @@
           "originalRemittanceInformation" : {
             "type" : "string"
           }
-        },
-        "required" : [ "amountCents", "category", "code", "companyName", "creditorReferenceId", "debtor", "idPsp", "iud", "noticeNumber", "orgFiscalCode", "organizationId", "paymentAmountCents", "paymentReceiptId", "pspCompanyName", "remittanceInformation", "transferIndex" ]
+        }
       },
       "PagedInstallmentsPaidView" : {
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
         "type" : "object",
         "properties" : {
           "content" : {
@@ -12479,10 +12756,10 @@
             "type" : "integer",
             "format" : "int64"
           }
-        },
-        "required" : [ "content", "number", "size", "totalElements", "totalPages" ]
+        }
       },
       "PagedDebtPositions" : {
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
         "type" : "object",
         "properties" : {
           "content" : {
@@ -12507,12 +12784,30 @@
             "type" : "integer",
             "format" : "int64"
           }
-        },
-        "required" : [ "content", "number", "size", "totalElements", "totalPages" ]
+        }
       },
       "BaseInstallment" : {
+        "title" : "BaseInstallment",
         "type" : "object",
         "properties" : {
+          "status" : {
+            "$ref" : "#/components/schemas/InstallmentStatus"
+          },
+          "dueDate" : {
+            "type" : "string",
+            "format" : "date"
+          },
+          "receiptId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "amountCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "syncStatus" : {
+            "$ref" : "#/components/schemas/InstallmentSyncStatus"
+          },
           "remittanceInformation" : {
             "type" : "string"
           },
@@ -12528,37 +12823,15 @@
           },
           "nav" : {
             "type" : "string"
-          },
-          "receiptId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "amountCents" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "syncStatus" : {
-            "$ref" : "#/components/schemas/InstallmentSyncStatus"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/InstallmentStatus"
-          },
-          "dueDate" : {
-            "type" : "string",
-            "format" : "date"
           }
         }
       },
       "BasePaymentOption" : {
+        "title" : "BasePaymentOption",
         "type" : "object",
         "properties" : {
-          "totalAmountCents" : {
-            "type" : "integer",
-            "format" : "int64",
-            "writeOnly" : true
-          },
-          "paymentOptionType" : {
-            "$ref" : "#/components/schemas/PaymentOptionType"
+          "status" : {
+            "$ref" : "#/components/schemas/PaymentOptionStatus"
           },
           "paymentOptionId" : {
             "type" : "integer",
@@ -12570,8 +12843,13 @@
               "$ref" : "#/components/schemas/BaseInstallment"
             }
           },
-          "status" : {
-            "$ref" : "#/components/schemas/PaymentOptionStatus"
+          "paymentOptionType" : {
+            "$ref" : "#/components/schemas/PaymentOptionType"
+          },
+          "totalAmountCents" : {
+            "type" : "integer",
+            "format" : "int64",
+            "writeOnly" : true
           }
         }
       },
@@ -12610,6 +12888,7 @@
         }
       },
       "PagedDebtorUnpaidDebtPositionDTO" : {
+        "required" : [ "content", "number", "size", "totalElements", "totalPages" ],
         "type" : "object",
         "properties" : {
           "content" : {
@@ -12634,30 +12913,36 @@
             "type" : "integer",
             "format" : "int64"
           }
-        },
-        "required" : [ "content", "number", "size", "totalElements", "totalPages" ]
+        }
       },
       "IONotificationDTO" : {
         "type" : "object",
         "properties" : {
           "serviceId" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "ioTemplateSubject" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           },
           "ioTemplateMessage" : {
-            "type" : "string"
+            "type" : "string",
+            "nullable" : true
           }
         }
       },
       "PaymentEventType" : {
+        "title" : "PaymentEventType",
         "type" : "string",
         "enum" : [ "DP_CREATED", "DP_UPDATED", "DP_CANCELLED", "DPI_ADDED", "DPI_UPDATED", "DPI_CANCELLED", "DPI_EXPIRED", "DPI_REPORTED", "RT_RECEIVED", "SYNC_ERROR", "IO_NOTIFIED", "SEND_NOTIFICATION_CREATED", "SEND_NOTIFICATION_ERROR", "SEND_NOTIFICATION_DATE" ]
       },
       "BaseDebtPosition" : {
         "type" : "object",
         "properties" : {
+          "status" : {
+            "$ref" : "#/components/schemas/DebtPositionStatus"
+          },
           "debtPositionId" : {
             "type" : "integer",
             "format" : "int64"
@@ -12667,83 +12952,11 @@
             "items" : {
               "$ref" : "#/components/schemas/BasePaymentOption"
             }
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/DebtPositionStatus"
-          }
-        }
-      },
-      "CollectionModelDebtPositionTypeOrgWithActiveSpontaneousCount" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeOrgWithActiveSpontaneousCounts" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgWithActiveSpontaneousCount"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "DebtPositionTypeOrgWithActiveSpontaneousCount" : {
-        "type" : "object",
-        "properties" : {
-          "organizationId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "activeSpontaneousDebtPositionTypeOrg" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "activeSpontaneousDebtPositionTypeOrg" ]
-      },
-      "DebtPositionIdView" : {
-        "type" : "object",
-        "properties" : {
-          "debtPositionId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "PagedModelDebtPositionIdView" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionIdViews" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionIdView"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
           }
         }
       },
       "PagedModelSpontaneousForm" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -12766,6 +12979,7 @@
         }
       },
       "CollectionModelSpontaneousForm" : {
+        "title" : "CollectionModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -12784,15 +12998,14 @@
           }
         }
       },
-      "ReceiptNoPIIView" : {
+      "ReceiptView" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionTypeOrgDescription", "debtorFiscalCodeHash", "installmentId", "iud", "paymentAmountCents", "receiptOrigin" ],
         "type" : "object",
         "properties" : {
           "receiptId" : {
             "type" : "integer",
             "format" : "int64"
-          },
-          "orgFiscalCode" : {
-            "type" : "string"
           },
           "paymentAmountCents" : {
             "type" : "integer",
@@ -12802,41 +13015,42 @@
             "type" : "string",
             "format" : "date-time"
           },
-          "receiptOrigin" : {
-            "$ref" : "#/components/schemas/ReceiptOriginType"
-          },
           "installmentId" : {
             "type" : "integer",
             "format" : "int64"
           },
-          "remittanceInformation" : {
+          "receiptOrigin" : {
+            "$ref" : "#/components/schemas/ReceiptOriginType"
+          },
+          "iuv" : {
             "type" : "string"
           },
           "debtPositionTypeOrgDescription" : {
             "type" : "string"
           },
-          "debtPositionTypeDescription" : {
-            "type" : "string"
+          "debtorFiscalCodeHash" : {
+            "type" : "string",
+            "format" : "byte"
           },
-          "serviceType" : {
+          "iud" : {
             "type" : "string"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "debtPositionTypeDescription", "debtPositionTypeOrgDescription", "installmentId", "orgFiscalCode", "paymentAmountCents", "paymentDateTime", "receiptOrigin", "remittanceInformation" ]
+        }
       },
-      "PagedModelReceiptNoPIIView" : {
+      "PagedModelReceiptView" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "receiptNoPIIViews" : {
+              "receiptViews" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/ReceiptNoPIIView"
+                  "$ref" : "#/components/schemas/ReceiptView"
                 }
               }
             }
@@ -12849,16 +13063,75 @@
           }
         }
       },
-      "CollectionModelReceiptNoPIIView" : {
+      "DebtPositionTypeOrgOperators" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionTypeOrgId", "operatorExternalUserId" ],
+        "type" : "object",
+        "properties" : {
+          "creationDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateOperatorExternalId" : {
+            "type" : "string"
+          },
+          "updateTraceId" : {
+            "type" : "string"
+          },
+          "debtPositionTypeOrgOperatorId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "debtPositionTypeOrgId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "operatorExternalUserId" : {
+            "type" : "string"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelDebtPositionTypeOrgOperators" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "receiptNoPIIViews" : {
+              "debtPositionTypeOrgOperatorses" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/ReceiptNoPIIView"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelDebtPositionTypeOrgOperators" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeOrgOperatorses" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
                 }
               }
             }
@@ -12869,6 +13142,8 @@
         }
       },
       "DebtPositionType" : {
+        "title" : "EntityModel",
+        "required" : [ "brokerId", "code", "collectingReason", "description", "macroArea", "orgType", "serviceType", "taxonomyCode" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -12932,10 +13207,10 @@
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "brokerId", "code", "collectingReason", "description", "macroArea", "orgType", "serviceType", "taxonomyCode" ]
+        }
       },
       "PagedModelDebtPositionType" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -12958,6 +13233,7 @@
         }
       },
       "CollectionModelDebtPositionType" : {
+        "title" : "CollectionModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -12976,82 +13252,17 @@
           }
         }
       },
-      "CollectionModelDebtPositionTypeOrgOperatorsDptoCountView" : {
+      "PagedModelDebtPositionTypeOrg" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "debtPositionTypeOrgOperatorsDptoCountViews" : {
+              "debtPositionTypeOrgs" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperatorsDptoCountView"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "DebtPositionTypeOrgOperatorsDptoCountView" : {
-        "type" : "object",
-        "properties" : {
-          "operatorExternalUserId" : {
-            "type" : "string"
-          },
-          "debtPositionTypeOrgCount" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "debtPositionTypeOrgCount" ]
-      },
-      "DebtPositionTypeWithCount" : {
-        "type" : "object",
-        "properties" : {
-          "debtPositionTypeId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "code" : {
-            "type" : "string"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "updateDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "activeOrganizations" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "brokerId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "brokerId", "code", "description" ]
-      },
-      "PagedModelDebtPositionTypeWithCount" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeWithCounts" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeWithCount"
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
                 }
               }
             }
@@ -13064,7 +13275,29 @@
           }
         }
       },
+      "CollectionModelDebtPositionTypeOrg" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeOrgs" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
       "DebtPosition" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "iupdOrg", "organizationId", "status" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -13118,10 +13351,10 @@
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgId", "iupdOrg", "organizationId", "status" ]
+        }
       },
       "PagedModelDebtPosition" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -13143,344 +13376,9 @@
           }
         }
       },
-      "PaymentOption" : {
-        "type" : "object",
-        "properties" : {
-          "creationDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateOperatorExternalId" : {
-            "type" : "string"
-          },
-          "updateTraceId" : {
-            "type" : "string"
-          },
-          "paymentOptionId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "debtPositionId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "totalAmountCents" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/PaymentOptionStatus"
-          },
-          "description" : {
-            "type" : "string"
-          },
-          "paymentOptionType" : {
-            "$ref" : "#/components/schemas/PaymentOptionType"
-          },
-          "paymentOptionIndex" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ]
-      },
-      "PagedModelPaymentOption" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "paymentOptions" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/PaymentOption"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "PagedModelDebtPositionTypeOrg" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeOrgs" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "CollectionModelDebtPositionTypeOrg" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeOrgs" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrg"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "Transfer" : {
-        "type" : "object",
-        "properties" : {
-          "creationDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateOperatorExternalId" : {
-            "type" : "string"
-          },
-          "updateTraceId" : {
-            "type" : "string"
-          },
-          "transferId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "installmentId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "orgFiscalCode" : {
-            "type" : "string"
-          },
-          "orgName" : {
-            "type" : "string"
-          },
-          "amountCents" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "remittanceInformation" : {
-            "type" : "string"
-          },
-          "stamp" : {
-            "$ref" : "#/components/schemas/Stamp"
-          },
-          "iban" : {
-            "type" : "string"
-          },
-          "postalIban" : {
-            "type" : "string"
-          },
-          "category" : {
-            "type" : "string"
-          },
-          "transferIndex" : {
-            "type" : "integer",
-            "format" : "int32"
-          },
-          "mbdAttachment" : {
-            "type" : "string"
-          },
-          "flagOwner" : {
-            "type" : "boolean"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "amountCents", "category", "installmentId", "orgFiscalCode", "remittanceInformation", "transferIndex" ]
-      },
-      "PagedModelTransfer" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "transfers" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/Transfer"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "DebtPositionTypeOrgOperators" : {
-        "type" : "object",
-        "properties" : {
-          "creationDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "updateOperatorExternalId" : {
-            "type" : "string"
-          },
-          "updateTraceId" : {
-            "type" : "string"
-          },
-          "debtPositionTypeOrgOperatorId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "debtPositionTypeOrgId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "operatorExternalUserId" : {
-            "type" : "string"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "debtPositionTypeOrgId", "operatorExternalUserId" ]
-      },
-      "PagedModelDebtPositionTypeOrgOperators" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeOrgOperatorses" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
-          }
-        }
-      },
-      "CollectionModelDebtPositionTypeOrgOperators" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "debtPositionTypeOrgOperatorses" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperators"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        }
-      },
-      "ReceiptView" : {
-        "type" : "object",
-        "properties" : {
-          "receiptId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "paymentAmountCents" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "paymentDateTime" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "installmentId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
-          "receiptOrigin" : {
-            "$ref" : "#/components/schemas/ReceiptOriginType"
-          },
-          "iuv" : {
-            "type" : "string"
-          },
-          "debtPositionTypeOrgDescription" : {
-            "type" : "string"
-          },
-          "debtorFiscalCodeHash" : {
-            "type" : "string",
-            "format" : "byte"
-          },
-          "iud" : {
-            "type" : "string"
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          }
-        },
-        "required" : [ "debtPositionTypeOrgDescription", "debtorFiscalCodeHash", "installmentId", "iud", "paymentAmountCents", "receiptOrigin" ]
-      },
-      "PagedModelReceiptView" : {
-        "type" : "object",
-        "properties" : {
-          "_embedded" : {
-            "type" : "object",
-            "properties" : {
-              "receiptViews" : {
-                "type" : "array",
-                "items" : {
-                  "$ref" : "#/components/schemas/ReceiptView"
-                }
-              }
-            }
-          },
-          "_links" : {
-            "$ref" : "#/components/schemas/Links"
-          },
-          "page" : {
-            "$ref" : "#/components/schemas/PageMetadata"
-          }
-        }
-      },
       "ReceiptNoPII" : {
+        "title" : "EntityModel",
+        "required" : [ "companyName", "creditorReferenceId", "debtorEntityType", "debtorFiscalCodeHash", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "personalDataId", "pspCompanyName", "receiptOrigin" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -13596,10 +13494,10 @@
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "companyName", "creditorReferenceId", "debtorEntityType", "debtorFiscalCodeHash", "description", "idPsp", "noticeNumber", "orgFiscalCode", "outcome", "paymentAmountCents", "paymentReceiptId", "personalDataId", "pspCompanyName", "receiptOrigin" ]
+        }
       },
       "PagedModelReceiptNoPII" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -13622,6 +13520,7 @@
         }
       },
       "CollectionModelReceiptNoPII" : {
+        "title" : "CollectionModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -13641,6 +13540,8 @@
         }
       },
       "DebtPositionTypeOrgWithCount" : {
+        "title" : "EntityModel",
+        "required" : [ "code", "description", "organizationId" ],
         "type" : "object",
         "properties" : {
           "debtPositionTypeOrgId" : {
@@ -13671,10 +13572,10 @@
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "code", "description", "organizationId" ]
+        }
       },
       "PagedModelDebtPositionTypeOrgWithCount" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -13696,53 +13597,104 @@
           }
         }
       },
-      "DebtPositionView" : {
+      "CollectionModelDebtPositionTypeOrgWithActiveSpontaneousCount" : {
+        "title" : "CollectionModel",
         "type" : "object",
         "properties" : {
-          "debtPositionId" : {
-            "type" : "integer",
-            "format" : "int64"
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeOrgWithActiveSpontaneousCounts" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgWithActiveSpontaneousCount"
+                }
+              }
+            }
           },
-          "description" : {
-            "type" : "string"
-          },
-          "debtPositionTypeOrgDescription" : {
-            "type" : "string"
-          },
-          "creationDate" : {
-            "type" : "string",
-            "format" : "date-time"
-          },
-          "status" : {
-            "$ref" : "#/components/schemas/DebtPositionStatus"
-          },
-          "debtPositionOrigin" : {
-            "$ref" : "#/components/schemas/DebtPositionOrigin"
-          },
-          "debtPositionTypeOrgId" : {
-            "type" : "integer",
-            "format" : "int64"
-          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "DebtPositionTypeOrgWithActiveSpontaneousCount" : {
+        "title" : "EntityModel",
+        "required" : [ "activeSpontaneousDebtPositionTypeOrg" ],
+        "type" : "object",
+        "properties" : {
           "organizationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "activeSpontaneousDebtPositionTypeOrg" : {
             "type" : "integer",
             "format" : "int64"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtPositionTypeOrgId", "organizationId", "status" ]
+        }
       },
-      "PagedModelDebtPositionView" : {
+      "PaymentOption" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionId", "paymentOptionIndex", "paymentOptionType", "status", "totalAmountCents" ],
+        "type" : "object",
+        "properties" : {
+          "creationDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateOperatorExternalId" : {
+            "type" : "string"
+          },
+          "updateTraceId" : {
+            "type" : "string"
+          },
+          "paymentOptionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "debtPositionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "totalAmountCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/PaymentOptionStatus"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "paymentOptionType" : {
+            "$ref" : "#/components/schemas/PaymentOptionType"
+          },
+          "paymentOptionIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelPaymentOption" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "debtPositionViews" : {
+              "paymentOptions" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionView"
+                  "$ref" : "#/components/schemas/PaymentOption"
                 }
               }
             }
@@ -13755,7 +13707,224 @@
           }
         }
       },
+      "CollectionModelDebtPositionTypeOrgCountByOrganizationId" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeOrgCountByOrganizationIds" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgCountByOrganizationId"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "DebtPositionTypeOrgCountByOrganizationId" : {
+        "title" : "EntityModel",
+        "type" : "object",
+        "properties" : {
+          "organizationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "activeOrganizations" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "DebtPositionTypeWithCount" : {
+        "title" : "EntityModel",
+        "required" : [ "brokerId", "code", "description" ],
+        "type" : "object",
+        "properties" : {
+          "debtPositionTypeId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "code" : {
+            "type" : "string"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "updateDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "activeOrganizations" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "brokerId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelDebtPositionTypeWithCount" : {
+        "title" : "PagedModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeWithCounts" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeWithCount"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "DebtPositionIdView" : {
+        "title" : "EntityModel",
+        "type" : "object",
+        "properties" : {
+          "debtPositionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelDebtPositionIdView" : {
+        "title" : "PagedModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionIdViews" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionIdView"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "ReceiptNoPIIView" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionTypeDescription", "debtPositionTypeOrgDescription", "installmentId", "orgFiscalCode", "paymentAmountCents", "paymentDateTime", "receiptOrigin", "remittanceInformation" ],
+        "type" : "object",
+        "properties" : {
+          "receiptId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "orgFiscalCode" : {
+            "type" : "string"
+          },
+          "paymentAmountCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "paymentDateTime" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "receiptOrigin" : {
+            "$ref" : "#/components/schemas/ReceiptOriginType"
+          },
+          "installmentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "remittanceInformation" : {
+            "type" : "string"
+          },
+          "debtPositionTypeOrgDescription" : {
+            "type" : "string"
+          },
+          "debtPositionTypeDescription" : {
+            "type" : "string"
+          },
+          "serviceType" : {
+            "type" : "string"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelReceiptNoPIIView" : {
+        "title" : "PagedModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "receiptNoPIIViews" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/ReceiptNoPIIView"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelReceiptNoPIIView" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "receiptNoPIIViews" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/ReceiptNoPIIView"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
       "InstallmentNoPII" : {
+        "title" : "EntityModel",
+        "required" : [ "amountCents", "debtorEntityType", "debtorFiscalCodeHash", "iud", "paymentOptionId", "personalDataId", "remittanceInformation", "status" ],
         "type" : "object",
         "properties" : {
           "creationDate" : {
@@ -13870,10 +14039,10 @@
           "_links" : {
             "$ref" : "#/components/schemas/Links"
           }
-        },
-        "required" : [ "amountCents", "debtorEntityType", "debtorFiscalCodeHash", "iud", "paymentOptionId", "personalDataId", "remittanceInformation", "status" ]
+        }
       },
       "PagedModelInstallmentNoPII" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
@@ -13895,16 +14064,168 @@
           }
         }
       },
-      "CollectionModelDebtPositionTypeOrgCountByOrganizationId" : {
+      "Transfer" : {
+        "title" : "EntityModel",
+        "required" : [ "amountCents", "category", "installmentId", "orgFiscalCode", "remittanceInformation", "transferIndex" ],
+        "type" : "object",
+        "properties" : {
+          "creationDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "updateOperatorExternalId" : {
+            "type" : "string"
+          },
+          "updateTraceId" : {
+            "type" : "string"
+          },
+          "transferId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "installmentId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "orgFiscalCode" : {
+            "type" : "string"
+          },
+          "orgName" : {
+            "type" : "string"
+          },
+          "amountCents" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "remittanceInformation" : {
+            "type" : "string"
+          },
+          "stamp" : {
+            "$ref" : "#/components/schemas/Stamp"
+          },
+          "iban" : {
+            "type" : "string"
+          },
+          "postalIban" : {
+            "type" : "string"
+          },
+          "category" : {
+            "type" : "string"
+          },
+          "transferIndex" : {
+            "type" : "integer",
+            "format" : "int32"
+          },
+          "mbdAttachment" : {
+            "type" : "string"
+          },
+          "flagOwner" : {
+            "type" : "boolean"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelTransfer" : {
+        "title" : "PagedModel",
         "type" : "object",
         "properties" : {
           "_embedded" : {
             "type" : "object",
             "properties" : {
-              "debtPositionTypeOrgCountByOrganizationIds" : {
+              "transfers" : {
                 "type" : "array",
                 "items" : {
-                  "$ref" : "#/components/schemas/DebtPositionTypeOrgCountByOrganizationId"
+                  "$ref" : "#/components/schemas/Transfer"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "DebtPositionView" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionOrigin", "debtPositionTypeOrgDescription", "debtPositionTypeOrgId", "organizationId", "status" ],
+        "type" : "object",
+        "properties" : {
+          "debtPositionId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "description" : {
+            "type" : "string"
+          },
+          "debtPositionTypeOrgDescription" : {
+            "type" : "string"
+          },
+          "creationDate" : {
+            "type" : "string",
+            "format" : "date-time"
+          },
+          "status" : {
+            "$ref" : "#/components/schemas/DebtPositionStatus"
+          },
+          "debtPositionOrigin" : {
+            "$ref" : "#/components/schemas/DebtPositionOrigin"
+          },
+          "debtPositionTypeOrgId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "organizationId" : {
+            "type" : "integer",
+            "format" : "int64"
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          }
+        }
+      },
+      "PagedModelDebtPositionView" : {
+        "title" : "PagedModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionViews" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionView"
+                }
+              }
+            }
+          },
+          "_links" : {
+            "$ref" : "#/components/schemas/Links"
+          },
+          "page" : {
+            "$ref" : "#/components/schemas/PageMetadata"
+          }
+        }
+      },
+      "CollectionModelDebtPositionTypeOrgOperatorsDptoCountView" : {
+        "title" : "CollectionModel",
+        "type" : "object",
+        "properties" : {
+          "_embedded" : {
+            "type" : "object",
+            "properties" : {
+              "debtPositionTypeOrgOperatorsDptoCountViews" : {
+                "type" : "array",
+                "items" : {
+                  "$ref" : "#/components/schemas/DebtPositionTypeOrgOperatorsDptoCountView"
                 }
               }
             }
@@ -13914,16 +14235,17 @@
           }
         }
       },
-      "DebtPositionTypeOrgCountByOrganizationId" : {
+      "DebtPositionTypeOrgOperatorsDptoCountView" : {
+        "title" : "EntityModel",
+        "required" : [ "debtPositionTypeOrgCount" ],
         "type" : "object",
         "properties" : {
-          "organizationId" : {
+          "operatorExternalUserId" : {
+            "type" : "string"
+          },
+          "debtPositionTypeOrgCount" : {
             "type" : "integer",
             "format" : "int64"
-          },
-          "activeOrganizations" : {
-            "type" : "integer",
-            "format" : "int32"
           },
           "_links" : {
             "$ref" : "#/components/schemas/Links"
