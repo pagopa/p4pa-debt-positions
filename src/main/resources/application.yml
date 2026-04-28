@@ -155,6 +155,7 @@ data-cipher:
   hash-pepper: "\${DATA_CIPHER_HASH_PEPPER:PEPPER}"
 
 springdoc:
+  api-docs.version: openapi_3_0
   writer-with-default-pretty-printer: true
 
 jwt:
