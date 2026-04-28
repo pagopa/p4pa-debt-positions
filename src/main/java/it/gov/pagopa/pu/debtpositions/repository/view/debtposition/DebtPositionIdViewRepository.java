@@ -3,8 +3,8 @@ package it.gov.pagopa.pu.debtpositions.repository.view.debtposition;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.model.view.debtposition.DebtPositionIdView;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.List;
 
 @RepositoryRestResource(path = "debt-position-id-view")
-public interface DebtPositionIdViewRepository extends JpaRepository<DebtPositionIdView, Long> {
+public interface DebtPositionIdViewRepository extends Repository<DebtPositionIdView, Long> {
   /**
    * Retrieves a paginated list of debt position identifiers (DebtPositionIdView).
    * The query excludes debt positions with dpto of type MIXED and origin SPONTANEOUS_MIXED, and applies
