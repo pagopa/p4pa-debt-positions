@@ -60,9 +60,9 @@ public interface DebtPositionIdViewRepository extends JpaRepository<DebtPosition
   List<DebtPositionIdView> getDebtPositionIdsByIbansAndDptoId(
     @Param("organizationId") Long organizationId,
     @Param(("iban")) String iban,
-    @RequestParam(value = "postalIban", required = false) String postalIban,
+    @RequestParam(required = false) String postalIban,
     @Param(value = "syncError") Boolean syncError,
-    @RequestParam(value = "dptoId", required = false) Long dptoId,
+    @RequestParam(required = false) Long dptoId,
     @Param(("installmentStatuses")) List<InstallmentStatus> installmentStatuses,
     Pageable pageable
   );

@@ -49,9 +49,9 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
   """
   )
   Page<DebtPositionView> findDebtPositionViews(
-    @Parameter(required = true) @Param("organizationId") Long organizationId,
-    @RequestParam(required = false) @Parameter(array = @ArraySchema(schema = @Schema(type = "string"))) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
-    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+    @Param("organizationId") Long organizationId,
+    @RequestParam(required = false) @Parameter @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
+    @Param("operatorExternalUserId") String operatorExternalUserId,
     @RequestParam(required = false) @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateFrom") LocalDateTime creationDateFrom,
     @RequestParam(required = false) @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateTo") LocalDateTime creationDateTo,
     String fiscalCode,
