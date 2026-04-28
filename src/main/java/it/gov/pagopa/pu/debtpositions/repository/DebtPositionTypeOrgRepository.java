@@ -37,7 +37,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
                                                      @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
                                                      @RequestParam(required = false) @Param("flagActive")  Boolean flagActive);
 
-  Page<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+  Page<DebtPositionTypeOrg> findByDebtPositionTypeId(@Parameter(required = true) @Param("debtPositionTypeId") Long debtPositionTypeId,
                                                      Pageable pageable);
 
   @Query("select dpto from InstallmentNoPII i " +
@@ -60,7 +60,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     AND dptoo.operatorExternalUserId = :operatorExternalUserId
     """)
   DebtPositionTypeOrg findDebtPositionTypeOrg(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("code") String code,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId
   );
@@ -106,7 +106,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       WHERE d.notifyOutcomePushOrgSilServiceId = :orgSilServiceId
       OR d.amountActualizationOrgSilServiceId = :orgSilServiceId
       """)
-  long countByOrgSilServiceId(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("orgSilServiceId") Long orgSilServiceId);
+  long countByOrgSilServiceId(@Parameter(required = true) @Param("orgSilServiceId") Long orgSilServiceId);
 
   @Query("""
     SELECT dpto
@@ -119,11 +119,11 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     AND (:debtPositionTypeId IS NULL OR dpto.debtPositionTypeId = :debtPositionTypeId)
     """)
   Page<DebtPositionTypeOrg> findPagedDebtPositionTypeOrg(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
     @RequestParam(required = false) @Param("code") String code,
     @RequestParam(required = false) @Param("description") String description,
-    @RequestParam(required = false) @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+    @RequestParam(required = false) @Param("debtPositionTypeId") Long debtPositionTypeId,
     Pageable pageable);
 
   @Query("""
@@ -134,7 +134,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     AND dpto.flagSpontaneous = TRUE
     """)
   List<DebtPositionTypeOrg> findActiveDebtPositionTypeOrg(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId
+    @Parameter(required = true) @Param("organizationId") Long organizationId
   );
 
   List<DebtPositionTypeOrg> findByDebtPositionTypeOrgIdIn(Set<Long> debtPositionTypeOrgIds);
@@ -154,11 +154,11 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     AND (:debtPositionTypeId IS NULL OR dpto.debtPositionTypeId = :debtPositionTypeId)
     """)
   Page<DebtPositionTypeOrg> findDebtPositionTypeOrgNotEnabledForOperator(
-      @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+      @Parameter(required = true) @Param("organizationId") Long organizationId,
       @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
       @RequestParam(required = false) @Param("code") String code,
       @RequestParam(required = false) @Param("description") String description,
-      @RequestParam(required = false) @Parameter(schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionTypeId") Long debtPositionTypeId,
+      @RequestParam(required = false) @Param("debtPositionTypeId") Long debtPositionTypeId,
       Pageable pageable);
 
   @Query("""
@@ -188,7 +188,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     """
   )
   Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationByOrganizationIdAndDate(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateFrom") LocalDateTime creationDateFrom,
     @Parameter(schema = @Schema(type = "LocalDateTime"), required = true) @Param("creationDateTo") LocalDateTime creationDateTo,
     Pageable pageable

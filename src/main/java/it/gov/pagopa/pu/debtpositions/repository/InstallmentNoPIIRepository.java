@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
@@ -81,7 +80,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "t.transferIndex = :transferIndex AND " +
     "dptoo.operatorExternalUserId = :operatorExternalUserId")
   Optional<InstallmentNoPII> findAuthorizedByTransferSemanticKey(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
     @Parameter(required = true) @Param("iuv") String iuv,
     @Parameter(required = true) @Param("iur") String iur,
     @Parameter(required = true) @Param("transferIndex") int transferIndex,
@@ -148,8 +147,8 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     " and dp.organizationId = :organizationId" +
     " and (:debtPositionOrigins is null or dp.debtPositionOrigin in (:debtPositionOrigins))")
   List<InstallmentNoPII> getByOrganizationIdAndReceiptId(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
+    @Parameter(required = true) @Param("organizationId") Long organizationId,
+    @Parameter(required = true) @Param("receiptId") Long receiptId,
     @RequestParam(required = false) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins);
 
   @RestResource(exported = false)
@@ -180,10 +179,10 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     AND dp.organizationId = :organizationId
     """)
   List<InstallmentNoPII> findDebtorUnpaidOrPaidByDebtPositionIdAndPaymentOptionId(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("paymentOptionId") Long paymentOptionId,
+    @Parameter(required = true) @Param("debtPositionId") Long debtPositionId,
+    @Parameter(required = true) @Param("paymentOptionId") Long paymentOptionId,
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId);
+    @Parameter(required = true) @Param("organizationId") Long organizationId);
 
   @RestResource(exported = false)
   @Transactional
