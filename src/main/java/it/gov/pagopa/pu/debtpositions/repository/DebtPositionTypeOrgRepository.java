@@ -106,7 +106,7 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
       WHERE d.notifyOutcomePushOrgSilServiceId = :orgSilServiceId
       OR d.amountActualizationOrgSilServiceId = :orgSilServiceId
       """)
-  long countByOrgSilServiceId(@Parameter(required = true) @Param("orgSilServiceId") Long orgSilServiceId);
+  long countByOrgSilServiceId(@Parameter(required = true) Long orgSilServiceId);
 
   @Query("""
     SELECT dpto
