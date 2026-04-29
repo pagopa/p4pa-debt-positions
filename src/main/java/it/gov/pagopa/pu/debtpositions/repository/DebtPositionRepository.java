@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
@@ -207,8 +206,8 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
      AND dptoo.operatorExternalUserId = :operatorExternalUserId
      AND d.organizationId = :organizationId
    """)
-  long validateOperator(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("debtPositionId") Long debtPositionId,
-                        @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+  long validateOperator(@Parameter(required = true) @Param("debtPositionId") Long debtPositionId,
+                        @Parameter(required = true) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId);
 
   Optional<DebtPosition> findDebtPositionByIupdOrgAndOrganizationId(String iupd, Long organizationId);
@@ -265,7 +264,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
   @EntityGraph(value = "completeDebtPosition")
   Page<DebtPosition> findPagedPrimaryDebtPositionByFilters(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
-    @Parameter(name = "organizationIds", required = true, array = @ArraySchema(schema = @Schema(type = "integer", format = "int64")))@Param("organizationIds") List<Long> organizationIds,
+    @Parameter(name = "organizationIds", required = true) @Param("organizationIds") List<Long> organizationIds,
     Pageable pageable
   );
 

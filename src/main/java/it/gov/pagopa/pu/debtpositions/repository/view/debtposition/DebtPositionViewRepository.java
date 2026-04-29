@@ -1,13 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.debtposition;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.model.view.debtposition.DebtPositionView;
-import java.time.LocalDateTime;
-import java.util.List;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -15,6 +12,9 @@ import org.springframework.data.repository.Repository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RepositoryRestResource(path = "debt-positions-view")
 public interface DebtPositionViewRepository extends Repository<DebtPositionView,Long> {
@@ -49,9 +49,9 @@ public interface DebtPositionViewRepository extends Repository<DebtPositionView,
   """
   )
   Page<DebtPositionView> findDebtPositionViews(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
-    @RequestParam(required = false) @Parameter(array = @ArraySchema(schema = @Schema(type = "string"))) @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
-    @Parameter(required = true) @Param("operatorExternalUserId") String operatorExternalUserId,
+    @Param("organizationId") Long organizationId,
+    @RequestParam(required = false) @Parameter @Param("debtPositionOrigins") List<DebtPositionOrigin> debtPositionOrigins,
+    @Param("operatorExternalUserId") String operatorExternalUserId,
     @RequestParam(required = false) @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateFrom") LocalDateTime creationDateFrom,
     @RequestParam(required = false) @Parameter(schema = @Schema(type = "LocalDateTime")) @Param("creationDateTo") LocalDateTime creationDateTo,
     String fiscalCode,

@@ -7,11 +7,11 @@ import org.gradle.api.tasks.testing.logging.TestLogEvent
 
 plugins {
   java
-  id("org.springframework.boot") version "4.0.5"
+  id("org.springframework.boot") version "4.0.6"
   id("io.spring.dependency-management") version "1.1.7"
   jacoco
   id("org.sonarqube") version "7.2.3.7755"
-  id("com.github.ben-manes.versions") version "0.53.0"
+  id("com.github.ben-manes.versions") version "0.54.0"
   id("org.openapi.generator") version "7.21.0"
   id("org.ajoberstar.grgit") version "5.3.2"
   id("com.gorylenko.gradle-git-properties") version "2.5.7"
@@ -51,29 +51,26 @@ repositories {
   mavenCentral()
 }
 
-val springDocOpenApiVersion = "3.0.2"
+val springDocOpenApiVersion = "3.0.3"
 val janinoVersion = "3.1.12"
 val openApiToolsVersion = "0.2.10"
 val springWolfAsyncApiVersion = "1.20.0"
 val springWolfUiAsyncApiVersion = "1.20.0"
-val micrometerVersion = "1.6.4"
+val micrometerVersion = "1.6.5"
 val postgresJdbcVersion = "42.7.10"
-val bouncycastleVersion = "1.83"
+val bouncycastleVersion = "1.84"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
 val caffeineVersion = "3.2.3"
-val httpClientVersion = "5.6"
+val httpClientVersion = "5.6.1"
 val httpCoreVersion = "5.4.2"
 val openHtmlToPdfVersion = "1.0.10"
 val commonsLang3Version = "3.20.0"
-val lz4JavaVersion = "1.10.4"
+val lz4JavaVersion = "1.11.0"
 val itextVersion = "9.6.0"
 
 // Downgrading in order to handle List of enums in SpringDataRest exposed queries
 val hibernateCoreVersion = "7.1.18.Final"
-
-// fix cve
-val jackson3CoreVersion = "3.1.1"
 
 val springCloudDepsVersion = "2025.1.1"
 
@@ -122,9 +119,6 @@ dependencies {
   implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:${openHtmlToPdfVersion}")
   implementation("com.itextpdf:kernel:${itextVersion}")
   implementation("com.itextpdf:barcodes:${itextVersion}")
-
-  // CVE fix
-  implementation("tools.jackson.core:jackson-core:$jackson3CoreVersion")
 
   compileOnly("org.projectlombok:lombok")
 
@@ -268,7 +262,7 @@ tasks.register<GenerateTask>("openApiGenerateORGANIZATION") {
   description = "openapi"
 
   generatorName.set("java")
-  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-organization/refs/heads/$targetEnv/openapi/generated.openapi.json")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-organization.generated.openapi.json")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.organization.generated")
   apiPackage.set("it.gov.pagopa.pu.organization.client.generated")
@@ -299,7 +293,7 @@ tasks.register<GenerateTask>("openApiGenerateP4PAAUTH") {
   description = "openapi"
 
   generatorName.set("java")
-  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-auth/refs/heads/$targetEnv/openapi/p4pa-auth.openapi.yaml")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-auth.openapi.yaml")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.auth.generated")
   apiPackage.set("it.gov.pagopa.pu.auth.controller.generated")
@@ -330,7 +324,7 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
   description = "openapi"
 
   generatorName.set("java")
-  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-workflow-hub/refs/heads/$targetEnv/openapi/generated.openapi.json")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-workflow-hub.generated.openapi.json")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.workflowhub.generated")
   apiPackage.set("it.gov.pagopa.pu.workflowhub.controller.generated")
@@ -371,7 +365,7 @@ tasks.register<GenerateTask>("openApiGenerateCLASSIFICATION") {
   description = "openapi"
 
   generatorName.set("java")
-  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-classification/refs/heads/$targetEnv/openapi/generated.openapi.json")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-classification.generated.openapi.json")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.classification.generated")
   apiPackage.set("it.gov.pagopa.pu.classification.controller.generated")

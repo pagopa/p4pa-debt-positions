@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -50,8 +49,8 @@ public interface ReceiptNoPIIRepository extends JpaRepository<ReceiptNoPII,Long>
     AND dp.organizationId = :organizationId
     AND (r.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)})
    """)
-  long validateReceiptDebtor(@Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("receiptId") Long receiptId,
-                        @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("organizationId") Long organizationId,
+  long validateReceiptDebtor(@Parameter(required = true) @Param("receiptId") Long receiptId,
+                        @Parameter(required = true) @Param("organizationId") Long organizationId,
                         @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode);
 
   List<ReceiptNoPII> findAllByReceiptIdIn(Set<Long> receiptIds);

@@ -1,7 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -15,7 +14,7 @@ import java.util.Set;
 public interface DebtPositionTypeRepository extends JpaRepository<DebtPositionType, Long> {
 
   List<DebtPositionType> findAllByBrokerIdAndOrgType(
-    @Parameter(required = true, schema = @Schema(type = "integer", format = "int64")) @Param("brokerId") Long brokerId,
+    @Parameter(required = true) @Param("brokerId") Long brokerId,
     @Parameter(required = true) @Param("orgType") String orgType);
 
 @Query("select dpt from DebtPositionType dpt " +
