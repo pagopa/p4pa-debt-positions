@@ -72,6 +72,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
         );
 
       if (retrievedInstallment.isEmpty()) {
+        log.info("Provided a Receipt for notice {} on organization {} not handled by PU on delegate broker {}", receiptDTO.getNoticeNumber(), receiptDTO.getOrgFiscalCode(), broker.getExternalId());
         return null;
       }
     }
