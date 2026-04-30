@@ -1,0 +1,64 @@
+package it.gov.pagopa.pu.debtpositions.mapper;
+
+import static it.gov.pagopa.pu.debtpositions.util.Utilities.localDatetimeToOffsetDateTime;
+
+import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
+import it.gov.pagopa.pu.debtpositions.model.Stamp;
+import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import org.springframework.stereotype.Service;
+
+@Service
+public class TransferMapper {
+
+  public Transfer mapToModel(TransferDTO dto) {
+    Transfer transfer = new Transfer();
+    transfer.setTransferId(dto.getTransferId());
+    transfer.setInstallmentId(dto.getInstallmentId());
+    transfer.setOrgFiscalCode(dto.getOrgFiscalCode());
+    transfer.setOrgName(dto.getOrgName());
+    transfer.setAmountCents(dto.getAmountCents());
+    transfer.setRemittanceInformation(dto.getRemittanceInformation());
+    transfer.setStamp(new Stamp(dto.getStampType(), dto.getStampHashDocument(), dto.getStampProvincialResidence()));
+    transfer.setIban(dto.getIban());
+    transfer.setPostalIban(dto.getPostalIban());
+    transfer.setCategory(dto.getCategory());
+    transfer.setTransferIndex(dto.getTransferIndex());
+    transfer.setMbdAttachment(dto.getMbdAttachment());
+    transfer.setFlagOwner(dto.getFlagOwner());
+    return transfer;
+  }
+
+  public TransferDTO mapToDto(Transfer transfer) {
+    TransferDTO transferDTO = TransferDTO.builder()
+      .installmentId(transfer.getInstallmentId())
+      .orgFiscalCode(transfer.getOrgFiscalCode())
+      .orgName(transfer.getOrgName())
+      .amountCents(transfer.getAmountCents())
+      .remittanceInformation(transfer.getRemittanceInformation())
+      .iban(transfer.getIban())
+      .postalIban(transfer.getPostalIban())
+      .category(transfer.getCategory())
+      .transferIndex(transfer.getTransferIndex())
+      .mbdAttachment(transfer.getMbdAttachment())
+      .flagOwner(transfer.getFlagOwner())
+      .build();
+
+    if (transfer.getStamp() != null) {
+      transferDTO.setStampType(transfer.getStamp().getStampType());
+      transferDTO.setStampHashDocument(transfer.getStamp().getStampHashDocument());
+      transferDTO.setStampProvincialResidence(transfer.getStamp().getStampProvincialResidence());
+    }
+
+    setToDtoAutoDbFields(transferDTO, transfer);
+    return transferDTO;
+  }
+
+  public static void setToDtoAutoDbFields(TransferDTO transferDTO, Transfer transfer){
+    transferDTO.setTransferId(transfer.getTransferId());
+    transferDTO.setCreationDate(localDatetimeToOffsetDateTime(transfer.getCreationDate()));
+    transferDTO.setUpdateDate(localDatetimeToOffsetDateTime(transfer.getUpdateDate()));
+    transferDTO.setUpdateOperatorExternalId(transfer.getUpdateOperatorExternalId());
+    transferDTO.setUpdateTraceId(transfer.getUpdateTraceId());
+  }
+
+}

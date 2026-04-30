@@ -1,0 +1,57 @@
+package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.ordinary;
+
+import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
+import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
+import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.utils.PaymentFlowOrchestratorService;
+import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
+import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+
+@Service
+@Slf4j
+public class OrdinaryDPPaymentHandlerService {
+
+  private final DebtPositionMapper mapper;
+  private final DebtPositionSyncService syncService;
+  private final UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp;
+  private final PaymentFlowOrchestratorService paymentFlowOrchestratorService;
+
+  public OrdinaryDPPaymentHandlerService(DebtPositionMapper mapper,
+                                         DebtPositionSyncService syncService,
+                                         UpdateAndSynchronizeOrdinaryDp updateAndSynchronizeOrdinaryDp, PaymentFlowOrchestratorService paymentFlowOrchestratorService) {
+    this.mapper = mapper;
+    this.syncService = syncService;
+    this.updateAndSynchronizeOrdinaryDp = updateAndSynchronizeOrdinaryDp;
+    this.paymentFlowOrchestratorService = paymentFlowOrchestratorService;
+  }
+
+  public void handlePayment(DebtPosition dp, InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
+    Runnable syncWorkflowAction = () -> invokeWorkflow(dp, receiptDTO, accessToken);
+
+    if (!InstallmentUtils.PAID_STATUSES.contains(installment.getStatus())) {
+      paymentFlowOrchestratorService.performStandardUpdate(dp, installment, receiptDTO, accessToken);
+      syncWorkflowAction.run();
+    } else {
+      updateAndSynchronizeOrdinaryDp.handleOrdinaryDpAlreadyPaid(
+        installment,
+        receiptDTO,
+        dp,
+        syncWorkflowAction,
+        accessToken
+      );
+    }
+  }
+
+  private void invokeWorkflow(DebtPosition dp, ReceiptDTO receiptDTO, String accessToken) {
+    DebtPositionDTO dpDTO = mapper.mapToDto(dp);
+    log.info("Synchronizing DebtPosition {}", dpDTO.getDebtPositionId());
+    syncService.syncDebtPosition(dpDTO, new WfExecutionParameters(), PaymentEventType.RT_RECEIVED, "receiptId:" + receiptDTO.getReceiptId(), accessToken);
+  }
+}

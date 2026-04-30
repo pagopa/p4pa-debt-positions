@@ -1,0 +1,277 @@
+@font-face {
+    font-family: 'TitilliumWeb';
+    src: url(../fonts/Titillium_Web/TitilliumWeb-Regular.ttf);
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'TitilliumWeb';
+    src: url(../fonts/Titillium_Web/TitilliumWeb-Bold.ttf);
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'DMMono';
+    src: url(../fonts/DM_Mono/DMMono-Medium.ttf);
+    font-weight: bold;
+    font-style: normal;
+}
+
+@page {
+    margin: 0mm;
+    size: A4;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'TitilliumWeb', sans-serif;
+    font-size: 11px;
+    line-height: 1.4;
+    color: #000;
+    background: white;
+    padding: 40px;
+    padding-bottom: 80px;
+    max-width: 210mm;
+    margin: 0 auto;
+    position: relative;
+    height: 297mm;
+    box-sizing: border-box;
+}
+
+.header {
+    width: 100%;
+    margin-bottom: 50px;
+    min-height: 40px;
+    display: table;
+    table-layout: fixed;
+}
+
+.ec-logo,
+.pagopa-logo {
+    display: table-cell;
+    width: 40px;
+    vertical-align: middle;
+}
+
+.ec-logo {
+    text-align: left;
+}
+
+.pagopa-logo {
+    text-align: right;
+}
+
+.logo-image {
+    max-width: 40px;
+    max-height: 40px;
+    height: auto;
+    width: auto;
+}
+
+.header-text {
+    display: table-cell;
+    text-align: left;
+    vertical-align: middle;
+    padding: 0 20px;
+}
+
+.header-text h1 {
+    font-size: 12px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.document-type {
+    font-size: 13px;
+    line-height: 100%;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.divider {
+    width: 100%;
+    height: 1px;
+    background-color: #E3E7EB;
+    margin: 20px 0;
+    clear: both;
+}
+
+/* Transaction Section */
+.transaction-section {
+    width: 100%;
+    margin-bottom: 40px;
+}
+
+.transaction-grid {
+    display: table;
+    width: 100%;
+}
+
+.transaction-left,
+.transaction-right {
+    display: table-cell;
+    vertical-align: top;
+}
+
+.transaction-left {
+    width: 70%;
+    padding-right: 40px;
+}
+
+.transaction-right {
+    width: 30%;
+}
+
+.info-item {
+    margin-bottom: 15px;
+}
+
+.info-label {
+    font-size: 12px;
+    line-height: 13.87px;
+    font-weight: 400;
+    color: #000;
+    margin-bottom: 3px;
+}
+
+.info-value {
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 11.89px;
+    color: #000;
+}
+
+.amount-large {
+    font-size: 17px;
+    font-weight: 700;
+    color: #000;
+}
+
+.background-color {
+    background: #F9FAFB;
+    padding: 19.81px;
+    margin: 0;
+    border-radius: 8.35px;
+}
+
+/* Remittance Section */
+.remittance-section {
+    margin: 0 0;
+}
+
+.remittance-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #000;
+    line-height: 1.5;
+    margin: 0;
+    margin-bottom: 25px;
+}
+
+/* Details Row (3 columns) */
+.details-row {
+    display: table;
+    width: 100%;
+}
+
+.details-cell {
+    display: table-cell;
+    vertical-align: top;
+    padding-right: 15px;
+}
+
+.details-cell:last-child {
+    padding-right: 0;
+}
+
+.details-cell-debtor {
+    width: 25%;
+}
+
+.details-cell-org {
+    width: 38%;
+}
+
+.details-cell-nav {
+    width: 37%;
+    text-align: right;
+}
+
+/* Barcode spacer for debtor column (matches barcode height) */
+.barcode-spacer {
+    height: 14mm;
+    margin-bottom: 12px;
+}
+
+/* Barcode Section */
+.barcode-container {
+    margin-bottom: 12px;
+    overflow: hidden;
+}
+
+.barcode-image {
+    height: 14mm;
+    width: auto;
+    display: block;
+}
+
+.details-cell-nav .barcode-container {
+    text-align: right;
+}
+
+.details-cell-nav .barcode-image {
+    display: inline-block;
+}
+
+.fiscal-code,
+.org-fiscal-code,
+.payment-code {
+    font-family: 'DMMono', monospace;
+    font-size: 14px;
+    line-height: 11.89px;
+    font-weight: 500;
+    color: #000;
+    vertical-align: middle;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+/* Footer IDs Section */
+.footer-ids {
+    margin-top: 30px;
+}
+
+.footer-ids .info-item {
+    margin-bottom: 15px;
+}
+
+.id-value {
+    font-family: 'DMMono', monospace;
+    font-size: 12px;
+    font-weight: 500;
+    color: #000;
+}
+
+/* Footer info section */
+.footer {
+    position: absolute;
+    bottom: 40px;
+    left: 40px;
+    right: 40px;
+}
+
+.footer-text {
+    font-size: 10px;
+    font-weight: 400;
+    line-height: 10px;
+    vertical-align: bottom;
+}

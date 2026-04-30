@@ -1,0 +1,77 @@
+package it.gov.pagopa.pu.debtpositions.model;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import it.gov.pagopa.pu.debtpositions.dto.generated.PersonEntityType;
+import it.gov.pagopa.pu.debtpositions.model.validator.BalanceConstraint;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+
+import java.io.Serializable;
+import java.util.Map;
+
+@Entity
+@Table(name = "debt_position_type_org")
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@SuperBuilder(toBuilder = true)
+@EqualsAndHashCode(callSuper = false)
+public class DebtPositionTypeOrg extends BaseEntity implements Serializable {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "debt_position_type_org_generator")
+  @SequenceGenerator(name = "debt_position_type_org_generator", sequenceName = "debt_position_type_org_seq", allocationSize = 1)
+  private Long debtPositionTypeOrgId;
+  @NotNull
+  private Long debtPositionTypeId;
+  @NotNull
+  private Long organizationId;
+  @BalanceConstraint
+  private String balance;
+  @NotNull
+  private String code;
+  @NotNull
+  private String description;
+  private String iban;
+  private String postalIban;
+  private String postalAccountCode;
+  private String holderPostalCc;
+  private String orgSector;
+  private Long amountCents;
+  private String externalPaymentUrl;
+  private boolean flagAnonymousFiscalCode;
+  private boolean flagMandatoryDueDate;
+  private boolean flagSpontaneous;
+  private boolean flagNotifyIo;
+  private String serviceId;
+  private String ioTemplateSubject;
+  private String ioTemplateMessage;
+  private boolean flagActive;
+  private boolean flagNotifyOutcomePush;
+  private Long notifyOutcomePushOrgSilServiceId;
+  private boolean flagAmountActualization;
+  private Long amountActualizationOrgSilServiceId;
+  private boolean flagExternal;
+  private Long spontaneousFormId;
+  @Enumerated(EnumType.STRING)
+  private PersonEntityType allowedEntityType;
+  @Schema(
+    description = """
+            This map contains the localized description of the DebtPositionTypeOrg.
+
+            Example:
+            {
+              "EN": "DebtPositionTypeOrg description"
+            }
+            """
+  )
+  @JdbcTypeCode(SqlTypes.JSON)
+  private Map<String,String> descriptionI18n;
+}

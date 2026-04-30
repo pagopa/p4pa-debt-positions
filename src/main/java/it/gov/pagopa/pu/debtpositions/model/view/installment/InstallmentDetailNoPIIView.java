@@ -1,0 +1,65 @@
+package it.gov.pagopa.pu.debtpositions.model.view.installment;
+
+import it.gov.pagopa.pu.common.pii.dto.No2PIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
+import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
+import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
+import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
+@Entity
+@Table(name = "installment")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = false)
+public class InstallmentDetailNoPIIView implements No2PIIDTO<InstallmentPIIDTO, ReceiptPIIDTO> {
+
+  @Id
+  private Long installmentId;
+  private Long receiptId;
+  @NotNull
+  private Long paymentOptionId;
+  @NotNull
+  @Enumerated(EnumType.STRING)
+  private InstallmentStatus status;
+  private String iuv;
+  private String nav;
+  @NotNull
+  private Long amountCents;
+  private LocalDate dueDate;
+  @NotNull
+  private Long personalDataId;
+  @NotNull
+  private String debtPositionTypeOrgDescription;
+  private String debtPositionDescription;
+  @NotNull
+  private Long debtPositionId;
+  @Enumerated(EnumType.STRING)
+  @NotNull
+  private DebtPositionOrigin debtPositionOrigin;
+  private OffsetDateTime paymentDateTime;
+  @NotNull
+  private Long receiptPersonalDataId;
+  @NotNull
+  private String pspCompanyName;
+  @NotNull
+  private String iud;
+  private String iur;
+  private String iun;
+  private OffsetDateTime notificationDate;
+  private Long notificationFeeCents;
+
+  @Override
+  public Long getPersonalDataId2() {
+    return receiptPersonalDataId;
+  }
+}

@@ -1,18 +1,241 @@
+server:
+  http: "\${SERVER_PORT:8080}"
+
 spring:
-    application:
-      name: ${artifactId}
-      version: ${version}
-    jmx.enabled: true
+  application:
+    name: ${artifactId}
+    version: ${version}
+  jmx.enabled: true
+  threads:
+    virtual:
+      enabled: "\${VIRTUAL_THREADS_ENABLED:true}"
+  jpa:
+    show-sql: "\${SHOW_SQL:false}"
+    hibernate:
+      ddl-auto: none
+  datasource:
+    debt-position:
+      jdbc-url: "\${DEBT_POSITIONS_DB_URL:jdbc:postgresql://\${DEBT_POSITIONS_DB_HOST:localhost}:\${DEBT_POSITIONS_DB_PORT:5432}/\${DEBT_POSITIONS_DB_NAME:payhub}?currentSchema=debt_positions}"
+      username: "\${DEBT_POSITIONS_DB_USER}"
+      password: "\${DEBT_POSITIONS_DB_PASSWORD}"
+      driverClassName: org.postgresql.Driver
+      idle-timeout: "\${DEBT_POSITIONS_DB_CONNECTION_IDLE_TIMEOUT_MILLISECONDS:600000}"
+      connection-timeout: "\${DEBT_POSITIONS_DB_CONNECTION_TIMEOUT_MILLISECONDS:30000}"
+      keepalive-time: "\${DEBT_POSITIONS_DB_CONNECTION_KEEPALIVE_TIME_MILLISECONDS:120000}"
+      max-lifetime: "\${DEBT_POSITIONS_DB_CONNECTION_MAX_LIFETIME_MILLISECONDS:1800000}"
+      maximum-pool-size: "\${DEBT_POSITIONS_DB_CONNECTION_MAX_POOL_SIZE:20}"
+      minimum-idle: "\${DEBT_POSITIONS_DB_CONNECTION_MIN_IDLE:20}"
+    citizen:
+      jdbc-url: "\${CITIZENDB_URL:jdbc:postgresql://\${CITIZENDB_HOST:localhost}:\${CITIZENDB_PORT:5432}/citizen}"
+      username: "\${CITIZENDB_USER}"
+      password: "\${CITIZENDB_PASSWORD}"
+      driverClassName: org.postgresql.Driver
+      idle-timeout: "\${CITIZENDB_CONNECTION_IDLE_TIMEOUT_MILLISECONDS:600000}"
+      connection-timeout: "\${CITIZENDB_CONNECTION_TIMEOUT_MILLISECONDS:30000}"
+      keepalive-time: "\${CITIZENDB_CONNECTION_KEEPALIVE_TIME_MILLISECONDS:120000}"
+      max-lifetime: "\${CITIZENDB_CONNECTION_MAX_LIFETIME_MILLISECONDS:1800000}"
+      maximum-pool-size: "\${CITIZENDB_CONNECTION_MAX_POOL_SIZE:20}"
+      minimum-idle: "\${CITIZENDB_CONNECTION_MIN_IDLE:20}"
+  data:
+    rest:
+      basePath: crud
+  cloud:
+    function:
+      definition: paymentsProducer
+    stream:
+      binders:
+        kafka-payments-producer:
+          type: kafka
+          environment:
+            spring.cloud.stream.kafka.binder:
+              brokers: "\${KAFKA_BINDER_BROKER:}"
+              configuration:
+                sasl.jaas.config: "\${KAFKA_PAYMENTS_PRODUCER_SASL_JAAS_CONFIG:}"
+                key.serializer: org.apache.kafka.common.serialization.StringSerializer
+      bindings:
+        paymentsProducer-out-0:
+          binder: kafka-payments-producer
+          content-type: "\${KAFKA_CONTENT_TYPE:application/json}"
+          destination: "\${KAFKA_TOPIC_PAYMENTS:p4pa-payhub-payments-evh}"
+      kafka:
+        binder:
+          auto-create-topics: false
+          configuration:
+            heartbeat.interval.ms: "\${KAFKA_CONFIG_HEARTBEAT_INTERVAL_MS:3000}"
+            session.timeout.ms: "\${KAFKA_CONFIG_SESSION_TIMEOUT_MS:30000}"
+            request.timeout.ms: "\${KAFKA_CONFIG_REQUEST_TIMEOUT_MS:60000}"
+            metadata.max.age.ms: "\${KAFKA_CONFIG_METADATA_MAX_AGE:180000}"
+            sasl.mechanism: "\${KAFKA_CONFIG_SASL_MECHANISM:PLAIN}"
+            security.protocol: "\${KAFKA_CONFIG_SECURITY_PROTOCOL:SASL_SSL}"
+            max.request.size: "\${KAFKA_CONFIG_MAX_REQUEST_SIZE:1000000}"
+        binders:
+          paymentsProducer-out-0:
+            producer:
+              configuration:
+                client.id: debt-positions
+                connections.max.idle.ms: "\${KAFKA_PAYMENTS_PRODUCER_CONNECTION_MAX_IDLE_TIME:180000}"
+                retry.backoff.ms: "\${KAFKA_PAYMENTS_PRODUCER_RETRY_MS:\${KAFKA_RETRY_MS:10000}}"
+                linger.ms: "\${KAFKA_PAYMENTS_PRODUCER_LINGER_MS:\${KAFKA_LINGER_MS:2}}"
+                batch.size: "\${KAFKA_PAYMENTS_PRODUCER_BATCH_SIZE:\${KAFKA_BATCH_SIZE:16384}}"
+
 management:
-    endpoint:
-      health:
-        probes.enabled: true
-        group:
-          readiness.include: "*"
-          liveness.include: livenessState,diskSpace,ping
-    endpoints:
-      jmx:
-        exposure.include: "*"
-      web:
-        exposure.include: info, health
-app:
+  info:
+    build.enabled: true
+    java.enabled: true
+    git.enabled: true
+  otlp.metrics.export.enabled: "\${TRACING_EXPORT:false}"
+  tracing:
+    sampling.probability: "\${TRACING_SAMPLING_PROBABILITY:1.0}"
+    baggage.remote-fields:
+      - X-user-id
+  observations:
+    http.server:
+        filter.order: -100
+  endpoints:
+    jmx:
+      exposure.include: "*"
+    web:
+      exposure:
+        include: health, info, prometheus, metrics, caches
+      base-path: /actuator
+  endpoint:
+    health:
+      probes.enabled: true
+      logging.slow-indicator-threshold: "\${HEALTH_ACTUATOR_LOGGER_TIMEOUT_DURATION:PT1S}"
+      show-details: "\${HEALTH_ACTUATOR_SHOW_DETAILS:when-authorized}"
+      group:
+        readiness.include: "*"
+        liveness.include: livenessState,diskSpace,ping,binders
+    prometheus:
+      enabled: true
+  metrics:
+    tags:
+      application: ${artifactId}
+    export:
+      prometheus:
+        enabled: true
+        step: 1m
+        descriptions: true
+    enable:
+      jvm: true
+      process: true
+      system: true
+      http: true
+      logback: true
+
+springwolf:
+  docket:
+    base-package: it.gov.pagopa.pu.debtpositions.event
+    info:
+      title: "\${spring.application.name}"
+      version: "\${spring.application.version}"
+      description: AsyncAPI And Models
+    servers.kafka-server:
+      protocol: kafka
+      host: "\${KAFKA_BINDER_BROKER:localhost:9093}"
+  use-fqn: false
+
+logging:
+  level:
+    root: "\${LOG_LEVEL_ROOT:INFO}"
+    it.gov.pagopa: "\${LOG_LEVEL_PAGOPA:INFO}"
+    org.springframework: "\${LOG_LEVEL_SPRING:INFO}"
+    org.springframework.boot.availability: "\${LOG_LEVEL_SPRING_BOOT_AVAILABILITY:DEBUG}"
+    org.springframework.kafka: "\${LOG_LEVEL_SPRING_KAFKA:INFO}"
+    org.apache.kafka.clients.consumer.internals.ConsumerCoordinator: "\${LOG_LEVEL_KAFKA_CONSUMER_COORDINATOR:WARN}"
+    org.apache.kafka.clients.admin.internals.AdminMetadataManager: "\${LOG_LEVEL_KAFKA_ADMIN_METADATA_MANAGER:WARN}"
+    it.gov.pagopa.pu.debtpositions.exception.DebtPositionExceptionHandler: "\${LOGGING_LEVEL_API_REQUEST_EXCEPTION:INFO}"
+    org.springdoc.core.utils.SpringDocAnnotationsUtils: "\${LOG_LEVEL_SPRING_DOC:ERROR}"
+    PERFORMANCE_LOG: "\${LOG_LEVEL_PERFORMANCE_LOG:INFO}"
+    PERFORMANCE_LOG.API_REQUEST: "\${LOG_LEVEL_PERFORMANCE_LOG_API_REQUEST:\${logging.level.PERFORMANCE_LOG}}"
+    PERFORMANCE_LOG.REST_INVOKE: "\${LOG_LEVEL_PERFORMANCE_LOG_REST_INVOKE:\${logging.level.PERFORMANCE_LOG}}"
+
+data-cipher:
+  encrypt-psw: "\${DATA_CIPHER_ENCRYPT_PASSWORD:PWD}"
+  hash-pepper: "\${DATA_CIPHER_HASH_PEPPER:PEPPER}"
+
+springdoc:
+  api-docs.version: openapi_3_0
+  writer-with-default-pretty-printer: true
+
+jwt:
+  access-token:
+    public-key: "\${JWT_TOKEN_PUBLIC_KEY:-----BEGIN PUBLIC KEY-----
+                MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA2ovm/rd3g69dq9PisinQ
+                6mWy8ZttT8D+GKXCsHZycsGnN7b74TPyYy+4+h+9cgJeizp8RDRrufHjiBrqi/2r
+                eOk/rD7ZHbpfQvHK8MYfgIVdtTxYMX/GGdOrX6/5TV2b8e2aCG6GmxF0UuEvxY9o
+                TmcZUxnIeDtl/ixz4DQ754eS363qWfEA92opW+jcYzr07sbQtR86e+Z/s/CUeX6W
+                1PHNvBqdlAgp2ecr/1DOLq1D9hEANBPSwbt+FM6FNe4vLphi7GTwiB0yaAuy+jE8
+                odND6HPvvvmgbK1/2qTHn/HJjWUm11LUC73BszR32BKbdEEhxPQnnwswVekWzPi1
+                IwIDAQAB
+                -----END PUBLIC KEY-----}"
+
+rest:
+  defaults:
+    connection-pool:
+      size: "\${DEFAULT_REST_CONNECTION_POOL_SIZE:10}"
+      size-per-route: "\${DEFAULT_REST_CONNECTION_POOL_SIZE_PER_ROUTE:5}"
+      time-to-live-minutes: "\${DEFAULT_REST_CONNECTION_POOL_TIME_TO_LIVE_MINUTES:10}"
+    timeout:
+      connect-millis: "\${DEFAULT_REST_TIMEOUT_CONNECT_MILLIS:120000}"
+      read-millis: "\${DEFAULT_REST_TIMEOUT_READ_MILLIS:120000}"
+  organization:
+    base-url: "\${ORGANIZATION_BASE_URL:http://localhost:8081}"
+    max-attempts: "\${ORGANIZATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${ORGANIZATION_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${ORGANIZATION_PRINT_BODY_WHEN_ERROR:true}"
+  workflow-hub:
+    base-url: "\${WORKFLOW_HUB_BASE_URL:http://localhost:8082}"
+    max-attempts: "\${WORKFLOW_HUB_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${WORKFLOW_HUB_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${WORKFLOW_HUB_PRINT_BODY_WHEN_ERROR:true}"
+  classification:
+    base-url: "\${CLASSIFICATION_BASE_URL:http://localhost:8083}"
+    max-attempts: "\${CLASSIFICATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${CLASSIFICATION_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${CLASSIFICATION_PRINT_BODY_WHEN_ERROR:true}"
+
+iuv:
+  information-system-id: "\${IUV_INFORMATION_SYSTEM_ID:00}"
+nav:
+  aux-digit: "\${NAV_AUX_DIGIT:3}"
+
+category:
+  prefix: "9/"
+  suffix: "/"
+
+data-export:
+  default:
+    max-total-elements: "\${DATA_EXPORT_MAX_TOTAL_ELEMENTS: 100000}"
+    max-months-interval: "${DATA_EXPORT_MAX_MONTHS_INTERVAL: 6}"
+  installment-paid-view:
+    max-months-interval: "\${INSTALLMENT_PAID_VIEW_MAX_MONTHS_INTERVAL:\${data-export.default.max-months-interval}}"
+    max-total-elements: "\${INSTALLMENT_PAID_VIEW_MAX_TOTAL_ELEMENTS:\${data-export.default.max-total-elements}}"
+  receipt-archiving-view:
+    max-months-interval: "\${RECEIPT_ARCHIVING_VIEW_MAX_MONTHS_INTERVAL: \${data-export.default.max-months-interval}}"
+    max-total-elements: "\${RECEIPT_ARCHIVING_VIEW_MAX_TOTAL_ELEMENTS:\${data-export.default.max-total-elements}}"
+
+cache:
+  pii:
+    size: "\${CACHE_PII_SIZE:1000}"
+    expire-in: "\${CACHE_PII_MINUTES:60}"
+  broker:
+    size: "\${CACHE_BROKER_SIZE:100}"
+    expire-in: "\${CACHE_BROKER_MINUTES:10}"
+  organization:
+    size: "\${CACHE_ORGANIZATION_SIZE:100}"
+    expire-in: "\${CACHE_ORGANIZATION_MINUTES:60}"
+  taxonomy:
+    size: "\${CACHE_TAXONOMY_SIZE:100}"
+    expire-in: "\${CACHE_TAXONOMY_MINUTES:60}"
+
+features:
+  organization:
+    piva-check: "\${FEATURE_ORGANIZATION_PIVA_CHECK:true}"
+
+wf-await:
+  max-waiting-minutes: "\${WORKFLOW_AWAIT_MAX_WAITING_MINUTES:5}"
+  retry-delays-ms: "\${WORKFLOW_AWAIT_RETRY_DELAYS_MS:1000}"
+
+massive-update:
+  expired-threshold-years: "\${EXPIRED_THRESHOLD_YEARS_FOR_MASSIVE_IBAN_UPDATE:1}"

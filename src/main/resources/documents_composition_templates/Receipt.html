@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <title>Ricevuta Telematica PagoPA</title>
+  <link rel="stylesheet" href="styles/index.css" />
+</head>
+<body>
+
+<div class="header">
+  <div class="ec-logo">
+    <img src="${logo}" alt="Logo Ente Creditore" class="logo-image" />
+  </div>
+  <div class="header-text">
+    <h1>${headerOrgName}</h1>
+  </div>
+  <div class="pagopa-logo">
+    <img src="static/images/pagoPA.png" alt="Logo PagoPA" class="logo-image" />
+  </div>
+</div>
+
+<div class="document-type">
+  <h1>RICEVUTA TELEMATICA</h1>
+</div>
+
+<div class="transaction-section">
+  <div class="transaction-grid">
+    <div class="transaction-left">
+      <div class="info-item">
+        <div class="info-label">Importo</div>
+        <div class="info-value amount-large">${amount}</div>
+      </div>
+    </div>
+
+    <div class="transaction-right">
+      <div class="info-item">
+        <div class="info-label">Data e ora del pagamento</div>
+        <div class="info-value">${paymentDate}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-label">Gestore della transazione (PSP)</div>
+        <div class="info-value">${pspName}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="background-color">
+  <div class="remittance-section">
+    <h2 class="remittance-title">${remittanceInformation}</h2>
+  </div>
+
+  <div class="details-row">
+    <div class="details-cell details-cell-debtor">
+      <div class="barcode-spacer"></div>
+      <div class="info-label">Debitore</div>
+      <div class="info-value">
+        ${debtorName}<br/>
+        <span class="fiscal-code">${debtorFiscalCode}</span>
+      </div>
+    </div>
+    <div class="details-cell details-cell-org">
+      <div class="barcode-container">
+        <img src="${orgFiscalCodeBarcode}" alt="Barcode Ente Creditore" class="barcode-image" />
+      </div>
+      <div class="info-label">Ente Creditore</div>
+      <div class="info-value">
+        ${orgName}<br/>
+        <span class="org-fiscal-code">${orgFiscalCode}</span>
+      </div>
+    </div>
+    <div class="details-cell details-cell-nav">
+      <div class="barcode-container">
+        <img src="${navBarcode}" alt="Barcode Codice Avviso" class="barcode-image" />
+      </div>
+      <div class="info-label">Codice Avviso</div>
+      <div class="info-value">
+        <span class="payment-code">${nav}</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="footer-ids">
+  <div class="info-item">
+    <div class="info-label">Identificativo univoco ricevuta (IUR)</div>
+    <div class="info-value id-value">${iur}</div>
+  </div>
+
+  <div class="info-item">
+    <div class="info-label">Identificativo univoco dovuto (IUD)</div>
+    <div class="info-value id-value">${iud}</div>
+  </div>
+</div>
+
+<div class="footer">
+  <div class="footer-text">${receiptFooter}</div>
+</div>
+
+</body>
+</html>
