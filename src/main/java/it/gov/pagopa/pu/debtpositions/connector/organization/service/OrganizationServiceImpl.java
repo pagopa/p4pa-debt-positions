@@ -47,7 +47,7 @@ public class OrganizationServiceImpl implements OrganizationService {
   @Cacheable(key = "'organizationId-' + #organizationId + '_stationId-' + #stationId", unless = "#result == null")
   public Optional<OrganizationStation> getOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
     return Optional.ofNullable(
-      organizationSearchClient.getOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken)
+      organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken)
     );
   }
 

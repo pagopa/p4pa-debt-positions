@@ -47,7 +47,7 @@ public class OrganizationSearchClient {
     }
   }
 
-  public OrganizationStation getOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
+  public OrganizationStation findOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
     try{
       return organizationApisHolder.getOrganizationStationSearchControllerApi(accessToken)
         .crudOrganizationStationsFindByOrganizationIdAndStationId(organizationId, stationId);
