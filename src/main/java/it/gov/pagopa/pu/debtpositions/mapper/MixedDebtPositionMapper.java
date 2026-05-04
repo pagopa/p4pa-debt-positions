@@ -1,22 +1,23 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +28,7 @@ public class MixedDebtPositionMapper {
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final OrganizationService organizationService;
 
   public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
     if (request == null) {
@@ -91,7 +93,35 @@ public class MixedDebtPositionMapper {
       .multiDebtor(false)
       .debtPositionTypeOrgId(debtPositionTypeOrgId)
       .paymentOptions(List.of(paymentOption))
+      .stationId(this.fetchStationId(request, organization.getOrganizationId()))
       .build();
+  }
+
+  private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId) {
+    String accessToken = SecurityUtils.getAccessToken();
+    if(mixedDebtPositionDTO.getStationId() != null) {
+      this.verifyStationId(mixedDebtPositionDTO, accessToken);
+      return mixedDebtPositionDTO.getStationId();
+    } else {
+      OrganizationStation defaultOrganizationStation = this.getDefaultOrganizationStation(organizationId, accessToken);
+      return defaultOrganizationStation.getStationId();
+    }
+  }
+
+  private void verifyStationId(MixedDebtPositionDTO dto, String accessToken) {
+    organizationService.getOrganizationStationByOrganizationIdAndStationId(dto.getOrganizationId(), dto.getStationId(), accessToken)
+      .orElseThrow(() -> new InvalidParamException(
+        ErrorCodeConstants.ERROR_CODE_INVALID_STATION_ID,
+        "Invalid station id %s for Organization %d".formatted(dto.getStationId(), dto.getOrganizationId())
+      ));
+  }
+
+  private OrganizationStation getDefaultOrganizationStation(Long organizationId, String accessToken) {
+    return organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, null, accessToken)
+      .orElseThrow(() -> new NotFoundException(
+        ErrorCodeConstants.ERROR_CODE_DEFAULT_ORGANIZATION_STATION_NOT_FOUND,
+        "Unable to find a default organization station for Organization %d".formatted(organizationId)
+      ));
   }
 
   public Map<Long, List<MixedDpAdditionalData>> buildDebtPositionTypeOrgId2TransfersData(

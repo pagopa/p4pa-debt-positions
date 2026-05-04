@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
@@ -7,10 +8,13 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker;
 import it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,18 +42,38 @@ class MixedDebtPositionMapperTest {
 
   private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
 
+  private final String accessToken = "accessToken";
+
   @Mock
   private MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverServiceMock;
   @Mock
   private CategoryResolverService categoryResolverServiceMock;
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
+  @Mock
+  private OrganizationService organizationServiceMock;
 
   private MixedDebtPositionMapper mapper;
 
   @BeforeEach
   void init() {
-    mapper = new MixedDebtPositionMapper(mixedDebtPositionTypeOrgRetrieverServiceMock, categoryResolverServiceMock, debtPositionTypeOrgRepositoryMock);
+    mapper = new MixedDebtPositionMapper(
+      mixedDebtPositionTypeOrgRetrieverServiceMock,
+      categoryResolverServiceMock,
+      debtPositionTypeOrgRepositoryMock,
+      organizationServiceMock
+    );
+    SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      mixedDebtPositionTypeOrgRetrieverServiceMock,
+      categoryResolverServiceMock,
+      debtPositionTypeOrgRepositoryMock,
+      organizationServiceMock
+    );
   }
 
   @Test
@@ -102,6 +126,7 @@ class MixedDebtPositionMapperTest {
       .multiDebtor(false)
       .debtPositionTypeOrgId(dpTypeOrg.getDebtPositionTypeOrgId())
       .paymentOptions(List.of(expectedPaymentOption))
+      .stationId("stationId")
       .build();
 
     try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
@@ -120,6 +145,10 @@ class MixedDebtPositionMapperTest {
 
       when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
         .thenReturn("9/01234567/");
+
+      when(organizationServiceMock.getOrganizationStationByOrganizationIdAndStationId(
+        mixedDebtPositionDTO.getOrganizationId(), mixedDebtPositionDTO.getStationId(), accessToken
+      )).thenReturn(Optional.of(OrganizationStation.builder().organizationId(1L).stationId("stationId").build()));
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
           mixedDebtPositionDTO);
