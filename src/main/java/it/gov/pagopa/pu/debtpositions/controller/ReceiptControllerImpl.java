@@ -32,6 +32,9 @@ public class ReceiptControllerImpl implements ReceiptApi {
   public ResponseEntity<ReceiptDTO> createReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO) {
     String accessToken = SecurityUtils.getAccessToken();
     ReceiptDTO body = createReceiptService.createReceipt(receiptDTO, accessToken);
+    if (body == null){
+      return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
     return new ResponseEntity<>(body, HttpStatus.OK);
   }
 

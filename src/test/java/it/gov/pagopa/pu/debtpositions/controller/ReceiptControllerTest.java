@@ -85,6 +85,25 @@ class ReceiptControllerTest {
   }
 
   @Test
+  void whenCreateReceiptThenNoContent() throws Exception {
+    //given
+    ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+
+    Mockito.when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())), Mockito.any())).thenReturn(null);
+
+    mockMvc.perform(
+        MockMvcRequestBuilders.post("/receipts")
+          .content(jsonMapper.writeValueAsString(receiptDTO))
+          .contentType(MediaType.APPLICATION_JSON_VALUE))
+      .andExpect(status().isNoContent())
+      .andReturn();
+
+    Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
+      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
+      Mockito.any());
+  }
+
+  @Test
   void whenGetReceiptThenOk() throws Exception {
     //given
     Long receiptId = 1L;
