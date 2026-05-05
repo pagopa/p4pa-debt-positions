@@ -1,6 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
 import org.junit.jupiter.api.AfterEach;
@@ -134,9 +137,9 @@ class OrganizationServiceTest {
   }
 //endregion
 
-//region getOrganizationStationByOrganizationIdAndStationId tests
+//region verifyOrganizationStation tests
   @Test
-  void givenNotExistentOrganizationStationWhenGetOrganizationStationByOrganizationIdAndStationIdThenEmpty(){
+  void givenNotExistentOrganizationStationWhenVerifyStationIdThenThrowInvalidParamException(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
@@ -144,14 +147,20 @@ class OrganizationServiceTest {
       .thenReturn(null);
 
     // When
-    Optional<OrganizationStation> result = organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    InvalidParamException exception = Assertions.assertThrows(
+      InvalidParamException.class,
+      () -> organizationService.verifyStationId(organizationId, stationId, accessToken)
+    );
 
     // Then
-    Assertions.assertTrue(result.isEmpty());
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_STATION_ID, exception.getCode());
+    Assertions.assertEquals("Invalid station id %s for Organization %d".formatted(stationId, organizationId), exception.getMessage());
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
   }
 
   @Test
-  void givenExistentOrganizationStationWhenGetOrganizationStationByOrganizationIdAndStationIdThenEmpty(){
+  void givenExistentOrganizationStationWhenVerifyStationIdIdThenOk(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
@@ -160,11 +169,68 @@ class OrganizationServiceTest {
       .thenReturn(expectedResult);
 
     // When
-    Optional<OrganizationStation> result = organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    organizationService.verifyStationId(organizationId, stationId, accessToken);
 
     // Then
-    Assertions.assertTrue(result.isPresent());
-    Assertions.assertSame(expectedResult, result.get());
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+  }
+//endregion
+
+  //region verifyOrganizationStation tests
+  @Test
+  void givenNotExistentOrganizationStationWhenGetDefaultOrganizationStationThenThrowNotFoundException(){
+    // Given
+    Long organizationId = 1L;
+    Mockito.when(
+      organizationSearchClientMock.findOrganizationStationByOrganizationIdAndStationId(
+        Mockito.eq(organizationId),
+        Mockito.isNull(),
+        Mockito.eq(accessToken)
+      )
+    ).thenReturn(null);
+
+    // When
+    NotFoundException exception = Assertions.assertThrows(
+      NotFoundException.class,
+      () -> organizationService.getDefaultOrganizationStation(organizationId, accessToken)
+    );
+
+    // Then
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_DEFAULT_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
+    Assertions.assertEquals("Unable to find a default organization station for Organization %d".formatted(organizationId), exception.getMessage());
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(
+        Mockito.eq(organizationId),
+        Mockito.isNull(),
+        Mockito.eq(accessToken)
+      );
+  }
+
+  @Test
+  void givenExistentOrganizationStationWhenGetDefaultOrganizationStationThenOk(){
+    // Given
+    Long organizationId = 1L;
+    OrganizationStation expectedResult = new OrganizationStation();
+    Mockito.when(
+      organizationSearchClientMock.findOrganizationStationByOrganizationIdAndStationId(
+        Mockito.eq(organizationId),
+        Mockito.isNull(),
+        Mockito.eq(accessToken)
+      )
+    ).thenReturn(expectedResult);
+
+    // When
+    OrganizationStation defaultOrganizationStation = organizationService.getDefaultOrganizationStation(organizationId, accessToken);
+
+    // Then
+    Assertions.assertEquals(expectedResult, defaultOrganizationStation);
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(
+        Mockito.eq(organizationId),
+        Mockito.isNull(),
+        Mockito.eq(accessToken)
+      );
   }
 //endregion
 }

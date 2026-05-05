@@ -1,6 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
 import org.springframework.cache.annotation.CacheConfig;
@@ -44,11 +47,20 @@ public class OrganizationServiceImpl implements OrganizationService {
   }
 
   @Override
-  @Cacheable(key = "'organizationId-' + #organizationId + '_stationId-' + #stationId", unless = "#result == null")
-  public Optional<OrganizationStation> getOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
-    return Optional.ofNullable(
-      organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken)
-    );
+  public void verifyStationId(Long organizationId, String stationId, String accessToken) {
+    Optional.ofNullable(organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken))
+      .orElseThrow(() -> new InvalidParamException(
+        ErrorCodeConstants.ERROR_CODE_INVALID_STATION_ID,
+        "Invalid station id %s for Organization %d".formatted(stationId, organizationId)
+      ));
   }
 
+  @Override
+  public OrganizationStation getDefaultOrganizationStation(Long organizationId, String accessToken) {
+    return Optional.ofNullable(organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, null, accessToken))
+      .orElseThrow(() -> new NotFoundException(
+        ErrorCodeConstants.ERROR_CODE_DEFAULT_ORGANIZATION_STATION_NOT_FOUND,
+        "Unable to find a default organization station for Organization %d".formatted(organizationId)
+      ));
+  }
 }

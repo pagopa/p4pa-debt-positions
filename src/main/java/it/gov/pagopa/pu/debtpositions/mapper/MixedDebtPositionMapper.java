@@ -4,7 +4,6 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
@@ -100,28 +99,12 @@ public class MixedDebtPositionMapper {
   private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId) {
     String accessToken = SecurityUtils.getAccessToken();
     if(mixedDebtPositionDTO.getStationId() != null) {
-      this.verifyStationId(mixedDebtPositionDTO, accessToken);
+      organizationService.verifyStationId(mixedDebtPositionDTO.getOrganizationId(), mixedDebtPositionDTO.getStationId(), accessToken);
       return mixedDebtPositionDTO.getStationId();
     } else {
-      OrganizationStation defaultOrganizationStation = this.getDefaultOrganizationStation(organizationId, accessToken);
+      OrganizationStation defaultOrganizationStation = organizationService.getDefaultOrganizationStation(organizationId, accessToken);
       return defaultOrganizationStation.getStationId();
     }
-  }
-
-  private void verifyStationId(MixedDebtPositionDTO dto, String accessToken) {
-    organizationService.getOrganizationStationByOrganizationIdAndStationId(dto.getOrganizationId(), dto.getStationId(), accessToken)
-      .orElseThrow(() -> new InvalidParamException(
-        ErrorCodeConstants.ERROR_CODE_INVALID_STATION_ID,
-        "Invalid station id %s for Organization %d".formatted(dto.getStationId(), dto.getOrganizationId())
-      ));
-  }
-
-  private OrganizationStation getDefaultOrganizationStation(Long organizationId, String accessToken) {
-    return organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, null, accessToken)
-      .orElseThrow(() -> new NotFoundException(
-        ErrorCodeConstants.ERROR_CODE_DEFAULT_ORGANIZATION_STATION_NOT_FOUND,
-        "Unable to find a default organization station for Organization %d".formatted(organizationId)
-      ));
   }
 
   public Map<Long, List<MixedDpAdditionalData>> buildDebtPositionTypeOrgId2TransfersData(
