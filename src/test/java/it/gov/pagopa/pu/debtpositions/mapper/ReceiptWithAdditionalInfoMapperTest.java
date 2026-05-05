@@ -53,7 +53,7 @@ class ReceiptWithAdditionalInfoMapperTest {
 
   private static InstallmentDTO commonAsserts(DebtPositionDTO debtPositionDTO, DebtPositionOrigin debtPositionOrigin, Long expectedTypeOrgId) {
     Assertions.assertNotNull(debtPositionDTO);
-    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate", "stationId", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     Assertions.assertEquals(debtPositionOrigin, debtPositionDTO.getDebtPositionOrigin());
     Assertions.assertEquals(expectedTypeOrgId, debtPositionDTO.getDebtPositionTypeOrgId());
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();

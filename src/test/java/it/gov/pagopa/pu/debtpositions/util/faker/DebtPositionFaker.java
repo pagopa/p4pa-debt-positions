@@ -38,6 +38,7 @@ public class DebtPositionFaker {
     debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPosition.setUpdateTraceId("TRACEID");
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildPaymentOption()))));
+    debtPosition.setStationId("stationId");
     return debtPosition;
   }
 
@@ -58,6 +59,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPositionDTO.setUpdateTraceId("TRACEID");
     debtPositionDTO.setPaymentOptions(new ArrayList<>(List.of(buildPaymentOptionDTO())));
+    debtPositionDTO.setStationId("stationId");
     return debtPositionDTO;
   }
 
@@ -103,6 +105,7 @@ public class DebtPositionFaker {
     debtPositionDTO.setDueDate(DATE);
     debtPositionDTO.setDebtor(PersonFaker.buildPerson());
     debtPositionDTO.setTransfers(List.of(TransferFaker.buildMixedTransferDTO()));
+    debtPositionDTO.setStationId("stationId");
     return debtPositionDTO;
   }
 
@@ -123,6 +126,7 @@ public class DebtPositionFaker {
     debtPosition.setUpdateOperatorExternalId("OPERATOREXTERNALUSERID");
     debtPosition.setUpdateTraceId("TRACEID");
     debtPosition.setPaymentOptions(new TreeSet<>(new ArrayList<>(List.of(buildMixedPaymentOption()))));
+    debtPosition.setStationId("stationId");
     return debtPosition;
   }
 }
