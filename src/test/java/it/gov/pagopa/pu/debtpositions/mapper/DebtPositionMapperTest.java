@@ -2,10 +2,13 @@ package it.gov.pagopa.pu.debtpositions.mapper;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidParamException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
@@ -14,6 +17,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -89,6 +93,82 @@ class DebtPositionMapperTest {
     //THEN
     reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+  }
+
+  @Test
+  void givenInvalidStationId_whenMapToModel_thenThrowInvalidParamException() {
+    //GIVEN
+    DebtPosition debtPositionExpected = buildDebtPosition();
+    debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+
+    PaymentOption paymentOption = buildPaymentOption();
+
+    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
+    Mockito.when(
+      organizationServiceMock.getOrganizationStationByOrganizationIdAndStationId(
+        debtPositionDTO.getOrganizationId(),
+        debtPositionDTO.getStationId(),
+        accessToken
+      )
+    ).thenReturn(Optional.empty());
+    //WHEN
+    InvalidParamException exception = Assertions.assertThrows(InvalidParamException.class, () -> debtPositionMapper.mapToModel(debtPositionDTO));
+    //THEN
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_STATION_ID, exception.getCode());
+    Assertions.assertEquals("Invalid station id %s for Organization %d".formatted(debtPositionDTO.getStationId(), debtPositionDTO.getOrganizationId()), exception.getMessage());
+  }
+
+  @Test
+  void givenValidDebtPositionDTOWithNoStationID_whenMapToModel_thenReturnDebtPositionAndInstallmentMapWithDefaultStationId() {
+    //GIVEN
+    DebtPosition debtPositionExpected = buildDebtPosition();
+    debtPositionExpected.setStationId("defaultStationId");
+    debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStationId(null);
+
+    PaymentOption paymentOption = buildPaymentOption();
+
+    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
+    Mockito.when(
+      organizationServiceMock.getOrganizationStationByOrganizationIdAndStationId(
+        ArgumentMatchers.eq(debtPositionDTO.getOrganizationId()),
+        ArgumentMatchers.isNull(),
+        ArgumentMatchers.eq(accessToken)
+      )
+    ).thenReturn(Optional.of(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build()));
+    //WHEN
+    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO);
+    //THEN
+    reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+  }
+
+  @Test
+  void givenDPWithNoStationIdAndNoDefaultStationId_whenMapToModel_thenThrowNotFoundException() {
+    //GIVEN
+    DebtPosition debtPositionExpected = buildDebtPosition();
+    debtPositionExpected.setStationId("defaultStationId");
+    debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStationId(null);
+
+    PaymentOption paymentOption = buildPaymentOption();
+
+    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
+    Mockito.when(
+      organizationServiceMock.getOrganizationStationByOrganizationIdAndStationId(
+        ArgumentMatchers.eq(debtPositionDTO.getOrganizationId()),
+        ArgumentMatchers.isNull(),
+        ArgumentMatchers.eq(accessToken)
+      )
+    ).thenReturn(Optional.empty());
+    //WHEN
+    NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> debtPositionMapper.mapToModel(debtPositionDTO));
+    //THEN
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_DEFAULT_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
+    Assertions.assertEquals("Unable to find a default organization station for Organization %d".formatted(debtPositionDTO.getOrganizationId()), exception.getMessage());
   }
 
   @Test
