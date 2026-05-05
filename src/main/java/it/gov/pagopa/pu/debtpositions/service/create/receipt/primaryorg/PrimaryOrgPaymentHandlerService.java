@@ -52,7 +52,7 @@ public class PrimaryOrgPaymentHandlerService {
 
       return installmentPaymentHandlerService.handlePayment(installment.get(), receiptDTO, primaryOrg, accessToken);
     } else {
-      return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO);
+      return technicalDpCreationService.createAndPublishTechDp(primaryOrg, receiptDTO, accessToken);
     }
   }
 }

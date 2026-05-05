@@ -24,6 +24,8 @@ import java.util.TreeSet;
 @ExtendWith(MockitoExtension.class)
 class TechnicalDpUpdateServiceTest {
 
+  private final String ACCESS_TOKEN = "accessToken";
+
   @Mock
   private ReceiptWithAdditionalInfoMapper receiptMapperMock;
   @Mock
@@ -62,10 +64,10 @@ class TechnicalDpUpdateServiceTest {
     service = Mockito.spy(service);
     Mockito.doNothing()
       .when(service)
-      .updateDp(Mockito.same(dp), Mockito.same(expectedResult));
+      .updateDp(Mockito.same(dp), Mockito.same(expectedResult), Mockito.same(ACCESS_TOKEN));
 
     // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId);
+    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId, ACCESS_TOKEN);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -115,11 +117,11 @@ class TechnicalDpUpdateServiceTest {
     dpDTO.setPaymentOptions(List.of(poDTO));
 
     // When
-    service.updateDp(entity, dpDTO);
+    service.updateDp(entity, dpDTO, ACCESS_TOKEN);
 
     // Then
     ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture());
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(ACCESS_TOKEN));
     DebtPositionDTO saved = captor.getValue();
 
     Assertions.assertEquals(dpId, saved.getDebtPositionId());
@@ -188,11 +190,11 @@ class TechnicalDpUpdateServiceTest {
     dpDTO.setPaymentOptions(List.of(poDTO));
 
     // When
-    service.updateDp(entity, dpDTO);
+    service.updateDp(entity, dpDTO, ACCESS_TOKEN);
 
     // Then
     ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture());
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(ACCESS_TOKEN));
     DebtPositionDTO saved = captor.getValue();
 
     Assertions.assertEquals(dpId, saved.getDebtPositionId());

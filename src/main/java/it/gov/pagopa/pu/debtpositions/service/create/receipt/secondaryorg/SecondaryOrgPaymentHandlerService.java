@@ -43,25 +43,25 @@ public class SecondaryOrgPaymentHandlerService {
     } else {
       List<DebtPosition> secondaryDp = debtPositionRepository.findEntityGraphByOrganizationIdAndReceiptId(secondaryOrg.getOrganizationId(), receiptDTO.getReceiptId(), List.of(DebtPositionOrigin.SECONDARY_ORG));
       if (!secondaryDp.isEmpty()) {
-        updateExistingSecondaryDp(secondaryOrg, secondaryDp, receiptDTO);
+        updateExistingSecondaryDp(secondaryOrg, secondaryDp, receiptDTO, accessToken);
       } else {
-        createNewSecondaryDp(secondaryOrg, receiptDTO);
+        createNewSecondaryDp(secondaryOrg, receiptDTO, accessToken);
       }
     }
   }
 
-  private void updateExistingSecondaryDp(Organization secondaryOrg, List<DebtPosition> secondaryOrgDps, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+  private void updateExistingSecondaryDp(Organization secondaryOrg, List<DebtPosition> secondaryOrgDps, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.info("Found {} SECONDARY_ORG DP related to receipt [id={}, nav={}] on organization [id={}, fiscalCode={}]",
       secondaryOrgDps.size(),
       receiptDTO.getReceiptId(), receiptDTO.getNoticeNumber(),
       secondaryOrg.getOrganizationId(), secondaryOrg.getOrgFiscalCode());
-    receiptBasedTechnicalDpHandlerService.updateAndPublishTechDp(secondaryOrg, secondaryOrgDps.getFirst(), receiptDTO);
+    receiptBasedTechnicalDpHandlerService.updateAndPublishTechDp(secondaryOrg, secondaryOrgDps.getFirst(), receiptDTO, accessToken);
   }
 
-  private void createNewSecondaryDp(Organization secondaryOrg, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+  private void createNewSecondaryDp(Organization secondaryOrg, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     log.info("Creating SECONDARY_ORG DP related to receipt [id={}, nav={}] on organization [id={}, fiscalCode={}]",
       receiptDTO.getReceiptId(), receiptDTO.getNoticeNumber(),
       secondaryOrg.getOrganizationId(), secondaryOrg.getOrgFiscalCode());
-    receiptBasedTechnicalDpHandlerService.createAndPublishTechDp(secondaryOrg, receiptDTO);
+    receiptBasedTechnicalDpHandlerService.createAndPublishTechDp(secondaryOrg, receiptDTO, accessToken);
   }
 }

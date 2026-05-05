@@ -120,7 +120,7 @@ class DebtPositionAddInstallmentServiceImplTest {
 
     Mockito.verify(validateDebtPositionServiceMock).validateDebtorConsistency(debtPositionDTO);
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
@@ -158,7 +158,7 @@ class DebtPositionAddInstallmentServiceImplTest {
 
     Mockito.verify(validateDebtPositionServiceMock).validateDebtorConsistency(debtPositionDTO);
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 

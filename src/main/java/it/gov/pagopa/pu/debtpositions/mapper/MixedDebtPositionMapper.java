@@ -9,7 +9,6 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
@@ -29,7 +28,7 @@ public class MixedDebtPositionMapper {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final OrganizationService organizationService;
 
-  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
+  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request, String accessToken) {
     if (request == null) {
       return null;
     }
@@ -92,12 +91,11 @@ public class MixedDebtPositionMapper {
       .multiDebtor(false)
       .debtPositionTypeOrgId(debtPositionTypeOrgId)
       .paymentOptions(List.of(paymentOption))
-      .stationId(this.fetchStationId(request, organization.getOrganizationId()))
+      .stationId(this.fetchStationId(request, organization.getOrganizationId(), accessToken))
       .build();
   }
 
-  private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId) {
-    String accessToken = SecurityUtils.getAccessToken();
+  private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId, String accessToken) {
     if(mixedDebtPositionDTO.getStationId() != null) {
       organizationService.verifyStationId(mixedDebtPositionDTO.getOrganizationId(), mixedDebtPositionDTO.getStationId(), accessToken);
       return mixedDebtPositionDTO.getStationId();

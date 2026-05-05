@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
 
+  private final String ACCESS_TOKEN = "accessToken";
+
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
   @Mock
@@ -92,10 +94,10 @@ class DebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
     // When
-    debtPositionService.saveDebtPosition(debtPositionDTO);
+    debtPositionService.saveDebtPosition(debtPositionDTO, ACCESS_TOKEN);
 
     // Then
-    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO));
+    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO), Mockito.same(ACCESS_TOKEN));
   }
 
   @Test

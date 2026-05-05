@@ -99,8 +99,11 @@ public class MixedDebtPositionCreationServiceImpl implements
       mixedDebtPositionDTO.getTransfers(), accessToken, operatorExternalUserId);
     validateIudUniqueness(mixedDebtPositionDTO);
 
-    DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(organization,
-      mixedDebtPositionDTO);
+    DebtPositionDTO debtPositionDTO = mixedDebtPositionMapper.mapToDebtPositionDTO(
+      organization,
+      mixedDebtPositionDTO,
+      accessToken
+    );
 
     WorkflowCreatedDTO workflowCreatedDTO = debtPositionCreationService.createDebtPosition(
       debtPositionDTO, new WfExecutionParameters(), accessToken,
@@ -108,7 +111,7 @@ public class MixedDebtPositionCreationServiceImpl implements
 
     Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData = mixedDebtPositionMapper.buildDebtPositionTypeOrgId2TransfersData(
       mixedDebtPositionDTO.getTransfers());
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
     List<DebtPosition> technicalMixedDebtPositions = technicalMixedDebtPositionBuilderService.createTechnicalMixedDebtPositions(
       debtPositionTypeOrgId2TransfersData, debtPosition, accessToken);
 

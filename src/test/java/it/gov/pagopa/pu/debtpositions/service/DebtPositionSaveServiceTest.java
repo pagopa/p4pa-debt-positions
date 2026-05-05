@@ -30,6 +30,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 @ExtendWith(MockitoExtension.class)
 class DebtPositionSaveServiceTest {
 
+  private final String ACCESS_TOKEN = "accessToken";
+
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
   @Mock
@@ -92,13 +94,13 @@ class DebtPositionSaveServiceTest {
 
     Transfer savedTransfer = mockSavedTransfer(mappedTransfer);
 
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedDebtPosition);
+    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO, ACCESS_TOKEN)).thenReturn(mappedDebtPosition);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
       mockedStatic.when(Utilities::getRandomicUUID).thenReturn(generatedIupd);
 
-      service.saveDebtPositionDTO(debtPositionDTO);
+      service.saveDebtPositionDTO(debtPositionDTO, ACCESS_TOKEN);
 
       assertDebtPositionDtoAlign(savedDebtPosition, debtPositionDTO);
 

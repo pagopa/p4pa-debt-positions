@@ -111,7 +111,7 @@ class MixedDebtPositionCreationServiceTest {
       .thenReturn(false);
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(organization, mixedDebtPositionDTO))
+    when(mixedDebtPositionMapperMock.mapToDebtPositionDTO(organization, mixedDebtPositionDTO, accessToken))
       .thenReturn(debtPositionDTO);
 
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
@@ -127,7 +127,7 @@ class MixedDebtPositionCreationServiceTest {
       .thenReturn(debtPositionTypeOrgId2TransfersData);
 
     DebtPosition debtPosition = new DebtPosition();
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken)).thenReturn(
       debtPosition);
 
     when(

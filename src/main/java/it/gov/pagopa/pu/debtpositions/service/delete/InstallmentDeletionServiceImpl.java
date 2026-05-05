@@ -35,8 +35,8 @@ public class InstallmentDeletionServiceImpl implements InstallmentDeletionServic
 
   @Transactional
   @Override
-  public void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIdsToDelete) {
-    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+  public void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIdsToDelete, String accessToken) {
+    DebtPosition debtPosition = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
 
     boolean allInstallmentsToBeDeleted = installmentIdsToDelete.size() ==
       debtPositionDTO.getPaymentOptions().stream()

@@ -97,7 +97,7 @@ class DebtPositionCancelInstallmentServiceImplTest {
     assertEquals(InstallmentStatus.TO_SYNC, installmentDTO.getStatus());
 
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
@@ -132,9 +132,9 @@ class DebtPositionCancelInstallmentServiceImplTest {
     WorkflowCreatedDTO result = debtPositionCancelInstallmentService.cancelInstallment(debtPositionDTO, List.of(installmentDTO1), wfExecutionParameters, accessToken, operatorExternalId);
 
     assertNull(result);
-    Mockito.verify(installmentDeletionServiceMock).deleteDraftInstallments(debtPositionDTO, Set.of(200L));
+    Mockito.verify(installmentDeletionServiceMock).deleteDraftInstallments(debtPositionDTO, Set.of(200L), accessToken);
     Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock, times(0)).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock, times(0)).saveDebtPosition(debtPositionDTO, accessToken);
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock, times(0)).alignHierarchyStatus(debtPositionDTO);
   }
 

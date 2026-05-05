@@ -29,15 +29,15 @@ public class TechnicalDpUpdateService {
     this.debtPositionService = debtPositionService;
   }
 
-  public DebtPositionDTO updateDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId) {
+  public DebtPositionDTO updateDp(DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId, String accessToken) {
     DebtPositionDTO updatedTechDp = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId, dp);
-    updateDp(dp, updatedTechDp);
+    updateDp(dp, updatedTechDp, accessToken);
     return updatedTechDp;
   }
 
-  public void updateDp(DebtPosition dp, DebtPositionDTO dpDTO) {
+  public void updateDp(DebtPosition dp, DebtPositionDTO dpDTO, String accessToken) {
     propagateIdsForDebtPosition(dp, dpDTO);
-    debtPositionService.saveDebtPosition(dpDTO);
+    debtPositionService.saveDebtPosition(dpDTO, accessToken);
   }
 
   private void propagateIdsForDebtPosition(DebtPosition entity, DebtPositionDTO dto) {

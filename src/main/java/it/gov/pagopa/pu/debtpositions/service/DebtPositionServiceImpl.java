@@ -50,8 +50,8 @@ public class DebtPositionServiceImpl implements DebtPositionService {
   }
 
   @Override
-  public void saveDebtPosition(DebtPositionDTO debtPositionDTO) {
-    debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO);
+  public void saveDebtPosition(DebtPositionDTO debtPositionDTO, String accessToken) {
+    debtPositionSaveService.saveDebtPositionDTO(debtPositionDTO, accessToken);
   }
 
   @Override

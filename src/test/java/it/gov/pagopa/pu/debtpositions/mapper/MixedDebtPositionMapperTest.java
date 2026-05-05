@@ -156,8 +156,11 @@ class MixedDebtPositionMapperTest {
           accessToken
         );
 
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
-          mixedDebtPositionDTO);
+      DebtPositionDTO result = mapper.mapToDebtPositionDTO(
+        organization,
+        mixedDebtPositionDTO,
+        accessToken
+      );
 
       assertEquals(expectedResult, result);
     }
@@ -239,8 +242,11 @@ class MixedDebtPositionMapperTest {
         ArgumentMatchers.eq(accessToken)
       )).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
 
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(organization,
-        mixedDebtPositionDTO);
+      DebtPositionDTO result = mapper.mapToDebtPositionDTO(
+        organization,
+        mixedDebtPositionDTO,
+        accessToken
+      );
 
       assertEquals(expectedResult, result);
     }
@@ -248,7 +254,7 @@ class MixedDebtPositionMapperTest {
 
   @Test
   void givenNullWhenMapToDebtPositionDTOThenNull() {
-    assertNull(mapper.mapToDebtPositionDTO(new Organization(), null));
+    assertNull(mapper.mapToDebtPositionDTO(new Organization(), null, accessToken));
   }
 
   @Test

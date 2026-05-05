@@ -85,7 +85,7 @@ class DebtPositionMapperTest {
         accessToken
       );
     //WHEN
-    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO);
+    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
     //THEN
     reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
@@ -110,7 +110,7 @@ class DebtPositionMapperTest {
       )
     ).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
     //WHEN
-    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO);
+    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
     //THEN
     reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");

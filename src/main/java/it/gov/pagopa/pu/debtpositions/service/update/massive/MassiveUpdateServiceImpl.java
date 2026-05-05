@@ -70,7 +70,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
 
     if (!collectedIuds.isEmpty()) {
       debtPositionHierarchyStatusAlignerService.alignHierarchyStatus(debtPositionDTO);
-      debtPositionService.saveDebtPosition(debtPositionDTO);
+      debtPositionService.saveDebtPosition(debtPositionDTO, accessToken);
 
       debtPositionSyncService.syncDebtPosition(
         debtPositionDTO,

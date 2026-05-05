@@ -28,7 +28,7 @@ public class MixedDpPaymentHandlerService {
     if(!CollectionUtils.isEmpty(newMixedTechnicalDebtPositions)) {
       List<DebtPositionDTO> fullDtos = mapper.mapAllToDto(newMixedTechnicalDebtPositions);
       for (DebtPositionDTO dp : fullDtos) {
-        updateAndSynchronizeTechDp.publishTechDp(dp, receiptDTO);
+        updateAndSynchronizeTechDp.publishTechDp(dp, receiptDTO, accessToken);
       }
     }
   }

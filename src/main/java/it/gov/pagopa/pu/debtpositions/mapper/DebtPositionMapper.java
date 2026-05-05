@@ -9,7 +9,6 @@ import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
@@ -38,8 +37,7 @@ public class DebtPositionMapper {
     this.organizationService = organizationService;
   }
 
-  public DebtPosition mapToModel(DebtPositionDTO dto) {
-    String accessToken = SecurityUtils.getAccessToken();
+  public DebtPosition mapToModel(DebtPositionDTO dto, String accessToken) {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(dto.getDebtPositionId());
     debtPosition.setIupdOrg(dto.getIupdOrg());
