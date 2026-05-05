@@ -21,6 +21,8 @@ import java.util.*;
 @ExtendWith(MockitoExtension.class)
 class ReceiptWithAdditionalInfoMapperTest {
 
+  private static final String UNKNOWN_STATION_ID = "UNKNOWN";
+
   @InjectMocks
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;
 
@@ -48,12 +50,13 @@ class ReceiptWithAdditionalInfoMapperTest {
       case ReceiptOriginType.PAYMENTS_REPORTING -> DebtPositionOrigin.REPORTING_PAGOPA;
     };
     InstallmentDTO installmentDTO = commonAsserts(debtPositionDTO, debtPositionOrigin, providedTypeOrgId);
+    Assertions.assertEquals(UNKNOWN_STATION_ID, debtPositionDTO.getStationId());
     Assertions.assertEquals(receiptWithAdditionalNodeDataDTO.getTransfers().size(), installmentDTO.getTransfers().size());
   }
 
   private static InstallmentDTO commonAsserts(DebtPositionDTO debtPositionDTO, DebtPositionOrigin debtPositionOrigin, Long expectedTypeOrgId) {
     Assertions.assertNotNull(debtPositionDTO);
-    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate", "stationId", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    TestUtils.checkNotNullFields(debtPositionDTO, "debtPositionId", "validityDate", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     Assertions.assertEquals(debtPositionOrigin, debtPositionDTO.getDebtPositionOrigin());
     Assertions.assertEquals(expectedTypeOrgId, debtPositionDTO.getDebtPositionTypeOrgId());
     PaymentOptionDTO paymentOptionDTO = debtPositionDTO.getPaymentOptions().getFirst();
@@ -91,6 +94,7 @@ class ReceiptWithAdditionalInfoMapperTest {
     // Then
     InstallmentDTO installmentDTO = commonAsserts(debtPositionDTO, DebtPositionOrigin.SECONDARY_ORG, providedTypeOrgId);
 
+    Assertions.assertEquals(UNKNOWN_STATION_ID, debtPositionDTO.getStationId());
     Assertions.assertEquals(1, installmentDTO.getTransfers().size());
     Assertions.assertEquals(2, installmentDTO.getTransfers().getFirst().getTransferIndex());
     Assertions.assertEquals(secondaryOrganization.getOrgFiscalCode(), installmentDTO.getTransfers().getFirst().getOrgFiscalCode());
@@ -122,6 +126,7 @@ class ReceiptWithAdditionalInfoMapperTest {
 
     InstallmentDTO mappedInstallment = commonAsserts(result, DebtPositionOrigin.RECEIPT_PAGOPA, providedTypeOrgId);
 
+    Assertions.assertEquals(existingDp.getStationId(), result.getStationId());
     Assertions.assertEquals(expectedIupdPagopa, mappedInstallment.getIupdPagopa());
     Assertions.assertEquals(expectedIud, mappedInstallment.getIud());
   }
