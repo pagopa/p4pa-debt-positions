@@ -1,14 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +19,10 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.checkNotNullFields;
 import static it.gov.pagopa.pu.debtpositions.util.TestUtils.reflectionEqualsByName;
@@ -39,37 +39,29 @@ class DebtPositionMapperTest {
   private PaymentOptionMapper paymentOptionMapperMock;
   @Mock
   private InstallmentPIIMapper installmentPIIMapperMock;
-  @Mock
-  private OrganizationService organizationServiceMock;
 
   private DebtPositionMapper debtPositionMapper;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
-  private final String accessToken = "accessToken";
-
   @BeforeEach
   void setUp() {
     debtPositionMapper = new DebtPositionMapper(
       paymentOptionMapperMock,
-      installmentPIIMapperMock,
-      organizationServiceMock
+      installmentPIIMapperMock
     );
-    SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
   }
 
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       paymentOptionMapperMock,
-      installmentPIIMapperMock,
-      organizationServiceMock
+      installmentPIIMapperMock
     );
   }
 
   @Test
   void givenValidDebtPositionDTO_whenMapToModel_thenReturnDebtPositionAndInstallmentMap() {
-    //GIVEN
     DebtPosition debtPositionExpected = buildDebtPosition();
     debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -77,34 +69,26 @@ class DebtPositionMapperTest {
     PaymentOption paymentOption = buildPaymentOption();
 
     Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
-    Mockito.when(
-      organizationServiceMock.getOrganizationStationByOrganizationIdAndStationId(
-        debtPositionDTO.getOrganizationId(),
-        debtPositionDTO.getStationId(),
-        accessToken
-      )
-    ).thenReturn(Optional.of(OrganizationStation.builder().organizationId(1L).stationId("stationId").build()));
-    //WHEN
+
     DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO);
-    //THEN
+
     reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
     checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 
   @Test
   void givenMapToDtoThenOk() {
-    //GIVEN
     DebtPositionDTO expectedDpDTO = buildDebtPositionDTO();
     expectedDpDTO.setStatus(DebtPositionStatus.TO_SYNC);
     DebtPosition dp = buildDebtPosition();
 
     configureMapper2DTOMocks(expectedDpDTO, dp);
 
-    //WHEN
     DebtPositionDTO result = debtPositionMapper.mapToDto(dp);
-    //THEN
+
     checkNotNullFields(result);
     reflectionEqualsByName(expectedDpDTO, result);
+
     // nested lists should be modifiable
     result.getPaymentOptions().forEach(po -> po.getInstallments().clear());
     result.getPaymentOptions().clear();

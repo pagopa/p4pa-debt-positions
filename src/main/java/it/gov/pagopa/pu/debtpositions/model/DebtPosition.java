@@ -48,8 +48,6 @@ public class DebtPosition extends BaseEntity implements BaseDebtPosition, Serial
   @NotNull
   private Long organizationId;
   @NotNull
-  private String stationId;
-  @NotNull
   private Long debtPositionTypeOrgId;
   private LocalDate validityDate;
   private boolean multiDebtor;

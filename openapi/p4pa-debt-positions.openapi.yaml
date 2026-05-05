@@ -2029,8 +2029,6 @@ components:
         organizationId:
           type: integer
           format: int64
-        stationId:
-          type: string
         debtPositionTypeOrgId:
           type: integer
           format: int64
@@ -3100,8 +3098,6 @@ components:
         organizationId:
           type: integer
           format: int64
-        stationId:
-          type: string
         debtPositionOrigin:
           type: 'DebtPositionOrigin'
         sourceFlowName:
