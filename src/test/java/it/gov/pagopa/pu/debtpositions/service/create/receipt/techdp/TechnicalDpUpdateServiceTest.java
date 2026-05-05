@@ -24,7 +24,7 @@ import java.util.TreeSet;
 @ExtendWith(MockitoExtension.class)
 class TechnicalDpUpdateServiceTest {
 
-  private final String ACCESS_TOKEN = "accessToken";
+  private final String accessToken = "accessToken";
 
   @Mock
   private ReceiptWithAdditionalInfoMapper receiptMapperMock;
@@ -64,10 +64,10 @@ class TechnicalDpUpdateServiceTest {
     service = Mockito.spy(service);
     Mockito.doNothing()
       .when(service)
-      .updateDp(Mockito.same(dp), Mockito.same(expectedResult), Mockito.same(ACCESS_TOKEN));
+      .updateDp(Mockito.same(dp), Mockito.same(expectedResult), Mockito.same(accessToken));
 
     // When
-    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId, ACCESS_TOKEN);
+    DebtPositionDTO result = service.updateDp(dp, receiptDTO, organization, dpTypeOrgId, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -117,11 +117,11 @@ class TechnicalDpUpdateServiceTest {
     dpDTO.setPaymentOptions(List.of(poDTO));
 
     // When
-    service.updateDp(entity, dpDTO, ACCESS_TOKEN);
+    service.updateDp(entity, dpDTO, accessToken);
 
     // Then
     ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(ACCESS_TOKEN));
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(accessToken));
     DebtPositionDTO saved = captor.getValue();
 
     Assertions.assertEquals(dpId, saved.getDebtPositionId());
@@ -190,11 +190,11 @@ class TechnicalDpUpdateServiceTest {
     dpDTO.setPaymentOptions(List.of(poDTO));
 
     // When
-    service.updateDp(entity, dpDTO, ACCESS_TOKEN);
+    service.updateDp(entity, dpDTO, accessToken);
 
     // Then
     ArgumentCaptor<DebtPositionDTO> captor = ArgumentCaptor.forClass(DebtPositionDTO.class);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(ACCESS_TOKEN));
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(captor.capture(), Mockito.same(accessToken));
     DebtPositionDTO saved = captor.getValue();
 
     Assertions.assertEquals(dpId, saved.getDebtPositionId());
