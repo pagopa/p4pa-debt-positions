@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -105,8 +104,8 @@ class DebtPositionMapperTest {
     Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
     Mockito.when(
       organizationServiceMock.getDefaultOrganizationStation(
-        ArgumentMatchers.eq(debtPositionDTO.getOrganizationId()),
-        ArgumentMatchers.eq(accessToken)
+        debtPositionDTO.getOrganizationId(),
+        accessToken
       )
     ).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
     //WHEN

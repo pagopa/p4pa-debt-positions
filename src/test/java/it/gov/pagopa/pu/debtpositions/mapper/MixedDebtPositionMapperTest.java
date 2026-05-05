@@ -18,7 +18,6 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
@@ -238,8 +237,8 @@ class MixedDebtPositionMapperTest {
         .thenReturn("9/01234567/");
 
       when(organizationServiceMock.getDefaultOrganizationStation(
-        ArgumentMatchers.eq(organization.getOrganizationId()),
-        ArgumentMatchers.eq(accessToken)
+        organization.getOrganizationId(),
+        accessToken
       )).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(
