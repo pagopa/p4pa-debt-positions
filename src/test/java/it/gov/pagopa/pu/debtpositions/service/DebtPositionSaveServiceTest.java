@@ -30,8 +30,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 @ExtendWith(MockitoExtension.class)
 class DebtPositionSaveServiceTest {
 
-  private final String ACCESS_TOKEN = "accessToken";
-
   @Mock
   private DebtPositionRepository debtPositionRepositoryMock;
   @Mock
@@ -94,6 +92,7 @@ class DebtPositionSaveServiceTest {
 
     Transfer savedTransfer = mockSavedTransfer(mappedTransfer);
 
+    String ACCESS_TOKEN = "accessToken";
     Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO, ACCESS_TOKEN)).thenReturn(mappedDebtPosition);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
