@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -40,7 +40,7 @@ class DebtPositionMapperTest {
   @Mock
   private InstallmentPIIMapper installmentPIIMapperMock;
   @Mock
-  private OrganizationService organizationServiceMock;
+  private OrganizationStationRetrieverService organizationStationRetrieverServiceMock;
 
   private DebtPositionMapper debtPositionMapper;
 
@@ -53,7 +53,7 @@ class DebtPositionMapperTest {
     debtPositionMapper = new DebtPositionMapper(
       paymentOptionMapperMock,
       installmentPIIMapperMock,
-      organizationServiceMock
+      organizationStationRetrieverServiceMock
     );
     SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
   }
@@ -63,7 +63,7 @@ class DebtPositionMapperTest {
     Mockito.verifyNoMoreInteractions(
       paymentOptionMapperMock,
       installmentPIIMapperMock,
-      organizationServiceMock
+      organizationStationRetrieverServiceMock
     );
   }
 
@@ -81,7 +81,7 @@ class DebtPositionMapperTest {
     OrganizationStationDTO defaultStation = new OrganizationStationDTO();
     defaultStation.setStationId(debtPositionExpected.getStationId());
     Mockito.when(
-      organizationServiceMock.getOrganizationStation(
+      organizationStationRetrieverServiceMock.getOrganizationStation(
         debtPositionDTO.getOrganizationId(),
         debtPositionDTO.getStationId(),
         accessToken

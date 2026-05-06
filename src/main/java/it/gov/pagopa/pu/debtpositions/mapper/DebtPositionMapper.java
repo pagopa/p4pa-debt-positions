@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
@@ -25,16 +25,16 @@ public class DebtPositionMapper {
 
   private final PaymentOptionMapper paymentOptionMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
-  private final OrganizationService organizationService;
+  private final OrganizationStationRetrieverService organizationStationRetrieverService;
 
   private static final Collector<PaymentOption, ?, SortedSet<PaymentOption>> toPaymentOptionTreeSet = Collectors.toCollection(TreeSet::new);
 
   public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper,
                             InstallmentPIIMapper installmentPIIMapper,
-                            OrganizationService organizationService) {
+                            OrganizationStationRetrieverService organizationStationRetrieverService) {
     this.paymentOptionMapper = paymentOptionMapper;
     this.installmentPIIMapper = installmentPIIMapper;
-    this.organizationService = organizationService;
+    this.organizationStationRetrieverService = organizationStationRetrieverService;
   }
 
   public DebtPosition mapToModel(DebtPositionDTO dto, String accessToken) {
@@ -56,7 +56,7 @@ public class DebtPositionMapper {
 
     debtPosition.setPaymentOptions(paymentOptions);
 
-    OrganizationStationDTO organizationStation = organizationService.getOrganizationStation(dto.getOrganizationId(), dto.getStationId(), accessToken);
+    OrganizationStationDTO organizationStation = organizationStationRetrieverService.getOrganizationStation(dto.getOrganizationId(), dto.getStationId(), accessToken);
     debtPosition.setStationId(organizationStation.getStationId());
 
     return debtPosition;

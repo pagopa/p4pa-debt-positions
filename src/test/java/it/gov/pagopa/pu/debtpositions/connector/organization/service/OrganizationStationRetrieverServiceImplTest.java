@@ -1,0 +1,72 @@
+package it.gov.pagopa.pu.debtpositions.connector.organization.service;
+
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+class OrganizationStationRetrieverServiceImplTest {
+
+  private static final String accessToken = "ACCESS_TOKEN";
+
+  @Mock
+  private OrganizationService organizationServiceMock;
+  @InjectMocks
+  private OrganizationStationRetrieverServiceImpl organizationStationRetrieverService;
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      organizationServiceMock
+    );
+  }
+
+  @Test
+  void givenNotExistingOrganizationStationWhenGetOrganizationStationThenEmpty(){
+    // Given
+    Long organizationId = 1L;
+    String stationId = "STATION_ID";
+    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, accessToken))
+      .thenReturn(Optional.empty());
+
+    // When
+    NotFoundException exception = Assertions.assertThrows(
+      NotFoundException.class,
+      () -> organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, accessToken)
+    );
+
+    // Then
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
+    Assertions.assertEquals("Unable to find organization station for organizationId %d and stationId %s".formatted(organizationId, stationId), exception.getMessage());
+    Mockito.verify(organizationServiceMock)
+      .getOrganizationStation(organizationId, stationId, accessToken);
+  }
+
+  @Test
+  void givenExistentOrganizationStationWhenVerifyStationIdIdThenOk(){
+    // Given
+    Long organizationId = 1L;
+    String stationId = "STATION_ID";
+    Optional<OrganizationStationDTO> expectedResult = Optional.of(new OrganizationStationDTO());
+    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, accessToken))
+      .thenReturn(expectedResult);
+
+    // When
+    OrganizationStationDTO result = organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, accessToken);
+
+    // Then
+    Assertions.assertEquals(expectedResult.get(), result);
+    Mockito.verify(organizationServiceMock)
+      .getOrganizationStation(organizationId, stationId, accessToken);
+  }
+}

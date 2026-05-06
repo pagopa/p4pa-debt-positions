@@ -13,6 +13,6 @@ public interface OrganizationService {
 
   Optional<Organization> getOrganizationById(Long id, String accessToken);
 
-  OrganizationStationDTO getOrganizationStation(Long organizationId, String stationId, String accessToken);
+  Optional<OrganizationStationDTO> getOrganizationStation(Long organizationId, String stationId, String accessToken);
 
 }

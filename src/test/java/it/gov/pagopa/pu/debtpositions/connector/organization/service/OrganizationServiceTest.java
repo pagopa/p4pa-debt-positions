@@ -1,8 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -136,9 +134,9 @@ class OrganizationServiceTest {
   }
 //endregion
 
-//region verifyOrganizationStation tests
+//region getOrganizationStation tests
   @Test
-  void givenNotExistingOrganizationStationWhenGetOrganizationStationThenThrowNotFoundException(){
+  void givenNotExistingOrganizationStationWhenGetOrganizationStationThenEmpty(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
@@ -146,16 +144,11 @@ class OrganizationServiceTest {
       .thenReturn(null);
 
     // When
-    NotFoundException exception = Assertions.assertThrows(
-      NotFoundException.class,
-      () -> organizationService.getOrganizationStation(organizationId, stationId, accessToken)
-    );
+    Optional<OrganizationStationDTO> result =
+      organizationService.getOrganizationStation(organizationId, stationId, accessToken);
 
     // Then
-    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
-    Assertions.assertEquals("Unable to find organization station for organizationId %d and stationId %s".formatted(organizationId, stationId), exception.getMessage());
-    Mockito.verify(organizationSearchClientMock)
-      .findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    Assertions.assertTrue(result.isEmpty());
   }
 
   @Test

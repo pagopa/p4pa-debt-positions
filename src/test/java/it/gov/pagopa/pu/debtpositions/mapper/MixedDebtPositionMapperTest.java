@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
@@ -51,7 +51,7 @@ class MixedDebtPositionMapperTest {
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
-  private OrganizationService organizationServiceMock;
+  private OrganizationStationRetrieverService organizationStationRetrieverService;
 
   private MixedDebtPositionMapper mapper;
 
@@ -61,7 +61,7 @@ class MixedDebtPositionMapperTest {
       mixedDebtPositionTypeOrgRetrieverServiceMock,
       categoryResolverServiceMock,
       debtPositionTypeOrgRepositoryMock,
-      organizationServiceMock
+      organizationStationRetrieverService
     );
     SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
   }
@@ -72,7 +72,7 @@ class MixedDebtPositionMapperTest {
       mixedDebtPositionTypeOrgRetrieverServiceMock,
       categoryResolverServiceMock,
       debtPositionTypeOrgRepositoryMock,
-      organizationServiceMock
+      organizationStationRetrieverService
     );
   }
 
@@ -148,7 +148,7 @@ class MixedDebtPositionMapperTest {
 
       OrganizationStationDTO defaultStation = new OrganizationStationDTO();
       defaultStation.setStationId(mixedDebtPositionDTO.getStationId());
-      when(organizationServiceMock.getOrganizationStation(
+      when(organizationStationRetrieverService.getOrganizationStation(
         organization.getOrganizationId(),
         mixedDebtPositionDTO.getStationId(),
         accessToken

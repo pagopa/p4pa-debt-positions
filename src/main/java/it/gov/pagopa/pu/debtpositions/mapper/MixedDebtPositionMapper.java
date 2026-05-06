@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
@@ -26,7 +26,7 @@ public class MixedDebtPositionMapper {
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
-  private final OrganizationService organizationService;
+  private final OrganizationStationRetrieverService organizationStationRetrieverService;
 
   public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request, String accessToken) {
     if (request == null) {
@@ -96,7 +96,7 @@ public class MixedDebtPositionMapper {
   }
 
   private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId, String accessToken) {
-    OrganizationStationDTO organizationStation = organizationService.getOrganizationStation(organizationId, mixedDebtPositionDTO.getStationId(), accessToken);
+    OrganizationStationDTO organizationStation = organizationStationRetrieverService.getOrganizationStation(organizationId, mixedDebtPositionDTO.getStationId(), accessToken);
     return organizationStation.getStationId();
   }
 
