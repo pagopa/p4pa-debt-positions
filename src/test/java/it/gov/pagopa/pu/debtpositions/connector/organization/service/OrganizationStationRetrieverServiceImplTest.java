@@ -17,7 +17,7 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class OrganizationStationRetrieverServiceImplTest {
 
-  private static final String accessToken = "ACCESS_TOKEN";
+  private static final String ACCESS_TOKEN = "accessToken";
 
   @Mock
   private OrganizationService organizationServiceMock;
@@ -36,20 +36,20 @@ class OrganizationStationRetrieverServiceImplTest {
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
-    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, accessToken))
+    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
       .thenReturn(Optional.empty());
 
     // When
     NotFoundException exception = Assertions.assertThrows(
       NotFoundException.class,
-      () -> organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, accessToken)
+      () -> organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN)
     );
 
     // Then
     Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
     Assertions.assertEquals("Unable to find organization station for organizationId %d and stationId %s".formatted(organizationId, stationId), exception.getMessage());
     Mockito.verify(organizationServiceMock)
-      .getOrganizationStation(organizationId, stationId, accessToken);
+      .getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
   }
 
   @Test
@@ -58,15 +58,15 @@ class OrganizationStationRetrieverServiceImplTest {
     Long organizationId = 1L;
     String stationId = "STATION_ID";
     Optional<OrganizationStationDTO> expectedResult = Optional.of(new OrganizationStationDTO());
-    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, accessToken))
+    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
       .thenReturn(expectedResult);
 
     // When
-    OrganizationStationDTO result = organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, accessToken);
+    OrganizationStationDTO result = organizationStationRetrieverService.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
 
     // Then
     Assertions.assertEquals(expectedResult.get(), result);
     Mockito.verify(organizationServiceMock)
-      .getOrganizationStation(organizationId, stationId, accessToken);
+      .getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
   }
 }
