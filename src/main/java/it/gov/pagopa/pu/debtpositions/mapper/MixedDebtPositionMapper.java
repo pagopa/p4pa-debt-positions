@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
@@ -10,13 +11,11 @@ import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrg
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -27,8 +26,9 @@ public class MixedDebtPositionMapper {
   private final MixedDebtPositionTypeOrgRetrieverService mixedDebtPositionTypeOrgRetrieverService;
   private final CategoryResolverService categoryResolverService;
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private final OrganizationStationRetrieverService organizationStationRetrieverService;
 
-  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request) {
+  public DebtPositionDTO mapToDebtPositionDTO(Organization organization, MixedDebtPositionDTO request, String accessToken) {
     if (request == null) {
       return null;
     }
@@ -91,7 +91,13 @@ public class MixedDebtPositionMapper {
       .multiDebtor(false)
       .debtPositionTypeOrgId(debtPositionTypeOrgId)
       .paymentOptions(List.of(paymentOption))
+      .stationId(this.fetchStationId(request, organization.getOrganizationId(), accessToken))
       .build();
+  }
+
+  private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId, String accessToken) {
+    OrganizationStationDTO organizationStation = organizationStationRetrieverService.getOrganizationStation(organizationId, mixedDebtPositionDTO.getStationId(), accessToken);
+    return organizationStation.getStationId();
   }
 
   public Map<Long, List<MixedDpAdditionalData>> buildDebtPositionTypeOrgId2TransfersData(

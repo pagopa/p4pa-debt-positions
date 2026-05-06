@@ -27,12 +27,12 @@ public class ReceiptBasedTechnicalDpHandlerService {
         this.technicalDpUpdateService = technicalDpUpdateService;
     }
 
-    public DebtPosition createAndPublishTechDp(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    public DebtPosition createAndPublishTechDp(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
         Long debtPositionTypeOrgId = extractDebtPositionTypeOrgId(organization, receiptDTO);
 
         DebtPositionDTO debtPositionDTO = receiptMapper.mapToDebtPosition(receiptDTO, organization, debtPositionTypeOrgId, null);
-        debtPositionService.saveDebtPosition(debtPositionDTO);
-        return updateAndSynchronizeTechDp.publishTechDp(debtPositionDTO, receiptDTO);
+        debtPositionService.saveDebtPosition(debtPositionDTO, accessToken);
+        return updateAndSynchronizeTechDp.publishTechDp(debtPositionDTO, receiptDTO, accessToken);
     }
 
     public DebtPosition updateAndPublishTechDp(Organization organization, DebtPosition dp, InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
@@ -45,10 +45,10 @@ public class ReceiptBasedTechnicalDpHandlerService {
         );
     }
 
-    public void updateAndPublishTechDp(Organization organization, DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+    public void updateAndPublishTechDp(Organization organization, DebtPosition dp, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
         Long debtPositionTypeOrgId = extractDebtPositionTypeOrgId(organization, receiptDTO);
-        DebtPositionDTO debtPositionDTO = technicalDpUpdateService.updateDp(dp, receiptDTO, organization, debtPositionTypeOrgId);
-        updateAndSynchronizeTechDp.publishTechDp(debtPositionDTO, receiptDTO);
+        DebtPositionDTO debtPositionDTO = technicalDpUpdateService.updateDp(dp, receiptDTO, organization, debtPositionTypeOrgId, accessToken);
+        updateAndSynchronizeTechDp.publishTechDp(debtPositionDTO, receiptDTO, accessToken);
     }
 
     private Long extractDebtPositionTypeOrgId(Organization organization, ReceiptWithAdditionalNodeDataDTO receiptDTO) {

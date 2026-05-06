@@ -6,5 +6,5 @@ import java.util.Set;
 
 public interface InstallmentDeletionService {
 
-  void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIds);
+  void deleteDraftInstallments(DebtPositionDTO debtPositionDTO, Set<Long> installmentIds, String accessToken);
 }

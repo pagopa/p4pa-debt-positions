@@ -1,11 +1,11 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
+import it.gov.pagopa.pu.organization.client.generated.OrganizationApi;
 import it.gov.pagopa.pu.organization.client.generated.OrganizationEntityControllerApi;
 import it.gov.pagopa.pu.organization.client.generated.OrganizationSearchControllerApi;
-import it.gov.pagopa.pu.organization.client.generated.OrganizationStationSearchControllerApi;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,7 +27,7 @@ class OrganizationSearchClientTest {
   @Mock
   private OrganizationEntityControllerApi organizationEntityControllerApiMock;
   @Mock
-  private OrganizationStationSearchControllerApi organizationStationSearchControllerApiMock;
+  private OrganizationApi organizationApiMock;
 
   private OrganizationSearchClient organizationSearchClient;
 
@@ -42,7 +42,7 @@ class OrganizationSearchClientTest {
       organizationApisHolderMock,
       organizationSearchControllerApiMock,
       organizationEntityControllerApiMock,
-      organizationStationSearchControllerApiMock
+      organizationApiMock
     );
   }
 
@@ -170,15 +170,15 @@ class OrganizationSearchClientTest {
     String accessToken = "ACCESSTOKEN";
     Long organizationId = 1L;
     String stationId = "ORGFISCALCODE";
-    OrganizationStation expectedResult = new OrganizationStation();
+    OrganizationStationDTO expectedResult = new OrganizationStationDTO();
 
-    Mockito.when(organizationApisHolderMock.getOrganizationStationSearchControllerApi(accessToken))
-      .thenReturn(organizationStationSearchControllerApiMock);
-    Mockito.when(organizationStationSearchControllerApiMock.crudOrganizationStationsFindByOrganizationIdAndStationId(organizationId, stationId))
+    Mockito.when(organizationApisHolderMock.getOrganizationApi(accessToken))
+      .thenReturn(organizationApiMock);
+    Mockito.when(organizationApiMock.getOrganizationStation(organizationId, stationId))
       .thenReturn(expectedResult);
 
     // When
-    OrganizationStation result = organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    OrganizationStationDTO result = organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
@@ -191,13 +191,13 @@ class OrganizationSearchClientTest {
     Long organizationId = 1L;
     String stationId = "ORGFISCALCODE";
 
-    Mockito.when(organizationApisHolderMock.getOrganizationStationSearchControllerApi(accessToken))
-      .thenReturn(organizationStationSearchControllerApiMock);
-    Mockito.when(organizationStationSearchControllerApiMock.crudOrganizationStationsFindByOrganizationIdAndStationId(organizationId, stationId))
+    Mockito.when(organizationApisHolderMock.getOrganizationApi(accessToken))
+      .thenReturn(organizationApiMock);
+    Mockito.when(organizationApiMock.getOrganizationStation(organizationId, stationId))
       .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
 
     // When
-    OrganizationStation result = organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    OrganizationStationDTO result = organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
 
     // Then
     Assertions.assertNull(result);

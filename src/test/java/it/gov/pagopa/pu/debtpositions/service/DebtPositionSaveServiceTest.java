@@ -92,13 +92,14 @@ class DebtPositionSaveServiceTest {
 
     Transfer savedTransfer = mockSavedTransfer(mappedTransfer);
 
-    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(mappedDebtPosition);
+    String accessToken = "accessToken";
+    Mockito.when(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken)).thenReturn(mappedDebtPosition);
 
     try (MockedStatic<Utilities> mockedStatic = Mockito.mockStatic(Utilities.class)) {
       mockedStatic.when(Utilities::getRandomIUD).thenReturn(generatedIUD);
       mockedStatic.when(Utilities::getRandomicUUID).thenReturn(generatedIupd);
 
-      service.saveDebtPositionDTO(debtPositionDTO);
+      service.saveDebtPositionDTO(debtPositionDTO, accessToken);
 
       assertDebtPositionDtoAlign(savedDebtPosition, debtPositionDTO);
 

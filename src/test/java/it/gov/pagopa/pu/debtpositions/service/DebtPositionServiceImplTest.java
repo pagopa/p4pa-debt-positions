@@ -92,10 +92,11 @@ class DebtPositionServiceImplTest {
     DebtPositionDTO debtPositionDTO = new DebtPositionDTO();
 
     // When
-    debtPositionService.saveDebtPosition(debtPositionDTO);
+    String accessToken = "accessToken";
+    debtPositionService.saveDebtPosition(debtPositionDTO, accessToken);
 
     // Then
-    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO));
+    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO), Mockito.same(accessToken));
   }
 
   @Test

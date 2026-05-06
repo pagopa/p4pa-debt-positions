@@ -41,8 +41,8 @@ public class DebtPositionSaveService {
   }
 
   @Transactional
-  public void saveDebtPositionDTO(DebtPositionDTO debtPositionDTO) {
-    DebtPosition mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO);
+  public void saveDebtPositionDTO(DebtPositionDTO debtPositionDTO, String accessToken) {
+    DebtPosition mappedDebtPosition = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
 
     DebtPosition savedDebtPosition = debtPositionRepository.save(mappedDebtPosition);
     alignDebtPositionDTO(debtPositionDTO, savedDebtPosition);

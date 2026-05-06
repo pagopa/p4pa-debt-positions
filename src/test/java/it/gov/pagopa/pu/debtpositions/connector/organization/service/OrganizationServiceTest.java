@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -134,9 +134,9 @@ class OrganizationServiceTest {
   }
 //endregion
 
-//region getOrganizationStationByOrganizationIdAndStationId tests
+//region getOrganizationStation tests
   @Test
-  void givenNotExistentOrganizationStationWhenGetOrganizationStationByOrganizationIdAndStationIdThenEmpty(){
+  void givenNotExistingOrganizationStationWhenGetOrganizationStationThenEmpty(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
@@ -144,27 +144,29 @@ class OrganizationServiceTest {
       .thenReturn(null);
 
     // When
-    Optional<OrganizationStation> result = organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    Optional<OrganizationStationDTO> result =
+      organizationService.getOrganizationStation(organizationId, stationId, accessToken);
 
     // Then
     Assertions.assertTrue(result.isEmpty());
   }
 
   @Test
-  void givenExistentOrganizationStationWhenGetOrganizationStationByOrganizationIdAndStationIdThenEmpty(){
+  void givenExistentOrganizationStationWhenVerifyStationIdIdThenOk(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
-    OrganizationStation expectedResult = new OrganizationStation();
+    OrganizationStationDTO expectedResult = new OrganizationStationDTO();
     Mockito.when(organizationSearchClientMock.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken))
       .thenReturn(expectedResult);
 
     // When
-    Optional<OrganizationStation> result = organizationService.getOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+    organizationService.getOrganizationStation(organizationId, stationId, accessToken);
 
     // Then
-    Assertions.assertTrue(result.isPresent());
-    Assertions.assertSame(expectedResult, result.get());
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
   }
 //endregion
+
 }

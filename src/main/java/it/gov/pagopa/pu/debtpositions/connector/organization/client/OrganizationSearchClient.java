@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.config.OrganizationApisHolder;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -47,10 +47,10 @@ public class OrganizationSearchClient {
     }
   }
 
-  public OrganizationStation findOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
+  public OrganizationStationDTO findOrganizationStationByOrganizationIdAndStationId(Long organizationId, String stationId, String accessToken) {
     try{
-      return organizationApisHolder.getOrganizationStationSearchControllerApi(accessToken)
-        .crudOrganizationStationsFindByOrganizationIdAndStationId(organizationId, stationId);
+      return organizationApisHolder.getOrganizationApi(accessToken)
+        .getOrganizationStation(organizationId, stationId);
     } catch (HttpClientErrorException.NotFound e){
       log.info("Cannot find organization_station having organizationId {} and stationId {}", organizationId, stationId);
       return null;

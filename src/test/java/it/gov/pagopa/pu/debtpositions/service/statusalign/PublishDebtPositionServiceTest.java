@@ -125,7 +125,7 @@ class PublishDebtPositionServiceTest {
 
     // Then
     Mockito.verify(debtPositionProcessorServiceMock, Mockito.times(1)).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
     InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
     Mockito.verify(validateDebtPositionServiceMock).validateInstallment(installmentDTO, organization, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
 

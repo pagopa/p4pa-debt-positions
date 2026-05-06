@@ -72,7 +72,7 @@ class UpdateAndSynchronizeTechDpTest {
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
     Mockito.when(debtPositionMapperMock.mapToDto(storedDp)).thenReturn(mappedDto);
-    Mockito.when(debtPositionMapperMock.mapToModel(mappedDto)).thenReturn(expectedResult);
+    Mockito.when(debtPositionMapperMock.mapToModel(mappedDto, accessToken)).thenReturn(expectedResult);
 
     // When
     DebtPosition result = service.handleTechDpAlreadyPaid(installment, incomingReceipt, storedDp, organization, accessToken);
@@ -84,7 +84,7 @@ class UpdateAndSynchronizeTechDpTest {
     Mockito.verify(paymentFlowOrchestratorServiceMock).updateBalanceAndMeta(storedDp, installment, incomingReceipt, accessToken);
     Mockito.verify(debtPositionMapperMock).mapToDto(storedDp);
     Mockito.verify(paymentsProducerServiceMock).notifyPaymentsEvent(mappedDto, PaymentEventType.RT_RECEIVED, "receiptId:" + incomingReceipt.getReceiptId());
-    Mockito.verify(debtPositionMapperMock).mapToModel(mappedDto);
+    Mockito.verify(debtPositionMapperMock).mapToModel(mappedDto, accessToken);
   }
 
   @Test
@@ -110,7 +110,7 @@ class UpdateAndSynchronizeTechDpTest {
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(paymentFlowOrchestratorServiceMock, Mockito.never()).updateBalanceAndMeta(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString());
     Mockito.verify(paymentFlowOrchestratorServiceMock, Mockito.never()).performStandardUpdate(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyString());
-    Mockito.verify(technicalDpUpdateServiceMock, Mockito.never()).updateDp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyLong());
+    Mockito.verify(technicalDpUpdateServiceMock, Mockito.never()).updateDp(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.anyLong(), Mockito.same(accessToken));
     Mockito.verify(paymentsProducerServiceMock, Mockito.never()).notifyPaymentsEvent(Mockito.any(), Mockito.any(), Mockito.anyString());
   }
 
@@ -131,7 +131,7 @@ class UpdateAndSynchronizeTechDpTest {
 
     Mockito.when(receiptServiceMock.getReceipt(installment.getReceiptId())).thenReturn(storedReceipt);
     Mockito.when(debtPositionMapperMock.mapToDto(storedDp)).thenReturn(mappedDto);
-    Mockito.when(debtPositionMapperMock.mapToModel(mappedDto)).thenReturn(expectedResult);
+    Mockito.when(debtPositionMapperMock.mapToModel(mappedDto, accessToken)).thenReturn(expectedResult);
 
     // When
     DebtPosition result = service.handleTechDpAlreadyPaid(installment, incomingReceipt, storedDp, organization, accessToken);
@@ -143,7 +143,7 @@ class UpdateAndSynchronizeTechDpTest {
     Mockito.verify(paymentFlowOrchestratorServiceMock).performStandardUpdate(storedDp, installment, incomingReceipt, accessToken);
     Mockito.verify(debtPositionMapperMock).mapToDto(storedDp);
     Mockito.verify(paymentsProducerServiceMock).notifyPaymentsEvent(mappedDto, PaymentEventType.RT_RECEIVED, "receiptId:" + incomingReceipt.getReceiptId());
-    Mockito.verify(debtPositionMapperMock).mapToModel(mappedDto);
+    Mockito.verify(debtPositionMapperMock).mapToModel(mappedDto, accessToken);
   }
 
   @Test
@@ -179,10 +179,11 @@ class UpdateAndSynchronizeTechDpTest {
       Mockito.same(storedDp),
       Mockito.same(incomingReceipt),
       Mockito.same(organization),
-      Mockito.eq(resolvedTypeOrgId)
+      Mockito.eq(resolvedTypeOrgId),
+      Mockito.same(accessToken)
     )).thenReturn(updatedDto);
 
-    Mockito.when(debtPositionMapperMock.mapToModel(updatedDto)).thenReturn(mappedModel);
+    Mockito.when(debtPositionMapperMock.mapToModel(updatedDto, accessToken)).thenReturn(mappedModel);
 
     // When
     DebtPosition result = service.handleTechDpAlreadyPaid(installment, incomingReceipt, storedDp, organization, accessToken);
@@ -192,9 +193,9 @@ class UpdateAndSynchronizeTechDpTest {
 
     Mockito.verify(receiptServiceMock).getReceipt(installment.getReceiptId());
     Mockito.verify(paymentFlowOrchestratorServiceMock).resolveDebtPositionTypeOrgId(1L, "CODE", 100L);
-    Mockito.verify(technicalDpUpdateServiceMock).updateDp(storedDp, incomingReceipt, organization, resolvedTypeOrgId);
+    Mockito.verify(technicalDpUpdateServiceMock).updateDp(storedDp, incomingReceipt, organization, resolvedTypeOrgId, accessToken);
     Mockito.verify(paymentsProducerServiceMock).notifyPaymentsEvent(updatedDto, PaymentEventType.RT_RECEIVED, "receiptId:" + incomingReceipt.getReceiptId());
-    Mockito.verify(debtPositionMapperMock).mapToModel(updatedDto);
+    Mockito.verify(debtPositionMapperMock).mapToModel(updatedDto, accessToken);
   }
 
   @Test
@@ -204,14 +205,14 @@ class UpdateAndSynchronizeTechDpTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     DebtPosition expectedResult = new DebtPosition();
 
-    Mockito.when(debtPositionMapperMock.mapToModel(dpDto)).thenReturn(expectedResult);
+    Mockito.when(debtPositionMapperMock.mapToModel(dpDto, accessToken)).thenReturn(expectedResult);
 
     // When
-    DebtPosition result = service.publishTechDp(dpDto, receiptDTO);
+    DebtPosition result = service.publishTechDp(dpDto, receiptDTO, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
     Mockito.verify(paymentsProducerServiceMock).notifyPaymentsEvent(dpDto, PaymentEventType.RT_RECEIVED, "receiptId:" + receiptDTO.getReceiptId());
-    Mockito.verify(debtPositionMapperMock).mapToModel(dpDto);
+    Mockito.verify(debtPositionMapperMock).mapToModel(dpDto, accessToken);
   }
 }

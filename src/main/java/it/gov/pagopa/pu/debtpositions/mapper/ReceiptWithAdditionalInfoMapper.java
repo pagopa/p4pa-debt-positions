@@ -16,19 +16,24 @@ import java.util.stream.Stream;
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
 
+  private static final String UNKNOWN_STATION_ID = "UNKNOWN";
+
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId, DebtPosition existingDp) {
     List<TransferDTO> techTransfers = buildTechTransfers(receiptDTO, organization);
 
     String iupdPagopa;
     String iud;
+    String stationId;
 
     if (existingDp != null && !existingDp.getPaymentOptions().isEmpty() && !existingDp.getPaymentOptions().getFirst().getInstallments().isEmpty()) {
       InstallmentNoPII existingInstallment = existingDp.getPaymentOptions().getFirst().getInstallments().getFirst();
       iupdPagopa = existingInstallment.getIupdPagopa();
       iud = existingInstallment.getIud();
+      stationId = existingDp.getStationId();
     } else {
       iupdPagopa = Utilities.generateRandomIupd(organization.getOrgFiscalCode());
       iud = receiptDTO.getIud() != null ? receiptDTO.getIud() : Utilities.getRandomIUD();
+      stationId = UNKNOWN_STATION_ID;
     }
 
     return DebtPositionDTO.builder()
@@ -41,6 +46,7 @@ public class ReceiptWithAdditionalInfoMapper {
       .validityDate(null)
       .multiDebtor(false)
       .flagPuPagoPaPayment(true)
+      .stationId(stationId)
       .paymentOptions(List.of(PaymentOptionDTO.builder()
         .totalAmountCents(receiptDTO.getPaymentAmountCents())
         .status(PaymentOptionStatus.PAID)

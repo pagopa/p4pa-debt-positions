@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.mapper;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationStationRetrieverService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedDebtPositions;
@@ -8,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -23,15 +25,19 @@ public class DebtPositionMapper {
 
   private final PaymentOptionMapper paymentOptionMapper;
   private final InstallmentPIIMapper installmentPIIMapper;
+  private final OrganizationStationRetrieverService organizationStationRetrieverService;
 
   private static final Collector<PaymentOption, ?, SortedSet<PaymentOption>> toPaymentOptionTreeSet = Collectors.toCollection(TreeSet::new);
 
-  public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper, InstallmentPIIMapper installmentPIIMapper) {
+  public DebtPositionMapper(PaymentOptionMapper paymentOptionMapper,
+                            InstallmentPIIMapper installmentPIIMapper,
+                            OrganizationStationRetrieverService organizationStationRetrieverService) {
     this.paymentOptionMapper = paymentOptionMapper;
     this.installmentPIIMapper = installmentPIIMapper;
+    this.organizationStationRetrieverService = organizationStationRetrieverService;
   }
 
-  public DebtPosition mapToModel(DebtPositionDTO dto) {
+  public DebtPosition mapToModel(DebtPositionDTO dto, String accessToken) {
     DebtPosition debtPosition = new DebtPosition();
     debtPosition.setDebtPositionId(dto.getDebtPositionId());
     debtPosition.setIupdOrg(dto.getIupdOrg());
@@ -49,6 +55,9 @@ public class DebtPositionMapper {
       .collect(toPaymentOptionTreeSet);
 
     debtPosition.setPaymentOptions(paymentOptions);
+
+    OrganizationStationDTO organizationStation = organizationStationRetrieverService.getOrganizationStation(dto.getOrganizationId(), dto.getStationId(), accessToken);
+    debtPosition.setStationId(organizationStation.getStationId());
 
     return debtPosition;
   }
@@ -100,6 +109,7 @@ public class DebtPositionMapper {
           .map(po -> paymentOptionMapper.mapToDto(po, poId2InstallmentDTOHolder[0].get(po.getPaymentOptionId())))
           .collect(Collectors.toCollection(ArrayList<PaymentOptionDTO>::new))
       )
+      .stationId(debtPosition.getStationId())
       .build();
 
     setToDtoAutoDbFields(dto, debtPosition);

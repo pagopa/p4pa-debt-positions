@@ -82,8 +82,8 @@ class MixedDpPaymentHandlerServiceTest {
 
     // Then
     Mockito.verify(updateAndSynchronizeTechDpMock)
-      .publishTechDp(Mockito.same(techDpMixed1DTO), Mockito.same(receiptDTO));
+      .publishTechDp(Mockito.same(techDpMixed1DTO), Mockito.same(receiptDTO), Mockito.same(accessToken));
     Mockito.verify(updateAndSynchronizeTechDpMock)
-      .publishTechDp(Mockito.same(techDpMixed2DTO), Mockito.same(receiptDTO));
+      .publishTechDp(Mockito.same(techDpMixed2DTO), Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 }

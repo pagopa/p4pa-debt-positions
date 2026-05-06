@@ -75,16 +75,16 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
     Mockito.when(receiptMapperMock.mapToDebtPosition(Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(resolvedId), Mockito.any()))
       .thenReturn(dpDto);
 
-    Mockito.when(updateAndSynchronizeTechDpMock.publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO)))
+    Mockito.when(updateAndSynchronizeTechDpMock.publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO), Mockito.same(accessToken)))
       .thenReturn(expectedResult);
 
     // When
-    DebtPosition result = service.createAndPublishTechDp(organization, receiptDTO);
+    DebtPosition result = service.createAndPublishTechDp(organization, receiptDTO, accessToken);
 
     // Then
     Assertions.assertSame(expectedResult, result);
 
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(Mockito.same(dpDto));
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(Mockito.same(dpDto), Mockito.same(accessToken));
   }
 
   @Test
@@ -126,13 +126,13 @@ class ReceiptBasedTechnicalDpHandlerServiceTest {
     Mockito.when(paymentFlowOrchestratorServiceMock.resolveDebtPositionTypeOrgId(1L, "CODE", null))
       .thenReturn(resolvedId);
 
-    Mockito.when(technicalDpUpdateServiceMock.updateDp(Mockito.same(dp), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(resolvedId)))
+    Mockito.when(technicalDpUpdateServiceMock.updateDp(Mockito.same(dp), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.eq(resolvedId), Mockito.same(accessToken)))
       .thenReturn(dpDto);
 
     // When
-    service.updateAndPublishTechDp(organization, dp, receiptDTO);
+    service.updateAndPublishTechDp(organization, dp, receiptDTO, accessToken);
 
     // Then
-    Mockito.verify(updateAndSynchronizeTechDpMock).publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO));
+    Mockito.verify(updateAndSynchronizeTechDpMock).publishTechDp(Mockito.same(dpDto), Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 }
