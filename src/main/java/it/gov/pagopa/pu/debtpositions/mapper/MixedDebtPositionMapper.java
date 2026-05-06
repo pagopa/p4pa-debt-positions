@@ -11,7 +11,7 @@ import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrg
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -96,13 +96,8 @@ public class MixedDebtPositionMapper {
   }
 
   private String fetchStationId(MixedDebtPositionDTO mixedDebtPositionDTO, Long organizationId, String accessToken) {
-    if(mixedDebtPositionDTO.getStationId() != null) {
-      organizationService.verifyStationId(mixedDebtPositionDTO.getOrganizationId(), mixedDebtPositionDTO.getStationId(), accessToken);
-      return mixedDebtPositionDTO.getStationId();
-    } else {
-      OrganizationStation defaultOrganizationStation = organizationService.getDefaultOrganizationStation(organizationId, accessToken);
-      return defaultOrganizationStation.getStationId();
-    }
+    OrganizationStationDTO organizationStation = organizationService.getOrganizationStation(organizationId, mixedDebtPositionDTO.getStationId(), accessToken);
+    return organizationStation.getStationId();
   }
 
   public Map<Long, List<MixedDpAdditionalData>> buildDebtPositionTypeOrgId2TransfersData(

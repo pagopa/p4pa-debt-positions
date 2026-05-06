@@ -9,7 +9,7 @@ import it.gov.pagopa.pu.debtpositions.mapper.pii.InstallmentPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
@@ -56,13 +56,8 @@ public class DebtPositionMapper {
 
     debtPosition.setPaymentOptions(paymentOptions);
 
-    if(dto.getStationId() != null) {
-      organizationService.verifyStationId(dto.getOrganizationId(), dto.getStationId(), accessToken);
-      debtPosition.setStationId(dto.getStationId());
-    } else {
-      OrganizationStation defaultOrganizationStation = organizationService.getDefaultOrganizationStation(dto.getOrganizationId(), accessToken);
-      debtPosition.setStationId(defaultOrganizationStation.getStationId());
-    }
+    OrganizationStationDTO organizationStation = organizationService.getOrganizationStation(dto.getOrganizationId(), dto.getStationId(), accessToken);
+    debtPosition.setStationId(organizationStation.getStationId());
 
     return debtPosition;
   }

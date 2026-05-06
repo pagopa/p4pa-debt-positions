@@ -13,7 +13,7 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker;
 import it.gov.pagopa.pu.debtpositions.util.faker.TransferFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildO
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -147,99 +146,13 @@ class MixedDebtPositionMapperTest {
       when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
         .thenReturn("9/01234567/");
 
-      doNothing()
-        .when(organizationServiceMock)
-        .verifyStationId(
-          mixedDebtPositionDTO.getOrganizationId(),
-          mixedDebtPositionDTO.getStationId(),
-          accessToken
-        );
-
-      DebtPositionDTO result = mapper.mapToDebtPositionDTO(
-        organization,
-        mixedDebtPositionDTO,
-        accessToken
-      );
-
-      assertEquals(expectedResult, result);
-    }
-  }
-
-  @Test
-  void givenNoStationIdWhenMapToDebtPositionDTOThenDefaultStationId() {
-    Organization organization = buildOrganization();
-    MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
-    mixedDebtPositionDTO.setStationId(null);
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
-    dpTypeOrg.setDebtPositionTypeOrgId(100L);
-    String iud = "IUD";
-    String category = "9/01234567/";
-
-    TransferDTO expectedTransfer = TransferDTO.builder()
-      .transferIndex(1)
-      .orgFiscalCode(organization.getOrgFiscalCode())
-      .orgName(organization.getOrgName())
-      .amountCents(50L)
-      .stampType("stampType")
-      .stampHashDocument("stampHashDocument")
-      .stampProvincialResidence("stampProvincialResidence")
-      .iban("IT60X0542811101000000123456")
-      .postalIban("IT60X0542811101000000123456")
-      .category(category)
-      .remittanceInformation("Payment Info")
-      .build();
-    InstallmentDTO expectedInstallment = InstallmentDTO.builder()
-      .status(InstallmentStatus.UNPAID)
-      .amountCents(50L)
-      .iud(iud)
-      .balance(null)
-      .dueDate(DATE)
-      .debtor(PersonFaker.buildPerson())
-      .legacyPaymentMetadata(null)
-      .remittanceInformation("Causali multiple")
-      .sourceFlowName("sourceFlowName")
-      .transfers(List.of(expectedTransfer))
-      .build();
-    PaymentOptionDTO expectedPaymentOption = PaymentOptionDTO.builder()
-      .status(PaymentOptionStatus.UNPAID)
-      .paymentOptionIndex(1)
-      .paymentOptionType(PaymentOptionType.SINGLE_INSTALLMENT)
-      .installments(List.of(expectedInstallment))
-      .build();
-    DebtPositionDTO expectedResult = DebtPositionDTO.builder()
-      .status(DebtPositionStatus.UNPAID)
-      .debtPositionOrigin(DebtPositionOrigin.ORDINARY)
-      .organizationId(500L)
-      .description("Test Description")
-      .flagPuPagoPaPayment(true)
-      .multiDebtor(false)
-      .debtPositionTypeOrgId(dpTypeOrg.getDebtPositionTypeOrgId())
-      .paymentOptions(List.of(expectedPaymentOption))
-      .stationId("defaultStationId")
-      .build();
-
-    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
-      utilities.when(Utilities::getRandomIUD).thenReturn(iud);
-      utilities.when(() -> getTaxonomyCodeFromCategory("9/01234567/", "9/", "/")).thenReturn(category);
-
-      when(
-        mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(
-          anyLong()))
-        .thenReturn(dpTypeOrg);
-
-      when(
-        debtPositionTypeOrgRepositoryMock.findById(
-          anyLong()))
-        .thenReturn(Optional.of(debtPositionTypeOrg));
-
-      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode()))
-        .thenReturn("9/01234567/");
-
-      when(organizationServiceMock.getDefaultOrganizationStation(
+      OrganizationStationDTO defaultStation = new OrganizationStationDTO();
+      defaultStation.setStationId(mixedDebtPositionDTO.getStationId());
+      when(organizationServiceMock.getOrganizationStation(
         organization.getOrganizationId(),
+        mixedDebtPositionDTO.getStationId(),
         accessToken
-      )).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
+      )).thenReturn(defaultStation);
 
       DebtPositionDTO result = mapper.mapToDebtPositionDTO(
         organization,

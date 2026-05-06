@@ -8,7 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStation;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,37 +77,17 @@ class DebtPositionMapperTest {
     PaymentOption paymentOption = buildPaymentOption();
 
     Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
-    Mockito.doNothing().when(
-      organizationServiceMock).verifyStationId(
+
+    OrganizationStationDTO defaultStation = new OrganizationStationDTO();
+    defaultStation.setStationId(debtPositionExpected.getStationId());
+    Mockito.when(
+      organizationServiceMock.getOrganizationStation(
         debtPositionDTO.getOrganizationId(),
         debtPositionDTO.getStationId(),
         accessToken
-      );
-    //WHEN
-    DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
-    //THEN
-    reflectionEqualsByName(debtPositionExpected, result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
-    checkNotNullFields(result, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
-  }
-
-  @Test
-  void givenValidDebtPositionDTOWithNoStationID_whenMapToModel_thenReturnDebtPositionAndInstallmentMapWithDefaultStationId() {
-    //GIVEN
-    DebtPosition debtPositionExpected = buildDebtPosition();
-    debtPositionExpected.setStationId("defaultStationId");
-    debtPositionExpected.setStatus(DebtPositionStatus.UNPAID);
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setStationId(null);
-
-    PaymentOption paymentOption = buildPaymentOption();
-
-    Mockito.when(paymentOptionMapperMock.mapToModel(buildPaymentOptionDTO())).thenReturn(paymentOption);
-    Mockito.when(
-      organizationServiceMock.getDefaultOrganizationStation(
-        debtPositionDTO.getOrganizationId(),
-        accessToken
       )
-    ).thenReturn(OrganizationStation.builder().organizationId(1L).stationId("defaultStationId").build());
+    ).thenReturn(defaultStation);
+
     //WHEN
     DebtPosition result = debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
     //THEN
