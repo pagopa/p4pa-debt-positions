@@ -27,7 +27,7 @@ class OrganizationSearchClientTest {
   @Mock
   private OrganizationEntityControllerApi organizationEntityControllerApiMock;
   @Mock
-  private OrganizationApi OrganizationApiMock;
+  private OrganizationApi organizationApiMock;
 
   private OrganizationSearchClient organizationSearchClient;
 
@@ -42,7 +42,7 @@ class OrganizationSearchClientTest {
       organizationApisHolderMock,
       organizationSearchControllerApiMock,
       organizationEntityControllerApiMock,
-      OrganizationApiMock
+      organizationApiMock
     );
   }
 
@@ -173,8 +173,8 @@ class OrganizationSearchClientTest {
     OrganizationStationDTO expectedResult = new OrganizationStationDTO();
 
     Mockito.when(organizationApisHolderMock.getOrganizationApi(accessToken))
-      .thenReturn(OrganizationApiMock);
-    Mockito.when(OrganizationApiMock.getOrganizationStation(organizationId, stationId))
+      .thenReturn(organizationApiMock);
+    Mockito.when(organizationApiMock.getOrganizationStation(organizationId, stationId))
       .thenReturn(expectedResult);
 
     // When
@@ -192,8 +192,8 @@ class OrganizationSearchClientTest {
     String stationId = "ORGFISCALCODE";
 
     Mockito.when(organizationApisHolderMock.getOrganizationApi(accessToken))
-      .thenReturn(OrganizationApiMock);
-    Mockito.when(OrganizationApiMock.getOrganizationStation(organizationId, stationId))
+      .thenReturn(organizationApiMock);
+    Mockito.when(organizationApiMock.getOrganizationStation(organizationId, stationId))
       .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
 
     // When
