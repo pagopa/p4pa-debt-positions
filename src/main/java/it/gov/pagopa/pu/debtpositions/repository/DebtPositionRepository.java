@@ -257,18 +257,18 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
      AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
      AND dp.debtPositionOrigin != 'SPONTANEOUS_MIXED'
   """)
-  Page<Long> findPagedPrimaryDebtPositionIdByFilters(
+  Page<Long> findUnpaidOrdinaryDebtPositionIdsByDebtorFiscalCode(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(name = "organizationIds", required = true) @Param("organizationIds") List<Long> organizationIds,
     Pageable pageable);
 
   @RestResource(exported = false)
-  default Page<DebtPosition> findPagedPrimaryDebtPositionEntityGraphByFilters(
+  default Page<DebtPosition> findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(
     String debtorFiscalCode,
     List<Long> organizationIds,
     Pageable pageable)
   {
-    Page<Long> dpIdsPage = findPagedPrimaryDebtPositionIdByFilters(debtorFiscalCode, organizationIds, pageable);
+    Page<Long> dpIdsPage = findUnpaidOrdinaryDebtPositionIdsByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable);
     List<DebtPosition> dps = findEntityGraphByDebtPositionIdIn(dpIdsPage.getContent());
     return new PageImpl<>(dps, dpIdsPage.getPageable(), dpIdsPage.getTotalElements());
   }
