@@ -18,10 +18,10 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.*;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
+
 @ExtendWith(MockitoExtension.class)
 class ReceiptWithAdditionalInfoMapperTest {
-
-  private static final String UNKNOWN_STATION_ID = "UNKNOWN";
 
   @InjectMocks
   private ReceiptWithAdditionalInfoMapper receiptWithAdditionalInfoMapper;

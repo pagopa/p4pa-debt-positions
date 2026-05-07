@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Stream;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
+
 @Service
 public class ReceiptWithAdditionalInfoMapper {
   public static final String UNKNOWN = "unknown";
-
-  private static final String UNKNOWN_STATION_ID = "UNKNOWN";
 
   public DebtPositionDTO mapToDebtPosition(ReceiptWithAdditionalNodeDataDTO receiptDTO, Organization organization, Long debtPositionTypeOrgId, DebtPosition existingDp) {
     List<TransferDTO> techTransfers = buildTechTransfers(receiptDTO, organization);
