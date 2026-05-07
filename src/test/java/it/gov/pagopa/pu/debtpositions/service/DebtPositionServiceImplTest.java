@@ -442,7 +442,7 @@ class DebtPositionServiceImplTest {
     Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
     Mockito.when(debtPositionRepositoryMock
-        .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
+        .findPagedPrimaryDebtPositionEntityGraphByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(200L))
@@ -478,7 +478,7 @@ class DebtPositionServiceImplTest {
     Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
     Mockito.when(debtPositionRepositoryMock
-        .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
+        .findPagedPrimaryDebtPositionEntityGraphByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(emptyPage);
 
     Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
@@ -508,7 +508,7 @@ class DebtPositionServiceImplTest {
     Page<DebtPosition> page = new PageImpl<>(List.of(dp));
 
     Mockito.when(debtPositionRepositoryMock
-        .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
+        .findPagedPrimaryDebtPositionEntityGraphByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(70L))
@@ -534,7 +534,7 @@ class DebtPositionServiceImplTest {
     Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
     Mockito.when(debtPositionRepositoryMock
-        .findPagedPrimaryDebtPositionByFilters(debtorFiscalCode, organizationIds, pageable))
+        .findPagedPrimaryDebtPositionEntityGraphByFilters(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
     PagedDebtorUnpaidDebtPositionDTO expectedResult = new PagedDebtorUnpaidDebtPositionDTO();
