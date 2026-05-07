@@ -48,7 +48,7 @@ public class UpdateAndSynchronizeTechDp {
       if (!isIncomingPagoPa) {
         log.info("Updating balance/dpTypeOrgId for debtPositionId {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
         paymentFlowOrchestratorService.updateBalanceAndMeta(storedDp, installment, incomingReceiptDTO, accessToken);
-        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
+        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO, accessToken);
       } else {
         log.info("Skipping update for DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
       }
@@ -56,23 +56,23 @@ public class UpdateAndSynchronizeTechDp {
       if (isIncomingPagoPa) {
         log.info("Executing Full Update for DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
         paymentFlowOrchestratorService.performStandardUpdate(storedDp, installment, incomingReceiptDTO, accessToken);
-        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO);
+        publishTechDp(debtPositionMapper.mapToDto(storedDp), incomingReceiptDTO, accessToken);
       } else {
         log.info("Updating DP {} (Receipt - [Stored: {}, Incoming: {}])", storedDp.getDebtPositionId(), storedReceipt.getReceiptOrigin(), incomingReceiptDTO.getReceiptOrigin());
 
         Long debtPositionTypeOrgId = paymentFlowOrchestratorService.resolveDebtPositionTypeOrgId(
           organization.getOrganizationId(), incomingReceiptDTO.getDebtPositionTypeOrgCode(), storedDp.getDebtPositionTypeOrgId());
 
-        DebtPositionDTO dto = technicalDpUpdateService.updateDp(storedDp, incomingReceiptDTO, organization, debtPositionTypeOrgId);
+        DebtPositionDTO dto = technicalDpUpdateService.updateDp(storedDp, incomingReceiptDTO, organization, debtPositionTypeOrgId, accessToken);
 
-        publishTechDp(dto, incomingReceiptDTO);
+        publishTechDp(dto, incomingReceiptDTO, accessToken);
       }
     }
     return storedDp;
   }
 
-  public DebtPosition publishTechDp(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
+  public DebtPosition publishTechDp(DebtPositionDTO debtPositionDTO, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
     paymentsProducerService.notifyPaymentsEvent(debtPositionDTO, PaymentEventType.RT_RECEIVED, "receiptId:" + receiptDTO.getReceiptId());
-    return debtPositionMapper.mapToModel(debtPositionDTO);
+    return debtPositionMapper.mapToModel(debtPositionDTO, accessToken);
   }
 }

@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.springframework.cache.annotation.CacheConfig;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -39,6 +40,14 @@ public class OrganizationServiceImpl implements OrganizationService {
   public Optional<Organization> getOrganizationById(Long orgId, String accessToken) {
     return Optional.ofNullable(
       organizationSearchClient.findByOrganizationId(orgId, accessToken)
+    );
+  }
+
+  @Override
+  @Cacheable(key = "'organizationId-' + #organizationId + '_stationId-' + #stationId", unless = "#result == null")
+  public Optional<OrganizationStationDTO> getOrganizationStation(Long organizationId, String stationId, String accessToken) {
+    return Optional.ofNullable(
+      organizationSearchClient.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken)
     );
   }
 }

@@ -119,7 +119,7 @@ class MassiveUpdateServiceImplTest {
 
     Mockito.verify(debtPositionServiceMock).getDebtPosition(debtPositionDTO.getDebtPositionId());
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO);
+    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
     Mockito.verify(debtPositionSyncServiceMock).syncDebtPosition(
       Mockito.eq(debtPositionDTO),
       Mockito.any(WfExecutionParameters.class),

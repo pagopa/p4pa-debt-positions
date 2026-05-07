@@ -105,7 +105,7 @@ class SecondaryOrgPaymentHandlerServiceTest {
 
     // Then
     Mockito.verify(receiptBasedTechnicalDpHandlerServiceMock)
-      .updateAndPublishTechDp(Mockito.same(organization), Mockito.same(secondaryOrgDp), Mockito.same(receiptDTO));
+      .updateAndPublishTechDp(Mockito.same(organization), Mockito.same(secondaryOrgDp), Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 
   @Test
@@ -140,6 +140,6 @@ class SecondaryOrgPaymentHandlerServiceTest {
 
     // Then
     Mockito.verify(receiptBasedTechnicalDpHandlerServiceMock)
-      .createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO));
+      .createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 }

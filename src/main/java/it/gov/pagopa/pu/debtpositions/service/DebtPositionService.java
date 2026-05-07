@@ -11,7 +11,7 @@ import java.util.Optional;
 
 public interface DebtPositionService {
 
-  void saveDebtPosition(DebtPositionDTO debtPositionDTO);
+  void saveDebtPosition(DebtPositionDTO debtPositionDTO, String accessToken);
   void saveDebtPosition(DebtPosition debtPosition);
   List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition);
   DebtPositionDTO mapDebtPosition(DebtPosition debtPosition);

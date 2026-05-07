@@ -7,10 +7,12 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.pii.ReceiptPIIRepository;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.mixed.MixedDpPaymentHandlerService;
+import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgInstallmentRetrieverService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg.PrimaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.service.create.receipt.secondaryorg.SecondaryOrgPaymentHandlerService;
 import it.gov.pagopa.pu.debtpositions.util.Constants;
@@ -37,8 +39,9 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
   private final MixedDpPaymentHandlerService mixedDpPaymentHandlerService;
   private final OrganizationService organizationService;
   private final BrokerService brokerService;
+  private final PrimaryOrgInstallmentRetrieverService  primaryOrgInstallmentRetrieverService;
 
-  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService, SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService, MixedDpPaymentHandlerService mixedDpPaymentHandlerService, OrganizationService organizationService, BrokerService brokerService) {
+  public CreateReceiptServiceImpl(ReceiptNoPIIRepository receiptNoPIIRepository, ReceiptPIIRepository receiptPIIRepository, PrimaryOrgPaymentHandlerService primaryOrgPaymentHandlerService, SecondaryOrgPaymentHandlerService secondaryOrgPaymentHandlerService, MixedDpPaymentHandlerService mixedDpPaymentHandlerService, OrganizationService organizationService, BrokerService brokerService, PrimaryOrgInstallmentRetrieverService primaryOrgInstallmentRetrieverService) {
     this.receiptNoPIIRepository = receiptNoPIIRepository;
     this.receiptPIIRepository = receiptPIIRepository;
     this.primaryOrgPaymentHandlerService = primaryOrgPaymentHandlerService;
@@ -46,6 +49,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
     this.mixedDpPaymentHandlerService = mixedDpPaymentHandlerService;
     this.organizationService = organizationService;
     this.brokerService = brokerService;
+    this.primaryOrgInstallmentRetrieverService = primaryOrgInstallmentRetrieverService;
   }
 
   @Override
@@ -55,8 +59,24 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
     Pair<Broker, Organization> brokerOrgPair = validateAndRetrieveBrokerOrgPair(receiptDTO.getOrganizationId(), receiptDTO.getOrgFiscalCode(), accessToken);
     Organization primaryOrg = brokerOrgPair.getRight();
+    Broker broker = brokerOrgPair.getLeft();
 
     ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
+
+    if (existingReceipt == null && broker != null && Boolean.TRUE.equals(broker.getFlagDelegate())) {
+      Optional<InstallmentNoPII> retrievedInstallment =
+        primaryOrgInstallmentRetrieverService.retrieve(
+          primaryOrg,
+          receiptDTO.getNoticeNumber(),
+          receiptDTO.getIud()
+        );
+
+      if (retrievedInstallment.isEmpty()) {
+        log.info("Provided a Receipt for notice {} on organization {} not handled by PU on delegate broker {}", receiptDTO.getNoticeNumber(), receiptDTO.getOrgFiscalCode(), broker.getExternalId());
+        return null;
+      }
+    }
+
     boolean shouldSave;
 
     if (existingReceipt == null) {
@@ -74,7 +94,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       saveReceipt(receiptDTO);
     }
 
-    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(primaryOrg, receiptDTO, brokerOrgPair.getLeft(), accessToken);
+    Optional<DebtPosition> primaryOrgDp = primaryOrgPaymentHandlerService.handlePayment(primaryOrg, receiptDTO, broker, accessToken);
     secondaryOrgPaymentHandlerService.handle(receiptDTO, accessToken);
     primaryOrgDp.ifPresent(dp -> mixedDpPaymentHandlerService.handle(dp, receiptDTO, accessToken));
 

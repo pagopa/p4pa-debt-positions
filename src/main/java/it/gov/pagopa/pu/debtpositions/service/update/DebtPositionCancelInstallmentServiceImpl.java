@@ -79,7 +79,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
     if (DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
       log.debug("Deleting draft installments with ids {}", installmentIds);
-      installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIds);
+      installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIds, accessToken);
     } else {
       log.debug("Updating status cancelled for installments with ids {}", installmentIds);
       debtPositionDTO.getPaymentOptions()
@@ -91,9 +91,9 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
   }
 
   @Override
-  protected void saveAndAlignHierarchyStatus(DebtPositionDTO debtPositionDTO) {
+  protected void saveAndAlignHierarchyStatus(DebtPositionDTO debtPositionDTO, String accessToken) {
     if (!DebtPositionStatus.DRAFT.equals(debtPositionDTO.getStatus())) {
-      super.saveAndAlignHierarchyStatus(debtPositionDTO);
+      super.saveAndAlignHierarchyStatus(debtPositionDTO, accessToken);
     }
   }
 

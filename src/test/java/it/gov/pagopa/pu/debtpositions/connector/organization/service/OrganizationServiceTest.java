@@ -2,6 +2,7 @@ package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.client.OrganizationSearchClient;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -101,6 +102,7 @@ class OrganizationServiceTest {
     }
 //endregion
 
+//region getOrganizationById tests
   @Test
   void givenNotExistentOrgIdWhenGetOrganizationByIdThenEmpty(){
     // Given
@@ -130,4 +132,41 @@ class OrganizationServiceTest {
     Assertions.assertTrue(result.isPresent());
     Assertions.assertSame(expectedResult, result.get());
   }
+//endregion
+
+//region getOrganizationStation tests
+  @Test
+  void givenNotExistingOrganizationStationWhenGetOrganizationStationThenEmpty(){
+    // Given
+    Long organizationId = 1L;
+    String stationId = "STATION_ID";
+    Mockito.when(organizationSearchClientMock.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken))
+      .thenReturn(null);
+
+    // When
+    Optional<OrganizationStationDTO> result =
+      organizationService.getOrganizationStation(organizationId, stationId, accessToken);
+
+    // Then
+    Assertions.assertTrue(result.isEmpty());
+  }
+
+  @Test
+  void givenExistentOrganizationStationWhenVerifyStationIdIdThenOk(){
+    // Given
+    Long organizationId = 1L;
+    String stationId = "STATION_ID";
+    OrganizationStationDTO expectedResult = new OrganizationStationDTO();
+    Mockito.when(organizationSearchClientMock.findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken))
+      .thenReturn(expectedResult);
+
+    // When
+    organizationService.getOrganizationStation(organizationId, stationId, accessToken);
+
+    // Then
+    Mockito.verify(organizationSearchClientMock)
+      .findOrganizationStationByOrganizationIdAndStationId(organizationId, stationId, accessToken);
+  }
+//endregion
+
 }

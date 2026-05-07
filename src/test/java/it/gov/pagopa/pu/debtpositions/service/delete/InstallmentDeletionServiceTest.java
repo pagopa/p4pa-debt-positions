@@ -34,6 +34,9 @@ import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentDeletionServiceTest {
+
+  private final String accessToken = "accessToken";
+
   @Mock
   private PaymentOptionRepository paymentOptionRepositoryMock;
   @Mock
@@ -63,11 +66,11 @@ class InstallmentDeletionServiceTest {
     DebtPosition debtPosition = buildDebtPosition();
     Set<Long> installmentIdsToDelete = Set.of(100L);
 
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken)).thenReturn(debtPosition);
 
-    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
+    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete, accessToken);
 
-    verify(debtPositionServiceMock).delete(debtPositionMapperMock.mapToModel(debtPositionDTO));
+    verify(debtPositionServiceMock).delete(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken));
     assertTrue(debtPositionDTO.getPaymentOptions().isEmpty());
   }
 
@@ -85,11 +88,11 @@ class InstallmentDeletionServiceTest {
     po.setPaymentOptionId(20L);
     po.setInstallments(new TreeSet<>(List.of(installmentNoPII1, installmentNoPII2)));
 
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken)).thenReturn(debtPosition);
 
     Set<Long> installmentIdsToDelete = Set.of(300L, 400L);
 
-    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
+    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete, accessToken);
 
     verify(installmentPIIRepository).delete(installmentNoPII1);
     verify(installmentPIIRepository).delete(installmentNoPII2);
@@ -112,11 +115,11 @@ class InstallmentDeletionServiceTest {
     po.setPaymentOptionId(20L);
     po.setInstallments(new TreeSet<>(List.of(installmentNoPII1, installmentNoPII2)));
 
-    when(debtPositionMapperMock.mapToModel(debtPositionDTO)).thenReturn(debtPosition);
+    when(debtPositionMapperMock.mapToModel(debtPositionDTO, accessToken)).thenReturn(debtPosition);
 
     Set<Long> installmentIdsToDelete = Set.of(400L);
 
-    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete);
+    installmentDeletionService.deleteDraftInstallments(debtPositionDTO, installmentIdsToDelete, accessToken);
 
     verify(transferRepository).delete(installmentNoPII2.getTransfers().getFirst());
     verify(installmentPIIRepository).delete(installmentNoPII2);

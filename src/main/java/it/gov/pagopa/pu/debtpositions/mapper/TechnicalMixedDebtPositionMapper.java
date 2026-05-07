@@ -54,6 +54,7 @@ public class TechnicalMixedDebtPositionMapper {
       toTechnicalMixedDPPaymentOptions(
         debtPosition, isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
     debtPositionProcessorService.updateAmounts(technicalMixedDp);
+    technicalMixedDp.setStationId(debtPosition.getStationId());
 
     return technicalMixedDp;
   }

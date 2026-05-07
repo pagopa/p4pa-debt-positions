@@ -102,7 +102,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
 
     Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.empty());
-    Mockito.when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO)))
+    Mockito.when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(accessToken)))
       .thenReturn(dp);
 
     // When
