@@ -245,28 +245,33 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
 
   @RestResource(exported = false)
   @Query("""
-    SELECT dp
+    SELECT distinct dp.debtPositionId
     FROM DebtPosition dp
+    JOIN dp.paymentOptions po
+    JOIN po.installments i
     WHERE
      dp.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).OPEN_DP_STATUSES})
      AND dp.organizationId IN :organizationIds
-     AND EXISTS (
-             SELECT 1
-             FROM PaymentOption po
-             JOIN po.installments i
-             WHERE po.debtPositionId = dp.debtPositionId
-             AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_PO_STATUSES})
-             AND i.status = 'UNPAID'
-             AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
-     )
-    AND dp.debtPositionOrigin != 'SPONTANEOUS_MIXED'
+     AND po.status IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).PAYABLE_PO_STATUSES})
+     AND i.status = 'UNPAID'
+     AND i.debtorFiscalCodeHash = :#{@dataCipherService.hash(#debtorFiscalCode)}
+     AND dp.debtPositionOrigin != 'SPONTANEOUS_MIXED'
   """)
-  @EntityGraph(value = "completeDebtPosition")
-  Page<DebtPosition> findPagedPrimaryDebtPositionByFilters(
+  Page<Long> findUnpaidOrdinaryDebtPositionIdsByDebtorFiscalCode(
     @Parameter(required = true) @Param("debtorFiscalCode") String debtorFiscalCode,
     @Parameter(name = "organizationIds", required = true) @Param("organizationIds") List<Long> organizationIds,
-    Pageable pageable
-  );
+    Pageable pageable);
+
+  @RestResource(exported = false)
+  default Page<DebtPosition> findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(
+    String debtorFiscalCode,
+    List<Long> organizationIds,
+    Pageable pageable)
+  {
+    Page<Long> dpIdsPage = findUnpaidOrdinaryDebtPositionIdsByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable);
+    List<DebtPosition> dps = findEntityGraphByDebtPositionIdIn(dpIdsPage.getContent());
+    return new PageImpl<>(dps, dpIdsPage.getPageable(), dpIdsPage.getTotalElements());
+  }
 
   @RestResource(exported = false)
   @Query("""
