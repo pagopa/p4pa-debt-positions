@@ -17,5 +17,7 @@ public class Constants {
   public static final Long TECHNICAL_UNKNOWN_ORG_ID = -1L;
 
   public static final Long DEBT_POSITION_TYPE_MIXED = -2L;
+
+  public static final String UNKNOWN_STATION_ID = "UNKNOWN";
 }
 

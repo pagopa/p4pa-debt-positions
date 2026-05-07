@@ -14,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
+
 @ExtendWith(MockitoExtension.class)
 class OrganizationStationRetrieverServiceImplTest {
 
@@ -53,7 +55,7 @@ class OrganizationStationRetrieverServiceImplTest {
   }
 
   @Test
-  void givenExistentOrganizationStationWhenVerifyStationIdIdThenOk(){
+  void givenExistentOrganizationStationWhenGetOrganizationStationThenOk(){
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
@@ -69,4 +71,22 @@ class OrganizationStationRetrieverServiceImplTest {
     Mockito.verify(organizationServiceMock)
       .getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
   }
+
+  @Test
+  void givenUnknownStationIdWhenGetOrganizationStationThenReturnFakeOrganizationStationWithUnknownStationId(){
+    // Given
+    Long organizationId = 1L;
+    OrganizationStationDTO expectedOrganizationStationDTO = new OrganizationStationDTO();
+    expectedOrganizationStationDTO.setOrganizationId(organizationId);
+    expectedOrganizationStationDTO.setStationId(UNKNOWN_STATION_ID);
+
+    // When
+    OrganizationStationDTO result = organizationStationRetrieverService.getOrganizationStation(organizationId, UNKNOWN_STATION_ID, ACCESS_TOKEN);
+
+    // Then
+    Assertions.assertEquals(expectedOrganizationStationDTO, result);
+    Mockito.verify(organizationServiceMock, Mockito.times(0))
+      .getOrganizationStation(organizationId, UNKNOWN_STATION_ID, ACCESS_TOKEN);
+  }
+
 }
