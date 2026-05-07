@@ -245,7 +245,7 @@ public interface DebtPositionRepository extends JpaRepository<DebtPosition, Long
 
   @RestResource(exported = false)
   @Query("""
-    SELECT dp.debtPositionId
+    SELECT distinct dp.debtPositionId
     FROM DebtPosition dp
     JOIN dp.paymentOptions po
     JOIN po.installments i
