@@ -56,7 +56,7 @@ body {
 .ec-logo,
 .pagopa-logo {
     display: table-cell;
-    width: 60px;
+    width: 100px;
     vertical-align: middle;
 }
 
@@ -69,8 +69,8 @@ body {
 }
 
 .logo-image {
-    max-width: 40px;
-    max-height: 40px;
+    max-width: 100px;
+    max-height: 100px;
     height: auto;
     width: auto;
 }
