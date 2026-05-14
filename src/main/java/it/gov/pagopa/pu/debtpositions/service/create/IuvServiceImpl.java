@@ -39,10 +39,10 @@ public class IuvServiceImpl implements IuvService {
    * @param org the organization for which to generate the IUV
    * @return the generated IUV
    */
-  public String generateIuv(Organization org) {
+  public String generateIuv(Organization org, String segregationCode) {
     StringBuilder iuvBuilder = new StringBuilder();
     //header
-    iuvBuilder.append(org.getSegregationCode());
+    iuvBuilder.append(segregationCode);
     iuvBuilder.append(informationSystemId);
 
     //payment index
@@ -128,11 +128,11 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-  public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
+  public String validateIuvAndRetrieveNav(String iuv, String segregationCode, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
-    if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
+    if (!iuv.substring(0, 2).equals(segregationCode)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The first two character of iuv must be the same of segregation code of organization");
     }
 
