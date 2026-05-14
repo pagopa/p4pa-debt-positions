@@ -235,7 +235,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
   }
 
   @Test
-  void givenNewPOAndNoDPStatusWhensyncInstallmentThenOk() {
+  void givenNewPOAndNoDPWhensyncInstallmentThenOk() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
