@@ -71,6 +71,14 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
         throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_PAYMENT_OPTION_STATUS, String.format("The installment cannot be created because the payment option with index %s is not in an allowed status: %s",
           storedPaymentOption.getPaymentOptionIndex(), storedPaymentOption.getStatus()));
       }
+    } else if(storedDebtPosition!=null && DebtPositionStatus.PARTIALLY_PAID.equals(storedDebtPosition.getStatus())) {
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS,
+        String.format(
+          "The installment and its payment option cannot be created because the debt position with iupd %s is in PARTIALLY_PAID status",
+          storedDebtPosition.getIupdOrg()
+        )
+      );
     }
     if (storedInstallment != null && !installmentStatusesValidForInsertion.contains(storedInstallment.getStatus())) {
       throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, String.format("The installment with iud %s cannot be created because it already exists in a not modifiable status: %s",

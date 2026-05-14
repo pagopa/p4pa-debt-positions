@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionAddInstallmentService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.BeforeEach;
@@ -189,5 +190,22 @@ class InstallmentSynchronizeInsertServiceImplTest {
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
     assertEquals("INVALID_INSTALLMENT_STATUS",conflictException.getCode());
     assertEquals("The installment with iud iud cannot be created because it already exists in a not modifiable status: PAID", conflictException.getMessage());
+  }
+
+  @Test
+  void givenPartiallyPaidStatusAndNewPOWhensyncInstallmentThenConflictErrorException() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.PARTIALLY_PAID);
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(99);
+
+    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+      installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS,conflictException.getCode());
+    assertEquals("The installment and its payment option cannot be created because the debt position with iupd "+debtPositionDTO.getIupdOrg()+" is in PARTIALLY_PAID status", conflictException.getMessage());
   }
 }
