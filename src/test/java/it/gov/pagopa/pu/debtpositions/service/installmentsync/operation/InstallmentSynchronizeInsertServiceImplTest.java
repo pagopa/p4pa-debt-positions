@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionAddInstallmentS
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,8 +24,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildS
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildSyncInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeInsertServiceImplTest {
@@ -42,6 +41,14 @@ class InstallmentSynchronizeInsertServiceImplTest {
   void setUp() {
     installmentSynchronizeInsertService = new InstallmentSynchronizeInsertService(installmentSynchronizeApplierServiceMock,
       debtPositionCreationServiceMock, debtPositionAddInstallmentServiceMock);
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      installmentSynchronizeApplierServiceMock,
+      debtPositionCreationServiceMock,
+      debtPositionAddInstallmentServiceMock);
   }
 
   @Test
@@ -66,7 +73,6 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionCreationServiceMock, times(0)).createDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -105,7 +111,6 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, newDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionAddInstallmentServiceMock, times(0)).addInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -193,7 +198,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
   }
 
   @Test
-  void givenPartiallyPaidStatusAndNewPOWhensyncInstallmentThenConflictErrorException() {
+  void givenPartiallyPaidStatusAndNewPOWhenSyncInstallmentThenConflictErrorException() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
@@ -210,7 +215,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
   }
 
   @Test
-  void givenNewPOAndUnpaidDPStatusWhensyncInstallmentThenOk() {
+  void givenNewPOAndUnpaidDPStatusWhenSyncInstallmentThenOk() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
@@ -231,11 +236,10 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionCreationServiceMock, times(0)).createDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
-  void givenNewPOAndNoDPWhensyncInstallmentThenOk() {
+  void givenNewPOAndNoDPWhenSyncInstallmentThenOk() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
@@ -256,6 +260,5 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, null, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionCreationServiceMock, times(0)).createDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 }
