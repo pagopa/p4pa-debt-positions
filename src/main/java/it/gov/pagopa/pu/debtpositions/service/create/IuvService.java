@@ -25,5 +25,5 @@ public interface IuvService {
    * @param origin the origin of DebtPosition
    * @return the NAV created
    */
-  String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin, String segregationCode);
+  String validateIuvAndRetrieveNav(String iuv, String segregationCode, DebtPositionOrigin origin);
 }

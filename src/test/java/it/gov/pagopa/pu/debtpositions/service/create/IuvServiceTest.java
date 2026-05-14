@@ -159,7 +159,7 @@ class IuvServiceTest {
   @Test
   void givenIuvLengthNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG, DebtPositionOrigin.ORDINARY, VALID_ORG_STATION.getSegregationCode()));
+      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY));
 
     Assertions.assertEquals("INVALID_IUV",exception.getCode());
     Assertions.assertEquals("The iuv must be 17 characters long", exception.getMessage());
@@ -168,7 +168,7 @@ class IuvServiceTest {
   @Test
   void givenIuvWithSegregationNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG, DebtPositionOrigin.ORDINARY, VALID_ORG_STATION.getSegregationCode()));
+      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY));
 
     Assertions.assertEquals("INVALID_IUV",exception.getCode());
     Assertions.assertEquals("The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
@@ -180,7 +180,7 @@ class IuvServiceTest {
     DebtPositionOrigin origin = DebtPositionOrigin.valueOf(debtPositionOrigin);
 
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", IuvServiceTest.VALID_ORG, origin, VALID_ORG_STATION.getSegregationCode()));
+      () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", VALID_ORG_STATION.getSegregationCode(), origin));
 
     Assertions.assertEquals("INVALID_IUV", exception.getCode());
     Assertions.assertEquals("The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
@@ -189,7 +189,7 @@ class IuvServiceTest {
   @Test
   void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG, DebtPositionOrigin.SECONDARY_ORG, VALID_ORG_STATION.getSegregationCode()));
+      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.SECONDARY_ORG));
 
     Assertions.assertEquals("INVALID_IUV", exception.getCode());
     Assertions.assertEquals("The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
@@ -198,7 +198,7 @@ class IuvServiceTest {
   @Test
   void givenIuvValidWhenValidateIuvAndRetrieveNavThenOk(){
     String externalIuv = "01990000000004285";
-    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG, DebtPositionOrigin.SECONDARY_ORG, VALID_ORG_STATION.getSegregationCode());
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.SECONDARY_ORG);
 
     Assertions.assertEquals(3+externalIuv , result);
   }
@@ -206,7 +206,7 @@ class IuvServiceTest {
   @Test
   void givenIuvValidAndOriginOrdinaryWhenValidateIuvAndRetrieveNavThenOk(){
     String externalIuv = "01000000000004285";
-    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG, DebtPositionOrigin.ORDINARY, VALID_ORG_STATION.getSegregationCode());
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY);
 
     Assertions.assertEquals(3+externalIuv , result);
   }

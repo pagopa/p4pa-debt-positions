@@ -128,7 +128,7 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-  public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin, String segregationCode) {
+  public String validateIuvAndRetrieveNav(String iuv, String segregationCode, DebtPositionOrigin origin) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
