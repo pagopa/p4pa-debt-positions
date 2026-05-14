@@ -91,13 +91,22 @@ public class InstallmentUtils {
     Stream.of(InstallmentStatus.UNPAYABLE)
   ).collect(Collectors.toSet());
 
-  public static final List<DebtPositionOrigin> ORDINARY_DEBT_POSITION_ORIGINS = List.of(
-    DebtPositionOrigin.ORDINARY,
-    DebtPositionOrigin.ORDINARY_SIL,
+
+  public static final List<DebtPositionOrigin> ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED = List.of(
     DebtPositionOrigin.SPONTANEOUS,
     DebtPositionOrigin.SPONTANEOUS_SIL,
     DebtPositionOrigin.SPONTANEOUS_PSP
   );
+
+  public static final List<DebtPositionOrigin> ORDINARY_ORG_DEBT_POSITION_ORIGINS = List.of(
+    DebtPositionOrigin.ORDINARY,
+    DebtPositionOrigin.ORDINARY_SIL
+  );
+
+  public static final List<DebtPositionOrigin> ORDINARY_DEBT_POSITION_ORIGINS = Stream.concat(
+    ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED.stream(),
+    ORDINARY_ORG_DEBT_POSITION_ORIGINS.stream()
+  ).toList();
 
   public static final List<DebtPositionOrigin> PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED = Stream.concat(
     ORDINARY_DEBT_POSITION_ORIGINS.stream(),
@@ -113,10 +122,11 @@ public class InstallmentUtils {
       DebtPositionOrigin.SPONTANEOUS_MIXED)
   ).toList();
 
-  public static final List<DebtPositionOrigin> SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED = List.of(
-    DebtPositionOrigin.SPONTANEOUS,
-    DebtPositionOrigin.SPONTANEOUS_SIL,
-    DebtPositionOrigin.SPONTANEOUS_PSP
+  public static final List<DebtPositionOrigin> TECHNICAL_DEBT_POSITION_ORIGINS = List.of(
+    DebtPositionOrigin.SECONDARY_ORG,
+    DebtPositionOrigin.RECEIPT_FILE,
+    DebtPositionOrigin.RECEIPT_PAGOPA,
+    DebtPositionOrigin.REPORTING_PAGOPA
   );
 
   /**
