@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -10,8 +9,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -56,10 +53,11 @@ class IuvServiceTest {
     .ipaCode(INVALID_ORG_IPA_CODE);
 
   private static final String AUX_DIGIT = "3";
+  private static final String INFORMATION_SYSTEM_ID = "00";
 
   @BeforeEach
   void setUp() {
-    iuvService = new IuvServiceImpl("00", "3", iuvSequenceNumberService);
+    iuvService = new IuvServiceImpl(INFORMATION_SYSTEM_ID, AUX_DIGIT, iuvSequenceNumberService);
   }
 
   //region test generateIuv
@@ -159,7 +157,7 @@ class IuvServiceTest {
   @Test
   void givenIuvLengthNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY));
+      () -> iuvService.validateIuvAndRetrieveNav(WRONG_LENGTH_IUV, VALID_ORG_STATION.getSegregationCode()));
 
     Assertions.assertEquals("INVALID_IUV",exception.getCode());
     Assertions.assertEquals("The iuv must be 17 characters long", exception.getMessage());
@@ -168,46 +166,27 @@ class IuvServiceTest {
   @Test
   void givenIuvWithSegregationNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY));
+      () -> iuvService.validateIuvAndRetrieveNav("0X000000000004285", VALID_ORG_STATION.getSegregationCode()));
 
     Assertions.assertEquals("INVALID_IUV",exception.getCode());
     Assertions.assertEquals("The first two character of iuv must be the same of segregation code of organization", exception.getMessage());
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = {"ORDINARY", "SPONTANEOUS", "SPONTANEOUS_SIL"})
-  void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(String debtPositionOrigin) {
-    DebtPositionOrigin origin = DebtPositionOrigin.valueOf(debtPositionOrigin);
-
-    InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("01032000000004285", VALID_ORG_STATION.getSegregationCode(), origin));
-
-    Assertions.assertEquals("INVALID_IUV", exception.getCode());
-    Assertions.assertEquals("The third and fourth characters must be '00' for the origin: " + origin, exception.getMessage());
-  }
-
   @Test
   void givenIuvWithInformationSystemIdNotValidWhenValidateIuvAndRetrieveNavThenException(){
     InvalidValueException exception = Assertions.assertThrows(InvalidValueException.class,
-      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.SECONDARY_ORG));
+      () -> iuvService.validateIuvAndRetrieveNav("01000000000004285", VALID_ORG_STATION.getSegregationCode()));
 
     Assertions.assertEquals("INVALID_IUV", exception.getCode());
-    Assertions.assertEquals("The third and fourth characters cannot be '00' for the origin: " + DebtPositionOrigin.SECONDARY_ORG, exception.getMessage());
+    Assertions.assertEquals("The third and fourth characters cannot be '%s' for externally generated IUV".formatted(INFORMATION_SYSTEM_ID), exception.getMessage());
   }
 
   @Test
   void givenIuvValidWhenValidateIuvAndRetrieveNavThenOk(){
     String externalIuv = "01990000000004285";
-    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.SECONDARY_ORG);
+    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG_STATION.getSegregationCode());
 
-    Assertions.assertEquals(3+externalIuv , result);
+    Assertions.assertEquals(AUX_DIGIT + externalIuv , result);
   }
 
-  @Test
-  void givenIuvValidAndOriginOrdinaryWhenValidateIuvAndRetrieveNavThenOk(){
-    String externalIuv = "01000000000004285";
-    String result = iuvService.validateIuvAndRetrieveNav(externalIuv, VALID_ORG_STATION.getSegregationCode(), DebtPositionOrigin.ORDINARY);
-
-    Assertions.assertEquals(3+externalIuv , result);
-  }
 }
