@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -20,6 +21,7 @@ import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -47,6 +49,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
   private final DebtPositionProcessorService debtPositionProcessorService;
   private final CategoryResolverService categoryResolverService;
+  private final OrganizationService organizationService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -67,6 +70,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionProcessorService = debtPositionProcessorService;
     this.categoryResolverService = categoryResolverService;
+    this.organizationService = organizationService;
   }
 
   @Transactional
@@ -134,10 +138,13 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   public void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO, String accessToken) {
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPuPagoPaPayment())) {
       String nav;
+      OrganizationStationDTO organizationStationDTO = organizationService.getOrganizationStation(org.getOrganizationId(), debtPositionDTO.getStationId(), accessToken)
+        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
+          String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
       if (installmentDTO.getIuv() != null) {
-        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), org, debtPositionDTO.getDebtPositionOrigin());
+        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), organizationStationDTO.getSegregationCode());
       } else {
-        String generatedIuv = iuvService.generateIuv(org);
+        String generatedIuv = iuvService.generateIuv(org, organizationStationDTO.getSegregationCode());
         nav = iuvService.iuv2Nav(generatedIuv);
         installmentDTO.setIuv(generatedIuv);
       }

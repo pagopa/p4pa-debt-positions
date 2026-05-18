@@ -130,19 +130,19 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private void validateDebtPositionOrigin(DebtPositionDTO debtPositionDTO) {
     DebtPositionOrigin origin = debtPositionDTO.getDebtPositionOrigin();
 
-    if ((origin.equals(DebtPositionOrigin.ORDINARY) || origin.equals(DebtPositionOrigin.ORDINARY_SIL))
-      && (debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID && debtPositionDTO.getStatus() != DebtPositionStatus.DRAFT)) {
+    if (InstallmentUtils.ORDINARY_ORG_DEBT_POSITION_ORIGINS.contains(origin)
+      && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID && debtPositionDTO.getStatus() != DebtPositionStatus.DRAFT) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
     }
 
-    if (origin.equals(DebtPositionOrigin.SPONTANEOUS) && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS can only be created in UNPAID state");
+    if (InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED.contains(origin)
+      && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS, SPONTANEOUS_SIL or SPONTANEOUS_PSP can only be created in UNPAID state");
     }
 
-    if ((origin.equals(DebtPositionOrigin.SECONDARY_ORG) || origin.equals(DebtPositionOrigin.RECEIPT_PAGOPA)
-      || origin.equals(DebtPositionOrigin.RECEIPT_FILE) || origin.equals(DebtPositionOrigin.REPORTING_PAGOPA))
+    if (InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS.contains(origin)
       && debtPositionDTO.getStatus() != DebtPositionStatus.PAID) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
     }
   }
 
@@ -157,8 +157,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_CENTS_AMOUNT, "The installment amount must be greater than 0");
     }
     if (
-        (InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED.contains(debtPositionOrigin) ||
-         DebtPositionOrigin.ORDINARY_SIL.equals(debtPositionOrigin))
+        InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(debtPositionOrigin)
          && debtPositionTypeOrg.getAmountCents() != null
          && !installmentDTO.getAmountCents().equals(debtPositionTypeOrg.getAmountCents())
     ) {
@@ -199,7 +198,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     boolean switchToExpired = flagMandatoryDueDate
-        || InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS_NO_MIXED.contains(debtPositionOrigin);
+        || InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED.contains(debtPositionOrigin);
 
     installmentDTO.setSwitchToExpired(switchToExpired);
   }

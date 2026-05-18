@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.OperatorNotAuthorizedException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -22,6 +23,7 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -238,6 +240,9 @@ class DebtPositionCreationServiceImplTest {
     transfersList.add(buildTransferDTO().transferIndex(2));
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setTransfers(transfersList);
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
@@ -247,6 +252,8 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:" + iud, ACCESS_TOKEN))
       .thenReturn(expectedResult);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null);
 
@@ -276,6 +283,8 @@ class DebtPositionCreationServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
     String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
@@ -284,6 +293,8 @@ class DebtPositionCreationServiceImplTest {
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPosition.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:" + iud, ACCESS_TOKEN))
       .thenReturn(expectedResult);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null);
 
@@ -308,11 +319,17 @@ class DebtPositionCreationServiceImplTest {
     debtPositionTypeOrg.setIban("");
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, ACCESS_TOKEN, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(organizationStationDTO));
+
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null);
 
@@ -355,6 +372,7 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
     debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setStationId("STATIONID");
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIud("");
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setBalance("");
@@ -366,12 +384,16 @@ class DebtPositionCreationServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
 
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, ACCESS_TOKEN, debtPositionTypeOrg);
-    Mockito.when(iuvServiceMock.generateIuv(organization)).thenReturn("generatedIuv");
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+        .thenReturn(Optional.of(organizationStationDTO));
+    Mockito.when(iuvServiceMock.generateIuv(organization, organizationStationDTO.getSegregationCode())).thenReturn("generatedIuv");
     Mockito.when(iuvServiceMock.iuv2Nav("generatedIuv")).thenReturn("generatedNav");
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), "randomIUD", "generatedIuv", "generatedNav", InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
     Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DP_CREATED, "IUD:randomIUD", ACCESS_TOKEN))
@@ -486,11 +508,16 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, null, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), null))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
 
@@ -511,11 +538,16 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, null, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), null))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
 
@@ -536,11 +568,16 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, null, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), null))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
 
@@ -561,15 +598,46 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentNoPII installmentNoPII = buildInstallmentNoPII();
 
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
     Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), null)).thenReturn(Optional.of(organization));
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
     Mockito.doNothing().when(validateDebtPositionServiceMock).validate(debtPositionDTO, organization, null, debtPositionTypeOrg);
     Mockito.when(installmentNoPIIRepositoryMock.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentNoPII.getIud(), installmentNoPII.getIuv(), null, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS)).thenReturn(false);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), null))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     WorkflowCreatedDTO result = createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, null, null);
 
     assertNull(result);
     assertEquals(organization.getIpaCode() + "_SPONTANEO-PSP_" + LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSourceFlowName());
+  }
+
+  @Test
+  void givenNoExistsStationWhenCreateThenException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
+    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setIban("");
+
+    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    Mockito.when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.empty());
+
+
+    NotFoundException exception = assertThrows(NotFoundException.class, () ->
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null)
+    );
+    assertEquals("ORGANIZATION_STATION_NOT_FOUND",exception.getCode());
   }
 }

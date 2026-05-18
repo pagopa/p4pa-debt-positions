@@ -6,8 +6,10 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionAddInstallmentService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.apache.commons.lang3.tuple.Pair;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,8 +24,6 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildS
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildSyncInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeInsertServiceImplTest {
@@ -41,6 +41,14 @@ class InstallmentSynchronizeInsertServiceImplTest {
   void setUp() {
     installmentSynchronizeInsertService = new InstallmentSynchronizeInsertService(installmentSynchronizeApplierServiceMock,
       debtPositionCreationServiceMock, debtPositionAddInstallmentServiceMock);
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      installmentSynchronizeApplierServiceMock,
+      debtPositionCreationServiceMock,
+      debtPositionAddInstallmentServiceMock);
   }
 
   @Test
@@ -65,7 +73,6 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionCreationServiceMock, times(0)).createDebtPosition(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -104,7 +111,6 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, newDebtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
-    verify(debtPositionAddInstallmentServiceMock, times(0)).addInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -189,5 +195,70 @@ class InstallmentSynchronizeInsertServiceImplTest {
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
     assertEquals("INVALID_INSTALLMENT_STATUS",conflictException.getCode());
     assertEquals("The installment with iud iud cannot be created because it already exists in a not modifiable status: PAID", conflictException.getMessage());
+  }
+
+  @Test
+  void givenPartiallyPaidStatusAndNewPOWhenSyncInstallmentThenConflictErrorException() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setStatus(DebtPositionStatus.PARTIALLY_PAID);
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(99);
+
+    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+      installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS,conflictException.getCode());
+    assertEquals("The installment and its payment option cannot be created because the debt position with iupd "+debtPositionDTO.getIupdOrg()+" is in PARTIALLY_PAID status", conflictException.getMessage());
+  }
+
+  @Test
+  void givenNewPOAndUnpaidDPStatusWhenSyncInstallmentThenOk() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(99);
+    InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
+        null, null, accessToken))
+      .thenReturn(Pair.of(debtPositionDTO, newInstallmentDTO));
+
+    Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(newInstallmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
+      .thenReturn(expectedResult);
+
+    WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+
+    assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenNewPOAndNoDPWhenSyncInstallmentThenOk() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setPaymentOptionIndex(99);
+    InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
+    WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
+
+    Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, null,
+        null, null, accessToken))
+      .thenReturn(Pair.of(debtPositionDTO, newInstallmentDTO));
+
+    Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(newInstallmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
+      .thenReturn(expectedResult);
+
+    WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, null, wfExecutionParameters, accessToken, operatorExternalUserId);
+
+    assertSame(expectedResult, result);
   }
 }

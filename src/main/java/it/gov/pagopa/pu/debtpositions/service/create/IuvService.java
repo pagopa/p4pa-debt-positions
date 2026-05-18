@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 
 /**
@@ -14,7 +13,7 @@ public interface IuvService {
    * @param org the organization for which the IUV is requested
    * @return the IUV generated
    */
-  String generateIuv(Organization org);
+  String generateIuv(Organization org, String segregationCode);
 
   String iuv2Nav(String iuv);
 
@@ -22,8 +21,7 @@ public interface IuvService {
    * Validate the syntax of the IUV that is passed by external services and returns the corresponding NAV
    * @param iuv the IUV to be validated
    * @param org the organization for which the IUV belongs
-   * @param origin the origin of DebtPosition
    * @return the NAV created
    */
-  String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin);
+  String validateIuvAndRetrieveNav(String iuv, String segregationCode);
 }

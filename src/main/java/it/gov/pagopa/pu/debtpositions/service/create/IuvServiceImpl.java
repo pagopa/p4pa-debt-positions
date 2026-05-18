@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -39,10 +38,10 @@ public class IuvServiceImpl implements IuvService {
    * @param org the organization for which to generate the IUV
    * @return the generated IUV
    */
-  public String generateIuv(Organization org) {
+  public String generateIuv(Organization org, String segregationCode) {
     StringBuilder iuvBuilder = new StringBuilder();
     //header
-    iuvBuilder.append(org.getSegregationCode());
+    iuvBuilder.append(segregationCode);
     iuvBuilder.append(informationSystemId);
 
     //payment index
@@ -128,22 +127,16 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-  public String validateIuvAndRetrieveNav(String iuv, Organization org, DebtPositionOrigin origin) {
+  public String validateIuvAndRetrieveNav(String iuv, String segregationCode) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
-    if (!iuv.substring(0, 2).equals(org.getSegregationCode())) {
+    if (!iuv.substring(0, 2).equals(segregationCode)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The first two character of iuv must be the same of segregation code of organization");
     }
 
-    if (origin == DebtPositionOrigin.ORDINARY || origin == DebtPositionOrigin.SPONTANEOUS || origin == DebtPositionOrigin.SPONTANEOUS_SIL) {
-      if (!iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters must be '" + informationSystemId + "' for the origin: " + origin);
-      }
-    } else {
-      if (iuv.substring(2,4).equals(informationSystemId)) {
-        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + informationSystemId + "' for the origin: " + origin);
-      }
+    if (iuv.substring(2,4).equals(informationSystemId)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + informationSystemId + "' for externally generated IUV" );
     }
 
     return auxDigit + iuv;

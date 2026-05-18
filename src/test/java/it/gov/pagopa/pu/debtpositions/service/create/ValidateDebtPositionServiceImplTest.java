@@ -727,7 +727,7 @@ class ValidateDebtPositionServiceImplTest {
   void givenSecondTransferThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
+    debtPositionDTO.setDebtPositionOrigin(ORDINARY_SIL);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setAmountCents(200L);
     TransferDTO firstTransfer = buildTransferDTO();
@@ -838,27 +838,27 @@ class ValidateDebtPositionServiceImplTest {
 
   @Test
   void testValidateWhenDPOriginSpontaneousAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS can only be created in UNPAID state");
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS, SPONTANEOUS_SIL or SPONTANEOUS_PSP can only be created in UNPAID state");
   }
 
   @Test
   void testValidateWhenDPOriginSecondaryOrgAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SECONDARY_ORG, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+    testValidateDPOrigin(DebtPositionOrigin.SECONDARY_ORG, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
   }
 
   @Test
   void testValidateWhenDPReceiptPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
   }
 
   @Test
   void testValidateWhenDPReceiptFileAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_FILE, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_FILE, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
   }
 
   @Test
   void testValidateWhenDPReportingPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.REPORTING_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGO_PA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+    testValidateDPOrigin(DebtPositionOrigin.REPORTING_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
   }
 
   @Test
