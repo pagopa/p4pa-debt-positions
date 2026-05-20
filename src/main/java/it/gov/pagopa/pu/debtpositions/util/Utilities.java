@@ -27,7 +27,7 @@ public class Utilities {
   public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
   public static final Pattern IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]{23,30}$");
-  public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^(9/[^/]+/).*$");
+  public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^([6-9]/[^/]+/).*$");
   private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
 
   public static boolean isValidEmail(final String email) {
@@ -133,23 +133,28 @@ public class Utilities {
     return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
   }
 
-  public static String getTaxonomyCodeFromCategory(String category, String prefix, String suffix) {
-    boolean isTaxonomyCodeFormat = category.startsWith(prefix) && category.endsWith(suffix);
+  public static String getTaxonomyCodeFromCategory(String category, List<String> prefixList, String suffix) {
+    Optional<String> prefix = prefixList.stream().filter(category::startsWith).findAny();
+    boolean isTaxonomyCodeFormat = prefix.isPresent() && category.endsWith(suffix);
     return isTaxonomyCodeFormat ?
-      category.replace(prefix, "").replace(suffix, "")
+      category.replace(prefix.get(), "").replace(suffix, "")
       : category;
   }
 
-  public static String formatCategoryTransferFromTaxonomyCode(String taxonomyCode, String prefix, String suffix){
+  public static String formatCategoryTransferFromTaxonomyCode(String taxonomyCode, List<String> prefixList, String defaultPrefix, String suffix, String defaultSpontaneousPrefix, boolean isSpontaneous){
     String cleaned = taxonomyCode;
-    if (cleaned.startsWith(prefix)) {
-      cleaned = cleaned.substring(prefix.length());
+    Optional<String> prefix = prefixList.stream().filter(cleaned::startsWith).findAny();
+    if (prefix.isPresent()) {
+      cleaned = cleaned.substring(prefix.get().length());
     }
     if (cleaned.endsWith(suffix)) {
       cleaned = cleaned.substring(0, cleaned.length() - suffix.length());
     }
 
-    return prefix + cleaned + suffix;
+    if(prefix.isPresent()){
+      return prefix.get() + cleaned + suffix;
+    }
+    return (isSpontaneous?defaultSpontaneousPrefix:defaultPrefix) + cleaned + suffix;
   }
 
   public static String formatPrice(Long priceInCents) {

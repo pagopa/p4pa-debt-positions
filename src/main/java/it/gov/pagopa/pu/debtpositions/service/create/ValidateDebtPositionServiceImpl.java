@@ -40,8 +40,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final boolean isOrgPIvaCheckEnabled;
   private final OrganizationService organizationService;
   private final BrokerService brokerService;
-  private final String categoryPrefix;
+  private final String defaultSpontaneousPrefix;
+  private final String categoryDefaultPrefix;
   private final String categorySuffix;
+  private final List<String> categoryAllowedPrefixes;
 
   public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
@@ -49,16 +51,20 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
                                          OrganizationService organizationService,
                                          BrokerService brokerService,
                                          @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled,
-                                         @Value("${category.prefix}") String categoryPrefix,
-                                         @Value("${category.suffix}") String categorySuffix) {
+                                         @Value("${category.prefix}") String categoryDefaultPrefix,
+                                         @Value("${category.prefix-spontaneous}") String defaultSpontaneousPrefix,
+                                         @Value("${category.suffix}") String categorySuffix,
+                                         @Value("${category.allowed-prefixes}") List<String> categoryAllowedPrefixes) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
     this.organizationService = organizationService;
     this.brokerService = brokerService;
-    this.categoryPrefix = categoryPrefix;
+    this.defaultSpontaneousPrefix = defaultSpontaneousPrefix;
+    this.categoryDefaultPrefix = categoryDefaultPrefix;
     this.categorySuffix = categorySuffix;
+    this.categoryAllowedPrefixes = categoryAllowedPrefixes;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, Organization org, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -169,12 +175,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     if (StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
-      && !installmentDTO.getLegacyPaymentMetadata().matches("[0129]/\\S{3,138}")) {
+      && !installmentDTO.getLegacyPaymentMetadata().matches("[0126789]/\\S{3,138}")) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_LEGACY_PAYMENT_METADATA, "Legacy payment metadata is not valid");
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-    validateTransfers(installmentDTO.getTransfers(), org, accessToken);
+    validateTransfers(installmentDTO.getTransfers(), org, InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS.contains(debtPositionOrigin), accessToken);
 
     Long totalAmountTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
@@ -230,7 +236,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateTransfers(List<TransferDTO> transferDTOList, Organization org, String accessToken) {
+  private void validateTransfers(List<TransferDTO> transferDTOList, Organization org, boolean isSpontaneous, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_TRANSFER, "At least one transfer is mandatory for installment");
     }
@@ -264,7 +270,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
           .map(Organization::getOrgTypeCode)
           .orElse(null);
-        checkTaxonomyCategory(transferDTO, orgTypeCode);
+        checkTaxonomyCategory(transferDTO, orgTypeCode, isSpontaneous);
       }
     });
   }
@@ -310,7 +316,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode) {
+  private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode, boolean isSpontaneous) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_TAXONOMY_CATEGORY, "Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
@@ -318,7 +324,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_TAXONOMY_CATEGORY, "Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
-      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryPrefix, categorySuffix));
+      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryAllowedPrefixes, categoryDefaultPrefix, categorySuffix, defaultSpontaneousPrefix, isSpontaneous));
     }
   }
 }

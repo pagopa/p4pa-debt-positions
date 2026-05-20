@@ -275,31 +275,51 @@ public class UtilitiesTest {
     "'9/12345678/', '12345678'",
     "'12345678', '12345678'",
     "'9//', ''",
-    "'', ''"
+    "'', ''",
+    "'6/12345678/', '12345678'",
+    "'6/12345678', '6/12345678'",
+    "'6/12345678/', '12345678'",
+    "'6//', ''",
   })
   void testGetTaxonomyCodeFromCategory(String input, String expected) {
-    String result = Utilities.getTaxonomyCodeFromCategory(input, "9/", "/");
+    String result = Utilities.getTaxonomyCodeFromCategory(input, List.of("6/","9/"), "/");
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("provideTaxonomyCodeFormattingCases")
-  void testFormatCategoryTransferFromTaxonomyCode(String input, String expected) {
-    String result = Utilities.formatCategoryTransferFromTaxonomyCode(input, "9/", "/");
+  void testFormatCategoryTransferFromTaxonomyCode(String input, boolean isSpontaneous, String expected) {
+    String result = Utilities.formatCategoryTransferFromTaxonomyCode(input, List.of("6/","9/"),"9/", "/","6/", isSpontaneous);
     assertEquals(expected, result);
   }
 
   private static Stream<Arguments> provideTaxonomyCodeFormattingCases() {
     return Stream.of(
-      Arguments.of("12345678", "9/12345678/"),
-      Arguments.of("9/12345678/", "9/12345678/"),
-      Arguments.of("9/12345678", "9/12345678/"),
-      Arguments.of("12345678/", "9/12345678/"),
-      Arguments.of("12345678", "9/12345678/"),
-      Arguments.of("9/12345678/", "9/12345678/"),
-      Arguments.of("", "9//"),
-      Arguments.of("9/", "9//"),
-      Arguments.of("/", "9//")
+      Arguments.of("12345678", false, "9/12345678/"),
+      Arguments.of("9/12345678/", false, "9/12345678/"),
+      Arguments.of("9/12345678", false, "9/12345678/"),
+      Arguments.of("12345678/", false, "9/12345678/"),
+      Arguments.of("12345678", false, "9/12345678/"),
+      Arguments.of("9/12345678/", false, "9/12345678/"),
+      Arguments.of("", false, "9//"),
+      Arguments.of("9/", false, "9//"),
+      Arguments.of("/", false, "9//"),
+      Arguments.of("6/12345678/", false, "6/12345678/"),
+      Arguments.of("6/12345678", false, "6/12345678/"),
+      Arguments.of("6/12345678/", false, "6/12345678/"),
+      Arguments.of("6/", false, "6//"),
+      Arguments.of("12345678", true, "6/12345678/"),
+      Arguments.of("9/12345678/", true, "9/12345678/"),
+      Arguments.of("6/12345678/", true, "6/12345678/"),
+      Arguments.of("6/12345678", true, "6/12345678/"),
+      Arguments.of("12345678/", true, "6/12345678/"),
+      Arguments.of("12345678", true, "6/12345678/"),
+      Arguments.of("9/12345678/", true, "9/12345678/"),
+      Arguments.of("6/12345678/", true, "6/12345678/"),
+      Arguments.of("", true, "6//"),
+      Arguments.of("9/", true, "9//"),
+      Arguments.of("6/", true, "6//"),
+      Arguments.of("/", true, "6//")
     );
   }
 

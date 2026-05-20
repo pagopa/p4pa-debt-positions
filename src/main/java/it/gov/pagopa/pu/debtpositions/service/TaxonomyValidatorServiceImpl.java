@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.List;
+
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
 
 @Service
@@ -18,12 +20,12 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   private final TaxonomyService taxonomyService;
   private final OrganizationService organizationService;
-  private final String categoryPrefix;
+  private final List<String> categoryPrefix;
   private final String categorySuffix;
 
   public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService,
                                       OrganizationService organizationService,
-                                      @Value("${category.prefix}") String categoryPrefix,
+                                      @Value("${category.allowed-prefixes}") List<String> categoryPrefix,
                                       @Value("${category.suffix}") String categorySuffix) {
     this.taxonomyService = taxonomyService;
     this.organizationService = organizationService;
@@ -43,7 +45,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
   }
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
-      if(!taxonomyCode.startsWith(categoryPrefix) || !taxonomyCode.endsWith(categorySuffix)) {
+      if(categoryPrefix.stream().noneMatch(taxonomyCode::startsWith) || !taxonomyCode.endsWith(categorySuffix)) {
         log.info("The taxonomy code [{}] does not meet the required format", taxonomyCode);
         return false;
       }

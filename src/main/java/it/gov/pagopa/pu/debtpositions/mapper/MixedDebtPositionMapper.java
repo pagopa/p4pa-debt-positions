@@ -9,13 +9,17 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +46,7 @@ public class MixedDebtPositionMapper {
       Long debtPositionTypeId = debtPositionTypeOrgRepository.findById(requestTransfer.getDebtPositionTypeOrgId())
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, String.format("The debt position type org with id %s is not found", requestTransfer.getDebtPositionTypeOrgId())))
         .getDebtPositionTypeId();
-      String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId, organization.getOrgTypeCode());
+      String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId, organization.getOrgTypeCode(), InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS.contains(request.getDebtPositionOrigin()));
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i + 1)

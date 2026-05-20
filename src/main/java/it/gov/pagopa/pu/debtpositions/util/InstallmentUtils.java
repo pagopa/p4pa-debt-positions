@@ -129,6 +129,12 @@ public class InstallmentUtils {
     DebtPositionOrigin.REPORTING_PAGOPA
   );
 
+  public static final List<DebtPositionOrigin> SPONTANEOUS_DEBT_POSITION_ORIGINS = Stream.concat(
+    ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED.stream(),
+    Stream.of(
+      DebtPositionOrigin.SPONTANEOUS_MIXED)
+  ).toList();
+
   /**
    * It will check if the Installment is in a payable status
    */
