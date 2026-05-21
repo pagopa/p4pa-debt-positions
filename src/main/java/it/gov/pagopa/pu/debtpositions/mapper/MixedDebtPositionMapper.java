@@ -15,7 +15,10 @@ import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -42,7 +45,7 @@ public class MixedDebtPositionMapper {
       Long debtPositionTypeId = debtPositionTypeOrgRepository.findById(requestTransfer.getDebtPositionTypeOrgId())
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, String.format("The debt position type org with id %s is not found", requestTransfer.getDebtPositionTypeOrgId())))
         .getDebtPositionTypeId();
-      String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId, organization.getOrgTypeCode());
+      String category = categoryResolverService.resolveCategory(requestTransfer.getLegacyPaymentMetadata(), debtPositionTypeId, organization.getOrgTypeCode(), request.getDebtPositionOrigin());
       transfers.add(
         TransferDTO.builder()
           .transferIndex(i + 1)

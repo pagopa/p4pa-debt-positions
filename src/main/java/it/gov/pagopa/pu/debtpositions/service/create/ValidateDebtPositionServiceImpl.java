@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.util.CategoryUtils;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.formatCategoryTransferFromTaxonomyCode;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 
 @Service
@@ -40,25 +42,19 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
   private final boolean isOrgPIvaCheckEnabled;
   private final OrganizationService organizationService;
   private final BrokerService brokerService;
-  private final String categoryPrefix;
-  private final String categorySuffix;
 
   public ValidateDebtPositionServiceImpl(TaxonomyValidatorService taxonomyValidatorService,
                                          DebtPositionRepository debtPositionRepository,
                                          BalanceService balanceService,
                                          OrganizationService organizationService,
                                          BrokerService brokerService,
-                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled,
-                                         @Value("${category.prefix}") String categoryPrefix,
-                                         @Value("${category.suffix}") String categorySuffix) {
+                                         @Value("${features.organization.piva-check}") boolean isOrgPIvaCheckEnabled) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionRepository = debtPositionRepository;
     this.balanceService = balanceService;
     this.isOrgPIvaCheckEnabled = isOrgPIvaCheckEnabled;
     this.organizationService = organizationService;
     this.brokerService = brokerService;
-    this.categoryPrefix = categoryPrefix;
-    this.categorySuffix = categorySuffix;
   }
 
   public void validate(DebtPositionDTO debtPositionDTO, Organization org, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg) {
@@ -169,12 +165,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     if (StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
-      && !installmentDTO.getLegacyPaymentMetadata().matches("[0129]/\\S{3,138}")) {
+      && !installmentDTO.getLegacyPaymentMetadata().matches(CategoryUtils.LEGACY_PAYMENT_METADATA_REGEX)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_LEGACY_PAYMENT_METADATA, "Legacy payment metadata is not valid");
     }
 
     validatePersonData(installmentDTO.getDebtor(), debtPositionTypeOrg);
-    validateTransfers(installmentDTO.getTransfers(), org, accessToken);
+    validateTransfers(installmentDTO.getTransfers(), org, debtPositionOrigin, accessToken);
 
     Long totalAmountTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();
@@ -230,7 +226,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateTransfers(List<TransferDTO> transferDTOList, Organization org, String accessToken) {
+  private void validateTransfers(List<TransferDTO> transferDTOList, Organization org, DebtPositionOrigin debtPositionOrigin, String accessToken) {
     if (CollectionUtils.isEmpty(transferDTOList)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_TRANSFER, "At least one transfer is mandatory for installment");
     }
@@ -264,7 +260,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
         String orgTypeCode = organizationService.getOrganizationByFiscalCode(transferDTO.getOrgFiscalCode(), accessToken)
           .map(Organization::getOrgTypeCode)
           .orElse(null);
-        checkTaxonomyCategory(transferDTO, orgTypeCode);
+        checkTaxonomyCategory(transferDTO, orgTypeCode, debtPositionOrigin);
       }
     });
   }
@@ -310,7 +306,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode) {
+  private void checkTaxonomyCategory(TransferDTO transferDTO, String orgTypeCode, DebtPositionOrigin debtPositionOrigin) {
     if (StringUtils.isBlank(transferDTO.getCategory())) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_TAXONOMY_CATEGORY, "Category of transfer with index " + transferDTO.getTransferIndex() + " is mandatory");
     } else {
@@ -318,7 +314,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       if(!taxonomyValidatorService.isTaxonomyCategoryValid(taxonomyCategory, orgTypeCode)) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_TAXONOMY_CATEGORY, "Taxonomy category of transfer with index " + transferDTO.getTransferIndex() + " is not valid");
       }
-      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, categoryPrefix, categorySuffix));
+      transferDTO.setCategory(formatCategoryTransferFromTaxonomyCode(taxonomyCategory, debtPositionOrigin));
     }
   }
 }
