@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -24,14 +23,6 @@ public class Utilities {
 
   private Utilities() {
   }
-
-  //region Category domain
-  public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^([6-9]/[^/]+/).*$");
-  public static final String CATEGORY_PREFIX = "9/";
-  public static final String CATEGORY_PREFIX_SPONTANEOUS = "6/";
-  public static final String CATEGORY_SUFFIX = "/";
-  public static final List<String> CATEGORY_ALLOWED_PREFIXES = List.of("6/","7/","8/","9/");
-  //endregion
 
   public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
@@ -139,30 +130,6 @@ public class Utilities {
 
   public static LocalDateTime toLocalDateTime(OffsetDateTime date) {
     return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
-  }
-
-  public static String getTaxonomyCodeFromCategory(String category) {
-    Optional<String> prefix = CATEGORY_ALLOWED_PREFIXES.stream().filter(category::startsWith).findAny();
-    boolean isTaxonomyCodeFormat = prefix.isPresent() && category.endsWith(CATEGORY_SUFFIX);
-    return isTaxonomyCodeFormat ?
-      category.replace(prefix.get(), "").replace(CATEGORY_SUFFIX, "")
-      : category;
-  }
-
-  public static String formatCategoryTransferFromTaxonomyCode(String taxonomyCode, DebtPositionOrigin debtPositionOrigin){
-    String cleaned = taxonomyCode;
-    Optional<String> prefix = Utilities.CATEGORY_ALLOWED_PREFIXES.stream().filter(cleaned::startsWith).findAny();
-    if (prefix.isPresent()) {
-      cleaned = cleaned.substring(prefix.get().length());
-    }
-    if (cleaned.endsWith(CATEGORY_SUFFIX)) {
-      cleaned = cleaned.substring(0, cleaned.length() - CATEGORY_SUFFIX.length());
-    }
-
-    if(prefix.isPresent()){
-      return prefix.get() + cleaned + CATEGORY_SUFFIX;
-    }
-    return (InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS.contains(debtPositionOrigin)? CATEGORY_PREFIX_SPONTANEOUS : CATEGORY_PREFIX) + cleaned + CATEGORY_SUFFIX;
   }
 
   public static String formatPrice(Long priceInCents) {

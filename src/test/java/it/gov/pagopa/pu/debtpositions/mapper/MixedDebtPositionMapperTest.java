@@ -8,6 +8,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.dptypeorg.MixedDebtPositionTypeOrgRetrieverService;
+import it.gov.pagopa.pu.debtpositions.util.CategoryUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtilsTest;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.debtpositions.util.faker.PersonFaker;
@@ -28,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.getTaxonomyCodeFromCategory;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
@@ -129,9 +130,10 @@ class MixedDebtPositionMapperTest {
       .stationId("stationId")
       .build();
 
-    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
+    try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class);
+         MockedStatic<CategoryUtils> categoryUtils = Mockito.mockStatic(CategoryUtils.class)) {
       utilities.when(Utilities::getRandomIUD).thenReturn(iud);
-      utilities.when(() -> getTaxonomyCodeFromCategory("9/01234567/")).thenReturn(category);
+      categoryUtils.when(() -> getTaxonomyCodeFromCategory("9/01234567/")).thenReturn(category);
 
       when(
         mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(

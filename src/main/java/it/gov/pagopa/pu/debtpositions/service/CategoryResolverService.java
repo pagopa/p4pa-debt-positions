@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.regex.Matcher;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.formatCategoryTransferFromTaxonomyCode;
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.LEGACY_PAYMENT_METADATA_REGEX_PATTERN;
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.formatCategoryTransferFromTaxonomyCode;
 
 @Slf4j
 @Service
@@ -53,7 +53,7 @@ public class CategoryResolverService {
   }
 
   private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
-    Matcher matcher = LEGACY_PAYMENT_METADATA_REGEX.matcher(legacyPaymentMetadata);
+    Matcher matcher = LEGACY_PAYMENT_METADATA_REGEX_PATTERN.matcher(legacyPaymentMetadata);
     if (!matcher.find()) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_LEGACY_PAYMENT_METADATA, String.format("The legacy payment metadata [%s] is not valid to extract taxonomy code", legacyPaymentMetadata));
     }

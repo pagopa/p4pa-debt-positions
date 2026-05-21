@@ -10,6 +10,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.util.CategoryUtils;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -27,6 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.formatCategoryTransferFromTaxonomyCode;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 
 @Service
@@ -163,7 +165,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
 
     if (StringUtils.isNotBlank(installmentDTO.getLegacyPaymentMetadata())
-      && !installmentDTO.getLegacyPaymentMetadata().matches("[0126789]/\\S{3,138}")) {
+      && !installmentDTO.getLegacyPaymentMetadata().matches(CategoryUtils.LEGACY_PAYMENT_METADATA_REGEX)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_LEGACY_PAYMENT_METADATA, "Legacy payment metadata is not valid");
     }
 
