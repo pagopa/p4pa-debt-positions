@@ -131,7 +131,7 @@ class MixedDebtPositionMapperTest {
 
     try (MockedStatic<Utilities> utilities = Mockito.mockStatic(Utilities.class)) {
       utilities.when(Utilities::getRandomIUD).thenReturn(iud);
-      utilities.when(() -> getTaxonomyCodeFromCategory("9/01234567/", List.of("9/"), "/")).thenReturn(category);
+      utilities.when(() -> getTaxonomyCodeFromCategory("9/01234567/")).thenReturn(category);
 
       when(
         mixedDebtPositionTypeOrgRetrieverServiceMock.getMixedDebtPositionTypeOrg(
@@ -143,7 +143,7 @@ class MixedDebtPositionMapperTest {
           anyLong()))
         .thenReturn(Optional.of(debtPositionTypeOrg));
 
-      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), false))
+      when(categoryResolverServiceMock.resolveCategory("9/01234567/xxxxx", debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), mixedDebtPositionDTO.getDebtPositionOrigin()))
         .thenReturn("9/01234567/");
 
       OrganizationStationDTO defaultStation = new OrganizationStationDTO();

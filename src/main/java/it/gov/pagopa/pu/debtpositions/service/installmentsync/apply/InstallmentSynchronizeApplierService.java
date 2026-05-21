@@ -8,7 +8,6 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.tuple.Pair;
@@ -57,12 +56,12 @@ public class InstallmentSynchronizeApplierService {
       return Pair.of(storedDebtPosition, paymentOptionDTO.getInstallments().getFirst());
     } else {
       applierPaymentOptionService.merge(installmentSynchronizeDTO, storedPaymentOption);
-      InstallmentDTO installmentDTO = applyInstallment(installmentSynchronizeDTO, storedPaymentOption, storedInstallment, accessToken, debtPositionTypeOrg, InstallmentUtils.SPONTANEOUS_DEBT_POSITION_ORIGINS.contains(storedDebtPosition.getDebtPositionOrigin()));
+      InstallmentDTO installmentDTO = applyInstallment(installmentSynchronizeDTO, storedPaymentOption, storedInstallment, accessToken, debtPositionTypeOrg, storedDebtPosition.getDebtPositionOrigin());
       return Pair.of(storedDebtPosition, installmentDTO);
     }
   }
 
-  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, boolean isSpontaneous) {
+  private InstallmentDTO applyInstallment(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO storedPaymentOption, InstallmentDTO installmentDTO, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin) {
     if (installmentDTO == null) {
       installmentDTO = installmentSynchronizeMapper.map2Installment(installmentSynchronizeDTO);
       storedPaymentOption.getInstallments().add(installmentDTO);
@@ -71,7 +70,7 @@ public class InstallmentSynchronizeApplierService {
       Organization organization = organizationService.getOrganizationById(organizationId, accessToken)
         .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_ORGANIZATION, String.format("Provided organization with id %s not found", organizationId)));
 
-      populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg, isSpontaneous);
+      populateFirstTransfer(installmentSynchronizeDTO, organization, debtPositionTypeOrg, debtPositionOrigin);
       applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
     }
     return installmentDTO;
@@ -83,13 +82,13 @@ public class InstallmentSynchronizeApplierService {
       .orElseThrow(() -> new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_TYPE_ORG_CODE, String.format("The debt position type org with code %s is not valid for this organizationId %s", debtPositionTypeCode, organizationId)));
   }
 
-  private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg, boolean isSpontaneous) {
+  private void populateFirstTransfer(InstallmentSynchronizeDTO installmentSynchronizeDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin) {
     if (installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .anyMatch(transferDTO -> transferDTO.getTransferIndex() == 1)) {
       return;
     }
 
-    String category = categoryResolverService.resolveCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), isSpontaneous);
+    String category = categoryResolverService.resolveCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), debtPositionOrigin);
 
     Long totalAmountOtherTransfers = installmentSynchronizeDTO.getAdditionalTransfers().stream()
       .mapToLong(TransferSynchronizeDTO::getAmountCents).sum();

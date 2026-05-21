@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -282,14 +283,14 @@ public class UtilitiesTest {
     "'6//', ''",
   })
   void testGetTaxonomyCodeFromCategory(String input, String expected) {
-    String result = Utilities.getTaxonomyCodeFromCategory(input, List.of("6/","9/"), "/");
+    String result = Utilities.getTaxonomyCodeFromCategory(input);
     assertEquals(expected, result);
   }
 
   @ParameterizedTest
   @MethodSource("provideTaxonomyCodeFormattingCases")
   void testFormatCategoryTransferFromTaxonomyCode(String input, boolean isSpontaneous, String expected) {
-    String result = Utilities.formatCategoryTransferFromTaxonomyCode(input, List.of("6/","9/"),"9/", "/","6/", isSpontaneous);
+    String result = Utilities.formatCategoryTransferFromTaxonomyCode(input, isSpontaneous?DebtPositionOrigin.SPONTANEOUS:DebtPositionOrigin.ORDINARY);
     assertEquals(expected, result);
   }
 

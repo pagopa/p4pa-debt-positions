@@ -40,7 +40,7 @@ class TaxonomyValidatorServiceImplTest {
 
   @BeforeEach
   void init() {
-    service = new TaxonomyValidatorServiceImpl(taxonomyServiceMock, organizationServiceMock, List.of("9/"), "/");
+    service = new TaxonomyValidatorServiceImpl(taxonomyServiceMock, organizationServiceMock);
     SecurityUtilsTest.configureSecurityContext(accessToken, "USERID");
   }
 

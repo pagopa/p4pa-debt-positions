@@ -67,7 +67,7 @@ class ValidateDebtPositionServiceImplTest {
 
   @BeforeEach
   void init() {
-    service = new ValidateDebtPositionServiceImpl(taxonomyValidatorService, debtPositionRepository, balanceServiceMock, organizationServiceMock, brokerServiceMock,false, "9/", "6/","/",List.of("6/","9/"));
+    service = new ValidateDebtPositionServiceImpl(taxonomyValidatorService, debtPositionRepository, balanceServiceMock, organizationServiceMock, brokerServiceMock,false);
   }
 
   @Test

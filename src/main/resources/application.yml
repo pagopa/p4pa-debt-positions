@@ -200,12 +200,6 @@ iuv:
 nav:
   aux-digit: "\${NAV_AUX_DIGIT:3}"
 
-category:
-  prefix: "9/"
-  prefix-spontaneous: "6/"
-  suffix: "/"
-  allowed-prefixes: "6/,7/,8/,9/"
-
 data-export:
   default:
     max-total-elements: "\${DATA_EXPORT_MAX_TOTAL_ELEMENTS: 100000}"

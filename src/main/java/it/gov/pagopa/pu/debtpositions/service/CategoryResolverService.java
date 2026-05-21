@@ -1,15 +1,14 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.regex.Matcher;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.LEGACY_PAYMENT_METADATA_REGEX;
@@ -21,26 +20,14 @@ public class CategoryResolverService {
 
   private final TaxonomyValidatorService taxonomyValidatorService;
   private final DebtPositionTypeRepository debtPositionTypeRepository;
-  private final String categoryDefaultSpontaneousPrefix;
-  private final String categoryDefaultPrefix;
-  private final String categorySuffix;
-  private final List<String> categoryAllowedPrefixes;
 
   public CategoryResolverService(DebtPositionTypeRepository debtPositionTypeRepository,
-                                 TaxonomyValidatorService taxonomyValidatorService,
-                                 @Value("${category.prefix-spontaneous}") String categoryDefaultSpontaneousPrefix,
-                                 @Value("${category.prefix}") String categoryDefaultPrefix,
-                                 @Value("${category.suffix}") String categorySuffix,
-                                 @Value("${category.allowed-prefixes}") List<String> categoryAllowedPrefixes) {
+                                 TaxonomyValidatorService taxonomyValidatorService) {
     this.taxonomyValidatorService = taxonomyValidatorService;
     this.debtPositionTypeRepository = debtPositionTypeRepository;
-    this.categoryDefaultSpontaneousPrefix = categoryDefaultSpontaneousPrefix;
-    this.categoryDefaultPrefix = categoryDefaultPrefix;
-    this.categorySuffix = categorySuffix;
-    this.categoryAllowedPrefixes = categoryAllowedPrefixes;
   }
 
-  public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId, String orgTypeCode, boolean isSpontaneous) {
+  public String resolveCategory(String legacyPaymentMetadata, Long debtPositionTypeId, String orgTypeCode, DebtPositionOrigin debtPositionOrigin) {
     String taxonomyCode = null;
 
     if (StringUtils.isNotBlank(legacyPaymentMetadata)) {
@@ -62,7 +49,7 @@ public class CategoryResolverService {
       taxonomyCode = getTaxonomyFromRepository(debtPositionTypeId);
     }
 
-    return formatCategoryTransferFromTaxonomyCode(taxonomyCode, categoryAllowedPrefixes, categoryDefaultPrefix, categorySuffix, categoryDefaultSpontaneousPrefix, isSpontaneous);
+    return formatCategoryTransferFromTaxonomyCode(taxonomyCode, debtPositionOrigin);
   }
 
   private String extractTaxonomyFromLegacyPaymentMetadata(String legacyPaymentMetadata) {
