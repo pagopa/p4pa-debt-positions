@@ -27,7 +27,6 @@ public class Utilities {
   public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
   public static final Pattern IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]{23,30}$");
-  public static final Pattern LEGACY_PAYMENT_METADATA_REGEX = Pattern.compile("^(9/[^/]+/).*$");
   private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
 
   public static boolean isValidEmail(final String email) {
@@ -131,25 +130,6 @@ public class Utilities {
 
   public static LocalDateTime toLocalDateTime(OffsetDateTime date) {
     return date != null ? date.atZoneSameInstant(ZoneId.systemDefault()).toLocalDateTime() : null;
-  }
-
-  public static String getTaxonomyCodeFromCategory(String category, String prefix, String suffix) {
-    boolean isTaxonomyCodeFormat = category.startsWith(prefix) && category.endsWith(suffix);
-    return isTaxonomyCodeFormat ?
-      category.replace(prefix, "").replace(suffix, "")
-      : category;
-  }
-
-  public static String formatCategoryTransferFromTaxonomyCode(String taxonomyCode, String prefix, String suffix){
-    String cleaned = taxonomyCode;
-    if (cleaned.startsWith(prefix)) {
-      cleaned = cleaned.substring(prefix.length());
-    }
-    if (cleaned.endsWith(suffix)) {
-      cleaned = cleaned.substring(0, cleaned.length() - suffix.length());
-    }
-
-    return prefix + cleaned + suffix;
   }
 
   public static String formatPrice(Long priceInCents) {

@@ -2,15 +2,16 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.TaxonomyService;
+import it.gov.pagopa.pu.debtpositions.util.CategoryUtils;
 import it.gov.pagopa.pu.debtpositions.util.SecurityUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.PagedModelTaxonomy;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
-import static it.gov.pagopa.pu.debtpositions.util.Utilities.getTaxonomyCodeFromCategory;
+import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.getTaxonomyCodeFromCategory;
+
 
 @Service
 @Slf4j
@@ -18,17 +19,11 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
 
   private final TaxonomyService taxonomyService;
   private final OrganizationService organizationService;
-  private final String categoryPrefix;
-  private final String categorySuffix;
 
   public TaxonomyValidatorServiceImpl(TaxonomyService taxonomyService,
-                                      OrganizationService organizationService,
-                                      @Value("${category.prefix}") String categoryPrefix,
-                                      @Value("${category.suffix}") String categorySuffix) {
+                                      OrganizationService organizationService) {
     this.taxonomyService = taxonomyService;
     this.organizationService = organizationService;
-    this.categoryPrefix = categoryPrefix;
-    this.categorySuffix = categorySuffix;
   }
 
   public boolean validateTaxonomyCategory(String taxonomyCategory, String orgFiscalCode) {
@@ -43,7 +38,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
   }
 
   public boolean isTaxonomyCodeValid(String taxonomyCode, String orgTypeCode) {
-      if(!taxonomyCode.startsWith(categoryPrefix) || !taxonomyCode.endsWith(categorySuffix)) {
+      if(CategoryUtils.CATEGORY_ALLOWED_PREFIXES.stream().noneMatch(taxonomyCode::startsWith) || !taxonomyCode.endsWith(CategoryUtils.CATEGORY_SUFFIX)) {
         log.info("The taxonomy code [{}] does not meet the required format", taxonomyCode);
         return false;
       }
@@ -51,7 +46,7 @@ public class TaxonomyValidatorServiceImpl implements TaxonomyValidatorService {
   }
 
   public boolean isTaxonomyCategoryValid(String taxonomyCategory, String orgTypeCode) {
-    String formattedTaxonomyCategory = getTaxonomyCodeFromCategory(taxonomyCategory, categoryPrefix, categorySuffix);
+    String formattedTaxonomyCategory = getTaxonomyCodeFromCategory(taxonomyCategory);
 
     try {
       String organizationType = formattedTaxonomyCategory.substring(0, 2);

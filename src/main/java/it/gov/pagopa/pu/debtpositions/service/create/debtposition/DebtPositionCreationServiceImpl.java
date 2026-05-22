@@ -163,7 +163,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
     verifyInstallmentUniqueness(debtPositionDTO, installmentDTO);
 
-    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg);
+    populateFirstTransfer(installmentDTO, org, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin());
   }
 
   private void setSourceFlowName(InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin, String orgIpaCode) {
@@ -194,13 +194,13 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     }
   }
 
-  private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg) {
+  private void populateFirstTransfer(InstallmentDTO installmentDTO, Organization organization, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin) {
     if (installmentDTO.getTransfers().stream()
       .anyMatch(transferDTO -> transferDTO.getTransferIndex() == 1)) {
       return;
     }
 
-    String category = categoryResolverService.resolveCategory(installmentDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode());
+    String category = categoryResolverService.resolveCategory(installmentDTO.getLegacyPaymentMetadata(), debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), debtPositionOrigin);
 
     Long totalAmountOtherTransfers = installmentDTO.getTransfers().stream()
       .mapToLong(TransferDTO::getAmountCents).sum();

@@ -113,7 +113,7 @@ class InstallmentSynchronizeApplierServiceTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(categoryResolverServiceMock.resolveCategory(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getLegacyPaymentMetadata(),
-      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("category");
+      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), debtPositionDTO.getDebtPositionOrigin())).thenReturn("category");
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
     Mockito.doNothing().when(applierInstallmentServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
@@ -275,7 +275,7 @@ class InstallmentSynchronizeApplierServiceTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(categoryResolverServiceMock.resolveCategory(installmentSynchronizeDTO.getLegacyPaymentMetadata(),
-      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode())).thenReturn("resolvedCategory");
+      debtPositionTypeOrg.getDebtPositionTypeId(), organization.getOrgTypeCode(), debtPositionDTO.getDebtPositionOrigin())).thenReturn("resolvedCategory");
 
     Mockito.doNothing().when(applierDebtPositionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO, debtPositionTypeOrg.getDebtPositionTypeOrgId());
     Mockito.doNothing().when(applierPaymentOptionServiceMock).merge(installmentSynchronizeDTO, debtPositionDTO.getPaymentOptions().getFirst());
