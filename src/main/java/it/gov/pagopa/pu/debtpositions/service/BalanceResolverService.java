@@ -51,7 +51,7 @@ public class BalanceResolverService {
     boolean hasNotificationFee = notificationFeeCents != null && notificationFeeCents > 0;
 
     DebtPositionTypeOrgBalanceCostDTO debtPositionTypeOrgBalanceCostDTO = hasNotificationFee
-      ? fetchBalanceCostDTO(debtPositionTypeOrgId)
+      ? fetchDebtPositionTypeOrgBalanceCostDTO(debtPositionTypeOrgId)
       : null;
 
     long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
@@ -73,7 +73,7 @@ public class BalanceResolverService {
     return balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
   }
 
-  private DebtPositionTypeOrgBalanceCostDTO fetchBalanceCostDTO(Long debtPositionTypeOrgId) {
+  private DebtPositionTypeOrgBalanceCostDTO fetchDebtPositionTypeOrgBalanceCostDTO(Long debtPositionTypeOrgId) {
     return debtPositionTypeOrgBalanceCostRepository.findById(debtPositionTypeOrgId)
       .map(debtPositionTypeOrgBalanceCost -> DebtPositionTypeOrgBalanceCostDTO.builder()
         .assessmentCode(debtPositionTypeOrgBalanceCost.getAssessmentCode())
