@@ -43,7 +43,7 @@ public class BalanceResolverService {
     return balanceService.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrg.getCode(), accessToken);
   }
 
-  public String resolveAmountBalance(Long organizationId, Long debtPositionTypeOrgId, InstallmentNoPII installment, String accessToken) {
+  private String resolveAmountBalance(Long organizationId, Long debtPositionTypeOrgId, InstallmentNoPII installment, String accessToken) {
     Organization org = organizationService.getOrganizationById(organizationId, accessToken)
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + organizationId + " not found"));
 
