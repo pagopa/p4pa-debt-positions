@@ -90,7 +90,7 @@ class BalanceResolverServiceTest {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
-    installment.setNotificationFeeCents(0L);
+    installment.setNotificationFeeCents(null);
 
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken)).thenReturn(Optional.ofNullable(buildOrganization()));
 
@@ -131,7 +131,7 @@ class BalanceResolverServiceTest {
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
     installment.setBalance(null);
-    installment.setNotificationFeeCents(0L);
+    installment.setNotificationFeeCents(null);
 
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
@@ -159,7 +159,7 @@ class BalanceResolverServiceTest {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
-    installment.setNotificationFeeCents(0L);
+    installment.setNotificationFeeCents(null);
 
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
