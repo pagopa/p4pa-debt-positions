@@ -77,7 +77,7 @@ class TechnicalMixedDebtPositionMapperTest {
     checkTransfer(transfer, resultTransfer);
 
     Mockito.verify(balanceResolverServiceMock, Mockito.times(0))
-      .resolveAmountBalance(debtPosition.getOrganizationId(), installment, accessToken);
+      .resolveAmountBalance(debtPosition.getOrganizationId(), debtPosition.getDebtPositionTypeOrgId(), installment, accessToken);
   }
 
   @Test

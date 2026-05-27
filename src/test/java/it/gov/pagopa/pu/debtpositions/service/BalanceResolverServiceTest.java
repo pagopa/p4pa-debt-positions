@@ -6,6 +6,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,10 +34,25 @@ class BalanceResolverServiceTest {
   private BalanceService balanceServiceMock;
   @Mock
   private OrganizationService organizationServiceMock;
+  @Mock
+  private DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepositoryMock;
 
   @BeforeEach
   void setUp() {
-    service = new BalanceResolverService(balanceServiceMock, organizationServiceMock);
+    service = new BalanceResolverService(
+      balanceServiceMock,
+      organizationServiceMock,
+      debtPositionTypeOrgBalanceCostRepositoryMock
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      balanceServiceMock,
+      organizationServiceMock,
+      debtPositionTypeOrgBalanceCostRepositoryMock
+    );
   }
 
   @Test
@@ -71,13 +88,21 @@ class BalanceResolverServiceTest {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setNotificationFeeCents(0L);
 
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken)).thenReturn(Optional.ofNullable(buildOrganization()));
+
     CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
-      .balance(installment.getBalance()).amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+      .balance(installment.getBalance())
+      .amountCents(1100L)
+      .remittanceInformation(installment.getRemittanceInformation())
+      .notificationFeeCents(installment.getNotificationFeeCents())
+      .debtPositionTypeOrgBalanceCost(null)
+      .build();
+
     Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken)).thenReturn("balanceResolved");
 
-    String result = service.resolveAmountBalance(orgId, installment, accessToken);
+    String result = service.resolveAmountBalance(orgId, 1L, installment, accessToken);
 
     assertEquals("balanceResolved", result);
   }
@@ -91,7 +116,7 @@ class BalanceResolverServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken)).thenReturn(Optional.empty());
 
     NotFoundException exception = assertThrows(NotFoundException.class,
-      () -> service.resolveAmountBalance(orgId, installment, accessToken));
+      () -> service.resolveAmountBalance(orgId, 1L, installment, accessToken));
 
     assertEquals("ORGANIZATION_NOT_FOUND",exception.getCode());
     assertEquals("Organization with id 1 not found", exception.getMessage());
@@ -104,12 +129,21 @@ class BalanceResolverServiceTest {
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
     installment.setBalance(null);
+    installment.setNotificationFeeCents(0L);
+
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
       .thenReturn(Optional.ofNullable(buildOrganization()));
+
     CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
-      .balance("balance").amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+      .balance("balance")
+      .amountCents(1100L)
+      .notificationFeeCents(installment.getNotificationFeeCents())
+      .remittanceInformation(installment.getRemittanceInformation())
+      .debtPositionTypeOrgBalanceCost(null)
+      .build();
+
     Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
       .thenReturn("balanceResolved");
 
@@ -123,12 +157,21 @@ class BalanceResolverServiceTest {
     Long orgId = 1L;
     String accessToken = "accessToken";
     InstallmentNoPII installment = buildInstallmentNoPII();
+    installment.setNotificationFeeCents(0L);
+
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
       .thenReturn(Optional.ofNullable(buildOrganization()));
+
     CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
-      .balance(installment.getBalance()).amountCents(100L).remittanceInformation(installment.getRemittanceInformation()).build();
+      .balance(installment.getBalance())
+      .amountCents(1100L)
+      .notificationFeeCents(installment.getNotificationFeeCents())
+      .debtPositionTypeOrgBalanceCost(null)
+      .remittanceInformation(installment.getRemittanceInformation())
+      .build();
+
     Mockito.when(balanceServiceMock.calculateAmountBalance(amountBalanceRequest, accessToken))
       .thenReturn("balanceResolved");
 
