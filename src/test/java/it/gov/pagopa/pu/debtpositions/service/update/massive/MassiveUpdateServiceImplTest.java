@@ -15,9 +15,14 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.stream.Stream;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 
@@ -31,7 +36,7 @@ class MassiveUpdateServiceImplTest {
   private DebtPositionSyncService debtPositionSyncServiceMock;
 
   private static final String VALID_IBAN = "IT0000000000000000000000000";
-  private static final String VALID_POSTAL_IBAN = "IT0000000000000000000000000";
+  private static final String VALID_POSTAL_IBAN = "IT00X0760100000000000000000";
 
   private MassiveUpdateService massiveUpdateService;
 
@@ -93,10 +98,13 @@ class MassiveUpdateServiceImplTest {
     );
   }
 
-  @Test
-  void givenMatchingTransferIbansWhenUpdateTransferIbansThenUpdatesAndSyncs() {
+  @ParameterizedTest
+  @MethodSource("provideTransferIbanParams")
+  void givenMatchingTransferIbansWhenUpdateTransferIbansThenUpdatesAndSyncs(
+    String oldPostalIban,
+    String newPostalIban
+  ) {
     String oldIban = "oldIban";
-    String oldPostalIban = "oldPostalIban";
     String accessToken = "accessToken";
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
@@ -111,11 +119,11 @@ class MassiveUpdateServiceImplTest {
     Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionDTO.getDebtPositionId())).thenReturn(debtPositionDTO);
 
     massiveUpdateService.updateTransferIbansAndSyncDebtPosition(
-      debtPositionDTO.getDebtPositionId(), oldIban, VALID_IBAN, oldPostalIban, VALID_POSTAL_IBAN, accessToken
+      debtPositionDTO.getDebtPositionId(), oldIban, VALID_IBAN, oldPostalIban, newPostalIban, accessToken
     );
 
     Assertions.assertEquals(VALID_IBAN, transferDTO.getIban());
-    Assertions.assertEquals(VALID_POSTAL_IBAN, transferDTO.getPostalIban());
+    Assertions.assertEquals(newPostalIban, transferDTO.getPostalIban());
 
     Mockito.verify(debtPositionServiceMock).getDebtPosition(debtPositionDTO.getDebtPositionId());
     Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
@@ -126,6 +134,13 @@ class MassiveUpdateServiceImplTest {
       Mockito.eq(PaymentEventType.DPI_UPDATED),
       Mockito.eq("IUD: " + expectedIud),
       Mockito.eq(accessToken)
+    );
+  }
+
+  private static Stream<Arguments> provideTransferIbanParams() {
+    return Stream.of(
+      Arguments.of("oldPostalIban", VALID_POSTAL_IBAN),
+      Arguments.of(null, null)
     );
   }
 
