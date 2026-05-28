@@ -464,6 +464,23 @@ class DebtPositionTypeOrgServiceImplTest {
   }
 
   @Test
+  void givenPostalIbanAndNullIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setIban(null);
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+
+    String accessToken = "accessToken";
+
+    InvalidValueException ex = Assertions.assertThrows(InvalidValueException.class,
+      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
+
+    Assertions.assertEquals("INVALID_POSTAL_IBAN",ex.getCode());
+    Assertions.assertEquals("It is not possible to set postalIban if the iban is null", ex.getMessage());
+  }
+
+  @Test
   void givenInvalidPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
