@@ -25,7 +25,7 @@ public class TransferFaker {
     transfer.setAmountCents(100L);
     transfer.setRemittanceInformation("Payment Info");
     transfer.setIban("IT60X0542811101000000123456");
-    transfer.setPostalIban("IT60X0542811101009000123456");
+    transfer.setPostalIban("IT00X0760100000000000000000");
     transfer.setCategory("001122233");
     transfer.setTransferIndex(1);
     transfer.setCreationDate(DATETIME.toLocalDateTime());
