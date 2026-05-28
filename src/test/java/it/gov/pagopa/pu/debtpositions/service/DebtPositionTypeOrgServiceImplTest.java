@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +30,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionTypeOrgServiceImplTest {
@@ -463,12 +467,17 @@ class DebtPositionTypeOrgServiceImplTest {
     Assertions.assertEquals("Provided iban is not valid", ex.getMessage());
   }
 
-  @Test
-  void givenPostalIbanAndNullIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
+  @ParameterizedTest()
+  @MethodSource("provideInvalidPostalIbanParams")
+  void givenInvalidPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException(
+    String iban,
+    String postalIban,
+    String expectedMessage
+  ) {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    debtPositionTypeOrg.setIban(null);
-    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
+    debtPositionTypeOrg.setIban(iban);
+    debtPositionTypeOrg.setPostalIban(postalIban);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
 
     String accessToken = "accessToken";
@@ -476,42 +485,28 @@ class DebtPositionTypeOrgServiceImplTest {
     InvalidValueException ex = Assertions.assertThrows(InvalidValueException.class,
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
 
-    Assertions.assertEquals("INVALID_POSTAL_IBAN",ex.getCode());
-    Assertions.assertEquals("It is not possible to set postalIban if the iban is null", ex.getMessage());
+    Assertions.assertEquals("INVALID_POSTAL_IBAN", ex.getCode());
+    Assertions.assertEquals(expectedMessage, ex.getMessage());
   }
 
-  @Test
-  void givenInvalidPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
-    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000");
-    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
-
-    String accessToken = "accessToken";
-
-    InvalidValueException ex = Assertions.assertThrows(InvalidValueException.class,
-      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
-
-    Assertions.assertEquals("INVALID_POSTAL_IBAN",ex.getCode());
-    Assertions.assertEquals("Provided postal iban is not valid", ex.getMessage());
-  }
-
-  @Test
-  void givenInvalidAbiCodeOfPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
-    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
-    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("invalidIban");
-    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
-
-    String accessToken = "accessToken";
-
-    InvalidValueException ex = Assertions.assertThrows(InvalidValueException.class,
-      () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
-
-    Assertions.assertEquals("INVALID_POSTAL_IBAN",ex.getCode());
-    Assertions.assertEquals("Provided postal iban is not valid", ex.getMessage());
+  private static Stream<Arguments> provideInvalidPostalIbanParams() {
+    return Stream.of(
+      Arguments.of(
+        null,
+        "IT00X0760100000000000000000",
+        "It is not possible to set postalIban if the iban is null"
+      ),
+      Arguments.of(
+        "IT0000000000000000000000000",
+        "IT00X0760100000000000",
+        "Provided postal iban is not valid"
+      ),
+      Arguments.of(
+        "IT0000000000000000000000000",
+        "invalidIban",
+        "Provided postal iban is not valid"
+      )
+    );
   }
 
   @Test
