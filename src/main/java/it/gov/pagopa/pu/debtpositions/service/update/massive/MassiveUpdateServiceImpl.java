@@ -87,7 +87,7 @@ public class MassiveUpdateServiceImpl implements MassiveUpdateService {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Provided newIban is not valid");
     }
 
-    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidIban(newPostalIban)) {
+    if (StringUtils.isNotBlank(newPostalIban) && !Utilities.isValidPostalIban(newPostalIban)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IBAN, "Provided newPostalIban is not valid");
     }
   }

@@ -19,6 +19,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -27,6 +30,7 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionTypeOrgServiceImplTest {
@@ -144,7 +148,7 @@ class DebtPositionTypeOrgServiceImplTest {
     expectedResult.setDebtPositionTypeOrgId(null);
     expectedResult.setSpontaneousFormId(null);
     expectedResult.setIban("IT0000000000000000000000000");
-    expectedResult.setPostalIban("IT0000000000000000000000000");
+    expectedResult.setPostalIban("IT00X0760100000000000000000");
 
     String accessToken = "accessToken";
 
@@ -171,7 +175,7 @@ class DebtPositionTypeOrgServiceImplTest {
     debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
     debtPositionTypeOrg.setSpontaneousFormId(null);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
     saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
@@ -196,7 +200,7 @@ class DebtPositionTypeOrgServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
     saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
@@ -220,7 +224,7 @@ class DebtPositionTypeOrgServiceImplTest {
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
     debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
     saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
     saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
@@ -251,7 +255,7 @@ class DebtPositionTypeOrgServiceImplTest {
     debtPositionTypeOrg.setDebtPositionTypeOrgId(1L);
     debtPositionTypeOrg.setSpontaneousFormId(null);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
     debtPositionTypeOrg.setOrganizationId(orgId);
 
     DebtPositionTypeOrg updatedDebtPositionTypeOrg = buildUpdatedDebtPositionTypeOrg(debtPositionTypeOrg);
@@ -420,7 +424,7 @@ class DebtPositionTypeOrgServiceImplTest {
     debtPositionTypeOrg.setOrganizationId(1L);
     debtPositionTypeOrg.setSpontaneousFormId(100L);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban(null);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
 
     String accessToken = "accessToken";
@@ -463,12 +467,17 @@ class DebtPositionTypeOrgServiceImplTest {
     Assertions.assertEquals("Provided iban is not valid", ex.getMessage());
   }
 
-  @Test
-  void givenInvalidPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException() {
+  @ParameterizedTest()
+  @MethodSource("provideInvalidPostalIbanParams")
+  void givenInvalidPostalIbanWhenSaveDebtPositionTypeOrgThenInvalidValueException(
+    String iban,
+    String postalIban,
+    String expectedMessage
+  ) {
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
-    debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("invalidIban");
+    debtPositionTypeOrg.setIban(iban);
+    debtPositionTypeOrg.setPostalIban(postalIban);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
 
     String accessToken = "accessToken";
@@ -476,8 +485,28 @@ class DebtPositionTypeOrgServiceImplTest {
     InvalidValueException ex = Assertions.assertThrows(InvalidValueException.class,
       () -> debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken));
 
-    Assertions.assertEquals("INVALID_POSTAL_IBAN",ex.getCode());
-    Assertions.assertEquals("Provided postal iban is not valid", ex.getMessage());
+    Assertions.assertEquals("INVALID_POSTAL_IBAN", ex.getCode());
+    Assertions.assertEquals(expectedMessage, ex.getMessage());
+  }
+
+  private static Stream<Arguments> provideInvalidPostalIbanParams() {
+    return Stream.of(
+      Arguments.of(
+        null,
+        "IT00X0760100000000000000000",
+        "It is not possible to set postalIban if the iban is null"
+      ),
+      Arguments.of(
+        "IT0000000000000000000000000",
+        "IT00X0760100000000000",
+        "Provided postal iban is not valid"
+      ),
+      Arguments.of(
+        "IT0000000000000000000000000",
+        "invalidIban",
+        "Provided postal iban is not valid"
+      )
+    );
   }
 
   @Test
@@ -512,7 +541,7 @@ class DebtPositionTypeOrgServiceImplTest {
     debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
     debtPositionTypeOrg.setSpontaneousFormId(123L);
     debtPositionTypeOrg.setIban("IT0000000000000000000000000");
-    debtPositionTypeOrg.setPostalIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
 
     String accessToken = "accessToken";
@@ -597,7 +626,7 @@ class DebtPositionTypeOrgServiceImplTest {
     Long orgId = 1L;
     String iban = "IT0000000000000000000000001";
     String oldPostalIban = null;
-    String newPostalIban = "IT0000000000000000000000002";
+    String newPostalIban = "IT00X0760100000000000000000";
     String accessToken = "accessToken";
 
     Organization organization = podamFactory.manufacturePojo(Organization.class);

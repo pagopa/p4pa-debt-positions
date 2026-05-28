@@ -123,8 +123,12 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     }
 
     String postalIban = debtPositionTypeOrg.getPostalIban();
+    if(StringUtils.isNotBlank(postalIban) && StringUtils.isBlank(debtPositionTypeOrg.getIban())){
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "It is not possible to set postalIban if the iban is null");
+    }
+
     // Postal IBAN is optional, but if provided, it must not be blank
-    if (postalIban != null && !Utilities.isValidIban(postalIban)) {
+    if (postalIban != null && !Utilities.isValidPostalIban(postalIban)) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "Provided postal iban is not valid");
     }
 

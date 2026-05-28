@@ -31,8 +31,7 @@ public class UtilitiesTest {
 
   @Test
   void givenNullIbanWhenIsValidIbanThenReturnFalse() {
-    boolean result = Utilities.isValidIban(null);
-    assertFalse(result);
+    assertFalse(Utilities.isValidIban(null));
   }
 
   @Test
@@ -40,6 +39,25 @@ public class UtilitiesTest {
     String iban = "IT0000000000000000000000000";
     boolean result = Utilities.isValidIban(iban);
     assertTrue(result);
+  }
+
+  @Test
+  void givenNullIbanWhenIsValidPostalIbanThenReturnFalse() {
+    assertFalse(Utilities.isValidPostalIban(null));
+  }
+
+  @Test
+  void givenShortPostalIbanWhenIsValidPostalIbanThenReturnFalse() {
+    String postalIban = "IT000000";
+    boolean result = Utilities.isValidPostalIban(postalIban);
+    assertFalse(result);
+  }
+
+  @Test
+  void givenPostalIbanWithWrongAbiCodeWhenIsValidPostalIbanThenReturnFalse() {
+    String postalIban = "IT0000000000000000000000000";
+    boolean result = Utilities.isValidPostalIban(postalIban);
+    assertFalse(result);
   }
 
   @Test
