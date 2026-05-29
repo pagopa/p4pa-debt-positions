@@ -30,6 +30,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DatabindException;
@@ -106,6 +107,10 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
+  @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
+  public ResponseEntity<DebtPositionErrorDTO> handleInvokedHttpClientTooManyRequestsError(Exception ex, HttpServletRequest request) {
+    return handleException(ex, request, HttpStatus.TOO_MANY_REQUESTS, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS);
+  }
 
   @ExceptionHandler({ServletException.class, ErrorResponseException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleServletException(Exception ex, HttpServletRequest request) {
@@ -221,6 +226,9 @@ public class DebtPositionExceptionHandler {
       case MissingServletRequestParameterException missingServletRequestParameterException -> {
         return Pair.of(DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
           missingServletRequestParameterException.getMessage());
+      }
+      case HttpClientErrorException.TooManyRequests tooManyRequestsException -> {
+        return Pair.of(DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS.name(), tooManyRequestsException.getMessage());
       }
       case BaseBusinessException businessException -> {
         return Pair.of(businessException.getCode(), businessException.getMessage());
