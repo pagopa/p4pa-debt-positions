@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceReque
 import it.gov.pagopa.pu.classification.dto.generated.DebtPositionTypeOrgBalanceCostDTO;
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
@@ -17,6 +18,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
@@ -195,8 +197,11 @@ class BalanceResolverServiceTest {
     debtPositionTypeOrgBalanceCost.setOfficeCode("OFF");
     debtPositionTypeOrgBalanceCost.setSectionCode("SEC");
 
-    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.findById(debtPositionTypeOrgId))
-      .thenReturn(Optional.of(debtPositionTypeOrgBalanceCost));
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.findByDebtPositionTypeOrgIdAndTypeAndOperatingYear(
+      debtPositionTypeOrgId,
+      DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
+      String.valueOf(LocalDate.now().getYear())
+    )).thenReturn(Optional.of(debtPositionTypeOrgBalanceCost));
 
     DebtPositionTypeOrgBalanceCostDTO debtPositionTypeOrgBalanceCostDTO = DebtPositionTypeOrgBalanceCostDTO.builder()
       .assessmentCode(debtPositionTypeOrgBalanceCost.getAssessmentCode())
@@ -234,8 +239,11 @@ class BalanceResolverServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
       .thenReturn(Optional.ofNullable(buildOrganization()));
 
-    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.findById(debtPositionTypeOrgId))
-      .thenReturn(Optional.empty());
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.findByDebtPositionTypeOrgIdAndTypeAndOperatingYear(
+      debtPositionTypeOrgId,
+      DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
+      String.valueOf(LocalDate.now().getYear())
+    )).thenReturn(Optional.empty());
 
     CalculateAmountBalanceRequest amountBalanceRequest = CalculateAmountBalanceRequest.builder()
       .balance(installment.getBalance())

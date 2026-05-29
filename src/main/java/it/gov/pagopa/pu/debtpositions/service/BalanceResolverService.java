@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceReque
 import it.gov.pagopa.pu.classification.dto.generated.DebtPositionTypeOrgBalanceCostDTO;
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
+import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
@@ -14,6 +15,8 @@ import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDate;
 
 @Service
 @Slf4j
@@ -51,7 +54,7 @@ public class BalanceResolverService {
     boolean hasNotificationFee = notificationFeeCents != null && notificationFeeCents > 0;
 
     DebtPositionTypeOrgBalanceCostDTO debtPositionTypeOrgBalanceCostDTO = hasNotificationFee
-      ? fetchDebtPositionTypeOrgBalanceCostDTO(debtPositionTypeOrgId)
+      ? fetchNotificationCostDebtPositionTypeOrgBalanceCostDTO(debtPositionTypeOrgId)
       : null;
 
     long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
@@ -73,8 +76,14 @@ public class BalanceResolverService {
     return balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
   }
 
-  private DebtPositionTypeOrgBalanceCostDTO fetchDebtPositionTypeOrgBalanceCostDTO(Long debtPositionTypeOrgId) {
-    return debtPositionTypeOrgBalanceCostRepository.findById(debtPositionTypeOrgId)
+  private DebtPositionTypeOrgBalanceCostDTO fetchNotificationCostDebtPositionTypeOrgBalanceCostDTO(Long debtPositionTypeOrgId) {
+    String operatingYear = String.valueOf(LocalDate.now().getYear());
+
+    return debtPositionTypeOrgBalanceCostRepository.findByDebtPositionTypeOrgIdAndTypeAndOperatingYear(
+        debtPositionTypeOrgId,
+        DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
+        operatingYear
+      )
       .map(debtPositionTypeOrgBalanceCost -> DebtPositionTypeOrgBalanceCostDTO.builder()
         .assessmentCode(debtPositionTypeOrgBalanceCost.getAssessmentCode())
         .officeCode(debtPositionTypeOrgBalanceCost.getOfficeCode())
