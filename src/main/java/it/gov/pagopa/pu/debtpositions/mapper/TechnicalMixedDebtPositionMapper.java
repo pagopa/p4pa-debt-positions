@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionPr
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -36,6 +37,7 @@ public class TechnicalMixedDebtPositionMapper {
                                                    Long debtPositionTypeOrgId,
                                                    boolean isUnpaid,
                                                    List<MixedDpAdditionalData> mixedDpAdditionalDataList,
+                                                   OffsetDateTime paymentDateTime,
                                                    String accessToken) {
     DebtPosition technicalMixedDp = new DebtPosition();
     technicalMixedDp.setIupdOrg(debtPosition.getIupdOrg());
@@ -52,7 +54,7 @@ public class TechnicalMixedDebtPositionMapper {
       debtPosition.isFlagPuPagoPaPayment());
     technicalMixedDp.setPaymentOptions(
       toTechnicalMixedDPPaymentOptions(
-        debtPosition, isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+        debtPosition, isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, paymentDateTime, accessToken));
     debtPositionProcessorService.updateAmounts(technicalMixedDp);
     technicalMixedDp.setStationId(debtPosition.getStationId());
 
@@ -62,7 +64,7 @@ public class TechnicalMixedDebtPositionMapper {
   private SortedSet<PaymentOption> toTechnicalMixedDPPaymentOptions(
     DebtPosition debtPosition, boolean isUnpaid,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList,
-    Long debtPositionTypeOrgId, String accessToken) {
+    Long debtPositionTypeOrgId, OffsetDateTime paymentDateTime, String accessToken) {
     SortedSet<PaymentOption> set = new TreeSet<>();
 
     for (PaymentOption paymentOption : debtPosition.getPaymentOptions()) {
@@ -80,7 +82,7 @@ public class TechnicalMixedDebtPositionMapper {
       technicalMixedDpPaymentOption.setInstallments(
         toTechnicalMixedDPInstallments(debtPosition.getOrganizationId(),
           paymentOption.getInstallments(),
-          isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, accessToken));
+          isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, paymentDateTime, accessToken));
 
       set.add(technicalMixedDpPaymentOption);
     }
@@ -91,7 +93,7 @@ public class TechnicalMixedDebtPositionMapper {
   private SortedSet<InstallmentNoPII> toTechnicalMixedDPInstallments(
     Long organizationId, SortedSet<InstallmentNoPII> installments, boolean isUnpaid,
     List<MixedDpAdditionalData> mixedDpAdditionalDataList,
-    Long debtPositionTypeOrgId, String accessToken) {
+    Long debtPositionTypeOrgId, OffsetDateTime paymentDateTime, String accessToken) {
     SortedSet<InstallmentNoPII> set = new TreeSet<>();
 
     installments.forEach(installment ->
@@ -155,7 +157,7 @@ public class TechnicalMixedDebtPositionMapper {
         if (!isUnpaid) {
           DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPositionTypeOrgId)
             .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "The DebtPositionTypeOrg with id " + debtPositionTypeOrgId + " was not found"));
-          balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, debtPositionTypeOrg, accessToken);
+          balanceResolverService.updateBalanceResolvingAmount(technicalMixedDpInstallment, organizationId, debtPositionTypeOrg, paymentDateTime, accessToken);
         }
         set.add(technicalMixedDpInstallment);
       }));

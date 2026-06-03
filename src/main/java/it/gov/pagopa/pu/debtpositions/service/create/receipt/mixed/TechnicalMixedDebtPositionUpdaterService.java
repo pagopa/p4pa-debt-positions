@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class TechnicalMixedDebtPositionUpdaterService  {
   private final DebtPositionDeleteService debtPositionDeleteService;
 
   @Transactional
-  public List<DebtPosition> update(DebtPosition debtPosition, String accessToken) {
+  public List<DebtPosition> update(DebtPosition debtPosition, OffsetDateTime paymentDateTime, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.findById(debtPosition.getDebtPositionTypeOrgId()).orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg with id " + debtPosition.getDebtPositionTypeOrgId() + " not found"));
 
     if (!Constants.MIXED_DP_TYPE_ORG_CODE.equalsIgnoreCase(debtPositionTypeOrg.getCode())) {
@@ -59,6 +60,7 @@ public class TechnicalMixedDebtPositionUpdaterService  {
       buildMixedDpAdditionalDataMap(oldMixedDebtPositions),
       debtPosition,
       false,
+      paymentDateTime,
       accessToken
     );
 

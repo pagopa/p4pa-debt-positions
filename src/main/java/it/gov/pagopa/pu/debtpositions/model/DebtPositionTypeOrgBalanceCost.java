@@ -1,6 +1,5 @@
 package it.gov.pagopa.pu.debtpositions.model;
 
-import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
@@ -15,13 +14,8 @@ import java.io.Serializable;
 @Data
 @EqualsAndHashCode(callSuper = false)
 public class DebtPositionTypeOrgBalanceCost extends BaseEntity implements Serializable {
-  @Id
-  private Long debtPositionTypeOrgId;
-  @Enumerated(EnumType.STRING)
-  @NotNull
-  private DebtPositionTypeOrgBalanceCostType type;
-  @NotNull
-  private String operatingYear;
+  @EmbeddedId
+  private DebtPositionTypeOrgBalanceCostId id;
   private String officeCode;
   private String officeDescription;
   @NotNull

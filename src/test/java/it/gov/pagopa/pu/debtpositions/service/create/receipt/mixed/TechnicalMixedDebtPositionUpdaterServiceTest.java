@@ -71,10 +71,12 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setCode("NOTMIXED");
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // When
-    List<DebtPosition> result = service.update(debtPosition, ACCESS_TOKEN);
+    List<DebtPosition> result = service.update(debtPosition, paymentDateTime, ACCESS_TOKEN);
 
     // Then
     assertTrue(result.isEmpty());
@@ -89,10 +91,12 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setCode("MIXED");
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, paymentDateTime, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("TOO_MANY_PAYMENT_OPTIONS", exception.getCode());
     assertEquals("PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
@@ -106,10 +110,12 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setCode("MIXED");
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, paymentDateTime, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("TOO_MANY_PAYMENT_OPTIONS", exception.getCode());
     assertEquals("PaymentOptions size must be 1 for debtPositionId " +  debtPosition.getDebtPositionId(), exception.getMessage());
@@ -123,10 +129,12 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setCode("MIXED");
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, paymentDateTime, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("TOO_MANY_INSTALLMENTS", exception.getCode());
     assertEquals("Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
@@ -140,10 +148,12 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = new DebtPositionTypeOrg();
     debtPositionTypeOrg.setCode("MIXED");
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
 
     // Then
-    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () -> service.update(debtPosition, paymentDateTime, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
     assertEquals("TOO_MANY_INSTALLMENTS", exception.getCode());
     assertEquals("Installments size must be 1 for debtPositionId " + debtPosition.getDebtPositionId(), exception.getMessage());
@@ -161,16 +171,18 @@ class TechnicalMixedDebtPositionUpdaterServiceTest {
     ArgumentCaptor<DebtPosition> dpCaptor =
 ArgumentCaptor.forClass(DebtPosition.class);
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     when(dpTypeOrgRepositoryMock.findById(debtPosition.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
     when(dpRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(),
       installment.getIuv(),
       List.of(DebtPositionOrigin.SPONTANEOUS_MIXED)
     )).thenReturn(List.of(oldMixedDebtPosition));
-    when(mixedDPBuilderServiceMock.createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(ACCESS_TOKEN))).thenReturn(List.of(newMixedDebtPosition));
+    when(mixedDPBuilderServiceMock.createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(paymentDateTime), eq(ACCESS_TOKEN))).thenReturn(List.of(newMixedDebtPosition));
 
     // When
-    List<DebtPosition> result = service.update(debtPosition, ACCESS_TOKEN);
+    List<DebtPosition> result = service.update(debtPosition, paymentDateTime, ACCESS_TOKEN);
 
     // Then
     assertNotNull(result);
@@ -178,7 +190,7 @@ ArgumentCaptor.forClass(DebtPosition.class);
     verify(dpTypeOrgRepositoryMock).findById(1L);
     verify(dpRepositoryMock).findEntityGraphByOrganizationIdAndInstallmentIuv(
       debtPosition.getOrganizationId(), installment.getIuv(), List.of(DebtPositionOrigin.SPONTANEOUS_MIXED));
-    verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(ACCESS_TOKEN));
+    verify(mixedDPBuilderServiceMock).createTechnicalMixedDebtPositions(anyMap(), eq(debtPosition), eq(false), eq(paymentDateTime), eq(ACCESS_TOKEN));
     result.forEach(dp -> verify(dpServiceMock).saveDebtPosition(same(dp)));
     verify(dpDeleteServiceMock).delete(dpCaptor.capture());
     assertEquals(newMixedDebtPosition.getDebtPositionId(), result.getFirst().getDebtPositionId());
@@ -191,7 +203,9 @@ ArgumentCaptor.forClass(DebtPosition.class);
     DebtPosition debtPosition = generateDebtPosition();
     when(dpTypeOrgRepositoryMock.findById(1L)).thenReturn(Optional.empty());
 
-    assertThrows(NotFoundException.class, () -> service.update(debtPosition, ACCESS_TOKEN));
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
+    assertThrows(NotFoundException.class, () -> service.update(debtPosition, paymentDateTime, ACCESS_TOKEN));
     verify(dpTypeOrgRepositoryMock).findById(1L);
   }
 

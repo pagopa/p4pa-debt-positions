@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCostId;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
@@ -17,6 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 
 @Service
 @Slf4j
@@ -46,7 +48,7 @@ public class BalanceResolverService {
     return balanceService.getBalanceByAssessmentRegistry(organizationId, debtPositionTypeOrg.getCode(), accessToken);
   }
 
-  private String resolveAmountBalance(Long organizationId, Long debtPositionTypeOrgId, InstallmentNoPII installment, String accessToken) {
+  private String resolveAmountBalance(Long organizationId, Long debtPositionTypeOrgId, InstallmentNoPII installment, OffsetDateTime paymentDateTime, String accessToken) {
     Organization org = organizationService.getOrganizationById(organizationId, accessToken)
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization with id " + organizationId + " not found"));
 
@@ -54,7 +56,7 @@ public class BalanceResolverService {
     boolean hasNotificationFee = notificationFeeCents != null && notificationFeeCents > 0;
 
     DebtPositionTypeOrgBalanceCostDTO debtPositionTypeOrgBalanceCostDTO = hasNotificationFee
-      ? fetchNotificationCostDebtPositionTypeOrgBalanceCostDTO(debtPositionTypeOrgId)
+      ? fetchNotificationCostBalanceInfo(debtPositionTypeOrgId, paymentDateTime)
       : null;
 
     long totalAmountCentsPrimaryOrg = installment.getTransfers().stream()
@@ -76,14 +78,16 @@ public class BalanceResolverService {
     return balanceService.calculateAmountBalance(amountBalanceRequest, accessToken);
   }
 
-  private DebtPositionTypeOrgBalanceCostDTO fetchNotificationCostDebtPositionTypeOrgBalanceCostDTO(Long debtPositionTypeOrgId) {
-    String operatingYear = String.valueOf(LocalDate.now().getYear());
+  private DebtPositionTypeOrgBalanceCostDTO fetchNotificationCostBalanceInfo(Long debtPositionTypeOrgId, OffsetDateTime paymentDateTime) {
+    String operatingYear = String.valueOf(paymentDateTime.getYear());
 
-    return debtPositionTypeOrgBalanceCostRepository.findByDebtPositionTypeOrgIdAndTypeAndOperatingYear(
-        debtPositionTypeOrgId,
-        DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
-        operatingYear
-      )
+    DebtPositionTypeOrgBalanceCostId costId = new DebtPositionTypeOrgBalanceCostId(
+      debtPositionTypeOrgId,
+      DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
+      operatingYear
+    );
+
+    return debtPositionTypeOrgBalanceCostRepository.findById(costId)
       .map(debtPositionTypeOrgBalanceCost -> DebtPositionTypeOrgBalanceCostDTO.builder()
         .assessmentCode(debtPositionTypeOrgBalanceCost.getAssessmentCode())
         .officeCode(debtPositionTypeOrgBalanceCost.getOfficeCode())
@@ -92,14 +96,14 @@ public class BalanceResolverService {
       .orElse(null);
   }
 
-  public void updateBalanceResolvingAmount(InstallmentNoPII installment, Long organizationId, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
+  public void updateBalanceResolvingAmount(InstallmentNoPII installment, Long organizationId, DebtPositionTypeOrg debtPositionTypeOrg, OffsetDateTime paymentDateTime, String accessToken) {
     if (StringUtils.isBlank(installment.getBalance())) {
       String balance = getBalanceDefault(organizationId, debtPositionTypeOrg, accessToken);
       installment.setBalance(balance);
     }
 
     if (StringUtils.isNotBlank(installment.getBalance())) {
-      String balanceResolved = resolveAmountBalance(organizationId, debtPositionTypeOrg.getDebtPositionTypeOrgId(), installment, accessToken);
+      String balanceResolved = resolveAmountBalance(organizationId, debtPositionTypeOrg.getDebtPositionTypeOrgId(), installment, paymentDateTime, accessToken);
       installment.setBalance(balanceResolved);
     }
   }

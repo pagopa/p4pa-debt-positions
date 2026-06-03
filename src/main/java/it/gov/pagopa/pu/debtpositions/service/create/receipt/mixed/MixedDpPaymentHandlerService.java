@@ -24,7 +24,7 @@ public class MixedDpPaymentHandlerService {
   }
 
   public void handle(DebtPosition primaryOrgDp, ReceiptWithAdditionalNodeDataDTO receiptDTO, String accessToken) {
-    List<DebtPosition> newMixedTechnicalDebtPositions = technicalMixedDebtPositionUpdaterService.update(primaryOrgDp, accessToken);
+    List<DebtPosition> newMixedTechnicalDebtPositions = technicalMixedDebtPositionUpdaterService.update(primaryOrgDp, receiptDTO.getPaymentDateTime(), accessToken);
     if(!CollectionUtils.isEmpty(newMixedTechnicalDebtPositions)) {
       List<DebtPositionDTO> fullDtos = mapper.mapAllToDto(newMixedTechnicalDebtPositions);
       for (DebtPositionDTO dp : fullDtos) {

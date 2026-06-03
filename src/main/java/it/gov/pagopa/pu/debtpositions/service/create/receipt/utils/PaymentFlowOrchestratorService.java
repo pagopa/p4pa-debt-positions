@@ -64,9 +64,9 @@ public class PaymentFlowOrchestratorService {
         installment.setBalance(incomingReceiptDTO.getBalance());
 
         if (typeOrgToUse != null) {
-            ordinaryInstallmentPaymentHandlerService.resolveBalance(installment, typeOrgToUse, accessToken);
+            ordinaryInstallmentPaymentHandlerService.resolveBalance(installment, typeOrgToUse, incomingReceiptDTO.getPaymentDateTime(), accessToken);
         } else {
-            ordinaryInstallmentPaymentHandlerService.resolveBalance(installment, accessToken);
+            ordinaryInstallmentPaymentHandlerService.resolveBalance(installment, incomingReceiptDTO.getPaymentDateTime(), accessToken);
         }
         installmentNoPIIRepository.updateBalance(installment.getInstallmentId(), installment.getBalance());
     }

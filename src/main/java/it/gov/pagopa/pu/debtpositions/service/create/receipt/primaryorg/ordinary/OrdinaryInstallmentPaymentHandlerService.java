@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
+
 @Service
 @Slf4j
 public class OrdinaryInstallmentPaymentHandlerService {
@@ -37,12 +39,12 @@ public class OrdinaryInstallmentPaymentHandlerService {
       if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
         installment.setBalance(receiptDTO.getBalance());
       }
-      resolveBalance(installment, accessToken);
+      resolveBalance(installment, receiptDTO.getPaymentDateTime(), accessToken);
       updateMbdAttachment(installment, receiptDTO);
     } else if (ReceiptOriginType.RECEIPT_FILE.equals(receiptDTO.getReceiptOrigin())) {
       if (StringUtils.isNotBlank(receiptDTO.getBalance())) {
         installment.setBalance(receiptDTO.getBalance());
-        resolveBalance(installment, accessToken);
+        resolveBalance(installment, receiptDTO.getPaymentDateTime(), accessToken);
       }
       updateMbdAttachment(installment, receiptDTO);
     }
@@ -80,16 +82,16 @@ public class OrdinaryInstallmentPaymentHandlerService {
     }
   }
 
-  public void resolveBalance(InstallmentNoPII installment, String accessToken) {
+  public void resolveBalance(InstallmentNoPII installment, OffsetDateTime paymentDateTime, String accessToken) {
     DebtPositionTypeOrg debtPositionTypeOrg = debtPositionTypeOrgRepository.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
     if (debtPositionTypeOrg == null) {
       throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg for installment with id " + installment.getInstallmentId() + " not found");
     }
-    resolveBalance(installment, debtPositionTypeOrg, accessToken);
+    resolveBalance(installment, debtPositionTypeOrg, paymentDateTime, accessToken);
   }
 
-  public void resolveBalance(InstallmentNoPII installment, DebtPositionTypeOrg debtPositionTypeOrg, String accessToken) {
-    balanceResolverService.updateBalanceResolvingAmount(installment, debtPositionTypeOrg.getOrganizationId(), debtPositionTypeOrg, accessToken);
+  public void resolveBalance(InstallmentNoPII installment, DebtPositionTypeOrg debtPositionTypeOrg, OffsetDateTime paymentDateTime, String accessToken) {
+    balanceResolverService.updateBalanceResolvingAmount(installment, debtPositionTypeOrg.getOrganizationId(), debtPositionTypeOrg, paymentDateTime, accessToken);
   }
 
   private void updateMbdAttachment(InstallmentNoPII installment, ReceiptWithAdditionalNodeDataDTO receiptDTO) {
