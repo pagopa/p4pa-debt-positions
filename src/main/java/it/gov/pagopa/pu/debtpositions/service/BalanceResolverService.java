@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
 
 @Service
@@ -78,15 +79,15 @@ public class BalanceResolverService {
   }
 
   private DebtPositionTypeOrgBalanceCostDTO fetchNotificationCostBalanceInfo(Long debtPositionTypeOrgId, OffsetDateTime paymentDateTime) {
-    String operatingYear = String.valueOf(paymentDateTime.getYear());
+    int operatingYear = paymentDateTime != null ? paymentDateTime.getYear() : LocalDate.now().getYear();
 
-    DebtPositionTypeOrgBalanceCostId costId = new DebtPositionTypeOrgBalanceCostId(
+    DebtPositionTypeOrgBalanceCostId balanceCostId = new DebtPositionTypeOrgBalanceCostId(
       debtPositionTypeOrgId,
       DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
-      operatingYear
+      String.valueOf(operatingYear)
     );
 
-    return debtPositionTypeOrgBalanceCostRepository.findById(costId)
+    return debtPositionTypeOrgBalanceCostRepository.findById(balanceCostId)
       .map(debtPositionTypeOrgBalanceCost -> DebtPositionTypeOrgBalanceCostDTO.builder()
         .assessmentCode(debtPositionTypeOrgBalanceCost.getAssessmentCode())
         .officeCode(debtPositionTypeOrgBalanceCost.getOfficeCode())
