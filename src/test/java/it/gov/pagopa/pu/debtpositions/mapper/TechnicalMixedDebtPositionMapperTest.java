@@ -12,6 +12,7 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,9 +36,9 @@ class TechnicalMixedDebtPositionMapperTest {
   @Mock
   private BalanceResolverService balanceResolverServiceMock;
   @Mock
-  private DebtPositionProcessorService debtPositionProcessorService;
+  private DebtPositionProcessorService debtPositionProcessorServiceMock;
   @Mock
-  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
+  private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
 
   private TechnicalMixedDebtPositionMapper mapper;
 
@@ -44,7 +46,20 @@ class TechnicalMixedDebtPositionMapperTest {
 
   @BeforeEach
   void init() {
-    mapper = new TechnicalMixedDebtPositionMapper(balanceResolverServiceMock, debtPositionTypeOrgRepository, debtPositionProcessorService);
+    mapper = new TechnicalMixedDebtPositionMapper(
+      balanceResolverServiceMock,
+      debtPositionTypeOrgRepositoryMock,
+      debtPositionProcessorServiceMock
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      balanceResolverServiceMock,
+      debtPositionTypeOrgRepositoryMock,
+      debtPositionProcessorServiceMock
+    );
   }
 
   @Test
@@ -55,6 +70,8 @@ class TechnicalMixedDebtPositionMapperTest {
     Transfer transfer = installment.getTransfers().getFirst();
     installment.setRemittanceInformation(transfer.getRemittanceInformation());
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
@@ -62,8 +79,11 @@ class TechnicalMixedDebtPositionMapperTest {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
+    Mockito.doNothing().when(debtPositionProcessorServiceMock)
+      .updateAmounts(Mockito.any(DebtPosition.class));
+
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      true, List.of(mixedDpAdditionalData), accessToken);
+      true, List.of(mixedDpAdditionalData), paymentDateTime, accessToken);
 
     checkDebtPosition(debtPosition, result, true);
 
@@ -75,9 +95,6 @@ class TechnicalMixedDebtPositionMapperTest {
 
     Transfer resultTransfer = installment.getTransfers().getFirst();
     checkTransfer(transfer, resultTransfer);
-
-    Mockito.verify(balanceResolverServiceMock, Mockito.times(0))
-      .resolveAmountBalance(debtPosition.getOrganizationId(), installment, accessToken);
   }
 
   @Test
@@ -89,6 +106,8 @@ class TechnicalMixedDebtPositionMapperTest {
     installment.setRemittanceInformation(transfer.getRemittanceInformation());
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
@@ -96,16 +115,20 @@ class TechnicalMixedDebtPositionMapperTest {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
-    Mockito.when(debtPositionTypeOrgRepository.findById(1L))
+    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(1L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(balanceResolverServiceMock)
       .updateBalanceResolvingAmount(Mockito.any(InstallmentNoPII.class),
         Mockito.eq(debtPosition.getOrganizationId()),
         Mockito.any(DebtPositionTypeOrg.class),
+        Mockito.eq(paymentDateTime),
         Mockito.eq(accessToken));
 
+    Mockito.doNothing().when(debtPositionProcessorServiceMock)
+      .updateAmounts(Mockito.any(DebtPosition.class));
+
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      false, List.of(mixedDpAdditionalData), accessToken);
+      false, List.of(mixedDpAdditionalData), paymentDateTime, accessToken);
 
     checkDebtPosition(debtPosition, result, false);
 
@@ -127,13 +150,15 @@ class TechnicalMixedDebtPositionMapperTest {
     Transfer transfer = installment.getTransfers().getFirst();
     transfer.setTransferIndex(999);
 
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
+
     MixedDpAdditionalData mixedDpAdditionalData = MixedDpAdditionalData.builder()
       .transferIndex(1)
       .iud("IUD")
       .balance("balance")
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
-    Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData), accessToken);
+    Executable exec = () -> mapper.toTechnicalMixedDebtPosition(debtPosition, 1L, true, List.of(mixedDpAdditionalData), paymentDateTime, accessToken);
 
     assertThrows(IllegalStateBusinessException.class, exec);
   }
@@ -142,6 +167,8 @@ class TechnicalMixedDebtPositionMapperTest {
   void givenDPMixedWithMultipleInstallmentsWhenToTechnicalMixedDebtPositionsThenCorrectMappingForPaymentOptionType() {
     DebtPosition debtPosition = buildMixedDebtPosition();
     PaymentOption expectedPO = debtPosition.getPaymentOptions().getFirst();
+
+    OffsetDateTime paymentDateTime = OffsetDateTime.now();
 
     MixedDpAdditionalData mixedDpAdditionalDataEl1 = MixedDpAdditionalData.builder()
       .transferIndex(1)
@@ -157,8 +184,11 @@ class TechnicalMixedDebtPositionMapperTest {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
+    Mockito.doNothing().when(debtPositionProcessorServiceMock)
+      .updateAmounts(Mockito.any(DebtPosition.class));
+
     DebtPosition result = mapper.toTechnicalMixedDebtPosition(debtPosition, 1L,
-      true, List.of(mixedDpAdditionalDataEl1, mixedDpAdditionalDataEl2), accessToken);
+      true, List.of(mixedDpAdditionalDataEl1, mixedDpAdditionalDataEl2), paymentDateTime, accessToken);
 
     PaymentOption resultPO = result.getPaymentOptions().getFirst();
 

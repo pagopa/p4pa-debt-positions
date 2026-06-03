@@ -729,7 +729,7 @@ class ValidateDebtPositionServiceImplTest {
     debtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     debtPositionDTO.setDebtPositionOrigin(ORDINARY_SIL);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-    debtPositionTypeOrg.setAmountCents(200L);
+    debtPositionTypeOrg.setAmountCents(2200L);
     TransferDTO firstTransfer = buildTransferDTO();
     TransferDTO secondTransfer = buildTransferDTO();
     secondTransfer.setTransferIndex(2);
@@ -740,7 +740,7 @@ class ValidateDebtPositionServiceImplTest {
       .getFirst();
     firstInstallment
       .setTransfers(new ArrayList<>(transfers));
-    firstInstallment.setAmountCents(200L);
+    firstInstallment.setAmountCents(2200L);
     Organization org = buildOrganization();
 
     Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);

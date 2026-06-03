@@ -101,7 +101,7 @@ class PaymentFlowOrchestratorServiceTest {
     Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
 
     Mockito.verify(debtPositionRepositoryMock).updateDebtPositionTypeOrgId(dp.getDebtPositionId(), 200L);
-    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, specificTypeOrg, accessToken);
+    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, specificTypeOrg, receiptDTO.getPaymentDateTime(), accessToken);
     Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
   }
 
@@ -129,7 +129,7 @@ class PaymentFlowOrchestratorServiceTest {
     Assertions.assertEquals(100L, dp.getDebtPositionTypeOrgId());
     Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
     Mockito.verify(debtPositionRepositoryMock, Mockito.never()).updateDebtPositionTypeOrgId(Mockito.anyLong(), Mockito.anyLong());
-    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, unknownTypeOrg, accessToken);
+    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, unknownTypeOrg, receiptDTO.getPaymentDateTime(), accessToken);
     Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
   }
 
@@ -155,7 +155,7 @@ class PaymentFlowOrchestratorServiceTest {
     Assertions.assertEquals("NEW_BALANCE", installment.getBalance());
 
     Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).findByOrganizationIdAndCode(Mockito.any(), Mockito.any());
-    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, accessToken);
+    Mockito.verify(ordinaryInstallmentPaymentHandlerServiceMock).resolveBalance(installment, receiptDTO.getPaymentDateTime(), accessToken);
     Mockito.verify(installmentNoPIIRepositoryMock).updateBalance(installment.getInstallmentId(), "NEW_BALANCE");
   }
 

@@ -39,7 +39,7 @@ class DebtPositionManageApplierServiceTest {
 
     assertEquals("remittanceInformation_updated", storedInstallment.getRemittanceInformation());
     assertEquals(DATE, storedInstallment.getDueDate());
-    assertEquals(100L, storedInstallment.getAmountCents());
+    assertEquals(1100L, storedInstallment.getAmountCents());
   }
 
   @Test

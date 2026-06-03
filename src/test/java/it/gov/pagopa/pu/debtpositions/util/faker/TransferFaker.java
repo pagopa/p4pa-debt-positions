@@ -22,7 +22,7 @@ public class TransferFaker {
     transfer.setInstallmentId(100L);
     transfer.setOrgFiscalCode("12345678901");
     transfer.setOrgName("Organization Name");
-    transfer.setAmountCents(100L);
+    transfer.setAmountCents(1100L);
     transfer.setRemittanceInformation("Payment Info");
     transfer.setIban("IT60X0542811101000000123456");
     transfer.setPostalIban("IT00X0760100000000000000000");
@@ -43,7 +43,7 @@ public class TransferFaker {
       .installmentId(100L)
       .orgFiscalCode("12345678901")
       .orgName("Organization Name")
-      .amountCents(100L)
+      .amountCents(1100L)
       .remittanceInformation("Payment Info")
       .iban("IT60X0542811101000000123456")
       .postalIban("IT00X0760100000000000000000")
