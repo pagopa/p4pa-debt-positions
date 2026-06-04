@@ -223,7 +223,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     Long transferId = 1000L;
     String accessToken = "ACCESSTOKEN";
     TransferReportedRequest request = TransferReportedRequest.builder()
-      .iuf("IUF")
+      .iuf("iuf")
       .build();
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
@@ -244,6 +244,56 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     assertEquals(PaymentOptionStatus.REPORTED, result.getLeft().getPaymentOptions().getFirst().getStatus());
     reflectionEqualsByName(debtPositionDTOexpected, result);
     assertNull(result.getRight());
+  }
+
+  @Test
+  void givenNotifyReportedTransferIdWhenInstallmentAlreadyReportedAndIufChangedThenUpdateIuf() {
+    Long transferId = 1000L;
+    String accessToken = "ACCESSTOKEN";
+    String oldIuf = "OLD-IUF";
+    String newIuf = "NEW-IUF";
+    TransferReportedRequest request = TransferReportedRequest.builder()
+      .iuf(newIuf)
+      .build();
+
+    DebtPosition debtPosition = buildDebtPosition();
+    InstallmentNoPII reportedInstallment = debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst();
+    reportedInstallment.setStatus(InstallmentStatus.REPORTED);
+    reportedInstallment.setIuf(oldIuf);
+    reportedInstallment.setTransfers(new TreeSet<>(new ArrayList<>(List.of(buildTransfer()))));
+
+    DebtPositionDTO debtPositionDTOexpected = buildDebtPositionDTO();
+    debtPositionDTOexpected.setStatus(DebtPositionStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.REPORTED);
+    debtPositionDTOexpected.getPaymentOptions().getFirst().getInstallments().getFirst().setIuf(newIuf);
+    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("WFID", "RUNID");
+
+    Mockito.when(debtPositionRepositoryMock.findEntityGraphByTransferId(transferId)).thenReturn(debtPosition);
+    Mockito.doNothing().when(installmentNoPIIRepositoryMock).updateStatusAndIuf(reportedInstallment.getInstallmentId(), InstallmentStatus.REPORTED, newIuf);
+    Mockito.doNothing().when(paymentOptionInnerStatusAlignerServiceMock).updatePaymentOptionStatus(buildPaymentOption());
+    Mockito.doNothing().when(debtPositionInnerStatusAlignerServiceMock).updateDebtPositionStatus(debtPosition);
+    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTOexpected);
+    Mockito.when(syncServiceMock.syncDebtPosition(
+        Mockito.same(debtPositionDTOexpected),
+        Mockito.eq(new WfExecutionParameters()),
+        Mockito.eq(PaymentEventType.DPI_REPORTED),
+        Mockito.eq("IUD:" + reportedInstallment.getIud()),
+        Mockito.same(accessToken)))
+      .thenReturn(workflow);
+
+    Pair<DebtPositionDTO, WorkflowCreatedDTO> result = service.notifyReportedTransferId(transferId, request, accessToken);
+
+    assertEquals(DebtPositionStatus.REPORTED, result.getLeft().getStatus());
+    assertEquals(PaymentOptionStatus.REPORTED, result.getLeft().getPaymentOptions().getFirst().getStatus());
+    assertEquals(InstallmentStatus.REPORTED, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
+    assertEquals(newIuf, result.getLeft().getPaymentOptions().getFirst().getInstallments().getFirst().getIuf());
+    assertSame(workflow, result.getRight());
+
+    assertEquals(InstallmentStatus.REPORTED, reportedInstallment.getStatus());
+    assertEquals(newIuf, reportedInstallment.getIuf());
+
+    verify(installmentNoPIIRepositoryMock).updateStatusAndIuf(reportedInstallment.getInstallmentId(), InstallmentStatus.REPORTED, newIuf);
   }
 
   @Test

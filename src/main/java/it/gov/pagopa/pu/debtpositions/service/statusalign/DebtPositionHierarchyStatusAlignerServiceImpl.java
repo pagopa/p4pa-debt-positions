@@ -147,7 +147,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
       .filter(i -> i.getTransfers().stream().anyMatch(transfer -> transfer.getTransferId().equals(transferId)))
       .filter(i ->
         switch (i.getStatus()) {
-          case InstallmentStatus.REPORTED -> false;
+          case InstallmentStatus.REPORTED -> !transferReportedRequest.getIuf().equals(i.getIuf());
           case InstallmentStatus.PAID -> true;
           default ->
             throw new InvalidStatusTransitionException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with id " + i.getInstallmentId() + " is in " + i.getStatus() + " status and cannot be set to reported status");

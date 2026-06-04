@@ -51,7 +51,7 @@ class MixedDpPaymentHandlerServiceTest {
     DebtPosition primaryOrgDp = new DebtPosition();
     ReceiptWithAdditionalNodeDataDTO receiptDTO = new ReceiptWithAdditionalNodeDataDTO();
 
-    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(accessToken)))
+    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(receiptDTO.getPaymentDateTime()), Mockito.same(accessToken)))
       .thenReturn(List.of());
 
     // When
@@ -72,7 +72,7 @@ class MixedDpPaymentHandlerServiceTest {
     DebtPositionDTO techDpMixed2DTO = new DebtPositionDTO();
 
     List<DebtPosition> dps = List.of(new DebtPosition(), new DebtPosition());
-    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(accessToken)))
+    Mockito.when(technicalMixedDebtPositionUpdaterServiceMock.update(Mockito.same(primaryOrgDp), Mockito.same(receiptDTO.getPaymentDateTime()), Mockito.same(accessToken)))
       .thenReturn(dps);
     Mockito.when(mapperMock.mapAllToDto(Mockito.same(dps)))
       .thenReturn(List.of(techDpMixed1DTO, techDpMixed2DTO));

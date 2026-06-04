@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -17,15 +18,15 @@ public class TechnicalMixedDebtPositionBuilderService {
 
   public List<DebtPosition> createTechnicalMixedDebtPositions(Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
                                                               DebtPosition debtPosition, String accessToken) {
-    return createTechnicalMixedDebtPositions(debtPositionTypeOrgId2TransfersData, debtPosition, true, accessToken);
+    return createTechnicalMixedDebtPositions(debtPositionTypeOrgId2TransfersData, debtPosition, true, null, accessToken);
   }
 
   public List<DebtPosition> createTechnicalMixedDebtPositions(Map<Long, List<MixedDpAdditionalData>> debtPositionTypeOrgId2TransfersData,
-                                                              DebtPosition debtPosition, boolean isUnpaid, String accessToken) {
+                                                              DebtPosition debtPosition, boolean isUnpaid, OffsetDateTime paymentDateTime, String accessToken) {
     return debtPositionTypeOrgId2TransfersData.entrySet().stream()
       .map(e ->
         technicalMixedDebtPositionMapper.toTechnicalMixedDebtPosition(
-          debtPosition, e.getKey(), isUnpaid, e.getValue(), accessToken))
+          debtPosition, e.getKey(), isUnpaid, e.getValue(), paymentDateTime, accessToken))
       .toList();
   }
 }
