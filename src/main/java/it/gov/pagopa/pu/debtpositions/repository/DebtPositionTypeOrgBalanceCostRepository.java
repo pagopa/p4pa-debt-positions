@@ -16,7 +16,7 @@ public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<
     "where i.installmentId = :installmentId " +
     "and dptobc.id.type = :type " +
     "and dptobc.id.operatingYear = :operatingYear")
-  DebtPositionTypeOrgBalanceCost getDebtPositionTypeOrgBalanceCostByInstallmentIdAndTypeAndOperatingYear(
+  DebtPositionTypeOrgBalanceCost getByInstallmentIdAndTypeAndOperatingYear(
     long installmentId,
     DebtPositionTypeOrgBalanceCostType type,
     String operatingYear
