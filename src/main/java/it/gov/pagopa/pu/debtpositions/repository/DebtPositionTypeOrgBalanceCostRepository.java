@@ -9,16 +9,16 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 @RepositoryRestResource(path = "debt-position-type-org-balance-costs")
 public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<DebtPositionTypeOrgBalanceCost, DebtPositionTypeOrgBalanceCostId> {
-  @Query("select dptobc from InstallmentNoPII i " +
-    "join PaymentOption po on i.paymentOptionId = po.paymentOptionId " +
-    "join DebtPosition dp on po.debtPositionId = dp.debtPositionId " +
+  @Query("select dptobc from DebtPosition dp " +
+    "join dp.paymentOptions po " +
+    "join po.installments i " +
     "join DebtPositionTypeOrgBalanceCost dptobc on dptobc.id.debtPositionTypeOrgId = dp.debtPositionTypeOrgId " +
     "where i.installmentId = :installmentId " +
     "and dptobc.id.type = :type " +
     "and dptobc.id.operatingYear = :operatingYear")
-  DebtPositionTypeOrgBalanceCost getDebtPositionTypeOrgBalanceCostByTypeAndOperatingYearAndInstallmentId(
+  DebtPositionTypeOrgBalanceCost getDebtPositionTypeOrgBalanceCostByInstallmentIdAndTypeAndOperatingYear(
+    long installmentId,
     DebtPositionTypeOrgBalanceCostType type,
-    String operatingYear,
-    long installmentId
+    String operatingYear
   );
 }
