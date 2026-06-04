@@ -1,10 +1,24 @@
 package it.gov.pagopa.pu.debtpositions.repository;
 
+import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCostId;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@Repository
+@RepositoryRestResource(path = "debt-position-type-org-balance-costs")
 public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<DebtPositionTypeOrgBalanceCost, DebtPositionTypeOrgBalanceCostId> {
+  @Query("select dptobc from InstallmentNoPII i " +
+    "join PaymentOption po on i.paymentOptionId = po.paymentOptionId " +
+    "join DebtPosition dp on po.debtPositionId = dp.debtPositionId " +
+    "join DebtPositionTypeOrgBalanceCost dptobc on dptobc.id.debtPositionTypeOrgId = dp.debtPositionTypeOrgId " +
+    "where i.installmentId = :installmentId " +
+    "and dptobc.id.type = :type " +
+    "and dptobc.id.operatingYear = :operatingYear")
+  DebtPositionTypeOrgBalanceCost getDebtPositionTypeOrgBalanceCostByTypeAndOperatingYearAndInstallmentId(
+    DebtPositionTypeOrgBalanceCostType type,
+    String operatingYear,
+    long installmentId
+  );
 }
