@@ -142,9 +142,18 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
           String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
       if (installmentDTO.getIuv() != null) {
-        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), organizationStationDTO.getSegregationCode());
+        nav = iuvService.validateIuvAndRetrieveNav(
+          installmentDTO.getIuv(),
+          organizationStationDTO.getSegregationCode(),
+          org.getBrokerId(),
+          accessToken
+        );
       } else {
-        String generatedIuv = iuvService.generateIuv(org, organizationStationDTO.getSegregationCode());
+        String generatedIuv = iuvService.generateIuv(
+          org,
+          organizationStationDTO.getSegregationCode(),
+          accessToken
+        );
         nav = iuvService.iuv2Nav(generatedIuv);
         installmentDTO.setIuv(generatedIuv);
       }

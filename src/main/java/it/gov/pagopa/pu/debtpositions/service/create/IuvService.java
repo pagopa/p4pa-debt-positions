@@ -11,17 +11,19 @@ public interface IuvService {
   /**
    * Generate a valid and unique IUV given the fiscal code of the organization.
    * @param org the organization for which the IUV is requested
+   * @param segregationCode the segregation code for the related organization station
    * @return the IUV generated
    */
-  String generateIuv(Organization org, String segregationCode);
+  String generateIuv(Organization org, String segregationCode, String accessToken);
 
   String iuv2Nav(String iuv);
 
   /**
    * Validate the syntax of the IUV that is passed by external services and returns the corresponding NAV
    * @param iuv the IUV to be validated
-   * @param org the organization for which the IUV belongs
+   * @param segregationCode the segregation code for the related organization station
+   * @param brokerId the brokerId for which the IUV is requested
    * @return the NAV created
    */
-  String validateIuvAndRetrieveNav(String iuv, String segregationCode);
+  String validateIuvAndRetrieveNav(String iuv, String segregationCode, Long brokerId, String accessToken);
 }

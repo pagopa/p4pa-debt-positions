@@ -1,13 +1,18 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Service class exposing methods related to IUV handling.
@@ -19,17 +24,17 @@ public class IuvServiceImpl implements IuvService {
   private static final int CHECK_DIGIT_BASE = 93;
   private static final int IUV_LENGTH = 17;
 
-  private final String informationSystemId;
   private final String auxDigit;
 
   private final IuvSequenceNumberService iuvSequenceNumberService;
+  private final BrokerService brokerService;
 
-  public IuvServiceImpl(@Value("${iuv.information-system-id}") String informationSystemId,
-                        @Value("${nav.aux-digit}") String auxDigit,
-                        IuvSequenceNumberService iuvSequenceNumberService) {
-    this.informationSystemId = informationSystemId;
+  public IuvServiceImpl(@Value("${nav.aux-digit}") String auxDigit,
+                        IuvSequenceNumberService iuvSequenceNumberService,
+                        BrokerService brokerService) {
     this.auxDigit = auxDigit;
     this.iuvSequenceNumberService = iuvSequenceNumberService;
+    this.brokerService = brokerService;
   }
 
   /**
@@ -38,11 +43,12 @@ public class IuvServiceImpl implements IuvService {
    * @param org the organization for which to generate the IUV
    * @return the generated IUV
    */
-  public String generateIuv(Organization org, String segregationCode) {
+  public String generateIuv(Organization org, String segregationCode, String accessToken) {
+    Broker broker = getBrokerOrElseThrowNotFound(org.getBrokerId(), accessToken);
     StringBuilder iuvBuilder = new StringBuilder();
     //header
     iuvBuilder.append(segregationCode);
-    iuvBuilder.append(informationSystemId);
+    iuvBuilder.append(broker.getIuvSystemId());
 
     //payment index
     String paymentIndex = generatePaymentIndex(org);
@@ -55,6 +61,16 @@ public class IuvServiceImpl implements IuvService {
     log.debug("generated new IUV[{}] for organization[{}/{}]", iuvBuilder, org.getIpaCode(), org.getOrgFiscalCode());
 
     return iuvBuilder.toString();
+  }
+
+  private Broker getBrokerOrElseThrowNotFound(Long brokerId, String accessToken) {
+    return Optional.ofNullable(brokerService.findById(brokerId, accessToken))
+      .orElseThrow(
+        () -> new NotFoundException(
+          ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND,
+          String.format("Broker not found having brokerId %d", brokerId)
+        )
+      );
   }
 
   private String generatePaymentIndex(Organization org) {
@@ -127,7 +143,7 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-  public String validateIuvAndRetrieveNav(String iuv, String segregationCode) {
+  public String validateIuvAndRetrieveNav(String iuv, String segregationCode, Long brokerId, String accessToken) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
@@ -135,8 +151,9 @@ public class IuvServiceImpl implements IuvService {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The first two character of iuv must be the same of segregation code of organization");
     }
 
-    if (iuv.substring(2,4).equals(informationSystemId)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + informationSystemId + "' for externally generated IUV" );
+    Broker broker = getBrokerOrElseThrowNotFound(brokerId, accessToken);
+    if (iuv.substring(2,4).equals(broker.getIuvSystemId())) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + broker.getIuvSystemId() + "' for externally generated IUV" );
     }
 
     return auxDigit + iuv;
