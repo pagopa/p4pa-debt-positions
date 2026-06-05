@@ -2,6 +2,8 @@ package it.gov.pagopa.pu.debtpositions.service.create;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -28,7 +30,6 @@ class IuvServiceTest {
   private IuvServiceImpl iuvService;
 
   private static final String INTERNAL_IUV_SYSTEM_ID = "00";
-  private static final String EXTERNAL_IUV_SYSTEM_ID = "99";
 
   private static final String VALID_ORG_FISCAL_CODE = "VALID_FISCAL_CODE";
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
@@ -90,6 +91,16 @@ class IuvServiceTest {
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
     Mockito.verify(iuvSequenceNumberService, Mockito.times(1)).getNextIuvSequenceNumber(VALID_ORG.getOrganizationId());
+  }
+
+  @Test
+  void givenNotFoundBrokerWhenGenerateIuvThenThrowNotFoundException(){
+    //When
+    NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> iuvService.generateIuv(VALID_ORG, VALID_ORG_STATION.getSegregationCode(), ACCESS_TOKEN));
+    //Verify
+    Assertions.assertNotNull(exception);
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND, exception.getCode());
+    Assertions.assertEquals("Broker not found having brokerId %d".formatted(VALID_ORG.getBrokerId()), exception.getMessage());
   }
 
   @Test
