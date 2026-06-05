@@ -20,11 +20,9 @@ class IuvServiceTest {
   @Mock
   private IuvSequenceNumberService iuvSequenceNumberService;
 
-  private static final String ACCESS_TOKEN = "ACCESSTOKEN";
-
   private IuvServiceImpl iuvService;
 
-  private static final String INTERNAL_IUV_SYSTEM_ID = "00";
+  private static final String IUV_SYSTEM_ID = "00";
 
   private static final String VALID_ORG_FISCAL_CODE = "VALID_FISCAL_CODE";
   private static final String VALID_ORG_IPA_CODE = "VALID_IPA_CODE";
@@ -51,7 +49,7 @@ class IuvServiceTest {
     .externalId("externalId")
     .flagDelegate(true)
     .flagPaymentsReporting(true)
-    .iuvSystemId(INTERNAL_IUV_SYSTEM_ID)
+    .iuvSystemId(IUV_SYSTEM_ID)
     .build();
   private static final long VALID_PAYMENT_INDEX = 42L;
   private static final String VALID_IUV = "01000000000004285";
@@ -195,7 +193,7 @@ class IuvServiceTest {
 
     //THEN
     Assertions.assertEquals("INVALID_IUV", exception.getCode());
-    Assertions.assertEquals("The third and fourth characters cannot be '%s' for externally generated IUV".formatted(INTERNAL_IUV_SYSTEM_ID), exception.getMessage());
+    Assertions.assertEquals("The third and fourth characters cannot be '%s' for externally generated IUV".formatted(IUV_SYSTEM_ID), exception.getMessage());
   }
 
   @Test
