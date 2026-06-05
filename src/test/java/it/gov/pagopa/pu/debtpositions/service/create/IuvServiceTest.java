@@ -96,7 +96,8 @@ class IuvServiceTest {
   @Test
   void givenNotFoundBrokerWhenGenerateIuvThenThrowNotFoundException(){
     //When
-    NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> iuvService.generateIuv(VALID_ORG, VALID_ORG_STATION.getSegregationCode(), ACCESS_TOKEN));
+    String segregationCode = VALID_ORG_STATION.getSegregationCode();
+    NotFoundException exception = Assertions.assertThrows(NotFoundException.class, () -> iuvService.generateIuv(VALID_ORG, segregationCode, ACCESS_TOKEN));
     //Verify
     Assertions.assertNotNull(exception);
     Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND, exception.getCode());
