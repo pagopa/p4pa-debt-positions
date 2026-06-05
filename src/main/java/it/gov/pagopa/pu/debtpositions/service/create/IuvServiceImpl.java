@@ -27,14 +27,11 @@ public class IuvServiceImpl implements IuvService {
   private final String auxDigit;
 
   private final IuvSequenceNumberService iuvSequenceNumberService;
-  private final BrokerService brokerService;
 
   public IuvServiceImpl(@Value("${nav.aux-digit}") String auxDigit,
-                        IuvSequenceNumberService iuvSequenceNumberService,
-                        BrokerService brokerService) {
+                        IuvSequenceNumberService iuvSequenceNumberService) {
     this.auxDigit = auxDigit;
     this.iuvSequenceNumberService = iuvSequenceNumberService;
-    this.brokerService = brokerService;
   }
 
   /**
@@ -43,8 +40,7 @@ public class IuvServiceImpl implements IuvService {
    * @param org the organization for which to generate the IUV
    * @return the generated IUV
    */
-  public String generateIuv(Organization org, String segregationCode, String accessToken) {
-    Broker broker = getBrokerOrElseThrowNotFound(org.getBrokerId(), accessToken);
+  public String generateIuv(Organization org, Broker broker, String segregationCode) {
     StringBuilder iuvBuilder = new StringBuilder();
     //header
     iuvBuilder.append(segregationCode);
@@ -61,16 +57,6 @@ public class IuvServiceImpl implements IuvService {
     log.debug("generated new IUV[{}] for organization[{}/{}]", iuvBuilder, org.getIpaCode(), org.getOrgFiscalCode());
 
     return iuvBuilder.toString();
-  }
-
-  private Broker getBrokerOrElseThrowNotFound(Long brokerId, String accessToken) {
-    return Optional.ofNullable(brokerService.findById(brokerId, accessToken))
-      .orElseThrow(
-        () -> new NotFoundException(
-          ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND,
-          String.format("Broker not found having brokerId %d", brokerId)
-        )
-      );
   }
 
   private String generatePaymentIndex(Organization org) {
@@ -143,7 +129,7 @@ public class IuvServiceImpl implements IuvService {
     return false;
   }
 
-  public String validateIuvAndRetrieveNav(String iuv, String segregationCode, Long brokerId, String accessToken) {
+  public String validateIuvAndRetrieveNav(String iuv, String segregationCode, Broker broker) {
     if (StringUtils.length(iuv) != IUV_LENGTH) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The iuv must be 17 characters long");
     }
@@ -151,7 +137,6 @@ public class IuvServiceImpl implements IuvService {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The first two character of iuv must be the same of segregation code of organization");
     }
 
-    Broker broker = getBrokerOrElseThrowNotFound(brokerId, accessToken);
     if (iuv.substring(2,4).equals(broker.getIuvSystemId())) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUV, "The third and fourth characters cannot be '" + broker.getIuvSystemId() + "' for externally generated IUV" );
     }
