@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition.mixed;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowTypeOrgService;
 import it.gov.pagopa.pu.debtpositions.dto.MixedDpAdditionalData;
@@ -74,8 +75,8 @@ public class MixedDebtPositionCreationServiceImpl implements
   @Service
   public static class MixedOrdinaryDebtPositionCreationInnerService extends DebtPositionCreationServiceImpl {
 
-    public MixedOrdinaryDebtPositionCreationInnerService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, ValidateDebtPositionService validateDebtPositionService, DebtPositionService debtPositionService, IuvService iuvService, DebtPositionSyncService debtPositionSyncService, InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService) {
-      super(authorizeOperatorOnDebtPositionTypeService, validateDebtPositionService, debtPositionService, iuvService, debtPositionSyncService, installmentNoPIIRepository, debtPositionProcessorService, organizationService, debtPositionHierarchyStatusAlignerService, debtPositionTypeOrgRepository, categoryResolverService);
+    public MixedOrdinaryDebtPositionCreationInnerService(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService, ValidateDebtPositionService validateDebtPositionService, DebtPositionService debtPositionService, IuvService iuvService, DebtPositionSyncService debtPositionSyncService, InstallmentNoPIIRepository installmentNoPIIRepository, DebtPositionProcessorService debtPositionProcessorService, OrganizationService organizationService, BrokerService brokerService, DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService, DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService) {
+      super(authorizeOperatorOnDebtPositionTypeService, validateDebtPositionService, debtPositionService, iuvService, debtPositionSyncService, installmentNoPIIRepository, debtPositionProcessorService, organizationService, brokerService, debtPositionHierarchyStatusAlignerService, debtPositionTypeOrgRepository, categoryResolverService);
     }
 
     @Override

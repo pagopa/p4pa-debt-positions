@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create.debtposition;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
@@ -20,6 +21,7 @@ import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
@@ -35,6 +37,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.getRandomicUUID;
 
@@ -50,6 +53,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
   private final DebtPositionProcessorService debtPositionProcessorService;
   private final CategoryResolverService categoryResolverService;
   private final OrganizationService organizationService;
+  private final BrokerService brokerService;
 
   public DebtPositionCreationServiceImpl(AuthorizeOperatorOnDebtPositionTypeService authorizeOperatorOnDebtPositionTypeService,
                                          ValidateDebtPositionService validateDebtPositionService,
@@ -59,6 +63,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
                                          InstallmentNoPIIRepository installmentNoPIIRepository,
                                          DebtPositionProcessorService debtPositionProcessorService,
                                          OrganizationService organizationService,
+                                         BrokerService brokerService,
                                          DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService,
                                          DebtPositionTypeOrgRepository debtPositionTypeOrgRepository, CategoryResolverService categoryResolverService
   ) {
@@ -71,6 +76,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     this.debtPositionProcessorService = debtPositionProcessorService;
     this.categoryResolverService = categoryResolverService;
     this.organizationService = organizationService;
+    this.brokerService = brokerService;
   }
 
   @Transactional
@@ -141,10 +147,21 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       OrganizationStationDTO organizationStationDTO = organizationService.getOrganizationStation(org.getOrganizationId(), debtPositionDTO.getStationId(), accessToken)
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
           String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
+      Broker broker = Optional.ofNullable(brokerService.findById(org.getBrokerId(), accessToken))
+        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND,
+          String.format("Broker not found having brokerId %s for debtPosition %s", org.getBrokerId(), debtPositionDTO.getDebtPositionId())));
       if (installmentDTO.getIuv() != null) {
-        nav = iuvService.validateIuvAndRetrieveNav(installmentDTO.getIuv(), organizationStationDTO.getSegregationCode());
+        nav = iuvService.validateIuvAndRetrieveNav(
+          installmentDTO.getIuv(),
+          organizationStationDTO.getSegregationCode(),
+          broker
+        );
       } else {
-        String generatedIuv = iuvService.generateIuv(org, organizationStationDTO.getSegregationCode());
+        String generatedIuv = iuvService.generateIuv(
+          org,
+          broker,
+          organizationStationDTO.getSegregationCode()
+        );
         nav = iuvService.iuv2Nav(generatedIuv);
         installmentDTO.setIuv(generatedIuv);
       }
