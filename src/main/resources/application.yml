@@ -195,8 +195,6 @@ rest:
     wait-time-millis: "\${CLASSIFICATION_WAIT_TIME_MILLIS:500}"
     print-body-when-error: "\${CLASSIFICATION_PRINT_BODY_WHEN_ERROR:true}"
 
-iuv:
-  information-system-id: "\${IUV_INFORMATION_SYSTEM_ID:00}"
 nav:
   aux-digit: "\${NAV_AUX_DIGIT:3}"
 

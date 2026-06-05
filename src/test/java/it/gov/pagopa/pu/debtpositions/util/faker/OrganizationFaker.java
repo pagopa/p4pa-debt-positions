@@ -18,6 +18,7 @@ public class OrganizationFaker {
   public static Broker buildBroker(){
     return TestUtils.getPodamFactory().manufacturePojo(Broker.class)
       .brokerId(1L)
+      .iuvSystemId("00")
       .flagDelegate(Boolean.FALSE);
   }
 
