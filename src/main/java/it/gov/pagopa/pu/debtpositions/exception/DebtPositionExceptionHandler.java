@@ -243,6 +243,11 @@ public class DebtPositionExceptionHandler {
   }
 
   private static Pair<String, String> buildCrudErrorMessage(String requestPath, HttpStatus httpStatus, Exception ex) {
+    if(ex instanceof BaseBusinessException) {
+      return buildReturnedMessage(ex);
+    } else if (ex.getCause() instanceof BaseBusinessException causeBusinessException) {
+      return buildReturnedMessage(causeBusinessException);
+    }
     String entity = requestPath.split("/crud/")[1].split("/")[0].replaceAll("s$", "");
     String entityCode = entity.replace("-", "_").toUpperCase();
     return Pair.of(entityCode + "_" + httpStatus.name(), buildReturnedMessage(ex).getValue());
