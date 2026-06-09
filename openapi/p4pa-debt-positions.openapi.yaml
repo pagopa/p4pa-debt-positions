@@ -3100,7 +3100,7 @@ components:
         - operatingYear
         - sectionCode
       properties:
-        debtPositionTypeOrgBalanceCostType:
+        type:
           type: 'DebtPositionTypeOrgBalanceCostType'
         operatingYear:
           type: string

@@ -219,7 +219,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
     DebtPositionTypeOrgBalanceCost saved = captor.getValue();
     Assertions.assertEquals(generatedId, saved.getId().getDebtPositionTypeOrgId());
-    Assertions.assertEquals(dptoBalanceCostRequest.getDebtPositionTypeOrgBalanceCostType(), saved.getId().getType());
+    Assertions.assertEquals(dptoBalanceCostRequest.getType(), saved.getId().getType());
     Assertions.assertEquals(dptoBalanceCostRequest.getOperatingYear(), saved.getId().getOperatingYear());
     Assertions.assertEquals(dptoBalanceCostRequest.getSectionCode(), saved.getSectionCode());
   }

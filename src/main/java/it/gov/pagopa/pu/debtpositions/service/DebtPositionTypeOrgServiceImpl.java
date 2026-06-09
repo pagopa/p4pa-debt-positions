@@ -88,9 +88,11 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     validateDptoAndTriggerMassiveIbanUpdateIfNeeded(dpto, accessToken);
     DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(dpto);
     Optional.ofNullable(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrgBalanceCostRequestList())
-      .ifPresent(dptoBalanceCostList -> dptoBalanceCostList.forEach(dto -> debtPositionTypeOrgBalanceCostRepository.save(
-        mapToDebtPositionTypeOrgBalanceCost(dto, savedDebtPositionTypeOrg.getDebtPositionTypeOrgId())
-      )));
+      .ifPresent(dptoBalanceCostList -> debtPositionTypeOrgBalanceCostRepository.saveAll(
+        dptoBalanceCostList.stream()
+          .map(dto -> mapToDebtPositionTypeOrgBalanceCost(dto, savedDebtPositionTypeOrg.getDebtPositionTypeOrgId()))
+          .toList()
+      ));
     handleOperators(savedDebtPositionTypeOrg, saveDebtPositionTypeOrgDTO);
     return savedDebtPositionTypeOrg;
   }
@@ -234,7 +236,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     return DebtPositionTypeOrgBalanceCost.builder()
       .id(new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(
         debtPositionTypeOrgId,
-        dto.getDebtPositionTypeOrgBalanceCostType(),
+        dto.getType(),
         dto.getOperatingYear()
       ))
       .officeCode(dto.getOfficeCode())
