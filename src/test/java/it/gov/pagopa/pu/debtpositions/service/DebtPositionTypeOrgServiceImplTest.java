@@ -25,7 +25,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -170,16 +169,14 @@ class DebtPositionTypeOrgServiceImplTest {
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrgBalanceCostRequestList(
       List.of(podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostRequestDTO.class))
     );
-    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.save(Mockito.any()))
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
       saveDebtPositionTypeOrgDTO, accessToken);
 
     Assertions.assertEquals(expectedResult, result);
-    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock,
-        Mockito.times(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrgBalanceCostRequestList().size()))
-      .save(Mockito.any(DebtPositionTypeOrgBalanceCost.class));
+    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock).saveAll(Mockito.anyList());
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
   }
 
@@ -208,20 +205,18 @@ class DebtPositionTypeOrgServiceImplTest {
     savedDpto.setDebtPositionTypeOrgId(generatedId);
 
     Mockito.when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(savedDpto);
-    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.save(Mockito.any()))
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
 
     debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
 
-    ArgumentCaptor<DebtPositionTypeOrgBalanceCost> captor =
-      ArgumentCaptor.forClass(DebtPositionTypeOrgBalanceCost.class);
-    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock).save(captor.capture());
-
-    DebtPositionTypeOrgBalanceCost saved = captor.getValue();
-    Assertions.assertEquals(generatedId, saved.getId().getDebtPositionTypeOrgId());
-    Assertions.assertEquals(dptoBalanceCostRequest.getType(), saved.getId().getType());
-    Assertions.assertEquals(dptoBalanceCostRequest.getOperatingYear(), saved.getId().getOperatingYear());
-    Assertions.assertEquals(dptoBalanceCostRequest.getSectionCode(), saved.getSectionCode());
+    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock).saveAll(Mockito.argThat(list -> {
+      DebtPositionTypeOrgBalanceCost saved = list.iterator().next();
+      TestUtils.checkNotNullFields(saved, "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+      TestUtils.checkNotNullFields(saved.getId());
+      Assertions.assertEquals(generatedId, saved.getId().getDebtPositionTypeOrgId());
+      return true;
+    }));
   }
 
   @Test

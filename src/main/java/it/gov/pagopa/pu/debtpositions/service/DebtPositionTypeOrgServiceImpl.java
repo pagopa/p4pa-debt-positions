@@ -229,7 +229,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
       ));
   }
 
-  private DebtPositionTypeOrgBalanceCost mapToDebtPositionTypeOrgBalanceCost(
+  protected DebtPositionTypeOrgBalanceCost mapToDebtPositionTypeOrgBalanceCost(
     DebtPositionTypeOrgBalanceCostRequestDTO dto,
     Long debtPositionTypeOrgId
   ) {
