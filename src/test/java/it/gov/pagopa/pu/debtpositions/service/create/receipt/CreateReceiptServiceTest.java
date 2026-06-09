@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDat
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
+import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.pii.ReceiptPIIRepository;
@@ -202,6 +203,7 @@ class CreateReceiptServiceTest {
     organization.setBrokerId(1L);
     Broker broker = new Broker();
     broker.setFlagDelegate(true);
+    InstallmentNoPII installment = new InstallmentNoPII();
 
     Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
@@ -209,6 +211,8 @@ class CreateReceiptServiceTest {
       .thenReturn(broker);
     Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
+    Mockito.when(primaryOrgInstallmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+      .thenReturn(Optional.of(installment));
     Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(organization, receiptDTO, broker, accessToken))
       .thenReturn(Optional.empty());
 
@@ -340,5 +344,47 @@ class CreateReceiptServiceTest {
       secondaryOrgPaymentHandlerServiceMock,
       mixedDpPaymentHandlerServiceMock
     );
+  }
+
+  @Test
+  void givenExistingReceiptDelegateBrokerAndMissingInstallmentWhenCreateReceiptThenReturnNull() {
+    // Given
+    ReceiptWithAdditionalNodeDataDTO receiptDTO =
+      podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
+
+    String accessToken = "ACCESSTOKEN";
+
+    Organization organization = new Organization();
+    organization.setOrganizationId(receiptDTO.getOrganizationId());
+    organization.setOrgFiscalCode(receiptDTO.getOrgFiscalCode());
+    organization.setBrokerId(1L);
+
+    Broker broker = new Broker();
+    broker.setFlagDelegate(true);
+    ReceiptNoPII receipt = new ReceiptNoPII();
+
+    Mockito.when(organizationServiceMock.getOrganizationById(
+        receiptDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+
+    Mockito.when(brokerServiceMock.findById(
+        organization.getBrokerId(), accessToken))
+      .thenReturn(broker);
+
+    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(
+        receiptDTO.getPaymentReceiptId()))
+      .thenReturn(receipt);
+
+    Mockito.when(primaryOrgInstallmentRetrieverServiceMock.retrieve(
+        Mockito.same(organization),
+        Mockito.eq(receiptDTO.getNoticeNumber()),
+        Mockito.eq(receiptDTO.getIud())))
+      .thenReturn(Optional.empty());
+
+    // When
+    ReceiptDTO result = service.createReceipt(receiptDTO, accessToken);
+
+    // Then
+    Assertions.assertNull(result);
   }
 }
