@@ -2,11 +2,14 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionTypeOrgBalanceCostRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
@@ -24,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
@@ -35,18 +39,21 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   private final SpontaneousFormRepository spontaneousFormRepository;
   private final WorkflowDebtPositionService workflowDebtPositionService;
   private final OrganizationService organizationService;
+  private final DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepository;
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
                                         DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
                                         SpontaneousFormRepository spontaneousFormRepository,
                                         WorkflowDebtPositionService workflowDebtPositionService,
-                                        OrganizationService organizationService
+                                        OrganizationService organizationService,
+                                        DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepository
   ) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
     this.debtPositionTypeOrgOperatorsService = debtPositionTypeOrgOperatorsService;
     this.spontaneousFormRepository = spontaneousFormRepository;
     this.workflowDebtPositionService = workflowDebtPositionService;
     this.organizationService = organizationService;
+    this.debtPositionTypeOrgBalanceCostRepository = debtPositionTypeOrgBalanceCostRepository;
   }
 
   @Override
@@ -80,6 +87,12 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     DebtPositionTypeOrg dpto = saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrg();
     validateDptoAndTriggerMassiveIbanUpdateIfNeeded(dpto, accessToken);
     DebtPositionTypeOrg savedDebtPositionTypeOrg = debtPositionTypeOrgRepository.save(dpto);
+    Optional.ofNullable(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrgBalanceCostRequestList())
+      .ifPresent(dptoBalanceCostList -> debtPositionTypeOrgBalanceCostRepository.saveAll(
+        dptoBalanceCostList.stream()
+          .map(dto -> mapToDebtPositionTypeOrgBalanceCost(dto, savedDebtPositionTypeOrg.getDebtPositionTypeOrgId()))
+          .toList()
+      ));
     handleOperators(savedDebtPositionTypeOrg, saveDebtPositionTypeOrgDTO);
     return savedDebtPositionTypeOrg;
   }
@@ -214,5 +227,24 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
         ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND,
         "DebtPositionTypeOrg with id %d not found".formatted(dptoId)
       ));
+  }
+
+  protected DebtPositionTypeOrgBalanceCost mapToDebtPositionTypeOrgBalanceCost(
+    DebtPositionTypeOrgBalanceCostRequestDTO dto,
+    Long debtPositionTypeOrgId
+  ) {
+    return DebtPositionTypeOrgBalanceCost.builder()
+      .id(new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(
+        debtPositionTypeOrgId,
+        dto.getType(),
+        dto.getOperatingYear()
+      ))
+      .officeCode(dto.getOfficeCode())
+      .officeDescription(dto.getOfficeDescription())
+      .sectionCode(dto.getSectionCode())
+      .sectionDescription(dto.getSectionDescription())
+      .assessmentCode(dto.getAssessmentCode())
+      .assessmentDescription(dto.getAssessmentDescription())
+      .build();
   }
 }
