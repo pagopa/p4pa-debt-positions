@@ -222,6 +222,7 @@ openApiGenerate {
       "object" to "tools.jackson.databind.JsonNode",
       "InstallmentSyncStatus" to "it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus",
       "DebtPositionTypeOrg" to "it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg",
+      "DebtPositionTypeOrgBalanceCostType" to "it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType",
       "InstallmentNoPII" to "it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII",
       "ReceiptNoPII" to "it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII",
       "SpontaneousForm" to "it.gov.pagopa.pu.debtpositions.model.SpontaneousForm",

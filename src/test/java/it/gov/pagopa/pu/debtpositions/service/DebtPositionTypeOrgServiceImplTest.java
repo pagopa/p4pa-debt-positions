@@ -2,12 +2,15 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionTypeOrgBalanceCostRequestDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
+import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
@@ -22,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -29,6 +33,7 @@ import org.springframework.beans.BeanUtils;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -45,6 +50,8 @@ class DebtPositionTypeOrgServiceImplTest {
   private WorkflowDebtPositionService workflowDebtPositionServiceMock;
   @Mock
   private OrganizationService organizationServiceMock;
+  @Mock
+  private DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepositoryMock;
 
   private DebtPositionTypeOrgService debtPositionTypeOrgService;
 
@@ -52,7 +59,7 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock, organizationServiceMock));
+    debtPositionTypeOrgService = Mockito.spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock, organizationServiceMock, debtPositionTypeOrgBalanceCostRepositoryMock));
   }
 
   @Test
@@ -160,12 +167,61 @@ class DebtPositionTypeOrgServiceImplTest {
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getEnabledOperators())).thenReturn(null);
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperators(
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getDisabledOperators())).thenReturn(2);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrgBalanceCostRequestList(
+      List.of(podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostRequestDTO.class))
+    );
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.save(Mockito.any()))
+      .thenAnswer(invocation -> invocation.getArgument(0));
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
       saveDebtPositionTypeOrgDTO, accessToken);
 
     Assertions.assertEquals(expectedResult, result);
+    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock,
+        Mockito.times(saveDebtPositionTypeOrgDTO.getDebtPositionTypeOrgBalanceCostRequestList().size()))
+      .save(Mockito.any(DebtPositionTypeOrgBalanceCost.class));
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
+  }
+
+  @Test
+  void givenBalanceCostListWhenSaveDebtPositionTypeOrgThenBalanceCostSaved() {
+    DebtPositionTypeOrg debtPositionTypeOrg = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    debtPositionTypeOrg.setDebtPositionTypeOrgId(null);
+    debtPositionTypeOrg.setSpontaneousFormId(null);
+    debtPositionTypeOrg.setIban("IT0000000000000000000000000");
+    debtPositionTypeOrg.setPostalIban("IT00X0760100000000000000000");
+
+    String accessToken = "accessToken";
+
+    DebtPositionTypeOrgBalanceCostRequestDTO dptoBalanceCostRequest =
+      podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostRequestDTO.class);
+
+    SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
+    saveDebtPositionTypeOrgDTO.setEnabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setDisabledOperators(Collections.emptySet());
+    saveDebtPositionTypeOrgDTO.setRemoveEnabledOperators(false);
+    saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrgBalanceCostRequestList(List.of(dptoBalanceCostRequest));
+
+    Long generatedId = 42L;
+    DebtPositionTypeOrg savedDpto = podamFactory.manufacturePojo(DebtPositionTypeOrg.class);
+    savedDpto.setDebtPositionTypeOrgId(generatedId);
+
+    Mockito.when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(savedDpto);
+    Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.save(Mockito.any()))
+      .thenAnswer(invocation -> invocation.getArgument(0));
+
+    debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
+
+    ArgumentCaptor<DebtPositionTypeOrgBalanceCost> captor =
+      ArgumentCaptor.forClass(DebtPositionTypeOrgBalanceCost.class);
+    Mockito.verify(debtPositionTypeOrgBalanceCostRepositoryMock).save(captor.capture());
+
+    DebtPositionTypeOrgBalanceCost saved = captor.getValue();
+    Assertions.assertEquals(generatedId, saved.getId().getDebtPositionTypeOrgId());
+    Assertions.assertEquals(dptoBalanceCostRequest.getDebtPositionTypeOrgBalanceCostType(), saved.getId().getType());
+    Assertions.assertEquals(dptoBalanceCostRequest.getOperatingYear(), saved.getId().getOperatingYear());
+    Assertions.assertEquals(dptoBalanceCostRequest.getSectionCode(), saved.getSectionCode());
   }
 
   @Test
