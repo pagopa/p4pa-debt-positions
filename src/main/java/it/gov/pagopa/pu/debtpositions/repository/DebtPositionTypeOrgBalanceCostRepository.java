@@ -10,6 +10,8 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RepositoryRestResource(path = "debt-position-type-org-balance-costs")
 public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<DebtPositionTypeOrgBalanceCost, DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId> {
   @Query("select dptobc from DebtPosition dp " +
@@ -30,4 +32,9 @@ public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<
   @Modifying
   @Query("DELETE FROM DebtPositionTypeOrgBalanceCost dptobc WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId")
   void deleteByDebtPositionTypeOrgId(@Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId);
+
+  List<DebtPositionTypeOrgBalanceCost> getByIdDebtPositionTypeOrgIdAndIdOperatingYear(
+    long debtPositionTypeOrgId,
+    String operatingYear
+  );
 }
