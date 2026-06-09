@@ -33,7 +33,10 @@ public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<
   @Query("DELETE FROM DebtPositionTypeOrgBalanceCost dptobc WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId")
   void deleteByDebtPositionTypeOrgId(@Param("debtPositionTypeOrgId") Long debtPositionTypeOrgId);
 
-  List<DebtPositionTypeOrgBalanceCost> getByIdDebtPositionTypeOrgIdAndIdOperatingYear(
+  @Query("SELECT dptobc FROM DebtPositionTypeOrgBalanceCost dptobc " +
+    "WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId " +
+    "AND dptobc.id.operatingYear = :operatingYear")
+  List<DebtPositionTypeOrgBalanceCost> getByDebtPositionTypeOrgIdAndOperatingYear(
     long debtPositionTypeOrgId,
     String operatingYear
   );
