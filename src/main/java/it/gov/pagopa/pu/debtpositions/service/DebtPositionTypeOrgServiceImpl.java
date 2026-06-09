@@ -75,6 +75,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
     DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
     debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    debtPositionTypeOrgBalanceCostRepository.deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
 

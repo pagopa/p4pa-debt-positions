@@ -126,6 +126,7 @@ class DebtPositionTypeOrgServiceImplTest {
     Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10);
+    Mockito.doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     Mockito.doNothing().when(debtPositionTypeOrgRepositoryMock).delete(debtPositionTypeOrg);
 
     debtPositionTypeOrgService.deleteDebtPositionTypeOrg(debtPositionTypeOrgId);
