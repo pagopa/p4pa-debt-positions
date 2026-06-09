@@ -63,7 +63,7 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
 
     ReceiptDTO existingReceipt = getExistingReceipt(receiptDTO);
 
-    if (existingReceipt == null && broker != null && Boolean.TRUE.equals(broker.getFlagDelegate())) {
+    if (broker != null && Boolean.TRUE.equals(broker.getFlagDelegate())) {
       Optional<InstallmentNoPII> retrievedInstallment =
         primaryOrgInstallmentRetrieverService.retrieve(
           primaryOrg,
