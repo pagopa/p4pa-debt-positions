@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,6 +12,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.DefaultFormattingConversionService;
 
 @Configuration
+@Slf4j
 public class RepositoryRestCustomConverters {
 
   private final DefaultFormattingConversionService conversionService;
@@ -40,6 +42,7 @@ public class RepositoryRestCustomConverters {
             operatingYear
           );
         } catch (Exception e) {
+          log.info("Exception has been thrown by debtPositionTypeOrgBalanceCostIdConverter: {}", e.getMessage());
           throw buildInvalidDPTypeOrgBalanceCostIdException();
         }
       }
