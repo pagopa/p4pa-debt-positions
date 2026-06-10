@@ -71,7 +71,7 @@ public interface TransferRepository extends JpaRepository<Transfer, Long> {
     AND i.iuv = :iuv
     AND t.transferIndex = :transferIndex
     """)
-  Optional<Transfer> findByOrganizationIdAndIuvAndTransferIndex(Long organizationId, String iuv, int transferIndex);
+  Optional<Transfer> findMixedByOrganizationIdAndIuvAndTransferIndex(Long organizationId, String iuv, int transferIndex);
 
   @RestResource(exported = false)
   @Query("""

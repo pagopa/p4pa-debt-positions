@@ -182,7 +182,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         .findFirst()
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
 
-      Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
+      Transfer transfer = transferRepository.findMixedByOrganizationIdAndIuvAndTransferIndex(
         debtPosition.getOrganizationId(),
         installmentAndTransfer.getLeft().getIuv(),
         installmentAndTransfer.getRight().getTransferIndex()
