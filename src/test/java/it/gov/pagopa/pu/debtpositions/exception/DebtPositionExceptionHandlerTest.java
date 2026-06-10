@@ -86,11 +86,6 @@ class DebtPositionExceptionHandlerTest {
     }
   }
 
-  @BeforeEach
-  void init() {
-    TestUtils.clearDefaultTimezone();
-  }
-
   @RestController
   @Slf4j
   static class TestCrudController {
@@ -113,10 +108,13 @@ class DebtPositionExceptionHandlerTest {
   }
 
   private final String traceId = "TRACEID";
+
   @BeforeEach
-  void setTraceId(){
+  void init() {
+    TestUtils.clearDefaultTimezone();
     UtilitiesTest.setTraceId(traceId);
   }
+
   @AfterEach
   void clearTraceId(){
     UtilitiesTest.clearTraceIdContext();
