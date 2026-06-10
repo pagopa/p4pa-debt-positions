@@ -15,6 +15,7 @@ import org.slf4j.event.Level;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -107,7 +108,7 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
-  @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
+  @ExceptionHandler({HttpClientErrorException.TooManyRequests.class, CannotAcquireLockException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvokedHttpClientTooManyRequestsError(Exception ex, HttpServletRequest request) {
     return handleException(ex, request, HttpStatus.TOO_MANY_REQUESTS, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS);
   }

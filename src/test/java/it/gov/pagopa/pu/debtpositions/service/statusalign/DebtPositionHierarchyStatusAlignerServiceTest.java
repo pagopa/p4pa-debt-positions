@@ -377,7 +377,7 @@ class DebtPositionHierarchyStatusAlignerServiceTest {
     // First call returns SPONTANEOUS_MIXED debt position
     Mockito.when(debtPositionRepositoryMock.findEntityGraphByTransferId(transferId)).thenReturn(mixedDebtPosition);
     // Find the ordinary transfer
-    Mockito.when(transferRepositoryMock.findByOrganizationIdAndIuvAndTransferIndex(
+    Mockito.when(transferRepositoryMock.findMixedByOrganizationIdAndIuvAndTransferIndex(
       mixedDebtPosition.getOrganizationId(),
       mixedInstallment.getIuv(),
       mixedTransfer.getTransferIndex()

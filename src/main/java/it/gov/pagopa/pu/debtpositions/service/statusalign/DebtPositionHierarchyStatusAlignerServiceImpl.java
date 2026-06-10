@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
@@ -133,7 +134,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     }
   }
 
-  @Transactional
+  @Transactional(isolation = Isolation.REPEATABLE_READ)
   @Override
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByTransferId(transferId);
@@ -181,7 +182,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
         .findFirst()
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, String.format("Transfer with id %s was not found in debt position with id %s", transferId, debtPosition.getDebtPositionId())));
 
-      Transfer transfer = transferRepository.findByOrganizationIdAndIuvAndTransferIndex(
+      Transfer transfer = transferRepository.findMixedByOrganizationIdAndIuvAndTransferIndex(
         debtPosition.getOrganizationId(),
         installmentAndTransfer.getLeft().getIuv(),
         installmentAndTransfer.getRight().getTransferIndex()
