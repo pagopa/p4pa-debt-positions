@@ -11,6 +11,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @RepositoryRestResource(path = "debt-position-type-org-balance-costs")
 public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<DebtPositionTypeOrgBalanceCost, DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId> {
@@ -39,5 +40,15 @@ public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<
   List<DebtPositionTypeOrgBalanceCost> getByDebtPositionTypeOrgIdAndOperatingYear(
     long debtPositionTypeOrgId,
     String operatingYear
+  );
+
+  @Query("SELECT dptobc FROM DebtPositionTypeOrgBalanceCost dptobc " +
+    "WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId " +
+    "AND dptobc.id.operatingYear = :operatingYear " +
+    "AND dptobc.id.type = :type")
+  Optional<DebtPositionTypeOrgBalanceCost> getByDebtPositionTypeOrgIdAndOperatingYearAndType(
+    long debtPositionTypeOrgId,
+    String operatingYear,
+    DebtPositionTypeOrgBalanceCostType type
   );
 }
