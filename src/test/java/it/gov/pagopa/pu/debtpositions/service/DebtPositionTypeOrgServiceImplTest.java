@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowDebtPositionService;
-import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionTypeOrgBalanceCostRequestDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionTypeOrgBalanceCostDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
@@ -168,7 +168,7 @@ class DebtPositionTypeOrgServiceImplTest {
     Mockito.when(debtPositionTypeOrgOperatorsServiceMock.deleteOperators(
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getDisabledOperators())).thenReturn(2);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrgBalanceCostRequestList(
-      List.of(podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostRequestDTO.class))
+      List.of(podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostDTO.class))
     );
     Mockito.when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
@@ -191,8 +191,8 @@ class DebtPositionTypeOrgServiceImplTest {
 
     String accessToken = "accessToken";
 
-    DebtPositionTypeOrgBalanceCostRequestDTO dptoBalanceCostRequest =
-      podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostRequestDTO.class);
+    DebtPositionTypeOrgBalanceCostDTO dptoBalanceCostRequest =
+      podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostDTO.class);
 
     SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO = new SaveDebtPositionTypeOrgDTO();
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrg(debtPositionTypeOrg);
