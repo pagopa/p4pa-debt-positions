@@ -1,10 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,10 +18,13 @@ import org.springframework.util.CollectionUtils;
 public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionTypeOrgOperatorsService{
 
   private final DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepository;
+  private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
   public DebtPositionTypeOrgOperatorsServiceImpl(
-    DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepository) {
+    DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepository,
+    UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
     this.debtPositionTypeOrgOperatorsRepository = debtPositionTypeOrgOperatorsRepository;
+    this.unknownDebtPositionTypeOrgRetrieverService = unknownDebtPositionTypeOrgRetrieverService;
   }
 
   @Transactional
@@ -51,12 +57,13 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
     }
 
     return debtPositionTypeOrgOperatorsRepository.saveAll(
-      externalOperatorUserIds.stream().map(o->{
-        DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
-        debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
-        debtPositionTypeOrgOperators.setOperatorExternalUserId(o);
-        return debtPositionTypeOrgOperators;
-      }).toList()
+      externalOperatorUserIds.stream()
+        .map(operatorExternalUserId ->
+          buildDebtPositionTypeOrgOperator(
+            debtPositionTypeOrgId,
+            operatorExternalUserId
+          )
+        ).toList()
     );
   }
 
@@ -76,13 +83,33 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
     }
 
     return debtPositionTypeOrgOperatorsRepository.saveAll(
-      debtPositionTypeOrgIds.stream().map(o->{
-        DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
-        debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(o);
-        debtPositionTypeOrgOperators.setOperatorExternalUserId(operatorExternalUserId);
-        return debtPositionTypeOrgOperators;
-      }).toList()
+      debtPositionTypeOrgIds.stream()
+        .map(debtPositionTypeOrgId ->
+            buildDebtPositionTypeOrgOperator(
+              debtPositionTypeOrgId,
+              operatorExternalUserId
+            )
+        ).toList()
     );
+  }
+
+  @Transactional
+  @Override
+  public List<DebtPositionTypeOrgOperators> saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(
+    String operatorExternalUserId, Long organizationId) {
+    DebtPositionTypeOrg unknownDebtPositionTypeOrg = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organizationId);
+    DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = buildDebtPositionTypeOrgOperator(
+      unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(),
+      operatorExternalUserId
+    );
+    return debtPositionTypeOrgOperatorsRepository.saveAll(List.of(debtPositionTypeOrgOperators));
+  }
+
+  private static DebtPositionTypeOrgOperators buildDebtPositionTypeOrgOperator(Long debtPositionTypeOrgId, String operatorExternalUserId) {
+    DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = new DebtPositionTypeOrgOperators();
+    debtPositionTypeOrgOperators.setDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    debtPositionTypeOrgOperators.setOperatorExternalUserId(operatorExternalUserId);
+    return debtPositionTypeOrgOperators;
   }
 
   @Transactional

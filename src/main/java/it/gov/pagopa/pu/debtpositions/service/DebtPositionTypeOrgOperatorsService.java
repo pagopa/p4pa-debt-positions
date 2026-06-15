@@ -9,4 +9,5 @@ public interface DebtPositionTypeOrgOperatorsService {
   List<DebtPositionTypeOrgOperators> saveOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
   int deleteOperators(Long debtPositionTypeOrgId, Set<String> externalOperatorUserIds);
   List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Set<Long> debtPositionTypeOrgIds);
+  List<DebtPositionTypeOrgOperators> saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Long organizationId);
 }

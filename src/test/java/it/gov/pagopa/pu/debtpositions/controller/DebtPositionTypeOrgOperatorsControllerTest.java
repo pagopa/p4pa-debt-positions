@@ -65,4 +65,20 @@ class DebtPositionTypeOrgOperatorsControllerTest {
     assertEquals(HttpStatus.CREATED, result.getStatusCode());
     assertNull(result.getBody());
   }
+
+  @Test
+  void givenOperatorExternalUserIdAndOrganizationIdWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenReturnCreated() {
+    //GIVEN
+    String operatorExternalUserId = "operator1";
+    long organizationId = 1L;
+    when(debtPositionTypeOrgOperatorsServiceMock
+      .saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId))
+      .thenReturn(Collections.emptyList());
+    //WHEN
+    ResponseEntity<Void> result = controller.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId);
+    //THEN
+    assertNotNull(result);
+    assertEquals(HttpStatus.CREATED, result.getStatusCode());
+    assertNull(result.getBody());
+  }
 }
