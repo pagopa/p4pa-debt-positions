@@ -30,4 +30,11 @@ public class DebtPositionTypeOrgOperatorsController implements DebtPositionTypeO
     debtPositionTypeOrgOperatorsService.saveDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, debtPositionTypeOrgIds);
     return ResponseEntity.status(HttpStatus.CREATED).build();
   }
+
+  @Override
+  public ResponseEntity<Void> saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(String operatorExternalUserId, Long organizationId) {
+    log.info("User requested to grant default tech dp types to operatorExternalUserId {} on organizationId {}", operatorExternalUserId, organizationId);
+    debtPositionTypeOrgOperatorsService.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId);
+    return ResponseEntity.status(HttpStatus.CREATED).build();
+  }
 }
