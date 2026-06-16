@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionTypeOrgOperatorsService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -67,7 +69,23 @@ class DebtPositionTypeOrgOperatorsControllerTest {
   }
 
   @Test
-  void givenOperatorExternalUserIdAndOrganizationIdWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenReturnCreated() {
+  void givenNonEmptyListOfDebtPositionTypeOrgOperatorWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenReturnCreated() {
+    //GIVEN
+    String operatorExternalUserId = "operator1";
+    long organizationId = 1L;
+    when(debtPositionTypeOrgOperatorsServiceMock
+      .saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId))
+      .thenReturn(List.of(new DebtPositionTypeOrgOperators()));
+    //WHEN
+    ResponseEntity<Void> result = controller.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId);
+    //THEN
+    assertNotNull(result);
+    assertEquals(HttpStatus.CREATED, result.getStatusCode());
+    assertNull(result.getBody());
+  }
+
+  @Test
+  void givenEmptyListOfDebtPositionTypeOrgOperatorWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenReturnOk() {
     //GIVEN
     String operatorExternalUserId = "operator1";
     long organizationId = 1L;
@@ -78,7 +96,8 @@ class DebtPositionTypeOrgOperatorsControllerTest {
     ResponseEntity<Void> result = controller.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId, organizationId);
     //THEN
     assertNotNull(result);
-    assertEquals(HttpStatus.CREATED, result.getStatusCode());
+    assertEquals(HttpStatus.OK, result.getStatusCode());
     assertNull(result.getBody());
   }
+
 }

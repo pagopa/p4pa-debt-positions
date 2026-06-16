@@ -97,12 +97,41 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
   @Override
   public List<DebtPositionTypeOrgOperators> saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(
     String operatorExternalUserId, Long organizationId) {
-    DebtPositionTypeOrg unknownDebtPositionTypeOrg = unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organizationId);
-    DebtPositionTypeOrgOperators debtPositionTypeOrgOperators = buildDebtPositionTypeOrgOperator(
+    List<DebtPositionTypeOrgOperators> defaultTechDebtPositionTypeOrgOperators =
+      buildDefaultTechDebtPositionTypeOrgOperators(operatorExternalUserId, organizationId);
+    List<DebtPositionTypeOrgOperators> newDefaultTechDebtPositionTypeOrgOperators =
+      filterNotAlreadySavedDebtPositionTypeOrgOperators(defaultTechDebtPositionTypeOrgOperators);
+    return debtPositionTypeOrgOperatorsRepository.saveAll(newDefaultTechDebtPositionTypeOrgOperators);
+  }
+
+  private List<DebtPositionTypeOrgOperators> buildDefaultTechDebtPositionTypeOrgOperators(String operatorExternalUserId, Long organizationId) {
+    DebtPositionTypeOrgOperators unknownDebtPositionTypeOrgOperator = buildUnknownDebtPositionTypeOrgOperators(
+      operatorExternalUserId,
+      organizationId
+    );
+    return List.of(
+      unknownDebtPositionTypeOrgOperator
+    );
+  }
+
+  private DebtPositionTypeOrgOperators buildUnknownDebtPositionTypeOrgOperators(String operatorExternalUserId, Long organizationId) {
+    DebtPositionTypeOrg unknownDebtPositionTypeOrg =
+      unknownDebtPositionTypeOrgRetrieverService.getUnknownDebtPositionTypeOrg(organizationId); //get or else create
+    return buildDebtPositionTypeOrgOperator(
       unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(),
       operatorExternalUserId
     );
-    return debtPositionTypeOrgOperatorsRepository.saveAll(List.of(debtPositionTypeOrgOperators));
+  }
+
+  private List<DebtPositionTypeOrgOperators> filterNotAlreadySavedDebtPositionTypeOrgOperators(
+    List<DebtPositionTypeOrgOperators> debtPositionTypeOrgOperators) {
+    return debtPositionTypeOrgOperators.stream()
+      .filter(dptoo ->
+        debtPositionTypeOrgOperatorsRepository.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(
+          dptoo.getDebtPositionTypeOrgId(),
+          dptoo.getOperatorExternalUserId()
+        ).isEmpty()
+      ).toList();
   }
 
   private static DebtPositionTypeOrgOperators buildDebtPositionTypeOrgOperator(Long debtPositionTypeOrgId, String operatorExternalUserId) {
