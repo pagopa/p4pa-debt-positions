@@ -6,10 +6,7 @@ import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceSe
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCostId;
-import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
-import it.gov.pagopa.pu.debtpositions.model.Transfer;
+import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -81,7 +78,7 @@ public class BalanceResolverService {
   private DebtPositionTypeOrgBalanceCostDTO fetchNotificationCostBalanceInfo(Long debtPositionTypeOrgId, OffsetDateTime paymentDateTime) {
     int operatingYear = paymentDateTime != null ? paymentDateTime.getYear() : LocalDate.now().getYear();
 
-    DebtPositionTypeOrgBalanceCostId balanceCostId = new DebtPositionTypeOrgBalanceCostId(
+    DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId balanceCostId = new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(
       debtPositionTypeOrgId,
       DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
       String.valueOf(operatingYear)

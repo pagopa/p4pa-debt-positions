@@ -1,12 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+
+import java.util.*;
+
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,27 @@ class DebtPositionTypeOrgOperatorsServiceImplTest {
 
   @Mock
   private DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepositoryMock;
+  @Mock
+  private UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverServiceMock;
 
   private DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgOperatorsService = Mockito.spy(new DebtPositionTypeOrgOperatorsServiceImpl(debtPositionTypeOrgOperatorsRepositoryMock));
+    debtPositionTypeOrgOperatorsService = Mockito.spy(
+      new DebtPositionTypeOrgOperatorsServiceImpl(
+        debtPositionTypeOrgOperatorsRepositoryMock,
+        unknownDebtPositionTypeOrgRetrieverServiceMock
+      )
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      debtPositionTypeOrgOperatorsRepositoryMock,
+      unknownDebtPositionTypeOrgRetrieverServiceMock
+    );
   }
 
   @Test
@@ -183,5 +199,93 @@ class DebtPositionTypeOrgOperatorsServiceImplTest {
     Assertions.assertTrue(result.isEmpty());
 
     Mockito.verifyNoMoreInteractions(debtPositionTypeOrgOperatorsRepositoryMock);
+  }
+
+  @Test
+  void givenNotFoundDebtPositionTypeOrgOperatorWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenSave() {
+    //GIVEN
+    String expectedOperatorExternalUserId = "operatorExternalUserId";
+    Long organizationId = 1L;
+
+    DebtPositionTypeOrg unknownDebtPositionTypeOrg = DebtPositionTypeOrg.builder()
+      .debtPositionTypeOrgId(1L)
+      .debtPositionTypeId(-1L)
+      .build();
+    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(organizationId))
+      .thenReturn(unknownDebtPositionTypeOrg);
+
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(
+        unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(),
+        expectedOperatorExternalUserId
+      )).thenReturn(Optional.empty());
+
+    DebtPositionTypeOrgOperators expectedDebtPositionTypeOrgOperator = buildDebtPositionTypeOrgOperator(
+      expectedOperatorExternalUserId,
+      unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(),
+      1L
+    );
+    ArgumentCaptor<List<DebtPositionTypeOrgOperators>> saveCaptor = ArgumentCaptor.forClass(List.class);
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.saveAll(
+      saveCaptor.capture()
+    )).thenReturn(List.of(expectedDebtPositionTypeOrgOperator));
+
+    //WHEN
+    List<DebtPositionTypeOrgOperators> actualDebtPositionTypeOrgOperators = debtPositionTypeOrgOperatorsService.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(
+      expectedOperatorExternalUserId,
+      organizationId
+    );
+
+    //THEN
+    //Assert DebtPositionTypeOrgOperators List returned by method debtPositionTypeOrgOperatorsRepository.saveAll
+    Assertions.assertNotNull(actualDebtPositionTypeOrgOperators);
+    Assertions.assertEquals(1, actualDebtPositionTypeOrgOperators.size());
+    Assertions.assertEquals(unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(), actualDebtPositionTypeOrgOperators.getFirst().getDebtPositionTypeOrgId());
+    Assertions.assertEquals(expectedOperatorExternalUserId, actualDebtPositionTypeOrgOperators.getFirst().getOperatorExternalUserId());
+    //Assert DebtPositionTypeOrgOperators List parameter passed to method debtPositionTypeOrgOperatorsRepository.saveAll
+    List<DebtPositionTypeOrgOperators> capturedDebtPositionTypeOrgoperatorList = saveCaptor.getValue();
+    Assertions.assertNotNull(capturedDebtPositionTypeOrgoperatorList);
+    Assertions.assertEquals(1, capturedDebtPositionTypeOrgoperatorList.size());
+    Assertions.assertEquals(unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(), capturedDebtPositionTypeOrgoperatorList.getFirst().getDebtPositionTypeOrgId());
+    Assertions.assertEquals(expectedOperatorExternalUserId, capturedDebtPositionTypeOrgoperatorList.getFirst().getOperatorExternalUserId());
+  }
+
+  @Test
+  void givenFoundDebtPositionTypeOrgOperatorWhenSaveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperatorThenDoNothing() {
+    //GIVEN
+    String expectedOperatorExternalUserId = "operatorExternalUserId";
+    Long organizationId = 1L;
+
+    DebtPositionTypeOrg unknownDebtPositionTypeOrg = DebtPositionTypeOrg.builder()
+      .debtPositionTypeOrgId(1L)
+      .debtPositionTypeId(-1L)
+      .build();
+    Mockito.when(unknownDebtPositionTypeOrgRetrieverServiceMock.getUnknownDebtPositionTypeOrg(organizationId))
+      .thenReturn(unknownDebtPositionTypeOrg);
+
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.findByDebtPositionTypeOrgIdAndOperatorExternalUserId(
+      unknownDebtPositionTypeOrg.getDebtPositionTypeOrgId(),
+      expectedOperatorExternalUserId
+    )).thenReturn(Optional.of(new DebtPositionTypeOrgOperators()));
+
+    ArgumentCaptor<List<DebtPositionTypeOrgOperators>> saveCaptor = ArgumentCaptor.forClass(List.class);
+    Mockito.when(debtPositionTypeOrgOperatorsRepositoryMock.saveAll(
+      saveCaptor.capture()
+    )).thenReturn(Collections.emptyList());
+
+    //WHEN
+    List<DebtPositionTypeOrgOperators> actualDebtPositionTypeOrgOperators = debtPositionTypeOrgOperatorsService.saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(
+      expectedOperatorExternalUserId,
+      organizationId
+    );
+
+    //THEN
+    //Assert DebtPositionTypeOrgOperators List returned by method debtPositionTypeOrgOperatorsRepository.saveAll
+    Assertions.assertNotNull(actualDebtPositionTypeOrgOperators);
+    Assertions.assertEquals(0, actualDebtPositionTypeOrgOperators.size());
+    //Assert DebtPositionTypeOrgOperators List parameter passed to method debtPositionTypeOrgOperatorsRepository.saveAll
+    List<DebtPositionTypeOrgOperators> capturedDebtPositionTypeOrgoperatorList = saveCaptor.getValue();
+    Assertions.assertNotNull(actualDebtPositionTypeOrgOperators);
+    Assertions.assertEquals(0, capturedDebtPositionTypeOrgoperatorList.size());
+
   }
 }

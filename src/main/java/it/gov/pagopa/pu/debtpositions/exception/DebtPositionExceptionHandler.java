@@ -15,6 +15,7 @@ import org.slf4j.event.Level;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.core.convert.ConversionFailedException;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -107,7 +108,7 @@ public class DebtPositionExceptionHandler {
     return handleException(ex, request, HttpStatus.PRECONDITION_FAILED, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST);
   }
 
-  @ExceptionHandler(HttpClientErrorException.TooManyRequests.class)
+  @ExceptionHandler({HttpClientErrorException.TooManyRequests.class, CannotAcquireLockException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleInvokedHttpClientTooManyRequestsError(Exception ex, HttpServletRequest request) {
     return handleException(ex, request, HttpStatus.TOO_MANY_REQUESTS, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS);
   }
@@ -243,6 +244,11 @@ public class DebtPositionExceptionHandler {
   }
 
   private static Pair<String, String> buildCrudErrorMessage(String requestPath, HttpStatus httpStatus, Exception ex) {
+    if(ex instanceof BaseBusinessException) {
+      return buildReturnedMessage(ex);
+    } else if (ex.getCause() instanceof BaseBusinessException causeBusinessException) {
+      return buildReturnedMessage(causeBusinessException);
+    }
     String entity = requestPath.split("/crud/")[1].split("/")[0].replaceAll("s$", "");
     String entityCode = entity.replace("-", "_").toUpperCase();
     return Pair.of(entityCode + "_" + httpStatus.name(), buildReturnedMessage(ex).getValue());

@@ -8,7 +8,6 @@ import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
-import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCostId;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgBalanceCostRepository;
 import org.junit.jupiter.api.AfterEach;
@@ -209,7 +208,7 @@ class BalanceResolverServiceTest {
     debtPositionTypeOrgBalanceCost.setOfficeCode("OFF");
     debtPositionTypeOrgBalanceCost.setSectionCode("SEC");
 
-    DebtPositionTypeOrgBalanceCostId id = new DebtPositionTypeOrgBalanceCostId(
+    DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId id = new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(
       debtPositionTypeOrgId,
       DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
       String.valueOf(LocalDate.now().getYear())
@@ -257,7 +256,7 @@ class BalanceResolverServiceTest {
     Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
       .thenReturn(Optional.ofNullable(buildOrganization()));
 
-    DebtPositionTypeOrgBalanceCostId id = new DebtPositionTypeOrgBalanceCostId(
+    DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId id = new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(
       debtPositionTypeOrgId,
       DebtPositionTypeOrgBalanceCostType.NOTIFICATION_COST,
       String.valueOf(LocalDate.now().getYear())

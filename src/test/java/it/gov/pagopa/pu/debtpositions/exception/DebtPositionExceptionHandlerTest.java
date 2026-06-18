@@ -25,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -85,11 +86,6 @@ class DebtPositionExceptionHandlerTest {
     }
   }
 
-  @BeforeEach
-  void init() {
-    TestUtils.clearDefaultTimezone();
-  }
-
   @RestController
   @Slf4j
   static class TestCrudController {
@@ -112,10 +108,13 @@ class DebtPositionExceptionHandlerTest {
   }
 
   private final String traceId = "TRACEID";
+
   @BeforeEach
-  void setTraceId(){
+  void init() {
+    TestUtils.clearDefaultTimezone();
     UtilitiesTest.setTraceId(traceId);
   }
+
   @AfterEach
   void clearTraceId(){
     UtilitiesTest.clearTraceIdContext();
@@ -508,6 +507,32 @@ class DebtPositionExceptionHandlerTest {
   }
 
   @Test
+  void handleCrudResourceBaseBusinessException() throws Exception {
+    Long id = -12L;
+    doThrow(new InvalidValueException("ERROR", "message")).when(testCrudControllerSpy).testCrudEndpoint(id);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/crud/installments/-12"))
+      .andExpect(MockMvcResultMatchers.status().isBadRequest())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERROR"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERROR] message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+  }
+
+  @Test
+  void handleCrudResourceCauseBaseBusinessException() throws Exception {
+    Long id = -12L;
+    doThrow(new IllegalArgumentException(new InvalidValueException("ERROR", "message"))).when(testCrudControllerSpy).testCrudEndpoint(id);
+
+    mockMvc.perform(MockMvcRequestBuilders.get("/crud/installments/-12"))
+      .andExpect(MockMvcResultMatchers.status().isInternalServerError())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERROR"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERROR] message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+  }
+
+  @Test
   void handleInstallmentCloningErrorException() throws Exception {
     doThrow(new InstallmentCloningException("ERRORCODE", "Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
 
@@ -516,6 +541,18 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+  }
+
+  @Test
+  void handleCannotAcquireLockException() throws Exception {
+    doThrow(new CannotAcquireLockException("Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isTooManyRequests())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_TOO_MANY_REQUESTS] Error"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 }
