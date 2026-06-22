@@ -44,6 +44,14 @@ public interface DebtPositionTypeOrgBalanceCostRepository extends JpaRepository<
 
   @Query("SELECT dptobc FROM DebtPositionTypeOrgBalanceCost dptobc " +
     "WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId " +
+    "AND dptobc.id.operatingYear IN :operatingYears")
+  List<DebtPositionTypeOrgBalanceCost> getByDebtPositionTypeOrgIdAndOperatingYears(
+    long debtPositionTypeOrgId,
+    List<String> operatingYears
+  );
+
+  @Query("SELECT dptobc FROM DebtPositionTypeOrgBalanceCost dptobc " +
+    "WHERE dptobc.id.debtPositionTypeOrgId = :debtPositionTypeOrgId " +
     "AND dptobc.id.operatingYear = :operatingYear " +
     "AND dptobc.id.type = :type")
   Optional<DebtPositionTypeOrgBalanceCost> getByDebtPositionTypeOrgIdAndOperatingYearAndType(
