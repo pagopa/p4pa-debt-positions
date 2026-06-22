@@ -38,6 +38,7 @@ See [Postman collection](/postman/p4pa-debt-positions-E2E.postman_collection.jso
 * `GET /export/organization/{organizationId}/receipts/archiving`: To export receipts for archiving purposes;
 
 ### 📌 Common HTTP status returned:
+* `200`: Successful operation;
 * `401`: Invalid access token provided, thus a new login is required;
 * `403`: Trying to access a not authorized resource.
 
