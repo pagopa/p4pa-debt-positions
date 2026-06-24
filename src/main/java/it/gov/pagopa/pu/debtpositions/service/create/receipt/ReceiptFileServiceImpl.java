@@ -156,7 +156,10 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
     templateModel.put(RECEIPT_PAYMENT_DATE, receiptDetail.getPaymentDateTime() != null ? receiptDetail.getPaymentDateTime().format(DATE_TIME_FORMATTER) : "");
     templateModel.put(RECEIPT_PSP_NAME, receiptDetail.getPspCompanyName());
     templateModel.put(RECEIPT_AMOUNT, Utilities.formatPrice(receiptDetail.getPaymentAmountCents()));
-    templateModel.put(REMITTANCE_INFORMATION, StringUtils.defaultString(receiptDetail.getRemittanceInformation()));
+
+    String remittanceInformation = StringUtils.isNotBlank(receiptDetail.getOriginalRemittanceInformation()) ?
+      receiptDetail.getOriginalRemittanceInformation() : StringUtils.defaultString(receiptDetail.getRemittanceInformation());
+    templateModel.put(REMITTANCE_INFORMATION, remittanceInformation);
     templateModel.put(IUR, receiptDetail.getIur());
     templateModel.put(IUD, receiptDetail.getIud());
     templateModel.put(RECEIPT_FOOTER, footer);
