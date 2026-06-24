@@ -129,7 +129,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
-          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getOriginalRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
           && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(expectedFooter)
@@ -156,6 +156,7 @@ class ReceiptFileServiceImplTest {
 
     ReceiptDetailDTO receiptDetailDTO = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
     receiptDetailDTO.setReceiptId(receiptId);
+    receiptDetailDTO.setOriginalRemittanceInformation(null);
     Organization organization = podamFactory.manufacturePojo(Organization.class);
     organization.setOrganizationId(organizationId);
     organization.setOrgFiscalCode("FISCALCODE");
@@ -256,7 +257,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(organization.getOrgFiscalCode())
-          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getOriginalRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
           && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(brokerConfiguration.getReceiptFooter())
@@ -330,7 +331,7 @@ class ReceiptFileServiceImplTest {
           && o.get(ReceiptFileServiceImpl.RECEIPT_PSP_NAME).equals(receiptDetailDTO.getPspCompanyName())
           && o.get(ReceiptFileServiceImpl.RECEIPT_AMOUNT).equals(Utilities.formatPrice(receiptDetailDTO.getPaymentAmountCents()))
           && o.get(ReceiptFileServiceImpl.RECEIPT_ORG_FISCAL_CODE).equals(ownerTransfer.getOrgFiscalCode())
-          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getRemittanceInformation())
+          && o.get(ReceiptFileServiceImpl.REMITTANCE_INFORMATION).equals(receiptDetailDTO.getOriginalRemittanceInformation())
           && o.get(ReceiptFileServiceImpl.IUR).equals(receiptDetailDTO.getIur())
           && o.get(ReceiptFileServiceImpl.IUD).equals(receiptDetailDTO.getIud())
           && o.get(ReceiptFileServiceImpl.RECEIPT_FOOTER).equals(expectedFooter)
