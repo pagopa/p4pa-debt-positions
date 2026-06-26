@@ -771,6 +771,24 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenPaidInstallmentWhenValidateThenSuccess() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    firstInstallment.getDebtor().setEmail(null);
+    firstInstallment.setStatus(InstallmentStatus.PAID);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    Mockito.when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    Mockito.when(brokerServiceMock.findById(orgOwner.getBrokerId(), accessToken)).thenReturn(broker);
+    Mockito.when(organizationServiceMock.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    Mockito.when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
+    assertDoesNotThrow(() -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg));
+    assertEquals(Boolean.TRUE, firstInstallment.getSwitchToExpired());
+  }
+
+  @Test
   void givenInvalidTransferCategoryWhenValidateThenThrowInvalidValueException() {
     // Given
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
