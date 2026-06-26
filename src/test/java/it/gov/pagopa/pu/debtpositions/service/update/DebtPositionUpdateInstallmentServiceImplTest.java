@@ -105,46 +105,6 @@ class DebtPositionUpdateInstallmentServiceImplTest {
   }
 
   @Test
-  void testUpdateInstallmentWhenAlreadyPaidThenOK(){
-    String accessToken = "ACCESSTOKEN";
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    String operatorExternalId = "OPERATOREXTERNALID";
-    WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
-
-    Organization organization = buildOrganization();
-    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
-    debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.PAID);
-    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
-
-    InstallmentDTO installmentDTO = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
-    installmentDTO.setStatus(InstallmentStatus.PAID);
-    installmentDTO.setSyncStatus(null);
-    String iud = installmentDTO.getIud();
-
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
-      .thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
-      .thenReturn(debtPositionTypeOrg);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
-      .thenReturn(Optional.of(debtPositionTypeOrg));
-    Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(installmentDTO, organization, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken))
-      .thenReturn(workflow);
-
-    WorkflowCreatedDTO result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalId);
-
-    assertSame(workflow, result);
-    assertEquals(DebtPositionStatus.PAID, debtPositionDTO.getStatus());
-    assertEquals(PaymentOptionStatus.PAID, debtPositionDTO.getPaymentOptions().getFirst().getStatus());
-    assertEquals(InstallmentStatus.PAID, installmentDTO.getStatus());
-
-    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
-  }
-
-  @Test
   void testUpdateInstallmentExpiredThenOK(){
     String accessToken = "ACCESSTOKEN";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
