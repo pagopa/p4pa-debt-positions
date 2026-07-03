@@ -159,7 +159,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     ) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_AMOUNT, "Amount is not valid for this debt position type org");
     }
-    if (StringUtils.isNotBlank(installmentDTO.getBalance()) &&
+    if (!InstallmentStatus.PAID.equals(installmentDTO.getStatus()) &&
+      StringUtils.isNotBlank(installmentDTO.getBalance()) &&
       BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), installmentDTO.getAmountCents(), accessToken))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_BALANCE, "Balance is not formally valid");
     }
