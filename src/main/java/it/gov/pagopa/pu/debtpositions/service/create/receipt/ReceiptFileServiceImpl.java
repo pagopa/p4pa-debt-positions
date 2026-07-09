@@ -23,6 +23,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Locale;
@@ -44,9 +45,10 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
   public static final String RECEIPT_AMOUNT = "amount";
   public static final String RECEIPT_ORG_FISCAL_CODE = "orgFiscalCode";
   public static final String RECEIPT_FOOTER = "receiptFooter";
-  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm", Locale.ITALIAN);
-  public static final DateTimeFormatter DATE_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ITALIAN);
-  public static final DateTimeFormatter TIME_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("HH:mm", Locale.ITALIAN);
+  public static final ZoneId ZONE_ITALY = ZoneId.of("Europe/Rome");
+  public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("dd MMMM yyyy, HH:mm", Locale.ITALIAN).withZone(ZONE_ITALY);
+  public static final DateTimeFormatter DATE_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("dd MMMM yyyy", Locale.ITALIAN).withZone(ZONE_ITALY);
+  public static final DateTimeFormatter TIME_FORMATTER_FOOTER = DateTimeFormatter.ofPattern("HH:mm", Locale.ITALIAN).withZone(ZONE_ITALY);
   public static final String REMITTANCE_INFORMATION = "remittanceInformation";
   public static final String IUD = "iud";
   public static final String IUR = "iur";
