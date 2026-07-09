@@ -174,17 +174,17 @@ public interface DebtPositionTypeOrgRepository extends JpaRepository<DebtPositio
     """
       SELECT dpto
       FROM DebtPositionTypeOrg dpto
-      JOIN DebtPosition dp on dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+      LEFT JOIN DebtPosition dp ON dpto.debtPositionTypeOrgId = dp.debtPositionTypeOrgId
+        AND dp.debtPositionOrigin = 'SPONTANEOUS'
+        AND dp.organizationId = :organizationId
+        AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
+        AND dp.creationDate >= :creationDateFrom
+        AND dp.creationDate <= :creationDateTo
       WHERE dpto.organizationId = :organizationId
       AND dpto.flagSpontaneous = true
       AND dpto.flagActive = true
-      AND dp.debtPositionOrigin = 'SPONTANEOUS'
-      AND dp.organizationId = :organizationId
-      AND dp.status NOT IN (:#{T(it.gov.pagopa.pu.debtpositions.util.InstallmentUtils).NOT_PAYABLE_DP_STATUSES})
-      AND dp.creationDate >= :creationDateFrom
-      AND dp.creationDate <= :creationDateTo
       GROUP BY dpto
-      ORDER BY COUNT(dp) DESC
+      ORDER BY COUNT(dp) DESC, UPPER(dpto.description) ASC
     """
   )
   Page<DebtPositionTypeOrg> findMostUsedSpontaneousDebtPositionTypesForOrganizationByOrganizationIdAndDate(
