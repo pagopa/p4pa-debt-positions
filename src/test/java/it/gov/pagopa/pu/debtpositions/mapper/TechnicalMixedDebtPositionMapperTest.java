@@ -25,6 +25,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildMixedDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -224,6 +225,7 @@ class TechnicalMixedDebtPositionMapperTest {
     assertEquals(expected.isMultiDebtor(), result.isMultiDebtor());
     assertEquals(expected.isFlagPuPagoPaPayment(),
       result.isFlagPuPagoPaPayment());
+    assertEquals(UNKNOWN_STATION_ID, result.getStationId());
     assertEquals(1, result.getPaymentOptions().size());
   }
 
