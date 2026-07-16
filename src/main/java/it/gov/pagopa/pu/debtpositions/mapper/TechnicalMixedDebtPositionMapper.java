@@ -20,6 +20,8 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
+
 @Service
 public class TechnicalMixedDebtPositionMapper {
 
@@ -56,7 +58,7 @@ public class TechnicalMixedDebtPositionMapper {
       toTechnicalMixedDPPaymentOptions(
         debtPosition, isUnpaid, mixedDpAdditionalDataList, debtPositionTypeOrgId, paymentDateTime, accessToken));
     debtPositionProcessorService.updateAmounts(technicalMixedDp);
-    technicalMixedDp.setStationId(debtPosition.getStationId());
+    technicalMixedDp.setStationId(UNKNOWN_STATION_ID);
 
     return technicalMixedDp;
   }
