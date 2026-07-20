@@ -140,6 +140,10 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       && debtPositionDTO.getStatus() != DebtPositionStatus.PAID) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
     }
+
+    if (DebtPositionOrigin.SPONTANEOUS_MIXED.equals(origin)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS_MIXED can be created only technically");
+    }
   }
 
   public void validateInstallment(InstallmentDTO installmentDTO, Organization org, String accessToken, DebtPositionTypeOrg debtPositionTypeOrg, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {

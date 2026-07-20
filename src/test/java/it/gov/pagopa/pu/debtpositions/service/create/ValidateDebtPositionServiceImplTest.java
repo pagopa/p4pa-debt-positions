@@ -880,6 +880,11 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void testValidateWhenDPSpontaneousMixedThenThrowInvalidValueException() {
+    testValidateDPOrigin(SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS_MIXED can be created only technically");
+  }
+
+  @Test
   void givenFlagPuPagoPaPaymentFalseAndBlankIuvThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPuPagoPaPayment(false);
