@@ -9,6 +9,7 @@ import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
+import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker;
 import it.gov.pagopa.pu.debtpositions.util.faker.PaymentOptionFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
@@ -840,22 +841,22 @@ class ValidateDebtPositionServiceImplTest {
 
   @Test
   void testValidateWhenDPOriginOrdinaryAndStatusPaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(ORDINARY, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+    testValidateDPOrigin(ORDINARY, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin " + InstallmentUtils.ORDINARY_ORG_DEBT_POSITION_ORIGINS + " can only be created in UNPAID or DRAFT state");
   }
 
   @Test
   void testValidateWhenDPOriginOrdinarySilAndStatusPaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(ORDINARY_SIL,DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+    testValidateDPOrigin(ORDINARY_SIL,DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin " + InstallmentUtils.ORDINARY_ORG_DEBT_POSITION_ORIGINS + " can only be created in UNPAID or DRAFT state");
   }
 
   @Test
   void testValidateWhenDPOriginSpontaneousAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS, SPONTANEOUS_SIL or SPONTANEOUS_PSP can only be created in UNPAID state");
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS, DebtPositionStatus.PAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin " + InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED + " can only be created in UNPAID state");
   }
 
   @Test
   void testValidateWhenDPSpontaneousMixedThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, REPORTING_PAGOPA or SPONTANEOUS_MIXED can be created only technically");
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin " + InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS + " can be created only technically");
   }
 
   @Test
