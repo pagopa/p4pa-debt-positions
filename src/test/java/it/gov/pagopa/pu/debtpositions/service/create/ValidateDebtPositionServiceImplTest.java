@@ -352,8 +352,6 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonWithNullFullNameThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.REPORTING_PAGOPA);
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     debtPositionTypeOrg.setFlagAnonymousFiscalCode(true);
     InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
@@ -371,8 +369,6 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenPersonWithInvalidEmailThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_PAGOPA);
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
     firstInstallment.getDebtor().setEntityType(PersonEntityType.G);
@@ -390,8 +386,6 @@ class ValidateDebtPositionServiceImplTest {
   @Test
   void givenNoTransfersThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SECONDARY_ORG);
-    debtPositionDTO.setStatus(DebtPositionStatus.PAID);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
     firstInstallment.setTransfers(null);
