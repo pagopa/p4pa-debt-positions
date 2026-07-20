@@ -136,13 +136,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS, SPONTANEOUS_SIL or SPONTANEOUS_PSP can only be created in UNPAID state");
     }
 
-    if (InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS.contains(origin)
-      && debtPositionDTO.getStatus() != DebtPositionStatus.PAID) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
-    }
-
-    if (DebtPositionOrigin.SPONTANEOUS_MIXED.equals(origin)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS_MIXED can be created only technically");
+    if (InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS.contains(origin)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, REPORTING_PAGOPA or SPONTANEOUS_MIXED can be created only technically");
     }
   }
 

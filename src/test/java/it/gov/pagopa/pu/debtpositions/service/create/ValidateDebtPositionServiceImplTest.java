@@ -860,28 +860,8 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void testValidateWhenDPOriginSecondaryOrgAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SECONDARY_ORG, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
-  }
-
-  @Test
-  void testValidateWhenDPReceiptPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
-  }
-
-  @Test
-  void testValidateWhenDPReceiptFileAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.RECEIPT_FILE, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
-  }
-
-  @Test
-  void testValidateWhenDPReportingPagoPaAndStatusUnpaidThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.REPORTING_PAGOPA, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
-  }
-
-  @Test
   void testValidateWhenDPSpontaneousMixedThenThrowInvalidValueException() {
-    testValidateDPOrigin(SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS_MIXED can be created only technically");
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, REPORTING_PAGOPA or SPONTANEOUS_MIXED can be created only technically");
   }
 
   @Test
