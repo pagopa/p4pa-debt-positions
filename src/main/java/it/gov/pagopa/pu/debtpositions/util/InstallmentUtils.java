@@ -126,8 +126,7 @@ public class InstallmentUtils {
     DebtPositionOrigin.SECONDARY_ORG,
     DebtPositionOrigin.RECEIPT_FILE,
     DebtPositionOrigin.RECEIPT_PAGOPA,
-    DebtPositionOrigin.REPORTING_PAGOPA,
-    DebtPositionOrigin.SPONTANEOUS_MIXED
+    DebtPositionOrigin.REPORTING_PAGOPA
   );
 
   public static final List<DebtPositionOrigin> ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS = Stream.concat(

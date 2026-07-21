@@ -136,8 +136,8 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED + " can only be created in UNPAID state");
     }
 
-    if (InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS.contains(origin)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS + " can be created only technically");
+    if (!InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(origin)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + origin + " can be created only technically");
     }
   }
 

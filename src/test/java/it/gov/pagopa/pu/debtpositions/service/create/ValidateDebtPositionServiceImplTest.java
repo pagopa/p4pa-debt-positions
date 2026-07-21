@@ -856,7 +856,7 @@ class ValidateDebtPositionServiceImplTest {
 
   @Test
   void testValidateWhenDPSpontaneousMixedThenThrowInvalidValueException() {
-    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin " + InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS + " can be created only technically");
+    testValidateDPOrigin(DebtPositionOrigin.SPONTANEOUS_MIXED, DebtPositionStatus.UNPAID, "INVALID_DEBT_POSITION_STATUS", "A Debt Position with origin SPONTANEOUS_MIXED can be created only technically");
   }
 
   @Test
