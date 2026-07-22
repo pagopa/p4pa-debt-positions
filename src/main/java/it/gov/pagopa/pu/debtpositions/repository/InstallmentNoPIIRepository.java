@@ -125,7 +125,7 @@ public interface InstallmentNoPIIRepository extends JpaRepository<InstallmentNoP
     "  and (:installmentStatuses is null or i.status in (:installmentStatuses))")
   List<InstallmentNoPII> findByDebtPositionIdAndStatuses(
     @Parameter(required = true) @Param("debtPositionId") Long debtPositionId,
-    @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses);
+    @RequestParam(required = false) @Param("installmentStatuses") List<InstallmentStatus> installmentStatuses);
 
   @Query(" select i" +
     "  from InstallmentNoPII i" +
