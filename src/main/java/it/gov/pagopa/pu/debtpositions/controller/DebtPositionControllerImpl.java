@@ -52,7 +52,7 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
     String accessToken = SecurityUtils.getAccessToken();
     String operatorExternalUserId = SecurityUtils.getCurrentUserExternalId();
     WfExecutionParameters wfExecutionParameters = WfExecutionParameters.builder()
-      .massive(massive)
+      .massive(Boolean.TRUE.equals(massive))
       .partialChange(false)
       .build();
     WorkflowCreatedDTO workflow = debtPositionCreationService.createDebtPosition(debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
