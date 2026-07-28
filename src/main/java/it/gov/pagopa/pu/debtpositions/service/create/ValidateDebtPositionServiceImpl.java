@@ -128,17 +128,16 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
 
     if (InstallmentUtils.ORDINARY_ORG_DEBT_POSITION_ORIGINS.contains(origin)
       && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID && debtPositionDTO.getStatus() != DebtPositionStatus.DRAFT) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin ORDINARY or ORDINARY_SIL can only be created in UNPAID or DRAFT state");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + InstallmentUtils.ORDINARY_ORG_DEBT_POSITION_ORIGINS + " can only be created in UNPAID or DRAFT state");
     }
 
     if (InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED.contains(origin)
       && debtPositionDTO.getStatus() != DebtPositionStatus.UNPAID) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SPONTANEOUS, SPONTANEOUS_SIL or SPONTANEOUS_PSP can only be created in UNPAID state");
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + InstallmentUtils.ORDINARY_CITIZEN_DEBT_POSITION_ORIGINS_NO_MIXED + " can only be created in UNPAID state");
     }
 
-    if (InstallmentUtils.TECHNICAL_DEBT_POSITION_ORIGINS.contains(origin)
-      && debtPositionDTO.getStatus() != DebtPositionStatus.PAID) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin SECONDARY_ORG, RECEIPT_PAGOPA, RECEIPT_FILE, or REPORTING_PAGOPA can only be created in PAID state");
+    if (!InstallmentUtils.ORDINARY_DEBT_POSITION_ORIGINS.contains(origin)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "A Debt Position with origin " + origin + " can be created only technically");
     }
   }
 
