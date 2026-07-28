@@ -238,6 +238,7 @@ openApiGenerate {
   configOptions.set(
     mapOf(
       "dateLibrary" to "java8",
+      "serializableModel" to "true",
       "requestMappingMode" to "api_interface",
       "useSpringBoot4" to "true",
       "useJackson3" to "true",
