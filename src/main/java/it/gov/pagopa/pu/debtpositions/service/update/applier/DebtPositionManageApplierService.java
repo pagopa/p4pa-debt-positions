@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.update.applier;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
@@ -25,7 +26,8 @@ public class DebtPositionManageApplierService {
     storedInstallment.setLegacyPaymentMetadata(updatedInstallment.getLegacyPaymentMetadata());
     storedInstallment.setAmountCents(updatedInstallment.getAmountCents());
     storedInstallment.setSourceFlowName(updatedInstallment.getSourceFlowName());
-    List<String> modifiedFields = new ArrayList<>();
+
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionId", updatedInstallment.getPaymentOptionId(), storedInstallment.getPaymentOptionId(), modifiedFields);
     checkImmutableField("iupdPagopa", updatedInstallment.getIupdPagopa(), storedInstallment.getIupdPagopa(), modifiedFields);
     checkImmutableField("iuv", updatedInstallment.getIuv(), storedInstallment.getIuv(), modifiedFields);
@@ -42,7 +44,10 @@ public class DebtPositionManageApplierService {
     mergeDebtorFields(updatedInstallment.getDebtor(), storedInstallment.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, String.format("These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields));
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        String.format("These fields for installment having id %s are not mutable: %s", storedInstallment.getInstallmentId(), modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
+        modifiedFields);
     }
 
     if (storedInstallment.getTransfers().size() != updatedInstallment.getTransfers().size()) {
@@ -52,7 +57,7 @@ public class DebtPositionManageApplierService {
     updateTransferList(storedInstallment, updatedInstallment);
   }
 
-  private void mergeDebtorFields(PersonDTO updatedDebtor, PersonDTO storedDebtor, List<String> modifiedFields) {
+  private void mergeDebtorFields(PersonDTO updatedDebtor, PersonDTO storedDebtor, List<ErrorFieldDTO> modifiedFields) {
     storedDebtor.setFullName(updatedDebtor.getFullName());
     storedDebtor.setAddress(updatedDebtor.getAddress());
     storedDebtor.setCivic(updatedDebtor.getCivic());
@@ -62,12 +67,12 @@ public class DebtPositionManageApplierService {
     storedDebtor.setNation(updatedDebtor.getNation());
     storedDebtor.setEmail(updatedDebtor.getEmail());
 
-    List<String> modifiedDebtorFields = new ArrayList<>();
-    checkImmutableField("entityType", updatedDebtor.getEntityType(), storedDebtor.getEntityType(), modifiedDebtorFields);
-    checkImmutableField("fiscalCode", updatedDebtor.getFiscalCode(), storedDebtor.getFiscalCode(), modifiedDebtorFields);
+    List<ErrorFieldDTO> modifiedDebtorFields = new ArrayList<>();
+    checkImmutableField("debtor.entityType", updatedDebtor.getEntityType(), storedDebtor.getEntityType(), modifiedDebtorFields);
+    checkImmutableField("debtor.fiscalCode", updatedDebtor.getFiscalCode(), storedDebtor.getFiscalCode(), modifiedDebtorFields);
 
-    if(!modifiedDebtorFields.isEmpty()) {
-      modifiedFields.add("debtor: " + modifiedDebtorFields);
+    if (!modifiedDebtorFields.isEmpty()) {
+      modifiedFields.addAll(modifiedDebtorFields);
     }
   }
 
@@ -81,10 +86,10 @@ public class DebtPositionManageApplierService {
 
     storedInstallment.getTransfers()
       .forEach(transferDTO -> {
-        if (mapIndexTransferUpdated.get(transferDTO.getTransferId()) == null){
+        if (mapIndexTransferUpdated.get(transferDTO.getTransferId()) == null) {
           throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, String.format("The transfer having id %s of installment having id %s does not found", transferDTO.getTransferId(), storedInstallment.getInstallmentId()));
         }
-        if(transferDTO.getTransferIndex() == 1){
+        if (transferDTO.getTransferIndex() == 1) {
           mapIndexTransferUpdated.get(transferDTO.getTransferId()).setAmountCents(storedInstallment.getAmountCents() - totalAmountOtherTransfersUpdated);
           mapIndexTransferUpdated.get(transferDTO.getTransferId()).setRemittanceInformation(storedInstallment.getRemittanceInformation());
         }
@@ -99,7 +104,7 @@ public class DebtPositionManageApplierService {
     storedTransfer.setIban(updatedTransfer.getIban());
     storedTransfer.setPostalIban(updatedTransfer.getPostalIban());
 
-    List<String> modifiedFields = new ArrayList<>();
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("installmentId", storedTransfer.getInstallmentId(), updatedTransfer.getInstallmentId(), modifiedFields);
     checkImmutableField("transferIndex", storedTransfer.getTransferIndex(), updatedTransfer.getTransferIndex(), modifiedFields);
     checkImmutableField("orgFiscalCode", storedTransfer.getOrgFiscalCode(), updatedTransfer.getOrgFiscalCode(), modifiedFields);
@@ -110,8 +115,11 @@ public class DebtPositionManageApplierService {
     checkImmutableField("stampProvincialResidence", storedTransfer.getStampProvincialResidence(), updatedTransfer.getStampProvincialResidence(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, String.format("These fields for transfer with index %s of installment having id %s are not mutable: %s",
-        storedTransfer.getTransferIndex(), installmentId, modifiedFields));
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        String.format("These fields for transfer with index %s of installment having id %s are not mutable: %s",
+          storedTransfer.getTransferIndex(), installmentId, modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
+        modifiedFields);
     }
   }
 

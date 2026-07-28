@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
@@ -15,15 +16,18 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 @Service
 public class InstallmentSynchronizePaymentOptionApplierService {
 
-  public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO paymentOptionDTO){
+  public void merge(InstallmentSynchronizeDTO installmentSynchronizeDTO, PaymentOptionDTO paymentOptionDTO) {
     paymentOptionDTO.setDescription(installmentSynchronizeDTO.getPaymentOptionDescription());
 
-    List<String> modifiedFields = new ArrayList<>();
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("paymentOptionIndex", installmentSynchronizeDTO.getPaymentOptionIndex(), Objects.requireNonNull(paymentOptionDTO.getPaymentOptionIndex()), modifiedFields);
     checkImmutableField("paymentOptionType", installmentSynchronizeDTO.getPaymentOptionType(), String.valueOf(paymentOptionDTO.getPaymentOptionType()), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, String.format("These fields for payment option with index %s of debt position with iupd %s are not mutable: %s", paymentOptionDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg(), modifiedFields));
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        String.format("These fields for payment option with index %s of debt position with iupd %s are not mutable: %s", paymentOptionDTO.getPaymentOptionIndex(), installmentSynchronizeDTO.getIupdOrg(), modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
+        modifiedFields);
     }
   }
 }

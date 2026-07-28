@@ -1,12 +1,12 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildSyncInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
@@ -44,7 +44,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
   }
 
   @Test
-  void testMergeInstallmentThenOk(){
+  void testMergeInstallmentThenOk() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setAmountCents(500L);
     installmentSynchronizeDTO.setRemittanceInformation("New remittance information");
@@ -60,7 +60,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
   }
 
   @Test
-  void testMergeInstallmentImmutableFieldThenException(){
+  void testMergeInstallmentImmutableFieldThenException() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setDescription("New description");
     installmentSynchronizeDTO.setIuv("iuv_iuv");
@@ -69,36 +69,41 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("IMMUTABLE_FIELD",exception.getCode());
-    assertEquals("These fields for installment with iud iud are not mutable: [iuv, debtor: [fiscalCode]]", exception.getMessage());
+    assertEquals("IMMUTABLE_FIELD", exception.getCode());
+    assertEquals("These fields for installment with iud iud are not mutable: [iuv, debtor.fiscalCode]", exception.getMessage());
+    assertEquals(List.of(
+        new ErrorFieldDTO("iuv", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated"),
+        new ErrorFieldDTO("debtor.fiscalCode", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated")
+      ),
+      exception.getFields());
   }
 
   @Test
-  void testMergeInstallmentTransfersSizeMismatchThenException(){
+  void testMergeInstallmentTransfersSizeMismatchThenException() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setNumberBeneficiary(3);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("INVALID_INSTALLMENT",exception.getCode());
+    assertEquals("INVALID_INSTALLMENT", exception.getCode());
     assertEquals("The number of beneficiary for installment with iud iud does not match with the size of the list", exception.getMessage());
   }
 
   @Test
-  void testMergeInstallmentTransfersSizeNotMutableThenException(){
+  void testMergeInstallmentTransfersSizeNotMutableThenException() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstSyncTransfer);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("IMMUTABLE_FIELD",exception.getCode());
+    assertEquals("IMMUTABLE_FIELD", exception.getCode());
     assertEquals("The number of beneficiary for installment with iud iud cannot be modified", exception.getMessage());
   }
 
   @Test
-  void testMergeInstallmentWithTransferNotFoundThenException(){
+  void testMergeInstallmentWithTransferNotFoundThenException() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     TransferSynchronizeDTO transferSynchronizeDTO = buildTransferSynchronizeDTO();
     transferSynchronizeDTO.setTransferIndex(3);
@@ -108,12 +113,12 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("TRANSFER_NOT_FOUND",exception.getCode());
+    assertEquals("TRANSFER_NOT_FOUND", exception.getCode());
     assertEquals("The transfer with index 1 for installment with iud iud does not found", exception.getMessage());
   }
 
   @Test
-  void testMergeInstallmentWithTransferImmutableFieldThenException(){
+  void testMergeInstallmentWithTransferImmutableFieldThenException() {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     TransferSynchronizeDTO transferSynchronizeDTO = buildTransferSynchronizeDTO();
     transferSynchronizeDTO.setTransferIndex(1);
@@ -124,8 +129,15 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
 
     ConflictErrorException exception = assertThrows(ConflictErrorException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
-    assertEquals("IMMUTABLE_FIELD",exception.getCode());
+    assertEquals("IMMUTABLE_FIELD", exception.getCode());
     assertEquals("These fields for transfer with index 1 of installment with iud iud are not mutable: [orgFiscalCode, orgName, iban, category]", exception.getMessage());
+    assertEquals(List.of(
+        new ErrorFieldDTO("orgFiscalCode", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated"),
+        new ErrorFieldDTO("orgName", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated"),
+        new ErrorFieldDTO("iban", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated"),
+        new ErrorFieldDTO("category", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated")
+      ),
+      exception.getFields());
   }
 
 }

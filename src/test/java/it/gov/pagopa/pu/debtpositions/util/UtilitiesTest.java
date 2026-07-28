@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -166,38 +167,44 @@ public class UtilitiesTest {
 
   @Test
   void testCheckImmutableField_OffsetDateTime() {
-    List<String> result = new ArrayList<>();
+    List<ErrorFieldDTO> result = new ArrayList<>();
     OffsetDateTime o1 = OffsetDateTime.now();
     OffsetDateTime o2 = o1.withOffsetSameInstant(ZoneOffset.MIN);
     Utilities.checkImmutableField("fieldName", o1, o2, result);
 
     Utilities.checkImmutableField("expectedDiffer", o1, o2.minusSeconds(1), result);
 
-    Assertions.assertEquals(List.of("expectedDiffer"), result);
+    Assertions.assertEquals(
+      List.of(new ErrorFieldDTO("expectedDiffer", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated")),
+      result);
   }
 
   @Test
   void testCheckImmutableField_Comparable() {
-    List<String> result = new ArrayList<>();
+    List<ErrorFieldDTO> result = new ArrayList<>();
     BigDecimal o1 = BigDecimal.ONE;
     BigDecimal o2 = BigDecimal.valueOf(1_00, 2);
     Utilities.checkImmutableField("fieldName", o1, o2, result);
 
     Utilities.checkImmutableField("expectedDiffer", o1, o2.add(BigDecimal.ONE), result);
 
-    Assertions.assertEquals(List.of("expectedDiffer"), result);
+    Assertions.assertEquals(
+      List.of(new ErrorFieldDTO("expectedDiffer", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated")),
+      result);
   }
 
   @Test
   void testCheckImmutableField_Object() {
-    List<String> result = new ArrayList<>();
+    List<ErrorFieldDTO> result = new ArrayList<>();
     String o1 = "string";
     String o2 = "string";
     Utilities.checkImmutableField("fieldName", o1, o2, result);
 
     Utilities.checkImmutableField("expectedDiffer", o1, o2.concat("1"), result);
 
-    Assertions.assertEquals(List.of("expectedDiffer"), result);
+    Assertions.assertEquals(
+      List.of(new ErrorFieldDTO("expectedDiffer", ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated")),
+      result);
   }
 
   @Test

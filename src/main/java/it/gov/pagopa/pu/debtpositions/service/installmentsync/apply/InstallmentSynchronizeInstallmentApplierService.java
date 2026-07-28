@@ -1,10 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.PersonDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.dto.generated.TransferSynchronizeDTO;
+import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
@@ -31,7 +27,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setIngestionFlowFileAction(installmentSynchronizeDTO.getAction());
     installmentDTO.setSourceFlowName(installmentSynchronizeDTO.getIngestionFlowFileName());
 
-    List<String> modifiedFields = new ArrayList<>();
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
     checkImmutableField("generateNotice", installmentSynchronizeDTO.getGenerateNotice(), installmentDTO.getGenerateNotice(), modifiedFields);
     checkImmutableField("legacyPaymentMetadata", installmentSynchronizeDTO.getLegacyPaymentMetadata(), installmentDTO.getLegacyPaymentMetadata(), modifiedFields);
@@ -39,10 +35,13 @@ public class InstallmentSynchronizeInstallmentApplierService {
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields));
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        String.format("These fields for installment with iud %s are not mutable: %s", installmentDTO.getIud(), modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
+        modifiedFields);
     }
 
-    if(installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
+    if (installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT, String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentDTO.getIud()));
     }
 
@@ -59,7 +58,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
 
     installmentDTO.getTransfers()
       .forEach(transferDTO -> {
-        if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null){
+        if (mapIndexTransferSync.get(transferDTO.getTransferIndex()) == null) {
           throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TRANSFER_NOT_FOUND, String.format("The transfer with index %s for installment with iud %s does not found", transferDTO.getTransferIndex(), installmentDTO.getIud()));
         }
         mergeTransfer(transferDTO, mapIndexTransferSync.get(transferDTO.getTransferIndex()), installmentDTO.getIud());
@@ -70,19 +69,22 @@ public class InstallmentSynchronizeInstallmentApplierService {
     transferDTO.setAmountCents(transferSynchronizeDTO.getAmountCents());
     transferDTO.setRemittanceInformation(transferSynchronizeDTO.getRemittanceInformation());
 
-    List<String> modifiedFields = new ArrayList<>();
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("orgFiscalCode", transferDTO.getOrgFiscalCode(), transferSynchronizeDTO.getOrgFiscalCode(), modifiedFields);
     checkImmutableField("orgName", transferDTO.getOrgName(), transferSynchronizeDTO.getOrgName(), modifiedFields);
     checkImmutableField("iban", transferDTO.getIban(), transferSynchronizeDTO.getIban(), modifiedFields);
     checkImmutableField("category", transferDTO.getCategory(), transferSynchronizeDTO.getCategory(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
-        transferDTO.getTransferIndex(), iud, modifiedFields));
+      throw new ConflictErrorException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        String.format("These fields for transfer with index %s of installment with iud %s are not mutable: %s",
+          transferDTO.getTransferIndex(), iud, modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
+        modifiedFields);
     }
   }
 
-  private void mergeDebtorFields(InstallmentSynchronizeDTO updatedInstallment, PersonDTO storedDebtor, List<String> modifiedFields) {
+  private void mergeDebtorFields(InstallmentSynchronizeDTO updatedInstallment, PersonDTO storedDebtor, List<ErrorFieldDTO> modifiedFields) {
     storedDebtor.setFullName(updatedInstallment.getFullName());
     storedDebtor.setAddress(updatedInstallment.getAddress());
     storedDebtor.setCivic(updatedInstallment.getCivic());
@@ -92,12 +94,12 @@ public class InstallmentSynchronizeInstallmentApplierService {
     storedDebtor.setNation(updatedInstallment.getNation());
     storedDebtor.setEmail(updatedInstallment.getEmail());
 
-    List<String> modifiedDebtorFields = new ArrayList<>();
-    checkImmutableField("entityType", updatedInstallment.getEntityType(), storedDebtor.getEntityType(), modifiedDebtorFields);
-    checkImmutableField("fiscalCode", updatedInstallment.getFiscalCode(), storedDebtor.getFiscalCode(), modifiedDebtorFields);
+    List<ErrorFieldDTO> modifiedDebtorFields = new ArrayList<>();
+    checkImmutableField("debtor.entityType", updatedInstallment.getEntityType(), storedDebtor.getEntityType(), modifiedDebtorFields);
+    checkImmutableField("debtor.fiscalCode", updatedInstallment.getFiscalCode(), storedDebtor.getFiscalCode(), modifiedDebtorFields);
 
-    if(!modifiedDebtorFields.isEmpty()) {
-      modifiedFields.add("debtor: " + modifiedDebtorFields);
+    if (!modifiedDebtorFields.isEmpty()) {
+      modifiedFields.addAll(modifiedDebtorFields);
     }
   }
 }
