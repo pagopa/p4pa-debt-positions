@@ -2,7 +2,9 @@ package it.gov.pagopa.pu.debtpositions.exception;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
+import it.gov.pagopa.pu.debtpositions.exception.transcoder.handler.ConstraintViolationExceptionMessageTranscoderTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.UtilitiesTest;
 import jakarta.persistence.RollbackException;
@@ -16,8 +18,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpHostConnectException;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -46,9 +46,9 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.sql.SQLException;
 import java.time.LocalDateTime;
-import java.util.Map;
-import java.util.Set;
+import java.util.List;
 
+import static it.gov.pagopa.pu.debtpositions.exception.transcoder.handler.ConstraintViolationExceptionMessageTranscoderTest.EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
@@ -141,13 +141,16 @@ class DebtPositionExceptionHandlerTest {
 
   @Test
   void handleInvalidValueExceptionError() throws Exception {
-    doThrow(new InvalidValueException("ERRORCODE", "Error")).when(testControllerSpy).testEndpoint(DATA,BODY);
+    doThrow(new InvalidValueException("ERRORCODE", "Error", List.of(new ErrorFieldDTO().field("fieldName").error("fieldError").message("fieldErrorMessage")))).when(testControllerSpy).testEndpoint(DATA,BODY);
 
     performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isBadRequest())
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("fieldName"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("fieldError"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("fieldErrorMessage"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
   }
@@ -161,6 +164,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_FORBIDDEN"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
   }
@@ -174,6 +178,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
   }
@@ -187,6 +192,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
   }
@@ -200,6 +206,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -212,6 +219,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -223,6 +231,9 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Required request parameter 'data' for method parameter type String is not present"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("data"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("NotNull"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("Required request parameter 'data' for method parameter type String is not present"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
   }
@@ -236,6 +247,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_GENERIC_ERROR] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -249,6 +261,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_GENERIC_ERROR] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -259,6 +272,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] No acceptable representation"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -269,6 +283,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_NOT_FOUND] No static resource NOTEXISTENTURL for request '/NOTEXISTENTURL'."))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -282,6 +297,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_NOT_FOUND] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -295,6 +311,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_CONFLICT] Conflict."))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -308,6 +325,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_CONFLICT] Conflict. SQLEXCEPTION"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -318,6 +336,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Required request body is missing"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -329,6 +348,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Cannot parse body. Unexpected end-of-input: was expecting closing '\"' for name"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -340,6 +360,12 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Invalid request content. lowerCaseAlphabeticField: must match \"[a-z]+\"; requiredField: must not be null"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("lowerCaseAlphabeticField"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("Pattern"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("must match \"[a-z]+\""))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[1].field").value("requiredField"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[1].error").value("NotNull"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[1].message").value("must not be null"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -351,6 +377,9 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Cannot parse body. dateTimeField: Text '2025-02-05' could not be parsed at index 10"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("dateTimeField"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("DateTimeParse"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("Text '2025-02-05' could not be parsed at index 10"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -364,6 +393,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_GENERIC_ERROR] 500 INTERNAL_SERVER_ERROR \"Error\""))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -377,22 +407,33 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_TOO_MANY_REQUESTS] 429 TooManyRequests"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
-  private final ConstraintViolationException constraintViolationException = new ConstraintViolationException("Error", Set.of(ConstraintViolationImpl.forParameterValidation(
-    "error message template", Map.of(), Map.of(), "resolved message", null, null, null, null, MutablePath.createPathFromString("fieldName").materialize(), null, null, null
-  )));
+  private final ConstraintViolationException constraintViolationException = ConstraintViolationExceptionMessageTranscoderTest.buildConstraintViolationException();
   @Test
   void handleViolationException() throws Exception {
     doThrow(constraintViolationException).when(testControllerSpy).testEndpoint(DATA, BODY);
 
-    performRequest(DATA, MediaType.APPLICATION_JSON)
+    assertConstraintViolationException();
+  }
+
+  private void assertConstraintViolationException() throws Exception {
+    ResultActions resultActions = performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isBadRequest())
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Invalid request content. fieldName: resolved message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] " + EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getMessage()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+
+    for (int i = 0; i < EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getFields().size(); i++) {
+      ErrorFieldDTO errorFieldDTO = EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getFields().get(i);
+      resultActions
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].field").value(errorFieldDTO.getField()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].error").value(errorFieldDTO.getError()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].message").value(errorFieldDTO.getMessage()));
+    }
   }
 
   @Test
@@ -404,6 +445,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONNECTION_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_CONNECTION_ERROR] connection refused"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -412,12 +454,7 @@ class DebtPositionExceptionHandlerTest {
     doThrow(new TransactionSystemException("TransactionError", new RollbackException("rollbackException", constraintViolationException)))
       .when(testControllerSpy).testEndpoint(DATA, BODY);
 
-    performRequest(DATA, MediaType.APPLICATION_JSON)
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Invalid request content. fieldName: resolved message"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+    assertConstraintViolationException();
   }
 
   @Test
@@ -430,6 +467,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_GENERIC_ERROR] TransactionError"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -442,6 +480,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -454,6 +493,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -466,6 +506,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -478,6 +519,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -490,6 +532,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -503,19 +546,23 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("INSTALLMENT_NOT_FOUND"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INSTALLMENT_NOT_FOUND] EntityRepresentationModel not found"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
   @Test
   void handleCrudResourceBaseBusinessException() throws Exception {
     Long id = -12L;
-    doThrow(new InvalidValueException("ERROR", "message")).when(testCrudControllerSpy).testCrudEndpoint(id);
+    doThrow(new InvalidValueException("ERROR", "message", List.of(new ErrorFieldDTO().field("fieldName").error("resolvedError").message("resolved message")))).when(testCrudControllerSpy).testCrudEndpoint(id);
 
     mockMvc.perform(MockMvcRequestBuilders.get("/crud/installments/-12"))
       .andExpect(MockMvcResultMatchers.status().isBadRequest())
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERROR] message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("fieldName"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("resolvedError"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("resolved message"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -529,6 +576,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERROR] message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -541,6 +589,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_GENERIC_ERROR"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("ERRORCODE"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[ERRORCODE] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
@@ -553,6 +602,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_TOO_MANY_REQUESTS"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_TOO_MANY_REQUESTS] Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 }
