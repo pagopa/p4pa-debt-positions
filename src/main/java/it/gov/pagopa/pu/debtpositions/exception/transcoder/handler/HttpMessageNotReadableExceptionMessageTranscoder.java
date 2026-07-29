@@ -9,6 +9,7 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.DatabindException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class HttpMessageNotReadableExceptionMessageTranscoder implements ExceptionMessageTranscoder<HttpMessageNotReadableException> {
@@ -22,9 +23,12 @@ public class HttpMessageNotReadableExceptionMessageTranscoder implements Excepti
         .map(JacksonException.Reference::getPropertyName)
         .collect(Collectors.joining("."));
 
+      String errorCode = Objects.requireNonNullElse(jsonMappingException.getCause(), jsonMappingException)
+        .getClass().getSimpleName().replace("Exception", "");
+
       ErrorFieldDTO errorField = new ErrorFieldDTO(
         errorPath,
-        jsonMappingException.getCause().getClass().getSimpleName(),
+        errorCode,
         jsonMappingException.getOriginalMessage());
 
       errorMsg = "Cannot parse body. " + errorPath + ": " + errorField.getMessage();

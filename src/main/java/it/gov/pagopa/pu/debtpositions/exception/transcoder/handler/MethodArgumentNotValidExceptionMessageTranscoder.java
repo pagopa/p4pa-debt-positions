@@ -9,6 +9,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class MethodArgumentNotValidExceptionMessageTranscoder implements ExceptionMessageTranscoder<MethodArgumentNotValidException> {
@@ -19,8 +20,8 @@ public class MethodArgumentNotValidExceptionMessageTranscoder implements Excepti
       .getAllErrors().stream()
       .map(e -> (ErrorFieldDTO)ErrorFieldDTO.builder()
         .field(e instanceof FieldError fieldError ? fieldError.getField() : e.getObjectName())
-        .error(e.getCode())
-        .message(e.getDefaultMessage())
+        .error(Objects.requireNonNullElse(e.getCode(), "InvalidValue"))
+        .message(Objects.requireNonNullElse(e.getDefaultMessage(), "value not valid"))
         .build()
       )
       .sorted(Comparator.comparing(ErrorFieldDTO::getField))

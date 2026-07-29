@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
+import it.gov.pagopa.pu.debtpositions.exception.transcoder.handler.ConstraintViolationExceptionMessageTranscoderTest;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.UtilitiesTest;
 import jakarta.persistence.RollbackException;
@@ -17,8 +18,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hc.client5.http.HttpHostConnectException;
-import org.hibernate.validator.internal.engine.ConstraintViolationImpl;
-import org.hibernate.validator.internal.engine.path.MutablePath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -48,9 +47,8 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
+import static it.gov.pagopa.pu.debtpositions.exception.transcoder.handler.ConstraintViolationExceptionMessageTranscoderTest.EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 
@@ -380,7 +378,7 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Cannot parse body. dateTimeField: Text '2025-02-05' could not be parsed at index 10"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("dateTimeField"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("DateTimeParseException")) // TODO
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("DateTimeParse"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("Text '2025-02-05' could not be parsed at index 10"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
@@ -413,22 +411,29 @@ class DebtPositionExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
-  private final ConstraintViolationException constraintViolationException = new ConstraintViolationException("Error", Set.of(ConstraintViolationImpl.forParameterValidation(
-    "error message template", Map.of(), Map.of(), "resolved message", null, null, null, null, MutablePath.createPathFromString("fieldName").materialize(), null, null, null
-  )));
+  private final ConstraintViolationException constraintViolationException = ConstraintViolationExceptionMessageTranscoderTest.buildConstraintViolationException();
   @Test
   void handleViolationException() throws Exception {
     doThrow(constraintViolationException).when(testControllerSpy).testEndpoint(DATA, BODY);
 
-    performRequest(DATA, MediaType.APPLICATION_JSON)
+    assertConstraintViolationException();
+  }
+
+  private void assertConstraintViolationException() throws Exception {
+    ResultActions resultActions = performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isBadRequest())
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Invalid request content. fieldName: resolved message"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("fieldName"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("ConstraintViolationImpl")) //TODO
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("resolved message"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] " + EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getMessage()))
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+
+    for (int i = 0; i < EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getFields().size(); i++) {
+      ErrorFieldDTO errorFieldDTO = EXPECTED_CONSTRAINT_EXCEPTION_MESSAGE_TRANSCODED.getFields().get(i);
+      resultActions
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].field").value(errorFieldDTO.getField()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].error").value(errorFieldDTO.getError()))
+        .andExpect(MockMvcResultMatchers.jsonPath("$.fields[" + i + "].message").value(errorFieldDTO.getMessage()));
+    }
   }
 
   @Test
@@ -449,15 +454,7 @@ class DebtPositionExceptionHandlerTest {
     doThrow(new TransactionSystemException("TransactionError", new RollbackException("rollbackException", constraintViolationException)))
       .when(testControllerSpy).testEndpoint(DATA, BODY);
 
-    performRequest(DATA, MediaType.APPLICATION_JSON)
-      .andExpect(MockMvcResultMatchers.status().isBadRequest())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[DEBT_POSITION_BAD_REQUEST] Invalid request content. fieldName: resolved message"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].field").value("fieldName"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].error").value("ConstraintViolationImpl")) //TODO
-      .andExpect(MockMvcResultMatchers.jsonPath("$.fields[0].message").value("resolved message"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+    assertConstraintViolationException();
   }
 
   @Test

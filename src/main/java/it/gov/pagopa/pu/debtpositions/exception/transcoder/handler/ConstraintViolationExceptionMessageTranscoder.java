@@ -17,7 +17,7 @@ public class ConstraintViolationExceptionMessageTranscoder implements ExceptionM
       .stream()
       .map(e -> (ErrorFieldDTO)ErrorFieldDTO.builder()
         .field(e.getPropertyPath().toString())
-        .error(e.getClass().getSimpleName())
+        .error(e.getConstraintDescriptor().getAnnotation().annotationType().getSimpleName())
         .message(e.getMessage())
         .build()
       )

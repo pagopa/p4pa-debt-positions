@@ -154,9 +154,9 @@ public class DebtPositionExceptionHandler {
       .map(path -> buildCrudErrorMessage(path, httpStatus, ex))
       .orElseGet(() -> buildReturnedMessage(ex));
 
-    String code = Objects.requireNonNullElse(code2message.code(), errorEnum.getValue());
-    String message = code2message.message();
-    List<ErrorFieldDTO> fields = code2message.fields();
+    String code = Objects.requireNonNullElse(code2message.getCode(), errorEnum.getValue());
+    String message = code2message.getMessage();
+    List<ErrorFieldDTO> fields = code2message.getFields();
 
     return ResponseEntity
       .status(httpStatus)
@@ -193,7 +193,7 @@ public class DebtPositionExceptionHandler {
     String entity = requestPath.split("/crud/")[1].split("/")[0].replaceAll("s$", "");
     String entityCode = entity.replace("-", "_").toUpperCase();
     ExceptionMessageTranscoded error = buildReturnedMessage(ex);
-    return new ExceptionMessageTranscoded(entityCode + "_" + httpStatus.name(), error.message(), error.fields());
+    return new ExceptionMessageTranscoded(entityCode + "_" + httpStatus.name(), error.getMessage(), error.getFields());
   }
 
   static String getRequestDetails(HttpServletRequest request) {
