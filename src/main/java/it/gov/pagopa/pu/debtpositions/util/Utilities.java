@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.MDC;
@@ -107,12 +108,12 @@ public class Utilities {
     String lastUuidPart = UUID.randomUUID().toString().substring(26);
     return String.join("-",
       orgFiscalCode,
-      LocalDateTime.now().format(DateTimeFormatter.ofPattern("ddMMyyHHmmss")),
+      LocalDateTime.now(Constants.ZONEID).format(DateTimeFormatter.ofPattern("ddMMyyHHmmss")),
       lastUuidPart
     );
   }
 
-  public static <T> void checkImmutableField(String fieldName, T original, T updated, List<String> modifiedFields) {
+  public static <T> void checkImmutableField(String fieldName, T original, T updated, List<ErrorFieldDTO> modifiedFields) {
     @SuppressWarnings("unchecked") // suppressing: same type due to same Generic type
     boolean fieldUpdated =
       (original instanceof OffsetDateTime o1 && updated instanceof OffsetDateTime o2)
@@ -121,7 +122,7 @@ public class Utilities {
         ? c1.compareTo(c2) != 0
         : !Objects.equals(original, updated);
     if (fieldUpdated) {
-      modifiedFields.add(fieldName);
+      modifiedFields.add(new ErrorFieldDTO(fieldName, ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "Cannot be updated"));
     }
   }
 

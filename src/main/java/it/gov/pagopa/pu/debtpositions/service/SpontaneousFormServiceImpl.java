@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
+import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
@@ -70,11 +71,14 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
   }
 
   private void checkReadOnlyFields(SpontaneousForm existingSpontaneousForm, SpontaneousForm updatedSpontaneousForm) {
-    List<String> modifiedFields = new ArrayList<>();
+    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("organizationId", existingSpontaneousForm.getOrganizationId(), updatedSpontaneousForm.getOrganizationId(), modifiedFields);
     checkImmutableField("code", existingSpontaneousForm.getCode(), updatedSpontaneousForm.getCode(), modifiedFields);
     if(!CollectionUtils.isEmpty(modifiedFields)){
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD, "The following SpontaneousForm fields are readOnly. "+modifiedFields);
+      throw new InvalidValueException(
+        ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
+        "The following SpontaneousForm fields are readOnly. "+modifiedFields.stream().map(ErrorFieldDTO::getField).toList(),
+        modifiedFields);
     }
   }
 }
