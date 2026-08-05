@@ -1,8 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
-import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
+import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
@@ -37,6 +38,7 @@ import tools.jackson.databind.node.NullNode;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.Month;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -51,6 +53,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFa
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -67,38 +71,30 @@ class DebtPositionControllerTest {
 
   @MockitoBean
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
-
   @MockitoBean
   private DebtPositionCreationService createDebtPositionService;
-
   @MockitoBean
   private DebtPositionService debtPositionService;
-
   @MockitoBean
   private InstallmentSynchronizeService installmentSynchronizerService;
-
   @MockitoBean
   private InstallmentService installmentService;
-
   @MockitoBean
   private DebtPositionManageInstallmentsService debtPositionManageInstallmentsService;
-
   @MockitoBean
   private DebtPositionDeletionService debtPositionDeletionService;
-
   @MockitoBean
   private PublishDebtPositionService publishDebtPositionService;
-
   @MockitoBean
   private MixedDebtPositionCreationService mixedDebtPositionCreationService;
-
   @MockitoBean
   private TaxonomyValidatorService taxonomyValidatorService;
-
   @MockitoBean
   private MassiveUpdateService massiveUpdateService;
+  @MockitoBean
+  private Tracer tracerMock;
 
-  private static final LocalDate DATE = LocalDate.of(2099, 1, 1);
+  private static final LocalDate DATE = LocalDate.of(2099, Month.JANUARY, 1);
   private static final OffsetDateTime DATETIME = OffsetDateTime.of(DATE, LocalTime.MIDNIGHT, ZoneOffset.UTC);
 
   private final String accessToken = "ACCESSTOKEN";
@@ -126,7 +122,7 @@ class DebtPositionControllerTest {
 
     SyncStatusUpdateRequestDTO requestDTO = new SyncStatusUpdateRequestDTO(iupd2finalize, iupdSyncError);
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(id, requestDTO)).thenReturn(buildDebtPositionDTO());
+    when(debtPositionHierarchyStatusAlignerService.finalizeSyncStatus(id, requestDTO)).thenReturn(buildDebtPositionDTO());
 
     MvcResult result = mockMvc.perform(
         put("/debt-positions/1/finalize-sync-status")
@@ -148,7 +144,7 @@ class DebtPositionControllerTest {
       .build();
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
+    when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
       .thenReturn(workflow);
 
     MvcResult result = mockMvc.perform(
@@ -174,7 +170,7 @@ class DebtPositionControllerTest {
       .massive(massive)
       .build();
 
-    Mockito.when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
+    when(createDebtPositionService.createDebtPosition(debtPosition, wfExecutionParameters, accessToken, userId))
       .thenReturn(null);
 
     MvcResult result = mockMvc.perform(
@@ -196,7 +192,7 @@ class DebtPositionControllerTest {
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
-    Mockito.when(mixedDebtPositionCreationService.createMixedDebtPosition(mixedDebtPositionDTO, accessToken, userId))
+    when(mixedDebtPositionCreationService.createMixedDebtPosition(mixedDebtPositionDTO, accessToken, userId))
       .thenReturn(Pair.of(workflow, debtPositionDTO));
 
     MvcResult result = mockMvc.perform(
@@ -216,7 +212,7 @@ class DebtPositionControllerTest {
   void givenNullWorkflowWhenCreateMixedDebtPositionThenOk() throws Exception {
     MixedDebtPositionDTO mixedDebtPositionDTO = buildMixedDebtPositionDTO();
 
-    Mockito.when(mixedDebtPositionCreationService.createMixedDebtPosition(mixedDebtPositionDTO, accessToken, userId))
+    when(mixedDebtPositionCreationService.createMixedDebtPosition(mixedDebtPositionDTO, accessToken, userId))
       .thenReturn(Pair.of(null, buildDebtPositionDTO()));
 
     MvcResult result = mockMvc.perform(
@@ -235,7 +231,7 @@ class DebtPositionControllerTest {
     Long id = 1L;
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accessToken))
+    when(debtPositionHierarchyStatusAlignerService.checkAndUpdateInstallmentExpiration(id, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
@@ -255,7 +251,7 @@ class DebtPositionControllerTest {
     Long debtPositionId = 1L;
 
     DebtPositionDTO expectedResult = new DebtPositionDTO();
-    Mockito.when(debtPositionService.getDebtPosition(debtPositionId)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPosition(debtPositionId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/" + debtPositionId)
@@ -272,7 +268,7 @@ class DebtPositionControllerTest {
     Long installmentId = 1L;
 
     DebtPositionDTO expectedResult = new DebtPositionDTO();
-    Mockito.when(debtPositionService.getDebtPositionByInstallmentId(installmentId)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionByInstallmentId(installmentId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-installmentId/" + installmentId)
@@ -290,7 +286,7 @@ class DebtPositionControllerTest {
     String nav = "301000000000000245";
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionsByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-nav/" + organizationId + "/" + nav)
@@ -308,7 +304,7 @@ class DebtPositionControllerTest {
     String iuv = "12345678901234567";
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, null)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionsByOrganizationIdAndIuv(organizationId, iuv, null)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-iuv/" + organizationId + "/" + iuv)
@@ -326,7 +322,7 @@ class DebtPositionControllerTest {
     String iud = "123456789012345678";
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, null)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionsByOrganizationIdAndIud(organizationId, iud, null)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-iud/" + organizationId + "/" + iud)
@@ -351,7 +347,7 @@ class DebtPositionControllerTest {
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
+    when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
       .thenReturn(workflow);
 
     mockMvc.perform(
@@ -379,7 +375,7 @@ class DebtPositionControllerTest {
       .build();
     DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
 
-    Mockito.when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
+    when(installmentSynchronizerService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, userId))
       .thenReturn(null);
 
     mockMvc.perform(
@@ -398,7 +394,7 @@ class DebtPositionControllerTest {
     Long ingestionFlowFileId = 1L;
 
     PagedDebtPositions expectedPagedDebtPositions = PagedDebtPositions.builder().size(1L).build();
-    Mockito.when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
+    when(debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, Pageable.ofSize(1))).thenReturn(expectedPagedDebtPositions);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/ingestion-flow-file/" + ingestionFlowFileId)
@@ -424,7 +420,7 @@ class DebtPositionControllerTest {
       .build();
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accessToken))
+    when(installmentService.updateInstallmentNotificationDate(request, wfExecutionParameters, userId, accessToken))
       .thenReturn(workflow);
 
     mockMvc.perform(
@@ -447,7 +443,7 @@ class DebtPositionControllerTest {
       .build();
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
+    when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
       .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
@@ -472,7 +468,7 @@ class DebtPositionControllerTest {
       .partialChange(false)
       .build();
 
-    Mockito.when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
+    when(debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, request, wfExecutionParameters, accessToken, userId))
       .thenReturn(Pair.of(buildDebtPositionDTO().status(DebtPositionStatus.DRAFT), null));
 
     MvcResult result = mockMvc.perform(
@@ -506,7 +502,7 @@ class DebtPositionControllerTest {
 
     InstallmentDTO installmentDTO = InstallmentDTO.builder().build();
 
-    Mockito.when(installmentService.updateInstallmentNotificationFee(request,
+    when(installmentService.updateInstallmentNotificationFee(request,
       wfExecutionParameters, accessToken, userId)).thenReturn(installmentDTO);
 
     mockMvc.perform(
@@ -522,7 +518,7 @@ class DebtPositionControllerTest {
     Long debtPositionId = 1L;
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
+    when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
       .thenReturn(workflow);
 
     mockMvc.perform(
@@ -538,7 +534,7 @@ class DebtPositionControllerTest {
   void whenDeleteDraftDebtPositionThenOk() throws Exception {
     Long debtPositionId = 1L;
 
-    Mockito.when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
+    when(debtPositionDeletionService.deleteDebtPosition(debtPositionId, accessToken, userId))
       .thenReturn(null);
 
     mockMvc.perform(
@@ -557,7 +553,7 @@ class DebtPositionControllerTest {
       .build();
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
+    when(publishDebtPositionService.publishDebtPosition(debtPositionId, wfExecutionParameters, accessToken, userId))
       .thenReturn(Pair.of(debtPosition, workflow));
 
     MvcResult result = mockMvc.perform(
@@ -581,7 +577,7 @@ class DebtPositionControllerTest {
     LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(null, null);
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationIds, dateTimeIntervalFilter)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationIds, dateTimeIntervalFilter)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
@@ -606,7 +602,7 @@ class DebtPositionControllerTest {
       Utilities.offsetDateTimeToLocalDateTime(toDate));
 
     List<DebtPositionDTO> expectedResult = List.of(new DebtPositionDTO());
-    Mockito.when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationIds, dateTimeIntervalFilter)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(debtorFiscalCode, debtorEntityType, null, null, null, organizationIds, dateTimeIntervalFilter)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/by-debtor/" + debtorFiscalCode + "/" + debtorEntityType.getValue())
@@ -628,7 +624,7 @@ class DebtPositionControllerTest {
     String debtorFiscalCode = "debtorFiscalCode";
     PagedDebtorUnpaidDebtPositionDTO expectedResult = new PagedDebtorUnpaidDebtPositionDTO();
 
-    Mockito.when(debtPositionService.getPagedDebtorUnpaidDebtPosition(debtorFiscalCode, organizationIds, Pageable.ofSize(1))).thenReturn(expectedResult);
+    when(debtPositionService.getPagedDebtorUnpaidDebtPosition(debtorFiscalCode, organizationIds, Pageable.ofSize(1))).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
       get("/debt-positions/debtor/unpaid")
@@ -653,7 +649,7 @@ class DebtPositionControllerTest {
     String debtorFiscalCode = "debtorFiscalCode";
     DebtorDebtPositionDTO expectedResult = new DebtorDebtPositionDTO();
 
-    Mockito.when(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, debtorFiscalCode, organizationId)).thenReturn(expectedResult);
+    when(debtPositionService.getDebtorUnpaidDebtPositionOverview(debtPositionId, debtorFiscalCode, organizationId)).thenReturn(expectedResult);
 
     MvcResult result = mockMvc.perform(
         get("/debt-positions/debtor/unpaid/{debtPositionId}/overview", debtPositionId)
@@ -696,7 +692,7 @@ class DebtPositionControllerTest {
       .andExpect(status().isOk())
       .andReturn();
 
-    Mockito.verify(massiveUpdateService, Mockito.times(1)).updateTransferIbansAndSyncDebtPosition(
+    verify(massiveUpdateService).updateTransferIbansAndSyncDebtPosition(
       debtPositionId,
       requestDTO.getOldIban(),
       requestDTO.getNewIban(),

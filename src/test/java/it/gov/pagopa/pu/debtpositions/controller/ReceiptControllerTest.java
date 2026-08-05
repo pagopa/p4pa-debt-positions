@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
@@ -29,7 +30,10 @@ import tools.jackson.databind.json.JsonMapper;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ReceiptControllerImpl.class)
@@ -44,12 +48,12 @@ class ReceiptControllerTest {
 
   @MockitoBean
   private CreateReceiptService createReceiptServiceMock;
-
   @MockitoBean
   private ReceiptService receiptServiceMock;
-
   @MockitoBean
   private ReceiptFileService receiptFileServiceMock;
+  @MockitoBean
+  private Tracer tracerMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
   private final String accessToken = "accessToken";
@@ -66,7 +70,7 @@ class ReceiptControllerTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())), Mockito.any())).thenReturn(expectedResponse);
+    when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> Objects.equals(receiptDTO.getReceiptId(), r.getReceiptId())), Mockito.any())).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.post("/receipts")
@@ -79,8 +83,8 @@ class ReceiptControllerTest {
     });
     TestUtils.reflectionEqualsByName(expectedResponse, resultResponse, "receiptId", "creationDate", "updateDate", "noPII");
 
-    Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
-      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
+    verify(createReceiptServiceMock).createReceipt(
+      Mockito.argThat(r -> Objects.equals(receiptDTO.getReceiptId(), r.getReceiptId())),
       Mockito.any());
   }
 
@@ -89,7 +93,7 @@ class ReceiptControllerTest {
     //given
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
 
-    Mockito.when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())), Mockito.any())).thenReturn(null);
+    when(createReceiptServiceMock.createReceipt(Mockito.argThat(r -> Objects.equals(receiptDTO.getReceiptId(), r.getReceiptId())), Mockito.any())).thenReturn(null);
 
     mockMvc.perform(
         MockMvcRequestBuilders.post("/receipts")
@@ -98,8 +102,8 @@ class ReceiptControllerTest {
       .andExpect(status().isNoContent())
       .andReturn();
 
-    Mockito.verify(createReceiptServiceMock, Mockito.times(1)).createReceipt(
-      Mockito.argThat(r -> receiptDTO.getReceiptId().equals(r.getReceiptId())),
+    verify(createReceiptServiceMock).createReceipt(
+      Mockito.argThat(r -> Objects.equals(receiptDTO.getReceiptId(), r.getReceiptId())),
       Mockito.any());
   }
 
@@ -109,7 +113,7 @@ class ReceiptControllerTest {
     Long receiptId = 1L;
     ReceiptDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDTO.class);
 
-    Mockito.when(receiptServiceMock.getReceipt(receiptId)).thenReturn(expectedResponse);
+    when(receiptServiceMock.getReceipt(receiptId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/receipts/"+receiptId))
@@ -119,7 +123,7 @@ class ReceiptControllerTest {
     ReceiptDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), ReceiptDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response, "noPII");
 
-    Mockito.verify(receiptServiceMock).getReceipt(receiptId);
+    verify(receiptServiceMock).getReceipt(receiptId);
   }
 
   @Test
@@ -130,7 +134,7 @@ class ReceiptControllerTest {
     String iud = "iud";
     ReceiptDetailDTO expectedResponse = podamFactory.manufacturePojo(ReceiptDetailDTO.class);
 
-    Mockito.when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(expectedResponse);
+    when(receiptServiceMock.getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/receipts/"+receiptId+"/detail")
@@ -143,7 +147,7 @@ class ReceiptControllerTest {
     ReceiptDetailDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), ReceiptDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
+    verify(receiptServiceMock).getReceiptDetail(receiptId, operatorExternalUserId, organizationId, iud);
   }
 
   @Test
@@ -156,7 +160,7 @@ class ReceiptControllerTest {
     FileResourceDTO expectedResult = new FileResourceDTO(new ByteArrayResource(pdfBytes),
       "RECEIPT_CFENTE_"+receiptId+".pdf");
 
-    Mockito.when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId)).thenReturn(expectedResult);
+    when(receiptFileServiceMock.generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId)).thenReturn(expectedResult);
 
     String urlPattern = "/receipts/{receiptId}/pdf";
     String expectedFileName = "RECEIPT_CFENTE_"+receiptId+".pdf";
@@ -174,6 +178,6 @@ class ReceiptControllerTest {
       .andExpect(MockMvcResultMatchers.content().bytes(pdfBytes))
       .andReturn();
 
-    Mockito.verify(receiptFileServiceMock, Mockito.times(1)).generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
+    verify(receiptFileServiceMock).generateReceiptPdf(receiptId, organizationId, accessToken, operatorExternalUserId);
   }
 }

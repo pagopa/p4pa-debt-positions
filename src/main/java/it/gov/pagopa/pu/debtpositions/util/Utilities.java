@@ -22,14 +22,21 @@ import java.util.stream.Collectors;
 
 public class Utilities {
 
-  private Utilities() {
-  }
-
+  private Utilities() {}
   public static final Pattern FISCAL_CODE_STRUCTURE_REGEX = Pattern.compile("^([A-Za-z]{6}[0-9lmnpqrstuvLMNPQRSTUV]{2}[abcdehlmprstABCDEHLMPRST][0-9lmnpqrstuvLMNPQRSTUV]{2}[A-Za-z][0-9lmnpqrstuvLMNPQRSTUV]{3}[A-Za-z])$");
   public static final Pattern EMAIL_PATTERN = Pattern.compile("^[a-zA-Z0-9_!#$%&'*+/=?`{|}~^.-]+@[a-zA-Z0-9.-]+$");
   public static final Pattern IBAN_PATTERN = Pattern.compile("^[A-Z]{2}\\d{2}[A-Z0-9]{23,30}$");
   public static final String POSTAL_IBAN_ABI_CODE = "07601";
   private static final NumberFormat currencyFormat = NumberFormat.getCurrencyInstance(Locale.ITALY);
+
+  public static String getTraceId() {
+    return MDC.get("traceId");
+  }
+
+  public static String getSpanId(){
+    return MDC.get("spanId");
+  }
+
 
   public static boolean isValidEmail(final String email) {
     Matcher matcher = EMAIL_PATTERN.matcher(email);
@@ -128,10 +135,6 @@ public class Utilities {
 
   public static boolean isValidIntervalBetweenOffsetDateTime(OffsetDateTime dateFrom, OffsetDateTime dateTo, ChronoUnit chronoUnit, long maxInterval) {
     return chronoUnit.between(dateFrom, dateTo) <= maxInterval;
-  }
-
-  public static String getTraceId() {
-    return MDC.get("traceId");
   }
 
   public static BigDecimal longCentsToBigDecimalEuro(Long centsAmount) {

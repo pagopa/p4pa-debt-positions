@@ -521,6 +521,11 @@
 <td><a href='https://www.bouncycastle.org/licence.html'>MIT</a></td>
 </tr>
 <tr>
+<td><a href='https://checkerframework.org/'>org.checkerframework:checker-qual</a></td>
+<td>3.55.1</td>
+<td><a href='https://opensource.org/licenses/mit'>MIT</a></td>
+</tr>
+<tr>
 <td><a href='https://www.eclipse.org'>org.eclipse.angus:angus-activation</a></td>
 <td>2.0.3</td>
 <td><a href='https://openjdk.java.net/legal/gplv2+ce.html'>GPL-2.0-only WITH Classpath-exception-2.0</a></td>
@@ -622,7 +627,7 @@
 </tr>
 <tr>
 <td><a href='https://jdbc.postgresql.org/'>org.postgresql:postgresql</a></td>
-<td>42.7.11</td>
+<td>42.7.13</td>
 <td><a href='https://opensource.org/licenses/BSD-2-Clause'>BSD-2-Clause</a></td>
 </tr>
 <tr>

@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PostalIbanVerifyResponse;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferReportedRequest;
@@ -12,7 +13,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -29,6 +29,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
@@ -46,12 +47,12 @@ class TransferControllerTest {
 
   @MockitoBean
   private DebtPositionHierarchyStatusAlignerService debtPositionHierarchyStatusAlignerService;
-
   @MockitoBean
   private TaxonomyValidatorService taxonomyValidatorService;
-
   @MockitoBean
   private TransferService transferServiceMock;
+  @MockitoBean
+  private Tracer tracerMock;
 
   private final String accessToken = "ACCESSTOKEN";
 
@@ -71,7 +72,7 @@ class TransferControllerTest {
     TransferReportedRequest request = new TransferReportedRequest("IUF");
     WorkflowCreatedDTO workflow = new WorkflowCreatedDTO("workflowId", "runId");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
+    when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), workflow));
 
     MvcResult result = mockMvc.perform(
@@ -92,7 +93,7 @@ class TransferControllerTest {
     Long transferId = 1L;
     TransferReportedRequest request = new TransferReportedRequest("IUF");
 
-    Mockito.when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
+    when(debtPositionHierarchyStatusAlignerService.notifyReportedTransferId(transferId, request, accessToken))
       .thenReturn(Pair.of(buildDebtPositionDTO(), null));
 
     MvcResult result = mockMvc.perform(
@@ -109,7 +110,7 @@ class TransferControllerTest {
 
   @Test
   void whenValidateTaxonomyCategoryThenOk() throws Exception {
-    Mockito.when(taxonomyValidatorService.validateTaxonomyCategory(anyString(), anyString()))
+    when(taxonomyValidatorService.validateTaxonomyCategory(anyString(), anyString()))
       .thenReturn(true);
 
     MvcResult result = mockMvc.perform(
@@ -131,7 +132,7 @@ class TransferControllerTest {
     PostalIbanVerifyResponse expectedResult  = new PostalIbanVerifyResponse();
     expectedResult.setInstallmentPostalIbanCheck(Map.of("1", false, "2", true));
 
-    Mockito.when(transferServiceMock.verifyPostalIban(installmentIds)).thenReturn(expectedResult);
+    when(transferServiceMock.verifyPostalIban(installmentIds)).thenReturn(expectedResult);
     //when
     MvcResult result = mockMvc.perform(
         get("/transfers/postal-iban/verify")
