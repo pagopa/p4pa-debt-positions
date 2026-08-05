@@ -45,11 +45,11 @@ class BalanceClientTest {
 
     Mockito.when(classificationApisHolder.getBalanceApi(accessToken))
       .thenReturn(balanceApiMock);
-    Mockito.when(balanceApiMock.validateBalance(ValidateBalanceRequest.builder().balance(balance).amountCents(amountCents).build()))
+    Mockito.when(balanceApiMock.validateBalance(ValidateBalanceRequest.builder().balance(balance).amountCents(amountCents).build(), Boolean.TRUE))
       .thenReturn(Boolean.TRUE);
 
     // When
-    Boolean result = balanceClient.validateBalance(balance, amountCents, accessToken);
+    Boolean result = balanceClient.validateBalance(balance, amountCents, Boolean.TRUE, accessToken);
 
     // Then
     Assertions.assertSame(Boolean.TRUE, result);

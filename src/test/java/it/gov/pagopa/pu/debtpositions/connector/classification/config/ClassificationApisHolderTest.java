@@ -43,7 +43,7 @@ class ClassificationApisHolderTest extends BaseApiHolderTest {
     void whenBalanceApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
         assertAuthenticationShouldBeSetInThreadSafeMode(
                 accessToken -> classificationApisHolder.getBalanceApi(accessToken)
-                        .validateBalance(new ValidateBalanceRequest()),
+                        .validateBalance(new ValidateBalanceRequest(), Boolean.TRUE),
                 new ParameterizedTypeReference<>() {},
                 classificationApisHolder::unload);
     }

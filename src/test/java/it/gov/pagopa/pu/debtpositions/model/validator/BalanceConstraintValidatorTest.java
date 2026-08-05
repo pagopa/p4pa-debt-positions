@@ -46,7 +46,7 @@ class BalanceConstraintValidatorTest {
   void givenBalanceNotValidWhenIsValidThenTrue(){
     // Given
     String balance = "balance";
-    Mockito.when(balanceServiceMock.isValidBalance(balance, null, accessToken))
+    Mockito.when(balanceServiceMock.isValidBalance(balance, null, Boolean.TRUE, accessToken))
       .thenReturn(true);
 
     // When
@@ -60,7 +60,7 @@ class BalanceConstraintValidatorTest {
   void givenBalanceNotValidWhenIsValidThenFalse(){
     // Given
     String balance = "balance";
-    Mockito.when(balanceServiceMock.isValidBalance(balance, null, accessToken))
+    Mockito.when(balanceServiceMock.isValidBalance(balance, null, Boolean.TRUE, accessToken))
       .thenReturn(false);
 
     // When

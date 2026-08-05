@@ -14,8 +14,8 @@ public class BalanceServiceImpl implements BalanceService {
   }
 
   @Override
-  public Boolean isValidBalance(String balance, Long amountCents, String accessToken) {
-    return balanceClient.validateBalance(balance, amountCents, accessToken);
+  public Boolean isValidBalance(String balance, Long amountCents, Boolean allowTemplate, String accessToken) {
+    return balanceClient.validateBalance(balance, amountCents, allowTemplate, accessToken);
   }
 
   @Override

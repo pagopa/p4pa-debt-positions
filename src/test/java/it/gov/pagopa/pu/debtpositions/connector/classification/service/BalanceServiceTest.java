@@ -36,11 +36,11 @@ class BalanceServiceTest {
     Long amountCents = 100L;
     String accessToken = "ACCESSTOKEN";
 
-    Mockito.when(balanceClientMock.validateBalance(balance, amountCents, accessToken))
+    Mockito.when(balanceClientMock.validateBalance(balance, amountCents, Boolean.TRUE, accessToken))
       .thenReturn(Boolean.TRUE);
 
     // When
-    Boolean result = balanceService.isValidBalance(balance, amountCents, accessToken);
+    Boolean result = balanceService.isValidBalance(balance, amountCents, Boolean.TRUE, accessToken);
 
     // Then
     Assertions.assertEquals(Boolean.TRUE, result);
