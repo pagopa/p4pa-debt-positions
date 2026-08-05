@@ -160,7 +160,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
     if (!InstallmentStatus.PAID.equals(installmentDTO.getStatus()) &&
       StringUtils.isNotBlank(installmentDTO.getBalance()) &&
-      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), installmentDTO.getAmountCents(), accessToken))) {
+      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), installmentDTO.getAmountCents(), Boolean.FALSE, accessToken))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_BALANCE, "Balance is not formally valid");
     }
 

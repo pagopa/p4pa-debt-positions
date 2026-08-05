@@ -11,10 +11,11 @@ public interface BalanceService {
    *
    * @param balance the value of balance to be validated
    * @param amountCents the installment's amount
+   * @param allowTemplate indicates if balance validation allow template structure or not
    * @param accessToken the access token
    * @return a Boolean based on whether the value is formally valid or not
    */
-  Boolean isValidBalance(String balance, Long amountCents, String accessToken);
+  Boolean isValidBalance(String balance, Long amountCents, Boolean allowTemplate, String accessToken);
 
   /***
    *

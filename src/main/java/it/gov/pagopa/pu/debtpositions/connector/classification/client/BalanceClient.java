@@ -17,12 +17,12 @@ public class BalanceClient {
     this.classificationApisHolder = classificationApisHolder;
   }
 
-  public Boolean validateBalance(String balance, Long amountCents, String accessToken){
+  public Boolean validateBalance(String balance, Long amountCents, Boolean allowTemplate, String accessToken){
     ValidateBalanceRequest validateBalanceRequest = ValidateBalanceRequest.builder()
       .balance(balance)
       .amountCents(amountCents)
       .build();
-    return classificationApisHolder.getBalanceApi(accessToken).validateBalance(validateBalanceRequest);
+    return classificationApisHolder.getBalanceApi(accessToken).validateBalance(validateBalanceRequest, allowTemplate);
   }
 
   public String getBalanceByAssessmentRegistry(Long organizationId, String debtPositionTypeOrgCode, String accessToken){
