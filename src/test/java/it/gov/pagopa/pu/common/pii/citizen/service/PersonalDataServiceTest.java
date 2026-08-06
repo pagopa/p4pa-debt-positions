@@ -6,7 +6,7 @@ import it.gov.pagopa.pu.common.pii.citizen.repository.PersonalDataRepository;
 import it.gov.pagopa.pu.debtpositions.config.CacheConfig;
 import it.gov.pagopa.pu.debtpositions.dto.pii.InstallmentPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.tuple.Pair;
@@ -26,6 +26,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
+
+import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class PersonalDataServiceTest {
@@ -50,7 +53,7 @@ class PersonalDataServiceTest {
   @BeforeEach
   void init() {
     cache = new ConcurrentMapCache(CacheConfig.Fields.pii);
-    Mockito.when(cacheManagerMock.getCache(CacheConfig.Fields.pii)).thenReturn(cache);
+    when(cacheManagerMock.getCache(CacheConfig.Fields.pii)).thenReturn(cache);
 
     service = new PersonalDataService(
       repositoryMock,
@@ -74,7 +77,7 @@ class PersonalDataServiceTest {
     InstallmentPIIDTO pii = new InstallmentPIIDTO();
 
     byte[] cipherData = new byte[0];
-    Mockito.when(cipherServiceMock.encryptObj(pii)).thenReturn(cipherData);
+    when(cipherServiceMock.encryptObj(pii)).thenReturn(cipherData);
     PersonalData personalDataInput = PersonalData.builder()
       .type(PERSONAL_DATA_TYPE.name())
       .data(cipherData)
@@ -87,7 +90,7 @@ class PersonalDataServiceTest {
       .data(cipherData)
       .build();
 
-    Mockito.when(repositoryMock.save(personalDataInput)).thenReturn(personalDataOutput);
+    when(repositoryMock.save(personalDataInput)).thenReturn(personalDataOutput);
 
     // When
     long insert = service.insert(pii, PERSONAL_DATA_TYPE);
@@ -103,9 +106,9 @@ class PersonalDataServiceTest {
     // Given
     long personalDataId = 1L;
     InstallmentPIIDTO expected = podamFactory.manufacturePojo(CLASS_PII_DTO);
-    Mockito.when(repositoryMock.findById(personalDataId)).thenReturn(
+    when(repositoryMock.findById(personalDataId)).thenReturn(
       Optional.of(PersonalData.builder().id(personalDataId).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()));
-    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(expected);
+    when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(expected);
 
     // When
     InstallmentPIIDTO result = service.get(personalDataId, CLASS_PII_DTO);
@@ -118,7 +121,7 @@ class PersonalDataServiceTest {
   void givenNotFoundPersonalDataIdWhenGetThenException() {
     // Given
     long personalDataId = 1L;
-    Mockito.when(repositoryMock.findById(personalDataId)).thenReturn(Optional.empty());
+    when(repositoryMock.findById(personalDataId)).thenReturn(Optional.empty());
 
     // When
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.get(personalDataId, CLASS_PII_DTO));
@@ -142,10 +145,10 @@ class PersonalDataServiceTest {
     Set<Long> cacheMissedPIds = Set.of(pId1);
     cache.put(pId2, pii2);
 
-    Mockito.when(repositoryMock.findAllById(cacheMissedPIds)).thenReturn(List.of(
+    when(repositoryMock.findAllById(cacheMissedPIds)).thenReturn(List.of(
       PersonalData.builder().id(pId1).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()
     ));
-    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
+    when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
 
     // When
     Map<Long, InstallmentPIIDTO> results = service.getAll(personalDataIds, CLASS_PII_DTO);
@@ -190,7 +193,7 @@ class PersonalDataServiceTest {
       PersonalData.builder().id(pId2).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()
     );
 
-    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
+    when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(pii1);
 
     // When
     Map<Long, InstallmentPIIDTO> results = service.getAll(pData, pDataIds, CLASS_PII_DTO);
@@ -204,9 +207,9 @@ class PersonalDataServiceTest {
   void givenNotFoundPersonalDataIdsWhenGetAllThenException() {
     // Given
     Set<Long> personalDataIds = Set.of(1L, 2L);
-    Mockito.when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
+    when(repositoryMock.findAllById(personalDataIds)).thenReturn(List.of(
       PersonalData.builder().id(1L).data(new byte[0]).type(PERSONAL_DATA_TYPE.name()).build()));
-    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(podamFactory.manufacturePojo(CLASS_PII_DTO));
+    when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO)).thenReturn(podamFactory.manufacturePojo(CLASS_PII_DTO));
 
     // When
     NotFoundException notFoundException = Assertions.assertThrows(NotFoundException.class, () -> service.getAll(personalDataIds, CLASS_PII_DTO));
@@ -242,7 +245,7 @@ class PersonalDataServiceTest {
 
     InstallmentPIIDTO pii1 = podamFactory.manufacturePojo(CLASS_PII_DTO);
     InstallmentPIIDTO pii2 = podamFactory.manufacturePojo(CLASS_PII_DTO);
-    Mockito.when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO))
+    when(cipherServiceMock.decryptObj(new byte[0], CLASS_PII_DTO))
       .thenReturn(pii1)
       .thenReturn(pii2);
 
@@ -280,24 +283,24 @@ class PersonalDataServiceTest {
     expectedPData2Result.put(pDataId2Cached, pData2Cached);
     expectedPData2Result.putAll(expectedPData2Retrieved);
 
-    service = Mockito.spy(service);
+    service = spy(service);
 
     List<PersonalData> pData = List.of();
 
     Set<Long> expectedPii1CacheMiss = pDataIds1.stream().filter(id -> id != pDataId1Cached).collect(Collectors.toSet());
     Set<Long> expectedPii2CacheMiss = pDataIds2.stream().filter(id -> id != pDataId2Cached).collect(Collectors.toSet());
 
-    Mockito.when(repositoryMock.findAllById(Stream.concat(
+    when(repositoryMock.findAllById(Stream.concat(
         expectedPii1CacheMiss.stream(),
         expectedPii2CacheMiss.stream()
       ).toList()))
       .thenReturn(pData);
 
-    Mockito.doReturn(expectedPData1Retrieved)
+    doReturn(expectedPData1Retrieved)
       .when(service)
       .getAll(Mockito.same(pData), Mockito.eq(expectedPii1CacheMiss), Mockito.same(classType1));
 
-    Mockito.doReturn(expectedPData2Retrieved)
+    doReturn(expectedPData2Retrieved)
       .when(service)
       .getAll(Mockito.same(pData), Mockito.eq(expectedPii2CacheMiss), Mockito.same(classType2));
 
@@ -353,6 +356,6 @@ class PersonalDataServiceTest {
     service.delete(id);
 
     // Then
-    Mockito.verify(repositoryMock).deleteById(id);
+    verify(repositoryMock).deleteById(id);
   }
 }

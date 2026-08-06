@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptTransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class OrdinaryInstallmentPaymentHandlerServiceTest {
@@ -63,7 +65,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     receiptDTO.setReceiptOrigin(ReceiptOriginType.RECEIPT_FILE);
     receiptDTO.setBalance("BAL");
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(null);
 
     // When, Then
@@ -88,8 +90,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     Assertions.assertSame(receiptDTO.getReceiptId(), installment.getReceiptId());
     Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
 
-    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
-    Mockito.verify(balanceResolverServiceMock, Mockito.never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock, never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
+    verify(balanceResolverServiceMock, never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -105,7 +107,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     // When
@@ -113,8 +115,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
 
     // Then
     Assertions.assertEquals("BAL", installment.getBalance());
-    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -131,7 +132,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     // When
@@ -139,8 +140,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
 
     // Then
     Assertions.assertEquals("OLD_BAL", installment.getBalance());
-    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -156,7 +157,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     // When
@@ -164,8 +165,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
 
     // Then
     Assertions.assertEquals("NEW_BAL", installment.getBalance());
-    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -182,8 +183,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     service.updateInstallment(installment, receiptDTO, accessToken);
 
     // Then
-    Mockito.verify(debtPositionTypeOrgRepositoryMock, Mockito.never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
-    Mockito.verify(balanceResolverServiceMock, Mockito.never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock, never()).getDebtPositionTypeOrgByInstallmentId(Mockito.anyLong());
+    verify(balanceResolverServiceMock, never()).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -211,7 +212,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
 
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     service.updateInstallment(installment, receiptDTO, accessToken);
@@ -223,8 +224,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     long expectedFeeDiff = receiptAmount - initialInstallmentAmount;
     Assertions.assertEquals(500L + expectedFeeDiff, t1.getAmountCents());
 
-    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -254,7 +255,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(1L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     service.updateInstallment(installment, receiptDTO, accessToken);
@@ -264,8 +265,8 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     Assertions.assertEquals(receiptAmount, installment.getAmountCents());
     Assertions.assertEquals(500L + calculatedDiff, t1.getAmountCents());
 
-    Mockito.verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
-    Mockito.verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
+    verify(debtPositionTypeOrgRepositoryMock).getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId());
+    verify(balanceResolverServiceMock).updateBalanceResolvingAmount(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
   @Test
@@ -304,7 +305,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     // When
@@ -343,7 +344,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     DebtPositionTypeOrg dpTypeOrg = new DebtPositionTypeOrg();
     dpTypeOrg.setOrganizationId(-2L);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
+    when(debtPositionTypeOrgRepositoryMock.getDebtPositionTypeOrgByInstallmentId(installment.getInstallmentId()))
       .thenReturn(dpTypeOrg);
 
     // When
@@ -362,7 +363,7 @@ class OrdinaryInstallmentPaymentHandlerServiceTest {
     Assertions.assertEquals(InstallmentStatus.PAID, installment.getStatus());
     Assertions.assertNull(installment.getSyncStatus());
 
-    Mockito.verify(balanceResolverServiceMock)
+    verify(balanceResolverServiceMock)
       .updateBalanceResolvingAmount(
         Mockito.same(installment), Mockito.same(dpTypeOrg.getOrganizationId()), Mockito.same(dpTypeOrg), Mockito.same(receiptDTO.getPaymentDateTime()), Mockito.same(accessToken));
   }

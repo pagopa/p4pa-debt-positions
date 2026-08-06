@@ -7,6 +7,9 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -84,7 +87,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
     DebtPositionDTO storedDebtPosition = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!InstallmentUtils.MODIFIABLE_DP_STATUSES.contains(storedDebtPosition.getStatus())) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("Debt position with id %s cannot be modified because it is not in an allowed status: %s",
         debtPositionId, storedDebtPosition.getStatus()));
     }
 
@@ -97,7 +100,7 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_PAYMENT_OPTION_NOT_FOUND, String.format("Payment option having id %s not found", manageDebtPositionDTO.getPaymentOptionId())));
 
     if (!InstallmentUtils.MODIFIABLE_PO_STATUSES.contains(storedPaymentOption.getStatus())) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_PAYMENT_OPTION_STATUS, String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_PAYMENT_OPTION_STATUS, String.format("Payment option having id %s cannot be modified because is not in allowed status: %s", storedPaymentOption.getPaymentOptionId(), storedPaymentOption.getStatus()));
     }
 
     storedPaymentOption.setDescription(manageDebtPositionDTO.getPaymentOptionDescription());
@@ -196,11 +199,11 @@ public class DebtPositionManageInstallmentsServiceImpl extends BaseDebtPositionO
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_NOT_FOUND, String.format("The installment with id %s not found", installmentId)));
 
     if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installment.getStatus())) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, String.format("Installment having id %s cannot be modified because is not in allowed status: %s", installmentId, installment.getStatus()));
     }
 
     if (StringUtils.isNotBlank(installment.getIun())) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with id " + installment.getInstallmentId() + " cannot be modified because is been notified by SEND");
     }
 
     return installment;

@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
 import it.gov.pagopa.pu.debtpositions.enums.ReceiptOriginType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
@@ -32,6 +32,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Optional;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class CreateReceiptServiceTest {
@@ -98,7 +101,7 @@ class CreateReceiptServiceTest {
     Broker broker = new Broker();
     broker.setFlagDelegate(false);
 
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(null);
 
     // When, Then
@@ -113,13 +116,13 @@ class CreateReceiptServiceTest {
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptId(-1L);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+    when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
       .thenReturn(broker);
-    Mockito.when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
+    when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
       .thenReturn(storedReceipt);
-    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(broker), Mockito.same(accessToken)))
+    when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(broker), Mockito.same(accessToken)))
       .thenReturn(primaryOrgDp);
 
     // When
@@ -130,10 +133,10 @@ class CreateReceiptServiceTest {
     Assertions.assertSame(receiptDTO.getReceiptId(), storedReceipt.getReceiptId());
     Assertions.assertSame(receiptDTO.getNoPII(), storedReceipt.getNoPII());
 
-    Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
+    verify(secondaryOrgPaymentHandlerServiceMock)
       .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
     if (primaryOrgHandledByPu) {
-      Mockito.verify(mixedDpPaymentHandlerServiceMock)
+      verify(mixedDpPaymentHandlerServiceMock)
         .handle(Mockito.same(primaryOrgDp.get()), Mockito.same(receiptDTO), Mockito.same(accessToken));
     }
   }
@@ -155,7 +158,7 @@ class CreateReceiptServiceTest {
     Broker broker = new Broker();
     broker.setFlagDelegate(false);
 
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
 
     testProcessedReceiptAndDpHandling(organization, broker, receiptDTO, accessToken, primaryOrgHandledByPu);
@@ -175,19 +178,19 @@ class CreateReceiptServiceTest {
 
     ReceiptNoPII existingReceiptNoPII = podamFactory.manufacturePojo(ReceiptNoPII.class);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+    when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
       .thenReturn(broker);
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId())).thenReturn(existingReceiptNoPII);
-    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(organization, receiptDTO, broker, accessToken)).thenReturn(Optional.empty());
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId())).thenReturn(existingReceiptNoPII);
+    when(primaryOrgPaymentHandlerServiceMock.handlePayment(organization, receiptDTO, broker, accessToken)).thenReturn(Optional.empty());
 
     ReceiptDTO result = service.createReceipt(receiptDTO, accessToken);
 
     Assertions.assertNotNull(result);
     Assertions.assertEquals(existingReceiptNoPII.getReceiptId(), result.getReceiptId());
 
-    Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
+    verify(secondaryOrgPaymentHandlerServiceMock)
       .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 
@@ -205,15 +208,15 @@ class CreateReceiptServiceTest {
     broker.setFlagDelegate(true);
     InstallmentNoPII installment = new InstallmentNoPII();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+    when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
       .thenReturn(broker);
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(receiptInDb);
-    Mockito.when(primaryOrgInstallmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+    when(primaryOrgInstallmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
       .thenReturn(Optional.of(installment));
-    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(organization, receiptDTO, broker, accessToken))
+    when(primaryOrgPaymentHandlerServiceMock.handlePayment(organization, receiptDTO, broker, accessToken))
       .thenReturn(Optional.empty());
 
     ReceiptDTO result = service.createReceipt(receiptDTO, accessToken);
@@ -221,7 +224,7 @@ class CreateReceiptServiceTest {
     Assertions.assertNotNull(result);
     Assertions.assertEquals(receiptInDb.getReceiptId(), result.getReceiptId());
 
-    Mockito.verify(secondaryOrgPaymentHandlerServiceMock)
+    verify(secondaryOrgPaymentHandlerServiceMock)
       .handle(Mockito.same(receiptDTO), Mockito.same(accessToken));
   }
 
@@ -238,13 +241,13 @@ class CreateReceiptServiceTest {
     ReceiptDTO storedReceipt = podamFactory.manufacturePojo(ReceiptDTO.class);
     storedReceipt.setReceiptId(999L);
 
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(receiptDTO.getPaymentReceiptId()))
       .thenReturn(null);
 
-    Mockito.when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
+    when(receiptPIIRepositoryMock.save(Mockito.same(receiptDTO)))
       .thenReturn(storedReceipt);
 
-    Mockito.when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.isNull(), Mockito.same(receiptDTO), Mockito.isNull(),  Mockito.same(accessToken)))
+    when(primaryOrgPaymentHandlerServiceMock.handlePayment(Mockito.isNull(), Mockito.same(receiptDTO), Mockito.isNull(),  Mockito.same(accessToken)))
       .thenReturn(Optional.empty());
 
     ReceiptDTO result = service.createReceipt(receiptDTO, accessToken);
@@ -252,7 +255,7 @@ class CreateReceiptServiceTest {
     Assertions.assertEquals(expectedFiscalCode, receiptDTO.getOrgFiscalCode());
     Assertions.assertEquals(storedReceipt.getReceiptId(), result.getReceiptId());
 
-    Mockito.verify(secondaryOrgPaymentHandlerServiceMock).handle(receiptDTO, accessToken);
+    verify(secondaryOrgPaymentHandlerServiceMock).handle(receiptDTO, accessToken);
   }
 
   @Test
@@ -268,9 +271,9 @@ class CreateReceiptServiceTest {
     Broker broker = new Broker();
     broker.setFlagDelegate(false);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
+    when(brokerServiceMock.findById(organization.getBrokerId(), accessToken))
       .thenReturn(broker);
 
     Assertions.assertThrows(InvalidValueException.class,
@@ -284,7 +287,7 @@ class CreateReceiptServiceTest {
     ReceiptWithAdditionalNodeDataDTO receiptDTO = podamFactory.manufacturePojo(ReceiptWithAdditionalNodeDataDTO.class);
     receiptDTO.setOrganizationId(orgId);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(orgId, accessToken))
+    when(organizationServiceMock.getOrganizationById(orgId, accessToken))
       .thenReturn(Optional.empty());
 
     Assertions.assertThrows(InvalidValueException.class,
@@ -307,19 +310,19 @@ class CreateReceiptServiceTest {
     Broker broker = new Broker();
     broker.setFlagDelegate(true);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(
+    when(organizationServiceMock.getOrganizationById(
         receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
 
-    Mockito.when(brokerServiceMock.findById(
+    when(brokerServiceMock.findById(
         organization.getBrokerId(), accessToken))
       .thenReturn(broker);
 
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(
         receiptDTO.getPaymentReceiptId()))
       .thenReturn(null);
 
-    Mockito.when(primaryOrgInstallmentRetrieverServiceMock.retrieve(
+    when(primaryOrgInstallmentRetrieverServiceMock.retrieve(
         Mockito.same(organization),
         Mockito.eq(receiptDTO.getNoticeNumber()),
         Mockito.eq(receiptDTO.getIud())))
@@ -331,7 +334,7 @@ class CreateReceiptServiceTest {
     // Then
     Assertions.assertNull(result);
 
-    Mockito.verify(primaryOrgInstallmentRetrieverServiceMock)
+    verify(primaryOrgInstallmentRetrieverServiceMock)
       .retrieve(
         Mockito.same(organization),
         Mockito.eq(receiptDTO.getNoticeNumber()),
@@ -363,19 +366,19 @@ class CreateReceiptServiceTest {
     broker.setFlagDelegate(true);
     ReceiptNoPII receipt = new ReceiptNoPII();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(
+    when(organizationServiceMock.getOrganizationById(
         receiptDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
 
-    Mockito.when(brokerServiceMock.findById(
+    when(brokerServiceMock.findById(
         organization.getBrokerId(), accessToken))
       .thenReturn(broker);
 
-    Mockito.when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(
+    when(receiptNoPIIRepositoryMock.getByPaymentReceiptId(
         receiptDTO.getPaymentReceiptId()))
       .thenReturn(receipt);
 
-    Mockito.when(primaryOrgInstallmentRetrieverServiceMock.retrieve(
+    when(primaryOrgInstallmentRetrieverServiceMock.retrieve(
         Mockito.same(organization),
         Mockito.eq(receiptDTO.getNoticeNumber()),
         Mockito.eq(receiptDTO.getIud())))

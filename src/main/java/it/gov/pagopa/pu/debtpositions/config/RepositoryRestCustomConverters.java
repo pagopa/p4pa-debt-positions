@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
 import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import lombok.extern.slf4j.Slf4j;

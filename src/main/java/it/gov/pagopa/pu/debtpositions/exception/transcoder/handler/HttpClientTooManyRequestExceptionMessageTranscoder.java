@@ -9,7 +9,7 @@ public class HttpClientTooManyRequestExceptionMessageTranscoder implements Excep
   @Override
   public ExceptionMessageTranscoded transcode(HttpClientErrorException.TooManyRequests tooManyRequestsException) {
     return new ExceptionMessageTranscoded(
-      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS.name(),
+      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_TOO_MANY_REQUESTS.getValue(),
       tooManyRequestsException.getMessage(),
       null);
   }

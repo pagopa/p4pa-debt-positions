@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.update.apply;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.service.update.applier.DebtPositionManageApplierService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.BeforeEach;
@@ -54,7 +54,7 @@ class DebtPositionManageApplierServiceTest {
     updatedInstallment.setIuv("new_iuv");
     updatedInstallment.getDebtor().setFiscalCode("new_uniqueIdentifierCode");
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
 
     assertEquals("IMMUTABLE_FIELD", exception.getCode());
@@ -73,7 +73,7 @@ class DebtPositionManageApplierServiceTest {
     InstallmentDTO updatedInstallment = buildInstallmentDTO();
     updatedInstallment.getTransfers().add(TRANSFER_1);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
 
     assertEquals("IMMUTABLE_FIELD", exception.getCode());
@@ -87,7 +87,7 @@ class DebtPositionManageApplierServiceTest {
     InstallmentDTO updatedInstallment = buildInstallmentDTO();
     updatedInstallment.getTransfers().getFirst().setTransferId(1L);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
 
     assertEquals("TRANSFER_NOT_FOUND", exception.getCode());
@@ -101,7 +101,7 @@ class DebtPositionManageApplierServiceTest {
     updatedInstallment.getTransfers().getFirst().setOrgName("new_org_name");
     updatedInstallment.getTransfers().getFirst().setOrgFiscalCode("new_org_fiscal_code");
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applier.merge(updatedInstallment, storedInstallment));
 
     assertEquals("IMMUTABLE_FIELD", exception.getCode());

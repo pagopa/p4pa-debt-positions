@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;

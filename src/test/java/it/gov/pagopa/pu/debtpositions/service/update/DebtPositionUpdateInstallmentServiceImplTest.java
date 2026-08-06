@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.update;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -32,6 +32,8 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionUpdateInstallmentServiceImplTest {
@@ -81,14 +83,14 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     installmentDTO.setSyncStatus(null);
     String iud = installmentDTO.getIud();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
       .thenReturn(debtPositionTypeOrg);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
+    when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(installmentDTO, organization, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken))
+    when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken))
       .thenReturn(workflow);
 
     WorkflowCreatedDTO result = debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalId);
@@ -99,9 +101,9 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     assertEquals(new InstallmentSyncStatus(InstallmentStatus.UNPAID, InstallmentStatus.UNPAID), installmentDTO.getSyncStatus());
     assertEquals(InstallmentStatus.TO_SYNC, installmentDTO.getStatus());
 
-    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
+    verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
+    verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
+    verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
   @Test
@@ -119,14 +121,14 @@ class DebtPositionUpdateInstallmentServiceImplTest {
 
     String iud = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getIud();
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
       .thenReturn(debtPositionTypeOrg);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
+    when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(validateDebtPositionServiceMock).validateInstallment(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), organization, accessToken, debtPositionTypeOrg, debtPositionDTO.getDebtPositionOrigin(), debtPositionDTO.getFlagPuPagoPaPayment());
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken))
+    when(debtPositionSyncServiceMock.syncDebtPosition(debtPositionDTO, wfExecutionParameters, PaymentEventType.DPI_UPDATED, "IUD:"+iud, accessToken))
       .thenReturn(workflow);
 
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.EXPIRED);
@@ -141,9 +143,9 @@ class DebtPositionUpdateInstallmentServiceImplTest {
     assertEquals(new InstallmentSyncStatus(InstallmentStatus.EXPIRED, InstallmentStatus.UNPAID), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getSyncStatus());
     assertEquals(InstallmentStatus.TO_SYNC, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getStatus());
 
-    Mockito.verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
-    Mockito.verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
-    Mockito.verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
+    verify(debtPositionProcessorServiceMock).updateAmounts(debtPositionDTO);
+    verify(debtPositionServiceMock).saveDebtPosition(debtPositionDTO, accessToken);
+    verify(debtPositionHierarchyStatusAlignerServiceMock).alignHierarchyStatus(debtPositionDTO);
   }
 
   @Test
@@ -158,11 +160,11 @@ class DebtPositionUpdateInstallmentServiceImplTest {
 
     List<InstallmentDTO> installments = List.of(buildInstallmentDTO());
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), accessToken))
       .thenReturn(Optional.of(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(),2L, operatorExternalId))
       .thenReturn(debtPositionTypeOrg);
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(2L))
+    when(debtPositionTypeOrgRepositoryMock.findById(2L))
       .thenReturn(Optional.empty());
 
     NotFoundException exception = assertThrows(NotFoundException.class, () -> debtPositionUpdateInstallmentService.updateInstallment(debtPositionDTO, installments, wfExecutionParameters, accessToken, operatorExternalId));

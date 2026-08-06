@@ -7,7 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.BaseDebtPositionOperationService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -47,6 +47,7 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Transactional
   @Override
+  @SuppressWarnings("java:S6809") // Suppressing warning regarding invocation a Transactional method through current instance: this method is also Transactional
   public WorkflowCreatedDTO cancelInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
 
@@ -66,10 +67,10 @@ public class DebtPositionCancelInstallmentServiceImpl extends BaseDebtPositionOp
       .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()))
       .map(installmentDTO -> {
         if (!InstallmentUtils.MODIFIABLE_STATUSES.contains(installmentDTO.getStatus())) {
-          throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
+          throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is not in allowed status: " + installmentDTO.getStatus());
         }
         if (StringUtils.isNotBlank(installmentDTO.getIun())) {
-          throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is been notified by SEND");
+          throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with iud " + installmentDTO.getIud() + " cannot be cancelled because is been notified by SEND");
         }
         return installmentDTO;
       })

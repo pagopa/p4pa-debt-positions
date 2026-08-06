@@ -1,9 +1,9 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
@@ -36,7 +36,7 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
     }
     Optional<SpontaneousForm> optSpontaneousForm = spontaneousFormRepository.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(), spontaneousForm.getCode());
     if(optSpontaneousForm.isPresent()){
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_SPONTANEOUS_FORM_ALREADY_EXISTS, "There is another SpontaneousForm with organizationId "+spontaneousForm.getOrganizationId()+" and code "+spontaneousForm.getCode());
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_SPONTANEOUS_FORM_ALREADY_EXISTS, "There is another SpontaneousForm with organizationId "+spontaneousForm.getOrganizationId()+" and code "+spontaneousForm.getCode());
     }
     return spontaneousFormRepository.save(spontaneousForm);
   }
@@ -49,7 +49,7 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
 
     long dptoCount = debtPositionTypeOrgRepository.countBySpontaneousFormId(spontaneousFormId);
     if(dptoCount > 0L){
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_SPONTANEOUS_FORM, "The SpontaneousForm having id "+spontaneousFormId+" is referenced by "+dptoCount+" DebtPositionTypeOrgs");
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_SPONTANEOUS_FORM, "The SpontaneousForm having id "+spontaneousFormId+" is referenced by "+dptoCount+" DebtPositionTypeOrgs");
     }
     spontaneousFormRepository.delete(spontaneousForm);
   }

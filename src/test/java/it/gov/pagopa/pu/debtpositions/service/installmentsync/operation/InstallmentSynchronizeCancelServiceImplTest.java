@@ -5,8 +5,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionCancelInstallmentService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -23,6 +22,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentFaker.buildInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeCancelServiceImplTest {
@@ -50,7 +50,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     installmentDTO.setIngestionFlowFileLineNumber(101L);
     installmentDTO.setIun(null);
 
-    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
+    when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installmentDTO), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 
     WorkflowCreatedDTO result = installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
@@ -128,7 +128,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -145,7 +145,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -164,7 +164,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -185,7 +185,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -205,7 +205,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
+    when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 
@@ -227,7 +227,7 @@ class InstallmentSynchronizeCancelServiceImplTest {
       .setSyncStatus(InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.UNPAID).build());
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
+    when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 

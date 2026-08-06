@@ -1,8 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
@@ -18,6 +18,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.Optional;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SpontaneousFormServiceImplTest {
@@ -48,8 +50,8 @@ class SpontaneousFormServiceImplTest {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     spontaneousForm.setSpontaneousFormId(null);
 
-    Mockito.when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(),spontaneousForm.getCode())).thenReturn(Optional.empty());
-    Mockito.when(spontaneousFormRepositoryMock.save(spontaneousForm)).thenReturn(spontaneousForm);
+    when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(),spontaneousForm.getCode())).thenReturn(Optional.empty());
+    when(spontaneousFormRepositoryMock.save(spontaneousForm)).thenReturn(spontaneousForm);
 
     SpontaneousForm response = spontaneousFormService.createSpontaneousForm(spontaneousForm);
 
@@ -62,9 +64,9 @@ class SpontaneousFormServiceImplTest {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     spontaneousForm.setSpontaneousFormId(null);
 
-    Mockito.when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(),spontaneousForm.getCode())).thenReturn(Optional.of(spontaneousForm));
+    when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(),spontaneousForm.getCode())).thenReturn(Optional.of(spontaneousForm));
 
-    Assertions.assertThrows(ConflictErrorException.class,()-> spontaneousFormService.createSpontaneousForm(spontaneousForm));
+    Assertions.assertThrows(ConflictException.class,()-> spontaneousFormService.createSpontaneousForm(spontaneousForm));
   }
 
   @Test
@@ -81,8 +83,8 @@ class SpontaneousFormServiceImplTest {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     Long spontaneousFormId = spontaneousForm.getSpontaneousFormId();
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
-    Mockito.when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(0L);
+    when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
+    when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(0L);
     Mockito.doNothing().when(spontaneousFormRepositoryMock).delete(spontaneousForm);
 
     Assertions.assertDoesNotThrow(()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
@@ -93,17 +95,17 @@ class SpontaneousFormServiceImplTest {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
     Long spontaneousFormId = spontaneousForm.getSpontaneousFormId();
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
-    Mockito.when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(1L);
+    when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.of(spontaneousForm));
+    when(debtPositionTypeOrgRepositoryMock.countBySpontaneousFormId(spontaneousFormId)).thenReturn(1L);
 
-    Assertions.assertThrows(ConflictErrorException.class, ()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
+    Assertions.assertThrows(ConflictException.class, ()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
   }
 
   @Test
   void givenNoSpontaneousFormWhenDeleteSpontaneousFormThenNotFoundException() {
     Long spontaneousFormId = 1L;
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.empty());
+    when(spontaneousFormRepositoryMock.findById(spontaneousFormId)).thenReturn(Optional.empty());
 
     Assertions.assertThrows(NotFoundException.class, ()->spontaneousFormService.deleteSpontaneousForm(spontaneousFormId));
 
@@ -114,8 +116,8 @@ class SpontaneousFormServiceImplTest {
   void whenUpdateSpontaneousFormThenOk() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousForm.getSpontaneousFormId())).thenReturn(Optional.of(spontaneousForm));
-    Mockito.when(spontaneousFormRepositoryMock.save(spontaneousForm)).thenReturn(spontaneousForm);
+    when(spontaneousFormRepositoryMock.findById(spontaneousForm.getSpontaneousFormId())).thenReturn(Optional.of(spontaneousForm));
+    when(spontaneousFormRepositoryMock.save(spontaneousForm)).thenReturn(spontaneousForm);
 
     SpontaneousForm response = spontaneousFormService.updateSpontaneousForm(spontaneousForm);
 
@@ -131,7 +133,7 @@ class SpontaneousFormServiceImplTest {
     updatedSpontaneousForm.setOrganizationId(spontaneousForm.getOrganizationId() + 1);
     updatedSpontaneousForm.setCode(spontaneousForm.getCode() + 1);
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(updatedSpontaneousForm.getSpontaneousFormId())).thenReturn(Optional.of(spontaneousForm));
+    when(spontaneousFormRepositoryMock.findById(updatedSpontaneousForm.getSpontaneousFormId())).thenReturn(Optional.of(spontaneousForm));
 
     Assertions.assertThrows(InvalidValueException.class, () -> spontaneousFormService.updateSpontaneousForm(updatedSpontaneousForm));
   }
@@ -140,7 +142,7 @@ class SpontaneousFormServiceImplTest {
   void givenNoSpontaneousFormWhenUpdateSpontaneousFormThenNotFoundException() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
-    Mockito.when(spontaneousFormRepositoryMock.findById(spontaneousForm.getSpontaneousFormId())).thenReturn(Optional.empty());
+    when(spontaneousFormRepositoryMock.findById(spontaneousForm.getSpontaneousFormId())).thenReturn(Optional.empty());
 
     Assertions.assertThrows(NotFoundException.class, () -> spontaneousFormService.updateSpontaneousForm(spontaneousForm));
   }

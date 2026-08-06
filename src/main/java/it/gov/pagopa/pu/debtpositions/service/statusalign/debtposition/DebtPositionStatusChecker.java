@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.BasePaymentOption;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.StatusRulesHandler;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;

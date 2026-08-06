@@ -2,7 +2,7 @@ package it.gov.pagopa.pu.debtpositions.service.statusalign.debtposition;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.PaymentOption;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionStatusCheckerTest {
@@ -214,7 +215,7 @@ class DebtPositionStatusCheckerTest {
 
     checker.storeStatus(debtPosition, newStatus);
 
-    Mockito.verify(debtPositionRepositoryMock).updateStatus(1L, newStatus);
+    verify(debtPositionRepositoryMock).updateStatus(1L, newStatus);
   }
 }
 

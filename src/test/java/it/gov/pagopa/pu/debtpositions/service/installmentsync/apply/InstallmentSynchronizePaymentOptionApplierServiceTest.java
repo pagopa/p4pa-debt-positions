@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -42,7 +42,7 @@ class InstallmentSynchronizePaymentOptionApplierServiceTest {
     installmentSynchronizeDTO.setPaymentOptionType("New payment option type");
     PaymentOptionDTO paymentOptionDTO = buildSyncPaymentOptionDTO();
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierPaymentOptionService.merge(installmentSynchronizeDTO, paymentOptionDTO));
     assertEquals("IMMUTABLE_FIELD",exception.getCode());
     assertEquals("These fields for payment option with index 1 of debt position with iupd IUPD_ORG are not mutable: [paymentOptionType]", exception.getMessage());
