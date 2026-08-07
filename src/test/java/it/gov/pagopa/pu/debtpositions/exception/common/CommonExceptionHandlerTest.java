@@ -28,6 +28,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -174,6 +175,19 @@ public abstract class CommonExceptionHandlerTest {
       .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
 
+  }
+
+  @Test
+  void handleAuthorizationDeniedException() throws Exception {
+    doThrow(new AuthorizationDeniedException("Error")).when(testControllerSpy).testEndpoint(DATA, BODY);
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isForbidden())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_FORBIDDEN"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_FORBIDDEN"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Error"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
   @Test

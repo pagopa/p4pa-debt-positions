@@ -118,7 +118,7 @@ public class CommonExceptionHandler {
 
   @ExceptionHandler({AuthorizationDeniedException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleAuthorizationDeniedException(Exception ex, HttpServletRequest request) {
-    return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_UNAUTHORIZED);
+    return handleException(ex, request, HttpStatus.FORBIDDEN, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_FORBIDDEN);
   }
 
   public static ResponseEntity<DebtPositionErrorDTO> handleException(Exception ex, HttpServletRequest request, HttpStatus httpStatus, DebtPositionErrorDTO.CategoryEnum errorEnum) {
