@@ -64,7 +64,7 @@ val caffeineVersion = "3.2.4"
 val httpClientVersion = "5.6.1"
 val httpCoreVersion = "5.4.2"
 val kafkaAppender = "0.2.0-RC2"
-val lz4JavaVersion = "1.11.0"
+val lz4JavaVersion = "1.11.1"
 val openHtmlToPdfVersion = "1.0.10"
 val commonsLang3Version = "3.20.0"
 val itextVersion = "9.6.0"
@@ -303,7 +303,7 @@ tasks.register<GenerateTask>("openApiGenerateP4PAAUTH") {
   remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-auth.openapi.yaml")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.auth.generated")
-  apiPackage.set("it.gov.pagopa.pu.auth.controller.generated")
+  apiPackage.set("it.gov.pagopa.pu.auth.client.generated")
   modelPackage.set("it.gov.pagopa.pu.auth.dto.generated")
   configOptions.set(
     mapOf(
@@ -335,7 +335,7 @@ tasks.register<GenerateTask>("openApiGenerateWORKFLOWHUB") {
   remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-workflow-hub.generated.openapi.json")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.workflowhub.generated")
-  apiPackage.set("it.gov.pagopa.pu.workflowhub.controller.generated")
+  apiPackage.set("it.gov.pagopa.pu.workflowhub.client.generated")
   modelPackage.set("it.gov.pagopa.pu.workflowhub.dto.generated")
   typeMappings.set(
     mapOf(
@@ -377,7 +377,7 @@ tasks.register<GenerateTask>("openApiGenerateCLASSIFICATION") {
   remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-classification.generated.openapi.json")
   outputDir.set("$projectDir/build/generated")
   invokerPackage.set("it.gov.pagopa.pu.classification.generated")
-  apiPackage.set("it.gov.pagopa.pu.classification.controller.generated")
+  apiPackage.set("it.gov.pagopa.pu.classification.client.generated")
   modelPackage.set("it.gov.pagopa.pu.classification.dto.generated")
   configOptions.set(
     mapOf(

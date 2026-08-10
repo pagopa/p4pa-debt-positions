@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
-import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowApi;
+import it.gov.pagopa.pu.workflowhub.client.generated.WorkflowApi;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowStatusDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
@@ -13,6 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpClientErrorException;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowHubApiClientTest {
@@ -41,9 +43,9 @@ class WorkflowHubApiClientTest {
     // Given
     String accessToken = "ACCESSTOKEN";
 
-    Mockito.when(workflowApisHolderMock.getWorkflowApi(accessToken))
+    when(workflowApisHolderMock.getWorkflowApi(accessToken))
       .thenReturn(workflowApiMock);
-    Mockito.when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
+    when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
       .thenReturn(new WorkflowStatusDTO().status("COMPLETED"));
 
     // When
@@ -58,9 +60,9 @@ class WorkflowHubApiClientTest {
     // Given
     String accessToken = "ACCESSTOKEN";
 
-    Mockito.when(workflowApisHolderMock.getWorkflowApi(accessToken))
+    when(workflowApisHolderMock.getWorkflowApi(accessToken))
       .thenReturn(workflowApiMock);
-    Mockito.when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
+    when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
       .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
 
     // When

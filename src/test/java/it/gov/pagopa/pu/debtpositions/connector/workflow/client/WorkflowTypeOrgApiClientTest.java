@@ -1,9 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
-import it.gov.pagopa.pu.workflowhub.controller.generated.WorkflowTypeOrgEntityControllerApi;
+import it.gov.pagopa.pu.workflowhub.client.generated.WorkflowTypeOrgEntityControllerApi;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,9 +45,9 @@ class WorkflowTypeOrgApiClientTest {
     String workflowTypeOrgId = "id";
     WorkflowTypeOrg expectedResult = new WorkflowTypeOrg();
 
-    Mockito.when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
+    when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
       .thenReturn(workflowTypeOrgEntityControllerApiMock);
-    Mockito.when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
+    when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
       .thenReturn(expectedResult);
 
     WorkflowTypeOrg result = workflowTypeOrgApiClient.findById(workflowTypeOrgId, accessToken);
@@ -59,9 +60,9 @@ class WorkflowTypeOrgApiClientTest {
     String accessToken = "accessToken";
     String workflowTypeOrgId = "id";
 
-    Mockito.when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
+    when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
       .thenReturn(workflowTypeOrgEntityControllerApiMock);
-    Mockito.when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
+    when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
       .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
 
     WorkflowTypeOrg result = workflowTypeOrgApiClient.findById(workflowTypeOrgId, accessToken);
