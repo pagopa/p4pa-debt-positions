@@ -59,7 +59,8 @@ public abstract class BaseApiHolderTest {
 
     Assertions.assertEquals(
       apiPackage
-        .replaceFirst("^.+\\.", ""),
+        .replaceFirst("it\\.gov\\.pagopa\\.(pu\\.)?", "")
+        .replace(".", ""),
       errorHandler.getApplicationName()
         .toLowerCase()
         .replace("_","")
