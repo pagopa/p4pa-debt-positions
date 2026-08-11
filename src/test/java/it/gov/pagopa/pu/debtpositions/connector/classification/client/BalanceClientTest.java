@@ -4,6 +4,7 @@ import it.gov.pagopa.pu.classification.client.generated.BalanceApi;
 import it.gov.pagopa.pu.classification.dto.generated.CalculateAmountBalanceRequest;
 import it.gov.pagopa.pu.classification.dto.generated.ValidateBalanceRequest;
 import it.gov.pagopa.pu.debtpositions.connector.classification.config.ClassificationApisHolder;
+import it.gov.pagopa.pu.debtpositions.exception.common.RestInvokeNotFoundException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 import static org.mockito.Mockito.when;
 
@@ -89,7 +89,7 @@ class BalanceClientTest {
       .thenReturn(balanceApiMock);
 
     when(balanceApiMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode))
-      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
 
     // When
     String result = balanceClient.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);

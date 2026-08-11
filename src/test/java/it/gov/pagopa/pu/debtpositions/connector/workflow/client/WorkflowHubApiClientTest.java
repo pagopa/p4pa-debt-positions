@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
+import it.gov.pagopa.pu.debtpositions.exception.common.RestInvokeNotFoundException;
 import it.gov.pagopa.pu.workflowhub.client.generated.WorkflowApi;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowStatusDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -12,7 +13,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
 
 import static org.mockito.Mockito.when;
 
@@ -63,7 +63,7 @@ class WorkflowHubApiClientTest {
     when(workflowApisHolderMock.getWorkflowApi(accessToken))
       .thenReturn(workflowApiMock);
     when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
-      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
 
     // When
     String result = client.waitWorkflowCompletion(accessToken, "workflowId", 1, 1);

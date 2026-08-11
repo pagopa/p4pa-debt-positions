@@ -1,9 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
-
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
+import it.gov.pagopa.pu.debtpositions.exception.common.RestInvokeNotFoundException;
 import it.gov.pagopa.pu.workflowhub.client.generated.WorkflowTypeOrgEntityControllerApi;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
 import org.junit.jupiter.api.AfterEach;
@@ -14,7 +12,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.client.HttpClientErrorException;
+
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowTypeOrgApiClientTest {
@@ -63,7 +64,7 @@ class WorkflowTypeOrgApiClientTest {
     when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
       .thenReturn(workflowTypeOrgEntityControllerApiMock);
     when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
-      .thenThrow(HttpClientErrorException.create(HttpStatus.NOT_FOUND, "NotFound", null, null, null));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
 
     WorkflowTypeOrg result = workflowTypeOrgApiClient.findById(workflowTypeOrgId, accessToken);
 
