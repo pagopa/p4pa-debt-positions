@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.exception.transcoder;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.BaseBusinessException;
+import it.gov.pagopa.pu.debtpositions.exception.common.BaseBusinessException;
 import it.gov.pagopa.pu.debtpositions.exception.transcoder.handler.*;
 import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;

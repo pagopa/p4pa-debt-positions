@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.common.pii.citizen.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
+import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -11,6 +11,8 @@ import java.util.Base64;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DataCipherServiceTest {
 
@@ -65,9 +67,9 @@ class DataCipherServiceTest {
 
   @Test
   void givenJsonSerializationExceptionWhenEncryptObjThenThrowIllegalStateBusinessException() {
-    JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
+    JsonMapper jsonMapperMock = mock(JsonMapper.class);
 
-    Mockito.when(jsonMapperMock.writeValueAsString(any())).thenThrow(Mockito.mock(JacksonException.class));
+    when(jsonMapperMock.writeValueAsString(any())).thenThrow(mock(JacksonException.class));
 
     DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
 
@@ -82,10 +84,10 @@ class DataCipherServiceTest {
 
   @Test
   void givenJsonDeserializationExceptionWhenDecryptObjThenThrowIllegalStateBusinessException() {
-    JsonMapper jsonMapperMock = Mockito.mock(JsonMapper.class);
+    JsonMapper jsonMapperMock = mock(JsonMapper.class);
 
-    Mockito.when(jsonMapperMock.readValue(any(String.class), Mockito.eq(String.class)))
-      .thenThrow(Mockito.mock(JacksonException.class));
+    when(jsonMapperMock.readValue(any(String.class), Mockito.eq(String.class)))
+      .thenThrow(mock(JacksonException.class));
 
     DataCipherService brokenServiceWithMock = new DataCipherService("PSW", "PEPPER", jsonMapperMock);
 

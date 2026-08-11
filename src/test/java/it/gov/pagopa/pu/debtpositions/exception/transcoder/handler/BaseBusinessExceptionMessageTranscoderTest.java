@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.exception.transcoder.handler;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.BaseBusinessException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.BaseBusinessException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.transcoder.ExceptionMessageTranscoded;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

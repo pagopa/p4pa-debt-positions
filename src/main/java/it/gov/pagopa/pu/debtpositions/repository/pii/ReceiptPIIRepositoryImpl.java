@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.common.pii.citizen.service.PersonalDataService;
 import it.gov.pagopa.pu.common.pii.repository.BasePIIRepository;
 import it.gov.pagopa.pu.debtpositions.dto.pii.ReceiptPIIDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.ReceiptPIIMapper;
 import it.gov.pagopa.pu.debtpositions.model.ReceiptNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.ReceiptNoPIIRepository;

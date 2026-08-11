@@ -1,10 +1,10 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
+import it.gov.pagopa.pu.debtpositions.exception.common.RestInvokeNotFoundException;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowTypeOrg;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 
 @Slf4j
 @Service
@@ -21,7 +21,7 @@ public class WorkflowTypeOrgApiClient {
       return workflowApisHolder.getWorkflowTypeOrgEntityControllerApi(
           accessToken)
         .crudGetWorkflowtypeorg(id);
-    } catch (HttpClientErrorException.NotFound e) {
+    } catch (RestInvokeNotFoundException e) {
       log.info("Cannot find WorkflowTypeOrg with id {}", id);
       return null;
     }

@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.repository.view.installment;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDetailDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.pii.view.InstallmentDetailPIIViewMapper;
 import it.gov.pagopa.pu.debtpositions.model.view.installment.InstallmentDetailNoPIIView;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;

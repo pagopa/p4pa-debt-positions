@@ -29,7 +29,7 @@ public class ConstraintViolationExceptionMessageTranscoder implements ExceptionM
       .collect(Collectors.joining(";"));
 
     return new ExceptionMessageTranscoded(
-      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
+      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.getValue(),
       "Invalid request content." + errorDescription,
       errorFields
     );

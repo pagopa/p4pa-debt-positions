@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.PostalIbanVerifyResponse;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.PostalIbanVerifyResponseMapper;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TransferServiceImplTest {
@@ -57,13 +58,13 @@ class TransferServiceImplTest {
 
     PostalIbanVerifyResponse expectedResponse = new PostalIbanVerifyResponse();
 
-    Mockito.when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
+    when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
       .thenReturn(Set.of(1L, 2L, 3L));
 
-    Mockito.when(transferRepositoryMock.findInstallmentIdsWithNullPostalIban(installmentIds))
+    when(transferRepositoryMock.findInstallmentIdsWithNullPostalIban(installmentIds))
       .thenReturn(idsWithNull);
 
-    Mockito.when(postalIbanVerifyResponseMapperMock.map(installmentIds, idsWithNull))
+    when(postalIbanVerifyResponseMapperMock.map(installmentIds, idsWithNull))
       .thenReturn(expectedResponse);
 
     // when
@@ -79,7 +80,7 @@ class TransferServiceImplTest {
     // given
     List<Long> installmentIds = List.of(1L, 2L, 3L);
 
-    Mockito.when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
+    when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
       .thenReturn(Set.of(1L, 2L));
 
     // when & then
@@ -98,13 +99,13 @@ class TransferServiceImplTest {
 
     PostalIbanVerifyResponse expectedResponse = new PostalIbanVerifyResponse();
 
-    Mockito.when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
+    when(installmentNoPIIRepositoryMock.findExistingInstallmentIds(installmentIds))
       .thenReturn(Set.of(1L, 2L));
 
-    Mockito.when(transferRepositoryMock.findInstallmentIdsWithNullPostalIban(installmentIds))
+    when(transferRepositoryMock.findInstallmentIdsWithNullPostalIban(installmentIds))
       .thenReturn(Set.of());
 
-    Mockito.when(postalIbanVerifyResponseMapperMock.map(installmentIds, Set.of()))
+    when(postalIbanVerifyResponseMapperMock.map(installmentIds, Set.of()))
       .thenReturn(expectedResponse);
 
     // when

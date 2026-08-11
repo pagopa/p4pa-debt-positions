@@ -15,6 +15,9 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsPaidView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PagedInstallmentsView;
 import it.gov.pagopa.pu.debtpositions.dto.generated.TransferDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.UpdateInstallmentNotificationDateRequest;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.InstallmentDebtorDTOMapper;
@@ -29,6 +32,7 @@ import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentDet
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentViewPIIRepository;
 import it.gov.pagopa.pu.debtpositions.repository.view.installment.InstallmentPaidViewPIIViewRepository;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -88,14 +92,14 @@ public class InstallmentServiceImpl implements InstallmentService {
     debtPositionDTO.getPaymentOptions()
       .forEach(paymentOptionDTO -> paymentOptionDTO.getInstallments().stream()
         .filter(installmentDTO -> !InstallmentStatus.CANCELLED.equals(installmentDTO.getStatus()) && request.getNav().contains(installmentDTO.getNav()) &&
-          request.getNotificationDate() != null && installmentDTO.getNotificationDate() != request.getNotificationDate())
+          request.getNotificationDate() != null && (installmentDTO.getNotificationDate() == null || !request.getNotificationDate().isEqual(installmentDTO.getNotificationDate())))
         .forEach(installmentDTO -> {
           log.info("Updating notificationDate {} for installment with id {} related to debt position {}", request.getNotificationDate(), installmentDTO.getInstallmentId(), request.getDebtPositionId());
           installmentDTO.setNotificationDate(request.getNotificationDate());
-          if(installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now())) {
+          if(installmentDTO.getDueDate() != null && installmentDTO.getDueDate().isBefore(LocalDate.now(Constants.ZONEID))) {
             log.info("Obtained a notificationDate on an already expired Installment: installmentId:{} dueDate:{} status:{}",
               installmentDTO.getInstallmentId(), installmentDTO.getDueDate(), installmentDTO.getStatus());
-            installmentDTO.setDueDate(LocalDate.now());
+            installmentDTO.setDueDate(LocalDate.now(Constants.ZONEID));
           }
           updatedInstallments.add(installmentDTO);
         }));
@@ -118,7 +122,7 @@ public class InstallmentServiceImpl implements InstallmentService {
     if(installments.isEmpty())
       throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_NOT_FOUND, "The installment with NAV: "+nav+" was not found");
     if(installments.size() > 1)
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_INSTALLMENTS, "Found more than one installment processable with NAV: "+nav);
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_TOO_MANY_INSTALLMENTS, "Found more than one installment processable with NAV: "+nav);
     if(InstallmentStatus.EXPIRED.equals(installments.getFirst().getStatus()))
       throw new InvalidConditionException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_STATUS, "The installment with NAV: " + nav + " is expired");
 

@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.dptypeorg;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionTypeOrgMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;

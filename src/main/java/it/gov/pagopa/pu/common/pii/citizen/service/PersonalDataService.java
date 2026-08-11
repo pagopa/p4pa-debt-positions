@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.common.pii.citizen.service;
 import it.gov.pagopa.pu.common.pii.citizen.enums.PersonalDataType;
 import it.gov.pagopa.pu.common.pii.citizen.model.PersonalData;
 import it.gov.pagopa.pu.common.pii.citizen.repository.PersonalDataRepository;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.cache.Cache;

@@ -5,14 +5,11 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerServi
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.FileResourceDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptDetailDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
 import it.gov.pagopa.pu.debtpositions.repository.TransferRepository;
 import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
-import it.gov.pagopa.pu.debtpositions.util.BarcodeUtils;
-import it.gov.pagopa.pu.debtpositions.util.DocumentComposition;
-import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.debtpositions.util.*;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.BrokerConfiguration;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -128,7 +125,7 @@ public class ReceiptFileServiceImpl implements ReceiptFileService {
       return "";
     }
 
-    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime now = LocalDateTime.now(Constants.ZONEID);
     String emissionDateStr = now.format(DATE_FORMATTER_FOOTER);
     String emissionTimeStr = now.format(TIME_FORMATTER_FOOTER);
 

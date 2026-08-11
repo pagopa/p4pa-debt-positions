@@ -6,8 +6,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
 import it.gov.pagopa.pu.debtpositions.service.DebtPositionService;
@@ -54,11 +54,11 @@ public class DebtPositionDeletionServiceImpl implements DebtPositionDeletionServ
     }
 
     if(isIunPresent(debtPosition)) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "DebtPosition with id " + debtPositionId + " cannot be deleted because it is been notified");
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "DebtPosition with id " + debtPositionId + " cannot be deleted because it is been notified");
     }
 
     if(!InstallmentUtils.DELETABLE_DP_STATUSES.contains(debtPosition.getStatus())){
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "DebtPosition with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, "DebtPosition with id " + debtPositionId + " cannot be deleted because is not in allowed status: " + debtPosition.getStatus());
     }
 
     DebtPositionDTO debtPositionDTO = debtPositionService.mapDebtPosition(debtPosition);

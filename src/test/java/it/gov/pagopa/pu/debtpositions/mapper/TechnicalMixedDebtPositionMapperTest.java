@@ -6,7 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionStatus;
 import it.gov.pagopa.pu.debtpositions.enums.PaymentOptionType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.IllegalStateBusinessException;
+import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.model.*;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.BalanceResolverService;
@@ -30,6 +30,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildM
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TechnicalMixedDebtPositionMapperTest {
@@ -116,7 +117,7 @@ class TechnicalMixedDebtPositionMapperTest {
       .legacyPaymentMetadata("legacyPaymentMetadata")
       .build();
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(1L))
+    when(debtPositionTypeOrgRepositoryMock.findById(1L))
       .thenReturn(Optional.of(debtPositionTypeOrg));
     Mockito.doNothing().when(balanceResolverServiceMock)
       .updateBalanceResolvingAmount(Mockito.any(InstallmentNoPII.class),

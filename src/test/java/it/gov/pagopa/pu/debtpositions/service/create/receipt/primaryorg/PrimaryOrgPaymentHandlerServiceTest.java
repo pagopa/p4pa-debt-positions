@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.ReceiptWithAdditionalNodeDataDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.model.Transfer;
@@ -20,6 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.util.*;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrimaryOrgPaymentHandlerServiceTest {
@@ -78,9 +80,9 @@ class PrimaryOrgPaymentHandlerServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     DebtPosition dp = new DebtPosition();
 
-    Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
+    when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.of(installment));
-    Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(accessToken)))
+    when(installmentPaymentHandlerServiceMock.handlePayment(Mockito.same(installment), Mockito.same(receiptDTO), Mockito.same(organization), Mockito.same(accessToken)))
       .thenReturn(dp);
 
     // When
@@ -100,9 +102,9 @@ class PrimaryOrgPaymentHandlerServiceTest {
     Broker broker = new Broker();
     DebtPosition dp = new DebtPosition();
 
-    Mockito.when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
+    when(installmentRetrieverServiceMock.retrieve(Mockito.same(organization), Mockito.same(receiptDTO.getNoticeNumber()), Mockito.same(receiptDTO.getIud())))
       .thenReturn(Optional.empty());
-    Mockito.when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(accessToken)))
+    when(technicalDpCreationServiceMock.createAndPublishTechDp(Mockito.same(organization), Mockito.same(receiptDTO), Mockito.same(accessToken)))
       .thenReturn(dp);
 
     // When
@@ -134,9 +136,9 @@ class PrimaryOrgPaymentHandlerServiceTest {
 
     DebtPosition dp = new DebtPosition();
 
-    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+    when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
       .thenReturn(Optional.of(installment));
-    Mockito.when(installmentPaymentHandlerServiceMock.handlePayment(installment, receiptDTO, organization, accessToken))
+    when(installmentPaymentHandlerServiceMock.handlePayment(installment, receiptDTO, organization, accessToken))
       .thenReturn(dp);
 
     Optional<DebtPosition> result = service.handlePayment(organization, receiptDTO, broker, accessToken);
@@ -162,7 +164,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setTransfers(new TreeSet<>(Set.of(transfer)));
 
-    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+    when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
       .thenReturn(Optional.of(installment));
 
     Assertions.assertThrows(InvalidValueException.class, () ->
@@ -186,7 +188,7 @@ class PrimaryOrgPaymentHandlerServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setTransfers(new TreeSet<>(Set.of(transfer)));
 
-    Mockito.when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
+    when(installmentRetrieverServiceMock.retrieve(organization, receiptDTO.getNoticeNumber(), receiptDTO.getIud()))
       .thenReturn(Optional.of(installment));
 
     Assertions.assertThrows(InvalidValueException.class, () ->

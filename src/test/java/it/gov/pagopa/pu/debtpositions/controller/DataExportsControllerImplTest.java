@@ -150,7 +150,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_COMBINATION] You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"))
       .andReturn();
 
   }
@@ -180,7 +180,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }
@@ -210,7 +210,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }
@@ -271,7 +271,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }

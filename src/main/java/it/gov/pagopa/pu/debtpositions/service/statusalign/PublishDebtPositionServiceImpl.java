@@ -5,8 +5,8 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.PaymentOptionDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -46,11 +46,12 @@ public class PublishDebtPositionServiceImpl extends BaseDebtPositionOperationSer
   }
 
   @Transactional
+  @SuppressWarnings("java:S6809") // Suppressing warning regarding invocation a Transactional method through current instance: this method is also Transactional
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> publishDebtPosition(Long debtPositionId, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     DebtPositionDTO debtPositionDTO = debtPositionService.getDebtPosition(debtPositionId);
 
     if (!DRAFT.equals(debtPositionDTO.getStatus())) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("The debt position with id %s cannot be published because is not in an allowed status: %s"
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_DEBT_POSITION_STATUS, String.format("The debt position with id %s cannot be published because is not in an allowed status: %s"
         ,debtPositionId, debtPositionDTO.getStatus()));
     }
 

@@ -8,6 +8,9 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.connector.workflow.service.WorkflowHubService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.exception.custom.*;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -40,6 +43,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.
 import static it.gov.pagopa.pu.debtpositions.util.faker.ManageDebtPositionFaker.buildManageUpdateInstallmentDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionManageInstallmentsServiceImplTest {
@@ -110,9 +114,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_DEBT_POSITION_STATUS",exception.getCode());
@@ -127,7 +131,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
@@ -144,9 +148,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.PAID);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_PAYMENT_OPTION_STATUS",exception.getCode());
@@ -163,9 +167,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
     InstallmentDTO installment2update = buildInstallmentDTO().installmentId(2L).iud("iud2").status(InstallmentStatus.PAID);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_INSTALLMENT_STATUS",exception.getCode());
@@ -179,7 +183,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
@@ -199,9 +203,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
       .status(InstallmentStatus.UNPAID).syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_INSTALLMENT_STATUS",exception.getCode());
@@ -229,17 +233,17 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setCode("ORG_TYPE_CODE");
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
       .thenReturn(Optional.of(buildOrganization()));
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
 
-    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(Mockito.any(), Mockito.any(), Mockito.eq(wfExecutionParametersPartial), Mockito.eq(ACCESS_TOKEN), Mockito.eq(OPERATOR_EXTERNAL_ID)))
+    when(debtPositionUpdateInstallmentServiceMock.updateInstallment(Mockito.any(), Mockito.any(), Mockito.eq(wfExecutionParametersPartial), Mockito.eq(ACCESS_TOKEN), Mockito.eq(OPERATOR_EXTERNAL_ID)))
       .thenReturn(WORKFLOW_UPDATE);
-    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn("FAILED");
+    when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn("FAILED");
 
     WorkflowErrorException exception = assertThrows(WorkflowErrorException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
@@ -272,28 +276,28 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setCode("ORG_TYPE_CODE");
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId))
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId))
       .thenReturn(debtPositionDTO);
 
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
       .thenReturn(Optional.of(buildOrganization()));
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
 
     Mockito.doNothing().when(debtPositionManageApplierServiceMock).merge(Mockito.any(), Mockito.any());
 
-    Mockito.when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(installment2insert), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
+    when(debtPositionAddInstallmentServiceMock.addInstallment(debtPositionDTO, List.of(installment2insert), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_ADD);
-    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_ADD.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
-    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installment2update), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
+    when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_ADD.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
+    when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO, List.of(installment2update), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_UPDATE);
-    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
-    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
+    when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_UPDATE.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
+    when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO, List.of(installment2cancel), wfExecutionParametersPartial, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW_CANCEL);
-    Mockito.when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_CANCEL.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
+    when(workflowHubServiceMock.waitWorkflowCompletion(ACCESS_TOKEN, WORKFLOW_CANCEL.getWorkflowId(), maxRetries, retryDelayMs)).thenReturn(WORKFLOW_STATUS_COMPLETED_VALUE);
 
-    Mockito.when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.eq(wfExecutionParameters), Mockito.eq(PaymentEventType.DP_UPDATED), Mockito.any(), Mockito.eq(ACCESS_TOKEN)))
+    when(debtPositionSyncServiceMock.syncDebtPosition(Mockito.any(), Mockito.eq(wfExecutionParameters), Mockito.eq(PaymentEventType.DP_UPDATED), Mockito.any(), Mockito.eq(ACCESS_TOKEN)))
       .thenReturn(WORKFLOW);
 
     Pair<DebtPositionDTO, WorkflowCreatedDTO> result = debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
@@ -331,12 +335,12 @@ class DebtPositionManageInstallmentsServiceImplTest {
 
     InvalidValueException expectedException = new InvalidValueException("CODE", "Taxonomy invalid");
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
       .thenReturn(Optional.of(org));
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId()))
       .thenReturn(Optional.of(typeOrg));
-    Mockito.doThrow(expectedException)
+    doThrow(expectedException)
       .when(validateDebtPositionServiceMock).validateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
 
     // When
@@ -346,7 +350,7 @@ class DebtPositionManageInstallmentsServiceImplTest {
     // Then
     assertSame(expectedException, resultException);
 
-    Mockito.verify(debtPositionUpdateInstallmentServiceMock, Mockito.never())
+    verify(debtPositionUpdateInstallmentServiceMock, never())
       .updateInstallment(Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any(), Mockito.any());
   }
 
@@ -372,9 +376,9 @@ class DebtPositionManageInstallmentsServiceImplTest {
     DebtPositionTypeOrg typeOrg = new DebtPositionTypeOrg();
     typeOrg.setCode("ORG_TYPE_CODE");
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
 
-    Mockito.doThrow(new com.fasterxml.jackson.databind.JsonMappingException(null, "Error"))
+    doThrow(new com.fasterxml.jackson.databind.JsonMappingException(null, "Error"))
       .when(objectMapper).writeValueAsString(Mockito.any());
 
     InstallmentCloningException exception = assertThrows(InstallmentCloningException.class,
@@ -406,10 +410,10 @@ class DebtPositionManageInstallmentsServiceImplTest {
       .syncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().addInstallmentsItem(installment2update);
 
-    Mockito.when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
+    when(debtPositionServiceMock.getDebtPosition(debtPositionId)).thenReturn(debtPositionDTO);
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN))
       .thenReturn(Optional.of(buildOrganization()));
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(99L)).thenReturn(Optional.empty());
+    when(debtPositionTypeOrgRepositoryMock.findById(99L)).thenReturn(Optional.empty());
 
     NotFoundException exception = assertThrows(NotFoundException.class,
       () -> debtPositionManageInstallmentsService.manageDebtPositionInstallments(debtPositionId, manageDebtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));

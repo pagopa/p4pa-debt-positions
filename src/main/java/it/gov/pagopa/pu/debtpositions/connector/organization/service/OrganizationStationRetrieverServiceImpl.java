@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.springframework.stereotype.Service;
