@@ -3,10 +3,12 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.dto.spontaneous.SpontaneousFormStructure;
 import it.gov.pagopa.pu.debtpositions.model.SpontaneousForm;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.repository.SpontaneousFormRepository;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -123,6 +125,71 @@ class SpontaneousFormServiceImplTest {
 
     Assertions.assertNotNull(response);
     Assertions.assertEquals(spontaneousForm, response);
+  }
+
+  @Test
+  void givenNoSpontaneousFormWhenResolveOrCreateSpontaneousFormThenCreateIt() {
+    SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
+    spontaneousForm.setSpontaneousFormId(null);
+
+    when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(spontaneousForm.getOrganizationId(), spontaneousForm.getCode()))
+      .thenReturn(Optional.empty());
+    when(spontaneousFormRepositoryMock.save(spontaneousForm)).thenReturn(spontaneousForm);
+
+    SpontaneousForm result = spontaneousFormService.resolveOrCreateSpontaneousForm(spontaneousForm);
+
+    Assertions.assertEquals(spontaneousForm, result);
+  }
+
+  @Test
+  void givenExistingSpontaneousFormWithMatchingStructureWhenResolveOrCreateSpontaneousFormThenReturnIt() {
+    Long organizationId = 1L;
+    String code = "CODE";
+    SpontaneousFormStructure structure = SpontaneousFormStructure.builder().amountFieldName("amount").build();
+    SpontaneousForm existingSpontaneousForm = new SpontaneousForm();
+    existingSpontaneousForm.setSpontaneousFormId(12L);
+    existingSpontaneousForm.setOrganizationId(organizationId);
+    existingSpontaneousForm.setCode(code);
+    existingSpontaneousForm.setStructure(structure);
+
+    when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(organizationId, code)).thenReturn(Optional.of(existingSpontaneousForm));
+
+    SpontaneousForm result = spontaneousFormService.resolveOrCreateSpontaneousForm(
+      SpontaneousForm.builder()
+        .organizationId(organizationId)
+        .code(code)
+        .structure(structure)
+        .build()
+    );
+
+    Assertions.assertEquals(existingSpontaneousForm, result);
+  }
+
+  @Test
+  void givenExistingSpontaneousFormWithDifferentStructureWhenResolveOrCreateSpontaneousFormThenConflictException() {
+    Long organizationId = 1L;
+    String code = "CODE";
+    SpontaneousForm existingSpontaneousForm = new SpontaneousForm();
+    existingSpontaneousForm.setSpontaneousFormId(12L);
+    existingSpontaneousForm.setOrganizationId(organizationId);
+    existingSpontaneousForm.setCode(code);
+    existingSpontaneousForm.setStructure(SpontaneousFormStructure.builder().amountFieldName("amount").build());
+    SpontaneousFormStructure requestedStructure = SpontaneousFormStructure.builder().amountFieldName("differentAmount").build();
+    SpontaneousForm spontaneousForm = SpontaneousForm.builder()
+      .organizationId(organizationId)
+      .code(code)
+      .structure(requestedStructure)
+      .build();
+
+    when(spontaneousFormRepositoryMock.findByOrganizationIdAndCode(organizationId, code)).thenReturn(Optional.of(existingSpontaneousForm));
+
+    ConflictException exception = Assertions.assertThrows(
+      ConflictException.class,
+      () -> spontaneousFormService.resolveOrCreateSpontaneousForm(spontaneousForm)
+    );
+
+    Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_SPONTANEOUS_FORM_STRUCTURE_MISMATCH, exception.getCode());
+    Assertions.assertEquals("A Spontaneous Form with the same code already exists but its structure differs from the requested structure.", exception.getMessage());
   }
 
   @Test
