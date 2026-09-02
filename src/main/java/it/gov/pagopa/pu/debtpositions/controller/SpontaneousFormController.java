@@ -40,7 +40,7 @@ public class SpontaneousFormController implements SpontaneousFormApi {
   }
 
   @Override
-  public ResponseEntity<SpontaneousForm> resolveSpontaneousForm(SpontaneousForm spontaneousForm) {
+  public ResponseEntity<SpontaneousForm> matchOrSaveSpontaneousForm(SpontaneousForm spontaneousForm) {
     log.info("resolving SpontaneousForm having organizationId {} and code {}", spontaneousForm.getOrganizationId(), spontaneousForm.getCode());
     return ResponseEntity.ok(spontaneousFormService.resolveOrCreateSpontaneousForm(spontaneousForm));
   }

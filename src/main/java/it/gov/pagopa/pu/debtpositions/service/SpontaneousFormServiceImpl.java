@@ -16,6 +16,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Objects;
 
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 
@@ -83,9 +84,7 @@ public class SpontaneousFormServiceImpl implements SpontaneousFormService {
   }
 
   private void checkMatchingStructure(SpontaneousForm existingSpontaneousForm, SpontaneousFormStructure requestedStructure) {
-    List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
-    checkImmutableField("structure", existingSpontaneousForm.getStructure(), requestedStructure, modifiedFields);
-    if (!CollectionUtils.isEmpty(modifiedFields)) {
+    if (!Objects.equals(existingSpontaneousForm.getStructure(), requestedStructure)) {
       throw new ConflictException(
         ErrorCodeConstants.ERROR_CODE_SPONTANEOUS_FORM_STRUCTURE_MISMATCH,
         "A Spontaneous Form with the same code already exists but its structure differs from the requested structure.");

@@ -2074,12 +2074,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DebtPositionErrorDTO"
-  /spontaneous-forms/resolve:
+  /spontaneous-forms/match-or-save:
     post:
       tags:
         - spontaneous-form
-      operationId: resolveSpontaneousForm
-      description: Resolve or create a Spontaneous Form by organizationId and code, validating its structure when it already exists.
+      operationId: matchOrSaveSpontaneousForm
+      description: Match or create a Spontaneous Form by organizationId and code, verifying if the requested structure is the same when its code already exists.
       requestBody:
         required: true
         content:

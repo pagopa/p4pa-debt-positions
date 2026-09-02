@@ -77,13 +77,13 @@ class SpontaneousFormControllerTest {
   }
 
   @Test
-  void whenResolveSpontaneousFormThenReturnOk() {
+  void whenMatchOrSaveSpontaneousFormThenReturnOk() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
     when(spontaneousFormServiceMock.resolveOrCreateSpontaneousForm(spontaneousForm))
       .thenReturn(spontaneousForm);
 
-    ResponseEntity<SpontaneousForm> result = controller.resolveSpontaneousForm(spontaneousForm);
+    ResponseEntity<SpontaneousForm> result = controller.matchOrSaveSpontaneousForm(spontaneousForm);
 
     assertNotNull(result);
     assertEquals(HttpStatus.OK, result.getStatusCode());
