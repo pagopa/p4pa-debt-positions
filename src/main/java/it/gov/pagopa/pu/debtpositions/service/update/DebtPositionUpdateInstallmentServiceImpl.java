@@ -5,7 +5,7 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -15,6 +15,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionProcessorService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -44,6 +45,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
 
   @Transactional
   @Override
+  @SuppressWarnings("java:S6809") // Suppressing warning regarding invocation a Transactional method through current instance: this method is also Transactional
   public WorkflowCreatedDTO updateInstallment(DebtPositionDTO debtPositionDTO, List<InstallmentDTO> installments2operate, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     if (log.isDebugEnabled()) {
       Set<Long> installmentIds = installments2operate.stream().map(InstallmentDTO::getInstallmentId).collect(Collectors.toSet());
@@ -74,7 +76,7 @@ public class DebtPositionUpdateInstallmentServiceImpl extends BaseDebtPositionOp
 
           InstallmentStatus statusTo = installmentDTO.getStatus();
           if (InstallmentStatus.EXPIRED.equals(installmentDTO.getStatus()) && installmentDTO.getDueDate() != null &&
-            installmentDTO.getDueDate().isAfter(LocalDate.now())) {
+            installmentDTO.getDueDate().isAfter(LocalDate.now(Constants.ZONEID))) {
             statusTo = InstallmentStatus.UNPAID;
           }
           InstallmentUtils.setStatus(installmentDTO, statusTo);

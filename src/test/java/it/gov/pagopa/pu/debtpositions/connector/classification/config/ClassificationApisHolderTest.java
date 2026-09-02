@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.connector.classification.config;
 
 import it.gov.pagopa.pu.classification.dto.generated.ValidateBalanceRequest;
+import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,39 +14,56 @@ import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class ClassificationApisHolderTest extends BaseApiHolderTest {
 
-    @Mock
-    private RestTemplateBuilder restTemplateBuilderMock;
+  @Mock
+  private RestTemplateBuilder restTemplateBuilderMock;
 
-    private ClassificationApisHolder classificationApisHolder;
+  private ClassificationApisHolder apisHolder;
+  private ClassificationApiClientConfig apiClientConfig;
 
-    @BeforeEach
-    void setUp() {
-        Mockito.when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
-        Mockito.when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        ClassificationApiClientConfig clientConfig = ClassificationApiClientConfig.builder()
-          .baseUrl("http://example.com")
-          .build();
-        classificationApisHolder = new ClassificationApisHolder(clientConfig, restTemplateBuilderMock);
-    }
+  @BeforeEach
+  void setUp() {
+    when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
+    when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
 
-    @AfterEach
-    void verifyNoMoreInteractions() {
-        Mockito.verifyNoMoreInteractions(
-                restTemplateBuilderMock,
-                restTemplateMock
-        );
-    }
+    apiClientConfig = ClassificationApiClientConfig.builder()
+      .baseUrl("http://example.com")
+      .maxAttempts(3)
+      .build();
+    apisHolder = new ClassificationApisHolder(apiClientConfig, restTemplateBuilderMock, new JsonConfig().objectMapperJackson3());
 
-    @Test
-    void whenBalanceApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
-        assertAuthenticationShouldBeSetInThreadSafeMode(
-                accessToken -> classificationApisHolder.getBalanceApi(accessToken)
-                        .validateBalance(new ValidateBalanceRequest()),
-                new ParameterizedTypeReference<>() {},
-                classificationApisHolder::unload);
-    }
+    verifyHttpClientErrorJsonBodyHandlerConfiguration(apisHolder.getBalanceApi(null));
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      restTemplateBuilderMock,
+      restTemplateMock
+    );
+  }
+
+  @Test
+  void testRetryConfiguration() {
+    assertRetry(apiClientConfig,
+      accessToken -> apisHolder.getBalanceApi(accessToken)
+        .validateBalance(new ValidateBalanceRequest(), Boolean.TRUE),
+      new ParameterizedTypeReference<>() {}
+    );
+  }
+
+  @Test
+  void whenBalanceApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> apisHolder.getBalanceApi(accessToken)
+        .validateBalance(new ValidateBalanceRequest(), Boolean.TRUE),
+      new ParameterizedTypeReference<>() {
+      },
+      apisHolder::unload);
+  }
 
 }

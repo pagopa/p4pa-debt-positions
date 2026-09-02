@@ -4,7 +4,7 @@ import it.gov.pagopa.pu.debtpositions.dto.BaseDebtPosition;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidStatusTransitionException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
@@ -136,6 +136,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
 
   @Transactional(isolation = Isolation.REPEATABLE_READ)
   @Override
+  @SuppressWarnings("java:S6809") // Suppressing warning regarding invocation a Transactional method through current instance: this method is also Transactional
   public Pair<DebtPositionDTO, WorkflowCreatedDTO> notifyReportedTransferId(Long transferId, TransferReportedRequest transferReportedRequest, String accessToken) {
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByTransferId(transferId);
 
@@ -266,7 +267,7 @@ public class DebtPositionHierarchyStatusAlignerServiceImpl implements DebtPositi
     return debtPosition.getPaymentOptions().stream()
       .flatMap(paymentOption -> paymentOption.getInstallments().stream())
       .filter(i -> i.getStatus().equals(InstallmentStatus.UNPAID) &&
-        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now()) && i.isSwitchToExpired())
+        i.getDueDate() != null && i.getDueDate().isBefore(LocalDate.now(Constants.ZONEID)) && i.isSwitchToExpired())
       .map(i -> {
           InstallmentStatus newStatus = InstallmentStatus.EXPIRED;
           i.setStatus(InstallmentStatus.EXPIRED);

@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.create.receipt.primaryorg;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.repository.InstallmentNoPIIRepository;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
@@ -17,6 +17,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class PrimaryOrgInstallmentRetrieverServiceTest {
@@ -47,7 +49,7 @@ class PrimaryOrgInstallmentRetrieverServiceTest {
     String nav = "NAV";
     String iud = "IUD";
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
+    when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
       .thenReturn(List.of());
 
     // When
@@ -65,11 +67,11 @@ class PrimaryOrgInstallmentRetrieverServiceTest {
     String nav = "NAV";
     String iud = "IUD";
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
+    when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
       .thenReturn(List.of(new InstallmentNoPII(), new InstallmentNoPII()));
 
     // When, Then
-    Assertions.assertThrows(ConflictErrorException.class, () -> service.retrieve(primaryOrg, nav, iud));
+    Assertions.assertThrows(ConflictException.class, () -> service.retrieve(primaryOrg, nav, iud));
   }
 
   @Test
@@ -82,11 +84,11 @@ class PrimaryOrgInstallmentRetrieverServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setNav("UNEXPECTED");
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
+    when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
       .thenReturn(List.of(installment));
 
     // When, Then
-    Assertions.assertThrows(ConflictErrorException.class, () -> service.retrieve(primaryOrg, nav, iud));
+    Assertions.assertThrows(ConflictException.class, () -> service.retrieve(primaryOrg, nav, iud));
   }
 
   @Test
@@ -99,7 +101,7 @@ class PrimaryOrgInstallmentRetrieverServiceTest {
     InstallmentNoPII installment = new InstallmentNoPII();
     installment.setNav(nav);
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
+    when(repositoryMock.getByOrganizationIdAndIudAndStatus(primaryOrg.getOrganizationId(), iud, null))
       .thenReturn(List.of(installment));
 
     // When
@@ -119,7 +121,7 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
   primaryOrg.setOrganizationId(-1L);
   String nav = "NAV";
 
-  Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
+  when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
     .thenReturn(List.of());
 
   // When
@@ -140,11 +142,11 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
     InstallmentNoPII installment2 = new InstallmentNoPII();
     installment2.setStatus(InstallmentStatus.UNPAYABLE);
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
+    when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
       .thenReturn(List.of(installment1, installment2));
 
     // When, Then
-    Assertions.assertThrows(ConflictErrorException.class, () -> service.retrieve(primaryOrg, nav, null));
+    Assertions.assertThrows(ConflictException.class, () -> service.retrieve(primaryOrg, nav, null));
   }
 
   @Test
@@ -158,7 +160,7 @@ void givenNavAndNoInstallmentWhenRetrieveThenReturnEmpty() {
     InstallmentNoPII installment2 = new InstallmentNoPII();
     installment2.setStatus(InstallmentStatus.CANCELLED);
 
-    Mockito.when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
+    when(repositoryMock.getByOrganizationIdAndNav(primaryOrg.getOrganizationId(), nav, InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS_NO_MIXED))
       .thenReturn(List.of(installment1, installment2));
 
     // When

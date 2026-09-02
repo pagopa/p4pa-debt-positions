@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.connector.workflow.client;
 import it.gov.pagopa.pu.debtpositions.connector.workflow.config.WorkflowApisHolder;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
-import it.gov.pagopa.pu.workflowhub.controller.generated.DebtPositionApi;
+import it.gov.pagopa.pu.workflowhub.client.generated.DebtPositionApi;
 import it.gov.pagopa.pu.workflowhub.dto.generated.MassiveDebtPositionIbanUpdateRequestDTO;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
@@ -15,6 +15,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class WorkflowDebtPositionApiClientTest {
@@ -52,9 +54,9 @@ class WorkflowDebtPositionApiClientTest {
     String eventDescription = "EVENTDESCRIPTION";
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("1", "runId");
 
-    Mockito.when(workflowApisHolderMock.getDebtPositionApi(accessToken))
+    when(workflowApisHolderMock.getDebtPositionApi(accessToken))
       .thenReturn(debtPositionApiMock);
-    Mockito.when(debtPositionApiMock.syncDebtPosition(Mockito.argThat(i -> i.getDebtPosition() == debtPositionDTO && i.getExecutionConfig() == null), Mockito.same(massive), Mockito.same(partialChange), Mockito.same(paymentEventType), Mockito.same(eventDescription)))
+    when(debtPositionApiMock.syncDebtPosition(Mockito.argThat(i -> i.getDebtPosition() == debtPositionDTO && i.getExecutionConfig() == null), Mockito.same(massive), Mockito.same(partialChange), Mockito.same(paymentEventType), Mockito.same(eventDescription)))
       .thenReturn(new WorkflowCreatedDTO("1", "runId"));
 
     // When
@@ -71,9 +73,9 @@ class WorkflowDebtPositionApiClientTest {
     MassiveDebtPositionIbanUpdateRequestDTO requestDTO = new MassiveDebtPositionIbanUpdateRequestDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO();
 
-    Mockito.when(workflowApisHolderMock.getDebtPositionApi(accessToken))
+    when(workflowApisHolderMock.getDebtPositionApi(accessToken))
       .thenReturn(debtPositionApiMock);
-    Mockito.when(debtPositionApiMock.massiveDpIbanUpdate(orgId, requestDTO))
+    when(debtPositionApiMock.massiveDpIbanUpdate(orgId, requestDTO))
       .thenReturn(expectedResult);
 
     WorkflowCreatedDTO result = workflowApiClient.massiveDpIbanUpdate(orgId, requestDTO, accessToken);

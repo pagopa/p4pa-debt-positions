@@ -4,8 +4,8 @@ import it.gov.pagopa.pu.common.pii.citizen.service.DataCipherService;
 import it.gov.pagopa.pu.debtpositions.dto.DebtorDebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtorDebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.mapper.pages.PagedDebtorUnpaidDebtPositionMapper;
@@ -28,6 +28,7 @@ import org.springframework.data.domain.Pageable;
 import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,8 @@ import java.util.Optional;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPosition;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionServiceImplTest {
@@ -96,7 +99,7 @@ class DebtPositionServiceImplTest {
     debtPositionService.saveDebtPosition(debtPositionDTO, accessToken);
 
     // Then
-    Mockito.verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO), Mockito.same(accessToken));
+    verify(debtPositionSaveServiceMock).saveDebtPositionDTO(Mockito.same(debtPositionDTO), Mockito.same(accessToken));
   }
 
   @Test
@@ -108,7 +111,7 @@ class DebtPositionServiceImplTest {
     debtPositionService.saveDebtPosition(debtPosition);
 
     // Then
-    Mockito.verify(debtPositionSaveServiceMock).saveDebtPosition(Mockito.same(debtPosition));
+    verify(debtPositionSaveServiceMock).saveDebtPosition(Mockito.same(debtPosition));
   }
 
   @Test
@@ -118,8 +121,8 @@ class DebtPositionServiceImplTest {
     DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
 
     // When
     DebtPositionDTO result = debtPositionService.getDebtPosition(
@@ -136,7 +139,7 @@ class DebtPositionServiceImplTest {
     // Given
     Long debtPositionId = 1L;
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(null);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(null);
 
     // When
     Assertions.assertThrows(NotFoundException.class, () -> debtPositionService.getDebtPosition(
@@ -154,8 +157,8 @@ class DebtPositionServiceImplTest {
     DebtPositionDTO expectedResult = podamFactory.manufacturePojo(DebtPositionDTO.class);
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(debtPosition);
-    Mockito.when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
+    when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(debtPosition);
+    when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(expectedResult);
 
     // When
     DebtPositionDTO result = debtPositionService.getDebtPositionByInstallmentId(
@@ -171,7 +174,7 @@ class DebtPositionServiceImplTest {
     // Given
     Long installmentId = 1L;
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(null);
+    when(debtPositionRepositoryMock.findEntityGraphByInstallmentId(installmentId)).thenReturn(null);
 
     // When, Then
     Assertions.assertThrows(NotFoundException.class, () -> debtPositionService.getDebtPositionByInstallmentId(
@@ -186,8 +189,8 @@ class DebtPositionServiceImplTest {
     List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
     List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(debtPositions);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
+    when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndNav(organizationId, nav, null)).thenReturn(debtPositions);
+    when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndNav(
@@ -206,8 +209,8 @@ class DebtPositionServiceImplTest {
     List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
     List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIuv(organizationId, iuv, null)).thenReturn(debtPositions);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
+    when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIuv(organizationId, iuv, null)).thenReturn(debtPositions);
+    when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndIuv(
@@ -226,8 +229,8 @@ class DebtPositionServiceImplTest {
     List<DebtPositionDTO> expectedResult = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
     List<DebtPosition> debtPositions = List.of(podamFactory.manufacturePojo(DebtPosition.class));
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(organizationId, iud, null)).thenReturn(debtPositions);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
+    when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(organizationId, iud, null)).thenReturn(debtPositions);
+    when(debtPositionMapperMock.mapAllToDto(debtPositions)).thenReturn(expectedResult);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByOrganizationIdAndIud(
@@ -249,8 +252,8 @@ class DebtPositionServiceImplTest {
 
     Page<DebtPosition> pageDebtPosition = new PageImpl<>(List.of(buildDebtPosition()), pageable, 1);
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, null, pageable)).thenReturn(pageDebtPosition);
-    Mockito.when(debtPositionMapperMock.mapToPagedDebtPositions(pageDebtPosition)).thenReturn(expectedPagedDebtPositions);
+    when(debtPositionRepositoryMock.findEntityGraphByIngestionFlowFileIdAndStatusToExclude(ingestionFlowFileId, null, pageable)).thenReturn(pageDebtPosition);
+    when(debtPositionMapperMock.mapToPagedDebtPositions(pageDebtPosition)).thenReturn(expectedPagedDebtPositions);
 
     // When
     PagedDebtPositions result = debtPositionService.getPagedDebtPositionsByIngestionFlowFileId(ingestionFlowFileId, null, pageable);
@@ -265,7 +268,7 @@ class DebtPositionServiceImplTest {
     Long debtPositionId = 1L;
     DebtPosition debtPosition = podamFactory.manufacturePojo(DebtPosition.class);
 
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtPositionId(debtPositionId)).thenReturn(debtPosition);
 
     // When
     DebtPosition result = debtPositionService.getDebtPositionNoPII(debtPositionId);
@@ -292,7 +295,7 @@ class DebtPositionServiceImplTest {
     String iupd = "IUPD-123";
     Long orgId = 42L;
     DebtPosition entity = podamFactory.manufacturePojo(DebtPosition.class);
-    Mockito.when(debtPositionRepositoryMock.findDebtPositionByIupdOrgAndOrganizationId(iupd, orgId))
+    when(debtPositionRepositoryMock.findDebtPositionByIupdOrgAndOrganizationId(iupd, orgId))
       .thenReturn(Optional.of(entity));
 
     // When
@@ -309,7 +312,7 @@ class DebtPositionServiceImplTest {
     // Given
     String iupd = "IUPD-123";
     Long orgId = 42L;
-    Mockito.when(debtPositionRepositoryMock.findDebtPositionByIupdOrgAndOrganizationId(iupd, orgId))
+    when(debtPositionRepositoryMock.findDebtPositionByIupdOrgAndOrganizationId(iupd, orgId))
       .thenReturn(Optional.empty());
 
     // When
@@ -328,17 +331,17 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = List.of(InstallmentStatus.PAID);
     List<DebtPositionOrigin> origin = List.of(DebtPositionOrigin.ORDINARY);
     List<Long> orgIds = List.of(123L);
-    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, 1, 1, 0, 0),
-      LocalDateTime.of(2023, 12, 31, 23, 59));
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, Month.JANUARY, 1, 0, 0),
+      LocalDateTime.of(2023, Month.DECEMBER, 31, 23, 59));
 
     byte[] fiscalCodeHash = new byte[]{1,2,3};
     List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
     List<DebtPositionDTO> dtos = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
 
-    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
+    when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(dtos);
+    when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(dtos);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
@@ -363,10 +366,10 @@ class DebtPositionServiceImplTest {
     List<DebtPosition> entities = List.of(podamFactory.manufacturePojo(DebtPosition.class));
     List<DebtPositionDTO> dtos = List.of(podamFactory.manufacturePojo(DebtPositionDTO.class));
 
-    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
+    when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(dtos);
+    when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(dtos);
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
@@ -401,16 +404,16 @@ class DebtPositionServiceImplTest {
     List<InstallmentStatus> status = List.of();
     List<DebtPositionOrigin> origin = List.of();
     List<Long> orgIds = List.of(789L);
-    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, 1, 1, 0, 0),
-      LocalDateTime.of(2023, 12, 31, 23, 59));
+    LocalDateTimeIntervalFilter dateTimeIntervalFilter = new LocalDateTimeIntervalFilter(LocalDateTime.of(2023, Month.JANUARY, 1, 0, 0),
+      LocalDateTime.of(2023, Month.DECEMBER, 31, 23, 59));
 
     byte[] fiscalCodeHash = new byte[]{10,11,12};
     List<DebtPosition> entities = List.of();
 
-    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
-    Mockito.when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
+    when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(fiscalCodeHash);
+    when(debtPositionRepositoryMock.findEntityGraphByDebtorFiscalCodeAndDebtorEntityType(
       fiscalCodeHash, entityType, status, origin, Collections.emptyList(), orgIds, dateTimeIntervalFilter)).thenReturn(entities);
-    Mockito.when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(Collections.emptyList());
+    when(debtPositionMapperMock.mapAllToDto(entities)).thenReturn(Collections.emptyList());
 
     // When
     List<DebtPositionDTO> result = debtPositionService.getDebtPositionsByDebtorFiscalCodeAndDebtorEntityType(
@@ -439,16 +442,16 @@ class DebtPositionServiceImplTest {
 
     PagedDebtorUnpaidDebtPositionDTO expected = podamFactory.manufacturePojo(PagedDebtorUnpaidDebtPositionDTO.class);
 
-    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
+    when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
-    Mockito.when(debtPositionRepositoryMock
+    when(debtPositionRepositoryMock
         .findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(200L))
+    when(debtPositionTypeOrgRepositoryMock.findById(200L))
       .thenReturn(Optional.of(typeOrg));
 
-    Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
+    when(pagedDebtorUnpaidDebtPositionMapperMock
         .map(page, Map.of(100L, typeOrg), hashedDebtorFiscalCode ))
       .thenReturn(expected);
 
@@ -475,13 +478,13 @@ class DebtPositionServiceImplTest {
     PagedDebtorUnpaidDebtPositionDTO expected =
       podamFactory.manufacturePojo(PagedDebtorUnpaidDebtPositionDTO.class);
 
-    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
+    when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
-    Mockito.when(debtPositionRepositoryMock
+    when(debtPositionRepositoryMock
         .findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(emptyPage);
 
-    Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
+    when(pagedDebtorUnpaidDebtPositionMapperMock
         .map(emptyPage, Collections.emptyMap(), hashedDebtorFiscalCode))
       .thenReturn(expected);
 
@@ -507,11 +510,11 @@ class DebtPositionServiceImplTest {
 
     Page<DebtPosition> page = new PageImpl<>(List.of(dp));
 
-    Mockito.when(debtPositionRepositoryMock
+    when(debtPositionRepositoryMock
         .findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
-    Mockito.when(debtPositionTypeOrgRepositoryMock.findById(70L))
+    when(debtPositionTypeOrgRepositoryMock.findById(70L))
       .thenReturn(Optional.empty());
 
     // When, Then
@@ -531,14 +534,14 @@ class DebtPositionServiceImplTest {
 
     Page<DebtPosition> page = new PageImpl<>(List.of());
 
-    Mockito.when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
+    when(dataCipherServiceMock.hash(debtorFiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
-    Mockito.when(debtPositionRepositoryMock
+    when(debtPositionRepositoryMock
         .findEntityGraphUnpaidOrdinaryDebtPositionByDebtorFiscalCode(debtorFiscalCode, organizationIds, pageable))
       .thenReturn(page);
 
     PagedDebtorUnpaidDebtPositionDTO expectedResult = new PagedDebtorUnpaidDebtPositionDTO();
-    Mockito.when(pagedDebtorUnpaidDebtPositionMapperMock
+    when(pagedDebtorUnpaidDebtPositionMapperMock
         .map(page, Collections.emptyMap(), hashedDebtorFiscalCode))
       .thenReturn(expectedResult);
 
@@ -564,18 +567,18 @@ class DebtPositionServiceImplTest {
 
     DebtorDebtPositionDTO expected = podamFactory.manufacturePojo(DebtorDebtPositionDTO.class);
 
-    Mockito.when(
+    when(
       debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
-    Mockito.when(
+    when(
       debtPositionTypeOrgRepositoryMock.findById(99L)
     ).thenReturn(Optional.of(typeOrg));
 
-    Mockito.when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(hashedDebtorFiscalCode);
+    when(dataCipherServiceMock.hash(fiscalCode)).thenReturn(hashedDebtorFiscalCode);
 
-    Mockito.when(
+    when(
       debtorDebtPositionMapperMock.map(entity, typeOrg, hashedDebtorFiscalCode)
     ).thenReturn(expected);
 
@@ -597,7 +600,7 @@ class DebtPositionServiceImplTest {
     String fiscalCode = "debtorFiscalCode";
     Long organizationId = 10L;
 
-    Mockito.when(
+    when(
       debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(null);
@@ -621,12 +624,12 @@ class DebtPositionServiceImplTest {
     DebtPosition entity = podamFactory.manufacturePojo(DebtPosition.class);
     entity.setDebtPositionTypeOrgId(123L);
 
-    Mockito.when(
+    when(
       debtPositionRepositoryMock.findEntityGraphUnpaidOrPaidDebtPositionsByDebtorFiscalCode(
         debtPositionId, fiscalCode, organizationId)
     ).thenReturn(entity);
 
-    Mockito.when(
+    when(
       debtPositionTypeOrgRepositoryMock.findById(123L)
     ).thenReturn(Optional.empty());
 

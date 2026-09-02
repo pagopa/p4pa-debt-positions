@@ -4,8 +4,8 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerServi
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -18,6 +18,7 @@ import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.Constants;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
@@ -81,6 +82,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Transactional
   @Override
+  @SuppressWarnings("java:S6809") // Suppressing warning regarding invocation a Transactional method through current instance: this method is also Transactional
   public WorkflowCreatedDTO createDebtPosition(DebtPositionDTO debtPositionDTO, WfExecutionParameters wfExecutionParameters, String accessToken, String operatorExternalUserId) {
     log.info("Creating a DebtPosition having organizationId {}, debtPositionTypeOrgId {}, iupdOrg {}", debtPositionDTO.getOrganizationId(),
       debtPositionDTO.getDebtPositionTypeOrgId(), debtPositionDTO.getIupdOrg());
@@ -185,7 +187,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   private void setSourceFlowName(InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin, String orgIpaCode) {
     if(installmentDTO.getSourceFlowName() == null) {
-      String now = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+      String now = LocalDate.now(Constants.ZONEID).format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
       if (DebtPositionOrigin.ORDINARY.equals(debtPositionOrigin))
         installmentDTO.setSourceFlowName(orgIpaCode + "_IMPORT-DOVUTO_" + now);
       if (DebtPositionOrigin.SPONTANEOUS.equals(debtPositionOrigin))
@@ -201,7 +203,7 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
     boolean isInstallmentDuplicate = installmentNoPIIRepository.isInstallmentExists(debtPositionDTO.getOrganizationId(), installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), InstallmentUtils.PRIMARY_ORG_DEBT_POSITION_ORIGINS);
     if (isInstallmentDuplicate) {
       log.error("Duplicate installments found for input Installment having IUD {}, IUV {}, NAV {} on organization {}", installmentDTO.getIud(), installmentDTO.getIuv(), installmentDTO.getNav(), debtPositionDTO.getOrganizationId());
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_ALREADY_EXISTS, "Duplicate records found: the provided data conflicts with existing records");
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INSTALLMENT_ALREADY_EXISTS, "Duplicate records found: the provided data conflicts with existing records");
     }
   }
 

@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.model.validator;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionType;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import org.junit.jupiter.api.AfterEach;
@@ -13,6 +13,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeFaker.buildDebtPositionType;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class TaxonomyCodeConstraintValidatorTest {
@@ -31,7 +32,7 @@ class TaxonomyCodeConstraintValidatorTest {
   @Test
   void givenValidTaxonomyCodeWhenIsValidThenReturnTrue() {
     //Given
-    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
+    when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
       .thenReturn(true);
     //When
     boolean actualResult = validator.isValid(buildDebtPositionType(), null);
@@ -43,7 +44,7 @@ class TaxonomyCodeConstraintValidatorTest {
   void givenInvalidTaxonomyCodeWhenIsValidThenThrowInvalidValueException() {
     //Given
     InvalidValueException expectedException = new InvalidValueException("CODE", "Error");
-    Mockito.when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
+    when(serviceMock.isTaxonomyCodeValid(Mockito.anyString(), Mockito.anyString()))
       .thenThrow(expectedException);
 
     DebtPositionType debtPositionType = buildDebtPositionType();

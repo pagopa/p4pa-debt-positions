@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.service.create;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
@@ -11,8 +11,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class IuvServiceTest {
@@ -77,18 +78,18 @@ class IuvServiceTest {
   @Test
   void givenValidOrgWhenGenerateIuvThenOk(){
     //Given
-    Mockito.when(iuvSequenceNumberService.getNextIuvSequenceNumber(VALID_ORG.getOrganizationId())).thenReturn(VALID_PAYMENT_INDEX);
+    when(iuvSequenceNumberService.getNextIuvSequenceNumber(VALID_ORG.getOrganizationId())).thenReturn(VALID_PAYMENT_INDEX);
     //When
     String result = iuvService.generateIuv(VALID_ORG, BROKER, VALID_ORG_STATION.getSegregationCode());
     //Verify
     Assertions.assertEquals(VALID_IUV, result);
-    Mockito.verify(iuvSequenceNumberService, Mockito.times(1)).getNextIuvSequenceNumber(VALID_ORG.getOrganizationId());
+    verify(iuvSequenceNumberService, times(1)).getNextIuvSequenceNumber(VALID_ORG.getOrganizationId());
   }
 
   @Test
   void givenEmptyOrgWhenGenerateIuvThenException(){
     //Given
-    Mockito.when(iuvSequenceNumberService.getNextIuvSequenceNumber(INVALID_ORG.getOrganizationId())).thenReturn(INVALID_PAYMENT_INDEX);
+    when(iuvSequenceNumberService.getNextIuvSequenceNumber(INVALID_ORG.getOrganizationId())).thenReturn(INVALID_PAYMENT_INDEX);
     //Verify
     Assertions.assertThrows(InvalidValueException.class, () -> iuvService.generateIuv(INVALID_ORG, BROKER, null));
   }

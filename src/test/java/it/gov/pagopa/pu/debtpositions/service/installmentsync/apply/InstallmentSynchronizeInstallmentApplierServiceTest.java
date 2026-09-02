@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,7 +67,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     installmentSynchronizeDTO.setFiscalCode("new_fiscal_code");
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
     assertEquals("IMMUTABLE_FIELD", exception.getCode());
     assertEquals("These fields for installment with iud iud are not mutable: [iuv, debtor.fiscalCode]", exception.getMessage());
@@ -84,7 +84,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     installmentSynchronizeDTO.setNumberBeneficiary(3);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
     assertEquals("INVALID_INSTALLMENT", exception.getCode());
     assertEquals("The number of beneficiary for installment with iud iud does not match with the size of the list", exception.getMessage());
@@ -96,7 +96,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstSyncTransfer);
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
     assertEquals("IMMUTABLE_FIELD", exception.getCode());
     assertEquals("The number of beneficiary for installment with iud iud cannot be modified", exception.getMessage());
@@ -111,7 +111,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
     installmentDTO.addTransfersItem(firstTransfer);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
     assertEquals("TRANSFER_NOT_FOUND", exception.getCode());
     assertEquals("The transfer with index 1 for installment with iud iud does not found", exception.getMessage());
@@ -127,7 +127,7 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
     installmentDTO.addTransfersItem(firstTransfer);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO));
     assertEquals("IMMUTABLE_FIELD", exception.getCode());
     assertEquals("These fields for transfer with index 1 of installment with iud iud are not mutable: [orgFiscalCode, orgName, iban, category]", exception.getMessage());

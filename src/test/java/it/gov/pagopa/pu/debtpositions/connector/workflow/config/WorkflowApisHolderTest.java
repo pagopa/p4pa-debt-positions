@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.workflow.config;
 
+import it.gov.pagopa.pu.debtpositions.config.json.JsonConfig;
 import it.gov.pagopa.pu.debtpositions.connector.BaseApiHolderTest;
 import it.gov.pagopa.pu.workflowhub.dto.generated.SyncDebtPositionRequestDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -13,56 +14,75 @@ import org.springframework.boot.restclient.RestTemplateBuilder;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 
+import static org.mockito.Mockito.when;
+
 @ExtendWith(MockitoExtension.class)
 class WorkflowApisHolderTest extends BaseApiHolderTest {
-    @Mock
-    private RestTemplateBuilder restTemplateBuilderMock;
+  @Mock
+  private RestTemplateBuilder restTemplateBuilderMock;
 
-    private WorkflowApisHolder workflowApisHolder;
+  private WorkflowApisHolder apisHolder;
+  private WorkflowApiClientConfig apiClientConfig;
 
-    @BeforeEach
-    void setUp() {
-        Mockito.when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
-        Mockito.when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
-        WorkflowApiClientConfig clientConfig = WorkflowApiClientConfig.builder()
-          .baseUrl("http://example.com")
-          .build();
-        workflowApisHolder = new WorkflowApisHolder(clientConfig, restTemplateBuilderMock);
-    }
+  @BeforeEach
+  void setUp() {
+    when(restTemplateBuilderMock.build()).thenReturn(restTemplateMock);
+    when(restTemplateMock.getUriTemplateHandler()).thenReturn(new DefaultUriBuilderFactory());
 
-    @AfterEach
-    void verifyNoMoreInteractions() {
-        Mockito.verifyNoMoreInteractions(
-                restTemplateBuilderMock,
-                restTemplateMock
-        );
-    }
+    apiClientConfig = WorkflowApiClientConfig.builder()
+      .baseUrl("http://example.com")
+      .maxAttempts(3)
+      .build();
+    apisHolder = new WorkflowApisHolder(apiClientConfig, restTemplateBuilderMock, new JsonConfig().objectMapperJackson3());
 
-    @Test
-    void whenWorkflowTypeOrgEntityControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
-      assertAuthenticationShouldBeSetInThreadSafeMode(
-        accessToken -> workflowApisHolder.getWorkflowTypeOrgEntityControllerApi(accessToken)
-          .crudGetWorkflowtypeorg("id"),
-        new ParameterizedTypeReference<>() {},
-        workflowApisHolder::unload);
-    }
+    verifyHttpClientErrorJsonBodyHandlerConfiguration(apisHolder.getWorkflowTypeOrgEntityControllerApi(null));
+  }
 
-    @Test
-    void whenDebtPositionApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
-        assertAuthenticationShouldBeSetInThreadSafeMode(
-                accessToken -> workflowApisHolder.getDebtPositionApi(accessToken)
-                  .syncDebtPosition(new SyncDebtPositionRequestDTO(), null, null, null, null),
-                new ParameterizedTypeReference<>() {},
-                workflowApisHolder::unload);
-    }
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      restTemplateBuilderMock,
+      restTemplateMock
+    );
+  }
+
+  @Test
+  void testRetryConfiguration() {
+    assertRetry(apiClientConfig,
+      accessToken -> apisHolder.getWorkflowTypeOrgEntityControllerApi(accessToken)
+        .crudGetWorkflowtypeorg("id"),
+      new ParameterizedTypeReference<>() {}
+    );
+  }
+
+  @Test
+  void whenWorkflowTypeOrgEntityControllerApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> apisHolder.getWorkflowTypeOrgEntityControllerApi(accessToken)
+        .crudGetWorkflowtypeorg("id"),
+      new ParameterizedTypeReference<>() {
+      },
+      apisHolder::unload);
+  }
+
+  @Test
+  void whenDebtPositionApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
+    assertAuthenticationShouldBeSetInThreadSafeMode(
+      accessToken -> apisHolder.getDebtPositionApi(accessToken)
+        .syncDebtPosition(new SyncDebtPositionRequestDTO(), null, null, null, null),
+      new ParameterizedTypeReference<>() {
+      },
+      apisHolder::unload);
+  }
 
   @Test
   void whenWorkflowHubApiThenAuthenticationShouldBeSetInThreadSafeMode() throws InterruptedException {
     assertAuthenticationShouldBeSetInThreadSafeMode(
-      accessToken -> workflowApisHolder.getWorkflowApi(accessToken)
+      accessToken -> apisHolder.getWorkflowApi(accessToken)
         .waitWorkflowCompletion("workflowId", 3, 30),
-      new ParameterizedTypeReference<>() {},
-      workflowApisHolder::unload);
+      new ParameterizedTypeReference<>() {
+      },
+      apisHolder::unload);
   }
 
 }

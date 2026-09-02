@@ -3,7 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.ErrorFieldDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.springframework.stereotype.Service;
 
@@ -25,7 +25,7 @@ public class InstallmentSynchronizeDebtPositionApplierService {
     checkImmutableField("flagPuPagoPaPayment", installmentSynchronizeDTO.getFlagPuPagoPaPayment(), debtPositionDTO.getFlagPuPagoPaPayment(), modifiedFields);
 
     if (!modifiedFields.isEmpty()) {
-      throw new ConflictErrorException(
+      throw new ConflictException(
         ErrorCodeConstants.ERROR_CODE_IMMUTABLE_FIELD,
         String.format("These fields for debt position with iupd %s are not mutable: %s", debtPositionDTO.getIupdOrg(), modifiedFields.stream().map(ErrorFieldDTO::getField).toList()),
         modifiedFields);

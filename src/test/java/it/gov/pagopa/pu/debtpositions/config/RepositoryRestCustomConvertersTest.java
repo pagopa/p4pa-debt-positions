@@ -1,7 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.config;
 
 import it.gov.pagopa.pu.debtpositions.enums.DebtPositionTypeOrgBalanceCostType;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgBalanceCost;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import org.junit.jupiter.api.AfterEach;
@@ -14,6 +14,8 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.support.DefaultFormattingConversionService;
+
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class RepositoryRestCustomConvertersTest {
@@ -28,7 +30,7 @@ class RepositoryRestCustomConvertersTest {
     RepositoryRestCustomConverters repositoryRestCustomConverters = new RepositoryRestCustomConverters(conversionServiceMock);
 
     debtPositionTypeOrgBalanceCostIdConverter = repositoryRestCustomConverters.debtPositionTypeOrgBalanceCostIdConverter();
-    Mockito.verify(conversionServiceMock).addConverter(debtPositionTypeOrgBalanceCostIdConverter);
+    verify(conversionServiceMock).addConverter(debtPositionTypeOrgBalanceCostIdConverter);
   }
 
   @AfterEach

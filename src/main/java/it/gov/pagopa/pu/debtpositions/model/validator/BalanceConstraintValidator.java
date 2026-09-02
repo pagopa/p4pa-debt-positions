@@ -18,6 +18,6 @@ public class BalanceConstraintValidator implements ConstraintValidator<BalanceCo
   @Override
   public boolean isValid(String balance, ConstraintValidatorContext context) {
     return StringUtils.isBlank(balance) ||
-      BooleanUtils.isTrue(balanceService.isValidBalance(balance, null, SecurityUtils.getAccessToken()));
+      BooleanUtils.isTrue(balanceService.isValidBalance(balance, null, Boolean.TRUE, SecurityUtils.getAccessToken()));
   }
 }

@@ -23,6 +23,45 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class UtilitiesTest {
 
+  public static void setTraceId(String traceId) {
+    setTraceId(traceId, null);
+  }
+  public static void setTraceId(String traceId, String spanId) {
+    MDC.put("traceId", traceId);
+    MDC.put("spanId", spanId);
+  }
+  public static void clearTraceIdContext(){
+    MDC.clear();
+  }
+
+  @Test
+  void testGetTraceId(){
+    // Given
+    String expectedResult = "TRACEID";
+    setTraceId(expectedResult);
+
+    // When
+    String result = Utilities.getTraceId();
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+    clearTraceIdContext();
+  }
+
+  @Test
+  void testGetSpanId(){
+    // Given
+    String expectedResult = "SPANID";
+    setTraceId("TRACEID", expectedResult);
+
+    // When
+    String result = Utilities.getSpanId();
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+    clearTraceIdContext();
+  }
+
   @Test
   void givenInvalidIbanWhenIsValidIbanThenReturnFalse() {
     String iban = "test";
@@ -208,20 +247,6 @@ public class UtilitiesTest {
   }
 
   @Test
-  void testGetTraceId() {
-    // Given
-    String expectedResult = "TRACEID";
-    setTraceId(expectedResult);
-
-    // When
-    String result = Utilities.getTraceId();
-
-    // Then
-    Assertions.assertSame(expectedResult, result);
-    clearTraceIdContext();
-  }
-
-  @Test
   void givenValidLongWhenLongCentsToBigDecimalEuroThenOk() {
     // Given
     Long centsAmount = 7500L;
@@ -240,14 +265,6 @@ public class UtilitiesTest {
     Long centsAmount = null;
     // When & Then
     assertNull(Utilities.longCentsToBigDecimalEuro(centsAmount));
-  }
-
-  public static void setTraceId(String traceId) {
-    MDC.put("traceId", traceId);
-  }
-
-  public static void clearTraceIdContext() {
-    MDC.clear();
   }
 
   @Test

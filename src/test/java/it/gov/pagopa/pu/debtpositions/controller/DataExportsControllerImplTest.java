@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.dto.filters.ExportPaidInstallmentsFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.filters.LocalDateTimeIntervalFilter;
 import it.gov.pagopa.pu.debtpositions.dto.filters.OffsetDateTimeIntervalFilter;
@@ -10,7 +11,6 @@ import it.gov.pagopa.pu.debtpositions.service.ReceiptService;
 import it.gov.pagopa.pu.debtpositions.util.TestUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -31,6 +31,8 @@ import java.time.ZoneOffset;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(DataExportsControllerImpl.class)
@@ -46,9 +48,10 @@ class DataExportsControllerImplTest {
 
   @MockitoBean
   private InstallmentService installmentServiceMock;
-
   @MockitoBean
   private ReceiptService receiptServiceMock;
+  @MockitoBean
+  private Tracer tracerMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
@@ -65,7 +68,7 @@ class DataExportsControllerImplTest {
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, new LocalDateTimeIntervalFilter(), debtPositionTypeOrgId, null);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
+    when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
@@ -81,7 +84,7 @@ class DataExportsControllerImplTest {
 
     PagedInstallmentsPaidView response = jsonMapper.readValue(result.getResponse().getContentAsString(), PagedInstallmentsPaidView.class);
     TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "paymentDateTime");
-    Mockito.verify(installmentServiceMock).getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
+    verify(installmentServiceMock).getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
   }
 
   @Test
@@ -97,7 +100,7 @@ class DataExportsControllerImplTest {
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), localDateTimeIntervalFilter, debtPositionTypeOrgId, null);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
+    when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
@@ -113,7 +116,7 @@ class DataExportsControllerImplTest {
 
     PagedInstallmentsPaidView response = jsonMapper.readValue(result.getResponse().getContentAsString(), PagedInstallmentsPaidView.class);
     TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "installmentUpdateDateTime");
-    Mockito.verify(installmentServiceMock).getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
+    verify(installmentServiceMock).getPagedInstallmentPaidView(exportPaidInstallmentsFiltersDTO, Pageable.ofSize(1));
   }
 
   @Test
@@ -132,7 +135,7 @@ class DataExportsControllerImplTest {
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, paymentDateTimeIntervalFilter, localDateTimeIntervalFilter, debtPositionTypeOrgId, null);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
+    when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     mockMvc.perform(
@@ -147,7 +150,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_COMBINATION] You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("You must provide only one of the following date ranges: either the payment date range (paymentDateTimeFrom and paymentDateTimeTo) or the installment update date range (installmentUpdateDateTimeFrom and installmentUpdateDateTimeTo). Providing both or neither is not allowed"))
       .andReturn();
 
   }
@@ -164,7 +167,7 @@ class DataExportsControllerImplTest {
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, offsetDateTimeIntervalFilter, null, debtPositionTypeOrgId, null);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
+    when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     mockMvc.perform(
@@ -177,7 +180,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }
@@ -194,7 +197,7 @@ class DataExportsControllerImplTest {
     ExportPaidInstallmentsFiltersDTO exportPaidInstallmentsFiltersDTO = new ExportPaidInstallmentsFiltersDTO(organizationId, operatorExternalUserId, new OffsetDateTimeIntervalFilter(), localDateTimeIntervalFilter, debtPositionTypeOrgId, null);
     PagedInstallmentsPaidView expectedResponse = podamFactory.manufacturePojo(PagedInstallmentsPaidView.class);
 
-    Mockito.when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
+    when(installmentServiceMock.getPagedInstallmentPaidView(eq(exportPaidInstallmentsFiltersDTO),
       any(PageRequest.class))).thenReturn(expectedResponse);
 
     mockMvc.perform(
@@ -207,7 +210,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }
@@ -221,7 +224,7 @@ class DataExportsControllerImplTest {
 
     PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
 
-    Mockito.when(receiptServiceMock.getPagedReceiptArchivingView(eq(organizationId),
+    when(receiptServiceMock.getPagedReceiptArchivingView(eq(organizationId),
       eq(operatorExternalUserId),
       eq(paymentDateFrom),
       eq(paymentDateTo),
@@ -239,7 +242,7 @@ class DataExportsControllerImplTest {
 
     PagedReceiptsArchivingView response = jsonMapper.readValue(result.getResponse().getContentAsString(), PagedReceiptsArchivingView.class);
     TestUtils.reflectionEqualsByName(expectedResponse.getContent().getFirst(),response.getContent().getFirst(), "paymentDateTime");
-    Mockito.verify(receiptServiceMock).getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1));
+    verify(receiptServiceMock).getPagedReceiptArchivingView(organizationId, operatorExternalUserId, paymentDateFrom, paymentDateTo, Pageable.ofSize(1));
   }
 
   @Test
@@ -252,7 +255,7 @@ class DataExportsControllerImplTest {
 
     PagedReceiptsArchivingView expectedResponse = podamFactory.manufacturePojo(PagedReceiptsArchivingView.class);
 
-    Mockito.when(receiptServiceMock.getPagedReceiptArchivingView(eq(organizationId),
+    when(receiptServiceMock.getPagedReceiptArchivingView(eq(organizationId),
       eq(operatorExternalUserId),
       eq(paymentDateFrom),
       eq(paymentDateTo),
@@ -268,7 +271,7 @@ class DataExportsControllerImplTest {
       .andExpect(status().isBadRequest())
       .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("[INVALID_DATE_FILTER_INTERVAL] The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("The date interval between 2025-03-06T17:05:04.685811Z and 2025-11-06T17:05:04.686949700Z cannot exceed 6 months"))
       .andReturn();
 
   }

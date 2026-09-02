@@ -4,16 +4,13 @@ import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceSe
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.BrokerService;
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
-import it.gov.pagopa.pu.debtpositions.util.CategoryUtils;
-import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
-import it.gov.pagopa.pu.debtpositions.util.Utilities;
+import it.gov.pagopa.pu.debtpositions.util.*;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import org.apache.commons.lang3.BooleanUtils;
@@ -64,7 +61,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     DebtPosition debtPosition = debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId());
 
     if (debtPosition != null) {
-      throw new ConflictErrorException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_ALREADY_EXISTS, "Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
+      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_ALREADY_EXISTS, "Duplicate records found: DebtPosition with same iupdOrg " + debtPositionDTO.getIupdOrg() + " conflicts with existing records.");
     }
 
     if (debtPositionTypeOrg == null ||
@@ -160,7 +157,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
     if (!InstallmentStatus.PAID.equals(installmentDTO.getStatus()) &&
       StringUtils.isNotBlank(installmentDTO.getBalance()) &&
-      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), installmentDTO.getAmountCents(), accessToken))) {
+      BooleanUtils.isNotTrue(balanceService.isValidBalance(installmentDTO.getBalance(), installmentDTO.getAmountCents(), Boolean.FALSE, accessToken))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_BALANCE, "Balance is not formally valid");
     }
 
@@ -189,7 +186,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (flagMandatoryDueDate && dueDate == null) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_DUE_DATE, "The due date is mandatory");
     }
-    if (dueDate != null && dueDate.isBefore(LocalDate.now())) {
+    if (dueDate != null && dueDate.isBefore(LocalDate.now(Constants.ZONEID))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DUE_DATE, "The due date cannot be retroactive");
     }
 

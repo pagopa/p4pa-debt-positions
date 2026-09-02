@@ -6,8 +6,8 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.InvalidValueException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentNoPII;
 import it.gov.pagopa.pu.debtpositions.service.AuthorizeOperatorOnDebtPositionTypeService;
@@ -31,6 +31,7 @@ import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildD
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionTypeOrgFaker.buildDebtPositionTypeOrg;
 import static it.gov.pagopa.pu.debtpositions.util.faker.OrganizationFaker.buildOrganization;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class DebtPositionDeletionServiceImplTest {
@@ -64,16 +65,16 @@ class DebtPositionDeletionServiceImplTest {
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setStatus(DebtPositionStatus.DRAFT);
 
-    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.ofNullable(organization));
-    Mockito.when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPosition.getDebtPositionTypeOrgId(), OPERATOR_EXTERNAL_ID))
+    when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
+    when(organizationServiceMock.getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.ofNullable(organization));
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPosition.getDebtPositionTypeOrgId(), OPERATOR_EXTERNAL_ID))
       .thenReturn(buildDebtPositionTypeOrg());
     Mockito.doNothing().when(debtPositionServiceMock).delete(debtPosition);
 
     WorkflowCreatedDTO result = debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID);
 
     assertNull(result);
-    Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
+    verify(debtPositionCancelInstallmentServiceMock, times(0))
       .cancelInstallment(Mockito.any(), Mockito.anyList(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
   }
 
@@ -85,8 +86,8 @@ class DebtPositionDeletionServiceImplTest {
     DebtPosition debtPosition = buildDebtPosition();
     debtPosition.setStatus(DebtPositionStatus.DRAFT);
 
-    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
-    Mockito.when(organizationServiceMock.getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
+    when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
+    when(organizationServiceMock.getOrganizationById(debtPosition.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
 
     InvalidValueException exception = assertThrows(InvalidValueException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
@@ -101,15 +102,15 @@ class DebtPositionDeletionServiceImplTest {
     Long debtPositionId = 1L;
     DebtPosition debtPosition = buildDebtPosition();
 
-    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
+    when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_DEBT_POSITION_STATUS",exception.getCode());
     assertEquals("DebtPosition with id 1 cannot be deleted because it is been notified", exception.getMessage());
 
-    Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
+    verify(debtPositionCancelInstallmentServiceMock, times(0))
       .cancelInstallment(Mockito.any(), Mockito.anyList(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
   }
 
@@ -120,15 +121,15 @@ class DebtPositionDeletionServiceImplTest {
     debtPosition.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
     debtPosition.setStatus(DebtPositionStatus.PAID);
 
-    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
+    when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
 
-    ConflictErrorException exception = assertThrows(ConflictErrorException.class,
+    ConflictException exception = assertThrows(ConflictException.class,
       () -> debtPositionDeletionService.deleteDebtPosition(debtPositionId, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID));
 
     assertEquals("INVALID_DEBT_POSITION_STATUS",exception.getCode());
     assertEquals("DebtPosition with id 1 cannot be deleted because is not in allowed status: PAID", exception.getMessage());
 
-    Mockito.verify(debtPositionCancelInstallmentServiceMock, Mockito.times(0))
+    verify(debtPositionCancelInstallmentServiceMock, times(0))
       .cancelInstallment(Mockito.any(), Mockito.anyList(), Mockito.any(), Mockito.anyString(), Mockito.anyString());
   }
 
@@ -147,9 +148,9 @@ class DebtPositionDeletionServiceImplTest {
     installmentDTO.setStatus(InstallmentStatus.UNPAID);
     installmentDTO.setSyncStatus(null);
 
-    Mockito.when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
-    Mockito.when(debtPositionServiceMock.mapDebtPosition(debtPosition)).thenReturn(debtPositionDTO);
-    Mockito.when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
+    when(debtPositionServiceMock.getDebtPositionNoPII(debtPositionId)).thenReturn(debtPosition);
+    when(debtPositionServiceMock.mapDebtPosition(debtPosition)).thenReturn(debtPositionDTO);
+    when(debtPositionCancelInstallmentServiceMock.cancelInstallment(debtPositionDTO,
         List.of(installmentDTO), wfExecutionParameters, ACCESS_TOKEN, OPERATOR_EXTERNAL_ID))
       .thenReturn(WORKFLOW);
 

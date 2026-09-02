@@ -4,8 +4,8 @@ import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentStatus;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
-import it.gov.pagopa.pu.debtpositions.exception.custom.ConflictErrorException;
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
 import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionUpdateInstallmentService;
@@ -15,7 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
@@ -23,6 +22,7 @@ import java.util.List;
 import static it.gov.pagopa.pu.debtpositions.util.faker.DebtPositionFaker.buildDebtPositionDTO;
 import static it.gov.pagopa.pu.debtpositions.util.faker.InstallmentSynchronizeFaker.buildInstallmentSynchronizeDTO;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class InstallmentSynchronizeUpdateServiceImplTest {
@@ -50,11 +50,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
+    when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
         debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
-    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
+    when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 
@@ -133,7 +133,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -150,7 +150,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.PAID);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -169,7 +169,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.TO_SYNC);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -189,7 +189,7 @@ class InstallmentSynchronizeUpdateServiceImplTest {
       InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.PAID).build());
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    ConflictErrorException conflictException = assertThrows(ConflictErrorException.class, () ->
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals("INVALID_INSTALLMENT_STATUS", conflictException.getCode());
@@ -209,11 +209,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSyncStatus(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
+    when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
       debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
-    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
+    when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 
@@ -235,11 +235,11 @@ class InstallmentSynchronizeUpdateServiceImplTest {
       .setSyncStatus(InstallmentSyncStatus.builder().syncStatusTo(InstallmentStatus.UNPAID).build());
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIun(null);
 
-    Mockito.when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
+    when(installmentSynchronizeApplierServiceMock.apply(installmentSynchronizeDTO, debtPositionDTO,
         debtPositionDTO.getPaymentOptions().getFirst(), debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst(), accessToken))
       .thenReturn(Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()));
 
-    Mockito.when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
+    when(debtPositionUpdateInstallmentServiceMock.updateInstallment(debtPositionDTO,
         List.of(debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst()), wfExecutionParameters, accessToken, operatorExternalUserId))
       .thenReturn(expectedResult);
 

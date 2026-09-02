@@ -15,7 +15,7 @@ public class DataIntegrityViolationExceptionMessageTranscoder implements Excepti
       errorMsg += " " + hibernateConstraintViolationException.getSQLException().getMessage();
     }
     return new ExceptionMessageTranscoded(
-      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_CONFLICT.name(),
+      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_CONFLICT.getValue(),
       errorMsg,
       null) ;
   }

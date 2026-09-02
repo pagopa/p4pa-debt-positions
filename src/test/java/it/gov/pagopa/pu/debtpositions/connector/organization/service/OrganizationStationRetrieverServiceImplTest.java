@@ -1,6 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.connector.organization.service;
 
-import it.gov.pagopa.pu.debtpositions.exception.custom.NotFoundException;
+import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
 import org.junit.jupiter.api.AfterEach;
@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static it.gov.pagopa.pu.debtpositions.util.Constants.UNKNOWN_STATION_ID;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class OrganizationStationRetrieverServiceImplTest {
@@ -38,7 +39,7 @@ class OrganizationStationRetrieverServiceImplTest {
     // Given
     Long organizationId = 1L;
     String stationId = "STATION_ID";
-    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
+    when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
       .thenReturn(Optional.empty());
 
     // When
@@ -50,8 +51,6 @@ class OrganizationStationRetrieverServiceImplTest {
     // Then
     Assertions.assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exception.getCode());
     Assertions.assertEquals("Unable to find organization station for organizationId %d and stationId %s".formatted(organizationId, stationId), exception.getMessage());
-    Mockito.verify(organizationServiceMock)
-      .getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
   }
 
   @Test
@@ -60,7 +59,7 @@ class OrganizationStationRetrieverServiceImplTest {
     Long organizationId = 1L;
     String stationId = "STATION_ID";
     Optional<OrganizationStationDTO> expectedResult = Optional.of(new OrganizationStationDTO());
-    Mockito.when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
+    when(organizationServiceMock.getOrganizationStation(organizationId, stationId, ACCESS_TOKEN))
       .thenReturn(expectedResult);
 
     // When
@@ -68,8 +67,6 @@ class OrganizationStationRetrieverServiceImplTest {
 
     // Then
     Assertions.assertEquals(expectedResult.get(), result);
-    Mockito.verify(organizationServiceMock)
-      .getOrganizationStation(organizationId, stationId, ACCESS_TOKEN);
   }
 
   @Test
@@ -85,8 +82,6 @@ class OrganizationStationRetrieverServiceImplTest {
 
     // Then
     Assertions.assertEquals(expectedOrganizationStationDTO, result);
-    Mockito.verify(organizationServiceMock, Mockito.times(0))
-      .getOrganizationStation(organizationId, UNKNOWN_STATION_ID, ACCESS_TOKEN);
   }
 
 }

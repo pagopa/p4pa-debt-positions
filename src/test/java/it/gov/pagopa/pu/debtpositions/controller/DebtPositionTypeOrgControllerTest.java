@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.connector.classification.service.BalanceService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.IONotificationDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.SaveDebtPositionTypeOrgDTO;
@@ -42,6 +43,8 @@ class DebtPositionTypeOrgControllerTest {
   private BalanceService balanceServiceMock;
   @MockitoBean
   private DebtPositionTypeOrgTechHandlerService debtPositionTypeOrgTechHandlerService;
+  @MockitoBean
+  private Tracer tracerMock;
 
   private final String accessToken = "ACCESSTOKEN";
 

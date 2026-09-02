@@ -13,7 +13,7 @@ public class MissingServletRequestParameterExceptionMessageTranscoder implements
   @Override
   public ExceptionMessageTranscoded transcode(MissingServletRequestParameterException missingServletRequestParameterException) {
     return new ExceptionMessageTranscoded(
-      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.name(),
+      DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.getValue(),
       missingServletRequestParameterException.getMessage(),
       List.of(new ErrorFieldDTO(missingServletRequestParameterException.getParameterName(), "NotNull", missingServletRequestParameterException.getMessage())));
   }

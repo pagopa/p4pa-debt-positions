@@ -1,5 +1,6 @@
 package it.gov.pagopa.pu.debtpositions.controller;
 
+import io.micrometer.tracing.Tracer;
 import it.gov.pagopa.pu.debtpositions.dto.filters.InstallmentsSearchFiltersDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.service.InstallmentService;
@@ -10,7 +11,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
@@ -28,7 +28,10 @@ import uk.co.jemos.podam.api.PodamFactory;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(InstallmentControllerImpl.class)
@@ -43,6 +46,8 @@ class InstallmentControllerTest {
 
   @MockitoBean
   private InstallmentService installmentServiceMock;
+  @MockitoBean
+  private Tracer tracerMock;
 
   private final PodamFactory podamFactory = TestUtils.getPodamFactory();
 
@@ -53,7 +58,7 @@ class InstallmentControllerTest {
     List<InstallmentDTO> installmentDTOList = List.of(InstallmentFaker.buildInstallmentDTO());
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
+    when(installmentServiceMock.getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList)).thenReturn(installmentDTOList);
 
     var builder = MockMvcRequestBuilders.get("/installments/{organizationId}/{nav}",1L,"NAV")
       .contentType(MediaType.APPLICATION_JSON_VALUE);
@@ -71,12 +76,12 @@ class InstallmentControllerTest {
       Assertions.assertTrue(EqualsBuilder.reflectionEquals(expectedElem, resultElem, false, null, true,
         "transfers", "notificationDate","dueDate", "creationDate", "updateDate"), "Error on element " + idx);
       Assertions.assertEquals(expectedElem.getDueDate(), resultElem.getDueDate());
-      Assertions.assertEquals(expectedElem.getNotificationDate().toInstant(), resultElem.getNotificationDate().toInstant());
-      Assertions.assertEquals(expectedElem.getCreationDate().toInstant(), resultElem.getCreationDate().toInstant());
-      Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getNotificationDate()).toInstant(), Objects.requireNonNull(resultElem.getNotificationDate()).toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getCreationDate()).toInstant(), Objects.requireNonNull(resultElem.getCreationDate()).toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getUpdateDate()).toInstant(), Objects.requireNonNull(resultElem.getUpdateDate()).toInstant());
       Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
     }
-    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
+    verify(installmentServiceMock).getInstallmentsByOrganizationIdAndNav(1L, "NAV", originList);
   }
 
   @ParameterizedTest
@@ -86,7 +91,7 @@ class InstallmentControllerTest {
     List<InstallmentDTO> installmentDTOList = List.of(InstallmentFaker.buildInstallmentDTO());
     List<DebtPositionOrigin> originList = List.of(DebtPositionOrigin.valueOf(debtPositionOrigin));
 
-    Mockito.when(installmentServiceMock.getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
+    when(installmentServiceMock.getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList)).thenReturn(installmentDTOList);
 
     var builder = MockMvcRequestBuilders.get("/installments/by-organizationId-and-receiptId")
       .contentType(MediaType.APPLICATION_JSON_VALUE);
@@ -108,12 +113,12 @@ class InstallmentControllerTest {
       Assertions.assertTrue(EqualsBuilder.reflectionEquals(expectedElem, resultElem, false, null, true,
         "transfers", "notificationDate","dueDate", "creationDate", "updateDate"), "Error on element " + idx);
       Assertions.assertEquals(expectedElem.getDueDate(), resultElem.getDueDate());
-      Assertions.assertEquals(expectedElem.getNotificationDate().toInstant(), resultElem.getNotificationDate().toInstant());
-      Assertions.assertEquals(expectedElem.getCreationDate().toInstant(), resultElem.getCreationDate().toInstant());
-      Assertions.assertEquals(expectedElem.getUpdateDate().toInstant(), resultElem.getUpdateDate().toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getNotificationDate()).toInstant(), Objects.requireNonNull(resultElem.getNotificationDate()).toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getCreationDate()).toInstant(), Objects.requireNonNull(resultElem.getCreationDate()).toInstant());
+      Assertions.assertEquals(Objects.requireNonNull(expectedElem.getUpdateDate()).toInstant(), Objects.requireNonNull(resultElem.getUpdateDate()).toInstant());
       Assertions.assertIterableEquals(expectedElem.getTransfers(), resultElem.getTransfers());
     }
-    Mockito.verify(installmentServiceMock, Mockito.times(1)).getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList);
+    verify(installmentServiceMock).getInstallmentsByOrganizationIdAndReceiptId(1L, 999L, originList);
   }
 
   @Test
@@ -122,7 +127,7 @@ class InstallmentControllerTest {
     String operatorExternalUserId = "operatorExternalUserId";
     InstallmentDetailDTO expectedResponse = podamFactory.manufacturePojo(InstallmentDetailDTO.class);
 
-    Mockito.when(installmentServiceMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(expectedResponse);
+    when(installmentServiceMock.getInstallmentDetail(installmentId, operatorExternalUserId)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/installments/"+installmentId)
@@ -133,7 +138,7 @@ class InstallmentControllerTest {
     InstallmentDetailDTO response = jsonMapper.readValue(result.getResponse().getContentAsString(), InstallmentDetailDTO.class);
     TestUtils.reflectionEqualsByName(expectedResponse,response);
 
-    Mockito.verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
+    verify(installmentServiceMock).getInstallmentDetail(installmentId, operatorExternalUserId);
   }
 
   @Test
@@ -144,7 +149,7 @@ class InstallmentControllerTest {
     List<InstallmentDebtorDTO> expectedResponse = podamFactory.manufacturePojo(List.class,InstallmentDebtorDTO.class);
     List<InstallmentStatus> statuses = List.of(InstallmentStatus.PAID);
 
-    Mockito.when(installmentServiceMock.getInstallmentsByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(expectedResponse);
+    when(installmentServiceMock.getInstallmentsByIuvOrNav(iuvOrNav,debtorFiscalCode,organizationId, statuses)).thenReturn(expectedResponse);
 
     MvcResult result = mockMvc.perform(
         MockMvcRequestBuilders.get("/installments/debtor")
@@ -187,7 +192,7 @@ class InstallmentControllerTest {
       debtPositionTypeOrgId,
       status
     );
-    Mockito.when(installmentServiceMock
+    when(installmentServiceMock
         .getPagedInstallmentsByFilters(filtersDTO, pageable))
       .thenReturn(expectedResponse);
 

@@ -23,8 +23,7 @@ import java.util.*;
 @Slf4j
 public class TestUtils {
 
-  private TestUtils() {
-  }
+  private TestUtils() {}
 
   static {
     clearDefaultTimezone();
