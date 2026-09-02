@@ -68,11 +68,25 @@ class SpontaneousFormControllerTest {
   void whenUpdateSpontaneousFormThenReturnOk() {
     SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
 
-    Mockito.when(spontaneousFormServiceMock.updateSpontaneousForm(spontaneousForm)).thenReturn(spontaneousForm);
+    when(spontaneousFormServiceMock.updateSpontaneousForm(spontaneousForm)).thenReturn(spontaneousForm);
 
     ResponseEntity<Void> result = controller.updateSpontaneousForm(spontaneousForm);
 
     assertNotNull(result);
     assertEquals(HttpStatus.OK, result.getStatusCode());
+  }
+
+  @Test
+  void whenMatchOrSaveSpontaneousFormThenReturnOk() {
+    SpontaneousForm spontaneousForm = podamFactory.manufacturePojo(SpontaneousForm.class);
+
+    when(spontaneousFormServiceMock.resolveOrCreateSpontaneousForm(spontaneousForm))
+      .thenReturn(spontaneousForm);
+
+    ResponseEntity<SpontaneousForm> result = controller.matchOrSaveSpontaneousForm(spontaneousForm);
+
+    assertNotNull(result);
+    assertEquals(HttpStatus.OK, result.getStatusCode());
+    assertEquals(spontaneousForm, result.getBody());
   }
 }

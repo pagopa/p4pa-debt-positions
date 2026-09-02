@@ -6,4 +6,5 @@ public interface SpontaneousFormService {
   SpontaneousForm createSpontaneousForm(SpontaneousForm spontaneousForm);
   void deleteSpontaneousForm(Long spontaneousFormId);
   SpontaneousForm updateSpontaneousForm(SpontaneousForm spontaneousForm);
+  SpontaneousForm resolveOrCreateSpontaneousForm(SpontaneousForm spontaneousForm);
 }
