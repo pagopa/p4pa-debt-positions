@@ -74,6 +74,9 @@ val hibernateCoreVersion = "7.1.18.Final"
 
 val springCloudDepsVersion = "2025.1.3"
 
+// CVE Security dependencies
+val tomcatEmbedCoreVersion = "11.0.25"
+
 dependencyManagement {
   imports {
     mavenBom("org.springframework.cloud:spring-cloud-dependencies:$springCloudDepsVersion")
@@ -123,7 +126,14 @@ dependencies {
   implementation("com.itextpdf:kernel:$itextVersion")
   implementation("com.itextpdf:barcodes:$itextVersion")
 
+  // CVE Security dependencies
+  implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedCoreVersion")
+
   compileOnly("org.projectlombok:lombok")
+  annotationProcessor("org.projectlombok:lombok")
+  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
+  testAnnotationProcessor("org.projectlombok:lombok")
+  testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 
   //  Testing
   testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
@@ -133,10 +143,6 @@ dependencies {
   testImplementation("com.h2database:h2")
   testImplementation("uk.co.jemos.podam:podam:$podamVersion")
 
-  testAnnotationProcessor("org.projectlombok:lombok")
-
-  annotationProcessor("org.projectlombok:lombok")
-  annotationProcessor("org.mapstruct:mapstruct-processor:$mapStructVersion")
 }
 
 tasks.withType<Test> {
