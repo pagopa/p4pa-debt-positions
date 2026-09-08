@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @RepositoryRestResource(path = "debt-position-types")
@@ -27,7 +28,7 @@ public interface DebtPositionTypeRepository extends JpaRepository<DebtPositionTy
   "and dpt.taxonomyCode = :taxonomyCode")
 List<DebtPositionType> findByMainFields(String code, Long brokerId, String orgType, String macroArea, String serviceType, String collectingReason, String taxonomyCode);
 
-List<DebtPositionType> findByBrokerIdAndCode(Long brokerId, String code);
+Optional<DebtPositionType> findByBrokerIdAndCodeAndOrgTypeAndTaxonomyCode(Long brokerId, String code, String orgType, String taxonomyCode);
 
 List<DebtPositionType> findByDebtPositionTypeIdIn(Set<Long> debtPositionTypeIds);
 }
