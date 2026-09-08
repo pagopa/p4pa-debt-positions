@@ -27,7 +27,7 @@ public interface DebtPositionTypeRepository extends JpaRepository<DebtPositionTy
   "and dpt.taxonomyCode = :taxonomyCode")
 List<DebtPositionType> findByMainFields(String code, Long brokerId, String orgType, String macroArea, String serviceType, String collectingReason, String taxonomyCode);
 
-List<DebtPositionType> findByBrokerIdAndCode(Long brokerId, String code);
+List<DebtPositionType> findByBrokerIdAndCodeAndOrgTypeAndTaxonomyCode(Long brokerId, String code, String orgType, String taxonomyCode);
 
 List<DebtPositionType> findByDebtPositionTypeIdIn(Set<Long> debtPositionTypeIds);
 }
