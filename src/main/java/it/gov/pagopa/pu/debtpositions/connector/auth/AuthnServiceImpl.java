@@ -1,10 +1,8 @@
 package it.gov.pagopa.pu.debtpositions.connector.auth;
 
 import it.gov.pagopa.pu.debtpositions.connector.auth.service.AuthAccessTokenRetriever;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-@Lazy
 @Service
 public class AuthnServiceImpl implements AuthnService {
 

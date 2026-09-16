@@ -3,10 +3,8 @@ package it.gov.pagopa.pu.debtpositions.connector.auth.client;
 
 import it.gov.pagopa.pu.auth.dto.generated.AccessToken;
 import it.gov.pagopa.pu.debtpositions.connector.auth.config.AuthApisHolder;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
-@Lazy
 @Service
 public class AuthnClient {
 
