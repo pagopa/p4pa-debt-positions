@@ -95,6 +95,12 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
           .map(dto -> mapToDebtPositionTypeOrgBalanceCost(dto, savedDebtPositionTypeOrg.getDebtPositionTypeOrgId()))
           .toList()
       ));
+    Optional.ofNullable(saveDebtPositionTypeOrgDTO.getDeleteDebtPositionTypeOrgBalanceCostList())
+      .ifPresent(deleteDptoBalanceCostList -> debtPositionTypeOrgBalanceCostRepository.deleteAllById(
+        deleteDptoBalanceCostList.stream()
+          .map(dto -> new DebtPositionTypeOrgBalanceCost.DebtPositionTypeOrgBalanceCostId(savedDebtPositionTypeOrg.getDebtPositionTypeOrgId(), dto.getType(), dto.getOperatingYear()))
+          .toList()
+      ));
     handleOperators(savedDebtPositionTypeOrg, saveDebtPositionTypeOrgDTO);
     return savedDebtPositionTypeOrg;
   }
@@ -108,7 +114,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     }
 
     if (debtPositionTypeOrgRepository.updateFlagActiveDebtPositionTypeOrg(debtPositionTypeOrgId, flagActive) == 0) {
-      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND,"DebtPositionTypeOrg with id %d not found".formatted(debtPositionTypeOrgId));
+      throw new NotFoundException(ErrorCodeConstants.ERROR_CODE_DEBT_POSITION_TYPE_ORG_NOT_FOUND, "DebtPositionTypeOrg with id %d not found".formatted(debtPositionTypeOrgId));
     }
   }
 
@@ -138,7 +144,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
     }
 
     String postalIban = debtPositionTypeOrg.getPostalIban();
-    if(StringUtils.isNotBlank(postalIban) && StringUtils.isBlank(debtPositionTypeOrg.getIban())){
+    if (StringUtils.isNotBlank(postalIban) && StringUtils.isBlank(debtPositionTypeOrg.getIban())) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_POSTAL_IBAN, "It is not possible to set postalIban if the iban is null");
     }
 
@@ -168,7 +174,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
         });
     }
 
-   triggerMassiveIbanUpdateIfNeeded(debtPositionTypeOrg, existingDpto, accessToken);
+    triggerMassiveIbanUpdateIfNeeded(debtPositionTypeOrg, existingDpto, accessToken);
   }
 
   private void checkReadOnlyFields(DebtPositionTypeOrg existingDebtPositionTypeOrg, DebtPositionTypeOrg updatedDebtPositionTypeOrg) {

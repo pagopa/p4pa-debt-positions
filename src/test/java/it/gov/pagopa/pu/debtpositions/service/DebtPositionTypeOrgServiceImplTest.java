@@ -182,6 +182,7 @@ class DebtPositionTypeOrgServiceImplTest {
     );
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
       saveDebtPositionTypeOrgDTO, accessToken);
@@ -216,6 +217,7 @@ class DebtPositionTypeOrgServiceImplTest {
     when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(savedDpto);
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
 
@@ -247,6 +249,7 @@ class DebtPositionTypeOrgServiceImplTest {
       .thenReturn(debtPositionTypeOrg);
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
       saveDebtPositionTypeOrgDTO, accessToken);
@@ -329,6 +332,7 @@ class DebtPositionTypeOrgServiceImplTest {
     when(organizationServiceMock.getOrganizationById(orgId, accessToken)).thenReturn(Optional.of(organization));
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(
       saveDebtPositionTypeOrgDTO, accessToken);
@@ -592,6 +596,7 @@ class DebtPositionTypeOrgServiceImplTest {
     when(debtPositionTypeOrgRepositoryMock.save(debtPositionTypeOrg)).thenReturn(debtPositionTypeOrg);
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     DebtPositionTypeOrg result = debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
 
@@ -648,6 +653,7 @@ class DebtPositionTypeOrgServiceImplTest {
       .thenReturn(updatedDpto);
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
 
@@ -696,6 +702,7 @@ class DebtPositionTypeOrgServiceImplTest {
       .thenReturn(updatedDpto);
     when(debtPositionTypeOrgBalanceCostRepositoryMock.saveAll(Mockito.anyList()))
       .thenAnswer(invocation -> invocation.getArgument(0));
+    doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteAllById(Mockito.anyList());
 
     debtPositionTypeOrgService.saveDebtPositionTypeOrg(saveDebtPositionTypeOrgDTO, accessToken);
 
