@@ -36,21 +36,21 @@ import static it.gov.pagopa.pu.debtpositions.util.Utilities.checkImmutableField;
 @Service
 public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgService {
   private final DebtPositionTypeOrgRepository debtPositionTypeOrgRepository;
-  private final DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService;
+  private final DebtPositionTypeOrgOperatorsFacadeService debtPositionTypeOrgOperatorsFacadeService;
   private final SpontaneousFormRepository spontaneousFormRepository;
   private final WorkflowDebtPositionService workflowDebtPositionService;
   private final OrganizationService organizationService;
   private final DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepository;
 
   public DebtPositionTypeOrgServiceImpl(DebtPositionTypeOrgRepository debtPositionTypeOrgRepository,
-                                        DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsService,
+                                        DebtPositionTypeOrgOperatorsFacadeService debtPositionTypeOrgOperatorsFacadeService,
                                         SpontaneousFormRepository spontaneousFormRepository,
                                         WorkflowDebtPositionService workflowDebtPositionService,
                                         OrganizationService organizationService,
                                         DebtPositionTypeOrgBalanceCostRepository debtPositionTypeOrgBalanceCostRepository
   ) {
     this.debtPositionTypeOrgRepository = debtPositionTypeOrgRepository;
-    this.debtPositionTypeOrgOperatorsService = debtPositionTypeOrgOperatorsService;
+    this.debtPositionTypeOrgOperatorsFacadeService = debtPositionTypeOrgOperatorsFacadeService;
     this.spontaneousFormRepository = spontaneousFormRepository;
     this.workflowDebtPositionService = workflowDebtPositionService;
     this.organizationService = organizationService;
@@ -75,7 +75,7 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
   @Override
   public void deleteDebtPositionTypeOrg(Long debtPositionTypeOrgId) {
     DebtPositionTypeOrg debtPositionTypeOrg = findDptoByIdOrThrow(debtPositionTypeOrgId);
-    debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
+    debtPositionTypeOrgOperatorsFacadeService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgBalanceCostRepository.deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     debtPositionTypeOrgRepository.delete(debtPositionTypeOrg);
   }
@@ -120,14 +120,14 @@ public class DebtPositionTypeOrgServiceImpl implements DebtPositionTypeOrgServic
 
   private void handleOperators(DebtPositionTypeOrg debtPositionTypeOrg, SaveDebtPositionTypeOrgDTO saveDebtPositionTypeOrgDTO) {
     if (Boolean.TRUE.equals(saveDebtPositionTypeOrgDTO.getRemoveEnabledOperators())) {
-      debtPositionTypeOrgOperatorsService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId());
+      debtPositionTypeOrgOperatorsFacadeService.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrg.getDebtPositionTypeOrgId());
     }
     if (!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getDisabledOperators())) {
-      debtPositionTypeOrgOperatorsService.deleteOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
+      debtPositionTypeOrgOperatorsFacadeService.deleteOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getDisabledOperators());
     }
     if (!CollectionUtils.isEmpty(saveDebtPositionTypeOrgDTO.getEnabledOperators())) {
-      debtPositionTypeOrgOperatorsService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
+      debtPositionTypeOrgOperatorsFacadeService.saveOperators(debtPositionTypeOrg.getDebtPositionTypeOrgId(),
         saveDebtPositionTypeOrgDTO.getEnabledOperators());
     }
   }

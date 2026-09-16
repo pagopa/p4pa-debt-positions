@@ -3,24 +3,26 @@ package it.gov.pagopa.pu.debtpositions.service;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgOperatorsRepository;
+import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
+
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import it.gov.pagopa.pu.debtpositions.service.dptypeorg.UnknownDebtPositionTypeOrgRetrieverService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
-
 @Slf4j
 @Service
-public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionTypeOrgOperatorsService{
+public class DebtPositionTypeOrgOperatorsFacadeServiceImpl implements DebtPositionTypeOrgOperatorsFacadeService {
 
   private final DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepository;
   private final UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService;
 
-  public DebtPositionTypeOrgOperatorsServiceImpl(
+  public DebtPositionTypeOrgOperatorsFacadeServiceImpl(
     DebtPositionTypeOrgOperatorsRepository debtPositionTypeOrgOperatorsRepository,
     UnknownDebtPositionTypeOrgRetrieverService unknownDebtPositionTypeOrgRetrieverService) {
     this.debtPositionTypeOrgOperatorsRepository = debtPositionTypeOrgOperatorsRepository;
@@ -153,5 +155,16 @@ public class DebtPositionTypeOrgOperatorsServiceImpl implements DebtPositionType
     }
     logDeletedOperators(debtPositionTypeOrgId, deletedOperators);
     return deletedOperators;
+  }
+
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  @Override
+  public List<DebtPositionTypeOrgOperators> saveDebtPositionTypeOrgOperatorsForNewOperator(String operatorExternalUserId, Long organizationId, Set<Long> debtPositionTypeOrgIds) {
+    List<DebtPositionTypeOrgOperators> dptoos = new ArrayList<>();
+    if(!CollectionUtils.isEmpty(debtPositionTypeOrgIds)){
+      dptoos.addAll(saveDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId,debtPositionTypeOrgIds));
+    }
+    dptoos.addAll(saveDefaultTechnicalDebtPositionTypeOrgOperatorsForOperator(operatorExternalUserId,organizationId));
+    return dptoos;
   }
 }

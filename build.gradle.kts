@@ -1,9 +1,9 @@
-import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
-import java.util.*
-import com.github.jk1.license.render.*
-import com.github.jk1.license.filter.*
+import com.github.jk1.license.filter.SpdxLicenseBundleNormalizer
+import com.github.jk1.license.render.XmlReportRenderer
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+import java.util.*
 
 plugins {
   java
@@ -202,7 +202,8 @@ tasks.register("dependenciesBuild") {
     "openApiGenerateORGANIZATION",
     "openApiGenerateP4PAAUTH",
     "openApiGenerateWORKFLOWHUB",
-    "openApiGenerateCLASSIFICATION"
+    "openApiGenerateCLASSIFICATION",
+    "openApiGenerateMIGRATION"
   )
 }
 
@@ -411,4 +412,36 @@ tasks.register<GenerateTask>("openApiGenerateCLASSIFICATION") {
       "LocalDateTime" to "java.time.LocalDateTime"
     )
   )
+}
+
+tasks.register<GenerateTask>("openApiGenerateMIGRATION") {
+  group = "AutomaticallyGeneratedCode"
+  description = "openapi"
+
+  generatorName.set("java")
+  remoteInputSpec.set("https://raw.githubusercontent.com/pagopa/p4pa-doc/refs/heads/main/openapi/$targetEnv/internal/p4pa-migration.generated.openapi.json")
+  outputDir.set("$projectDir/build/generated")
+  invokerPackage.set("it.gov.pagopa.pu.migration.generated")
+  apiPackage.set("it.gov.pagopa.pu.migration.client.generated")
+  modelPackage.set("it.gov.pagopa.pu.migration.dto.generated")
+  configOptions.set(
+    mapOf(
+      "swaggerAnnotations" to "false",
+      "openApiNullable" to "false",
+      "dateLibrary" to "java8",
+      "serializableModel" to "true",
+      "useSpringBoot4" to "true",
+      "useJackson3" to "true",
+      "useJakartaEe" to "true",
+      "useOneOfInterfaces" to "true",
+      "useBeanValidation" to "true",
+      "serializationLibrary" to "jackson",
+      "generateSupportingFiles" to "true",
+      "generateConstructorWithAllArgs" to "true",
+      "generatedConstructorWithRequiredArgs" to "true",
+      "enumPropertyNaming" to "original",
+      "additionalModelTypeAnnotations" to "@lombok.experimental.SuperBuilder(toBuilder = true)"
+    )
+  )
+  library.set("resttemplate")
 }

@@ -78,6 +78,10 @@ See [log configured pattern](/src/main/resources/logback-spring.xml).
 * [p4pa-workflow-hub](https://github.com/pagopa/p4pa-workflow-hub):
   * To start debt-position synchronization;
   * To wait the end of a debt-position synchronization.
+* [p4pa-auth](https://github.com/pagopa/p4pa-auth):
+  * To obtain a technical access token used to perform inner invocations.
+* [p4pa-migration](https://github.com/pagopa/p4pa-migration):
+  * To retrieve migrated debt position type orgs that needs to be enabled.
 
 ## 🗃️ Entities handled
 * `debt_position_type`
@@ -183,6 +187,14 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 | CLASSIFICATION_MAX_ATTEMPTS          | Classification API max attempts                                                   | 3       |
 | CLASSIFICATION_WAIT_TIME_MILLIS      | Classification retry waiting time (milliseconds)                                  | 500     |
 | CLASSIFICATION_PRINT_BODY_WHEN_ERROR | To print body when an error occurs                                                | true    |
+| AUTH_SERVER_BASE_URL                 | Auth microservice URL                                                             |         |
+| AUTH_MAX_ATTEMPTS                    | Auth API max attempts                                                             | 3       |
+| AUTH_WAIT_TIME_MILLIS                | Auth retry waiting time (milliseconds)                                            | 500     |
+| AUTH_PRINT_BODY_WHEN_ERROR           | To print body when an error occurs                                                | true    |
+| MIGRATION_BASE_URL                   | Migration microservice URL                                                        |         |
+| MIGRATION_MAX_ATTEMPTS               | Migration API max attempts                                                        | 3       |
+| MIGRATION_WAIT_TIME_MILLIS           | Migration retry waiting time (milliseconds)                                       | 500     |
+| MIGRATION_PRINT_BODY_WHEN_ERROR      | To print body when an error occurs                                                | true    |
 
 ##### 🌀 KAFKA
 | ENV                                              | DESCRIPTION                                                        | DEFAULT  |
@@ -219,11 +231,12 @@ See [application.yml](src/main/resources/application.yml) for each configurable 
 | NAV_AUX_DIGIT                              | The aux digit of NAV                                                 | 3                                  |
 
 #### 🔑 keys
-| ENV                          | DESCRIPTION                                         | DEFAULT |
-|------------------------------|-----------------------------------------------------|---------|
-| JWT_TOKEN_PUBLIC_KEY         | p4pa-auth JWT public key                            |         |
-| DATA_CIPHER_HASH_PEPPER      | Base64 encoded key (256 bit) used to calculate hash |         |
-| DATA_CIPHER_ENCRYPT_PASSWORD | Base64 encoded key (256 bit) used to encrypt data   |         |
+| ENV                          | DESCRIPTION                                                               | DEFAULT |
+|------------------------------|---------------------------------------------------------------------------|---------|
+| JWT_TOKEN_PUBLIC_KEY         | p4pa-auth JWT public key                                                  |         |
+| DATA_CIPHER_HASH_PEPPER      | Base64 encoded key (256 bit) used to calculate hash                       |         |
+| DATA_CIPHER_ENCRYPT_PASSWORD | Base64 encoded key (256 bit) used to encrypt data                         |         |
+| AUTH_CLIENT_SECRET           | client_secret used on M2M authentication to get a technical access token  |         |
 
 ## 🛠️ Getting Started
 

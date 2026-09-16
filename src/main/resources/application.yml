@@ -194,6 +194,18 @@ rest:
     max-attempts: "\${CLASSIFICATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
     wait-time-millis: "\${CLASSIFICATION_WAIT_TIME_MILLIS:500}"
     print-body-when-error: "\${CLASSIFICATION_PRINT_BODY_WHEN_ERROR:true}"
+  auth:
+    base-url: "\${AUTH_SERVER_BASE_URL:}"
+    max-attempts: "\${AUTH_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${AUTH_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${AUTH_PRINT_BODY_WHEN_ERROR:true}"
+    post-token:
+      client_secret: "\${AUTH_CLIENT_SECRET:clientsecret}"
+  migration:
+    base-url: "\${MIGRATION_BASE_URL:http://localhost:8084}"
+    max-attempts: "\${MIGRATION_MAX_ATTEMPTS:3}" # It's counting also the first attempt
+    wait-time-millis: "\${MIGRATION_WAIT_TIME_MILLIS:500}"
+    print-body-when-error: "\${MIGRATION_PRINT_BODY_WHEN_ERROR:true}"
 
 nav:
   aux-digit: "\${NAV_AUX_DIGIT:3}"

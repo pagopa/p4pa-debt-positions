@@ -45,7 +45,7 @@ class DebtPositionTypeOrgServiceImplTest {
   @Mock
   private DebtPositionTypeOrgRepository debtPositionTypeOrgRepositoryMock;
   @Mock
-  private DebtPositionTypeOrgOperatorsService debtPositionTypeOrgOperatorsServiceMock;
+  private DebtPositionTypeOrgOperatorsFacadeService debtPositionTypeOrgOperatorsFacadeServiceMock;
   @Mock
   private SpontaneousFormRepository spontaneousFormRepositoryMock;
   @Mock
@@ -61,14 +61,14 @@ class DebtPositionTypeOrgServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    debtPositionTypeOrgService = spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock, organizationServiceMock, debtPositionTypeOrgBalanceCostRepositoryMock));
+    debtPositionTypeOrgService = spy(new DebtPositionTypeOrgServiceImpl(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsFacadeServiceMock, spontaneousFormRepositoryMock, workflowDebtPositionServiceMock, organizationServiceMock, debtPositionTypeOrgBalanceCostRepositoryMock));
   }
 
   @AfterEach
   void verifyNoMoreInteractions() {
     Mockito.verifyNoMoreInteractions(
       debtPositionTypeOrgRepositoryMock,
-      debtPositionTypeOrgOperatorsServiceMock,
+            debtPositionTypeOrgOperatorsFacadeServiceMock,
       spontaneousFormRepositoryMock,
       workflowDebtPositionServiceMock,
       organizationServiceMock,
@@ -138,13 +138,13 @@ class DebtPositionTypeOrgServiceImplTest {
 
     when(debtPositionTypeOrgRepositoryMock.findById(debtPositionTypeOrgId))
       .thenReturn(Optional.of(debtPositionTypeOrg));
-    when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10);
+    when(debtPositionTypeOrgOperatorsFacadeServiceMock.deleteOperatorsByDebtPositionTypeOrgId(debtPositionTypeOrgId)).thenReturn(10);
     Mockito.doNothing().when(debtPositionTypeOrgBalanceCostRepositoryMock).deleteByDebtPositionTypeOrgId(debtPositionTypeOrgId);
     Mockito.doNothing().when(debtPositionTypeOrgRepositoryMock).delete(debtPositionTypeOrg);
 
     debtPositionTypeOrgService.deleteDebtPositionTypeOrg(debtPositionTypeOrgId);
 
-    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsServiceMock);
+    Mockito.verifyNoMoreInteractions(debtPositionTypeOrgRepositoryMock, debtPositionTypeOrgOperatorsFacadeServiceMock);
   }
 
   @Test
@@ -171,11 +171,11 @@ class DebtPositionTypeOrgServiceImplTest {
 
     when(debtPositionTypeOrgRepositoryMock.save(expectedResult))
       .thenReturn(expectedResult);
-    when(debtPositionTypeOrgOperatorsServiceMock.deleteOperatorsByDebtPositionTypeOrgId(
+    when(debtPositionTypeOrgOperatorsFacadeServiceMock.deleteOperatorsByDebtPositionTypeOrgId(
       expectedResult.getDebtPositionTypeOrgId())).thenReturn(1);
-    when(debtPositionTypeOrgOperatorsServiceMock.saveOperators(
+    when(debtPositionTypeOrgOperatorsFacadeServiceMock.saveOperators(
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getEnabledOperators())).thenReturn(null);
-    when(debtPositionTypeOrgOperatorsServiceMock.deleteOperators(
+    when(debtPositionTypeOrgOperatorsFacadeServiceMock.deleteOperators(
       expectedResult.getDebtPositionTypeOrgId(), saveDebtPositionTypeOrgDTO.getDisabledOperators())).thenReturn(2);
     saveDebtPositionTypeOrgDTO.setDebtPositionTypeOrgBalanceCostRequestList(
       List.of(podamFactory.manufacturePojo(DebtPositionTypeOrgBalanceCostDTO.class))
