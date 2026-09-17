@@ -3589,7 +3589,6 @@ components:
       required:
         - operatorExternalUserId
         - organizationId
-        - fiscalCode
       properties:
         operatorExternalUserId:
           type: string

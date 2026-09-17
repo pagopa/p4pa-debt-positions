@@ -7,9 +7,11 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrgOperators;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -30,9 +32,12 @@ public class DefaultDpTypeOrgOperatorFacadeServiceImpl implements DefaultDpTypeO
   public List<DebtPositionTypeOrgOperators> relateUserToDefaultDPTypeOrg(RelateUserToDefaultDPTypeOrgDTO relateUserToDefaultDPTypeOrgDTO, String accessToken) {
     Organization organization = organizationService.getOrganizationById(relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), accessToken)
       .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_NOT_FOUND, "Organization having id " + relateUserToDefaultDPTypeOrgDTO.getOrganizationId() + " not found"));
-    List<Long> unconsumedDebtPositionTypeOrgIds = debtPositionTypeOrgOperatorsService.getUnconsumedDebtPositionTypeOrgIds(
-      relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), relateUserToDefaultDPTypeOrgDTO.getFiscalCode(), organization.getIpaCode()
-    );
+    List<Long> unconsumedDebtPositionTypeOrgIds = new ArrayList<>();
+    if(StringUtils.isNotBlank(relateUserToDefaultDPTypeOrgDTO.getFiscalCode())) {
+      unconsumedDebtPositionTypeOrgIds = debtPositionTypeOrgOperatorsService.getUnconsumedDebtPositionTypeOrgIds(
+        relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), relateUserToDefaultDPTypeOrgDTO.getFiscalCode(), organization.getIpaCode()
+      );
+    }
     List<DebtPositionTypeOrgOperators> operators = dptoService.saveDebtPositionTypeOrgOperatorsForNewOperator(
       relateUserToDefaultDPTypeOrgDTO.getOperatorExternalUserId(), relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), new HashSet<>(unconsumedDebtPositionTypeOrgIds)
     );

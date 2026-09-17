@@ -98,6 +98,28 @@ class DefaultDpTypeOrgOperatorFacadeServiceImplTest {
   }
 
   @Test
+  void givenNoFiscalCodeWhenRelateUserToDefaultDPTypeOrgThenNoMigrationCalls() {
+    // Given
+    String accessToken = "accessToken";
+    RelateUserToDefaultDPTypeOrgDTO relateUserToDefaultDPTypeOrgDTO = podamFactory.manufacturePojo(RelateUserToDefaultDPTypeOrgDTO.class);
+    relateUserToDefaultDPTypeOrgDTO.setFiscalCode(null);
+    Organization organization = podamFactory.manufacturePojo(Organization.class);
+    List<DebtPositionTypeOrgOperators> expectedResult = List.of(new DebtPositionTypeOrgOperators());
+
+    when(organizationServiceMock.getOrganizationById(relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), accessToken))
+      .thenReturn(Optional.of(organization));
+    when(dptoServiceMock.saveDebtPositionTypeOrgOperatorsForNewOperator(
+      relateUserToDefaultDPTypeOrgDTO.getOperatorExternalUserId(), relateUserToDefaultDPTypeOrgDTO.getOrganizationId(), new HashSet<>()))
+      .thenReturn(expectedResult);
+
+    // When
+    List<DebtPositionTypeOrgOperators> result = service.relateUserToDefaultDPTypeOrg(relateUserToDefaultDPTypeOrgDTO, accessToken);
+
+    // Then
+    Assertions.assertSame(expectedResult, result);
+  }
+
+  @Test
   void givenOrganizationNotFoundWhenRelateUserToDefaultDPTypeOrgThenNotFoundException() {
     // Given
     String accessToken = "accessToken";
