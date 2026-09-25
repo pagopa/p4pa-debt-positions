@@ -76,6 +76,7 @@ val springCloudDepsVersion = "2025.1.3"
 
 // CVE Security dependencies
 val tomcatEmbedCoreVersion = "11.0.25"
+val freemarkerVersion = "2.3.35"
 
 dependencyManagement {
   imports {
@@ -128,6 +129,7 @@ dependencies {
 
   // CVE Security dependencies
   implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedCoreVersion")
+  implementation("org.freemarker:freemarker:$freemarkerVersion")
 
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
