@@ -51,20 +51,20 @@ repositories {
   mavenCentral()
 }
 
-val springDocOpenApiVersion = "3.1.0"
+val springDocOpenApiVersion = "3.1.1"
 val openApiToolsVersion = "0.2.11"
 val springWolfAsyncApiVersion = "1.21.0"
 val springWolfUiAsyncApiVersion = "1.21.0"
 val micrometerVersion = "1.7.1"
 val postgresJdbcVersion = "42.7.13"
-val bouncycastleVersion = "1.85.2"
+val bouncycastleVersion = "1.86"
 val mapStructVersion = "1.6.3"
 val podamVersion = "8.0.2.RELEASE"
-val caffeineVersion = "3.2.4"
+val caffeineVersion = "3.3.0"
 val httpClientVersion = "5.6.4"
-val httpCoreVersion = "5.4.3"
+val httpCoreVersion = "5.4.4"
 val kafkaAppender = "0.2.0-RC2"
-val lz4JavaVersion = "1.11.2"
+val lz4JavaVersion = "1.12.0"
 val openHtmlToPdfVersion = "1.0.10"
 val commonsLang3Version = "3.20.0"
 val itextVersion = "9.7.1"
@@ -75,7 +75,9 @@ val hibernateCoreVersion = "7.1.18.Final"
 val springCloudDepsVersion = "2025.1.3"
 
 // CVE Security dependencies
-val tomcatEmbedCoreVersion = "11.0.25"
+val tomcatEmbedCoreVersion = "11.0.26"
+val jackson2DatabindVersion = "2.22.3"
+val jackson3DatabindVersion = "3.1.7"
 val freemarkerVersion = "2.3.35"
 
 dependencyManagement {
@@ -129,6 +131,8 @@ dependencies {
 
   // CVE Security dependencies
   implementation("org.apache.tomcat.embed:tomcat-embed-core:$tomcatEmbedCoreVersion")
+    implementation("com.fasterxml.jackson.core:jackson-databind:$jackson2DatabindVersion")
+    implementation("tools.jackson.core:jackson-databind:$jackson3DatabindVersion")
   implementation("org.freemarker:freemarker:$freemarkerVersion")
 
   compileOnly("org.projectlombok:lombok")
