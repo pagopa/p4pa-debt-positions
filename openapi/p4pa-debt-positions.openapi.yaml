@@ -3100,6 +3100,8 @@ components:
           type: boolean
         iupdOrg:
           type: string
+        iupdPagoPa:
+          type: string
         description:
           type: string
         validityDate:
