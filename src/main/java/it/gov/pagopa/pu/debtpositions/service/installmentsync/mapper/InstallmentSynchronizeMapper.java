@@ -39,7 +39,7 @@ public class InstallmentSynchronizeMapper {
 
   public InstallmentDTO map2Installment(InstallmentSynchronizeDTO installmentSynchronizeDTO){
     return InstallmentDTO.builder()
-      .iupdPagopa(installmentSynchronizeDTO.getIupdPagoPa())
+      .iupdPagopa(installmentSynchronizeDTO.getIupdPagopa())
       .iud(installmentSynchronizeDTO.getIud())
       .iuv(installmentSynchronizeDTO.getIuv())
       .generateNotice(installmentSynchronizeDTO.getGenerateNotice())

@@ -3100,7 +3100,7 @@ components:
           type: boolean
         iupdOrg:
           type: string
-        iupdPagoPa:
+        iupdPagopa:
           type: string
         description:
           type: string
