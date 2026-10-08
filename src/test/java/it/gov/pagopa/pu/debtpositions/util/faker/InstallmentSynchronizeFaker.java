@@ -27,6 +27,7 @@ public class InstallmentSynchronizeFaker {
       .action(I)
       .draft(Boolean.FALSE)
       .iupdOrg("IUPD_ORG")
+      .iupdPagopa("IUPD_PAGOPA")
       .description("Test Description")
       .validityDate(DATE)
       .multiDebtor(Boolean.TRUE)

@@ -146,6 +146,7 @@ public class InstallmentFaker {
 
   public static InstallmentDTO buildSyncInstallmentDTO(){
     return InstallmentDTO.builder()
+      .iupdPagopa("IUPD_PAGOPA")
       .iud("iud")
       .iuv("iuv")
       .dueDate(DATE)

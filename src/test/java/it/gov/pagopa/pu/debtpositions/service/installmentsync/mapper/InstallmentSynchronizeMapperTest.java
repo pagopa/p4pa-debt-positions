@@ -38,7 +38,7 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
-    checkNotNullFields(result, "debtPositionId", "stationId", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+    verifyNotNullFields(result, true);
   }
 
   @Test
@@ -56,6 +56,22 @@ class InstallmentSynchronizeMapperTest {
 
     assertEquals(expectedDebtPositionDTO, result);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
+    verifyNotNullFields(result, false);
+  }
+
+  private void verifyNotNullFields(DebtPositionDTO result, boolean isBalanceNull) {
     checkNotNullFields(result, "debtPositionId", "stationId", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+
+    PaymentOptionDTO paymentOption = result.getPaymentOptions().getFirst();
+    checkNotNullFields(paymentOption, "paymentOptionId", "debtPositionId", "totalAmountCents", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
+
+    InstallmentDTO installment = paymentOption.getInstallments().getFirst();
+    String[] installmentIgnored = isBalanceNull ?
+      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "balance", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"} :
+      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"};
+    checkNotNullFields(installment, installmentIgnored);
+
+    TransferDTO transferDTO = installment.getTransfers().getFirst();
+    checkNotNullFields(transferDTO, "transferId", "installmentId", "stampType", "stampHashDocument", "stampProvincialResidence", "postalIban", "mbdAttachment", "flagOwner", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId");
   }
 }
