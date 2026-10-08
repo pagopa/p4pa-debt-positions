@@ -1,11 +1,13 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync;
 
+import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.Action;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
@@ -13,12 +15,18 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.Installm
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
+import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.swing.text.html.Option;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -29,13 +37,15 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   private final InstallmentSynchronizeCancelService installmentSynchronizeCancelService;
   private final InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService;
   private final InstallmentSynchronizeInsertService installmentSynchronizeInsertService;
+  private final OrganizationService organizationService;
 
-  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService) {
+  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService, OrganizationService organizationService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentSynchronizeCancelService = installmentSynchronizeCancelService;
     this.installmentSynchronizeUpdateService = installmentSynchronizeUpdateService;
     this.installmentSynchronizeInsertService = installmentSynchronizeInsertService;
+    this.organizationService = organizationService;
   }
 
   @Transactional
@@ -45,10 +55,14 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
 
     Action action = installmentSynchronizeDTO.getAction();
     return switch (action) {
-      case I ->
-        installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-      case M ->
-        installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+      case I -> {
+        validate(installmentSynchronizeDTO, accessToken);
+        yield installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+      }
+      case M -> {
+        validate(installmentSynchronizeDTO, accessToken);
+        yield installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+      }
       case A ->
         installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     };
@@ -88,5 +102,29 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     return debtPositionMapper.mapToDto(debtPositions.getFirst());
+  }
+
+  private void validate(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken) {
+    Long orgId = installmentSynchronizeDTO.getOrganizationId();
+
+    OrganizationStationDTO organizationStationDTO = organizationService
+      .getOrganizationStation(orgId, null, accessToken)
+      .orElseThrow(() -> new InvalidValueException(
+        ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
+        String.format("Station for org with id %s not found", orgId)
+      ));
+
+    Boolean flagPuPagoPaPayment = installmentSynchronizeDTO.getFlagPuPagoPaPayment();
+    String iupdPagopa = installmentSynchronizeDTO.getIupdPagopa();
+
+    boolean isGpd = Objects.equals(organizationStationDTO.getPagoPaInteractionModel(), PagoPaInteractionModel.ASYNC_GPD);
+
+    if (Boolean.FALSE.equals(flagPuPagoPaPayment) && isGpd && StringUtils.isBlank(iupdPagopa)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, "iupdPagopa is mandatory when flagPuPagoPaPayment is false and is a gpd station");
+    }
+
+    if (Boolean.TRUE.equals(flagPuPagoPaPayment) && StringUtils.isNotBlank(iupdPagopa)) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, "iupdPagopa must not be populated when flagPuPagoPaPayment is true");
+    }
   }
 }

@@ -67,8 +67,8 @@ class InstallmentSynchronizeMapperTest {
 
     InstallmentDTO installment = paymentOption.getInstallments().getFirst();
     String[] installmentIgnored = isBalanceNull ?
-      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "balance", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"} :
-      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"};
+      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iupdPagopa", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "balance", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"} :
+      new String[]{"installmentId", "paymentOptionId", "syncStatus", "generateNotice", "iupdPagopa", "iur", "iuf", "nav", "iun", "switchToExpired", "notificationFeeCents", "receiptId", "originalRemittanceInformation", "noPII", "creationDate", "updateDate", "updateOperatorExternalId", "updateTraceId"};
     checkNotNullFields(installment, installmentIgnored);
 
     TransferDTO transferDTO = installment.getTransfers().getFirst();
