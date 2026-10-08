@@ -7,6 +7,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -110,7 +111,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
 
     OrganizationStationDTO organizationStationDTO = organizationService
       .getOrganizationStation(orgId, null, accessToken)
-      .orElseThrow(() -> new InvalidValueException(
+      .orElseThrow(() -> new IllegalStateBusinessException(
         ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
         String.format("Station for org with id %s not found", orgId)
       ));

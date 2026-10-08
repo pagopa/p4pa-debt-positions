@@ -6,6 +6,7 @@ import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
@@ -274,7 +275,7 @@ class InstallmentSynchronizeServiceImplTest {
     when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken))
       .thenReturn(Optional.empty());
 
-    InvalidValueException exc = assertThrows(InvalidValueException.class, () ->
+    IllegalStateBusinessException exc = assertThrows(IllegalStateBusinessException.class, () ->
       installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId)
     );
     assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exc.getCode());
