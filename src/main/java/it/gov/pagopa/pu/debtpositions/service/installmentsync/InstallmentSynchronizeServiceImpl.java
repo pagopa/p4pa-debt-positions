@@ -49,18 +49,17 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   @Transactional
   @Override
   public WorkflowCreatedDTO installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
+    Action action = installmentSynchronizeDTO.getAction();
+
+    validateInstallmentSynchronizeDTO(installmentSynchronizeDTO, action, accessToken);
+
     DebtPositionDTO debtPositionDTO = retrieveDebtPosition(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
-    Action action = installmentSynchronizeDTO.getAction();
     return switch (action) {
-      case I -> {
-        validate(installmentSynchronizeDTO, accessToken);
-        yield installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-      }
-      case M -> {
-        validate(installmentSynchronizeDTO, accessToken);
-        yield installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
-      }
+      case I ->
+        installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
+      case M ->
+        installmentSynchronizeUpdateService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
       case A ->
         installmentSynchronizeCancelService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
     };
@@ -102,7 +101,11 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     return debtPositionMapper.mapToDto(debtPositions.getFirst());
   }
 
-  private void validate(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken) {
+  private void validateInstallmentSynchronizeDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, Action action, String accessToken) {
+    if (Action.A.equals(action)) {
+      return;
+    }
+
     Long orgId = installmentSynchronizeDTO.getOrganizationId();
 
     OrganizationStationDTO organizationStationDTO = organizationService
