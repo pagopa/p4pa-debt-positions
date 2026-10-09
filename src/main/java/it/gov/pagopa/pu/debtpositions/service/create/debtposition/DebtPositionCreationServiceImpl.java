@@ -5,6 +5,7 @@ import it.gov.pagopa.pu.debtpositions.connector.organization.service.Organizatio
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
+import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.exception.common.NotFoundException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.model.InstallmentSyncStatus;
@@ -25,6 +26,7 @@ import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
+import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -144,11 +146,12 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
 
   @Override
   public void checkInstallment(DebtPositionDTO debtPositionDTO, Organization org, DebtPositionTypeOrg debtPositionTypeOrg, InstallmentDTO installmentDTO, String accessToken) {
+    OrganizationStationDTO organizationStationDTO = organizationService.getOrganizationStation(org.getOrganizationId(), debtPositionDTO.getStationId(), accessToken)
+      .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
+        String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
+
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPuPagoPaPayment())) {
       String nav;
-      OrganizationStationDTO organizationStationDTO = organizationService.getOrganizationStation(org.getOrganizationId(), debtPositionDTO.getStationId(), accessToken)
-        .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
-          String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
       Broker broker = Optional.ofNullable(brokerService.findById(org.getBrokerId(), accessToken))
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND,
           String.format("Broker not found having brokerId %s for debtPosition %s", org.getBrokerId(), debtPositionDTO.getDebtPositionId())));
@@ -171,6 +174,8 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
       installmentDTO.setNav(nav);
       String iupdPagopa = org.getOrgFiscalCode() + "_" + getRandomicUUID();
       installmentDTO.setIupdPagopa(iupdPagopa);
+    } else if (StringUtils.isBlank(installmentDTO.getIupdPagopa()) && PagoPaInteractionModel.ASYNC_GPD.equals(organizationStationDTO.getPagoPaInteractionModel())) {
+      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, "iupdPagopa is mandatory when flagPuPagoPaPayment is false and pagoPaInteractionModel is gpd");
     }
 
     if (StringUtils.isBlank(installmentDTO.getIud())) {

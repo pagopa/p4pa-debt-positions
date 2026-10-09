@@ -2,7 +2,6 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 
 import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
-import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
 import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
@@ -11,13 +10,8 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.Installment
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
-import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
-
-import java.util.Objects;
 
 @Service
 public class InstallmentSynchronizeApplierService {
@@ -47,8 +41,7 @@ public class InstallmentSynchronizeApplierService {
       installmentSynchronizeDTO.getDebtPositionTypeCode());
 
     if (storedDebtPosition == null) {
-      String stationId = validateIupdPagopaAndRetrieveStationId(installmentSynchronizeDTO, accessToken);
-      DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, stationId);
+      DebtPositionDTO debtPositionDTO = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg);
       return Pair.of(debtPositionDTO, debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst());
     }
     applierDebtPositionService.merge(installmentSynchronizeDTO, storedDebtPosition, debtPositionTypeOrg.getDebtPositionTypeOrgId());
@@ -119,31 +112,5 @@ public class InstallmentSynchronizeApplierService {
       .build();
 
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstTransfer);
-  }
-
-  private String validateIupdPagopaAndRetrieveStationId(InstallmentSynchronizeDTO installmentSynchronizeDTO, String accessToken) {
-    Long orgId = installmentSynchronizeDTO.getOrganizationId();
-
-    OrganizationStationDTO organizationStationDTO = organizationService
-      .getOrganizationStation(orgId, null, accessToken)
-      .orElseThrow(() -> new IllegalStateBusinessException(
-        ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
-        String.format("Station for org with id %s not found", orgId)
-      ));
-
-    Boolean flagPuPagoPaPayment = installmentSynchronizeDTO.getFlagPuPagoPaPayment();
-    String iupdPagopa = installmentSynchronizeDTO.getIupdPagopa();
-
-    boolean isGpd = Objects.equals(organizationStationDTO.getPagoPaInteractionModel(), PagoPaInteractionModel.ASYNC_GPD);
-
-    if (Boolean.FALSE.equals(flagPuPagoPaPayment) && isGpd && StringUtils.isBlank(iupdPagopa)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, "iupdPagopa is mandatory when flagPuPagoPaPayment is false and is a gpd station");
-    }
-
-    if (Boolean.TRUE.equals(flagPuPagoPaPayment) && StringUtils.isNotBlank(iupdPagopa)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, "iupdPagopa must not be populated when flagPuPagoPaPayment is true");
-    }
-
-    return organizationStationDTO.getStationId();
   }
 }

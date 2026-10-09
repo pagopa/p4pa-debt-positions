@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 @Service
 public class InstallmentSynchronizeMapper {
 
-  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionTypeOrg debtPositionTypeOrg, String stationId) {
+  public DebtPositionDTO map2DebtPositionDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, DebtPositionTypeOrg debtPositionTypeOrg) {
     return DebtPositionDTO.builder()
       .iupdOrg(installmentSynchronizeDTO.getIupdOrg())
       .description(installmentSynchronizeDTO.getDescription())
@@ -24,7 +24,6 @@ public class InstallmentSynchronizeMapper {
       .flagPuPagoPaPayment(installmentSynchronizeDTO.getFlagPuPagoPaPayment())
       .status((Boolean.TRUE).equals(installmentSynchronizeDTO.getDraft()) ? DebtPositionStatus.DRAFT : DebtPositionStatus.UNPAID)
       .paymentOptions(List.of(map2PaymentOptionDTO(installmentSynchronizeDTO)))
-      .stationId(stationId)
       .build();
   }
 
