@@ -146,8 +146,6 @@ class InstallmentSynchronizeServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
-    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
-
     when(debtPositionRepositoryMock.findEntityGraphByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
     when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     when(installmentSynchronizeUpdateServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
@@ -171,8 +169,6 @@ class InstallmentSynchronizeServiceImplTest {
     debtPosition.setDebtPositionOrigin(debtPositionOrigin);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
-
-    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
 
     when(debtPositionRepositoryMock.findEntityGraphByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(),
         installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
@@ -199,8 +195,6 @@ class InstallmentSynchronizeServiceImplTest {
     debtPosition.setDebtPositionOrigin(debtPositionOrigin);
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
-
-    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
 
     when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getIud(), List.of(debtPositionOrigin))).thenReturn(List.of(debtPosition));
     when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
