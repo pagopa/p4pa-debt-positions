@@ -151,6 +151,9 @@ public class DebtPositionCreationServiceImpl extends BaseDebtPositionOperationSe
         String.format("Station not found having orgId %s and stationId %s for debtPosition %s", org.getOrganizationId(), debtPositionDTO.getStationId(), debtPositionDTO.getDebtPositionId())));
 
     if (Boolean.TRUE.equals(debtPositionDTO.getFlagPuPagoPaPayment())) {
+      if (StringUtils.isNotBlank(installmentDTO.getIupdPagopa())) {
+        throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, "iupdPagopa must not be populated when flagPuPagoPaPayment is true");
+      }
       String nav;
       Broker broker = Optional.ofNullable(brokerService.findById(org.getBrokerId(), accessToken))
         .orElseThrow(() -> new NotFoundException(ErrorCodeConstants.ERROR_CODE_BROKER_NOT_FOUND,

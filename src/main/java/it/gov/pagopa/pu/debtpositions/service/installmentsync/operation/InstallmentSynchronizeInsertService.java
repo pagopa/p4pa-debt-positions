@@ -3,7 +3,6 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.operation;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
-import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.service.create.debtposition.DebtPositionCreationService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.BaseInstallmentSynchronizeService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.apply.InstallmentSynchronizeApplierService;
@@ -11,7 +10,6 @@ import it.gov.pagopa.pu.debtpositions.service.update.DebtPositionAddInstallmentS
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -45,7 +43,6 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
       return null;
     }
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment, installmentSynchronizeDTO.getIngestionFlowFileId());
-    validateIupdPagopa(installmentSynchronizeDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
 
@@ -99,11 +96,5 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
   private boolean isPOToSyncAllowed(PaymentOptionDTO storedPaymentOption, Long ingestionFlowFileId) {
     return storedPaymentOption.getInstallments()
       .stream().anyMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId));
-  }
-
-  private void validateIupdPagopa(InstallmentSynchronizeDTO installmentSynchronizeDTO) {
-    if (Boolean.TRUE.equals(installmentSynchronizeDTO.getFlagPuPagoPaPayment()) && StringUtils.isNotBlank(installmentSynchronizeDTO.getIupdPagopa())) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, "iupdPagopa must not be populated when flagPuPagoPaPayment is true");
-    }
   }
 }

@@ -247,6 +247,7 @@ class DebtPositionCreationServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY_SIL);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
@@ -336,6 +337,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
@@ -408,6 +410,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIuv(null);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setBalance("");
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().getTransfers().getFirst().setTransferIndex(1);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
     debtPositionDTO.setIupdOrg("");
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -540,6 +543,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.ORDINARY);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
@@ -604,6 +608,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.SPONTANEOUS_SIL);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setSourceFlowName(null);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
@@ -668,6 +673,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
@@ -694,6 +700,7 @@ class DebtPositionCreationServiceImplTest {
     debtPositionDTO.setFlagPuPagoPaPayment(true);
     debtPositionDTO.setDebtPositionOrigin(DebtPositionOrigin.RECEIPT_FILE);
     debtPositionDTO.setStatus(DebtPositionStatus.PAID);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
 
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
     Organization organization = buildOrganization();
