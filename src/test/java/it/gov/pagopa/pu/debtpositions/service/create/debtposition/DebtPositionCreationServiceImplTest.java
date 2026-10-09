@@ -21,12 +21,10 @@ import it.gov.pagopa.pu.debtpositions.service.create.IuvService;
 import it.gov.pagopa.pu.debtpositions.service.create.ValidateDebtPositionService;
 import it.gov.pagopa.pu.debtpositions.service.statusalign.DebtPositionHierarchyStatusAlignerService;
 import it.gov.pagopa.pu.debtpositions.service.sync.DebtPositionSyncService;
+import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.debtpositions.util.InstallmentUtils;
 import it.gov.pagopa.pu.debtpositions.util.Utilities;
-import it.gov.pagopa.pu.organization.dto.generated.Broker;
-import it.gov.pagopa.pu.organization.dto.generated.Organization;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStatus;
+import it.gov.pagopa.pu.organization.dto.generated.*;
 import it.gov.pagopa.pu.workflowhub.dto.generated.PaymentEventType;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.BeforeEach;
@@ -723,5 +721,59 @@ class DebtPositionCreationServiceImplTest {
       createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null)
     );
     assertEquals("BROKER_NOT_FOUND", exception.getCode());
+  }
+
+  @Test
+  void givenFlagPuPagoPaPaymentTrueAndIupdPagopaNotBlankWhenCreateDebtPositionThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(organizationStationDTO));
+
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null)
+    );
+
+    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, exception.getCode());
+    assertEquals("iupdPagopa must not be populated when flagPuPagoPaPayment is true", exception.getMessage());
+  }
+
+  @Test
+  void givenFlagPuPagoPaPaymentFalseAndMissingIupdPagopaAndPagoPaInteractionModelAsyncGpdWhenCreateDebtPositionThenThrowInvalidValueException() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(false);
+    debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIupdPagopa(null);
+
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    Organization organization = buildOrganization();
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setSegregationCode("SEGREGATIONCODE");
+    organizationStationDTO.setPagoPaInteractionModel(PagoPaInteractionModel.ASYNC_GPD);
+
+    when(organizationServiceMock.getOrganizationById(debtPositionDTO.getOrganizationId(), ACCESS_TOKEN)).thenReturn(Optional.of(organization));
+    when(debtPositionTypeOrgRepositoryMock.findById(debtPositionDTO.getDebtPositionTypeOrgId())).thenReturn(Optional.of(debtPositionTypeOrg));
+    when(authorizeOperatorOnDebtPositionTypeServiceMock.authorize(organization.getIpaCode(), debtPositionTypeOrgId, null)).thenReturn(debtPositionTypeOrg);
+    when(organizationServiceMock.getOrganizationStation(organization.getOrganizationId(), debtPositionDTO.getStationId(), ACCESS_TOKEN))
+      .thenReturn(Optional.of(organizationStationDTO));
+
+    InvalidValueException exception = assertThrows(InvalidValueException.class, () ->
+      createDebtPositionService.createDebtPosition(debtPositionDTO, wfExecutionParameters, ACCESS_TOKEN, null)
+    );
+
+    assertEquals(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, exception.getCode());
+    assertEquals("iupdPagopa is mandatory when flagPuPagoPaPayment is false and pagoPaInteractionModel is gpd", exception.getMessage());
   }
 }
