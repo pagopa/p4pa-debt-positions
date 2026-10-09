@@ -240,7 +240,7 @@ class InstallmentSynchronizeApplierServiceTest {
     when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
 
-      when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg))
+    when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg))
       .thenReturn(newDebtPositionDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> result = installmentSynchronizeApplierService.apply(

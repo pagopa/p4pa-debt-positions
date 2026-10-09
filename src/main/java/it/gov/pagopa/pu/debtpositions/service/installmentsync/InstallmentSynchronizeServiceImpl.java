@@ -44,6 +44,7 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     DebtPositionDTO debtPositionDTO = retrieveDebtPosition(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
 
     Action action = installmentSynchronizeDTO.getAction();
+
     return switch (action) {
       case I ->
         installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId);
