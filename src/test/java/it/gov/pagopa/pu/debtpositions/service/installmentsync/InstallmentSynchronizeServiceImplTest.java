@@ -1,22 +1,17 @@
 package it.gov.pagopa.pu.debtpositions.service.installmentsync;
 
-import it.gov.pagopa.pu.debtpositions.connector.organization.service.OrganizationService;
 import it.gov.pagopa.pu.debtpositions.dto.WfExecutionParameters;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionDTO;
 import it.gov.pagopa.pu.debtpositions.dto.generated.DebtPositionOrigin;
 import it.gov.pagopa.pu.debtpositions.dto.generated.InstallmentSynchronizeDTO;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
-import it.gov.pagopa.pu.debtpositions.exception.common.IllegalStateBusinessException;
-import it.gov.pagopa.pu.debtpositions.exception.common.InvalidValueException;
 import it.gov.pagopa.pu.debtpositions.mapper.DebtPositionMapper;
 import it.gov.pagopa.pu.debtpositions.model.DebtPosition;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeCancelService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
-import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
 import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
-import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,8 +45,6 @@ class InstallmentSynchronizeServiceImplTest {
   private InstallmentSynchronizeUpdateService installmentSynchronizeUpdateServiceMock;
   @Mock
   private InstallmentSynchronizeInsertService installmentSynchronizeInsertServiceMock;
-  @Mock
-  private OrganizationService organizationServiceMock;
 
   private InstallmentSynchronizeService installmentSynchronizeService;
 
@@ -62,8 +55,7 @@ class InstallmentSynchronizeServiceImplTest {
       debtPositionMapperMock,
       installmentSynchronizeCancelServiceMock,
       installmentSynchronizeUpdateServiceMock,
-      installmentSynchronizeInsertServiceMock,
-      organizationServiceMock
+      installmentSynchronizeInsertServiceMock
     );
   }
 
@@ -74,8 +66,7 @@ class InstallmentSynchronizeServiceImplTest {
       debtPositionMapperMock,
       installmentSynchronizeCancelServiceMock,
       installmentSynchronizeUpdateServiceMock,
-      installmentSynchronizeInsertServiceMock,
-      organizationServiceMock
+      installmentSynchronizeInsertServiceMock
     );
   }
 
@@ -158,7 +149,6 @@ class InstallmentSynchronizeServiceImplTest {
 
     OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
 
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken)).thenReturn(Optional.of(organizationStationDTO));
     when(debtPositionRepositoryMock.findEntityGraphByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
     when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     when(installmentSynchronizeUpdateServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
@@ -185,7 +175,6 @@ class InstallmentSynchronizeServiceImplTest {
 
     OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
 
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken)).thenReturn(Optional.of(organizationStationDTO));
     when(debtPositionRepositoryMock.findEntityGraphByIupdOrgAndOrganizationId(installmentSynchronizeDTO.getIupdOrg(),
         installmentSynchronizeDTO.getOrganizationId())).thenReturn(debtPosition);
     when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
@@ -214,7 +203,6 @@ class InstallmentSynchronizeServiceImplTest {
 
     OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
 
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken)).thenReturn(Optional.of(organizationStationDTO));
     when(debtPositionRepositoryMock.findEntityGraphByOrganizationIdAndInstallmentIud(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getIud(), List.of(debtPositionOrigin))).thenReturn(List.of(debtPosition));
     when(debtPositionMapperMock.mapToDto(debtPosition)).thenReturn(debtPositionDTO);
     when(installmentSynchronizeUpdateServiceMock.syncInstallment(installmentSynchronizeDTO, debtPositionDTO,
@@ -261,69 +249,5 @@ class InstallmentSynchronizeServiceImplTest {
       String.format("Multiple debt positions found for iud %s", installmentSynchronizeDTO.getIud()));
 
     verify(debtPositionMapperMock, times(0)).mapToDto(debtPositions.getFirst());
-  }
-
-  @Test
-  void givenMissingStationForOrgWhenInstallmentSynchronizeThenThrow() {
-    String accessToken = "accessToken";
-    String operatorExternalUserId = "operatorExternalUserId";
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(I);
-
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken))
-      .thenReturn(Optional.empty());
-
-    IllegalStateBusinessException exc = assertThrows(IllegalStateBusinessException.class, () ->
-      installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId)
-    );
-    assertEquals(ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND, exc.getCode());
-  }
-
-  @Test
-  void givenGpdStationAndIupdPagopaNullAndFlagPuPagoPaPaymentFalseWhenInstallmentSynchronizeThenThrow() {
-    String accessToken = "accessToken";
-    String operatorExternalUserId = "operatorExternalUserId";
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(I);
-    installmentSynchronizeDTO.setFlagPuPagoPaPayment(false);
-    installmentSynchronizeDTO.setIupdPagopa(null);
-
-    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
-    organizationStationDTO.setPagoPaInteractionModel(PagoPaInteractionModel.ASYNC_GPD);
-
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken))
-      .thenReturn(Optional.of(organizationStationDTO));
-
-    InvalidValueException exc = assertThrows(InvalidValueException.class, () ->
-      installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId)
-    );
-    assertEquals(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, exc.getCode());
-  }
-
-  @Test
-  void givenFlagPuPagoPaPaymentTrueAndIupdPagopaPopulatedWhenInstallmentSynchronizeThenThrow() {
-    String accessToken = "accessToken";
-    String operatorExternalUserId = "operatorExternalUserId";
-    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
-    DebtPositionOrigin debtPositionOrigin = DebtPositionOrigin.ORDINARY_SIL;
-    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setAction(I);
-    installmentSynchronizeDTO.setFlagPuPagoPaPayment(true);
-    installmentSynchronizeDTO.setIupdPagopa("iupdPagopa");
-
-    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
-
-    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken))
-      .thenReturn(Optional.of(organizationStationDTO));
-
-    InvalidValueException exc = assertThrows(InvalidValueException.class, () ->
-      installmentSynchronizeService.installmentSynchronize(installmentSynchronizeDTO, wfExecutionParameters, debtPositionOrigin, accessToken, operatorExternalUserId)
-    );
-
-    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, exc.getCode());
   }
 }

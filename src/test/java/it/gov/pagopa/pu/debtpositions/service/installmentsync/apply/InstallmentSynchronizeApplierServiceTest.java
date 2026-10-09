@@ -8,6 +8,8 @@ import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.service.CategoryResolverService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.mapper.InstallmentSynchronizeMapper;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
+import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -236,11 +238,19 @@ class InstallmentSynchronizeApplierServiceTest {
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     DebtPositionDTO newDebtPositionDTO = buildDebtPositionDTO();
+    String stationId = "stationId";
+
+    OrganizationStationDTO organizationStationDTO = new OrganizationStationDTO();
+    organizationStationDTO.setStationId(stationId);
+    organizationStationDTO.setPagoPaInteractionModel(PagoPaInteractionModel.SYNC);
+
+    when(organizationServiceMock.getOrganizationStation(installmentSynchronizeDTO.getOrganizationId(), null, accessToken))
+      .thenReturn(Optional.of(organizationStationDTO));
 
     when(debtPositionTypeOrgRepositoryMock.findByOrganizationIdAndCode(installmentSynchronizeDTO.getOrganizationId(), installmentSynchronizeDTO.getDebtPositionTypeCode()))
       .thenReturn(Optional.of(debtPositionTypeOrg));
 
-      when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg))
+    when(installmentSynchronizeMapperMock.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, stationId))
       .thenReturn(newDebtPositionDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> result = installmentSynchronizeApplierService.apply(

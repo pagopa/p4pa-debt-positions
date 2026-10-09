@@ -27,14 +27,16 @@ class InstallmentSynchronizeMapperTest {
 
   @Test
   void testSyncMapper(){
+    String stationId = "stationId";
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setBalance(null);
     DebtPositionDTO expectedDebtPositionDTO = buildSyncDebtPositionDTO();
     expectedDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setBalance(null);
     expectedDebtPositionDTO.setDebtPositionTypeOrgId(2L);
+    expectedDebtPositionDTO.setStationId(stationId);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg);
+    DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, stationId);
 
     assertEquals(result, expectedDebtPositionDTO);
     reflectionEqualsByName(expectedDebtPositionDTO, result);
@@ -43,6 +45,7 @@ class InstallmentSynchronizeMapperTest {
 
   @Test
   void testSyncMapperDraft(){
+    String stationId = "stationId";
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setDraft(Boolean.TRUE);
     DebtPositionDTO expectedDebtPositionDTO = buildSyncDebtPositionDTO();
@@ -50,9 +53,10 @@ class InstallmentSynchronizeMapperTest {
     expectedDebtPositionDTO.setStatus(DebtPositionStatus.DRAFT);
     expectedDebtPositionDTO.getPaymentOptions().getFirst().setStatus(PaymentOptionStatus.DRAFT);
     expectedDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.DRAFT);
+    expectedDebtPositionDTO.setStationId(stationId);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
 
-    DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg);
+    DebtPositionDTO result = installmentSynchronizeMapper.map2DebtPositionDTO(installmentSynchronizeDTO, debtPositionTypeOrg, stationId);
 
     assertEquals(expectedDebtPositionDTO, result);
     reflectionEqualsByName(expectedDebtPositionDTO, result);

@@ -16,16 +16,12 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.Installm
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
-import it.gov.pagopa.pu.organization.dto.generated.OrganizationStationDTO;
-import it.gov.pagopa.pu.organization.dto.generated.PagoPaInteractionModel;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -36,25 +32,21 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
   private final InstallmentSynchronizeCancelService installmentSynchronizeCancelService;
   private final InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService;
   private final InstallmentSynchronizeInsertService installmentSynchronizeInsertService;
-  private final OrganizationService organizationService;
 
-  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService, OrganizationService organizationService) {
+  public InstallmentSynchronizeServiceImpl(DebtPositionRepository debtPositionRepository, DebtPositionMapper debtPositionMapper, InstallmentSynchronizeCancelService installmentSynchronizeCancelService, InstallmentSynchronizeUpdateService installmentSynchronizeUpdateService, InstallmentSynchronizeInsertService installmentSynchronizeInsertService) {
     this.debtPositionRepository = debtPositionRepository;
     this.debtPositionMapper = debtPositionMapper;
     this.installmentSynchronizeCancelService = installmentSynchronizeCancelService;
     this.installmentSynchronizeUpdateService = installmentSynchronizeUpdateService;
     this.installmentSynchronizeInsertService = installmentSynchronizeInsertService;
-    this.organizationService = organizationService;
   }
 
   @Transactional
   @Override
   public WorkflowCreatedDTO installmentSynchronize(InstallmentSynchronizeDTO installmentSynchronizeDTO, WfExecutionParameters wfExecutionParameters, DebtPositionOrigin debtPositionOrigin, String accessToken, String operatorExternalUserId) {
-    Action action = installmentSynchronizeDTO.getAction();
-
-    validateInstallmentSynchronizeDTO(installmentSynchronizeDTO, action, accessToken);
-
     DebtPositionDTO debtPositionDTO = retrieveDebtPosition(installmentSynchronizeDTO.getIupdOrg(), installmentSynchronizeDTO.getIud(), installmentSynchronizeDTO.getOrganizationId(), debtPositionOrigin);
+
+    Action action = installmentSynchronizeDTO.getAction();
 
     return switch (action) {
       case I ->
@@ -100,33 +92,5 @@ public class InstallmentSynchronizeServiceImpl implements InstallmentSynchronize
     }
 
     return debtPositionMapper.mapToDto(debtPositions.getFirst());
-  }
-
-  private void validateInstallmentSynchronizeDTO(InstallmentSynchronizeDTO installmentSynchronizeDTO, Action action, String accessToken) {
-    if (Action.A.equals(action)) {
-      return;
-    }
-
-    Long orgId = installmentSynchronizeDTO.getOrganizationId();
-
-    OrganizationStationDTO organizationStationDTO = organizationService
-      .getOrganizationStation(orgId, null, accessToken)
-      .orElseThrow(() -> new IllegalStateBusinessException(
-        ErrorCodeConstants.ERROR_CODE_ORGANIZATION_STATION_NOT_FOUND,
-        String.format("Station for org with id %s not found", orgId)
-      ));
-
-    Boolean flagPuPagoPaPayment = installmentSynchronizeDTO.getFlagPuPagoPaPayment();
-    String iupdPagopa = installmentSynchronizeDTO.getIupdPagopa();
-
-    boolean isGpd = Objects.equals(organizationStationDTO.getPagoPaInteractionModel(), PagoPaInteractionModel.ASYNC_GPD);
-
-    if (Boolean.FALSE.equals(flagPuPagoPaPayment) && isGpd && StringUtils.isBlank(iupdPagopa)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_IUPD_PAGOPA, "iupdPagopa is mandatory when flagPuPagoPaPayment is false and is a gpd station");
-    }
-
-    if (Boolean.TRUE.equals(flagPuPagoPaPayment) && StringUtils.isNotBlank(iupdPagopa)) {
-      throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_IUPD_PAGOPA, "iupdPagopa must not be populated when flagPuPagoPaPayment is true");
-    }
   }
 }
