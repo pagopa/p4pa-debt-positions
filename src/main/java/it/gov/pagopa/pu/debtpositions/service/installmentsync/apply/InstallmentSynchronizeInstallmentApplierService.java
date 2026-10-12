@@ -26,6 +26,7 @@ public class InstallmentSynchronizeInstallmentApplierService {
     installmentDTO.setIngestionFlowFileLineNumber(installmentSynchronizeDTO.getIngestionFlowFileLineNumber());
     installmentDTO.setIngestionFlowFileAction(installmentSynchronizeDTO.getAction());
     installmentDTO.setSourceFlowName(installmentSynchronizeDTO.getIngestionFlowFileName());
+    installmentDTO.setIupdPagopa(installmentSynchronizeDTO.getIupdPagopa());
 
     List<ErrorFieldDTO> modifiedFields = new ArrayList<>();
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
