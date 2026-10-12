@@ -49,17 +49,14 @@ class InstallmentSynchronizeInstallmentApplierServiceTest {
     installmentSynchronizeDTO.setAmountCents(500L);
     installmentSynchronizeDTO.setRemittanceInformation("New remittance information");
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstSyncTransfer);
-    installmentSynchronizeDTO.setIupdPagopa("iupdPagopa");
     InstallmentDTO installmentDTO = buildSyncInstallmentDTO();
     installmentDTO.addTransfersItem(firstTransfer);
-    installmentDTO.setIupdPagopa("iupdPagopa");
 
     applierInstallmentService.merge(installmentSynchronizeDTO, installmentDTO);
 
     assertEquals("New remittance information", installmentDTO.getRemittanceInformation());
     assertEquals(500L, installmentDTO.getAmountCents());
     assertEquals(50L, installmentDTO.getTransfers().getLast().getAmountCents());
-    assertEquals("iupdPagopa", installmentDTO.getIupdPagopa());
   }
 
   @Test
