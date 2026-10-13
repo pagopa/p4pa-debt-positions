@@ -701,4 +701,20 @@ class DebtPositionControllerTest {
       accessToken
     );
   }
+
+  @Test
+  void whenAcquireMigratedDebtPositionsOwnershipThenOk() throws Exception {
+    Long organizationId = 1L;
+
+    Mockito.doNothing().when(debtPositionService).acquireMigratedDebtPositionsOwnership(organizationId);
+
+    mockMvc.perform(
+      post("/organizations/{organizationId}/debt-positions/migrated/acquire-ownership", organizationId)
+        .contentType(MediaType.APPLICATION_JSON_VALUE)
+      )
+      .andExpect(status().isOk())
+      .andReturn();
+
+    verify(debtPositionService).acquireMigratedDebtPositionsOwnership(organizationId);
+  }
 }
