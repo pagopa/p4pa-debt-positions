@@ -329,4 +329,11 @@ public class DebtPositionControllerImpl implements DebtPositionApi {
 
     return ResponseEntity.ok().build();
   }
+
+  @Override
+  public ResponseEntity<Void> acquireMigratedDebtPositionsOwnership(Long organizationId) {
+    log.info("User requested acquireMigratedDebtPositionsOwnership for organization with id {}", organizationId);
+    debtPositionService.acquireMigratedDebtPositionsOwnership(organizationId);
+    return ResponseEntity.ok().build();
+  }
 }

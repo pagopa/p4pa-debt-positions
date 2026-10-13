@@ -14,6 +14,7 @@ import it.gov.pagopa.pu.debtpositions.model.DebtPositionTypeOrg;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionRepository;
 import it.gov.pagopa.pu.debtpositions.repository.DebtPositionTypeOrgRepository;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class DebtPositionServiceImpl implements DebtPositionService {
 
@@ -166,6 +168,12 @@ public class DebtPositionServiceImpl implements DebtPositionService {
 
     byte[] hashedDebtorFiscalCode = dataCipherService.hash(xFiscalCode);
     return debtorDebtPositionMapper.map(primaryDebtPositionDetail, retrieveDebtPositionTypeOrg(primaryDebtPositionDetail.getDebtPositionTypeOrgId()), hashedDebtorFiscalCode);
+  }
+
+  @Override
+  public void acquireMigratedDebtPositionsOwnership(Long organizationId) {
+    Integer updatedDebtPositions = debtPositionRepository.acquireMigratedDebtPositionsOwnership(organizationId);
+    log.info("Acquired ownership for {} migrated debt positions belonging to organization {}", updatedDebtPositions, organizationId);
   }
 
   private Map<Long, DebtPositionTypeOrg> retrieveDebtPositionTypeOrgMap(Page<DebtPosition> pagedPrimaryDebtPositionByFilters){

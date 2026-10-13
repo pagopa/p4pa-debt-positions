@@ -641,4 +641,15 @@ class DebtPositionServiceImplTest {
     );
   }
 
+  @Test
+  void whenAcquireMigratedDebtPositionsOwnershipThenOk() {
+    Long organizationId = 1L;
+
+    when(debtPositionRepositoryMock.acquireMigratedDebtPositionsOwnership(organizationId))
+      .thenReturn(5);
+
+    debtPositionService.acquireMigratedDebtPositionsOwnership(organizationId);
+
+    verify(debtPositionRepositoryMock).acquireMigratedDebtPositionsOwnership(organizationId);
+  }
 }
