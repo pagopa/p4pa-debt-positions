@@ -166,8 +166,9 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
-  void givenInstallmentWithDueDateRetroactiveThenThrowInvalidValueException() {
+  void givenTrueFlagPuPagoPaPaymentAndInstallmentWithDueDateRetroactiveThenThrowInvalidValueException() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
     DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
     LocalDate localDate = LocalDate.of(2024, Month.MAY, 15);
     debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setDueDate(localDate);
@@ -1044,6 +1045,26 @@ class ValidateDebtPositionServiceImplTest {
       InvalidValueException.class,
       () -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg)
     );
+  }
+
+  @Test
+  void givenFalseFlagPuPagoPaPaymentAndInstallmentWithDueDateRetroactiveThenSuccess() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(false);
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    firstInstallment.getDebtor().setEmail(null);
+    firstInstallment.setDueDate(LocalDate.of(2024, Month.MAY, 15));
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    Organization org = buildOrganization();
+
+    when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    when(balanceServiceMock.isValidBalance(firstInstallment.getBalance(), firstInstallment.getAmountCents(), Boolean.FALSE, accessToken)).thenReturn(Boolean.TRUE);
+    when(brokerServiceMock.findById(orgOwner.getBrokerId(), accessToken)).thenReturn(broker);
+    when(organizationServiceMock.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
+    assertDoesNotThrow(() -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg));
+    assertEquals(Boolean.TRUE, firstInstallment.getSwitchToExpired());
   }
 }
 

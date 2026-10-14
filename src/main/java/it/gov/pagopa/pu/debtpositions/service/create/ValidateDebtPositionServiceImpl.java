@@ -143,7 +143,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_REMITTANCE_INFORMATION, "Remittance information is mandatory");
     }
 
-    validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin);
+    validateDueDate(debtPositionTypeOrg.isFlagMandatoryDueDate(), installmentDTO, debtPositionOrigin, flagPuPagoPaPayment);
 
     if (installmentDTO.getAmountCents() <= 0) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_CENTS_AMOUNT, "The installment amount must be greater than 0");
@@ -181,12 +181,12 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     }
   }
 
-  private void validateDueDate(boolean flagMandatoryDueDate, InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin) {
+  private void validateDueDate(boolean flagMandatoryDueDate, InstallmentDTO installmentDTO, DebtPositionOrigin debtPositionOrigin, Boolean flagPuPagoPaPayment) {
     LocalDate dueDate = installmentDTO.getDueDate();
     if (flagMandatoryDueDate && dueDate == null) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_DUE_DATE, "The due date is mandatory");
     }
-    if (dueDate != null && dueDate.isBefore(LocalDate.now(Constants.ZONEID))) {
+    if (Boolean.TRUE.equals(flagPuPagoPaPayment) && dueDate != null && dueDate.isBefore(LocalDate.now(Constants.ZONEID))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DUE_DATE, "The due date cannot be retroactive");
     }
 
