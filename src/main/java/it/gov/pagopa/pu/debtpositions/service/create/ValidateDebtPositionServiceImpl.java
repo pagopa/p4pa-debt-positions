@@ -13,6 +13,7 @@ import it.gov.pagopa.pu.debtpositions.service.TaxonomyValidatorService;
 import it.gov.pagopa.pu.debtpositions.util.*;
 import it.gov.pagopa.pu.organization.dto.generated.Broker;
 import it.gov.pagopa.pu.organization.dto.generated.Organization;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +29,7 @@ import java.util.Set;
 import static it.gov.pagopa.pu.debtpositions.util.CategoryUtils.formatCategoryTransferFromTaxonomyCode;
 import static it.gov.pagopa.pu.debtpositions.util.Utilities.*;
 
+@Slf4j
 @Service
 public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionService {
 
@@ -186,6 +188,7 @@ public class ValidateDebtPositionServiceImpl implements ValidateDebtPositionServ
     if (flagMandatoryDueDate && dueDate == null) {
         throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_MISSING_DUE_DATE, "The due date is mandatory");
     }
+    log.info("In validateDueDate: flagPuPagoPaPayment %s - dueDate %s".formatted(flagPuPagoPaPayment, dueDate));
     if (Boolean.TRUE.equals(flagPuPagoPaPayment) && dueDate != null && dueDate.isBefore(LocalDate.now(Constants.ZONEID))) {
       throw new InvalidValueException(ErrorCodeConstants.ERROR_CODE_INVALID_DUE_DATE, "The due date cannot be retroactive");
     }
