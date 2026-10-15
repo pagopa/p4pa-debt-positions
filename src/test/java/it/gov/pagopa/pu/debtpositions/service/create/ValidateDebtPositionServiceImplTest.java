@@ -1048,6 +1048,27 @@ class ValidateDebtPositionServiceImplTest {
   }
 
   @Test
+  void givenTrueFlagPuPagoPaPaymentAndInstallmentWithNoDueDateThenSuccess() {
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    debtPositionDTO.setFlagPuPagoPaPayment(true);
+    InstallmentDTO firstInstallment = debtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst();
+    firstInstallment.getDebtor().setEmail(null);
+    firstInstallment.setDueDate(null);
+    DebtPositionTypeOrg debtPositionTypeOrg = buildDebtPositionTypeOrg();
+    debtPositionTypeOrg.setFlagMandatoryDueDate(false);
+    Organization org = buildOrganization();
+
+    when(debtPositionRepository.findEntityGraphByIupdOrgAndOrganizationId(debtPositionDTO.getIupdOrg(), debtPositionDTO.getOrganizationId())).thenReturn(null);
+    when(balanceServiceMock.isValidBalance(firstInstallment.getBalance(), firstInstallment.getAmountCents(), Boolean.FALSE, accessToken)).thenReturn(Boolean.TRUE);
+    when(brokerServiceMock.findById(orgOwner.getBrokerId(), accessToken)).thenReturn(broker);
+    when(organizationServiceMock.getOrganizationByFiscalCode(Mockito.anyString(), Mockito.anyString())).thenReturn(Optional.ofNullable(org));
+    when(taxonomyValidatorService.isTaxonomyCategoryValid("001122233", org.getOrgTypeCode())).thenReturn(true);
+
+    assertDoesNotThrow(() -> service.validate(debtPositionDTO, orgOwner, accessToken, debtPositionTypeOrg));
+    assertEquals(Boolean.FALSE, firstInstallment.getSwitchToExpired());
+  }
+
+  @Test
   void givenFalseFlagPuPagoPaPaymentAndInstallmentWithDueDateRetroactiveThenSuccess() {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     debtPositionDTO.setFlagPuPagoPaPayment(false);
