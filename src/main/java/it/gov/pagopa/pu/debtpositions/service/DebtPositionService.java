@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface DebtPositionService {
-
   void saveDebtPosition(DebtPositionDTO debtPositionDTO, String accessToken);
   void saveDebtPosition(DebtPosition debtPosition);
   List<DebtPositionDTO> mapAllDebtPosition(List<DebtPosition> debtPosition);
@@ -18,7 +17,6 @@ public interface DebtPositionService {
   DebtPositionDTO getDebtPosition(Long debtPositionId);
   DebtPosition getDebtPositionNoPII(Long debtPositionId);
   Optional<DebtPosition> getDebtPositionByIupdAndOrganizationId(String iupd, Long organizationId);
-
   PagedDebtPositions getPagedDebtPositionsByIngestionFlowFileId(Long ingestionFlowFileId, List<InstallmentStatus> statusToExclude, Pageable pageable);
   DebtPositionDTO getDebtPositionByInstallmentId(Long installmentId);
   List<DebtPositionDTO> getDebtPositionsByOrganizationIdAndNav(Long organizationId, String nav, List<DebtPositionOrigin> debtPositionOrigins);
@@ -28,4 +26,5 @@ public interface DebtPositionService {
   PagedDebtorUnpaidDebtPositionDTO getPagedDebtorUnpaidDebtPosition(String xFiscalCode, List<Long> organizationIds, Pageable pageable);
   DebtorDebtPositionDTO getDebtorUnpaidDebtPositionOverview(Long debtPositionId, String xFiscalCode, Long organizationId);
   void delete(DebtPosition debtPosition);
+  void acquireMigratedDebtPositionsOwnership(Long organizationId);
 }

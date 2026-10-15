@@ -3,6 +3,7 @@ package it.gov.pagopa.pu.debtpositions.service.installmentsync.apply;
 import it.gov.pagopa.pu.debtpositions.dto.generated.*;
 import it.gov.pagopa.pu.debtpositions.exception.common.ConflictException;
 import it.gov.pagopa.pu.debtpositions.util.ErrorCodeConstants;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -31,6 +32,10 @@ public class InstallmentSynchronizeInstallmentApplierService {
     checkImmutableField("iuv", installmentSynchronizeDTO.getIuv(), installmentDTO.getIuv(), modifiedFields);
     checkImmutableField("generateNotice", installmentSynchronizeDTO.getGenerateNotice(), installmentDTO.getGenerateNotice(), modifiedFields);
     checkImmutableField("legacyPaymentMetadata", installmentSynchronizeDTO.getLegacyPaymentMetadata(), installmentDTO.getLegacyPaymentMetadata(), modifiedFields);
+
+    if (StringUtils.isNotBlank(installmentSynchronizeDTO.getIupdPagopa())) {
+      checkImmutableField("iupdPagopa", installmentSynchronizeDTO.getIupdPagopa(), installmentDTO.getIupdPagopa(), modifiedFields);
+    }
 
     mergeDebtorFields(installmentSynchronizeDTO, installmentDTO.getDebtor(), modifiedFields);
 

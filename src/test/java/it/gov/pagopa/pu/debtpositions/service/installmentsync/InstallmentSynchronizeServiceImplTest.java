@@ -12,10 +12,12 @@ import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.Installm
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeInsertService;
 import it.gov.pagopa.pu.debtpositions.service.installmentsync.operation.InstallmentSynchronizeUpdateService;
 import it.gov.pagopa.pu.workflowhub.dto.generated.WorkflowCreatedDTO;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Collections;
@@ -46,9 +48,24 @@ class InstallmentSynchronizeServiceImplTest {
 
   @BeforeEach
   void setUp() {
-    installmentSynchronizeService = new InstallmentSynchronizeServiceImpl(debtPositionRepositoryMock,
-      debtPositionMapperMock, installmentSynchronizeCancelServiceMock,
-      installmentSynchronizeUpdateServiceMock, installmentSynchronizeInsertServiceMock);
+    installmentSynchronizeService = new InstallmentSynchronizeServiceImpl(
+      debtPositionRepositoryMock,
+      debtPositionMapperMock,
+      installmentSynchronizeCancelServiceMock,
+      installmentSynchronizeUpdateServiceMock,
+      installmentSynchronizeInsertServiceMock
+    );
+  }
+
+  @AfterEach
+  void verifyNoMoreInteractions() {
+    Mockito.verifyNoMoreInteractions(
+      debtPositionRepositoryMock,
+      debtPositionMapperMock,
+      installmentSynchronizeCancelServiceMock,
+      installmentSynchronizeUpdateServiceMock,
+      installmentSynchronizeInsertServiceMock
+    );
   }
 
   @Test
@@ -164,7 +181,7 @@ class InstallmentSynchronizeServiceImplTest {
   }
 
   @Test
-  void givenInstallmentDTOWithIupdNullWhenSynchronizeUpdateActionThenOk() {
+  void givenInstallmentDTOWithIupdOrgNullWhenSynchronizeUpdateActionThenOk() {
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -189,7 +206,7 @@ class InstallmentSynchronizeServiceImplTest {
   }
 
   @Test
-  void givenInstallmentDTOWithIupdNullWhenSynchronizeCancelActionAndfindEntityGraphByOrganizationIdAndInstallmentIudReturnNullDpThenOk(){
+  void givenInstallmentDTOWithIupdOrgNullWhenSynchronizeCancelActionAndFindEntityGraphByOrganizationIdAndInstallmentIudReturnNullDpThenOk(){
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -208,7 +225,7 @@ class InstallmentSynchronizeServiceImplTest {
   }
 
   @Test
-  void givenInstallmentDTOWithIupdNullWhenSynchronizeCancelActionAndFindEntityGraphByOrganizationIdAndInstallmentIudReturnMultipleDpDpThenThrowEx() {
+  void givenInstallmentDTOWithIupdOrgNullWhenSynchronizeCancelActionAndFindEntityGraphByOrganizationIdAndInstallmentIudReturnMultipleDpDpThenThrowEx() {
     String accessToken = "accessToken";
     String operatorExternalUserId = "operatorExternalUserId";
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();

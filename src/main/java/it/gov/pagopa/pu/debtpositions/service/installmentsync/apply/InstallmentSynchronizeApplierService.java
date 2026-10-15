@@ -113,5 +113,4 @@ public class InstallmentSynchronizeApplierService {
 
     installmentSynchronizeDTO.addAdditionalTransfersItem(firstTransfer);
   }
-
 }

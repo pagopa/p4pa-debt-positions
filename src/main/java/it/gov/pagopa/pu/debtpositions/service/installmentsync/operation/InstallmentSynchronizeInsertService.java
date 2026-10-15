@@ -97,5 +97,4 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     return storedPaymentOption.getInstallments()
       .stream().anyMatch(installmentDTO -> installmentDTO.getIngestionFlowFileId().equals(ingestionFlowFileId));
   }
-
 }

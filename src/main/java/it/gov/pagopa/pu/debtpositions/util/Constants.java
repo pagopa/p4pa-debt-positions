@@ -19,5 +19,9 @@ public class Constants {
   public static final Long DEBT_POSITION_TYPE_MIXED = -2L;
 
   public static final String UNKNOWN_STATION_ID = "UNKNOWN";
+
+  public static final String UPDATE_AUDIT_FIELDS_SPEL = "updateDate = :#{T(java.time.LocalDateTime).now()}, " +
+    "updateOperatorExternalId = :#{T(it.gov.pagopa.pu.debtpositions.util.SecurityUtils).getCurrentUserExternalId()}, " +
+    "updateTraceId = :#{T(it.gov.pagopa.pu.debtpositions.util.Utilities).getTraceId()}";
 }
 
