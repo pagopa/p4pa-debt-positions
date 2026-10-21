@@ -37,12 +37,12 @@
 </tr>
 <tr>
 <td><a href='https://github.com/FasterXML/jackson'>com.fasterxml.jackson.core:jackson-annotations</a></td>
-<td>2.21</td>
+<td>2.22</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://github.com/FasterXML/jackson-core'>com.fasterxml.jackson.core:jackson-core</a></td>
-<td>2.21.5</td>
+<td>2.22.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -56,13 +56,23 @@
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
+<td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jdk8'>com.fasterxml.jackson.datatype:jackson-datatype-jdk8</a></td>
+<td>2.21.5</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
 <td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-datatype-jsr310'>com.fasterxml.jackson.datatype:jackson-datatype-jsr310</a></td>
 <td>2.21.5</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
+<td><a href='https://github.com/FasterXML/jackson-modules-java8/jackson-module-parameter-names'>com.fasterxml.jackson.module:jackson-module-parameter-names</a></td>
+<td>2.21.5</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
 <td><a href='https://github.com/ben-manes/caffeine'>com.github.ben-manes.caffeine:caffeine</a></td>
-<td>3.3.0</td>
+<td>3.3.1</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -87,27 +97,27 @@
 </tr>
 <tr>
 <td><a href='https://itextpdf.com/'>com.itextpdf:barcodes</a></td>
-<td>9.7.1</td>
+<td>9.8.0</td>
 <td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
 </tr>
 <tr>
 <td><a href='https://itextpdf.com/'>com.itextpdf:bouncy-castle-connector</a></td>
-<td>9.7.1</td>
+<td>9.8.0</td>
 <td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
 </tr>
 <tr>
 <td><a href='https://itextpdf.com/'>com.itextpdf:commons</a></td>
-<td>9.7.1</td>
+<td>9.8.0</td>
 <td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
 </tr>
 <tr>
 <td><a href='https://itextpdf.com/'>com.itextpdf:io</a></td>
-<td>9.7.1</td>
+<td>9.8.0</td>
 <td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
 </tr>
 <tr>
 <td><a href='https://itextpdf.com/'>com.itextpdf:kernel</a></td>
-<td>9.7.1</td>
+<td>9.8.0</td>
 <td><a href='http://www.fsf.org/licensing/licenses/agpl-3.0.html'>GNU Affero General Public License v3</a></td>
 </tr>
 <tr>
@@ -167,32 +177,32 @@
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-asyncapi</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-cloud-stream</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-core</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-kafka</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-kafka-binding</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://www.springwolf.dev'>io.github.springwolf:springwolf-ui</a></td>
-<td>1.21.0</td>
+<td>2.8.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -432,12 +442,12 @@
 </tr>
 <tr>
 <td><a href='https://commons.apache.org/proper/commons-lang/'>org.apache.commons:commons-lang3</a></td>
-<td>3.20.0</td>
+<td>3.21.0</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td>org.apache.httpcomponents.client5:httpclient5</td>
-<td>5.6.4</td>
+<td>5.6.5</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -552,12 +562,17 @@
 </tr>
 <tr>
 <td><a href='https://github.com/hibernate/hibernate-models'>org.hibernate.models:hibernate-models</a></td>
-<td>1.0.1</td>
+<td>1.1.2</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
-<td><a href='https://hibernate.org/orm/releases/7.1'>org.hibernate.orm:hibernate-core</a></td>
-<td>7.1.18.Final</td>
+<td><a href='https://hibernate.org/orm/releases/7.4'>org.hibernate.orm:hibernate-core</a></td>
+<td>7.4.13.Final</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://hibernate.org/orm'>org.hibernate.orm:hibernate-platform</a></td>
+<td>7.4.13.Final</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -607,7 +622,7 @@
 </tr>
 <tr>
 <td><a href='https://github.com/OpenAPITools/jackson-databind-nullable'>org.openapitools:jackson-databind-nullable</a></td>
-<td>0.2.11</td>
+<td>0.2.12</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -617,7 +632,7 @@
 </tr>
 <tr>
 <td><a href='https://jdbc.postgresql.org/'>org.postgresql:postgresql</a></td>
-<td>42.7.13</td>
+<td>42.7.14</td>
 <td><a href='https://opensource.org/licenses/BSD-2-Clause'>BSD-2-Clause</a></td>
 </tr>
 <tr>
@@ -757,7 +772,7 @@
 </tr>
 <tr>
 <td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-dependencies</a></td>
-<td>3.5.7</td>
+<td>4.1.1</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
@@ -797,6 +812,11 @@
 </tr>
 <tr>
 <td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-jackson</a></td>
+<td>4.1.1</td>
+<td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
+</tr>
+<tr>
+<td><a href='https://spring.io/projects/spring-boot'>org.springframework.boot:spring-boot-jackson2</a></td>
 <td>4.1.1</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
@@ -1127,17 +1147,17 @@
 </tr>
 <tr>
 <td><a href='https://github.com/FasterXML/jackson-bom'>tools.jackson:jackson-bom</a></td>
-<td>3.1.7</td>
+<td>3.2.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://github.com/FasterXML/jackson-core'>tools.jackson.core:jackson-core</a></td>
-<td>3.1.5</td>
+<td>3.2.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
 <td><a href='https://github.com/FasterXML/jackson'>tools.jackson.core:jackson-databind</a></td>
-<td>3.1.7</td>
+<td>3.2.3</td>
 <td><a href='https://www.apache.org/licenses/LICENSE-2.0'>Apache-2.0</a></td>
 </tr>
 <tr>
