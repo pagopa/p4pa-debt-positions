@@ -64,7 +64,7 @@ class WorkflowTypeOrgApiClientTest {
     when(workflowApisHolderMock.getWorkflowTypeOrgEntityControllerApi(accessToken))
       .thenReturn(workflowTypeOrgEntityControllerApiMock);
     when(workflowTypeOrgEntityControllerApiMock.crudGetWorkflowtypeorg(workflowTypeOrgId))
-      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE", "BODY"));
 
     WorkflowTypeOrg result = workflowTypeOrgApiClient.findById(workflowTypeOrgId, accessToken);
 

@@ -89,7 +89,7 @@ class BalanceClientTest {
       .thenReturn(balanceApiMock);
 
     when(balanceApiMock.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode))
-      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE", "BODY"));
 
     // When
     String result = balanceClient.getBalanceByAssessmentRegistry(orgId, debtPositionTypeOrgCode, accessToken);
