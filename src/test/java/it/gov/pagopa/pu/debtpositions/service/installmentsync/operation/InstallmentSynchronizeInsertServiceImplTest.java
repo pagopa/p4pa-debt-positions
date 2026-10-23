@@ -99,6 +99,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
     DebtPositionDTO newDebtPositionDTO = buildSyncDebtPositionDTO();
     newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.CANCELLED);
     newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIngestionFlowFileLineNumber(32L);

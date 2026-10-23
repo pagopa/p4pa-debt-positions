@@ -44,7 +44,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     }
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment, installmentSynchronizeDTO.getIngestionFlowFileId());
 
-    if (storedInstallment == null && installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
+    if (installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT,
         String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentSynchronizeDTO.getIud()));
     }
