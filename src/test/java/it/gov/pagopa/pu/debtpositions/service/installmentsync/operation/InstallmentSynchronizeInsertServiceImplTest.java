@@ -60,6 +60,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
     installmentSynchronizeDTO.setIud("IUD_NEW");
 
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
@@ -223,6 +224,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
     installmentSynchronizeDTO.setPaymentOptionIndex(99);
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
@@ -247,6 +249,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
     installmentSynchronizeDTO.setPaymentOptionIndex(99);
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
@@ -261,5 +264,23 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO result = installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, null, wfExecutionParameters, accessToken, operatorExternalUserId);
 
     assertSame(expectedResult, result);
+  }
+
+  @Test
+  void givenInvalidNumberBeneficiaryWhenSyncInstallmentThenConflictException() {
+    WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
+    String accessToken = "accessToken";
+    String operatorExternalUserId = "operatorExternalUserId";
+
+    DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
+    InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
+    installmentSynchronizeDTO.setIud("IUD_NEW");
+    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size() + 1);
+
+    ConflictException conflictException = assertThrows(ConflictException.class, () ->
+      installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
+
+    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT, conflictException.getCode());
+    assertEquals("The number of beneficiary for installment with iud IUD_NEW does not match with the size of the list", conflictException.getMessage());
   }
 }
