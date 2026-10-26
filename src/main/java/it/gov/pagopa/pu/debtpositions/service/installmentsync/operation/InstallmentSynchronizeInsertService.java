@@ -64,7 +64,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
 
     if (transfersCount != installmentSynchronizeDTO.getNumberBeneficiary()) {
       throw new ConflictException(
-        ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT,
+        ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_NUMBER_BENEFICIARY_MISMATCH,
         String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentSynchronizeDTO.getIud())
       );
     }
