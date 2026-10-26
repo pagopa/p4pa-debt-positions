@@ -284,7 +284,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
-    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT, conflictException.getCode());
+    assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT_NUMBER_BENEFICIARY_MISMATCH, conflictException.getCode());
     assertEquals("The number of beneficiary for installment with iud IUD_NEW does not match with the size of the list", conflictException.getMessage());
   }
 
