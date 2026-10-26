@@ -50,8 +50,8 @@ repositories {
   mavenCentral()
 }
 
-val springDocOpenApiVersion = "3.1.1"
-val openApiToolsVersion = "0.2.12"
+val springDocOpenApiVersion = "3.2.0"
+val openApiToolsVersion = "0.2.13"
 val springWolfAsyncApiVersion = "2.8.0"
 val springWolfUiAsyncApiVersion = "2.8.0"
 val micrometerOtelBridgeVersion = "1.7.2"
