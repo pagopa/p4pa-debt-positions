@@ -44,10 +44,7 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     }
     checkStatus(storedDebtPosition, storedPaymentOption, storedInstallment, installmentSynchronizeDTO.getIngestionFlowFileId());
 
-    if (installmentSynchronizeDTO.getAdditionalTransfers().size() != installmentSynchronizeDTO.getNumberBeneficiary()) {
-      throw new ConflictException(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT,
-        String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentSynchronizeDTO.getIud()));
-    }
+    checkNumberBeneficiary(installmentSynchronizeDTO);
 
     Pair<DebtPositionDTO, InstallmentDTO> debtPositionApplied = installmentSynchronizeApplierService.apply(installmentSynchronizeDTO, storedDebtPosition, storedPaymentOption, storedInstallment, accessToken);
 
@@ -56,6 +53,21 @@ public class InstallmentSynchronizeInsertService extends BaseInstallmentSynchron
     }
 
     return debtPositionAddInstallmentService.addInstallment(debtPositionApplied.getLeft(), List.of(debtPositionApplied.getRight()), wfExecutionParameters, accessToken, operatorExternalUserId);
+  }
+
+  private void checkNumberBeneficiary(InstallmentSynchronizeDTO installmentSynchronizeDTO) {
+    List<TransferSynchronizeDTO> additionalTransfers = installmentSynchronizeDTO.getAdditionalTransfers();
+    boolean hasFirstTransfer = additionalTransfers.stream().anyMatch(t -> t.getTransferIndex() == 1);
+
+    // numberBeneficiary includes the first transfer: when it isn't provided, it's populated later on with the organization's data (see populateFirstTransfer), so it has to be counted here
+    int transfersCount = additionalTransfers.size() + (hasFirstTransfer ? 0 : 1);
+
+    if (transfersCount != installmentSynchronizeDTO.getNumberBeneficiary()) {
+      throw new ConflictException(
+        ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT,
+        String.format("The number of beneficiary for installment with iud %s does not match with the size of the list", installmentSynchronizeDTO.getIud())
+      );
+    }
   }
 
   private void checkStatus(DebtPositionDTO storedDebtPosition, PaymentOptionDTO storedPaymentOption, InstallmentDTO storedInstallment, Long ingestionFlowFileId) {

@@ -60,7 +60,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
+    installmentSynchronizeDTO.setNumberBeneficiary(getExpectedNumberBeneficiary(installmentSynchronizeDTO));
     installmentSynchronizeDTO.setIud("IUD_NEW");
 
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
@@ -99,7 +99,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
 
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
+    installmentSynchronizeDTO.setNumberBeneficiary(getExpectedNumberBeneficiary(installmentSynchronizeDTO));
     DebtPositionDTO newDebtPositionDTO = buildSyncDebtPositionDTO();
     newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setStatus(InstallmentStatus.CANCELLED);
     newDebtPositionDTO.getPaymentOptions().getFirst().getInstallments().getFirst().setIngestionFlowFileLineNumber(32L);
@@ -225,7 +225,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
+    installmentSynchronizeDTO.setNumberBeneficiary(getExpectedNumberBeneficiary(installmentSynchronizeDTO));
     installmentSynchronizeDTO.setPaymentOptionIndex(99);
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
@@ -250,7 +250,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
 
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
-    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size());
+    installmentSynchronizeDTO.setNumberBeneficiary(getExpectedNumberBeneficiary(installmentSynchronizeDTO));
     installmentSynchronizeDTO.setPaymentOptionIndex(99);
     InstallmentDTO newInstallmentDTO = buildSyncInstallmentDTO();
     WorkflowCreatedDTO expectedResult = new WorkflowCreatedDTO("workflowId", "runId");
@@ -267,6 +267,7 @@ class InstallmentSynchronizeInsertServiceImplTest {
     assertSame(expectedResult, result);
   }
 
+
   @Test
   void givenInvalidNumberBeneficiaryWhenSyncInstallmentThenConflictException() {
     WfExecutionParameters wfExecutionParameters = new WfExecutionParameters();
@@ -276,12 +277,23 @@ class InstallmentSynchronizeInsertServiceImplTest {
     DebtPositionDTO debtPositionDTO = buildDebtPositionDTO();
     InstallmentSynchronizeDTO installmentSynchronizeDTO = buildInstallmentSynchronizeDTO();
     installmentSynchronizeDTO.setIud("IUD_NEW");
-    installmentSynchronizeDTO.setNumberBeneficiary(installmentSynchronizeDTO.getAdditionalTransfers().size() + 1);
+
+    installmentSynchronizeDTO.setAdditionalTransfers(List.of(TransferSynchronizeDTO.builder().transferIndex(1).build()));
+    installmentSynchronizeDTO.setNumberBeneficiary(2);
 
     ConflictException conflictException = assertThrows(ConflictException.class, () ->
       installmentSynchronizeInsertService.syncInstallment(installmentSynchronizeDTO, debtPositionDTO, wfExecutionParameters, accessToken, operatorExternalUserId));
 
     assertEquals(ErrorCodeConstants.ERROR_CODE_INVALID_INSTALLMENT, conflictException.getCode());
     assertEquals("The number of beneficiary for installment with iud IUD_NEW does not match with the size of the list", conflictException.getMessage());
+  }
+
+
+  private int getExpectedNumberBeneficiary(InstallmentSynchronizeDTO dto) {
+    List<TransferSynchronizeDTO> additionalTransfers = dto.getAdditionalTransfers();
+    boolean hasFirstTransfer = additionalTransfers.stream()
+      .anyMatch(t -> t.getTransferIndex() == 1);
+
+    return additionalTransfers.size() + (hasFirstTransfer ? 0 : 1);
   }
 }
