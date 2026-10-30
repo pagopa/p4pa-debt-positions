@@ -57,7 +57,16 @@ public class CommonExceptionHandler {
 
   @ExceptionHandler({DataIntegrityViolationException.class})
   public ResponseEntity<DebtPositionErrorDTO> handleDataIntegrityViolationException(RuntimeException ex, HttpServletRequest request){
-    return handleException(ex, request, HttpStatus.CONFLICT, DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_CONFLICT);
+    ExceptionMessageTranscoded transcoded = buildReturnedMessage(ex);
+    HttpStatus status = HttpStatus.CONFLICT;
+    DebtPositionErrorDTO.CategoryEnum errorEnum = DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_CONFLICT;
+
+    if (transcoded.getCode() != null && transcoded.getCode().equals(DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST.getValue())) {
+      status = HttpStatus.BAD_REQUEST;
+      errorEnum = DebtPositionErrorDTO.CategoryEnum.DEBT_POSITION_BAD_REQUEST;
+    }
+
+    return handleException(ex, request, status, errorEnum);
   }
 
   @ExceptionHandler({CannotAcquireLockException.class})

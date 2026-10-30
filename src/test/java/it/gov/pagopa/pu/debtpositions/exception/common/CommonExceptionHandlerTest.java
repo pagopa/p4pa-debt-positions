@@ -415,24 +415,40 @@ public abstract class CommonExceptionHandlerTest {
       .when(requestMappingHandlerAdapterSpy).handle(any(), any(), any());
 
     performRequest(DATA, MediaType.APPLICATION_JSON)
-      .andExpect(MockMvcResultMatchers.status().isConflict())
-      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_CONFLICT"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONFLICT"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Conflict."))
+      .andExpect(MockMvcResultMatchers.status().isBadRequest())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Data integrity violation."))
       .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }
 
   @Test
-  void handleDataIntegrityViolationHibernateException() throws Exception {
-    doThrow(new DataIntegrityViolationException("Error", new org.hibernate.exception.ConstraintViolationException("ERROR", new SQLException("SQLEXCEPTION"), "UNIQUE")))
+  void handleDataIntegrityViolationSQLException() throws Exception {
+    SQLException sqlException = new SQLException("SQLEXCEPTION");
+    doThrow(new DataIntegrityViolationException("Error", new org.hibernate.exception.ConstraintViolationException("ERROR", sqlException, "constraintName")))
+      .when(requestMappingHandlerAdapterSpy).handle(any(), any(), any());
+
+    performRequest(DATA, MediaType.APPLICATION_JSON)
+      .andExpect(MockMvcResultMatchers.status().isBadRequest())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_BAD_REQUEST"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Data integrity violation. SQLEXCEPTION"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
+      .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
+  }
+
+  @Test
+  void handleDataIntegrityViolationUniqueConstraintException() throws Exception {
+    SQLException sqlException = new SQLException("UNIQUE_VIOLATION", "23505");
+    doThrow(new DataIntegrityViolationException("Error", new org.hibernate.exception.ConstraintViolationException("ERROR", sqlException, "UNIQUE")))
       .when(requestMappingHandlerAdapterSpy).handle(any(), any(), any());
 
     performRequest(DATA, MediaType.APPLICATION_JSON)
       .andExpect(MockMvcResultMatchers.status().isConflict())
       .andExpect(MockMvcResultMatchers.jsonPath("$.category").value("DEBT_POSITION_CONFLICT"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.code").value("DEBT_POSITION_CONFLICT"))
-      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Conflict. SQLEXCEPTION"))
+      .andExpect(MockMvcResultMatchers.jsonPath("$.message").value("Conflict. UNIQUE_VIOLATION"))
       .andExpect(MockMvcResultMatchers.jsonPath("$.fields").doesNotExist())
       .andExpect(MockMvcResultMatchers.jsonPath("$.traceId").value(traceId));
   }

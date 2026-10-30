@@ -63,7 +63,7 @@ class WorkflowHubApiClientTest {
     when(workflowApisHolderMock.getWorkflowApi(accessToken))
       .thenReturn(workflowApiMock);
     when(workflowApiMock.waitWorkflowCompletion("workflowId", 1, 1))
-      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE"));
+      .thenThrow(new RestInvokeNotFoundException("APPNAME", HttpStatus.NOT_FOUND, "ERROR", "ERRORCODE", "ERRORMESSAGE", "BODY"));
 
     // When
     String result = client.waitWorkflowCompletion(accessToken, "workflowId", 1, 1);
