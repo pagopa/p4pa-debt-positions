@@ -32,7 +32,7 @@ public final class BarcodeUtils {
       // OpenHTMLtoPDF treats a root viewBox as a size in pixels. Keep physical
       // dimensions on the outer SVG and module coordinates on the inner SVG.
       String svg = String.format(Locale.ROOT,
-        "<svg width=\"%.2fmm\" height=\"%smm\">" +
+        "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"%.2fmm\" height=\"%smm\">" +
           "<svg viewBox=\"0 0 %d 1\" preserveAspectRatio=\"none\">%s</svg></svg>",
         totalModules * MODULE_WIDTH_MM, BAR_HEIGHT_MM, totalModules, barsSvg);
 
