@@ -55,8 +55,8 @@ class ReceiptFileServiceImplTest {
   private final String accessToken = "fakeAccessToken";
   private final String operatorExternalUserId = "operatorExternalUserId";
 
-  private static final String FAKE_NAV_BARCODE_BASE64 = "data:image/png;base64,fakeNavBarcode";
-  private static final String FAKE_ORG_BARCODE_BASE64 = "data:image/png;base64,fakeOrgBarcode";
+  private static final String FAKE_NAV_BARCODE_BASE64 = "data:image/svg+xml;base64,fakeNavBarcode";
+  private static final String FAKE_ORG_BARCODE_BASE64 = "data:image/svg+xml;base64,fakeOrgBarcode";
 
   @BeforeEach
   void setUp() {

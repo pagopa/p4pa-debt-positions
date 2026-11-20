@@ -1,6 +1,7 @@
 package it.gov.pagopa.pu.debtpositions.util;
 
 import com.openhtmltopdf.pdfboxout.PdfRendererBuilder;
+import com.openhtmltopdf.svgsupport.BatikSVGDrawer;
 import freemarker.cache.StringTemplateLoader;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
@@ -122,6 +123,7 @@ public class DocumentComposition {
     private byte[] html2Pdf(String baseUri, String html) throws IOException {
         try(ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             PdfRendererBuilder builder = new PdfRendererBuilder();
+            builder.useSVGDrawer(new BatikSVGDrawer());
             builder.usePdfUaAccessbility(true);
             builder.usePdfAConformance(PdfRendererBuilder.PdfAConformance.PDFA_3_A);
             builder.withHtmlContent(html, baseUri);
