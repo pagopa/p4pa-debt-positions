@@ -22,10 +22,6 @@ public final class BarcodeUtils {
 
   private static final float BAR_HEIGHT_MM = 14f;
   private static final float MODULE_WIDTH_MM = 0.25f;
-  private static final float MM_TO_POINTS = 2.83465f;
-
-  private static final float BAR_HEIGHT_POINTS = BAR_HEIGHT_MM * MM_TO_POINTS;
-  private static final float MODULE_WIDTH_POINTS = MODULE_WIDTH_MM * MM_TO_POINTS;
 
   public static String generateCode128AsBase64(String content) {
     return generateCode128AsBase64(content, null);
@@ -36,7 +32,7 @@ public final class BarcodeUtils {
       return "";
     }
 
-    float effectiveBarHeight = barHeight != null ? barHeight : BAR_HEIGHT_POINTS;
+    float effectiveBarHeight = barHeight != null ? barHeight : BAR_HEIGHT_MM;
 
     // iText requires a PdfDocument to instantiate Barcode128, even though we only need the AWT image.
     // pdfBackingStream is a disposable stream used solely to satisfy this API requirement.
@@ -49,13 +45,20 @@ public final class BarcodeUtils {
       barcode.setCodeType(Barcode128.CODE128);
       barcode.setCode(content);
       barcode.setFont(null);
-      barcode.setBarHeight(effectiveBarHeight);
-      barcode.setX(MODULE_WIDTH_POINTS);
+      barcode.setX(1f);
+      barcode.setBarHeight(1f);
 
       Image awtImage = barcode.createAwtImage(Color.BLACK, Color.WHITE);
-      BufferedImage bufferedImage = toBufferedImage(awtImage);
+      BufferedImage rawImage = toBufferedImage(awtImage);
+      int targetWidth = rawImage.getWidth();
+      int targetHeight = Math.round(effectiveBarHeight / MODULE_WIDTH_MM);
 
-      ImageIO.write(bufferedImage, "PNG", barcodeOutputStream);
+      BufferedImage scaledImage = new BufferedImage(targetWidth, targetHeight, BufferedImage.TYPE_BYTE_BINARY);
+      Graphics2D g2d = scaledImage.createGraphics();
+      g2d.drawImage(rawImage, 0, 0, targetWidth, targetHeight, null);
+      g2d.dispose();
+
+      ImageIO.write(scaledImage, "PNG", barcodeOutputStream);
       return BASE64_PNG_PREFIX + Base64.getEncoder().encodeToString(barcodeOutputStream.toByteArray());
 
     } catch (Exception e) {
