@@ -81,6 +81,7 @@ val springCloudDepsVersion = "2025.1.3"
 val jackson2DatabindVersion = "2.22.3"
 val snappyJavaVersion = "1.1.10.9"
 val batikVersion = "1.17"
+val commonsIoVersion = "2.14.0"
 
 dependencyManagement {
   imports {
@@ -133,6 +134,7 @@ dependencies {
     exclude(group = "org.apache.xmlgraphics", module = "batik-svgrasterizer")
     exclude(group = "org.apache.xmlgraphics", module = "batik-bridge")
     exclude(group = "org.apache.xmlgraphics", module = "batik-transcoder")
+    exclude(group = "commons-io", module = "commons-io")
   }
   implementation("com.itextpdf:kernel:$itextVersion")
   implementation("com.itextpdf:barcodes:$itextVersion")
@@ -143,6 +145,7 @@ dependencies {
   implementation("org.apache.xmlgraphics:batik-svgrasterizer:${batikVersion}")
   implementation("org.apache.xmlgraphics:batik-bridge:${batikVersion}")
   implementation("org.apache.xmlgraphics:batik-transcoder:${batikVersion}")
+  implementation("commons-io:commons-io:${commonsIoVersion}")
 
   compileOnly("org.projectlombok:lombok")
   annotationProcessor("org.projectlombok:lombok")
