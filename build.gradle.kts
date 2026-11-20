@@ -128,6 +128,7 @@ dependencies {
   }
   implementation("org.springframework.boot:spring-boot-starter-freemarker")
   implementation("com.openhtmltopdf:openhtmltopdf-pdfbox:$openHtmlToPdfVersion")
+  implementation("com.openhtmltopdf:openhtmltopdf-svg-support:$openHtmlToPdfVersion")
   implementation("com.itextpdf:kernel:$itextVersion")
   implementation("com.itextpdf:barcodes:$itextVersion")
 

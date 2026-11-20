@@ -219,8 +219,6 @@ body {
 }
 
 .barcode-image {
-    height: 14mm;
-    width: auto;
     display: block;
 }
 
