@@ -8,8 +8,13 @@ import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDAttribut
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureElement;
 import org.apache.pdfbox.pdmodel.documentinterchange.logicalstructure.PDStructureNode;
 import org.apache.pdfbox.pdmodel.documentinterchange.taggedpdf.PDLayoutAttributeObject;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Spy;
+import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -18,6 +23,7 @@ import java.util.stream.IntStream;
 import static java.util.Map.entry;
 import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
 class ReceiptBarcodeSpecsTest {
   private static final String FISCAL_CODE = "12345678901";
   private static final String NAV = "301234567890123456";
@@ -30,10 +36,19 @@ class ReceiptBarcodeSpecsTest {
   private static final double MIN_HEIGHT_MM = 14.0;
   private static final double TOLERANCE = 0.10;
 
-  @Test
-  void barcodeRespectsPagoPaGeometrySpecifications() throws Exception {
-    DocumentComposition composition = new DocumentComposition(new Configuration(Configuration.VERSION_2_3_34));
+  @Spy
+  private Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
 
+  private DocumentComposition documentComposition;
+
+  @BeforeEach
+  void setup() throws IOException {
+    // DocumentComposition loads the real RECEIPT template and styles/index.css from resources
+    documentComposition = new DocumentComposition(cfg);
+  }
+
+  @Test
+  void checkBarcodesMeetPagoPaSpecs() throws Exception {
     Map<String, String> model = Map.ofEntries(
       entry("logo", "static/images/pagoPA.png"),
       entry("headerOrgName", "Org name"),
@@ -53,8 +68,8 @@ class ReceiptBarcodeSpecsTest {
       entry("receiptFooter", "Receipt Footer")
     );
 
-    try (PDDocument pdf = PDDocument.load(composition.executePdfTemplate(DocumentComposition.TemplateType.RECEIPT, model))) {
-      ArrayList<PDStructureElement> figures = new ArrayList<>();
+    try (PDDocument pdf = PDDocument.load(documentComposition.executePdfTemplate(DocumentComposition.TemplateType.RECEIPT, model))) {
+      List<PDStructureElement> figures = new ArrayList<>();
       collectFigures(pdf.getDocumentCatalog().getStructureTreeRoot(), figures);
 
       List<PDStructureElement> barcodes = figures.stream()
