@@ -37,7 +37,7 @@ class ReceiptBarcodeSpecsTest {
   private static final double TOLERANCE = 0.10;
 
   @Spy
-  private Configuration cfg = new Configuration(Configuration.VERSION_2_3_34);
+  private Configuration cfg = new Configuration(Configuration.getVersion());
 
   private DocumentComposition documentComposition;
 
