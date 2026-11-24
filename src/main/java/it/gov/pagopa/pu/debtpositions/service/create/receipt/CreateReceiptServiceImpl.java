@@ -139,9 +139,6 @@ public class CreateReceiptServiceImpl implements CreateReceiptService {
       receiptDTO.getOrgFiscalCode(),
       receiptDTO.getNoticeNumber(),
       receiptDTO.getIud());
-
-    // TODO: remove
-    log.info("Receipt metadata for paymentReceiptId[{}]: {}", receiptDTO.getPaymentReceiptId(), receiptDTO.getMetadata());
   }
 
   private boolean shouldUpdateExistingReceipt(ReceiptWithAdditionalNodeDataDTO receiptDTO, ReceiptDTO existingReceipt) {
