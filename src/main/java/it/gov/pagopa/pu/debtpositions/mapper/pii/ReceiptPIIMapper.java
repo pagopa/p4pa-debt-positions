@@ -55,6 +55,7 @@ public class ReceiptPIIMapper extends BaseEntityPIIMapper<ReceiptDTO, ReceiptNoP
     receiptNoPII.setUpdateTraceId(fullDTO.getUpdateTraceId());
     receiptNoPII.setDebtorFiscalCodeHash(dataCipherService.hash(fullDTO.getDebtor().getFiscalCode()));
     receiptNoPII.setDebtorEntityType(fullDTO.getDebtor().getEntityType());
+    receiptNoPII.setMetadata(fullDTO.getMetadata());
 
     return receiptNoPII;
   }
@@ -102,6 +103,7 @@ public class ReceiptPIIMapper extends BaseEntityPIIMapper<ReceiptDTO, ReceiptNoP
       .applicationDate(noPii.getApplicationDate())
       .transferDate(noPii.getTransferDate())
       .standin(noPii.isStandin())
+      .metadata(noPii.getMetadata())
       .creationDate(Utilities.localDatetimeToOffsetDateTime(noPii.getCreationDate()))
       .updateDate(Utilities.localDatetimeToOffsetDateTime(noPii.getUpdateDate()))
       .updateOperatorExternalId(noPii.getUpdateOperatorExternalId())
